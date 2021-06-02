@@ -48,15 +48,14 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         TargetType: Text;
         Length: Integer;
         i: Integer;
+        ScopePathLbl: Label '$.data.%1', Locked = true;
     begin
-        //-NPR5.53 [362777]
         POSAction.DiscoverActions();
-        //+NPR5.53 [362777]
 
         JSON.SetScope('data', StrSubstNo(SettingScopeErr));
         Length := JSON.GetIntegerOrFail('length', ReadingErr);
         for i := 0 to Length - 1 do begin
-            JSON.SetScopePath(StrSubstNo('$.data.%1', i), StrSubstNo(SettingScopeErr));
+            JSON.SetScopePath(StrSubstNo(ScopePathLbl, i), StrSubstNo(SettingScopeErr));
             TargetType := JSON.GetString('targetType');
             case TargetType of
                 'button':

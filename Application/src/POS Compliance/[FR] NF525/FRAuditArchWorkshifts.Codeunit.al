@@ -42,6 +42,7 @@ codeunit 6184851 "NPR FR Audit Arch. Workshifts"
         XmlLine: Text;
         XmlFile: Text;
         StatusMessage: Text;
+        UriLbl: Label '%1/%2?%3', Locked = true;
     begin
         POSWorkshiftCheckpoint.SetRecFilter();
         TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
@@ -66,7 +67,7 @@ codeunit 6184851 "NPR FR Audit Arch. Workshifts"
         Headers.Add('Ocp-Apim-Subscription-Key', FRCertificationSetup."Auto Archive API Key");
         RequestMessage.Content(Content);
         RequestMessage.Method('PUT');
-        RequestMessage.SetRequestUri(StrSubstNo('%1/%2?%3', FRCertificationSetup."Auto Archive URL", Format(CreateGuid()), FRCertificationSetup."Auto Archive SAS"));
+        RequestMessage.SetRequestUri(StrSubstNo(UriLbl, FRCertificationSetup."Auto Archive URL", Format(CreateGuid()), FRCertificationSetup."Auto Archive SAS"));
 
         Client.Timeout(60000); //1min
         Client.Send(RequestMessage, ResponseMessage);

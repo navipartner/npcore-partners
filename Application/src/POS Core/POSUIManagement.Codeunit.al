@@ -141,6 +141,7 @@ codeunit 6150702 "NPR POS UI Management"
     local procedure InitializeMenuButtonObject(MenuButton: Record "NPR POS Menu Button"; var MenuButtonObj: Codeunit "NPR POS Menu Button"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
         ActionObj: Interface "NPR IAction";
+        MenuButtonLbl: Label '%1 [%2, %3]', Locked = true;
     begin
         Clear(MenuButtonObj);
         MenuButtonObj.SetCaption(MenuButton.GetLocalizedCaption(MenuButton.FieldNo(Caption)));
@@ -159,7 +160,7 @@ codeunit 6150702 "NPR POS UI Management"
 
         InitializeMenuButtonObjectFilters(MenuButton, MenuButtonObj);
 
-        if MenuButton.GetAction(ActionObj, POSSession, StrSubstNo('%1 [%2, %3]', MenuButton.TableCaption, MenuButton."Menu Code", MenuButton.Caption), tmpPOSParameterValue) then
+        if MenuButton.GetAction(ActionObj, POSSession, StrSubstNo(MenuButtonLbl, MenuButton.TableCaption, MenuButton."Menu Code", MenuButton.Caption), tmpPOSParameterValue) then
             MenuButtonObj.SetAction(ActionObj);
 
         MenuButton.StoreButtonConfiguration(MenuButtonObj);
@@ -457,6 +458,7 @@ codeunit 6150702 "NPR POS UI Management"
         Payment_TimeoutTitle: Label 'We seem to have lost you...';
         Payment_TimeoutCaption: Label 'Do you wish to continue?';
         Payment_TimeoutButtonCaption: Label 'Yes please, I need some more time.';
+        GlobalRecordLbl: Label 'Global_Record_%1_Field_%2', Locked = true;
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -599,7 +601,7 @@ codeunit 6150702 "NPR POS UI Management"
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
             FieldRef := RecRef.FieldIndex(i);
-            Captions.Add(StrSubstNo('Global_Record_%1_Field_%2', RecRef.Number, FieldRef.Number), FieldRef.Caption);
+            Captions.Add(StrSubstNo(GlobalRecordLbl, RecRef.Number, FieldRef.Number), FieldRef.Caption);
         end;
     end;
 
@@ -607,33 +609,34 @@ codeunit 6150702 "NPR POS UI Management"
     var
         "Action": Record "NPR POS Action" temporary;
         POSSetup: Record "NPR POS Setup";
+        ConfigureReusableWorkflowLbl: Label '%1, %2', Locked = true;
     begin
         Setup.Action_Item(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Item Insert Action Code")), POSSetup.FieldNo("Item Insert Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Item Insert Action Code")), POSSetup.FieldNo("Item Insert Action Code"));
 
         Setup.Action_Payment(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Payment Action Code")), POSSetup.FieldNo("Payment Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Payment Action Code")), POSSetup.FieldNo("Payment Action Code"));
 
         Setup.Action_Customer(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Customer Action Code")), POSSetup.FieldNo("Customer Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Customer Action Code")), POSSetup.FieldNo("Customer Action Code"));
 
         Setup.Action_LockPOS(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Lock POS Action Code")), POSSetup.FieldNo("Lock POS Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Lock POS Action Code")), POSSetup.FieldNo("Lock POS Action Code"));
 
         Setup.Action_UnlockPOS(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Unlock POS Action Code")), POSSetup.FieldNo("Unlock POS Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Unlock POS Action Code")), POSSetup.FieldNo("Unlock POS Action Code"));
 
         Setup.Action_Login(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Login Action Code")), POSSetup.FieldNo("Login Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Login Action Code")), POSSetup.FieldNo("Login Action Code"));
 
         Setup.Action_TextEnter(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Text Enter Action Code")), POSSetup.FieldNo("Text Enter Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Text Enter Action Code")), POSSetup.FieldNo("Text Enter Action Code"));
 
         Setup.Action_IdleTimeout(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
 
         Setup.Action_AdminMenu(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
 
         OnConfigureReusableWorkflows(POSSession, Setup);
     end;
@@ -720,10 +723,11 @@ codeunit 6150702 "NPR POS UI Management"
     local procedure GetLCYCode(): Code[20]
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        GeneralLedgerSetupLCYLbl: Label '(%1)', Locked = true;
     begin
         if (GeneralLedgerSetup.Get()) then
             if (GeneralLedgerSetup."LCY Code" <> '') then
-                exit(StrSubstNo('(%1)', GeneralLedgerSetup."LCY Code"));
+                exit(StrSubstNo(GeneralLedgerSetupLCYLbl, GeneralLedgerSetup."LCY Code"));
 
         exit('');
     end;

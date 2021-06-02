@@ -39,16 +39,18 @@ xmlport 6060142 "NPR MM Member Identifier"
                     {
 
                         trigger OnBeforePassVariable()
+                        var
+                            PlaceHolderLbl: Label '%1|%2', Locked = true;
                         begin
                             ValueIs := '';
                             if (TmpOutInfoCapture."External Membership No." <> '') then
                                 ValueIs := 'membershipnumber';
 
                             if (TmpOutInfoCapture."External Member No" <> '') then
-                                ValueIs := StrSubstNo('%1|%2', ValueIs, 'membernumber');
+                                ValueIs := StrSubstNo(PlaceHolderLbl, ValueIs, 'membernumber');
 
                             if (TmpOutInfoCapture."External Card No." <> '') then
-                                ValueIs := StrSubstNo('%1|%2', ValueIs, 'cardnumber');
+                                ValueIs := StrSubstNo(PlaceHolderLbl, ValueIs, 'cardnumber');
 
                             ValueIs := DelChr(ValueIs, '<', '|');
 

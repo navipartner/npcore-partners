@@ -88,7 +88,7 @@ codeunit 6014650 "NPR BTF GetOrderResp" implements "NPR BTF IEndPoint", "NPR Nc 
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
         Headers.Add('User-Agent', 'Dynamics 365');
-        Headers.Add('Authorization', StrSubstNo('bearer %1', ServiceAPI.GetTokenFromResponse(ServiceEndPointForAuth, Response)));
+        Headers.Add('Authorization', StrSubstNo(ServiceAPI.GetBearerTokenLbl(), ServiceAPI.GetTokenFromResponse(ServiceEndPointForAuth, Response)));
         Headers.Add('Subscription-Key', ServiceSetup."Subscription-Key");
         Headers.Add('Username', ServiceSetup.Username);
 

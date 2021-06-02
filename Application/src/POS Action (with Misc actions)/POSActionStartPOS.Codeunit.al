@@ -57,6 +57,12 @@ codeunit 6150858 "NPR POS Action: Start POS"
         Context: Codeunit "NPR POS JSON Management";
         POSUnit: Record "NPR POS Unit";
         BinContentsHTML: Text;
+        BinContentsHTMLLbl: Label '<b>%1</b>', Locked = true;
+        BinContentsHTML2Lbl: Label '<b>%1</b>', Locked = true;
+        BinContentsHTML3Lbl: Label '<b>%1</b>', Locked = true;
+        BinContentsHTML4Lbl: Label '<b>%1</b><p>', Locked = true;
+        BinContentsHTML5Lbl: Label '<tr><td align="left"><b>%1:&nbsp;</b></td><td align="right"><b>&nbsp;%2</b></td></tr>', Locked = true;
+        BinContentsHTML6Lbl: Label '<p><b>%1</b>', Locked = true;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -78,7 +84,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
                     if (MasterPOSUnit.Status <> MasterPOSUnit.Status::OPEN) then
                         Error(ManagedPos, MasterPOSUnit."No.", MasterPOSUnit.Name);
 
-                    BinContentsHTML := StrSubstNo('<b>%1</b>', WorkshiftWasClosed);
+                    BinContentsHTML := StrSubstNo(BinContentsHTMLLbl, WorkshiftWasClosed);
                     Context.SetContext('ConfirmBin', true);
                     Context.SetContext('BinContents', BinContentsHTML);
                     FrontEnd.SetActionContext(ActionCode(), Context);
@@ -93,25 +99,25 @@ codeunit 6150858 "NPR POS Action: Start POS"
         POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
         POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
-        BinContentsHTML := StrSubstNo('<b>%1</b>', FirstBalance);
+        BinContentsHTML := StrSubstNo(BinContentsHTML2Lbl, FirstBalance);
 
         if (POSWorkshiftCheckpoint.FindLast()) then begin
-            BinContentsHTML := StrSubstNo('<b>%1</b>', EmptyBin);
+            BinContentsHTML := StrSubstNo(BinContentsHTML3Lbl, EmptyBin);
 
             POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
             POSPaymentBinCheckpoint.SetFilter("New Float Amount", '>%1', 0);
 
             if (POSPaymentBinCheckpoint.FindSet()) then begin
-                BinContentsHTML := StrSubstNo('<b>%1</b><p>', Expected);
+                BinContentsHTML := StrSubstNo(BinContentsHTML4Lbl, Expected);
                 BinContentsHTML += '<center><table border="0" cellspacing="0" width="250">';
 
                 repeat
-                    BinContentsHTML += StrSubstNo('<tr><td align="left"><b>%1:&nbsp;</b></td><td align="right"><b>&nbsp;%2</b></td></tr>',
+                    BinContentsHTML += StrSubstNo(BinContentsHTML5Lbl,
                       POSPaymentBinCheckpoint.Description, Format(POSPaymentBinCheckpoint."New Float Amount", 0, '<Precision,2:2><Standard Format,0>'));
                 until (POSPaymentBinCheckpoint.Next() = 0);
 
                 BinContentsHTML += '</table></center>';
-                BinContentsHTML += StrSubstNo('<p><b>%1</b>', ConfirmBin);
+                BinContentsHTML += StrSubstNo(BinContentsHTML6Lbl, ConfirmBin);
             end;
         end;
 

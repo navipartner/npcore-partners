@@ -507,6 +507,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        UrlLbl: Label '%1%2', Locked = true;
     begin
 
         if (not TicketSetup.Get()) then
@@ -551,7 +552,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
         NotificationEntry."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
         NotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
-        NotificationEntry."Published Ticket URL" := StrSubstNo('%1%2', TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID");
+        NotificationEntry."Published Ticket URL" := StrSubstNo(UrlLbl, TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID");
 
         NotificationEntry."Ticket Type Code" := Ticket."Ticket Type Code";
         NotificationEntry."Ticket No." := Ticket."No.";

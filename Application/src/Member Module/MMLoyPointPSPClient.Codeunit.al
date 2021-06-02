@@ -130,12 +130,13 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
     procedure OnServiceRequestResponse(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
+        PlaceHolder1Lbl: Label '%1 xxxx%2', Locked = true;
+        PlaceHolder2Lbl: Label '%1 %2 xxxx%3', Locked = true;
     begin
-
         if (EFTTransactionRequest.Successful) then begin
             EFTTransactionRequest."POS Description" :=
               CopyStr(
-                StrSubstNo('%1 xxxx%2',
+                StrSubstNo(PlaceHolder1Lbl,
                   EFTTransactionRequest."Card Name",
                   CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 2)),
                 1, MaxStrLen(EFTTransactionRequest."POS Description"));
@@ -144,7 +145,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         if (not EFTTransactionRequest.Successful) then begin
             EFTTransactionRequest."POS Description" :=
               CopyStr(
-                StrSubstNo('%1 %2 xxxx%3',
+                StrSubstNo(PlaceHolder2Lbl,
                   EFTTransactionRequest."Result Description",
                   EFTTransactionRequest."Card Name",
                   CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 2)),

@@ -62,6 +62,7 @@ codeunit 6150852 "NPR POS Action - Item Price"
         PriceExclVat: Boolean;
         POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
+        HtmlTagLbl: Label '%1<br><h4>%2</h4>', Locked = true;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -115,7 +116,7 @@ codeunit 6150852 "NPR POS Action - Item Price"
                     JSON.SetContext('confirm_title', PriceQuery);
                     JSON.SetContext('confirm_message', StrSubstNo(PriceInfoHtml,
                       SaleLinePOS.FieldCaption("No."), SaleLinePOS."No.",
-                      SaleLinePOS.FieldCaption(Description), StrSubstNo('%1<br><h4>%2</h4>', SaleLinePOS.Description, SaleLinePOS."Description 2"),
+                      SaleLinePOS.FieldCaption(Description), StrSubstNo(HtmlTagLbl, SaleLinePOS.Description, SaleLinePOS."Description 2"),
                       SaleLinePOS.FieldCaption("Amount Including VAT"), SaleLinePOS."Amount Including VAT"));
                     JSON.SetScopeParameters(ActionCode());
                     PriceExclVat := JSON.GetBoolean('priceExclVat');
@@ -123,7 +124,7 @@ codeunit 6150852 "NPR POS Action - Item Price"
                     if PriceExclVat then
                         JSON.SetContext('confirm_message', StrSubstNo(PriceInfoHtml,
                           SaleLinePOS.FieldCaption("No."), SaleLinePOS."No.",
-                          SaleLinePOS.FieldCaption(Description), StrSubstNo('%1<br><h4>%2</h4>', SaleLinePOS.Description, SaleLinePOS."Description 2"),
+                          SaleLinePOS.FieldCaption(Description), StrSubstNo(HtmlTagLbl, SaleLinePOS.Description, SaleLinePOS."Description 2"),
                           SaleLinePOS.FieldCaption(Amount), SaleLinePOS.Amount));
                     FrontEnd.SetActionContext(ActionCode(), JSON);
 

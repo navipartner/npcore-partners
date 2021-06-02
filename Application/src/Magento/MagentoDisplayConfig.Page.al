@@ -186,11 +186,9 @@ page 6151443 "NPR Magento Display Config"
         SourceTableName: Text[100];
         SalesSrcTableName: Text[100];
         Description: Text[250];
+        PlaceHolder4Lbl: Label '%1 %2 %3 %4', Locked = true;
     begin
         GetRecFilters();
-
-
-
         SourceTableName := '';
         case ItemTypeFilter of
             ItemTypeFilter::Item:
@@ -205,6 +203,6 @@ page 6151443 "NPR Magento Display Config"
                 end;
         end;
 
-        exit(StrSubstNo('%1 %2 %3 %4', SalesSrcTableName, Description, SourceTableName, NumberFilter));
+        exit(StrSubstNo(PlaceHolder4Lbl, SalesSrcTableName, Description, SourceTableName, NumberFilter));
     end;
 }

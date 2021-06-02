@@ -9,6 +9,7 @@ codeunit 6060134 "NPR MM POS Receipt Print"
         MemberRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
         Voided: Text;
+        PlaceHolderLbl: Label '%1 - %2', Locked = true;
     begin
         Membership.CopyFilters(Rec);
 
@@ -32,7 +33,6 @@ codeunit 6060134 "NPR MM POS Receipt Print"
                 Printer.AddTextField(2, 2, Membership."External Membership No.");
 
                 MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
-                // MembershipEntry.setfilter ("Valid From Date", '>=%1', TODAY);
                 if (MembershipEntry.FindSet()) then begin
                     repeat
 
@@ -43,7 +43,7 @@ codeunit 6060134 "NPR MM POS Receipt Print"
                             Voided := VOID;
 
                         Printer.AddTextField(1, 0, StrSubstNo(VALID_PERIOD, Voided));
-                        Printer.AddTextField(2, 2, StrSubstNo('%1 - %2', MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date"));
+                        Printer.AddTextField(2, 2, StrSubstNo(PlaceHolderLbl, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date"));
                     until (MembershipEntry.Next() = 0);
                 end;
 

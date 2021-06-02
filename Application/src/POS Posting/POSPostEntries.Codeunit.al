@@ -414,6 +414,7 @@
         POSPostingSetup: Record "NPR POS Posting Setup";
         POSPostingSetupNewBin: Record "NPR POS Posting Setup";
         AmountToPostToAccount: Decimal;
+        PostingSetupNotFoundLbl: Label '%1: %4, %2: %5, %3: %6', Locked = true;
     begin
         POSEntry.Copy(POSEntryIn);
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
@@ -441,7 +442,7 @@
                             POSBalancingLine.TestField("Move-To Bin Code");
                             if not GetPostingSetup(POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Move-To Bin Code", POSPostingSetupNewBin) then
                                 Error(TextPostingSetupMissing, POSPostingSetup.TableCaption, POSBalancingLine.TableCaption, POSBalancingLine.FieldCaption("POS Entry No."), POSBalancingLine."POS Entry No.",
-                                    StrSubstNo('%1: %4, %2: %5, %3: %6', POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("Move-To Bin Code"),
+                                    StrSubstNo(PostingSetupNotFoundLbl, POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("Move-To Bin Code"),
                                     POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Move-To Bin Code"));
 
                             if (POSPostingSetup."Account Type" <> POSPostingSetupNewBin."Account Type") or (POSPostingSetup."Account No." <> POSPostingSetupNewBin."Account No.") then begin
@@ -456,7 +457,7 @@
                             POSBalancingLine.TestField("Deposit-To Bin Code");
                             if not GetPostingSetup(POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Deposit-To Bin Code", POSPostingSetupNewBin) then
                                 Error(TextPostingSetupMissing, POSPostingSetup.TableCaption, POSBalancingLine.TableCaption, POSBalancingLine.FieldCaption("POS Entry No."), POSBalancingLine."POS Entry No.",
-                                    StrSubstNo('%1: %4, %2: %5, %3: %6', POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("Deposit-To Bin Code"),
+                                    StrSubstNo(PostingSetupNotFoundLbl, POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("Deposit-To Bin Code"),
                                     POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Deposit-To Bin Code"));
 
                             if (POSPostingSetup."Account Type" <> POSPostingSetupNewBin."Account Type") or (POSPostingSetup."Account No." <> POSPostingSetupNewBin."Account No.") then begin
@@ -972,28 +973,32 @@
     end;
 
     local procedure GetPostingSetupFromBufferLine(POSPostingBuffer: Record "NPR POS Posting Buffer"; var POSPostingSetup: Record "NPR POS Posting Setup")
+    var
+        PostingSetupNotFoundLbl: Label '%1: %4, %2: %5, %3: %6', Locked = true;
     begin
         if not GetPostingSetup(POSPostingBuffer."POS Store Code", POSPostingBuffer."POS Payment Method Code", POSPostingBuffer."POS Payment Bin Code", POSPostingSetup) then
             if POSPostingBuffer."POS Entry No." <> 0 then
                 Error(TextPostingSetupMissing, POSPostingSetup.TableCaption, POSPostingBuffer."Line Type", POSPostingBuffer.FieldCaption("POS Entry No."), POSPostingBuffer."POS Entry No.",
-                    StrSubstNo('%1: %4, %2: %5, %3: %6', POSPostingBuffer.FieldCaption("POS Store Code"), POSPostingBuffer.FieldCaption("POS Payment Method Code"), POSPostingBuffer.FieldCaption("POS Payment Bin Code"),
+                    StrSubstNo(PostingSetupNotFoundLbl, POSPostingBuffer.FieldCaption("POS Store Code"), POSPostingBuffer.FieldCaption("POS Payment Method Code"), POSPostingBuffer.FieldCaption("POS Payment Bin Code"),
                     POSPostingBuffer."POS Store Code", POSPostingBuffer."POS Payment Method Code", POSPostingBuffer."POS Payment Bin Code"))
             else
                 Error(TextPostingSetupMissing, POSPostingSetup.TableCaption, POSPostingBuffer."Line Type", POSPostingBuffer."POS Period Register", POSPostingBuffer."POS Period Register",
-                    StrSubstNo('%1: %4, %2: %5, %3: %6', POSPostingBuffer.FieldCaption("POS Store Code"), POSPostingBuffer.FieldCaption("POS Payment Method Code"), POSPostingBuffer.FieldCaption("POS Payment Bin Code"),
+                    StrSubstNo(PostingSetupNotFoundLbl, POSPostingBuffer.FieldCaption("POS Store Code"), POSPostingBuffer.FieldCaption("POS Payment Method Code"), POSPostingBuffer.FieldCaption("POS Payment Bin Code"),
                     POSPostingBuffer."POS Store Code", POSPostingBuffer."POS Payment Method Code", POSPostingBuffer."POS Payment Bin Code"));
     end;
 
     local procedure GetPostingSetupFromBalancingLine(POSBalancingLine: Record "NPR POS Balancing Line"; var POSPostingSetup: Record "NPR POS Posting Setup")
+    var
+        PostingSetupNotFoundLbl: Label '%1: %4, %2: %5, %3: %6', Locked = true;
     begin
         if not GetPostingSetup(POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."POS Payment Bin Code", POSPostingSetup) then
             if POSBalancingLine."POS Entry No." <> 0 then
                 Error(TextPostingSetupMissing, POSPostingSetup.TableCaption, POSBalancingLine.TableCaption, POSBalancingLine.FieldCaption("POS Entry No."), POSBalancingLine."POS Entry No.",
-                    StrSubstNo('%1: %4, %2: %5, %3: %6', POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("POS Payment Bin Code"),
+                    StrSubstNo(PostingSetupNotFoundLbl, POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("POS Payment Bin Code"),
                     POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."POS Payment Bin Code"))
             else
                 Error(TextPostingSetupMissing, POSPostingSetup.TableCaption, POSBalancingLine.TableCaption, POSBalancingLine.FieldCaption("POS Period Register No."), POSBalancingLine."POS Period Register No.",
-                    StrSubstNo('%1: %4, %2: %5, %3: %6', POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("POS Payment Bin Code"),
+                    StrSubstNo(PostingSetupNotFoundLbl, POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("POS Payment Bin Code"),
                     POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."POS Payment Bin Code"));
     end;
 

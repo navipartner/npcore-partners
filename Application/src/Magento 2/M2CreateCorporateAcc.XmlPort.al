@@ -248,6 +248,7 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
 
     var
         StartTime: Time;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure GetRequest(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary)
     begin
@@ -291,14 +292,13 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
 
         ResponseCode := 'OK';
         ResponseMessage := '';
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
     procedure SetErrorResponse(ErrorMessage: Text)
     begin
-
         ResponseCode := 'ERROR';
         ResponseMessage := ErrorMessage;
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 }

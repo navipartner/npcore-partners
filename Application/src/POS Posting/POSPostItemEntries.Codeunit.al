@@ -256,6 +256,7 @@
         AssemblyPost: Codeunit "Assembly-Post";
         CreateAssembly: Boolean;
         CreateAssemblyLink: Boolean;
+        AssemblyHeaderLbl: Label '%1: %2 - %3', Locked = true;
     begin
         if (POSSalesLine.Type <> POSSalesLine.Type::Item) then
             exit(true);
@@ -298,7 +299,7 @@
             AssemblyHeader.Validate("Variant Code", POSSalesLine."Variant Code");
             AssemblyHeader.Validate("Location Code", POSSalesLine."Location Code");
             AssemblyHeader.Validate(Quantity, POSSalesLine.Quantity);
-            AssemblyHeader."Description 2" := StrSubstNo('%1: %2 - %3', POSEntry."Entry No.", POSEntry."Document No.", POSSalesLine."Line No.");
+            AssemblyHeader."Description 2" := StrSubstNo(AssemblyHeaderLbl, POSEntry."Entry No.", POSEntry."Document No.", POSSalesLine."Line No.");
             AssemblyHeader."Posting No." := AssemblyHeader."No.";
             AssemblyHeader.Modify(true);
         end;
@@ -360,6 +361,7 @@
         x: Integer;
         y: Integer;
         NextLineNo: Integer;
+        ServItemLbl: Label '%1 / %2 / %3', Locked = true;
     begin
         // Check if create service item
         if (POSSalesLine.Type <> POSSalesLine.Type::Item) then
@@ -416,7 +418,7 @@
             ServItem."Shipment Type" := ServItem."Shipment Type"::Sales;
 
             ServItem.Validate(Description, CopyStr(POSSalesLine.Description, 1, MaxStrLen(ServItem.Description)));
-            ServItem."Description 2" := CopyStr(StrSubstNo('%1 / %2 / %3', POSSalesLine."POS Store Code", POSSalesLine."POS Unit No.", POSSalesLine."Document No."), 1, MaxStrLen(ServItem."Description 2"));
+            ServItem."Description 2" := CopyStr(StrSubstNo(ServItemLbl, POSSalesLine."POS Store Code", POSSalesLine."POS Unit No.", POSSalesLine."Document No."), 1, MaxStrLen(ServItem."Description 2"));
 
             ServItem.Validate("Customer No.", POSEntry."Customer No.");
 

@@ -16,6 +16,7 @@
         MediaInfo: Record "NPR RP Template Media Info";
         i: Integer;
         FileName: Text;
+        FileNameLbl: Label '%1, Version %2', Locked = true;
     begin
         if not TemplateHeader.FindSet() then
             exit;
@@ -44,7 +45,7 @@
         until TemplateHeader.Next() = 0;
 
         if i = 1 then
-            FileName := StrSubstNo('%1, Version %2', TemplateHeader.Code, TemplateHeader.Version)
+            FileName := StrSubstNo(FileNameLbl, TemplateHeader.Code, TemplateHeader.Version)
         else
             FileName := 'Retail Print Templates';
 
@@ -61,6 +62,7 @@
         DataItemConstraint: Record "NPR RP Data Item Constr.";
         DataItemConstraintLinks: Record "NPR RP Data Item Constr. Links";
         DeviceSettings: Record "NPR RP Device Settings";
+        ArchTmplLbl: Label 'Archived template: %1', Locked = true;
     begin
         //Does not export media info to prevent archive bloat.
 
@@ -86,7 +88,7 @@
             ManagedPackageBuilder.AddRecord(DeviceSettings);
         until TemplateHeader.Next() = 0;
 
-        ManagedPackageBuilder.ExportToBlob('RP Template Archive', '1.0', StrSubstNo('Archived template: %1', TemplateHeader.Code), DATABASE::"NPR RP Template Header", TempBlobOut);
+        ManagedPackageBuilder.ExportToBlob('RP Template Archive', '1.0', StrSubstNo(ArchTmplLbl, TemplateHeader.Code), DATABASE::"NPR RP Template Header", TempBlobOut);
     end;
 
     procedure ImportPackageFromFile()

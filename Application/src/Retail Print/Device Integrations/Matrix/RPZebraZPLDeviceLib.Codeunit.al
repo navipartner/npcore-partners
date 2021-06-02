@@ -434,6 +434,12 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
     end;
 
     procedure PrintBarcode(Rotation: Option N,R,I,B; Type: Text[1]; Height: Integer; Width: Integer; FirstParam: Text; SecondParam: Text; LineAbove: Text[1]; Check: Text[1]; X: Integer; Y: Integer; Data: Text[100])
+    var
+        PrintBarcodeLbl: Label '^B%1%2,%6,%3,%4,%5', Locked = true;
+        PrintBarcode2Lbl: Label '^B%1%2,%3,%4,%5', Locked = true;
+        PrintBarcode3Lbl: Label '^B%1%2,%3,%4,%5,%6', Locked = true;
+        PrintBarcode4Lbl: Label '^B%1%2,%3,%4,%5,%6,A', Locked = true;
+        PrintBarcode5Lbl: Label '^BQ%1,%2,%3', Locked = true;
     begin
         FieldOrigin(X, Y);
 
@@ -441,26 +447,26 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
             '3': //CODE39
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo('^B%1%2,%6,%3,%4,%5', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
+                    AddToBuffer(StrSubstNo(PrintBarcodeLbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
                 end;
             'E': //EAN13
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5', Type, Format(Rotation), Height, SecondParam, LineAbove));
+                    AddToBuffer(StrSubstNo(PrintBarcode2Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove));
                 end;
             'U': //UPC-A
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5,%6', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
+                    AddToBuffer(StrSubstNo(PrintBarcode3Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
                 end;
             'C': //CODE128 in automatic subset mode
                 begin
                     BarcodeFieldDefault(Width, FirstParam, Height);
-                    AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5,%6,A', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
+                    AddToBuffer(StrSubstNo(PrintBarcode4Lbl, Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
                 end;
             'Q': //QR, model 2, alphanumeric input - FirstParam: Magnification, SecondParam: Error correction
                 begin
-                    AddToBuffer(StrSubstNo('^BQ%1,%2,%3', Format(Rotation), '2', FirstParam));
+                    AddToBuffer(StrSubstNo(PrintBarcode5Lbl, Format(Rotation), '2', FirstParam));
                     Data := SecondParam + 'M,A' + DelChr(UpperCase(Data), '=', DelChr(UpperCase(Data), '=', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$%*+-./:'));
                 end;
         end;

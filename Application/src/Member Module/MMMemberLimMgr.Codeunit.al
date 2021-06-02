@@ -291,6 +291,8 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         RelativeDateTime: DateTime;
         MyTime: Time;
+        PlaceHolderLbl: Label '%1', Locked = true;
+        PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
     begin
 
         MembershipLimitationSetup.Get(RuleEntryNo);
@@ -334,21 +336,21 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         case MembershipLimitationSetup."Constraint Type" of
             MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
                 begin
-                    RuleConditionalValue := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds");
+                    RuleConditionalValue := StrSubstNo(PlaceHolderLbl, MembershipLimitationSetup."Constraint Seconds");
                     RelativeDateTime := CurrentDateTime() - (MembershipLimitationSetup."Constraint Seconds" * 1000);
                     MemberArrivalLogEntry.SetFilter("Created At", '>=%1', RelativeDateTime);
                 end;
 
             MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
                 begin
-                    RuleConditionalValue := StrSubstNo('%1 - %2', MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
+                    RuleConditionalValue := StrSubstNo(PlaceHolder2Lbl, MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
                     MemberArrivalLogEntry.SetFilter("Local Date", '=%1', Today);
                     MemberArrivalLogEntry.SetFilter("Local Time", '>=%1 & <=%2', MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
                 end;
 
             MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
                 begin
-                    RuleConditionalValue := StrSubstNo('%1', CalcDate(MembershipLimitationSetup."Constraint Dateformula", Today));
+                    RuleConditionalValue := StrSubstNo(PlaceHolderLbl, CalcDate(MembershipLimitationSetup."Constraint Dateformula", Today));
                     MemberArrivalLogEntry.SetFilter("Local Date", '>=%1', CalcDate(MembershipLimitationSetup."Constraint Dateformula", Today));
                 end;
         end;
@@ -359,20 +361,20 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         if (MemberArrivalLogEntry.FindFirst()) then begin
             case MembershipLimitationSetup."Constraint Type" of
                 MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
-                    ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
+                    ContraintText := StrSubstNo(PlaceHolderLbl, MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
                 MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
-                    ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                    ContraintText := StrSubstNo(PlaceHolder2Lbl, MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
                 MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
-                    ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                    ContraintText := StrSubstNo(PlaceHolder2Lbl, MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
             end;
         end else begin
             case MembershipLimitationSetup."Constraint Type" of
                 MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
-                    ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds");
+                    ContraintText := StrSubstNo(PlaceHolderLbl, MembershipLimitationSetup."Constraint Seconds");
                 MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
-                    ContraintText := StrSubstNo('%1 - %2', MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
+                    ContraintText := StrSubstNo(PlaceHolder2Lbl, MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
                 MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
-                    ContraintText := StrSubstNo('%1', Today);
+                    ContraintText := StrSubstNo(PlaceHolder2Lbl, Today());
             end;
         end;
 

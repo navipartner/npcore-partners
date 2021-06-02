@@ -241,6 +241,7 @@ xmlport 6151150 "NPR M2 Authenticate"
     var
         StartTime: Time;
         Customer: Record Customer;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure GetRequest(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary)
     begin
@@ -291,7 +292,7 @@ xmlport 6151150 "NPR M2 Authenticate"
             until (TmpContact.Next() = 0);
         end;
 
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'OK';
         ResponseMessage := '';
 
@@ -301,7 +302,7 @@ xmlport 6151150 "NPR M2 Authenticate"
 
     procedure SetErrorResponse(ReasonText: Text)
     begin
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'ERROR';
         ResponseMessage := ReasonText;
     end;

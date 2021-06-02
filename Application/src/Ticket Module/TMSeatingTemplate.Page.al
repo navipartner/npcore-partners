@@ -60,11 +60,12 @@ page 6151131 "NPR TM Seating Template"
                     trigger OnValidate()
                     var
                         SeatingTemplate: Record "NPR TM Seating Template";
+                        PathLbl: Label '%1/*', Locked = true;
                     begin
 
                         if (Confirm(UPDATE_CHILDREN, true)) then begin
                             SeatingTemplate.SetFilter("Admission Code", '=%1', Rec."Admission Code");
-                            SeatingTemplate.SetFilter(Path, '%1', StrSubstNo('%1/*', Rec.Path));
+                            SeatingTemplate.SetFilter(Path, '%1', StrSubstNo(PathLbl, Rec.Path));
                             SeatingTemplate.ModifyAll("Unit Price", Rec."Unit Price");
                         end;
 
@@ -82,11 +83,12 @@ page 6151131 "NPR TM Seating Template"
                     trigger OnValidate()
                     var
                         SeatingTemplate: Record "NPR TM Seating Template";
+                        PathLbl: Label '%1/*', Locked = true;
                     begin
 
                         if (Confirm(UPDATE_CHILDREN, true)) then begin
                             SeatingTemplate.SetFilter("Admission Code", '=%1', Rec."Admission Code");
-                            SeatingTemplate.SetFilter(Path, '%1', StrSubstNo('%1/*', Rec.Path));
+                            SeatingTemplate.SetFilter(Path, '%1', StrSubstNo(PathLbl, Rec.Path));
                             SeatingTemplate.ModifyAll("Unit Price", Rec."Unit Price");
                         end;
                         CurrPage.Update(false);

@@ -1,7 +1,7 @@
 ﻿page 6060113 "NPR TM Ticket Make Reserv."
 {
     Caption = 'Make your reservation';
-    DataCaptionExpression = StrSubstNo('%1  - %2', Today, Time);
+    DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = StandardDialog;
@@ -226,6 +226,7 @@
                         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
                         ResponseMessage: Text;
                         Admission: Record "NPR TM Admission";
+                        DateTimeLbl: Label '%1  - %2', Locked = true;
                     begin
 
                         //-TM1.45 [380754]
@@ -248,7 +249,7 @@
 
                             Rec.Validate(Quantity, TicketWaitingList.Quantity);
                             Rec."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
-                            Rec."Scheduled Time Description" := StrSubstNo('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+                            Rec."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
                             if (gDeliverTicketTo = '') then
                                 gDeliverTicketTo := TicketWaitingList."Notification Address";
 
@@ -429,6 +430,8 @@
         OldEntryNo: Integer;
         "0DF": DateFormula;
         ToDate: Date;
+        DateTimeLbl: Label '%1  - %2', Locked = true;
+        PlaceHolderLbl: Label '%1', Locked = true;
     begin
 
         if (NOT IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.")) then
@@ -459,10 +462,10 @@
             PageScheduleEntry.GetRecord(AdmissionScheduleEntry);
 
             Rec."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
-            Rec."Scheduled Time Description" := StrSubstNo('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+            Rec."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
 
             if (AdmissionScheduleEntry."Allocation By" = AdmissionScheduleEntry."Allocation By"::WAITINGLIST) then begin
-                Rec."Scheduled Time Description" := StrSubstNo('%1', WAITING_LIST);
+                Rec."Scheduled Time Description" := StrSubstNo(PlaceHolderLbl, WAITING_LIST);
                 gShowDeliverTo := true;
             end;
 
@@ -849,6 +852,13 @@
 
         exit(RescheduleAllowed);
 
+    end;
+
+    local procedure GetDataCaptionExpr(): Text
+    var
+        DateTimeLbl: Label '%1  - %2', Locked = true;
+    begin
+        exit(StrSubstNo(DateTimeLbl, Today(), Time()));
     end;
 }
 

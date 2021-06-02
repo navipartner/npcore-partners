@@ -129,6 +129,8 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure WelcomePage() Html: Text
+    var
+        PlaceHolderLbl: Label '               <img src="%1/images/logo.gif" alt="Navipartner" />', Locked = true;
     begin
         Html :=
         '<!doctype html>' +
@@ -136,15 +138,12 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '<head>' +
         '    <meta charset="utf-8">' +
         '    <title>Self-service kiosk</title>' +
-        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
-        //'    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>'+
-        //'    <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">'+
         '</head>' +
         '    <body class="home">' +
         '       <div id="main">' +
         '           <a href="#" title="Touch anywhere to start" onClick="NavigateNext();return false;">' +
         '           <div id="logo">' +
-        StrSubstNo('               <img src="%1/images/logo.gif" alt="Navipartner" />', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolderLbl, GetMMMembershipKioskBaseUrl()) +
         '           </div></a>' +
         '           <div class="touch-anywhere">' +
         '               Touch anywhere to start' +
@@ -171,24 +170,25 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure ScanTicketBarcodePage() Html: Text
+    var
+        PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
+        PlaceHolder2Lbl: Label '                   <a class="barcode" href="#"><img src="%1/images/barcode.jpg" alt="Navipartner" /></a>', Locked = true;
     begin
-
         Html :=
         '<!doctype html>' +
         '<html lang="en">' +
         '<head>' +
         '    <meta charset="utf-8">' +
         '    <title>Scan your barcode | Self-service kiosk</title>' +
-        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolderLbl, GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Scan your barcode<br />to begin membership registration</h2>' +
-        StrSubstNo('                   <a class="barcode" href="#"><img src="%1/images/barcode.jpg" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolder2Lbl, GetMMMembershipKioskBaseUrl()) +
         '                   <input id="typed4" type="text" placeholder="Scan ticket number." />' +
         '               </div>' +
         '               <a class="next nav" href="#" onClick="NavigateNext(); return false;"><span>Next</span></a>' +
@@ -230,6 +230,13 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure MemberInfoCapturePage(var Parameters: JsonObject) Html: Text
+    var
+        PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
+        PlaceHolder2Lbl: Label '           <input id="mmFirstName" placeholder="First name" value="%1"/>', Locked = true;
+        PlaceHolder3Lbl: Label '           <input id="mmLastName" placeholder="Last name" value="%1"/>', Locked = true;
+        PlaceHolder4Lbl: Label '           <input id="mmEmail" placeholder="Email address" value="%1"/>', Locked = true;
+        PlaceHolder5Lbl: Label '           <input id="mmBirthDate" placeholder="Date of birth (DD/MM/YYYY)" value="%1"/>', Locked = true;
+        PlaceHolder6Lbl: Label '           <input id="mmPhone" placeholder="Phone number" value="%1"/>', Locked = true;
     begin
         Html :=
 
@@ -239,20 +246,19 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Data entry | Self-service kiosk</title>' +
-        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolderLbl, GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Please type requested info:</h2>' +
-        StrSubstNo('           <input id="mmFirstName" placeholder="First name" value="%1"/>', GetStringValue(Parameters, 'FirstName')) +
-        StrSubstNo('           <input id="mmLastName" placeholder="Last name" value="%1"/>', GetStringValue(Parameters, 'LastName')) +
-        StrSubstNo('           <input id="mmEmail" placeholder="Email address" value="%1"/>', GetStringValue(Parameters, 'EmailAddress')) +
-        StrSubstNo('           <input id="mmBirthDate" placeholder="Date of birth (DD/MM/YYYY)" value="%1"/>', GetStringValue(Parameters, 'DayOfBirth')) +
-        StrSubstNo('           <input id="mmPhone" placeholder="Phone number" value="%1"/>', GetStringValue(Parameters, 'PhoneNumber')) +
+        StrSubstNo(PlaceHolder2Lbl, GetStringValue(Parameters, 'FirstName')) +
+        StrSubstNo(PlaceHolder3Lbl, GetStringValue(Parameters, 'LastName')) +
+        StrSubstNo(PlaceHolder4Lbl, GetStringValue(Parameters, 'EmailAddress')) +
+        StrSubstNo(PlaceHolder5Lbl, GetStringValue(Parameters, 'DayOfBirth')) +
+        StrSubstNo(PlaceHolder6Lbl, GetStringValue(Parameters, 'PhoneNumber')) +
         '               </div>' +
         '               <a class="back nav" href="#" onClick="StartPage(); return false;"><span>Back</span></a>' +
         '               <a class="next nav" href="#" onClick="NavigateNext(); return false;"><span>Next</span></a>' +
@@ -307,6 +313,9 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure TakePhotoPage() Html: Text
+    var
+        PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
+        PlaceHolder2Lbl: Label '                   <div class="photo-holder"><img src="%1/images/transparent.png" alt="Navipartner" /></div>', Locked = true;
     begin
         Html :=
         '<!doctype html>' +
@@ -315,16 +324,15 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Take a photo | Self-service kiosk</title>' +
-        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolderLbl, GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Take a photo:</h2>' +
-        StrSubstNo('                   <div class="photo-holder"><img src="%1/images/transparent.png" alt="Navipartner" /></div>', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolder2Lbl, GetMMMembershipKioskBaseUrl()) +
         '                   <a class="camera" href="#"></a>' +
         '                   <h3>Press the icon when you are ready!</h3>' +
         '               </div>' +
@@ -366,10 +374,14 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure PreviewCardPage(var Parameters: JsonObject) Html: Text
+    var
+        PlaceHolderLbl: Label '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', Locked = true;
+        PlaceHolder2Lbl: Label '                        <div class="left"><img src="%1/images/photo.jpg" alt="Navipartner" /></div>', Locked = true;
+        PlaceHolder3Lbl: Label '                            <div class="name">%1 %2</div>', Locked = true;
+        PlaceHolder4Lbl: Label '                            <div class="date">%1</div>', Locked = true;
+        PlaceHolder5Lbl: Label '                            <div class="name">%1</div>', Locked = true;
+        PlaceHolder6Lbl: Label '                            <div class="name">%1</div>', Locked = true;
     begin
-
-        //MESSAGE ('Params: %1', Parameters.ToString ());
-
         Html :=
         '<!doctype html>' +
         '<html lang="en">' +
@@ -377,21 +389,20 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Card preview | Self-service kiosk</title>' +
-        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolderLbl, GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Membership card preview</h2>' +
         '                   <div class="preview-card-holder">' +
-        StrSubstNo('                        <div class="left"><img src="%1/images/photo.jpg" alt="Navipartner" /></div>', GetMMMembershipKioskBaseUrl()) +
-        StrSubstNo('                            <div class="name">%1 %2</div>', GetStringValue(Parameters, 'FirstName'), GetStringValue(Parameters, 'LastName')) +
-        StrSubstNo('                            <div class="date">%1</div>', GetStringValue(Parameters, 'DayOfBirth')) +
-        StrSubstNo('                            <div class="name">%1</div>', GetStringValue(Parameters, 'EmailAddress')) +
-        StrSubstNo('                            <div class="name">%1</div>', GetStringValue(Parameters, 'PhoneNumber')) +
+        StrSubstNo(PlaceHolder2Lbl, GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolder3Lbl, GetStringValue(Parameters, 'FirstName'), GetStringValue(Parameters, 'LastName')) +
+        StrSubstNo(PlaceHolder4Lbl, GetStringValue(Parameters, 'DayOfBirth')) +
+        StrSubstNo(PlaceHolder5Lbl, GetStringValue(Parameters, 'EmailAddress')) +
+        StrSubstNo(PlaceHolder6Lbl, GetStringValue(Parameters, 'PhoneNumber')) +
         '                        </div>' +
         '                   </div>' +
         '               <a class="back nav" href="#" onClick="NavigateBack(); return false;"><span>Back</span></a>' +
@@ -440,8 +451,9 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure PrintPage() Html: Text
+    var
+        PlaceHolderLbl: Label '                   <img id="small-printer" src="%1/images/print.png" alt="Navipartner" />', Locked = true;
     begin
-
         Html :=
         '<!doctype html>' +
         '<html lang="en">' +
@@ -449,7 +461,6 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Printing | Self-service kiosk</title>' +
-        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
@@ -457,7 +468,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Printing your membercard...</h2>' +
-        StrSubstNo('                   <img id="small-printer" src="%1/images/print.png" alt="Navipartner" />', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolderLbl, GetMMMembershipKioskBaseUrl()) +
         '                   <div class="loader12"></div>' +
         '               </div>' +
         '           </div>' +
@@ -490,8 +501,9 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure ShowErrorPage(var Parameters: JsonObject) Html: Text
+    var
+        PlaceHolderLbl: Label '                   <h3>%1</h3>', Locked = true;
     begin
-
         Html :=
         '<!doctype html>' +
         '<html lang="en">' +
@@ -499,14 +511,13 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Printing | Self-service kiosk</title>' +
-        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
         '           <div id="container">' +
         '               <h1 class="errorInformation">Ops! Something went wrong.</h1>' +
         '               <div id="content">' +
-        StrSubstNo('                   <h3>%1</h3>', GetStringValue(Parameters, 'ErrorMessage')) +
+        StrSubstNo(PlaceHolderLbl, GetStringValue(Parameters, 'ErrorMessage')) +
         '               <div class="loader12"></div>' +
         '               <a class="next nav" href="#" onClick="OnAfterError(); return false;"><span>Next</span></a>' +
         '               </div>' +
@@ -594,8 +605,11 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     end;
 
     local procedure ContainerCss(var Css: Text)
+    var
+        PlaceHolderLbl: Label ' background:url(%1/images/sprite.png) no-repeat;', Locked = true;
+        PlaceHolder2Lbl: Label ' background:url(%1/images/sprite.png) no-repeat;', Locked = true;
+        PlaceHolder3Lbl: Label ' background:url(%1/images/transparent-logo.png) no-repeat center center;', Locked = true;
     begin
-
         Css +=
         '#container {' +
         ' text-align:center;' +
@@ -676,7 +690,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '#container a.nav {' +
         ' font-weight:bold;' +
         ' color:#005191;' +
-        StrSubstNo(' background:url(%1/images/sprite.png) no-repeat;', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolderLbl, GetMMMembershipKioskBaseUrl()) +
         ' width:92px;' +
         ' height:92px;' +
         '}';
@@ -724,7 +738,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
 
         Css +=
         '#container a.camera {' +
-        StrSubstNo(' background:url(%1/images/sprite.png) no-repeat;', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolder2Lbl, GetMMMembershipKioskBaseUrl()) +
         ' width:87px;' +
         ' height:63px;' +
         ' background-position:-293px -14px;' +
@@ -767,7 +781,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '#container .preview-card-holder .right {' +
         ' float:left;' +
         ' text-align:left;' +
-        StrSubstNo(' background:url(%1/images/transparent-logo.png) no-repeat center center;', GetMMMembershipKioskBaseUrl()) +
+        StrSubstNo(PlaceHolder3Lbl, GetMMMembershipKioskBaseUrl()) +
         '}';
 
         Css +=

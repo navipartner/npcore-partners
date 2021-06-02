@@ -293,6 +293,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketDIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
 
         ReasonText := 'Invalid filter when exporting to ticket server';
@@ -310,9 +311,9 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
             exit(false);
         end;
 
-        SponsorshipTicketEntry."Ticket URL" := StrSubstNo('%1%2', TicketSetup."Print Server Ticket URL", SponsorshipTicketEntry."Ticket No.");
+        SponsorshipTicketEntry."Ticket URL" := StrSubstNo(PlaceHolderLbl, TicketSetup."Print Server Ticket URL", SponsorshipTicketEntry."Ticket No.");
         if (SponsorshipTicketEntry."Ticket No." = '') then
-            SponsorshipTicketEntry."Ticket URL" := StrSubstNo('%1%2', TicketSetup."Print Server Order URL", SponsorshipTicketEntry."Ticket Token");
+            SponsorshipTicketEntry."Ticket URL" := StrSubstNo(PlaceHolderLbl, TicketSetup."Print Server Order URL", SponsorshipTicketEntry."Ticket Token");
 
         ReasonText := '';
         exit(true);

@@ -14,11 +14,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetLoyaltyPoints-%1.xml', Locked = true;
     begin
         GetLoyaltyPoints.Import();
 
         InsertImportEntry('GetLoyaltyPoints', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetLoyaltyPoints-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -54,11 +55,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetLoyaltyPointEntries-%1.xml', Locked = true;
     begin
         GetLoyaltyStatement.Import();
 
         InsertImportEntry('GetLoyaltyPointEntries', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetLoyaltyPointEntries-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -94,12 +96,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetLoyaltyReceiptList-%1.xml', Locked = true;
     begin
 
         GetLoyaltyReceiptList.Import();
 
         InsertImportEntry('GetLoyaltyReceiptList', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetLoyaltyReceiptList-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -187,12 +190,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
+        FileNameLbl: Label 'RegisterSale-%1.xml', Locked = true;
     begin
 
         RegisterSale.Import();
 
         InsertImportEntry('RegisterSale', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('RegisterSale-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Modify(true);
         Commit();
@@ -238,12 +242,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
+        FileNameLbl: Label 'ReservePoints-%1.xml', Locked = true;
     begin
 
         ReservePoints.Import();
 
         InsertImportEntry('ReservePoints', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('ReservePoints-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Modify(true);
         Commit();
@@ -292,12 +297,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
+        FileNameLbl: Label 'GetLoyaltyConfiguration-%1.xml', Locked = true;
     begin
 
         GetLoyaltyConfiguration.Import();
 
         InsertImportEntry('GetLoyaltyConfiguration', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetLoyaltyConfiguration-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Modify(true);
         Commit();
@@ -348,12 +354,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         OutStr: OutStream;
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         ResponseMessage: Text;
+        FileNameLbl: Label 'LoyaltyCouponEligibility-%1.xml', Locked = true;
     begin
 
         LoyaltyCouponEligibility.Import();
 
         InsertImportEntry('LoyaltyCouponEligibility', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('LoyaltyCouponEligibility-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
@@ -409,12 +416,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         OutStr: OutStream;
         ResponseMessage: Text;
         MembershipEntryNo: Integer;
+        FileNameLbl: Label 'LoyaltyCreateCoupon-%1.xml', Locked = true;
     begin
 
         LoyaltyCreateCoupon.Import();
 
         InsertImportEntry('LoyaltyCreateCoupon', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('LoyaltyCreateCoupon-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
@@ -487,12 +495,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         OutStr: OutStream;
         ResponseMessage: Text;
         MembershipEntryNo: Integer;
+        FileNameLbl: Label 'LoyaltyListCoupon-%1.xml', Locked = true;
     begin
 
         LoyaltyListCoupon.Import();
 
         InsertImportEntry('LoyaltyListCoupon', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('LoyaltyListCoupon-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
@@ -567,12 +576,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ExternalMembershipNo: Code[20];
         CouponReferenceNo: Text[30];
         CurrSaleCouponCount: Integer;
+        FileNameLbl: Label 'LoyaltyDeleteCoupon-%1.xml', Locked = true;
     begin
 
         LoyaltyDeleteCoupon.Import();
 
         InsertImportEntry('LoyaltyDeleteCoupon', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('LoyaltyDeleteCoupon-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
@@ -645,6 +655,8 @@ codeunit 6060141 "NPR MM Loyalty WebService"
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
+    var
+        FileNameLbl: Label '%1-%2.xml', Locked = true;
     begin
         ImportEntry.Init();
         ImportEntry."Entry No." := 0;
@@ -657,7 +669,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         end;
 
         ImportEntry.Date := CurrentDateTime;
-        ImportEntry."Document Name" := StrSubstNo('%1-%2.xml', ImportEntry."Import Type", Format(ImportEntry.Date, 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, ImportEntry."Import Type", Format(ImportEntry.Date, 0, 9));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry.Insert(true);

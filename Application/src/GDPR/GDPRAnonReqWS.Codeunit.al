@@ -1,21 +1,8 @@
 codeunit 6151061 "NPR GDPR Anon. Req. WS"
 {
-    // NPR5.54/TSA /20200324 CASE 389817 Initial Version
-    // NPR5.55/TSA /20200715 CASE 388813 Refactored, added CanCustomerBeAnonymized(), InsertRequestEntry()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure AnonymizationRequest(CustomerNo: Code[20]; ContactNo: Code[20]): Boolean
     begin
-
-        //-NPR5.55 [388813]
-        // Moved code to function
-
         exit(InsertRequestEntry(CustomerNo, ContactNo) <> 0);
-        //+NPR5.55 [388813]
     end;
 
     procedure CanCustomerBeAnonymized(CustomerNo: Code[20]; ContactNo: Code[20]; var ResponseCode: Integer) OkToAnonymize: Boolean
@@ -27,9 +14,8 @@ codeunit 6151061 "NPR GDPR Anon. Req. WS"
         NPGDPRManagement: Codeunit "NPR NP GDPR Management";
         LimitingDateformula: DateFormula;
         RequestEntryNo: Integer;
+        GDPRAnonymizationRequestReasonLbl: Label 'Anonymization checker responded with: %1', Locked = true;
     begin
-
-        //-NPR5.55 [388813]
         ResponseCode := -1;
         if (not Customer.Get(CustomerNo)) then
             exit(true);
@@ -56,12 +42,11 @@ codeunit 6151061 "NPR GDPR Anon. Req. WS"
         GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::APPROVED;
         if (not OkToAnonymize) then begin
             GDPRAnonymizationRequest.Status := GDPRAnonymizationRequest.Status::DECLINED;
-            GDPRAnonymizationRequest.Reason := StrSubstNo('Anonymization checker responded with: %1', ResponseCode);
+            GDPRAnonymizationRequest.Reason := StrSubstNo(GDPRAnonymizationRequestReasonLbl, ResponseCode);
         end;
         GDPRAnonymizationRequest.Modify();
 
         exit(OkToAnonymize);
-        //+NPR5.55 [388813]
     end;
 
     local procedure InsertRequestEntry(CustomerNo: Code[20]; ContactNo: Code[20]) EntryNo: Integer
@@ -70,8 +55,6 @@ codeunit 6151061 "NPR GDPR Anon. Req. WS"
         Customer: Record Customer;
         Contact: Record Contact;
     begin
-
-        //-NPR5.55 [388813]
         GDPRAnonymizationRequest.Init();
         GDPRAnonymizationRequest."Customer No." := CustomerNo;
 
@@ -99,7 +82,6 @@ codeunit 6151061 "NPR GDPR Anon. Req. WS"
             EntryNo := GDPRAnonymizationRequest."Entry No.";
 
         exit(EntryNo);
-        //+NPR5.55 [388813]
     end;
 }
 

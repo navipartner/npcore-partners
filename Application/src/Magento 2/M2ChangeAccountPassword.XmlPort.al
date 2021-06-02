@@ -85,6 +85,7 @@ xmlport 6151149 "NPR M2 Change Account Password"
 
     var
         StartTime: Time;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure GetRequest(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary)
     begin
@@ -113,7 +114,7 @@ xmlport 6151149 "NPR M2 Change Account Password"
             until (TmpContact.Next() = 0);
         end;
 
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'OK';
         ResponseMessage := '';
 
@@ -123,7 +124,7 @@ xmlport 6151149 "NPR M2 Change Account Password"
 
     procedure SetErrorResponse(ReasonText: Text)
     begin
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'ERROR';
         ResponseMessage := ReasonText;
     end;

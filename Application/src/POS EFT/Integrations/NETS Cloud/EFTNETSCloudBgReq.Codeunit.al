@@ -27,10 +27,11 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
     var
         EFTNETSBackgndTrxReq: Codeunit "NPR EFT NETSCloud Bg. Req.";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
+        BackgroundTrxLbl: Label 'Background trx CODEUNIT.RUN error: %1';
     begin
         EFTNETSBackgndTrxReq.SetExecutionMode(CodeunitExecutionMode::START_TRX);
         if not EFTNETSBackgndTrxReq.Run(EFTTransactionAsyncRequest) then begin
-            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", StrSubstNo('Background trx CODEUNIT.RUN error: %1', GetLastErrorText), '');
+            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", StrSubstNo(BackgroundTrxLbl, GetLastErrorText), '');
         end;
     end;
 
@@ -175,6 +176,8 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         LookupResult: Boolean;
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
         EFTNETSCloudResponseParser: Codeunit "NPR EFT NETSCloud Resp. Parser";
+        AutoLookupSuccessLbl: Label 'Auto lookup attempt %1, Success';
+        AutoLookupFailureLbl: Label 'Auto lookup attempt %1, Failure';
     begin
         LookupResult := EFTNETSCloudProtocol.InvokeLookupLastTransaction(EFTTransactionRequest, EFTSetup, EFTTransactionRequest, TimeoutMs, LookupResponse);
 
@@ -185,12 +188,12 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         if LookupResult then begin
             EFTTransactionLoggingMgt.WriteLogEntry(
               EFTTransactionRequest."Entry No.",
-              StrSubstNo('Auto lookup attempt %1, Success', LookupAttempt),
+              StrSubstNo(AutoLookupSuccessLbl, LookupAttempt),
               EFTNETSCloudProtocol.GetRequestResponseBuffer());
         end else begin
             EFTTransactionLoggingMgt.WriteLogEntry(
               EFTTransactionRequest."Entry No.",
-              StrSubstNo('Auto lookup attempt %1, Failure', LookupAttempt),
+              StrSubstNo(AutoLookupFailureLbl, LookupAttempt),
               EFTNETSCloudProtocol.GetRequestResponseBuffer());
         end;
 

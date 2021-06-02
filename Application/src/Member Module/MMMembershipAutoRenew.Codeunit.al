@@ -146,6 +146,7 @@
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ReasonText: Text;
+        MembershipRenewNotAllowedLbl: Label 'Membership is already valid on %1 and does not require auto-renew at this time.';
     begin
 
         TmpMembershipAutoRenew."Selected Membership Count" += 1;
@@ -170,7 +171,7 @@
         SetResponseOk(MemberInfoCapture);
 
         if (MembershipManagement.GetMembershipValidDate(MembershipEntryNo, CalcDate('<+1D>', TmpMembershipAutoRenew."Valid Until Date"), StartDate, UntilDate)) then begin
-            SetResponseError(MemberInfoCapture, StrSubstNo('Membership is already valid on %1 and does not require auto-renew at this time.', TmpMembershipAutoRenew."Valid Until Date"));
+            SetResponseError(MemberInfoCapture, StrSubstNo(MembershipRenewNotAllowedLbl, TmpMembershipAutoRenew."Valid Until Date"));
             MemberInfoCapture.Modify();
             exit(MemberInfoCapture."Entry No.");
         end;
@@ -483,6 +484,7 @@
     var
         Membership: Record "NPR MM Membership";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipNotFoundLbl: Label '%1 %2 does not exist.';
     begin
 
         MemberInfoCapture.Init();
@@ -500,7 +502,7 @@
             MemberInfoCapture."Membership Code" := Membership."Membership Code";
 
         end else begin
-            SetResponseError(MemberInfoCapture, StrSubstNo('%1 %2 does not exist.', Membership.TableCaption, MembershipEntryNo));
+            SetResponseError(MemberInfoCapture, StrSubstNo(MembershipNotFoundLbl, Membership.TableCaption, MembershipEntryNo));
         end;
 
         MemberInfoCapture.Modify();

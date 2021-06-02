@@ -147,16 +147,16 @@ report 6014426 "NPR Vendor Top/Sale"
             column(ProfitPct; ProfitPct)
             {
             }
-            column(Share; StrSubstNo('%1%', Share))
+            column(Share; StrSubstNo(Pct1Lbl, Share))
             {
             }
-            column(PctOfTotal; StrSubstNo('%1%', PctOfTotal))
+            column(PctOfTotal; StrSubstNo(Pct1Lbl, PctOfTotal))
             {
             }
             column(Stock_Vendor; Vendor3."NPR Stock")
             {
             }
-            column(PctOfTotalInventory; StrSubstNo('%1%', PctOfTotalInventory))
+            column(PctOfTotalInventory; StrSubstNo(Pct1Lbl, PctOfTotalInventory))
             {
             }
             column(RankingLastYear; RankingLastYear)
@@ -165,7 +165,7 @@ report 6014426 "NPR Vendor Top/Sale"
             column(AmountLastYear; AmountLastYear)
             {
             }
-            column(DgLastYear; StrSubstNo('%1%', DgLastYear))
+            column(DgLastYear; StrSubstNo(Pct1Lbl, DgLastYear))
             {
             }
             column(Index; Index)
@@ -484,6 +484,7 @@ report 6014426 "NPR Vendor Top/Sale"
         j: Text[30];
         VendorDateFilter: Text[30];
         VendorFilter: Text[250];
+        Pct1Lbl: Label '%1%', locked = true;
 
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
     begin

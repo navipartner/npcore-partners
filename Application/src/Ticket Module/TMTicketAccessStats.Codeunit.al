@@ -295,6 +295,11 @@
     var
         AdmissionCount: Decimal;
         AdmissionCount2: Decimal;
+        CellValueLbl: Label '%1', Locked = true;
+        CellValue2Lbl: Label '%1 [%2]', Locked = true;
+        CellValue3Lbl: Label '%1 [%2%]', Locked = true;
+        CellValue4Lbl: Label '[%1]', Locked = true;
+        CellValue5Lbl: Label '[%1%]', Locked = true;
     begin
 
         AdmissionCount := CalcCount(LineFactOption, LineFactCode,
@@ -304,7 +309,7 @@
         if (AdmissionCount = 0) then begin
             CellValue := '';
         end else begin
-            CellValue := StrSubstNo('%1', AdmissionCount);
+            CellValue := StrSubstNo(CellValueLbl, AdmissionCount);
         end;
 
         if (PeriodFilter <> '') and (DisplayOption > DisplayOption::COUNT) then begin
@@ -319,17 +324,17 @@
                 DisplayOption::COUNT_TREND:
                     begin
                         if ((AdmissionCount2 = 0) and (AdmissionCount <> 0)) then
-                            CellValue := StrSubstNo('%1 [%2]', AdmissionCount, '---');
+                            CellValue := StrSubstNo(CellValue2Lbl, AdmissionCount, '---');
                         if (AdmissionCount2 <> 0) then
-                            CellValue := StrSubstNo('%1 [%2%]', AdmissionCount, Round((AdmissionCount - AdmissionCount2) / AdmissionCount2 * 100, 1));
+                            CellValue := StrSubstNo(CellValue3Lbl, AdmissionCount, Round((AdmissionCount - AdmissionCount2) / AdmissionCount2 * 100, 1));
 
                     end;
                 DisplayOption::TREND:
                     begin
                         if ((AdmissionCount2 = 0) and (AdmissionCount <> 0)) then
-                            CellValue := StrSubstNo('[%1]', '---');
+                            CellValue := StrSubstNo(CellValue4Lbl, '---');
                         if (AdmissionCount2 <> 0) then
-                            CellValue := StrSubstNo('[%1%]', Round((AdmissionCount - AdmissionCount2) / AdmissionCount2 * 100, 1));
+                            CellValue := StrSubstNo(CellValue5Lbl, Round((AdmissionCount - AdmissionCount2) / AdmissionCount2 * 100, 1));
                     end;
             end;
         end;
@@ -454,6 +459,7 @@
         MaxDate: Date;
         FirstEntryNo: Integer;
         LastEntryNo: Integer;
+        FromToLbl: Label '[%1 - %2]', Locked = true;
     begin
 
         if (not TicketAccessEntry.FindLast()) then
@@ -465,7 +471,7 @@
         // Compress and save to DB
         if ((LastEntryNo >= FirstEntryNo) and (LastEntryNo > 0)) then begin
 
-            if (not Confirm(Text003, true, StrSubstNo('[%1 - %2]', StartDate, MaxDate))) then
+            if (not Confirm(Text003, true, StrSubstNo(FromToLbl, StartDate, MaxDate))) then
                 exit;
 
             LockResource();
@@ -604,6 +610,8 @@
         Ticket: Record "NPR TM Ticket";
         Admission: Record "NPR TM Admission";
         Variant: Record "Item Variant";
+        FactCodeLbl: Label '0%1', Locked = true;
+        FactDescLbl: Label '%1:00 - %1:59', Locked = true;
     begin
 
         // Item, annual card have same ticket type for different guest ticket types.
@@ -672,12 +680,12 @@
         FactCode := '';
         FactCode := Format(TicketAccessEntry."Access Time", 0, '<Hours24,2>');
         if (StrLen(FactCode) = 1) then
-            FactCode := StrSubstNo('0%1', FactCode);
+            FactCode := StrSubstNo(FactCodeLbl, FactCode);
         if (not TicketFact.Get(TicketFact."Fact Name"::ADMISSION_HOUR, FactCode)) then begin
             TicketFact.Init();
             TicketFact."Fact Name" := TicketFact."Fact Name"::ADMISSION_HOUR;
             TicketFact."Fact Code" := FactCode;
-            TicketFact.Description := StrSubstNo('%1:00 - %1:59', FactCode);
+            TicketFact.Description := StrSubstNo(FactDescLbl, FactCode);
             TicketFact.Insert();
         end;
 
@@ -873,6 +881,8 @@
         ZeroHourPrefix: Text[30];
         MaxTime: Time;
         MaxHour: Integer;
+        MaxTimeLbl: Label '%1%2:00:00', Locked = true;
+        StartTimeLbl: Label '%1%2%3', Locked = true;
     begin
 
         // Find max date / time for compression
@@ -893,7 +903,7 @@
                 StartHour += 1;
             end;
             if (StartHour < 10) then ZeroHourPrefix := '0';
-            Evaluate(StartTime, StrSubstNo('%1%2%3', ZeroHourPrefix, Format(StartHour), ':00:00'), 9);
+            Evaluate(StartTime, StrSubstNo(StartTimeLbl, ZeroHourPrefix, Format(StartHour), ':00:00'), 9);
         end;
 
         // find first entry to compress
@@ -911,7 +921,7 @@
             Evaluate(MaxHour, Format(MaxTime, 0, '<Hours24>'));
             ZeroHourPrefix := '';
             if (MaxHour < 10) then ZeroHourPrefix := '0';
-            Evaluate(MaxTime, StrSubstNo('%1%2:00:00', ZeroHourPrefix, Format(MaxHour)));
+            Evaluate(MaxTime, StrSubstNo(MaxTimeLbl, ZeroHourPrefix, Format(MaxHour)));
             DetailAccessEntry.SetFilter("Created Datetime", '<%1', CreateDateTime(MaxDate, MaxTime));
             DetailAccessEntry.FindLast();
         end;

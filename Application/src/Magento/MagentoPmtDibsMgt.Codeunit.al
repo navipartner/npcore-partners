@@ -106,7 +106,7 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
         HttpWebResponse.Content.ReadAs(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
     end;
 
     local procedure "RequestMethod.Post"(): Text

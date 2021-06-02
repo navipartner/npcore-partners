@@ -112,8 +112,9 @@ codeunit 6014426 "NPR NaviPartner Send SMS" implements "NPR Send SMS"
     local procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
     var
         Base64Convert: Codeunit "Base64 Convert";
+        UserPassLbl: Label '%1:%2', Locked = true;
     begin
-        exit(Base64Convert.ToBase64(StrSubstNo('%1:%2', Username, Password)))
+        exit(Base64Convert.ToBase64(StrSubstNo(UserPassLbl, Username, Password)))
     end;
 
     local procedure ValidatePhone(PhoneNo: Text): Boolean;

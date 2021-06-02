@@ -74,6 +74,9 @@ codeunit 6150910 "NPR POS HC Ext. Price"
     end;
 
     local procedure BuildPriceRequest(CustomerNo: Code[20]; ExternalDocumentNumber: Code[20]; CurrencyCode: Code[10]; var TmpSaleLine: Record "Sales Line" temporary; var SoapAction: Text; XmlRequest: Text): Boolean
+    var
+        XmlReqHeaderLbl: Label '<x61:customer number="%1" externalDocumentNumber="%2" currencyCode="%3">', Locked = true;
+        XmlReqLineLbl: Label '<x61:line lineNumber="%1" type="%2" number="%3" variantCode="%4" quantity="%5" unitOfMeasure="%6"/>', Locked = true;
     begin
         SoapAction := 'urn:microsoft-dynamics-schemas/codeunit/hqconnector:GetCustomerPrice';
         XmlRequest :=
@@ -84,11 +87,11 @@ codeunit 6150910 "NPR POS HC Ext. Price"
          '         <hqc:customerPriceRequest>' +
          '            <x61:priceRequest>';
 
-        XmlRequest += StrSubstNo('<x61:customer number="%1" externalDocumentNumber="%2" currencyCode="%3">', CustomerNo, ExternalDocumentNumber, CurrencyCode);
+        XmlRequest += StrSubstNo(XmlReqHeaderLbl, CustomerNo, ExternalDocumentNumber, CurrencyCode);
 
         TmpSaleLine.FindSet();
         repeat
-            XmlRequest += StrSubstNo('<x61:line lineNumber="%1" type="%2" number="%3" variantCode="%4" quantity="%5" unitOfMeasure="%6"/>',
+            XmlRequest += StrSubstNo(XmlReqLineLbl,
               TmpSaleLine."Line No.",
               Format(TmpSaleLine.Type::Item, 0, 2),
               TmpSaleLine."No.",
@@ -159,6 +162,10 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         Request: HttpRequestMessage;
         RequestHeaders: HttpHeaders;
         Response: HttpResponseMessage;
+        BasicAuthLbl: Label 'Basic %1', Locked = true;
+        Base64ConvertCredentialsLbl: Label '%1:%2', Locked = true;
+        SoapActionLbl: Label '"%1"', Locked = true;
+        ResponseLbl: Label '<responseStatus><responseCode>%1</responseCode><responseDescription>%2 - %3</responseDescription></responseStatus>', Locked = true;
     begin
         Request.GetHeaders(RequestHeaders);
         RequestHeaders.Remove('Connection');
@@ -166,8 +173,8 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         case EndpointSetup."Credentials Type" of
             EndpointSetup."Credentials Type"::NAMED:
                 begin
-                    B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', EndpointSetup."User Account", EndpointSetup."User Password"));
-                    RequestHeaders.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
+                    B64Credential := Base64Convert.ToBase64(StrSubstNo(Base64ConvertCredentialsLbl, EndpointSetup."User Account", EndpointSetup."User Password"));
+                    RequestHeaders.Add('Authorization', StrSubstNo(BasicAuthLbl, B64Credential));
                 end;
             else
         end;
@@ -181,7 +188,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         ContentHeader.Clear();
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
-        ContentHeader.Add('SOAPAction', StrSubstNo('"%1"', SoapAction));
+        ContentHeader.Add('SOAPAction', StrSubstNo(SoapActionLbl, SoapAction));
         ContentHeader := Client.DefaultRequestHeaders();
 
         Request.Content(RequestContent);
@@ -201,10 +208,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
             XmlDocument.ReadFrom(ResponseText, XmlDocOut)
         else
             XmlDocument.ReadFrom(StrSubstNo(
-              '<responseStatus>' +
-                '<responseCode>%1</responseCode>' +
-                '<responseDescription>%2 - %3</responseDescription>' +
-              '</responseStatus>',
+              ResponseLbl,
               Response.HttpStatusCode,
               Response.ReasonPhrase,
               EndpointSetup."Endpoint URI"), XmlDocOut);

@@ -156,6 +156,7 @@
         CashKeeperTransaction: Record "NPR CashKeeper Transaction";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
+        OrderIdLbl: Label '%1-%2', Locked = true;
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
@@ -176,7 +177,7 @@
             CashKeeperTransaction."Register No." := SaleLinePOS."Register No.";
             CashKeeperTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             CashKeeperTransaction.Amount := NumpadAmount;
-            CashKeeperTransaction."Order ID" := StrSubstNo('%1-%2', CashKeeperTransaction."Register No.",
+            CashKeeperTransaction."Order ID" := StrSubstNo(OrderIdLbl, CashKeeperTransaction."Register No.",
                                                                      CashKeeperTransaction."Sales Ticket No.");
             CashKeeperTransaction."Value In Cents" := CashKeeperTransaction.Amount * 100;
             CashKeeperTransaction.Action := CashKeeperTransaction.Action::Capture;
@@ -194,7 +195,7 @@
             CashKeeperTransaction."Register No." := SaleLinePOS."Register No.";
             CashKeeperTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             CashKeeperTransaction.Amount := NumpadAmount * -1;
-            CashKeeperTransaction."Order ID" := StrSubstNo('%1-%2', CashKeeperTransaction."Register No.",
+            CashKeeperTransaction."Order ID" := StrSubstNo(OrderIdLbl, CashKeeperTransaction."Register No.",
                                                                    CashKeeperTransaction."Sales Ticket No.");
             CashKeeperTransaction."Value In Cents" := CashKeeperTransaction.Amount * 100;
             CashKeeperTransaction.Action := CashKeeperTransaction.Action::Pay;

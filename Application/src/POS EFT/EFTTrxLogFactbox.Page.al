@@ -53,12 +53,13 @@ page 6184473 "NPR EFT Trx Log Factbox"
                 var
                     InStream: InStream;
                     FileName: Text;
+                    FileNameLbl: Label 'EFT_Log_%1_%2', Locked = true;
                 begin
                     if not Rec.Log.HasValue() then
                         exit;
                     Rec.CalcFields(Log);
                     Rec.Log.CreateInStream(InStream);
-                    FileName := StrSubstNo('EFT_Log_%1_%2', Rec."Transaction Entry No.", Rec."Log Entry No.");
+                    FileName := StrSubstNo(FileNameLbl, Rec."Transaction Entry No.", Rec."Log Entry No.");
                     DownloadFromStream(InStream, 'Log Download', '', 'All Files (*.*)|*.*', FileName);
                 end;
             }

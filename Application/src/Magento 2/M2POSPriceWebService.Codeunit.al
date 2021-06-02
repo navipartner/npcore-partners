@@ -206,6 +206,11 @@
         ItemUnitofMeasure: Record "Item Unit of Measure";
         GeneralLedgerSetup: Record "General Ledger Setup";
         RequestLineErrorMessage: Text;
+        RequestLineError1Msg: Label 'Currency code "%1" is not valid.;';
+        RequestLineError2Msg: Label 'There is no Currency Exchange Rate within the filter "%1" "..%2".;';
+        RequestLineError3Msg: Label 'Unit of Measure Code "%1" is not valid for item "%2".;';
+        RequestLineError4Msg: Label 'Customer number "%1" is not valid.;';
+        RequestLineError5Msg: Label 'Item number "%1" is not valid.;';
     begin
         TmpSalesPriceRequest.Reset();
         if (not TmpSalesPriceRequest.FindSet()) then
@@ -242,13 +247,13 @@
                     TmpSalesPriceResponse."Currency Code" := GeneralLedgerSetup."LCY Code";
 
                 if (not Currency.Get(TmpSalesPriceResponse."Currency Code")) then
-                    RequestLineErrorMessage += StrSubstNo('Currency code "%1" is not valid.;', TmpSalesPriceResponse."Currency Code");
+                    RequestLineErrorMessage += StrSubstNo(RequestLineError1Msg, TmpSalesPriceResponse."Currency Code");
 
                 CurrencyExchangeRate.SetFilter("Currency Code", '=%1', TmpSalesPriceResponse."Currency Code");
 
                 CurrencyExchangeRate.SetFilter("Starting Date", '..%1', TmpSalesPriceResponse."Price End Date");
                 if (CurrencyExchangeRate.IsEmpty()) then
-                    RequestLineErrorMessage += StrSubstNo('There is no Currency Exchange Rate within the filter "%1" "..%2".;', TmpSalesPriceResponse."Currency Code", TmpSalesPriceResponse."Price End Date");
+                    RequestLineErrorMessage += StrSubstNo(RequestLineError2Msg, TmpSalesPriceResponse."Currency Code", TmpSalesPriceResponse."Price End Date");
 
                 if (TmpSalesPriceResponse."Unit of Measure Code" = '') then
                     TmpSalesPriceResponse."Unit of Measure Code" := Item."Sales Unit of Measure";
@@ -257,7 +262,7 @@
                     TmpSalesPriceResponse."Unit of Measure Code" := Item."Base Unit of Measure";
 
                 if (not ItemUnitofMeasure.Get(Item."No.", TmpSalesPriceResponse."Unit of Measure Code")) then
-                    RequestLineErrorMessage += StrSubstNo('Unit of Measure Code "%1" is not valid for item "%2".;', TmpSalesPriceResponse."Unit of Measure Code", Item."No.");
+                    RequestLineErrorMessage += StrSubstNo(RequestLineError3Msg, TmpSalesPriceResponse."Unit of Measure Code", Item."No.");
 
                 TmpSalesPriceResponse."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
 
@@ -267,13 +272,13 @@
 
                 if (TmpSalesPriceRequest."Source Code" <> '') then begin
                     if (not Customer.Get(TmpSalesPriceRequest."Source Code")) then begin
-                        RequestLineErrorMessage += StrSubstNo('Customer number "%1" is not valid.;', TmpSalesPriceRequest."Source Code");
+                        RequestLineErrorMessage += StrSubstNo(RequestLineError4Msg, TmpSalesPriceRequest."Source Code");
                         Clear(Customer);
                     end;
                 end;
 
             end else begin
-                RequestLineErrorMessage += StrSubstNo('Item number "%1" is not valid.;', TmpSalesPriceRequest."Item No.");
+                RequestLineErrorMessage += StrSubstNo(RequestLineError5Msg, TmpSalesPriceRequest."Item No.");
             end;
 
             if (RequestLineErrorMessage <> '') then

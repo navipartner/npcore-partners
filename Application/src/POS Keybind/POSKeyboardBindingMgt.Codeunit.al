@@ -275,9 +275,11 @@
     end;
 
     local procedure GetSupportedKeyBind(KeyBind: Text; var AvailablePOSKeybind: Record "NPR Available POS Keybind"; var ErrMessage: Text): Boolean
+    var
+        KeyBindLbl: Label '@%1', Locked = true;
     begin
         ErrMessage := '';
-        AvailablePOSKeybind.SetFilter("Key Name", StrSubstNo('@%1', KeyBind));
+        AvailablePOSKeybind.SetFilter("Key Name", StrSubstNo(KeyBindLbl, KeyBind));
         if (not AvailablePOSKeybind.FindFirst()) or (not AvailablePOSKeybind.Supported) then begin
             ErrMessage := StrSubstNo(NoSuchKeyBindErr, KeyBind);
             exit(false);

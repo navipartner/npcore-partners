@@ -473,13 +473,14 @@ table 6150621 "NPR POS Entry"
     procedure ShowDimensions()
     var
         DimMgt: Codeunit DimensionManagement;
+        DimSetIdLbl: Label '%1 %2', Locked = true;
     begin
         if (("Post Entry Status" = "Post Entry Status"::Posted) and ("Post Item Entry Status" = "Post Item Entry Status"::Posted)) then begin
-            DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', TableCaption, "Entry No."));
+            DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo(DimSetIdLbl, TableCaption, "Entry No."));
         end else begin
             "Dimension Set ID" :=
               DimMgt.EditDimensionSet(
-                "Dimension Set ID", StrSubstNo('%1 %2', TableCaption, "Entry No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+                "Dimension Set ID", StrSubstNo(DimSetIdLbl, TableCaption, "Entry No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
             Modify();
         end;
     end;

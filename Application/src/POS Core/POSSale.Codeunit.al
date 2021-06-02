@@ -137,6 +137,7 @@
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
+        LastSaleDateLbl: Label '%1 | %2', Locked = true;
     begin
         if not LastSaleRetrieved then begin
             POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
@@ -146,7 +147,7 @@
                 exit;
 
             LastReceiptNoOut := POSEntry."Fiscal No.";
-            LastSaleDateTextOut := StrSubstNo('%1 | %2', POSEntry."Entry Date", POSEntry."Ending Time");
+            LastSaleDateTextOut := StrSubstNo(LastSaleDateLbl, POSEntry."Entry Date", POSEntry."Ending Time");
 
             POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
             if POSSalesLine.Findset() then

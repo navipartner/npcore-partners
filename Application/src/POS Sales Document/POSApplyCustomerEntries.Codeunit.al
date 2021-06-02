@@ -118,6 +118,7 @@
         SalePOS: Record "NPR POS Sale";
         CustLedgEntry: Record "Cust. Ledger Entry";
         POSApplyCustomerEntries: Page "NPR POS Apply Cust. Entries";
+        CustomerEntriesLbl: Label '%1-%2', Locked = true;
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -130,7 +131,7 @@
         CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
         CustLedgEntry.SetRange(Open, true);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Buffer ID" := StrSubstNo('%1-%2', SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+        SaleLinePOS."Buffer ID" := StrSubstNo(CustomerEntriesLbl, SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
         POSApplyCustomerEntries.SetSalesLine(SaleLinePOS, SaleLinePOS.FieldNo("Buffer ID"));
         POSApplyCustomerEntries.SetRecord(CustLedgEntry);
         POSApplyCustomerEntries.SetTableView(CustLedgEntry);

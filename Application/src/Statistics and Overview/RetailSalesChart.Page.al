@@ -145,6 +145,7 @@ page 6059813 "NPR Retail Sales Chart"
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         Period: Option " ",Next,Previous;
+        FromToLbl: Label '%1 to %2', Locked = true;
 
     local procedure UpdateChart()
     begin
@@ -153,7 +154,7 @@ page 6059813 "NPR Retail Sales Chart"
 
         ChartMgt.TurnOver_Revenue(BusChartBuf, Period, PeriodType);
         BusChartBuf.Update(CurrPage.chart);
-        StatusText := StrSubstNo('%1 to %2', BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
+        StatusText := StrSubstNo(FromToLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }
 

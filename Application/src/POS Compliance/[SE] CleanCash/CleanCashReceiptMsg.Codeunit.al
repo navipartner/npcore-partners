@@ -144,6 +144,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         Envelope: XmlElement;
         Receipt: XmlElement;
         EnumName: Text;
+        DateTimeLbl: Label '%1%2', Locked = true;
     begin
 
         XmlNs := CleanCashXCCSPProtocol.GetNamespace();
@@ -165,7 +166,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('IsNewSession', '1', XmlNs));
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('SerialNo', Format(CleanCashTransactionRequest."POS Entry No.", 0, '<Integer>'), XmlNs));
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('Date',
-            StrSubstNo('%1%2',
+            StrSubstNo(DateTimeLbl,
                 Format(DT2Date(CleanCashTransactionRequest."Receipt DateTime"), 0, '<Filler Character,0><Year4><Month,2><Day,2>'),
                 Format(DT2Time(CleanCashTransactionRequest."Receipt DateTime"), 0, '<Filler Character,0><Hours24,2><Minutes,2>')), XmlNs));
 

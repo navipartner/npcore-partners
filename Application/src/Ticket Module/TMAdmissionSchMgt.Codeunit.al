@@ -103,14 +103,16 @@
     procedure GetRecurrenceEndDate(StartDate: Date; Occurences: Integer; RecurrencePattern: Option WEEKLY,DAILY) EndDate: Date
     var
         Pattern: Code[20];
+        PatternLbl: Label '<+%1D>', Locked = true;
+        Pattern2Lbl: Label '<CW+%1D>', Locked = true;
     begin
 
         if (Occurences = 0) then
             Occurences := 1;
 
-        Pattern := StrSubstNo('<+%1D>', Occurences - 1);
+        Pattern := StrSubstNo(PatternLbl, Occurences - 1);
         if (RecurrencePattern = RecurrencePattern::WEEKLY) then
-            Pattern := StrSubstNo('<CW+%1D>', 7 * (Occurences - 1));
+            Pattern := StrSubstNo(Pattern2Lbl, 7 * (Occurences - 1));
 
         EndDate := CalcDate(Pattern, StartDate);
 
@@ -500,10 +502,11 @@
     end;
 
     local procedure GetIdentifyingString(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Text
+    var
+        AdmissionScheduleEntryLbl: Label '%1;%2;%3', Locked = true;
     begin
-
         exit(
-          StrSubstNo('%1;%2;%3',
+          StrSubstNo(AdmissionScheduleEntryLbl,
             AdmissionScheduleEntry."Admission Code",
             AdmissionScheduleEntry."Admission Start Date",
             AdmissionScheduleEntry."Admission Start Time")

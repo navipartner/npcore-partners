@@ -185,6 +185,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
 
     var
         StartTime: Time;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure GetRequest()
     begin
@@ -208,13 +209,13 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
 
         ResponseCode := 'OK';
         ResponseMessage := '';
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
     procedure SetErrorResponse(ReasonText: Text)
     begin
 
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'ERROR';
         ResponseMessage := ReasonText;
     end;
@@ -354,39 +355,42 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
     var
         Date: Record Date;
         EndDate: Date;
+        FromUntilLbl: Label '%1..%2', Locked = true;
     begin
 
         EndDate := CalcDate('<CY>', Today);
         Date.SetRange("Period Type", Date."Period Type"::Year);
         Date.SetRange("Period End", ClosingDate(EndDate));
         if Date.FindFirst() then
-            exit(StrSubstNo('%1..%2', Date."Period Start", Today));
+            exit(StrSubstNo(FromUntilLbl, Date."Period Start", Today()));
     end;
 
     local procedure CreateCQFilter(): Text
     var
         Date: Record Date;
         EndDate: Date;
+        FromUntilLbl: Label '%1..%2', Locked = true;
     begin
 
         EndDate := CalcDate('<CQ>', Today);
         Date.SetRange("Period Type", Date."Period Type"::Quarter);
         Date.SetRange("Period End", ClosingDate(EndDate));
         if Date.FindFirst() then
-            exit(StrSubstNo('%1..%2', Date."Period Start", EndDate));
+            exit(StrSubstNo(FromUntilLbl, Date."Period Start", EndDate));
     end;
 
     local procedure CreateCMFilter(): Text
     var
         Date: Record Date;
         EndDate: Date;
+        FromUntilLbl: Label '%1..%2', Locked = true;
     begin
 
         EndDate := CalcDate('<CM>', Today);
         Date.SetRange("Period Type", Date."Period Type"::Month);
         Date.SetRange("Period End", ClosingDate(EndDate));
         if Date.FindFirst() then
-            exit(StrSubstNo('%1..%2', Date."Period Start", EndDate));
+            exit(StrSubstNo(FromUntilLbl, Date."Period Start", EndDate));
     end;
 
     local procedure CalculateOutstAmtExclVAT(SalesLine: Record "Sales Line"): Decimal

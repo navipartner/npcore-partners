@@ -171,6 +171,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         ExternalMemberCardNo: Text;
         ItemDescription: Text;
         ResponseMessage: Text;
+        PlaceHolderLbl: Label '%1/%2', Locked = true;
     begin
 
         ExternalMemberCardNo := Context.GetString('memberCardInput');
@@ -195,7 +196,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MembershipEvents.OnCustomItemDescription(MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Entry No.", ItemDescription);
 
         ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
-        AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo('%1/%2', Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
+        AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo(PlaceHolderLbl, Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
 
         case MembershipSetup."Member Information" of
             MembershipSetup."Member Information"::ANONYMOUS:

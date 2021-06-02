@@ -45,6 +45,7 @@ table 6059940 "NPR SMS Template Header"
             var
                 "Field": Record "Field";
                 SMSFieldList: Page "NPR SMS Field List";
+                RecipientLbl: Label '{%1}', Locked = true;
             begin
                 if "Table No." = 0 then
                     exit;
@@ -53,7 +54,7 @@ table 6059940 "NPR SMS Template Header"
                 SMSFieldList.SetTableView(Field);
                 if SMSFieldList.RunModal() = ACTION::OK then begin
                     SMSFieldList.GetRecord(Field);
-                    Recipient := StrSubstNo('{%1}', Field."No.");
+                    Recipient := StrSubstNo(RecipientLbl, Field."No.");
                 end;
             end;
         }

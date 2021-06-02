@@ -155,8 +155,9 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         EFTVerifoneVimIntegration: Codeunit "NPR EFT Verifone Vim Integ.";
         Licenceinformation: Codeunit "NPR License Information";
         EFTVerifoneUnitParameter: Record "NPR EFT Verifone Unit Param.";
+        EcrToGatewayDataLbl: Label '%1 | %2', Locked = true;
     begin
-        TransactionRequest.EcrToGatewayData := StrSubstNo('%1 | %2', EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.");
+        TransactionRequest.EcrToGatewayData := StrSubstNo(EcrToGatewayDataLbl, EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.");
         TransactionRequest.EcrID := EftTransactionRequest."Register No.";
         TransactionRequest.Currency := EftTransactionRequest."Currency Code";
         TransactionRequest.EftEntryTimestamp := EftTransactionRequest.Started;

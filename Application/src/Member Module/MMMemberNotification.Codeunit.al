@@ -162,6 +162,7 @@ codeunit 6060136 "NPR MM Member Notification"
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
         Method: Code[10];
+        EMailLbl: Label '%1?email=%2', Locked = true;
     begin
 
         NotificationSetup.Get(MembershipNotification."Notification Code");
@@ -293,7 +294,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
                     MemberNotificationEntry."Magento Get Password URL" := NotificationSetup."Fallback Magento PW URL";
                     if (Member."E-Mail Address" <> '') then
-                        MemberNotificationEntry."Magento Get Password URL" := StrSubstNo('%1?email=%2', NotificationSetup."Fallback Magento PW URL", Member."E-Mail Address");
+                        MemberNotificationEntry."Magento Get Password URL" := StrSubstNo(EMailLbl, NotificationSetup."Fallback Magento PW URL", Member."E-Mail Address");
                     if (NotificationSetup."Generate Magento PW URL") then begin
                         RequestMagentoPasswordUrl(Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
                     end;
@@ -667,6 +668,8 @@ codeunit 6060136 "NPR MM Member Notification"
         RecRef: RecordRef;
         MessageBody: JsonToken;
         MessageResponse: JsonToken;
+        TemplateNotDefinedLbl: Label 'The template for Notification Engine %1 has not been defined for %2 %3.';
+        PlaceHolderLbl: Label '%1 - %2', Locked = true;
     begin
 
         case MemberNotificationEntry."Notification Trigger" OF
@@ -684,7 +687,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
         MemberCommunicationSetup.CalcFields("Sender Template");
         if (not MemberCommunicationSetup."Sender Template".HasValue()) then
-            exit(StrSubstNo('The template for Notification Engine %1 has not been defined for %2 %3.', MemberCommunicationSetup."Notification Engine", MemberCommunicationSetup."Membership Code", MemberCommunicationSetup."Message Type"));
+            exit(StrSubstNo(TemplateNotDefinedLbl, MemberCommunicationSetup."Notification Engine", MemberCommunicationSetup."Membership Code", MemberCommunicationSetup."Message Type"));
 
         RecRef.GetTable(MemberNotificationEntry);
         MemberCommunicationSetup."Sender Template".CreateInStream(IStream);
@@ -695,7 +698,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
         MessageBody.ReadFrom(TemplateData);
         if (not MagentoApiPost_Membership('welcome-email', MessageBody, MessageResponse)) then begin
-            ResponseMessage := CopyStr(StrSubstNo('%1 - %2', GetLastErrorText(), MessageBody), 1, MaxStrLen(ResponseMessage));
+            ResponseMessage := CopyStr(StrSubstNo(PlaceHolderLbl, GetLastErrorText(), MessageBody), 1, MaxStrLen(ResponseMessage));
             exit(ResponseMessage);
         end;
 
@@ -907,6 +910,8 @@ codeunit 6060136 "NPR MM Member Notification"
         Body: JsonToken;
         Response: JsonToken;
         ResponseText: Text;
+        Request1Lbl: Label '{"id":"%1","storecode":"%2"}', Locked = true;
+        Request2Lbl: Label '{"account": {"email":"%1", "accounts":[%2]}}', Locked = true;
     begin
 
         if (not Customer.Get(CustomerNo)) then
@@ -918,8 +923,8 @@ codeunit 6060136 "NPR MM Member Notification"
         if (not Contact."NPR Magento Contact") then
             exit;
 
-        MessageText := StrSubstNo('{"id":"%1","storecode":"%2"}', ContactNo, Customer."NPR Magento Store Code");
-        Body.ReadFrom(StrSubstNo('{"account": {"email":"%1", "accounts":[%2]}}', EmailAddress, MessageText));
+        MessageText := StrSubstNo(Request1Lbl, ContactNo, Customer."NPR Magento Store Code");
+        Body.ReadFrom(StrSubstNo(Request2Lbl, EmailAddress, MessageText));
 
         if (not MagentoApiPost_b2b_customer('password-reset-link', Body, Response)) then begin
             ReasonText := CopyStr(GetLastErrorText, 1, MaxStrLen(ReasonText));
@@ -961,6 +966,7 @@ codeunit 6060136 "NPR MM Member Notification"
         ContentTypeLabel: Label 'Content-Type', Locked = true;
         ContentTypeValueLabel: Label 'naviconnect/json', Locked = true;
         AuthorizationLabel: Label 'Authorization', Locked = true;
+        BasicAuthLbl: Label 'Basic %1', Locked = true;
     begin
         if (Method = '') then
             exit;
@@ -978,7 +984,7 @@ codeunit 6060136 "NPR MM Member Notification"
             SetHttpHeaderValue(HttpRequestHeader, AuthorizationLabel, MagentoSetup."Api Authorization");
 
         if (MagentoSetup."Api Authorization" = '') then
-            SetHttpHeaderValue(HttpRequestHeader, AuthorizationLabel, StrSubstNo('Basic %1', MagentoSetup.GetBasicAuthInfo()));
+            SetHttpHeaderValue(HttpRequestHeader, AuthorizationLabel, StrSubstNo(BasicAuthLbl, MagentoSetup.GetBasicAuthInfo()));
 
         WebClient.Timeout := 1000 * 60;
         WebClient.Post(ApiUrl + Method, Content, WebResponse);
@@ -1022,6 +1028,7 @@ codeunit 6060136 "NPR MM Member Notification"
     var
         MagentoSetup: Record 6151401;
         ApiUrl: Text;
+        ApiLbl: Label '%1membership/', Locked = true;
     begin
 
         MagentoSetup.Get();
@@ -1029,7 +1036,7 @@ codeunit 6060136 "NPR MM Member Notification"
         if (MagentoSetup."Api Url"[STRLEN(MagentoSetup."Api Url")] <> '/') then
             MagentoSetup."Api Url" += '/';
 
-        ApiUrl := StrSubstNo('%1membership/', MagentoSetup."Api Url");
+        ApiUrl := StrSubstNo(ApiLbl, MagentoSetup."Api Url");
 
         MagentoApiPost(ApiUrl, Method, Body, Result)
 
@@ -1234,13 +1241,15 @@ codeunit 6060136 "NPR MM Member Notification"
         UserAgentTok: Label 'User-Agent', Locked = true;
         RequestOk: Boolean;
         Url: Text;
+        UrlLbl: Label '%1%2?sync=%3', Locked = true;
+        BearerLbl: Label 'Bearer %1', Locked = true;
     begin
 
         ReasonText := '';
         JSONOut := '';
         ClearLastError();
 
-        Url := StrSubstNo('%1%2?sync=%3', MemberNotificationSetup."NP Pass Server Base URL",
+        Url := StrSubstNo(UrlLbl, MemberNotificationSetup."NP Pass Server Base URL",
                                            StrSubstNo(MemberNotificationSetup."Passes API", MemberNotificationSetup."Pass Type Code", PassID),
                                            Format(MemberNotificationSetup."Pass Notification Method", 0, 9));
 
@@ -1254,7 +1263,7 @@ codeunit 6060136 "NPR MM Member Notification"
         RequestHeaders.Clear();
         RequestHeaders.Add(UserAgentTok, UserAgentTxt);
         RequestHeaders.Add(AcceptTok, ContentTypeTxt);
-        RequestHeaders.Add(AuthorizationTok, StrSubstNo('Bearer %1', MemberNotificationSetup."Pass Token"));
+        RequestHeaders.Add(AuthorizationTok, StrSubstNo(BearerLbl, MemberNotificationSetup."Pass Token"));
 
         Client.Timeout := 10000;
         if (RequestMethod = 'PUT') then

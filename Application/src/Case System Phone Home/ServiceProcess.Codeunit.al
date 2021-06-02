@@ -25,9 +25,10 @@ codeunit 6014483 "NPR Service Process"
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
+        BodyXmlLbl: Label '<userID>%1</userID><customerNo>%2</customerNo><serviceId>%3</serviceId>', Locked = true;
     begin
         ServiceMethod := 'IsUserSubscribed';
-        BodyXmlText := StrSubstNo('<userID>%1</userID><customerNo>%2</customerNo><serviceId>%3</serviceId>', SubscriptionUserId, CustomerNo, ServiceId);
+        BodyXmlText := StrSubstNo(BodyXmlLbl, SubscriptionUserId, CustomerNo, ServiceId);
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
 
     end;
@@ -36,9 +37,10 @@ codeunit 6014483 "NPR Service Process"
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
+        BodyXmlLbl: Label '<customerNo>%1</customerNo><serviceId>%2</serviceId>', Locked = true;
     begin
         ServiceMethod := 'IsCustomerSubscribed';
-        BodyXmlText := StrSubstNo('<customerNo>%1</customerNo><serviceId>%2</serviceId>', CustomerNo, ServiceId);
+        BodyXmlText := StrSubstNo(BodyXmlLbl, CustomerNo, ServiceId);
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
@@ -46,9 +48,10 @@ codeunit 6014483 "NPR Service Process"
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
+        BodyXmlLbl: Label '<userId>%1</userId><customerNo>%2</customerNo><serviceId>%3</serviceId>', Locked = true;
     begin
         ServiceMethod := 'CreateUserAccount';
-        BodyXmlText := StrSubstNo('<userId>%1</userId><customerNo>%2</customerNo><serviceId>%3</serviceId>', SubscriptionUserId, CustomerNo, ServiceId);
+        BodyXmlText := StrSubstNo(BodyXmlLbl, SubscriptionUserId, CustomerNo, ServiceId);
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
@@ -56,9 +59,10 @@ codeunit 6014483 "NPR Service Process"
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
+        BodyXmlLbl: Label '<userId>%1</userId><customerNo>%2</customerNo><serviceId>%3</serviceId>', Locked = true;
     begin
         ServiceMethod := 'CreateTransactionLog';
-        BodyXmlText := StrSubstNo('<userId>%1</userId><customerNo>%2</customerNo><serviceId>%3</serviceId>', SubscriptionUserId, CustomerNo, ServiceId);
+        BodyXmlText := StrSubstNo(BodyXmlLbl, SubscriptionUserId, CustomerNo, ServiceId);
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
@@ -66,9 +70,10 @@ codeunit 6014483 "NPR Service Process"
     var
         ServiceMethod: Text;
         BodyXmlText: Text;
+        BodyXmlLbl: Label '<userId>%1</userId><customerNo>%2</customerNo><quantity>%3</quantity><description>%4</description><amount>%5</amount>', Locked = true;
     begin
         ServiceMethod := 'CreateTransacLogAmt';
-        BodyXmlText := StrSubstNo('<userId>%1</userId><customerNo>%2</customerNo><quantity>%3</quantity><description>%4</description><amount>%5</amount>', SubscriptionUserId, CustomerNo, Format(Quantity, 0, 9), Description, Format(Amount, 0, 9));
+        BodyXmlText := StrSubstNo(BodyXmlLbl, SubscriptionUserId, CustomerNo, Format(Quantity, 0, 9), Description, Format(Amount, 0, 9));
         exit(InvokeServiceLibrary(ServiceMethod, BodyXmlText));
     end;
 
@@ -161,16 +166,18 @@ codeunit 6014483 "NPR Service Process"
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        SoapActionLbl: Label '%1:%2', Locked = true;
+        UriLbl: Label '%1/servicelibrary', Locked = true;
     begin
         Content.WriteFrom(CreateXMLRequest(ServiceMethod, BodyXmlText));
         Content.GetHeaders(Headers);
         Headers.Remove('Content-Type');
         Headers.Add('Content-Type', 'text/xml; charset=utf-8');
-        Headers.Add('SOAPAction', StrSubstNo('%1:%2', ServiceLibraryNamespaceUri, ServiceMethod));
+        Headers.Add('SOAPAction', StrSubstNo(SoapActionLbl, ServiceLibraryNamespaceUri, ServiceMethod));
         Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetSecret('ServiceLibraryKey'));
         RequestMessage.Content(Content);
         RequestMessage.Method('POST');
-        RequestMessage.SetRequestUri(StrSubstNo('%1/servicelibrary', AzureKeyVaultMgt.GetSecret('ApiHostUri')));
+        RequestMessage.SetRequestUri(StrSubstNo(UriLbl, AzureKeyVaultMgt.GetSecret('ApiHostUri')));
 
         Client.Timeout(5000);
         if not Client.Send(RequestMessage, ResponseMessage) then

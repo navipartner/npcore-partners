@@ -1,9 +1,7 @@
 page 6150724 "NPR POS Localized Table Data"
 {
-    // NPR5.37/NPKNAV/20171030  CASE 290485 Transport NPR5.37 - 27 October 2017
-
     Caption = 'Localized Table Data';
-    DataCaptionExpression = StrSubstNo('%1 %2 (%3) - %4', RecRef.Number, RecRef.Name, RecRef.Caption, RecRef.RecordId);
+    DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
@@ -260,6 +258,13 @@ page 6150724 "NPR POS Localized Table Data"
         Rec := Old;
 
         ChangesMade := false;
+    end;
+
+    local procedure GetDataCaptionExpr(): Text
+    var
+        DataCaptionExprLbl: Label '%1 %2 (%3) - %4', Locked = true;
+    begin
+        exit(StrSubstNo(DataCaptionExprLbl, RecRef.Number, RecRef.Name, RecRef.Caption, RecRef.RecordId()));
     end;
 }
 

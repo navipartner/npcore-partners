@@ -596,10 +596,12 @@
     end;
 
     procedure GetPOSDescription(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    var
+        POSDescriptionLbl: Label '%1: %2', Locked = true;
     begin
         if EFTTransactionRequest."Card Name" <> '' then begin
             if (StrLen(EFTTransactionRequest."Card Number") > 8) then
-                exit(StrSubstNo('%1: %2', EFTTransactionRequest."Card Name", CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
+                exit(StrSubstNo(POSDescriptionLbl, EFTTransactionRequest."Card Name", CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
             else
                 exit(StrSubstNo(EFTTransactionRequest."Card Name"));
         end;
@@ -898,6 +900,7 @@
         EFTSetup: Record "NPR EFT Setup";
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         CurrentShopperRef: Text;
+        CurrentShopperRefLbl: Label ', %1 %2', Locked = true;
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if GetCreateRecurringContract(EFTSetup) = 0 then
@@ -906,7 +909,7 @@
         if EFTTransactionRequest."External Customer ID" <> '' then begin
             CurrentShopperRef := EFTTransactionRequest."External Customer ID";
             if EFTShopperRecognition.Get(IntegrationType(), EFTTransactionRequest."External Customer ID") then
-                CurrentShopperRef += StrSubstNo(', %1 %2', Format(EFTShopperRecognition."Entity Type"), EFTShopperRecognition."Entity Key");
+                CurrentShopperRef += StrSubstNo(CurrentShopperRefLbl, Format(EFTShopperRecognition."Entity Type"), EFTShopperRecognition."Entity Key");
             AbortAcquireCard(EFTTransactionRequest, StrSubstNo(CONTRACT_DUPLICATE, EFTShopperRecognition.FieldCaption("Shopper Reference"), CurrentShopperRef));
             exit(true);
         end;

@@ -57,6 +57,7 @@ page 6151187 "NPR MM Member Comm. Setup"
                     Path: Text;
                     PassData: Text;
                     TemplateOutStream: outstream;
+                    FileNameLbl: Label '%1 - %2.json', Locked = true;
                 begin
                     Rec.CalcFields("Sender Template");
                     if (not REc."Sender Template".HasValue()) then begin
@@ -78,7 +79,7 @@ page 6151187 "NPR MM Member Comm. Setup"
                     TempBlob.FromRecord(Rec, Rec.FieldNo("Sender Template"));
                     if (not TempBlob.HasValue()) then
                         exit;
-                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo('%1 - %2.json', Rec."Membership Code", Rec.Description), true);
+                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo(FileNameLbl, Rec."Membership Code", Rec.Description), true);
 
                 end;
             }

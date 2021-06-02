@@ -25,6 +25,7 @@ codeunit 6184531 "NPR EFT Adyen Abort Unfin. Trx"
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
         EntryNoToCheck: Integer;
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
+        AbortReqLbl: Label 'Creating abort request for entry %1';
     begin
         if EFTTransactionRequest.Successful then
             exit;
@@ -41,10 +42,8 @@ codeunit 6184531 "NPR EFT Adyen Abort Unfin. Trx"
         if LastEFTTransactionRequest."External Result Known" then
             exit;
 
-        EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionRequest."Entry No.", StrSubstNo('Creating abort request for entry %1', EntryNoToCheck), '');
-        //-NPR5.54 [364340]
+        EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionRequest."Entry No.", StrSubstNo(AbortReqLbl, EntryNoToCheck), '');
         EFTAdyenCloudIntegration.AbortTransaction(LastEFTTransactionRequest, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
-        //+NPR5.54 [364340]
     end;
 
     local procedure GetLastTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Integer
