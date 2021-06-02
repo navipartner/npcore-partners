@@ -277,6 +277,8 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipEntry: Record "NPR MM Membership Entry";
+        ResponseLbl: Label 'Invalid Admission Code %1';
+        Response2Lbl: Label 'Membership %1 does not have a member %2';
     begin
 
         errordescription := '';
@@ -289,7 +291,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
 
         if (AdmissionCode <> '') then
             if (not AdmissionSetup.Get(AdmissionCode)) then begin
-                AddErrorResponse(StrSubstNo('Invalid Admission Code %1', AdmissionCode));
+                AddErrorResponse(StrSubstNo(ResponseLbl, AdmissionCode));
                 exit;
             end;
 
@@ -302,7 +304,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
             MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
             //IF (MembershipRole.IsEmpty ()) THEN BEGIN
             if (not MembershipRole.FindFirst()) then begin
-                AddErrorResponse(StrSubstNo('Membership %1 does not have a member %2', Membership."External Membership No.", tmpMemberInfoCapture."External Member No"));
+                AddErrorResponse(StrSubstNo(Response2Lbl, Membership."External Membership No.", tmpMemberInfoCapture."External Member No"));
                 exit;
             end;
 

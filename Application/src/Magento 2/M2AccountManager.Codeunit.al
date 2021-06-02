@@ -38,6 +38,8 @@
         TmpGlobsalShiptoAddressRequest: Record "Ship-to Address" temporary;
         TmpGlobalShiptoAddressResponse: Record "Ship-to Address" temporary;
         CONFIRM_GLOBAL_RESET_PASSWORD: Label 'Are you sure that you want to send an email to %1 Magento contacts?';
+        IdLbl: Label ',{"id":"%1","storecode":"%2"}', Locked = true;
+        AccountLbl: Label '{"account": {"email":"%1", "accounts":[%2]}}', Locked = true;
 
     procedure SetFunction(FunctionIn: Option)
     begin
@@ -416,12 +418,11 @@
                         ;
 
             Customer.TestField("NPR Magento Store Code");
-            msg := msg + StrSubstNo(',{"id":"%1","storecode":"%2"}', Contact."No.", Customer."NPR Magento Store Code");
+            msg := msg + StrSubstNo(IdLbl, Contact."No.", Customer."NPR Magento Store Code");
 
         until (Contact.Next() = 0);
 
-        // {"account": {"email":"tim@sannes.se", "accounts" : [{"id":"a","storecode":"dk"},{"id":"b","storecode":"fi"}]}}
-        Body.ReadFrom(StrSubstNo('{"account": {"email":"%1", "accounts":[%2]}}', Email, CopyStr(msg, 2)));
+        Body.ReadFrom(StrSubstNo(AccountLbl, Email, CopyStr(msg, 2)));
 
         MagentoApiPost('passwordreset', Body, Result);
     end;
@@ -1440,7 +1441,7 @@
         Client.Send(HttpWebRequest, HttpWebResponse);
         HttpWebResponse.Content.ReadAs(Response);
         if not HttpWebResponse.IsSuccessStatusCode() then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
         Result.ReadFrom(Response);
     end;

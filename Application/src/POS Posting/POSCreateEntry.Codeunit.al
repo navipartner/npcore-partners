@@ -99,6 +99,7 @@
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
+        SalesHeaderLbl: Label '%1 %2', Locked = true;
     begin
         OnBeforeCreatePOSEntry(SalePOS);
 
@@ -119,7 +120,7 @@
             SetPostedSalesDocInfo(POSEntry, SalesHeader);
 
         if POSEntry.Description = '' then
-            POSEntry.Description := StrSubstNo('%1 %2', SalesHeader."Document Type", SalesHeader."No.");
+            POSEntry.Description := StrSubstNo(SalesHeaderLbl, SalesHeader."Document Type", SalesHeader."No.");
         POSEntry.Modify();
 
         POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CREDIT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CREDIT_SALE_END, '');
@@ -132,6 +133,7 @@
         Contact: Record Contact;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SaleLinePOS: Record "NPR POS Sale Line";
+        SalespersonLbl: Label '%1: %2', Locked = true;
     begin
         POSEntry.Init();
         POSEntry."Entry No." := 0; //Autoincrement;
@@ -177,7 +179,7 @@
                 POSEntry."Entry Type"::Balancing:
                     begin
                         if (not SalespersonPurchaser.Get(SalePOS."Salesperson Code")) then
-                            SalespersonPurchaser.Name := StrSubstNo('%1: %2', SalespersonPurchaser.TableCaption, SalePOS."Salesperson Code");
+                            SalespersonPurchaser.Name := StrSubstNo(SalespersonLbl, SalespersonPurchaser.TableCaption, SalePOS."Salesperson Code");
                         POSEntry.Description := SalespersonPurchaser.Name;
                     end;
 
@@ -435,12 +437,13 @@
         POSBinEntry: Record "NPR POS Bin Entry";
         POSPaymentMethod: Record "NPR POS Payment Method";
         Difference: Decimal;
+        POSBalancingLineDescriptionLbl: Label '%1: %2 - %3', Locked = true;
     begin
 
         POSBalancingLine.Init();
         POSBalancingLine."POS Entry No." := POSEntry."Entry No.";
         POSBalancingLine."Line No." := LineNo;
-        POSBalancingLine.Description := StrSubstNo('%1: %2 - %3', POSEntry.TableCaption, POSEntry."Entry No.", PaymentBinCheckpoint."Payment Method No.");
+        POSBalancingLine.Description := StrSubstNo(POSBalancingLineDescriptionLbl, POSEntry.TableCaption, POSEntry."Entry No.", PaymentBinCheckpoint."Payment Method No.");
 
         POSBalancingLine."POS Bin Checkpoint Entry No." := PaymentBinCheckpoint."Entry No.";
         POSBalancingLine."POS Period Register No." := POSEntry."POS Period Register No.";
@@ -765,8 +768,9 @@
     var
         POSEntry: Record "NPR POS Entry";
         CreatedEntryNo: Integer;
+        SystemEventLbl: Label '[System Event] %1 transferred to location receipt %2', Locked = true;
     begin
-        CreatedEntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo('[System Event] %1 transferred to location receipt %2', OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
+        CreatedEntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo(SystemEventLbl, OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
     end;
 
     local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; Description: Text[80]): Integer
@@ -897,6 +901,7 @@
         PaymentBinCheckpointUpdate: Record "NPR POS Payment Bin Checkp.";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SalespersonPurchaserLbl: Label '%1: %2', Locked = true;
     begin
 
         PaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftEntryNo);
@@ -933,7 +938,7 @@
                 begin
                     InsertPOSEntry(POSPeriodRegister, SalePOS, POSEntry, POSEntry."Entry Type"::Balancing);
                     if (not SalespersonPurchaser.Get(SalePOS."Salesperson Code")) then
-                        SalespersonPurchaser.Name := StrSubstNo('%1: %2', SalespersonPurchaser.TableCaption, SalePOS."Salesperson Code");
+                        SalespersonPurchaser.Name := StrSubstNo(SalespersonPurchaserLbl, SalespersonPurchaser.TableCaption, SalePOS."Salesperson Code");
                     POSEntry.Description := SalespersonPurchaser.Name;
                 end;
 
@@ -984,6 +989,7 @@
         PosRmaLine: Record "NPR POS RMA Line";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
+        RMAEntryLbl: Label '%1|%2|%3', Locked = true;
     begin
 
         if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
@@ -1014,8 +1020,8 @@
 
         OnAfterInsertRmaEntry(PosRmaLine, POSEntry, SalePOS, SaleLinePOS);
 
-        POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::ITEM_RMA, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", '',
-          StrSubstNo('%1|%2|%3', PosRmaLine."Return Line No.", PosRmaLine."Sales Ticket No.", PosRmaLine."Return Reason Code"));
+        POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId(), POSAuditLog."Action Type"::ITEM_RMA, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", '',
+          StrSubstNo(RMAEntryLbl, PosRmaLine."Return Line No.", PosRmaLine."Sales Ticket No.", PosRmaLine."Return Reason Code"));
 
     end;
 
@@ -1129,6 +1135,7 @@
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
         PostedDocumentNo: Code[20];
+        POSEntryDescLbl: Label '%1 %2', Locked = true;
     begin
 
         if not (SalesHeader.Ship or SalesHeader.Invoice or SalesHeader.Receive) then
@@ -1166,7 +1173,7 @@
 
             POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
             if POSEntry.Description = '' then
-                POSEntry.Description := StrSubstNo('%1 %2', POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
+                POSEntry.Description := StrSubstNo(POSEntryDescLbl, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         end;
 
         if SalesHeader.Ship then begin
@@ -1182,7 +1189,7 @@
         end;
 
         if POSEntry.Description = '' then
-            POSEntry.Description := StrSubstNo('%1 %2', POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
+            POSEntry.Description := StrSubstNo(POSEntryDescLbl, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
 
     end;
 

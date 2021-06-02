@@ -155,6 +155,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
     local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         FlowStatus: Record "NPR NPRE Flow Status";
+        FlowStatusCodeLbl: Label '@%1*', Locked = true;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -168,7 +169,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
                     FlowStatus.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(FlowStatus.Code));
                     if not FlowStatus.Find() then begin
                         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);
-                        FlowStatus.SetFilter(Code, CopyStr(StrSubstNo('@%1*', POSParameterValue.Value), 1, MaxStrLen(FlowStatus.Code)));
+                        FlowStatus.SetFilter(Code, CopyStr(StrSubstNo(FlowStatusCodeLbl, POSParameterValue.Value), 1, MaxStrLen(FlowStatus.Code)));
                         FlowStatus.FindFirst();
                     end;
                     POSParameterValue.Value := FlowStatus.Code;

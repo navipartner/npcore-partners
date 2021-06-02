@@ -17,6 +17,7 @@
         INVALID_QTY: Label 'Invalid quantity. Old quantity %1, new quantity %2.';
         Text000: Label 'Update Ticket metadata on Sale Line Insert';
         REVOKE_IN_PROGRESS: Label 'Ticket %1 is being processed for revoke and can''t be added at this time.';
+        TICKETMGMTLbl: Label 'TM_TICKETMGMT_%1', Locked = true;
 
     local procedure "--Subscribers"()
     begin
@@ -24,9 +25,8 @@
 
     local procedure ActionCode(VersionCode: Code[10]): Text
     begin
-
         if (VersionCode <> '') then
-            exit(StrSubstNo('TM_TICKETMGMT_%1', VersionCode));
+            exit(StrSubstNo(TICKETMGMTLbl, VersionCode));
 
         exit('TM_TICKETMGMT');
     end;
@@ -43,6 +43,8 @@
         JSArr: Text;
         N: Integer;
         OptionsNameArray: Text;
+        JsArrLbl: Label '"%1",', Locked = true;
+        JsArr2Lbl: Label 'var optionNames = [%1];', Locked = true;
     begin
 
         if Sender.DiscoverAction(
@@ -60,8 +62,8 @@
                                   'Register Departure';
 
             for N := 1 to 10 do
-                JSArr += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
-            JSArr := StrSubstNo('var optionNames = [%1];', CopyStr(JSArr, 1, StrLen(JSArr) - 1));
+                JSArr += StrSubstNo(JsArrLbl, SelectStr(N, FunctionOptionString));
+            JSArr := StrSubstNo(JsArr2Lbl, CopyStr(JSArr, 1, StrLen(JSArr) - 1));
 
             Sender.RegisterWorkflowStep('0', JSArr + 'windowTitle = labels.TicketTitle.substitute (optionNames[param.Function].toString()); ');
             Sender.RegisterWorkflowStep('0', JSArr + 'if (param.Function < 0) {param.Function = 1;}; windowTitle = labels.TicketTitle.substitute (optionNames[param.Function].toString());');
@@ -93,8 +95,8 @@
                                   'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,' +
                                   'Register Departure';
             for N := 1 to 10 do
-                OptionsNameArray += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
-            OptionsNameArray := StrSubstNo('var optionNames = [%1];', CopyStr(OptionsNameArray, 1, StrLen(OptionsNameArray) - 1));
+                OptionsNameArray += StrSubstNo(JsArrLbl, SelectStr(N, FunctionOptionString));
+            OptionsNameArray := StrSubstNo(JsArr2Lbl, CopyStr(OptionsNameArray, 1, StrLen(OptionsNameArray) - 1));
 
             Sender.RegisterWorkflow20(
 

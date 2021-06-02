@@ -157,9 +157,11 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
     end;
 
     procedure SetResponse(var TmpFactLines: Record "NPR TM Ticket Access Fact" temporary; var TmpFactCols: Record "NPR TM Ticket Access Fact" temporary; var TmpStatisticsIn: Record "NPR TM Ticket Access Stats" temporary)
+    var
+        StatisticsNotFoundLbl: Label 'No statistics found for daterange %1..%2';
     begin
 
-        SetErrorResponse(StrSubstNo('No statistics found for daterange %1..%2', Format(RequestFromDate, 0, 9), Format(RequestUntilDate, 0, 9)));
+        SetErrorResponse(StrSubstNo(StatisticsNotFoundLbl, Format(RequestFromDate, 0, 9), Format(RequestUntilDate, 0, 9)));
 
         // Transfer fact lines
         TmpFactLines.Reset();
@@ -201,11 +203,12 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
     end;
 
     procedure SetErrorResponse(ReasonText: Text)
+    var
+        ExecutionTimeLbl: Label '%1 (ms)',Locked = true;
     begin
-
         ResponseStatus := 'ERROR';
         ResponseMessage := ReasonText;
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 }
 

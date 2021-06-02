@@ -680,6 +680,7 @@
     var
         PepperAuxFunctions: Codeunit "NPR Pepper Aux Func. TSD";
         AuxFunction: Option;
+        AuxFunctionLbl: Label 'Auxilary function: %1', Locked = true;
     begin
 
         PepperAuxFunctions.InitializeProtocol();
@@ -717,8 +718,8 @@
                 PepperAuxFunctions.SetShowCustomMenu();
         end;
 
-        AddToCommentBatch(StrSubstNo('Auxilary function: %1', EFTTransactionRequest."Pepper Trans. Subtype Code"));
-        AddToCommentBatch(StrSubstNo('Auxilary function: %1', SelectStr(AuxFunction, AuxFunctionMenu)));
+        AddToCommentBatch(StrSubstNo(AuxFunctionLbl, EFTTransactionRequest."Pepper Trans. Subtype Code"));
+        AddToCommentBatch(StrSubstNo(AuxFunctionLbl, SelectStr(AuxFunction, AuxFunctionMenu)));
 
         UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
 
@@ -1852,10 +1853,12 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
+    var
+        EFTIntegrationTypeDescriptionLbl: Label '%1 %2 %3', Locked = true;
     begin
 
         tmpEFTIntegrationType.Code := GetIntegrationType();
-        tmpEFTIntegrationType.Description := StrSubstNo('%1 %2 %3', 'Treibauf', 'Pepper', PepperDescription);
+        tmpEFTIntegrationType.Description := StrSubstNo(EFTIntegrationTypeDescriptionLbl, 'Treibauf', 'Pepper', PepperDescription);
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR Pepper Library TSD";
         tmpEFTIntegrationType.Insert();
 

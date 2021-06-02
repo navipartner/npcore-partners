@@ -42,6 +42,8 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
         i: Integer;
         AdmissionCode: array[10] of Code[20];
         TimeHeaderCreated: Boolean;
+        PrinterLbl: Label '%1 %2', Locked = true;
+        Printer2Lbl: Label '%1 - %2', Locked = true;
     begin
         Printer.SetFont('Control');
         Printer.AddLine('h');
@@ -82,7 +84,7 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
             repeat
                 if Admission.Get(TicketAccessEntry."Admission Code") then begin
                     Printer.AddTextField(1, 0, '   ' + Admission.Description);
-                    Printer.AddTextField(2, 2, StrSubstNo('%1 %2', TicketAccessEntry.Quantity, TicketAccessEntry.FieldCaption(Quantity)));
+                    Printer.AddTextField(2, 2, StrSubstNo(PrinterLbl, TicketAccessEntry.Quantity, TicketAccessEntry.FieldCaption(Quantity)));
                     i += 1;
                     AdmissionCode[i] := Admission."Admission Code";
                     TMDetTickAccEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
@@ -108,7 +110,7 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
         for i := 1 to ArrayLen(AdmissionCode) do begin
             if Admission.Get(AdmissionCode[i]) then begin
                 Printer.AddTextField(1, 0, '   ' + Admission.Description);
-                Printer.AddTextField(2, 2, StrSubstNo('%1 - %2', AdmStartDate[i], AdmEndDate[i]));
+                Printer.AddTextField(2, 2, StrSubstNo(Printer2Lbl, AdmStartDate[i], AdmEndDate[i]));
                 Printer.NewLine();
             end;
         end;
@@ -124,7 +126,7 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
                     TimeHeaderCreated := true;
                 end;
                 Printer.AddTextField(1, 0, '   ' + Admission.Description);
-                Printer.AddTextField(2, 2, StrSubstNo('%1 - %2', AdmStartTime[i], AdmEndTime[i]));
+                Printer.AddTextField(2, 2, StrSubstNo(Printer2Lbl, AdmStartTime[i], AdmEndTime[i]));
                 Printer.NewLine();
             end;
         end;

@@ -8,6 +8,8 @@ codeunit 6060048 "NPR Item Wksht. WebService"
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
+        DocumentNameLbl: Label 'ItemWorksheetLine-%1.xml', Locked = true;
+        FailedLbl: Label 'FAILED with error %1', Locked = true;
     begin
         SelectLatestVersion();
         itemworksheetlines.Import();
@@ -17,7 +19,7 @@ codeunit 6060048 "NPR Item Wksht. WebService"
         if (ImportEntry."Document ID" = '') then
             ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
-        ImportEntry."Document Name" := StrSubstNo('ItemWorksheetLine-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(DocumentNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
         ImportEntry."Document Source".CreateOutStream(OutStr);
         itemworksheetlines.SetDestination(OutStr);
@@ -33,7 +35,7 @@ codeunit 6060048 "NPR Item Wksht. WebService"
         ImportEntry.Get(ImportEntry."Entry No.");
 
         if (not ImportEntry.Imported) then
-            itemworksheetlines.SetItemWorksheetLineResult(StrSubstNo('FAILED with error %1', ImportEntry."Error Message"))
+            itemworksheetlines.SetItemWorksheetLineResult(StrSubstNo(FailedLbl, ImportEntry."Error Message"))
         else
             itemworksheetlines.SetItemWorksheetLineResult('SUCCESS');
 
@@ -42,6 +44,8 @@ codeunit 6060048 "NPR Item Wksht. WebService"
 
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
+    var
+        FileNameLbl: Label '%1-%2.xml', Locked = true;
     begin
         ImportEntry.Init();
         ImportEntry."Entry No." := 0;
@@ -54,7 +58,7 @@ codeunit 6060048 "NPR Item Wksht. WebService"
         end;
 
         ImportEntry.Date := CurrentDateTime;
-        ImportEntry."Document Name" := StrSubstNo('%1-%2.xml', ImportEntry."Import Type", Format(ImportEntry.Date, 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, ImportEntry."Import Type", Format(ImportEntry.Date, 0, 9));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry.Insert(true);

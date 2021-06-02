@@ -270,7 +270,7 @@ report 6060132 "NPR MM Membership Status"
 
         Filters += ' | ' + DateFilterCaption + ' ' + Format(ReferenceDate);
         Filters += ' | ' + ExpireWithinCaption + ' ' + Format(ExpiresWithinDateformula);
-        Filters += StrSubstNo(' | %1: %2', RenewedWithinCaption, Format(RenewedWithin));
+        Filters += StrSubstNo(Pct1Lbl, RenewedWithinCaption, Format(RenewedWithin));
     end;
 
     var
@@ -302,5 +302,6 @@ report 6060132 "NPR MM Membership Status"
         Date2Caption: Label 'Until Date';
         MembershipStatus: Option Active,"Active and Renewed","Active and Not Renewed","Not Active";
         Filters: Text;
+        Pct1Lbl: Label ' | %1: %2', locked = true;
 }
 

@@ -83,6 +83,7 @@
         CustomerPriceManagement: Codeunit "NPR HC Customer Price Mgt.";
         TmpSalesHeader: Record "Sales Header" temporary;
         TmpSalesLine: Record "Sales Line" temporary;
+        CustomerPriceRequestSetErrorResponseLbl: Label '<h3>HQ Connect Server:</h3><br>%1', Locked = true;
     begin
         SelectLatestVersion();
         customerPriceRequest.Import();
@@ -99,7 +100,7 @@
         customerPriceRequest.GetRequest(TmpSalesHeader, TmpSalesLine);
         ClearLastError();
         if (not CustomerPriceManagement.TryProcessRequest(TmpSalesHeader, TmpSalesLine)) then begin
-            customerPriceRequest.SetErrorResponse(StrSubstNo('<h3>HQ Connect Server:</h3><br>%1', GetLastErrorText));
+            customerPriceRequest.SetErrorResponse(StrSubstNo(CustomerPriceRequestSetErrorResponseLbl, GetLastErrorText));
             NaviConnectImportEntry.Imported := false;
             NaviConnectImportEntry."Runtime Error" := true;
         end else begin
@@ -123,6 +124,7 @@
         OutStr: OutStream;
         HCGenericWebReqManagement: Codeunit "NPR HC Generic Web Req. Mgt.";
         TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
+        GenericRequestSetErrorResponseLbl: Label '<h3>HQ Connect Server:</h3><br>%1', Locked = true;
     begin
         SelectLatestVersion();
         genericrequest.Import();
@@ -139,7 +141,7 @@
         genericrequest.GetRequest(TmpHCGenericWebRequest);
         ClearLastError();
         if (not HCGenericWebReqManagement.TryProcessRequest(TmpHCGenericWebRequest)) then begin
-            genericrequest.SetErrorResponse(StrSubstNo('<h3>HQ Connect Server:</h3><br>%1', GetLastErrorText));
+            genericrequest.SetErrorResponse(StrSubstNo(GenericRequestSetErrorResponseLbl, GetLastErrorText));
             NaviConnectImportEntry.Imported := false;
             NaviConnectImportEntry."Runtime Error" := true;
         end else begin

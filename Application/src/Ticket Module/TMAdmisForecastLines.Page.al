@@ -203,6 +203,7 @@ page 6151139 "NPR TM Admis. Forecast Lines"
         LINE_StartTime: Text;
         PageStatisticsOption: Option INITIAL,RESERVATION,UTILIZATION_PCT,CAPACITY_PCT;
         PagePeriodOption: Option ACTUAL,DAY,WEEK,MONTH,QUARTER,YEAR;
+        CellValueLbl: Label '%1%', Locked = true;
 
     local procedure MATRIX_OnDrillDown(ColumnOrdinal: Integer)
     var
@@ -320,12 +321,12 @@ page 6151139 "NPR TM Admis. Forecast Lines"
                 PageStatisticsOption::UTILIZATION_PCT:
                     begin
                         CellValue := '~';
-                        if (CellCapacity <> 0) then CellValue := StrSubstNo('%1%', Round(CellSum / CellCapacity * 100, 0.01));
+                        if (CellCapacity <> 0) then CellValue := StrSubstNo(CellValueLbl, Round(CellSum / CellCapacity * 100, 0.01));
                     end;
                 PageStatisticsOption::CAPACITY_PCT:
                     begin
                         CellValue := '100%';
-                        if (CellCapacity <> 0) then CellValue := StrSubstNo('%1%', Round(100 - CellSum / CellCapacity * 100, 0.01));
+                        if (CellCapacity <> 0) then CellValue := StrSubstNo(CellValueLbl, Round(100 - CellSum / CellCapacity * 100, 0.01));
                     end;
 
                 else

@@ -20,8 +20,10 @@ codeunit 6014525 "NPR MobilePayV10 Get Payment"
     end;
 
     internal procedure GetRequestResponse(): text
+    var
+        ReqRespLbl: Label '==Request==\%1\\==Response==\(%2)\%3', Locked = true;
     begin
-        exit(StrSubstNo('==Request==\%1\\==Response==\(%2)\%3', _request, _responseHttpCode, _response));
+        exit(StrSubstNo(ReqRespLbl, _request, _responseHttpCode, _response));
     end;
 
     internal procedure SetPaymentDetailBuffer(var TempMobilePayV10Paymenter: Record "NPR MobilePayV10 Payment" temporary)

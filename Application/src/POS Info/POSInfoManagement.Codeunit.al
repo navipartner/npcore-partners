@@ -559,8 +559,10 @@
     end;
 
     local procedure DataSoucePOSInfoColumnName(POSInfoCode: Code[20]): Text
+    var
+        POSInfoCodeLbl: Label '%1', Locked = true;
     begin
-        exit(StrSubstNo('%1', POSInfoCode));
+        exit(StrSubstNo(POSInfoCodeLbl, POSInfoCode));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
@@ -582,6 +584,7 @@
     var
         POSInfo: Record "NPR POS Info";
         DataType: Enum "NPR Data Type";
+        POSInfoLbl: Label 'POS Info: %1', Locked = true;
     begin
         if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
@@ -592,7 +595,7 @@
         if not POSInfo.FindSet() then
             exit;
         repeat
-            DataSource.AddColumn(DataSoucePOSInfoColumnName(POSInfo.Code), StrSubstNo('POS Info: %1', POSInfo.Code), DataType::String, false);
+            DataSource.AddColumn(DataSoucePOSInfoColumnName(POSInfo.Code), StrSubstNo(POSInfoLbl, POSInfo.Code), DataType::String, false);
         until POSInfo.Next() = 0;
     end;
 

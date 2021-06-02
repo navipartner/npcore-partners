@@ -180,8 +180,10 @@ xmlport 6060118 "NPR TM Ticket Reserv.AndArrive"
     end;
 
     procedure GetSummary(): Text[30]
+    var
+        SummaryLbl: Label '%1-%2', Locked = true;
     begin
-        exit(StrSubstNo('%1-%2', ExternalIdCount, QtySum));
+        exit(StrSubstNo(SummaryLbl, ExternalIdCount, QtySum));
     end;
 
     procedure SetReservationResult(DocumentID: Text[100])

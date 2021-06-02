@@ -65,6 +65,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         WaitingListSetup: Record "NPR TM Waiting List Setup";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TicketReservationRequestUpdate: Record "NPR TM Ticket Reservation Req.";
+        DateTimeLbl: Label '%1 - %2', Locked = true;
     begin
 
         TicketWaitingList."Entry No." := 0;
@@ -74,7 +75,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (AdmissionScheduleEntry.FindFirst()) then
-            TicketWaitingList."Schedule Entry Description" := StrSubstNo('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+            TicketWaitingList."Schedule Entry Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
 
         if (TicketReservationRequest."Admission Code" = '') then
             TicketReservationRequest."Admission Code" := AdmissionScheduleEntry."Admission Code";

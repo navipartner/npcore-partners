@@ -17,8 +17,10 @@ codeunit 6014557 "NPR MobilePayV10 Start Refund"
     end;
 
     internal procedure GetRequestResponse(): text
+    var
+        ReqRespLbl: Label '==Request==\%1\\==Response==\(%2)\%3', Locked = true;
     begin
-        exit(StrSubstNo('==Request==\%1\\==Response==\(%2)\%3', _request, _responseHttpCode, _response));
+        exit(StrSubstNo(ReqRespLbl, _request, _responseHttpCode, _response));
     end;
 
     internal procedure GetResponse(): Text

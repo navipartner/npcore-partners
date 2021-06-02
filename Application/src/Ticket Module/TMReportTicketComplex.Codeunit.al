@@ -42,6 +42,8 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
         i: Integer;
         AdmissionCode: array[10] of Code[20];
         TimeHeaderCreated: Boolean;
+        PrinterLbl: Label '%1 %2', Locked = true;
+        Printer2Lbl: Label '%1 - %2', Locked = true;
     begin
         Printer.SetFont('Control');
         Printer.AddLine('h');
@@ -82,7 +84,7 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
             repeat
                 if Admission.Get(TicketAccessEntry."Admission Code") then begin
                     Printer.AddTextField(1, 0, '   ' + Admission.Description);
-                    Printer.AddTextField(2, 2, StrSubstNo('%1 %2', TicketAccessEntry.Quantity, TicketAccessEntry.FieldCaption(Quantity)));
+                    Printer.AddTextField(2, 2, StrSubstNo(PrinterLbl, TicketAccessEntry.Quantity, TicketAccessEntry.FieldCaption(Quantity)));
                     i += 1;
                     AdmStartDate[i] := Ticket."Valid From Date";
                     AdmEndDate[i] := Ticket."Valid To Date";
@@ -113,7 +115,7 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
             if Admission.Get(AdmissionCode[i]) then begin
                 Printer.AddTextField(1, 0, '   ' + Admission.Description);
                 if (AdmStartDate[i] <> AdmEndDate[i]) then
-                    Printer.AddTextField(2, 2, StrSubstNo('%1 - %2', AdmStartDate[i], AdmEndDate[i]))
+                    Printer.AddTextField(2, 2, StrSubstNo(Printer2Lbl, AdmStartDate[i], AdmEndDate[i]))
                 else
                     Printer.AddTextField(2, 2, Format(AdmStartDate[i]));
                 Printer.NewLine();
@@ -132,7 +134,7 @@ codeunit 6060122 "NPR TM Report - Ticket Complex"
                 end;
                 Printer.AddTextField(1, 0, '   ' + Admission.Description);
                 if AdmStartTime[i] <> AdmEndTime[i] then
-                    Printer.AddTextField(2, 2, StrSubstNo('%1 - %2', AdmStartTime[i], AdmEndTime[i]))
+                    Printer.AddTextField(2, 2, StrSubstNo(Printer2Lbl, AdmStartTime[i], AdmEndTime[i]))
                 else
                     Printer.AddTextField(2, 2, Format(AdmStartTime[i]));
                 Printer.NewLine();

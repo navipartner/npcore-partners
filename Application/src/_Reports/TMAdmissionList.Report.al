@@ -96,7 +96,7 @@ report 6060126 "NPR TM Admission List"
                                         TempMMMember."Entry No." := MMMember."Entry No.";
                                         TempMMMember.Insert();
                                     end;
-                                    AccessName := StrSubstNo('%3, %1 %2', MMMember."First Name", MMMember."Middle Name", MMMember."Last Name");
+                                    AccessName := StrSubstNo(Pct1Lbl, MMMember."First Name", MMMember."Middle Name", MMMember."Last Name");
                                     AccessEmail := MMMember."E-Mail Address";
                                     AccessPhone := MMMember."Phone No.";
                                 end else
@@ -180,5 +180,6 @@ report 6060126 "NPR TM Admission List"
         AccessEmail: Text;
         AccessName: Text;
         AccessPhone: Text;
+        Pct1Lbl: Label '%3, %1 %2', locked = true;
 }
 

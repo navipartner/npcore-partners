@@ -341,14 +341,15 @@
     end;
 
     local procedure FilterAndFilter(pFilter1: Text; pFilter2: Text) newFilter: Text
+    var
+        FilterLbl: Label '%1&%2', Locked = true;
     begin
-
         newFilter := pFilter1;
         if (newFilter = '') then
             newFilter := pFilter2
         else
             if (pFilter2 <> '') then
-                newFilter := StrSubstNo('%1&%2', pFilter1, pFilter2);
+                newFilter := StrSubstNo(FilterLbl, pFilter1, pFilter2);
 
         exit(newFilter);
     end;

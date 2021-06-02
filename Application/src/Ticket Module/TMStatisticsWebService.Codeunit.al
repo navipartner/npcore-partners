@@ -72,6 +72,7 @@ codeunit 6060110 "NPR TM Statistics WebService"
     local procedure GetFactOption(DimensionText: Text; var FactCode: Option; var ReasonText: Text): Boolean
     var
         TicketAccessFact: Record "NPR TM Ticket Access Fact";
+        ReasonLbl: Label 'Unknown dimensioncode [%1], use one of: [Ticket, TicketType, AdmissionDate, AdmissionHour, AdmissionCode, TicketVariant] or [0,1,2,3,4,5] for short.';
     begin
 
         case UpperCase(DimensionText) of
@@ -88,7 +89,7 @@ codeunit 6060110 "NPR TM Statistics WebService"
             '5', 'VARIANTCODE', 'TICKETVARIANT', 'TICKET VARIANT':
                 FactCode := TicketAccessFact."Fact Name"::VARIANT_CODE;
             else begin
-                    ReasonText := StrSubstNo('Unknown dimensioncode [%1], use one of: [Ticket, TicketType, AdmissionDate, AdmissionHour, AdmissionCode, TicketVariant] or [0,1,2,3,4,5] for short.', DimensionText);
+                    ReasonText := StrSubstNo(ReasonLbl, DimensionText);
                     exit(false);
                 end;
         end;
@@ -222,6 +223,8 @@ codeunit 6060110 "NPR TM Statistics WebService"
         FactCode: Code[20];
         Admission: Record "NPR TM Admission";
         Variant: Record "Item Variant";
+        FactCodeLbl: Label '0%1', Locked = true;
+        FactDescriptionLbl: Label '%1:00 - %1:59', Locked = true;
     begin
 
         TmpTicketAccessStatistics.Reset();
@@ -277,12 +280,12 @@ codeunit 6060110 "NPR TM Statistics WebService"
 
             FactCode := Format(TmpTicketAccessStatistics."Admission Hour");
             if (StrLen(FactCode) = 1) then
-                FactCode := StrSubstNo('0%1', FactCode);
+                FactCode := StrSubstNo(FactCodeLbl, FactCode);
             if (not TmpTicketAccessFact.Get(TmpTicketAccessFact."Fact Name"::ADMISSION_HOUR, FactCode)) then begin
                 TmpTicketAccessFact.Init();
                 TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::ADMISSION_HOUR;
                 TmpTicketAccessFact."Fact Code" := FactCode;
-                TmpTicketAccessFact.Description := StrSubstNo('%1:00 - %1:59', FactCode);
+                TmpTicketAccessFact.Description := StrSubstNo(FactDescriptionLbl, FactCode);
                 TmpTicketAccessFact.Insert();
             end;
         until (TmpTicketAccessStatistics.Next() = 0);

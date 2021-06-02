@@ -30,6 +30,10 @@
         LoyaltyCode: Code[20];
         BurnFactor: Decimal;
         EarnFactor: Decimal;
+        CreateLoyaltyLbl: Label '%1-LOYALTY', Locked = true;
+        CreateMembershipLbl: Label '%1%2', Locked = true;
+        CreateEndpointsLbl: Label '%1-M', Locked = true;
+        CreateEndpoints2Lbl: Label '%1-L', Locked = true;
     begin
 
         NPRLoyaltyWizard.LookupMode(true);
@@ -43,11 +47,11 @@
         NPRLoyaltyWizard.GetUserSetup(CommunityCode, MembershipCode, Prefix, PaymentTypeCode, GL_Account, BaseUrl, UserName, Password, Description, AuthCode, LoyaltyCompanyName, EarnFactor, BurnFactor, TenantName);
 
         CreateCommunity(CommunityCode, Prefix, CopyStr(Description, 1, 50));
-        LoyaltyCode := CreateLoyalty(StrSubstNo('%1-LOYALTY', CommunityCode), CopyStr(Description, 1, 50), EarnFactor, BurnFactor);
-        CreateMembership(CommunityCode, StrSubstNo('%1%2', Prefix, MembershipCode), LoyaltyCode, CopyStr(Description, 1, 50));
+        LoyaltyCode := CreateLoyalty(StrSubstNo(CreateLoyaltyLbl, CommunityCode), CopyStr(Description, 1, 50), EarnFactor, BurnFactor);
+        CreateMembership(CommunityCode, StrSubstNo(CreateMembershipLbl, Prefix, MembershipCode), LoyaltyCode, CopyStr(Description, 1, 50));
 
-        CreateEndpoints(CommunityCode, StrSubstNo('%1-M', CommunityCode), BaseUrl, 0, UserName, Password, TenantName);
-        CreateEndpoints(CommunityCode, StrSubstNo('%1-L', CommunityCode), BaseUrl, 1, UserName, Password, TenantName);
+        CreateEndpoints(CommunityCode, StrSubstNo(CreateEndpointsLbl, CommunityCode), BaseUrl, 0, UserName, Password, TenantName);
+        CreateEndpoints(CommunityCode, StrSubstNo(CreateEndpoints2Lbl, CommunityCode), BaseUrl, 1, UserName, Password, TenantName);
 
         CreatePOSPaymentMethod(PaymentTypeCode, BurnFactor);
         CreateEFTSetup(PaymentTypeCode);
@@ -72,6 +76,8 @@
     local procedure CreateCommunity(CommunityCode: Code[20]; Prefix: Code[10]; Description: Text[50]): Code[20]
     var
         MemberCommunity: Record "NPR MM Member Community";
+        ExtMembershipNoSeriesLbl: Label '%1-MS', Locked = true;
+        ExtMemberNoSeriesLbl: Label '%1-ME', Locked = true;
     begin
 
         if (not MemberCommunity.Get(CommunityCode)) then begin
@@ -82,8 +88,8 @@
         MemberCommunity.Init();
         MemberCommunity.Description := Description;
         MemberCommunity."Member Unique Identity" := MemberCommunity."Member Unique Identity"::NONE;
-        MemberCommunity."External Membership No. Series" := CreateNoSerie(StrSubstNo('%1-MS', Prefix), 'NPR-MS0000000001');
-        MemberCommunity."External Member No. Series" := CreateNoSerie(StrSubstNo('%1-ME', Prefix), 'NPR-ME0000000001');
+        MemberCommunity."External Membership No. Series" := CreateNoSerie(StrSubstNo(ExtMembershipNoSeriesLbl, Prefix), 'NPR-MS0000000001');
+        MemberCommunity."External Member No. Series" := CreateNoSerie(StrSubstNo(ExtMemberNoSeriesLbl, Prefix), 'NPR-ME0000000001');
         MemberCommunity."Member Logon Credentials" := MemberCommunity."Member Logon Credentials"::NA;
         MemberCommunity."Membership to Cust. Rel." := false;
 
@@ -180,6 +186,9 @@
     local procedure CreateEndpoints(CommunityCode: Code[20]; EndpointCode: Code[10]; BaseUrl: Text; ServiceType: Integer; Username: Text[50]; Password: Text[50]; TenantName: Text)
     var
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
+        CreateEndpointsLbl: Label 'NPR %1', Locked = true;
+        CreateEndpoints2Lbl: Label '%1%2', Locked = true;
+        CreateEndpoints3Lbl: Label '%1%2?tenant=%3', Locked = true;
     begin
 
         NPRRemoteEndpointSetup.SetFilter(Code, '=%1', EndpointCode);
@@ -187,29 +196,25 @@
 
         NPRRemoteEndpointSetup.Code := EndpointCode;
         NPRRemoteEndpointSetup.Type := ServiceType;
-        NPRRemoteEndpointSetup.Description := StrSubstNo('NPR %1', NPRRemoteEndpointSetup.Type);
+        NPRRemoteEndpointSetup.Description := StrSubstNo(CreateEndpointsLbl, NPRRemoteEndpointSetup.Type);
         NPRRemoteEndpointSetup."Credentials Type" := NPRRemoteEndpointSetup."Credentials Type"::NAMED;
         NPRRemoteEndpointSetup."User Account" := Username;
         NPRRemoteEndpointSetup."User Password" := Password;
         NPRRemoteEndpointSetup."Community Code" := CommunityCode;
 
-        // CASE Type OF
-        //   Type::LoyaltyServices: "Endpoint URI" := BaseUrl+'loyalty_services';
-        //   Type::MemberServices : "Endpoint URI" := BaseUrl+'member_services';
-        // END;
         if (TenantName = '') then begin
             case NPRRemoteEndpointSetup.Type of
                 NPRRemoteEndpointSetup.Type::LoyaltyServices:
-                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2', BaseUrl, 'loyalty_services');
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo(CreateEndpoints2Lbl, BaseUrl, 'loyalty_services');
                 NPRRemoteEndpointSetup.Type::MemberServices:
-                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2', BaseUrl, 'member_services');
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo(CreateEndpoints2Lbl, BaseUrl, 'member_services');
             end;
         end else begin
             case NPRRemoteEndpointSetup.Type of
                 NPRRemoteEndpointSetup.Type::LoyaltyServices:
-                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2?tenant=%3', BaseUrl, 'loyalty_services', TenantName);
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo(CreateEndpoints3Lbl, BaseUrl, 'loyalty_services', TenantName);
                 NPRRemoteEndpointSetup.Type::MemberServices:
-                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo('%1%2?tenant=%3', BaseUrl, 'member_services', TenantName)
+                    NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo(CreateEndpoints3Lbl, BaseUrl, 'member_services', TenantName)
             end;
         end;
 
@@ -236,6 +241,7 @@
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         POSStore: Record "NPR POS Store";
         FromCompany: Text;
+        CreateStoreSetupLbl: Label '%1-L', Locked = true;
     begin
 
         FromCompany := DATABASE.CompanyName;
@@ -251,7 +257,7 @@
                 LoyaltyStoreSetup.Init();
                 LoyaltyStoreSetup."Store Code" := POSStore.Code;
                 LoyaltyStoreSetup.Description := CopyStr(POSStore.Name, 1, MaxStrLen(LoyaltyStoreSetup.Description));
-                LoyaltyStoreSetup."Store Endpoint Code" := StrSubstNo('%1-L', CommunityCode);
+                LoyaltyStoreSetup."Store Endpoint Code" := StrSubstNo(CreateStoreSetupLbl, CommunityCode);
                 LoyaltyStoreSetup."Accept Client Transactions" := true;
                 LoyaltyStoreSetup."Authorization Code" := AuthorizationCode;
                 LoyaltyStoreSetup.Setup := LoyaltyStoreSetup.Setup::CLIENT;

@@ -230,6 +230,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         EFTSetup: Record "NPR EFT Setup";
         PaymentTypeFilter: Text;
         POSPaymentMethod: Record "NPR POS Payment Method";
+        PymTypePOSLbl: Label '%1', Locked = true;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -259,7 +260,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                     repeat
                         if PaymentTypeFilter <> '' then
                             PaymentTypeFilter += '|';
-                        PaymentTypeFilter += StrSubstNo('%1', EFTSetup."Payment Type POS");
+                        PaymentTypeFilter += StrSubstNo(PymTypePOSLbl, EFTSetup."Payment Type POS");
                     until EFTSetup.Next() = 0;
                     POSPaymentMethod.SetFilter(Code, PaymentTypeFilter);
                     if PAGE.RunModal(0, POSPaymentMethod) = ACTION::LookupOK then

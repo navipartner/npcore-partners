@@ -58,13 +58,16 @@ page 6014411 "NPR Turnover Statistics"
         Week: Integer;
         Month: Integer;
         Year: Integer;
+        DayLbl: Label '%1', Locked = true;
+        DateLbl: Label '%1..%2', Locked = true;
+        YearLbl: Label '<-1Y>', Locked = true;
     begin
 
         if FromStart then begin
             case Value of
                 1:
                     begin
-                        DateFilter := StrSubstNo('%1', Today);
+                        DateFilter := StrSubstNo(DayLbl, Today);
                         D := Date2DWY(Today, 1);
                         W := Date2DWY(Today, 2);
                         Y := Date2DWY(Today, 3) - 1;
@@ -75,7 +78,7 @@ page 6014411 "NPR Turnover Statistics"
                             W := 1;
                             Y += 1;
                         end;
-                        DateFilterLast := StrSubstNo('%1', DWY2Date(D, W, Y));
+                        DateFilterLast := StrSubstNo(DayLbl, DWY2Date(D, W, Y));
                     end;
                 7:
                     begin
@@ -84,7 +87,7 @@ page 6014411 "NPR Turnover Statistics"
                         Week := Date2DWY(Today, 2);
                         Year := Date2DWY(Today, 3);
                         StartDate := DWY2Date(1, Week, Year);
-                        DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
+                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         Year := Year - 1;
                         if LastYear_W53 then
                             Week += 1;
@@ -95,7 +98,7 @@ page 6014411 "NPR Turnover Statistics"
                         end;
                         EndDateLast := DWY2Date(Weekday, Week, Year);
                         StartDateLast := DWY2Date(1, Week, Year);
-                        DateFilterLast := StrSubstNo('%1..%2', StartDateLast, EndDateLast);
+                        DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
                     end;
                 31:
                     begin
@@ -104,21 +107,21 @@ page 6014411 "NPR Turnover Statistics"
                         Month := Date2DMY(Today, 2);
                         Year := Date2DMY(Today, 3);
                         StartDate := DMY2Date(1, Month, Year);
-                        DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
+                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         Year := Year - 1;
                         EndDateLast := DMY2Date(Weekday, Month, Year);
                         StartDateLast := DMY2Date(1, Month, Year);
-                        DateFilterLast := StrSubstNo('%1..%2', StartDateLast, EndDateLast);
+                        DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
                     end;
                 12:
                     begin
                         EndDate := Today();
                         Year := Date2DMY(Today, 3);
                         StartDate := DMY2Date(1, 1, Year);
-                        DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
-                        EndDateLast := CalcDate('<-1Y>', Today);
-                        StartDateLast := CalcDate('<-1Y>', StartDate);
-                        DateFilterLast := StrSubstNo('%1..%2', StartDateLast, EndDateLast);
+                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        EndDateLast := CalcDate(YearLbl, Today);
+                        StartDateLast := CalcDate(YearLbl, StartDate);
+                        DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
                     end;
             end;
         end else begin
@@ -127,7 +130,7 @@ page 6014411 "NPR Turnover Statistics"
                     begin
                         EndDate := Today();
                         StartDate := CalcDate(Text10600000, EndDate);
-                        DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
+                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         Weekday := Date2DWY(EndDate, 1);
                         Week := Date2DWY(EndDate, 2);
                         Year := Date2DWY(EndDate, 3);
@@ -143,25 +146,25 @@ page 6014411 "NPR Turnover Statistics"
                         EndDateLast := DWY2Date(Weekday, Week, Year);
                         StartDateLast := CalcDate(Text10600000, EndDateLast);
                         ;
-                        DateFilterLast := StrSubstNo('%1..%2', StartDateLast, EndDateLast);
+                        DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
                     end;
                 31:
                     begin
                         EndDate := Today();
                         StartDate := CalcDate(Text10600001, EndDate);
-                        DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
-                        StartDateLast := CalcDate('<-1Y>', StartDate);
-                        EndDateLast := CalcDate('<-1Y>', EndDate);
-                        DateFilterLast := StrSubstNo('%1..%2', StartDateLast, EndDateLast);
+                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        StartDateLast := CalcDate(YearLbl, StartDate);
+                        EndDateLast := CalcDate(YearLbl, EndDate);
+                        DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
                     end;
                 12:
                     begin
                         EndDate := Today();
                         StartDate := CalcDate(Text10600002, EndDate);
-                        DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
-                        StartDateLast := CalcDate('<-1Y>', StartDate);
-                        EndDateLast := CalcDate('<-1Y>', EndDate);
-                        DateFilterLast := StrSubstNo('%1..%2', StartDateLast, EndDateLast);
+                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        StartDateLast := CalcDate(YearLbl, StartDate);
+                        EndDateLast := CalcDate(YearLbl, EndDate);
+                        DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
                     end;
             end;
         end;
@@ -236,28 +239,6 @@ page 6014411 "NPR Turnover Statistics"
         end;
         BarPct := Round(MidPct, 0.01);
         Label := 100 * Power(2, I);
-    end;
-
-    procedure Init()
-    begin
-        Int := 1;
-        Limitation := true;
-        DateFilter := StrSubstNo('%1', Today);
-        D := Date2DWY(Today, 1);
-        W := Date2DWY(Today, 2);
-        Y := Date2DWY(Today, 3) - 1;
-
-        if LastYear_W53 then
-            W += 1;
-
-        if Date2DWY(Today, 2) = 53 then begin
-            W := 1;
-            Y += 1;
-        end;
-        DateFilterLast := StrSubstNo('%1', DWY2Date(D, W, Y));
-
-        CalculateYear(DateFilter, DepartmentFilter);
-        CalculateLastYear(DateFilterLast, DepartmentFilter);
     end;
 
     procedure PushDay()

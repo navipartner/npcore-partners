@@ -452,6 +452,7 @@ page 6060140 "NPR MM POS Member Card"
         RemainingAmount: Decimal;
         DueAmount: Decimal;
         DueDate: Date;
+        PlaceHolderLbl: Label '%1 / %2', Locked = true;
     begin
         Clear(Membership);
         ValidFromDate := 0D;
@@ -509,7 +510,7 @@ page 6060140 "NPR MM POS Member Card"
                 until (MembershipEntry.Next() = 0);
             end;
             AccentuateDueAmount := (DueAmount > 0);
-            RemainingAmountText := StrSubstNo('%1 / %2', Format(RemainingAmount, 0, '<Precision,2:2><Integer><Decimals>'), Format(DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
+            RemainingAmountText := StrSubstNo(PlaceHolderLbl, Format(RemainingAmount, 0, '<Precision,2:2><Integer><Decimals>'), Format(DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
 
         end;
 

@@ -147,12 +147,14 @@ page 6151482 "NPR Magento Sales Chart"
         Period: Option " ",Next,Previous;
 
     local procedure UpdateChart()
+    var
+        FromToLbl: Label '%1 to %2', Locked = true;
     begin
         if not ChartIsReady then
             exit;
 
         ChartMgt.TurnOver_Revenue(BusChartBuf, Period, PeriodType);
         BusChartBuf.Update(CurrPage.chart);
-        StatusText := StrSubstNo('%1 to %2', BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
+        StatusText := StrSubstNo(FromToLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }

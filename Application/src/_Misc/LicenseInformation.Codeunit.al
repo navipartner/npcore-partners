@@ -11,6 +11,7 @@ codeunit 6014402 "NPR License Information"
 
     var
         "Object": Record "Object";
+        AppVersionLbl: Label 'NPR%1', locked = true;
 
     procedure InLicenseFile("Object Type": Integer; "Object No": Integer): Boolean
     var
@@ -66,7 +67,7 @@ codeunit 6014402 "NPR License Information"
         NPRApp: ModuleInfo;
     begin
         NavApp.GetCurrentModuleInfo(NPRApp);
-        exit(StrSubstNo('NPR%1', NPRApp.AppVersion()));
+        exit(StrSubstNo(AppVersionLbl, NPRApp.AppVersion()));
     end;
 }
 

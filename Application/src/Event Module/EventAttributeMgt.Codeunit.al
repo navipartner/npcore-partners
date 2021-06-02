@@ -117,11 +117,13 @@
     end;
 
     local procedure SetFormulaSearchFilter(RowTemplateName: Code[20]; RowLineNo: Integer; var EventAttrRowValue: Record "NPR Event Attr. Row Value")
+    var
+        LikeFilterLbl: Label '*%1*', Locked = true;
     begin
         Clear(EventAttrRowValue);
         EventAttrRowValue.SetRange("Template Name", RowTemplateName);
         EventAttrRowValue.SetFilter(Type, '<>%1', EventAttrRowValue.Type::" ");
-        EventAttrRowValue.SetFilter(Formula, '%1', StrSubstNo('*%1*', Format(RowLineNo)));
+        EventAttrRowValue.SetFilter(Formula, '%1', StrSubstNo(LikeFilterLbl, Format(RowLineNo)));
     end;
 
     procedure EventAttributeEntryAction(ActionHere: Option "Insert/Modify",Delete,Read; TemplateName: Code[20]; JobNo: Code[20]; RowLineNo: Integer; ColumnLineNo: Integer; ColumnCaption: Text; var Value: Text; FilterMode: Boolean; FilterName: Code[20])

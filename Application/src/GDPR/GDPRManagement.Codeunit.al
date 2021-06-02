@@ -93,6 +93,7 @@ codeunit 6151120 "NPR GDPR Management"
         GDPRAgreement: Record "NPR GDPR Agreement";
         GDPRAgreementVersion: Record "NPR GDPR Agreement Version";
         GDPRConsentLog: Record "NPR GDPR Consent Log";
+        AnonymizationDateFormulaEmptyLbl: Label '%1 is not specified for %2 version %3', Locked = true;
     begin
 
         GDPRConsentLog.SetFilter("Agreement No.", '=%1', AgreementNo);
@@ -108,7 +109,7 @@ codeunit 6151120 "NPR GDPR Management"
         end;
 
         if (Format(AnonymizationDateFormula) = '') then begin
-            ReasonText := StrSubstNo('%1 is not specified for %2 version %3', GDPRAgreementVersion.FieldCaption("Anonymize After"), AgreementNo, GDPRAgreementVersion.Version);
+            ReasonText := StrSubstNo(AnonymizationDateFormulaEmptyLbl, GDPRAgreementVersion.FieldCaption("Anonymize After"), AgreementNo, GDPRAgreementVersion.Version);
             exit(false);
         end;
 

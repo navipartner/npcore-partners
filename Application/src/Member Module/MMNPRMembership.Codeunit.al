@@ -192,9 +192,10 @@ codeunit 6060147 "NPR MM NPR Membership"
 
 
     local procedure AddLocalPrefix(Prefix: Text; String: Text): Text
+    var
+        PrefixLbl: Label '%1%2', Locked = true;
     begin
-
-        exit(StrSubstNo('%1%2', Prefix, String));
+        exit(StrSubstNo(PrefixLbl, Prefix, String));
     end;
 
     local procedure RemoveLocalPrefix(Prefix: Text; String: Text) NewString: Text
@@ -426,6 +427,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         ResponseText: Text;
         B64Credential: Text;
         Base64Convert: Codeunit "Base64 Convert";
+        Base64ConvertToBase64Lbl: Label '%1:%2', Locked = true;
+        BasicLbl: Label 'Basic %1', Locked = true;
     begin
         ReasonText := '';
         WebRequest.SetRequestUri(NPRRemoteEndpointSetup."Endpoint URI");
@@ -443,10 +446,10 @@ codeunit 6060147 "NPR MM NPR Membership"
 
             NPRRemoteEndpointSetup."Credentials Type"::BASIC:
                 begin
-                    B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password"));
+                    B64Credential := Base64Convert.ToBase64(StrSubstNo(Base64ConvertToBase64Lbl, NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password"));
                     if Headers.Contains('Authorization') then
                         Headers.Remove('Authorization');
-                    Headers.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
+                    Headers.Add('Authorization', StrSubstNo(BasicLbl, B64Credential));
                 end;
         end;
 
@@ -792,6 +795,7 @@ codeunit 6060147 "NPR MM NPR Membership"
     procedure CreateMembershipSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; var ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlText: Text;
+        XmlLbl: Label '<mem:scannerStationId>%1</mem:scannerStationId>', Locked = true;
     begin
         XmlText :=
             '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
@@ -801,7 +805,7 @@ codeunit 6060147 "NPR MM NPR Membership"
                     '<mem:membership>' +
                     CreateMembershipRequest(MemberInfoCapture) +
                     '</mem:membership>' +
-                    StrSubstNo('<mem:scannerStationId>%1</mem:scannerStationId>', ScannerStationId) +
+                    StrSubstNo(XmlLbl, ScannerStationId) +
                 '</mem:CreateMembership>' +
             '</soapenv:Body>' +
             '</soapenv:Envelope>';
@@ -820,6 +824,8 @@ codeunit 6060147 "NPR MM NPR Membership"
     local procedure CreateMembershipRequest(MemberInfoCapture: Record "NPR MM Member Info Capture") XmlText: Text
     var
         ActivationDateText: Text;
+        XmlLbl: Label '<membershipsalesitem>%1</membershipsalesitem>', Locked = true;
+        Xml2Lbl: Label '<activationdate>%1</activationdate>', Locked = true;
     begin
         ActivationDateText := '';
         if (MemberInfoCapture."Document Date" > 0D) then
@@ -828,8 +834,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         XmlText :=
             '<createmembership>' +
             '<request>' +
-                StrSubstNo('<membershipsalesitem>%1</membershipsalesitem>', MemberInfoCapture."Item No.") +
-                StrSubstNo('<activationdate>%1</activationdate>', ActivationDateText) +
+                StrSubstNo(XmlLbl, MemberInfoCapture."Item No.") +
+                StrSubstNo(Xml2Lbl, ActivationDateText) +
             '</request>' +
             '</createmembership>';
     end;
@@ -843,22 +849,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         ElementPath: Text;
         XmlText: Text;
         XmlDomMgt: Codeunit "XML DOM Management";
+        ServerResponseLbl: Label 'Message from Server: %1';
     begin
-
-        // <response>
-        //  <status>1</status>
-        //  <errordescription/>
-        //  <membership>
-        //      <communitycode>RIVERLAND</communitycode>
-        //      <membershipcode>BRONZE</membershipcode>
-        //      <membershipnumber>MS-DEMO-00251</membershipnumber>
-        //      <issuedate>2019-06-10</issuedate>
-        //      <validfromdate/>
-        //      <validuntildate/>
-        //      <documentid>407F7427BF0046DB87A13F2CBE8EEE20</documentid>
-        //  </membership>
-        // </response>
-
         XmlDoc.WriteTo(XmlText);
         XmlDomMgt.RemoveNameSpaces(XmlText);
         XmlDocument.ReadFrom(XmlText, XmlDoc);
@@ -870,7 +862,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         ElementPath := '//CreateMembership_Result/membership/createmembership/response/';
         TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'status', 5, true);
-        NotValidReason := StrSubstNo('Message from Server: %1', NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, true));
+        NotValidReason := StrSubstNo(ServerResponseLbl, NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, true));
         if (TextOk = '0') then
             exit(false);
 
@@ -888,6 +880,7 @@ codeunit 6060147 "NPR MM NPR Membership"
     local procedure CreateMemberSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; var ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlText: Text;
+        XmlLbl: Label '<mem:scannerStationId>%1</mem:scannerStationId>', Locked = true;
     begin
         XmlText :=
             '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
@@ -897,7 +890,7 @@ codeunit 6060147 "NPR MM NPR Membership"
                     '<mem:member>' +
                         CreateMemberRequest(MemberInfoCapture) +
                     '</mem:member>' +
-                    StrSubstNo('<mem:scannerStationId>%1</mem:scannerStationId>', ScannerStationId) +
+                    StrSubstNo(XmlLbl, ScannerStationId) +
                 '</mem:AddMembershipMember>' +
             '</soapenv:Body>' +
             '</soapenv:Envelope>';
@@ -911,6 +904,27 @@ codeunit 6060147 "NPR MM NPR Membership"
         MemberCardXml: Text;
         GuardianXml: Text;
         DateText: Text;
+        XmlLbl: Label '<cardnumber>%1</cardnumber>', Locked = true;
+        Xml2Lbl: Label '<is_permanent>%1</is_permanent>', Locked = true;
+        Xml3Lbl: Label '<valid_until>%1</valid_until>', Locked = true;
+        Xml4Lbl: Label '<membernumber>%1</membernumber>', Locked = true;
+        Xml5Lbl: Label '<email>%1</email>', Locked = true;
+        Xml6Lbl: Label '<membershipnumber>%1</membershipnumber>', Locked = true;
+        Xml7Lbl: Label '<firstname>%1</firstname>', Locked = true;
+        Xml8Lbl: Label '<middlename>%1</middlename>', Locked = true;
+        Xml9Lbl: Label '<lastname>%1</lastname>', Locked = true;
+        Xml10Lbl: Label '<address>%1</address>', Locked = true;
+        Xml11Lbl: Label '<postcode>%1</postcode>', Locked = true;
+        Xml12Lbl: Label '<city>%1</city>', Locked = true;
+        Xml13Lbl: Label '<country>%1</country>', Locked = true;
+        Xml14Lbl: Label '<phoneno>%1</phoneno>', Locked = true;
+        Xml15Lbl: Label '<email>%1</email>', Locked = true;
+        Xml16Lbl: Label '<birthday>%1</birthday>', Locked = true;
+        Xml17Lbl: Label '<gender>%1</gender>', Locked = true;
+        Xml18Lbl: Label '<newsletter>%1</newsletter>', Locked = true;
+        Xml19Lbl: Label '<username>%1</username>', Locked = true;
+        Xml20Lbl: Label '<password>%1</password>', Locked = true;
+        Xml21Lbl: Label '<gdpr_approval>%1</gdpr_approval>', Locked = true;
     begin
 
         MemberCardXml := '';
@@ -921,17 +935,17 @@ codeunit 6060147 "NPR MM NPR Membership"
         if (MemberInfoCapture."External Card No." <> '') then
             MemberCardXml :=
               '<membercard>' +
-                  StrSubstNo('<cardnumber>%1</cardnumber>', XmlSafe(MemberInfoCapture."External Card No.")) +
-                  StrSubstNo('<is_permanent>%1</is_permanent>', Format(MemberInfoCapture."Temporary Member Card", 0, 9)) +
-                  StrSubstNo('<valid_until>%1</valid_until>', DateText) +
+                  StrSubstNo(XmlLbl, XmlSafe(MemberInfoCapture."External Card No.")) +
+                  StrSubstNo(Xml2Lbl, Format(MemberInfoCapture."Temporary Member Card", 0, 9)) +
+                  StrSubstNo(Xml3Lbl, DateText) +
               '</membercard>';
 
         GuardianXml := '';
         if (MemberInfoCapture."Guardian External Member No." <> '') then
             GuardianXml :=
               '<guardian>' +
-                StrSubstNo('<membernumber>%1</membernumber>', XmlSafe(MemberInfoCapture."Guardian External Member No.")) +
-                StrSubstNo('<email>%1</email>', MemberInfoCapture."E-Mail Address") +
+                StrSubstNo(Xml4Lbl, XmlSafe(MemberInfoCapture."Guardian External Member No.")) +
+                StrSubstNo(Xml5Lbl, MemberInfoCapture."E-Mail Address") +
               '</guardian>';
 
         DateText := '1754-01-01';
@@ -941,24 +955,24 @@ codeunit 6060147 "NPR MM NPR Membership"
         XmlText :=
         '<addmember>' +
           '<request>' +
-            StrSubstNo('<membershipnumber>%1</membershipnumber>', XmlSafe(MemberInfoCapture."External Membership No.")) +
-            StrSubstNo('<firstname>%1</firstname>', XmlSafe(MemberInfoCapture."First Name")) +
-            StrSubstNo('<middlename>%1</middlename>', XmlSafe(MemberInfoCapture."Middle Name")) +
-            StrSubstNo('<lastname>%1</lastname>', XmlSafe(MemberInfoCapture."Last Name")) +
-            StrSubstNo('<address>%1</address>', XmlSafe(MemberInfoCapture.Address)) +
-            StrSubstNo('<postcode>%1</postcode>', XmlSafe(MemberInfoCapture."Post Code Code")) +
-            StrSubstNo('<city>%1</city>', XmlSafe(MemberInfoCapture.City)) +
-            StrSubstNo('<country>%1</country>', XmlSafe(MemberInfoCapture."Country Code")) +
-            StrSubstNo('<phoneno>%1</phoneno>', XmlSafe(MemberInfoCapture."Phone No.")) +
-            StrSubstNo('<email>%1</email>', XmlSafe(MemberInfoCapture."E-Mail Address")) +
-            StrSubstNo('<birthday>%1</birthday>', DateText) +
-            StrSubstNo('<gender>%1</gender>', Format(MemberInfoCapture.Gender, 0, 9)) +
-            StrSubstNo('<newsletter>%1</newsletter>', Format(MemberInfoCapture."News Letter", 0, 0)) +
-            StrSubstNo('<username>%1</username>', XmlSafe(MemberInfoCapture."User Logon ID")) +
-            StrSubstNo('<password>%1</password>', XmlSafe(MemberInfoCapture."Password SHA1")) +
+            StrSubstNo(Xml6Lbl, XmlSafe(MemberInfoCapture."External Membership No.")) +
+            StrSubstNo(Xml7Lbl, XmlSafe(MemberInfoCapture."First Name")) +
+            StrSubstNo(Xml8Lbl, XmlSafe(MemberInfoCapture."Middle Name")) +
+            StrSubstNo(Xml9Lbl, XmlSafe(MemberInfoCapture."Last Name")) +
+            StrSubstNo(Xml10Lbl, XmlSafe(MemberInfoCapture.Address)) +
+            StrSubstNo(Xml11Lbl, XmlSafe(MemberInfoCapture."Post Code Code")) +
+            StrSubstNo(Xml12Lbl, XmlSafe(MemberInfoCapture.City)) +
+            StrSubstNo(Xml13Lbl, XmlSafe(MemberInfoCapture."Country Code")) +
+            StrSubstNo(Xml14Lbl, XmlSafe(MemberInfoCapture."Phone No.")) +
+            StrSubstNo(Xml15Lbl, XmlSafe(MemberInfoCapture."E-Mail Address")) +
+            StrSubstNo(Xml16Lbl, DateText) +
+            StrSubstNo(Xml17Lbl, Format(MemberInfoCapture.Gender, 0, 9)) +
+            StrSubstNo(Xml18Lbl, Format(MemberInfoCapture."News Letter", 0, 0)) +
+            StrSubstNo(Xml19Lbl, XmlSafe(MemberInfoCapture."User Logon ID")) +
+            StrSubstNo(Xml20Lbl, XmlSafe(MemberInfoCapture."Password SHA1")) +
             MemberCardXml +
             GuardianXml +
-            StrSubstNo('<gdpr_approval>%1</gdpr_approval>', Format(MemberInfoCapture."GDPR Approval", 0, 9)) +
+            StrSubstNo(Xml21Lbl, Format(MemberInfoCapture."GDPR Approval", 0, 9)) +
           '</request>' +
         '</addmember>';
 
@@ -974,25 +988,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         ElementPath: Text;
         XmlText: Text;
         XmlDomMgt: Codeunit "XML DOM Management";
+        ServerResponseLbl: Label 'Message from Server: %1';
     begin
-
-        // <AddMembershipMember_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/member_services">
-        //   <member>
-        //     <addmember xmlns="urn:microsoft-dynamics-nav/xmlports/x6060128">
-        //
-        // <response>
-        //   <status>1</status>
-        //   <errordescription/>
-        //   <member>
-        //      <membernumber>MM-DEMO-00025</membernumber>
-        //      <email>0830.04@test.se</email>
-        //      <card>
-        //        <cardnumber>XC000005</cardnumber>
-        //        <expirydate>2020-06-10</expirydate>
-        //      </card>
-        //   </member>
-        // </response>
-
         XmlDoc.WriteTo(XmlText);
         XmlDomMgt.RemoveNameSpaces(XmlText);
         XmlDocument.ReadFrom(XmlText, XmlDoc);
@@ -1004,7 +1001,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         ElementPath := '//AddMembershipMember_Result/member/addmember/response/';
         TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'status', 5, true);
-        NotValidReason := StrSubstNo('Message from Server: %1', NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, true));
+        NotValidReason := StrSubstNo(ServerResponseLbl, NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, true));
         if (TextOk = '0') then
             exit(false);
 

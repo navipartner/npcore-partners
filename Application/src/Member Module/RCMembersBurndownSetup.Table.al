@@ -73,13 +73,10 @@ table 6060149 "NPR RC Members. Burndown Setup"
         Text001: Label 'Updated at %1.';
 
     procedure GetCurrentSelectionText(): Text[100]
+    var
+        PlaceHolderLbl: Label '%1|%2|%3|%4|. (%5)', Locked = true;
     begin
-        //EXIT(FORMAT("Show Memberships") + '|' +
-        //  FORMAT("Period Length") + '|' +
-        //  FORMAT("Value to Calculate") + '|. (' +
-        //  StrSubstNo(Text001,TIME) + ')');
-
-        exit(StrSubstNo('%1|%2|%3|%4|. (%5)',
+        exit(StrSubstNo(PlaceHolderLbl,
           "Show Memberships",
           "Period Length",
           "Value to Calculate",

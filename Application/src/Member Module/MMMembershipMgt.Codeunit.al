@@ -1105,6 +1105,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        PlaceHolderLbl: Label '%1: %2 {%3 .. %4}', Locked = true;
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
@@ -1144,7 +1145,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             if (not Confirm(CONFIRM_REGRET, false, Membership."External Membership No.", MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date")) then
                 exit(false);
 
-        ReasonText := StrSubstNo('%1: %2 {%3 .. %4}', MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
+        ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
 
         if (WithUpdate) then begin
 
@@ -1276,6 +1277,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Item: Record Item;
         EndDateNew: Date;
         CancelledFraction: Decimal;
+        PlaceHolderLbl: Label '%1: %2 {%3 .. %4}', Locked = true;
     begin
 
         OutStartDate := 0D;
@@ -1348,7 +1350,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 SuggestedUnitPrice := 0;
         end;
 
-        ReasonText := StrSubstNo('%1: %2 {%3 .. %4}', MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
+        ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
 
         if (WithUpdate) then begin
             MembershipEntry."Valid Until Date" := EndDateNew;
@@ -1429,6 +1431,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         StartDateNew: Date;
         EndDateNew: Date;
         EntryNo: Integer;
+        PlaceHolderLbl: Label '%1: %4 -> %5 {%2 .. %3}', Locked = true;
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
@@ -1513,7 +1516,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (not CheckExtendMemberCards(false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-        ReasonText := StrSubstNo('%1: %4 -> %5 {%2 .. %3}', MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code");
+        ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code");
 
         if (WithUpdate) then begin
             MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
@@ -1605,6 +1608,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         NewFraction: Decimal;
         StartDateLedgerEntryNo: Integer;
         EndDateLedgerEntryNo: Integer;
+        PlaceHolderLbl: Label '%1: %4 -> %5 {%2 .. %3}', Locked = true;
     begin
 
         OutStartDate := 0D;
@@ -1702,7 +1706,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (not CheckExtendMemberCards(false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-        ReasonText := StrSubstNo('%1: %4 -> %5 {%2 .. %3}', MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code");
+        ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code");
 
         if (WithUpdate) then begin
             MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
@@ -1808,6 +1812,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         EntryNo: Integer;
         RemainingFraction: Decimal;
         ValidFromDate: Date;
+        PlaceHolderLbl: Label '%1: %4 -> %5 {%2 .. %3} {%6 {%7,%8} -> %9}', Locked = true;
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
@@ -1895,7 +1900,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (not CheckExtendMemberCards(false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
 
-        ReasonText := StrSubstNo('%1: %4 -> %5 {%2 .. %3} {%6 {%7,%8} -> %9}',
+        ReasonText := StrSubstNo(PlaceHolderLbl,
                                   MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code",
                                   Round(RemainingFraction, 0.01), Item."Unit Price", MembershipEntry."Unit Price (Base)", Round(SuggestedUnitPrice, 0.01));
 
@@ -2004,6 +2009,8 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         HaveAutoRenewItem: Boolean;
+        PlaceHolderLbl: Label '%1 for %2', Locked = true;
+        PlaceHolder2Lbl: Label '%1 with %2', Locked = true;
     begin
 
         if (not Membership.Get(MembershipEntryNo)) then begin
@@ -2057,17 +2064,17 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
 
         if (not HaveAutoRenewItem) then begin
-            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule', StrSubstNo('%1 for %2', MembershipEntry.Context, MembershipEntry."Item No."));
+            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
             exit(0);
         end;
 
         if (RenewWithItemNo = '') then begin
-            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule item', StrSubstNo('%1 for %2', MembershipEntry.Context, MembershipEntry."Item No."));
+            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule item', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
             exit(0);
         end;
 
         if (not MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Membership."Membership Code", RenewWithItemNo)) then begin
-            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew item', StrSubstNo('%1 with %2', MembershipEntry.Context::AUTORENEW, RenewWithItemNo));
+            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew item', StrSubstNo(PlaceHolder2Lbl, MembershipEntry.Context::AUTORENEW, RenewWithItemNo));
             exit(0);
         end;
 
@@ -3003,6 +3010,8 @@ codeunit 6060127 "NPR MM Membership Mgt."
         AgeConstraintOk: Boolean;
         MemberEntryNo: Integer;
         MemberBirthDate: Date;
+        PlaceHolderLbl: Label ' {%5 must be %4 %3 => (%1 + %2)}';
+        PlaceHolder2Lbl: Label '<+%1Y>', Locked = true;
     begin
 
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
@@ -3058,7 +3067,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
             if (Member.Birthday <> 0D) then
                 ReasonText := StrSubstNo(AGE_VERIFICATION, Member."Display Name", Constraint) +
-                              StrSubstNo(' {%5 must be %4 %3 => (%1 + %2)}', Member.Birthday, Constraint, CalcDate(StrSubstNo('<+%1Y>', Constraint), Member.Birthday), Format(ConstraintType), ReferenceDate);
+                              StrSubstNo(PlaceHolderLbl, Member.Birthday, Constraint, CalcDate(StrSubstNo(PlaceHolder2Lbl, Constraint), Member.Birthday), Format(ConstraintType), ReferenceDate);
         end;
 
         exit(AgeConstraintOk);
@@ -3073,6 +3082,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         LowDate: Date;
         HighDate: Date;
         DateToValidate: Date;
+        PlaceHolderLbl: Label '<+%1Y>', Locked = true;
     begin
 
         if (ConstraintType = ConstraintType::NA) then
@@ -3093,7 +3103,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         LowRange := CalcDate('<CY-1Y+1D>', HighDate);
         HighRange := CalcDate('<CY>', HighDate);
-        DateToValidate := CalcDate(StrSubstNo('<+%1Y>', Years), LowDate); // Birth date + constraint in years
+        DateToValidate := CalcDate(StrSubstNo(PlaceHolderLbl, Years), LowDate); // Birth date + constraint in years
 
         // Always check year
         case ConstraintType of
@@ -3892,6 +3902,9 @@ codeunit 6060127 "NPR MM Membership Mgt."
         CountryRegion: Record "Country/Region";
         CountryName: Text;
         PostCode: Record "Post Code";
+        PlaceHolderLbl: Label '%1%2', Locked = true;
+        PlaceHolder2Lbl: Label '%1 %2', Locked = true;
+        PlaceHolder3Lbl: Label '%1 %2 %3', Locked = true;
     begin
 
         CurrentMember.Copy(Member);
@@ -3921,7 +3934,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (MemberInfoCapture.Country <> '') and (MemberInfoCapture."Country Code" = '') then begin
             CountryName := MemberInfoCapture.Country;
             if (StrLen(MemberInfoCapture.Country) > 1) then
-                CountryName := StrSubstNo('%1%2', UpperCase(CopyStr(MemberInfoCapture.Country, 1, 1)), LowerCase(CopyStr(MemberInfoCapture.Country, 2)));
+                CountryName := StrSubstNo(PlaceHolderLbl, UpperCase(CopyStr(MemberInfoCapture.Country, 1, 1)), LowerCase(CopyStr(MemberInfoCapture.Country, 2)));
 
             CountryRegion.SetFilter(Name, '=%1|=%2|=%3', CountryName, UpperCase(CountryName), MemberInfoCapture.Country);
             if (CountryRegion.FindFirst()) then begin
@@ -3951,11 +3964,11 @@ codeunit 6060127 "NPR MM Membership Mgt."
             Member.Image := MemberInfoCapture.Image;
         end;
 
-        Member."Display Name" := StrSubstNo('%1 %2', Member."First Name", Member."Last Name");
+        Member."Display Name" := StrSubstNo(PlaceHolder2Lbl, Member."First Name", Member."Last Name");
 
         if (StrLen(Member."Middle Name") > 0) then
             if (StrLen(Member."First Name") + StrLen(Member."Middle Name") + StrLen(Member."Last Name") + 2 <= MaxStrLen(Member."Display Name")) then
-                Member."Display Name" := StrSubstNo('%1 %2 %3', Member."First Name", Member."Middle Name", Member."Last Name");
+                Member."Display Name" := StrSubstNo(PlaceHolder3Lbl, Member."First Name", Member."Middle Name", Member."Last Name");
 
         Member."Store Code" := MemberInfoCapture."Store Code";
 
@@ -4315,6 +4328,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         BaseNumberPadding: Code[100];
         PAN: Code[100];
         PanLength: Integer;
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
 
         MembershipSetup.Get(MembershipCode);
@@ -4339,13 +4353,13 @@ codeunit 6060127 "NPR MM Membership Mgt."
         else
             PanLength += StrLen(BaseNumberPadding);
 
-        PAN := StrSubstNo('%1%2', MembershipSetup."Card Number Prefix", CopyStr(BaseNumberPadding, 1, PanLength));
+        PAN := StrSubstNo(PlaceHolderLbl, MembershipSetup."Card Number Prefix", CopyStr(BaseNumberPadding, 1, PanLength));
 
         case MembershipSetup."Card Number Validation" of
             MembershipSetup."Card Number Validation"::NONE:
                 ;
             MembershipSetup."Card Number Validation"::CHECKDIGIT:
-                PAN := StrSubstNo('%1%2', PAN, GenerateRandom('N'));
+                PAN := StrSubstNo(PlaceHolderLbl, PAN, GenerateRandom('N'));
         end;
 
         if (StrLen(PAN) > MaxStrLen(MemberInfoCapture."External Card No.")) then
@@ -4379,6 +4393,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Left: Text[10];
         Right: Text[10];
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
         if (GeneratePattern = '') then
             exit;
@@ -4425,19 +4440,19 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
                 case Left of
                     'MA':
-                        ExtCardNo := StrSubstNo('%1%2', ExtCardNo, ExternalMemberNo);
+                        ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, ExternalMemberNo);
                     'MS':
-                        ExtCardNo := StrSubstNo('%1%2', ExtCardNo, ExternalMembershipNo);
+                        ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, ExternalMembershipNo);
                     'S':
-                        ExtCardNo := StrSubstNo('%1%2', ExtCardNo, NoSeriesManagement.GetNextNo(NumberSeries, Today, true));
+                        ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, NoSeriesManagement.GetNextNo(NumberSeries, Today, true));
                     'N', 'A', 'X':
                         begin
                             Evaluate(PatternLength, Right);
                             for Itt := 1 to PatternLength do
-                                ExtCardNo := StrSubstNo('%1%2', ExtCardNo, GenerateRandom(Left));
+                                ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, GenerateRandom(Left));
                         end;
                     else begin
-                            ExtCardNo := StrSubstNo('%1%2', ExtCardNo, Pattern);
+                            ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, Pattern);
                         end;
                 end;
             end;
@@ -4626,11 +4641,13 @@ codeunit 6060127 "NPR MM Membership Mgt."
     end;
 
     local procedure RaiseError(var ResponseMessage: Text; MessageText: Text; MessageId: Text): Integer
+    var
+        PlaceHolderLbl: Label '[%1] - %2', Locked = true;
     begin
         ResponseMessage := MessageText;
 
         if (MessageId <> '') then
-            ResponseMessage := StrSubstNo('[%1] - %2', MessageId, MessageText);
+            ResponseMessage := StrSubstNo(PlaceHolderLbl, MessageId, MessageText);
 
         Error(ResponseMessage);
     end;
@@ -4734,6 +4751,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         RemoteReasonText: Text;
         ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
         FormatedCardNumber: Text[100];
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
 
         ForeignMembershipSetup.SetCurrentKey("Invokation Priority");
@@ -4746,7 +4764,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 // try remote number with local prefix
                 if (ForeignMembershipSetup."Append Local Prefix" <> '') then begin
                     if (StrLen(ForeignMembershipSetup."Append Local Prefix") + StrLen(ExternalCardNo) <= 50) then
-                        MembershipEntryNo := GetMembershipFromExtCardNoWorker(StrSubstNo('%1%2', ForeignMembershipSetup."Append Local Prefix", ExternalCardNo), ReferenceDate, RemoteReasonText, CardEntryNo);
+                        MembershipEntryNo := GetMembershipFromExtCardNoWorker(StrSubstNo(PlaceHolderLbl, ForeignMembershipSetup."Append Local Prefix", ExternalCardNo), ReferenceDate, RemoteReasonText, CardEntryNo);
                 end;
 
                 // try remote number with integration code to parse the scanned card data
@@ -4991,6 +5009,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberCard: Record "NPR MM Member Card";
         PrefixedCardNo: Text;
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
 
         MemberCard.SetCurrentKey("External Card No.");
@@ -5008,7 +5027,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
                     // try remote number with local prefix
                     PrefixedCardNo := ExternalCardNo;
                     if (ForeignMembershipSetup."Append Local Prefix" <> '') then
-                        PrefixedCardNo := StrSubstNo('%1%2', ForeignMembershipSetup."Append Local Prefix", ExternalCardNo);
+                        PrefixedCardNo := StrSubstNo(PlaceHolderLbl, ForeignMembershipSetup."Append Local Prefix", ExternalCardNo);
 
                     MemberCard.SetFilter("External Card No.", '=%1|=%2', PrefixedCardNo, EncodeSHA1(PrefixedCardNo));
 
@@ -5043,6 +5062,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
         MembershipFilter: Text;
+        PlaceHolderLbl: Label '|%1', Locked = true;
     begin
 
         if (TableID = Database::"NPR MM Membership Entry") then begin
@@ -5050,7 +5070,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             MembershipEntry.SetFilter("Receipt No.", DocNoFilter);
             MembershipEntry.FindSet();
             repeat
-                MembershipFilter += StrSubstNo('|%1', MembershipEntry."Membership Entry No.");
+                MembershipFilter += StrSubstNo(PlaceHolderLbl, MembershipEntry."Membership Entry No.");
             until (MembershipEntry.Next() = 0);
 
             Membership.SetFilter("Entry No.", CopyStr(MembershipFilter, 2));

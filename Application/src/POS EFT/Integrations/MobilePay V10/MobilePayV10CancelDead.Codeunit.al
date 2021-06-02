@@ -41,6 +41,7 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
         eftEntryNo: Integer;
         success: Boolean;
+        PosIdLbl: Label 'posId=%1', Locked = true;
     begin
         tempMobilePayV10Payment.Reset();
         tempMobilePayV10Payment.DeleteAll();
@@ -53,7 +54,7 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
 
         Commit();
 
-        mobilePayV10FindPayments.SetFilter(StrSubstNo('posId=%1', mobilePayV10UnitSetup."MobilePay POS ID"));
+        mobilePayV10FindPayments.SetFilter(StrSubstNo(PosIdLbl, mobilePayV10UnitSetup."MobilePay POS ID"));
         mobilePayV10FindPayments.SetPaymentDetailBuffer(tempMobilePayV10Payment);
         mobilePayV10FindPayments.Run(eftTransRequest);  // TODO: Handling... (I will move this to MobilePay protocol codeunit, only the part that returns list of payments).
 
@@ -109,6 +110,7 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
         eftEntryNo: Integer;
         success: Boolean;
+        PosIdLbl: Label 'posId=%1', Locked = true;
     begin
         mobilePayV10RefundBuff.Reset();
         mobilePayV10RefundBuff.DeleteAll();
@@ -121,7 +123,7 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
 
         Commit();
 
-        mobilePayV10FindRefunds.SetFilter(StrSubstNo('posId=%1', mobilePayV10UnitSetup."MobilePay POS ID"));
+        mobilePayV10FindRefunds.SetFilter(StrSubstNo(PosIdLbl, mobilePayV10UnitSetup."MobilePay POS ID"));
         mobilePayV10FindRefunds.SetRefundDetailBuffer(mobilePayV10RefundBuff);
         mobilePayV10FindRefunds.Run(eftTransRequest);  // TODO: Handling... (I will move this to MobilePay protocol codeunit, only the part that returns list of payments).
 

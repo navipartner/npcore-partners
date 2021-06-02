@@ -533,10 +533,10 @@ page 6060126 "NPR MM Members"
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
+    var
+        PlaceHolderLbl: Label '6014555,%1,%2,2', Locked = true;
     begin
-
-        exit(StrSubstNo('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
-
+        exit(StrSubstNo(PlaceHolderLbl, GetAttributeTableId(), AttributeNumber));
     end;
 
     local procedure SyncContact()

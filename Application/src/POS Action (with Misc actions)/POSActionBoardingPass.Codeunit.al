@@ -197,6 +197,9 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         ToAirportCode: Code[3];
         OperatorFlightNo: Code[8];
         FlightDate: Date;
+        PlaceHolderLbl: Label '%1\', Locked = true;
+        PlaceHolder2Lbl: Label '\%1 > %2 (%3) %4', Locked = true;
+        PlaceHolder3Lbl: Label '%1>%2(%3 %4) | ', Locked = true;
     begin
 
         if not Evaluate(NoOfLegs, CopyStr(iBoardingPassString, 2, 1)) then Error(ERRNOTVALID);
@@ -221,7 +224,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
             LegStringArray[CurrentLeg] := LegString;
         end;
 
-        oTravelDescription := StrSubstNo('%1\', PassengerName);
+        oTravelDescription := StrSubstNo(PlaceHolderLbl, PassengerName);
         oTravelSaveString := '';
         oTravelStartDate := 0D;
         oTravelEndDate := 0D;
@@ -244,8 +247,8 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
             if (FlightDate < oTravelStartDate) then oTravelStartDate := FlightDate;
             if (FlightDate > oTravelEndDate) then oTravelEndDate := FlightDate;
 
-            oTravelDescription := oTravelDescription + StrSubstNo('\%1 > %2 (%3) %4', FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
-            oTravelSaveString := oTravelSaveString + StrSubstNo('%1>%2(%3 %4) | ', FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
+            oTravelDescription := oTravelDescription + StrSubstNo(PlaceHolder2Lbl, FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
+            oTravelSaveString := oTravelSaveString + StrSubstNo(PlaceHolder3Lbl, FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
             CurrentLeg := CurrentLeg + 1;
         until (CurrentLeg > NoOfLegs);
     end;
@@ -289,14 +292,11 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     local procedure JulianDateToDate(iJulianDate: Integer) oDate: Date
     var
         CalcDateFormula: Text;
+        DateFormulaLbl: Label '<+%1D>', Locked = true;
     begin
         oDate := CalcDate('<-CY>', WorkDate());
-        CalcDateFormula := StrSubstNo('<+%1D>', iJulianDate - 1);
+        CalcDateFormula := StrSubstNo(DateFormulaLbl, iJulianDate - 1);
         oDate := CalcDate(CalcDateFormula, oDate);
-    end;
-
-    local procedure "--- Ean Box Event Handling"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]

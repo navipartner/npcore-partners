@@ -153,9 +153,9 @@ report 6014490 "NPR Advanced Sales Stat."
                 end;
 
                 if Type = Type::Period then begin
-                    PeriodFilters := StrSubstNo('%1..', Periodestart);
+                    PeriodFilters := StrSubstNo(Pct1Lbl, Periodestart);
                 end else begin
-                    PeriodFilters := StrSubstNo('%1..%2', Periodestart, Periodeslut);
+                    PeriodFilters := StrSubstNo(Pct2Lbl, Periodestart, Periodeslut);
                 end;
             end;
         }
@@ -304,6 +304,8 @@ report 6014490 "NPR Advanced Sales Stat."
         CalcLastYear: Text[50];
         PeriodeFilter: Text[255];
         PeriodFilters: Text[255];
+        Pct1Lbl: Label '%1..', locked = true;
+        Pct2Lbl: Label '%1..%2', locked = true;
 
     procedure setFilter(xType: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
     begin
@@ -317,9 +319,9 @@ report 6014490 "NPR Advanced Sales Stat."
         Type := xType;
 
         if Type = Type::Period then begin
-            PeriodeFilter := StrSubstNo('%1..', Periodestart);
+            PeriodeFilter := StrSubstNo(Pct1Lbl, Periodestart);
         end else begin
-            PeriodeFilter := StrSubstNo('%1..%2', Periodestart, Periodeslut);
+            PeriodeFilter := StrSubstNo(Pct2Lbl, Periodestart, Periodeslut);
         end;
     end;
 
@@ -335,7 +337,7 @@ report 6014490 "NPR Advanced Sales Stat."
                     Record.Open(DATABASE::Date);
                     // Datoen skal starte på Periodestart
                     FilterField := Record.Field(DateRecord.FieldNo("Period Start"));
-                    FilterField.SetFilter(StrSubstNo('%1..',
+                    FilterField.SetFilter(StrSubstNo(Pct1Lbl,
                                                Periodestart));
                     TypeField := Record.Field(DateRecord.FieldNo("Period Type"));
                     TypeField.SetRange(Day);
@@ -429,7 +431,7 @@ report 6014490 "NPR Advanced Sales Stat."
                 if not (Type = Type::Projectcode) then
                     Buffer.Description := Format(Caption.Value)
                 else
-                    Buffer.Description := StrSubstNo('%1..%2', ProjektKodeStart, ProjektKodeSlut);
+                    Buffer.Description := StrSubstNo(Pct2Lbl, ProjektKodeStart, ProjektKodeSlut);
                 Buffer."Sales qty." := AuxItemLedgerEntry.Quantity;
                 Buffer."Sales LCY" := AuxValueEntry."Sales Amount (Actual)";
                 Buffer."Profit LCY" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";

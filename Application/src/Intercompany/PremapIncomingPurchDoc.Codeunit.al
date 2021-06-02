@@ -67,6 +67,8 @@
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
         GLN: Text;
         VatRegNo: Text;
+        PlaceHolder1Lbl: Label '<>%1', Locked = true;
+        PlaceHolder2Lbl: Label '<>%1&<>%2', Locked = true;
     begin
         DataExch.Get(EntryNo);
         IncomingDocument.Get(DataExch."Incoming Entry No.");
@@ -90,7 +92,7 @@
             LogErrorMessage(EntryNo, CompanyInformation, CompanyInformation.FieldNo(GLN), MissingCompanyInfoSetupErr);
 
         if CompanyInformation.GLN <> '' then begin
-            IntermediateDataImport.SetFilter(Value, StrSubstNo('<>%1&<>%2', CompanyInformation.GLN, ''''''));
+            IntermediateDataImport.SetFilter(Value, StrSubstNo(PlaceHolder2Lbl, CompanyInformation.GLN, ''''''));
             if IntermediateDataImport.FindLast() then
                 LogErrorMessage(EntryNo, CompanyInformation, CompanyInformation.FieldNo(GLN),
                   StrSubstNo(InvalidCompanyInfoGLNErr, GLN));
@@ -98,7 +100,7 @@
 
         if CompanyInformation."VAT Registration No." <> '' then begin
             IntermediateDataImport.SetRange("Field ID", CompanyInformation.FieldNo("VAT Registration No."));
-            IntermediateDataImport.SetFilter(Value, StrSubstNo('<>%1', ''''''));
+            IntermediateDataImport.SetFilter(Value, StrSubstNo(PlaceHolder1Lbl, ''''''));
 
             if IntermediateDataImport.FindLast() then
                 if (ExtractVatRegNo(IntermediateDataImport.Value, '') <> ExtractVatRegNo(CompanyInformation."VAT Registration No.", ''))
@@ -381,6 +383,7 @@
         BuyFromPhoneNo: Text;
         VatRegNo: Text;
         VendorNo: Code[20];
+        PlaceHolder1Lbl: Label '*%1', Locked = true;
     begin
         BuyFromPhoneNo := IntermediateDataImport.GetEntryValue(EntryNo, DATABASE::Vendor, Vendor.FieldNo("Phone No."), 0, RecordNo);
 
@@ -423,7 +426,7 @@
             VatRegNo := IntermediateDataImport.Value;
             if IntermediateDataImport.Value <> '' then begin
                 Vendor.SetFilter("VAT Registration No.",
-                  StrSubstNo('*%1', CopyStr(IntermediateDataImport.Value, StrLen(IntermediateDataImport.Value))));
+                  StrSubstNo(PlaceHolder1Lbl, CopyStr(IntermediateDataImport.Value, StrLen(IntermediateDataImport.Value))));
                 if Vendor.FindSet() then
                     repeat
                         if ExtractVatRegNo(Vendor."VAT Registration No.", Vendor."Country/Region Code") =
@@ -469,6 +472,7 @@
         VatRegNo: Text;
         PayToName: Text;
         PayToAddress: Text;
+        PlaceHolder1Lbl: Label '*%1', Locked = true;
     begin
         if IntermediateDataImport.FindEntry(EntryNo, DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Pay-to Name"), 0, RecordNo) then
             PayToName := IntermediateDataImport.Value;
@@ -503,7 +507,7 @@
 
         Vendor.Reset();
 
-        Vendor.SetFilter("VAT Registration No.", StrSubstNo('*%1', CopyStr(VatRegNo, StrLen(VatRegNo))));
+        Vendor.SetFilter("VAT Registration No.", StrSubstNo(PlaceHolder1Lbl, CopyStr(VatRegNo, StrLen(VatRegNo))));
         if Vendor.FindSet() then
             repeat
                 if ExtractVatRegNo(Vendor."VAT Registration No.", Vendor."Country/Region Code") =

@@ -212,16 +212,19 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         Admission: Record "NPR TM Admission";
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        MembershipGuestTicketLbl: Label '%1-WD', Locked = true;
+        MembershipGuestTicket2Lbl: Label '%1-WE', Locked = true;
+        MembershipGuestTicket3Lbl: Label 'IXRF-%1', Locked = true;
     begin
 
         if (not Admission.get(AdmissionCode)) then begin
             CreateAdmissionCode(AdmissionCode, AdmissionDescription, Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
 
-            CreateSchedule(StrSubstNo('%1-WD', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
-            CreateSchedule(StrSubstNo('%1-WE', AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
+            CreateSchedule(StrSubstNo(MembershipGuestTicketLbl, AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+            CreateSchedule(StrSubstNo(MembershipGuestTicket2Lbl, AdmissionCode), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE);
 
-            CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WD', AdmissionCode), 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
-            CreateScheduleLine(AdmissionCode, StrSubstNo('%1-WE', AdmissionCode), 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+            CreateScheduleLine(AdmissionCode, StrSubstNo(MembershipGuestTicketLbl, AdmissionCode), 1, FALSE, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+            CreateScheduleLine(AdmissionCode, StrSubstNo(MembershipGuestTicket2Lbl, AdmissionCode), 1, FALSE, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
         end;
 
         CreateTicketType('MM-AUTO', 'Members and Member Guests', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
@@ -230,7 +233,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
 
         CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, TRUE, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        exit(StrSubstNo('IXRF-%1', ItemCode));
+        exit(StrSubstNo(MembershipGuestTicket3Lbl, ItemCode));
     end;
 
     local procedure ApplyConcurrencyLimit(AdmissionCodeFilter: Code[20]; ScheduleCodeFilter: Code[20]; ConcurrencyCode: Code[20])
@@ -344,6 +347,8 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";
+        CreateItemLbl: Label 'IXRF-%1', Locked = true;
+        CreateItem2Lbl: Label 'IXRF-%1-%2', Locked = true;
     begin
         TicketItem.INIT();
         if (NOT (TicketItem.GET(No))) then begin
@@ -374,18 +379,18 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
 
         ItemReference.INIT();
         ItemReference.SETFILTER("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
-        ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO('IXRF-%1', TicketItem."No."));
+        ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO(CreateItemLbl, TicketItem."No."));
         if (VariantCode <> '') then
-            ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode));
+            ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO(CreateItem2Lbl, TicketItem."No.", VariantCode));
 
         if (NOT ItemReference.FINDFIRST()) then begin
             ItemReference."Item No." := TicketItem."No.";
             ItemReference."Variant Code" := VariantCode;
             ItemReference."Unit of Measure" := TicketItem."Sales Unit of Measure";
             ItemReference."Reference Type" := ItemReference."Reference Type"::"Bar Code";
-            ItemReference."Reference No." := STRSUBSTNO('IXRF-%1', TicketItem."No.");
+            ItemReference."Reference No." := STRSUBSTNO(CreateItemLbl, TicketItem."No.");
             if (VariantCode <> '') then
-                ItemReference."Reference No." := STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode);
+                ItemReference."Reference No." := STRSUBSTNO(CreateItem2Lbl, TicketItem."No.", VariantCode);
             ItemReference.Description := TicketItem.Description;
             ItemReference.INSERT();
         end;

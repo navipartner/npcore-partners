@@ -146,6 +146,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         CommentLbl: Label 'Comment';
         PopupTitleLbl: Label 'Select your options...';
         UnsupportedErr: Label 'Unsupported entity %1';
+        PlaceHolder3Lbl: Label '%1 %3 %2', Locked = true;
     begin
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if ItemAddOnLine.FindSet() then
@@ -224,7 +225,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
                             end;
 
                         else
-                            Error(UnsupportedErr, StrSubstNo('%1 %3 %2', ItemAddOnLine.TableCaption, ItemAddOnLine.FieldCaption(Type), ItemAddOnLine.Type));
+                            Error(UnsupportedErr, StrSubstNo(PlaceHolder3Lbl, ItemAddOnLine.TableCaption, ItemAddOnLine.FieldCaption(Type), ItemAddOnLine.Type));
                     end;
 
                     if IncludeComment then begin
@@ -262,6 +263,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         PerUnitLbl: Label 'per unit';
         QuantityLbl: Label 'quantity';
         SelectOptionsLbl: Label 'Select one';
+        PlaceHolder2Lbl: Label '; %1 = %2', Locked = true;
     begin
         case UseField of
             UseField::Description:
@@ -288,7 +290,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
             end;
         end;
         if ItemAddOnLine."Fixed Quantity" then
-            LineCaption := LineCaption + StrSubstNo('; %1 = %2', QuantityLbl, ItemAddOnLine.Quantity);
+            LineCaption := LineCaption + StrSubstNo(PlaceHolder2Lbl, QuantityLbl, ItemAddOnLine.Quantity);
         if ItemAddOnLine."Per Unit" then
             LineCaption := LineCaption + '/' + PerUnitLbl;
     end;
@@ -306,8 +308,10 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     end;
 
     local procedure CommentLineID(LineNo: Integer): Text
+    var
+        CommentLbl: Label '%1_Comment', Locked = true;
     begin
-        exit(StrSubstNo('%1_Comment', LineNo));
+        exit(StrSubstNo(CommentLbl, LineNo));
     end;
 
     procedure UserInterfaceIsRequired(ItemAddOn: Record "NPR NpIa Item AddOn"): Boolean

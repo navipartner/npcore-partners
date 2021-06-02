@@ -285,8 +285,9 @@ table 6150651 "NPR POS View Profile"
     procedure GetDefaultMediaDescription(): Text
     var
         MediaDescription: Text;
+        FileNameLbl: Label '%1 %2.%3', Locked = true;
     begin
-        MediaDescription := StrSubstNo('%1 %2.%3', Rec.Code, Rec.Description, GetDefaultExtension());
+        MediaDescription := StrSubstNo(FileNameLbl, Rec.Code, Rec.Description, GetDefaultExtension());
         exit(MediaDescription);
     end;
 

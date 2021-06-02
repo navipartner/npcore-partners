@@ -166,6 +166,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
         ChartTypeIsChanged: Boolean;
         StartDate: Date;
         Enddate: Date;
+        FromToDateLbl: Label '%1 to %2', locked = true;
 
     trigger OnOpenPage()
     begin
@@ -183,7 +184,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 ChartMgt.TurnOver_RevenuebyDim1(BusChartBuf, Period, PeriodType, StartDate, Enddate, ChartTypeIsChanged);
         end;
         BusChartBuf.Update(CurrPage.chart);
-        StatusText := StrSubstNo('%1 to %2', StartDate, Enddate);
+        StatusText := StrSubstNo(FromToDateLbl, StartDate, Enddate);
         ChartTypeIsChanged := false;
     end;
 }

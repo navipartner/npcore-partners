@@ -353,6 +353,8 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
     end;
 
     local procedure CreatePaymentRequest(EftSetup: Record "NPR EFT Setup"; var EftTrxRequest: Record "NPR EFT Transaction Request")
+    var
+        MPayCertLbl: Label 'MPayCert-%1', Locked = true;
     begin
         EftTrxRequest.Init();
         EftTrxRequest."Entry No." := 0;
@@ -362,7 +364,7 @@ codeunit 6014508 "NPR MobilePayV10 SelfCertify"
         EftTrxRequest."Reference Number Input" := Format(EftTrxRequest."Entry No.");
         EftTrxRequest."Amount Input" := 100;
         EftTrxRequest."Currency Code" := 'DKK';
-        EftTrxRequest."Sales Ticket No." := StrSubstNo('MPayCert-%1', Format(EftTrxRequest."Entry No."));
+        EftTrxRequest."Sales Ticket No." := StrSubstNo(MPayCertLbl, Format(EftTrxRequest."Entry No."));
         EftTrxRequest."Processing Type" := EftTrxRequest."Processing Type"::PAYMENT;
         EftTrxRequest.Modify();
     end;

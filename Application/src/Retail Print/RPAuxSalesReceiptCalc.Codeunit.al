@@ -56,6 +56,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         MinDecimals: Integer;
         MaxDecimals: Integer;
         Result: Decimal;
+        FormadDecLbl: Label '<Precision,%1:%2><Standard Format,2>', Locked = true;
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux: SalesReceipt Calc." then
             exit;
@@ -88,7 +89,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
                 exit;
         end;
 
-        TemplateLine."Processing Value" := Format(Result, 0, StrSubstNo('<Precision,%1:%2><Standard Format,2>', MinDecimals, MaxDecimals));
+        TemplateLine."Processing Value" := Format(Result, 0, StrSubstNo(FormadDecLbl, MinDecimals, MaxDecimals));
     end;
 }
 

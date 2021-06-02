@@ -10,26 +10,26 @@ codeunit 6150710 "NPR POS Data Management"
         DataSource: Codeunit "NPR Data Source";
     begin
         case View.Type() of
-            View.Type()::Login:
+            View.Type() ::Login:
                 begin
                     GetDataSource(BuiltInSale(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
-            View.Type()::Sale:
+            View.Type() ::Sale:
                 begin
                     GetDataSource(BuiltInSaleLine(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                     GetDataSource(BuiltInSale(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
-            View.Type()::Payment:
+            View.Type() ::Payment:
                 begin
                     GetDataSource(BuiltInPaymentLine(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                     GetDataSource(BuiltInSale(), DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
-            View.Type()::BalanceRegister:
+            View.Type() ::BalanceRegister:
                 begin
                     GetDataSource(BuiltInBalancing(), DataSource, Setup);
                     View.AddDataSource(DataSource);
@@ -115,6 +115,7 @@ codeunit 6150710 "NPR POS Data Management"
         Handled: Boolean;
         HasVariables: Boolean;
         IsExtensionField: Boolean;
+        DataRowLbl: Label '%1.%2', Locked = true;
     begin
         foreach DataColumnToken in DataSource.Columns() do begin
             DataColumnObject := DataColumnToken.AsObject();
@@ -156,7 +157,7 @@ codeunit 6150710 "NPR POS Data Management"
                     FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Extension, DataSource.Id(), 'OnDataSourceExtensionReadData'));
                 ExtensionKeys := ExtensionDataRow.Fields().Keys();
                 foreach ExtensionKey in ExtensionKeys do
-                    DataRow.Add(StrSubstNo('%1.%2', Extension, ExtensionKey), ExtensionDataRow.Field(ExtensionKey));
+                    DataRow.Add(StrSubstNo(DataRowLbl, Extension, ExtensionKey), ExtensionDataRow.Field(ExtensionKey));
             end;
         end;
     end;

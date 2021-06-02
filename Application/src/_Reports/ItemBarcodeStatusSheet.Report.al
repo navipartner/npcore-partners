@@ -172,8 +172,8 @@ report 6014455 "NPR Item Barcode Status Sheet"
         BarcodeLib.SetAntiAliasing(false);
         BarcodeLib.SetShowText(true);
 
-        ItemFilter := StrSubstNo('%1: %2', Item.TableCaption, Item.GetFilters());
-        ItemVariantFilter := StrSubstNo('%1: %2', ItemVariant.TableCaption, ItemVariant.GetFilters());
+        ItemFilter := StrSubstNo(Pct1Lbl, Item.TableCaption, Item.GetFilters());
+        ItemVariantFilter := StrSubstNo(Pct1Lbl, ItemVariant.TableCaption, ItemVariant.GetFilters());
 
         if ShowInventory then
             Item.SetAutoCalcFields(Inventory);
@@ -191,6 +191,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
         ItemFilter: Text;
         ItemVariantFilter: Text;
         BlobBuffer: Record "NPR BLOB buffer" temporary;
+        Pct1Lbl: Label '%1: %2', locked = true;
 
     local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])
     begin

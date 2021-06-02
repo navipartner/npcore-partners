@@ -145,11 +145,12 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', Rec."External Adm. Sch. Entry No.");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (AdmissionScheduleEntry.FindFirst()) then
-            ScheduledTime := StrSubstNo('%1 %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+            ScheduledTime := StrSubstNo(ScheduledTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
     end;
 
     var
         ScheduledTime: Text[30];
+        ScheduledTimeLbl: Label '%1 %2', Locked = true;
 
     local procedure UnconsumeItem()
     begin

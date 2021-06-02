@@ -46,6 +46,8 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         FunctionOptionString: Text;
         JSArr: Text;
         N: Integer;
+        JSArrLbl: Label '"%1",', Locked = true;
+        JSArr2Lbl: Label 'var optionNames = [%1];', Locked = true;
     begin
         if Sender.DiscoverAction(
           ActionCode(),
@@ -60,8 +62,8 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                                     'View Membership Entry,Regret Membership Entry,' +
                                     'Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership';
             for N := 1 to 11 do
-                JSArr += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
-            JSArr := StrSubstNo('var optionNames = [%1];', CopyStr(JSArr, 1, StrLen(JSArr) - 1));
+                JSArr += StrSubstNo(JSArrLbl, SelectStr(N, FunctionOptionString));
+            JSArr := StrSubstNo(JSArr2Lbl, CopyStr(JSArr, 1, StrLen(JSArr) - 1));
 
             Sender.RegisterWorkflowStep('0', JSArr + 'windowTitle = labels.MembershipTitle.substitute (optionNames[param.Function].toString()); ');
             Sender.RegisterWorkflowStep('membercard_number', '(param.DefaultInputValue.length == 0) && (param.DialogPrompt <= 0) && input ({caption: labels.MemberCardPrompt, title: windowTitle}).cancel(abort);');
@@ -250,6 +252,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ResponseCode: Integer;
         ItemDescription: Text;
         ResponseMessage: Text;
+        PlaceHolderLbl: Label '%1/%2', Locked = true;
     begin
 
         if (InputMethod = DialogMethod::NO_PROMPT) and (ExternalMemberCardNo = '') then
@@ -277,7 +280,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MembershipEvents.OnCustomItemDescription(MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Entry No.", ItemDescription);
 
         ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
-        AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo('%1/%2', Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
+        AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo(PlaceHolderLbl, Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
 
         case MembershipSetup."Member Information" of
             MembershipSetup."Member Information"::ANONYMOUS:

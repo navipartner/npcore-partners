@@ -134,11 +134,12 @@ table 6151081 "NPR ExRv Voucher"
     var
         DimMgt: Codeunit DimensionManagement;
         OldDimSetID: Integer;
+        DimSetIdLbl: Label '%1 %2', Locked = true;
     begin
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet(
-            "Dimension Set ID", StrSubstNo('%1 %2', TableCaption, "No."),
+            "Dimension Set ID", StrSubstNo(DimSetIdLbl, TableCaption, "No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         if OldDimSetID <> "Dimension Set ID" then
             Modify();

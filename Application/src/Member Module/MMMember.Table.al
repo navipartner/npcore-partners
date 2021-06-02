@@ -227,6 +227,9 @@ table 6060126 "NPR MM Member"
     {
     }
 
+    var
+        PlaceHolderLbl: Label '%1 %2', Locked = true;
+
     trigger OnDelete()
     var
         MembershipRole: Record "NPR MM Membership Role";
@@ -259,7 +262,7 @@ table 6060126 "NPR MM Member"
 
     trigger OnInsert()
     begin
-        "Display Name" := StrSubstNo('%1 %2', "First Name", "Last Name");
+        "Display Name" := StrSubstNo(PlaceHolderLbl, "First Name", "Last Name");
         "Created Datetime" := CurrentDateTime();
     end;
 
@@ -268,7 +271,7 @@ table 6060126 "NPR MM Member"
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipRole: Record "NPR MM Membership Role";
     begin
-        "Display Name" := StrSubstNo('%1 %2', "First Name", "Last Name");
+        "Display Name" := StrSubstNo(PlaceHolderLbl, "First Name", "Last Name");
 
         MembershipRole.SetFilter("Member Entry No.", '=%1', "Entry No.");
         if (MembershipRole.FindSet()) then begin

@@ -834,6 +834,7 @@
     var
         SearchFilter: Text;
         SearchString: Text;
+        SearchFilterLbl: Label '=%1', Locked = true;
     begin
         Clear(Item);
 
@@ -841,7 +842,7 @@
         SearchString := UpperCase(SearchString);
         SearchFilter := '*' + SearchString + '*';
         if ItemIdentifierString = '' then
-            SearchFilter := StrSubstNo('=%1', '');
+            SearchFilter := StrSubstNo(SearchFilterLbl, '');
 
         Item.SetCurrentKey("Search Description");
         Item.SetFilter("Search Description", SearchFilter);

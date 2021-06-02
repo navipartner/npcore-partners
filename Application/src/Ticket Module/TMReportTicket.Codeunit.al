@@ -33,6 +33,8 @@ codeunit 6014571 "NPR TM Report - Ticket"
         TMTicketType: Record "NPR TM Ticket Type";
         PosEntry: Record "NPR POS Entry";
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
+        PrinterLbl: Label '%1 %2', Locked = true;
+        PrinterLbl2Lbl: Label '%1 - %2', Locked = true;
     begin
         Printer.SetFont('Control');
         Printer.AddLine('h');
@@ -74,7 +76,7 @@ codeunit 6014571 "NPR TM Report - Ticket"
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         if (TicketAccessEntry.FindFirst()) then
-            Printer.AddTextField(2, 2, StrSubstNo('%1 %2', TicketAccessEntry.Quantity, TicketAccessEntry.FieldCaption(Quantity)));
+            Printer.AddTextField(2, 2, StrSubstNo(PrinterLbl, TicketAccessEntry.Quantity, TicketAccessEntry.FieldCaption(Quantity)));
 
         Printer.SetBold(false);
         Printer.AddLine(' ');
@@ -82,7 +84,7 @@ codeunit 6014571 "NPR TM Report - Ticket"
         Printer.SetBold(true);
 
         if (Ticket."Valid From Date" <> Ticket."Valid To Date") then begin
-            Printer.AddTextField(2, 2, StrSubstNo('%1 - %2', Ticket."Valid From Date", Ticket."Valid To Date"))
+            Printer.AddTextField(2, 2, StrSubstNo(PrinterLbl2Lbl, Ticket."Valid From Date", Ticket."Valid To Date"))
         end else begin
             Printer.AddTextField(2, 2, Format(Ticket."Valid From Date"));
         end;

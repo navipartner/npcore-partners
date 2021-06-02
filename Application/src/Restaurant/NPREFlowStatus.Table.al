@@ -111,6 +111,7 @@ table 6150664 "NPR NPRE Flow Status"
         AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
         PrintCategoryString: Text;
+        PrintCategoryLbl: Label '%1|%2', Locked = true;
     begin
         //Return not assigned group filter for empty Code
         PrintCategory.Reset();
@@ -138,7 +139,7 @@ table 6150664 "NPR NPRE Flow Status"
             until PrintCategory.Next() = 0;
 
         if (Code = '') and (PrintCategoryString <> '') and not PrintCategory.Get('') then
-            PrintCategoryString := StrSubstNo('%1|%2', EmptyCodeINQuotes, PrintCategoryString);
+            PrintCategoryString := StrSubstNo(PrintCategoryLbl, EmptyCodeINQuotes, PrintCategoryString);
 
         exit(PrintCategoryString);
     end;

@@ -580,14 +580,15 @@ table 6150622 "NPR POS Entry Sales Line"
     var
         DimMgt: Codeunit DimensionManagement;
         POSEntry: Record "NPR POS Entry";
+        DimSetIdLbl: Label '%1 %2 %3', Locked = true;
     begin
         POSEntry.Get("POS Entry No.");
         if ((POSEntry."Post Entry Status" = POSEntry."Post Entry Status"::Posted) and (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted)) then begin
-            DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."));
+            DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo(DimSetIdLbl, TableCaption, "POS Entry No.", "Line No."));
         end else begin
             "Dimension Set ID" :=
               DimMgt.EditDimensionSet(
-                "Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+                "Dimension Set ID", StrSubstNo(DimSetIdLbl, TableCaption, "POS Entry No.", "Line No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
             Modify();
         end;
     end;

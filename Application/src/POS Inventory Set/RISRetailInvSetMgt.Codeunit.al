@@ -121,6 +121,8 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         WsNamespace: Text;
         XmlString: Text;
         AuthText: Text;
+        AuthLbl: Label '%1:%2', Locked = true;
+        BasicLbl: Label 'Basic %1', Locked = true;
     begin
         TotalInventory := 0;
         TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
@@ -170,8 +172,8 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 
         if RetailInventorySetEntry."Api Username" <> '' then begin
             HttpWebRequest.GetHeaders(HeadersReq);
-            AuthText := StrSubstNo('%1:%2', RetailInventorySetEntry."Api Username", RetailInventorySetEntry."Api Password");
-            HeadersReq.Add('Authorization', StrSubstNo('Basic %1', Base64Convert.ToBase64(AuthText)));
+            AuthText := StrSubstNo(AuthLbl, RetailInventorySetEntry."Api Username", RetailInventorySetEntry."Api Password");
+            HeadersReq.Add('Authorization', StrSubstNo(BasicLbl, Base64Convert.ToBase64(AuthText)));
         end;
 
         HttpWebRequest.Content(Content);
@@ -187,7 +189,7 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 
         if not HttpWebResponse.IsSuccessStatusCode then begin
             XmlDoc.SelectSingleNode('.//*[local-name()="faultstring"]', Node);
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Node.AsXmlElement().InnerText))
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Node.AsXmlElement().InnerText)
         end;
 
         XmlDoc.SelectNodes('.//*[local-name()="item"]', XmlNodeList);

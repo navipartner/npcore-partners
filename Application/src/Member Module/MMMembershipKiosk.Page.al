@@ -196,10 +196,12 @@ page 6060078 "NPR MM Membership Kiosk"
     end;
 
     local procedure GetJToken(JObject: JsonObject; JsonKey: Text; var JToken: JsonToken) KeyFound: Boolean
+    var
+        PlaceHolderLbl: Label '{%1: ""}', Locked = true;
     begin
         KeyFound := JObject.Get(JsonKey, JToken);
         if (not KeyFound) then
-            JToken.ReadFrom(StrSubstNo('{%1: ""}', JsonKey));
+            JToken.ReadFrom(StrSubstNo(PlaceHolderLbl, JsonKey));
     end;
 
     local procedure CopyKeyValue(SourceJObject: JsonObject; SourceKey: Text; TargetJObject: JsonObject; TargetKey: Text) KeyFound: Boolean
@@ -237,8 +239,9 @@ page 6060078 "NPR MM Membership Kiosk"
     end;
 
     local procedure TextToDate(FieldValue: Text; DateMask: Code[20]; FieldValueIsOptional: Boolean; FieldCaptionName: Text; var ReturnDate: Date; var ErrorMessage: Text) IsValid: Boolean
+    var
+        PlaceHolderLbl: Label '%1-%2-%3', Locked = true;
     begin
-
         ReturnDate := 0D;
 
         if (FieldValue = '') then begin
@@ -257,11 +260,11 @@ page 6060078 "NPR MM Membership Kiosk"
 
         case UpperCase(DateMask) of
             'YYYYMMDD':
-                IsValid := Evaluate(ReturnDate, StrSubstNo('%1-%2-%3', CopyStr(FieldValue, 1, 4), CopyStr(FieldValue, 5, 2), CopyStr(FieldValue, 7, 2)), 9);
+                IsValid := Evaluate(ReturnDate, StrSubstNo(PlaceHolderLbl, CopyStr(FieldValue, 1, 4), CopyStr(FieldValue, 5, 2), CopyStr(FieldValue, 7, 2)), 9);
             'YYYY-MM-DD':
-                IsValid := Evaluate(ReturnDate, StrSubstNo('%1-%2-%3', CopyStr(FieldValue, 1, 4), CopyStr(FieldValue, 6, 2), CopyStr(FieldValue, 9, 2)), 9);
+                IsValid := Evaluate(ReturnDate, StrSubstNo(PlaceHolderLbl, CopyStr(FieldValue, 1, 4), CopyStr(FieldValue, 6, 2), CopyStr(FieldValue, 9, 2)), 9);
             'DD/MM/YYYY':
-                IsValid := Evaluate(ReturnDate, StrSubstNo('%1-%2-%3', CopyStr(FieldValue, 7, 4), CopyStr(FieldValue, 1, 2), CopyStr(FieldValue, 4, 2)), 9);
+                IsValid := Evaluate(ReturnDate, StrSubstNo(PlaceHolderLbl, CopyStr(FieldValue, 7, 4), CopyStr(FieldValue, 1, 2), CopyStr(FieldValue, 4, 2)), 9);
             else
                 Error(DATE_MASK_ERROR, DateMask);
         end;
@@ -275,8 +278,9 @@ page 6060078 "NPR MM Membership Kiosk"
     local procedure PutStringValue(var JObject: JsonObject; JsonKey: Text; KeyValue: Text)
     var
         JToken: JsonToken;
+        PlaceHolderLbl: Label '{%1: "%2"}', Locked = true;
     begin
-        JToken.ReadFrom(StrSubstNo('{%1: "%2"}', JsonKey, KeyValue));
+        JToken.ReadFrom(StrSubstNo(PlaceHolderLbl, JsonKey, KeyValue));
         JObject.Remove(JsonKey);
         JObject.Add(JsonKey, JToken);
     end;

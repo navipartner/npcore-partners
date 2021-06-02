@@ -44,8 +44,9 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
     end;
 
     local procedure BuildGenericRequest(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary; var SoapAction: Text; var XmlRequest: Text): Boolean
+    var
+        WebReqLbl: Label '<x61:requestline number="%1" requestcode="%2">', Locked = true;
     begin
-
         SoapAction := 'urn:microsoft-dynamics-schemas/codeunit/hqconnector:GenericWebRequest';
         XmlRequest :=
          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hqc="urn:microsoft-dynamics-schemas/codeunit/hqconnector" xmlns:x61="urn:microsoft-dynamics-nav/xmlports/x6150905">' +
@@ -54,7 +55,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
          '      <hqc:GenericWebRequest>' +
          '         <hqc:genericrequest>' +
          '            <x61:request>';
-        XmlRequest += StrSubstNo('<x61:requestline number="%1" requestcode="%2">',
+        XmlRequest += StrSubstNo(WebReqLbl,
                                   TmpHCGenericWebRequest."Entry No.",
                                   TmpHCGenericWebRequest."Request Code");
         XmlRequest += '<parameter1>' + TmpHCGenericWebRequest."Parameter 1" + '</parameter1>';
@@ -125,6 +126,10 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         Request: HttpRequestMessage;
         RequestHeaders: HttpHeaders;
         Response: HttpResponseMessage;
+        BasicAuthLbl: Label 'Basic %1', Locked = true;
+        Base64ConvertCredentialsLbl: Label '%1:%2', Locked = true;
+        SoapActionLbl: Label '"%1"', Locked = true;
+        ResponseLbl: Label '<responseStatus><responseCode>%1</responseCode><responseDescription>%2 - %3</responseDescription></responseStatus>', Locked = true;
     begin
         Request.GetHeaders(RequestHeaders);
         RequestHeaders.Remove('Connection');
@@ -132,8 +137,8 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         case EndpointSetup."Credentials Type" of
             EndpointSetup."Credentials Type"::NAMED:
                 begin
-                    B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', EndpointSetup."User Account", EndpointSetup."User Password"));
-                    RequestHeaders.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
+                    B64Credential := Base64Convert.ToBase64(StrSubstNo(Base64ConvertCredentialsLbl, EndpointSetup."User Account", EndpointSetup."User Password"));
+                    RequestHeaders.Add('Authorization', StrSubstNo(BasicAuthLbl, B64Credential));
                 end;
             else
         end;
@@ -147,7 +152,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         ContentHeader.Clear();
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
-        ContentHeader.Add('SOAPAction', StrSubstNo('"%1"', SoapAction));
+        ContentHeader.Add('SOAPAction', StrSubstNo(SoapActionLbl, SoapAction));
         ContentHeader := Client.DefaultRequestHeaders();
 
         Request.Content(RequestContent);
@@ -167,10 +172,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
             XmlDocument.ReadFrom(ResponseXmlText, XmlDocOut)
         else
             XmlDocument.ReadFrom(StrSubstNo(
-              '<responseStatus>' +
-                '<responseCode>%1</responseCode>' +
-                '<responseDescription>%2 - %3</responseDescription>' +
-              '</responseStatus>',
+              ResponseLbl,
               Response.HttpStatusCode,
               Response.ReasonPhrase,
               EndpointSetup."Endpoint URI"), XmlDocOut);

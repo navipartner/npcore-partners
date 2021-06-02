@@ -337,6 +337,8 @@ page 6060134 "NPR MM Member Info Capture"
                         MembershipSetup: Record "NPR MM Membership Setup";
                         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
                         ReasonText: Text;
+                        ReasonLbl: Label ' {%5 must be %4 %3 => (%1 + %2)}';
+                        ReasonDateLbl: Label '<+%1Y>', Locked = true;
                     begin
                         if (BirthDateMandatory) then begin
 
@@ -352,9 +354,9 @@ page 6060134 "NPR MM Member Info Capture"
                                         MembershipSalesSetup."Age Constraint (Years)")) then begin
                                         ReasonText :=
                                           StrSubstNo(AGE_VERIFICATION, Rec."First Name", MembershipSalesSetup."Age Constraint (Years)") +
-                                          StrSubstNo(' {%5 must be %4 %3 => (%1 + %2)}', Rec.Birthday,
+                                          StrSubstNo(ReasonLbl, Rec.Birthday,
                                             MembershipSalesSetup."Age Constraint (Years)",
-                                            CalcDate(StrSubstNo('<+%1Y>', MembershipSalesSetup."Age Constraint (Years)"), Rec.Birthday),
+                                            CalcDate(StrSubstNo(ReasonDateLbl, MembershipSalesSetup."Age Constraint (Years)"), Rec.Birthday),
                                             Format(MembershipSalesSetup."Age Constraint Type"),
                                             MembershipManagement.GetMembershipAgeConstraintDate(MembershipSalesSetup, Rec));
                                         Error(ReasonText);
@@ -1475,17 +1477,16 @@ page 6060134 "NPR MM Member Info Capture"
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
+    var
+        PlaceHolderLbl: Label '6014555,%1,%2,2', Locked = true;
     begin
-
-        exit(StrSubstNo('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
+        exit(StrSubstNo(PlaceHolderLbl, GetAttributeTableId(), AttributeNumber));
 
     end;
 
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
-
         NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(AttributeNumber, 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
-
     end;
 }
 

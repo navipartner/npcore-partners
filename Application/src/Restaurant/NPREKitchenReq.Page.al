@@ -281,8 +281,10 @@ page 6150689 "NPR NPRE Kitchen Req."
         ViewModeListLbl: Label 'Expedite View,Kitchen Station View';
 
     local procedure GetPageCaption(): Text
+    var
+        PageCaptionLbl: Label '(%1)', Locked = true;
     begin
-        exit(StrSubstNo('(%1)', SelectStr(ViewMode + 1, ViewModeListLbl)));
+        exit(StrSubstNo(PageCaptionLbl, SelectStr(ViewMode + 1, ViewModeListLbl)));
     end;
 
     local procedure RunKitchenStationRelatedAction(ActionToRun: Option)

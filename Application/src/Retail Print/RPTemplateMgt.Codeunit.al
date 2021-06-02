@@ -237,6 +237,7 @@
     var
         InStream: InStream;
         FileName: Variant;
+        FileNameLbl: Label '%1, Version %2.json', Locked = true;
     begin
         if not TemplateArchive.Template.HasValue() then
             exit;
@@ -244,7 +245,7 @@
         TemplateArchive.CalcFields(Template);
         TemplateArchive.Template.CreateInStream(InStream);
 
-        FileName := StrSubstNo('%1, Version %2.json', TemplateArchive.Code, TemplateArchive.Version);
+        FileName := StrSubstNo(FileNameLbl, TemplateArchive.Code, TemplateArchive.Version);
         DownloadFromStream(InStream, 'Export archived template to file', '', 'JSON File (*.json)|*.json', FileName);
     end;
 

@@ -1,24 +1,15 @@
 codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
 {
-    // NPR5.48/MMV /20190124 CASE 341237 Created object
-    // NPR5.49/MMV /20190219 CASE 345188 Added AcquireCard support
-    // NPR5.49/MMV /20190409 CASE 351678 Renamed object
-    // NPR5.50/MMV /20190515 CASE 355433 Added modify
-    // NPR5.53/MMV /20191120 CASE 377533 Rewrote background session handling
-    // NPR5.54/MMV /20200218 CASE 387990 Use response status code to determine hard errors where transaction never started.
-
     TableNo = "NPR EFT Trx Async Req.";
 
     trigger OnRun()
     begin
-        //-NPR5.53 [377533]
         case CodeunitExecutionMode of
             CodeunitExecutionMode::INIT_SESSION:
                 InitializeSession(Rec);
             CodeunitExecutionMode::START_TRX:
                 StartTransaction(Rec);
         end;
-        //+NPR5.53 [377533]
     end;
 
     var
@@ -27,22 +18,19 @@ codeunit 6184521 "NPR EFT Adyen Bnd. Trx Req."
 
     procedure SetExecutionMode(CodeunitExecutionModeIn: Integer)
     begin
-        //-NPR5.53 [377533]
         CodeunitExecutionMode := CodeunitExecutionModeIn;
-        //+NPR5.53 [377533]
     end;
 
     local procedure InitializeSession(EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.")
     var
         EFTAdyenBackgndTrxReq: Codeunit "NPR EFT Adyen Bnd. Trx Req.";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
+        BackgroundTrxLbl: Label 'Background trx CODEUNIT.RUN error: %1';
     begin
-        //-NPR5.53 [377533]
         EFTAdyenBackgndTrxReq.SetExecutionMode(CodeunitExecutionMode::START_TRX);
         if not EFTAdyenBackgndTrxReq.Run(EFTTransactionAsyncRequest) then begin
-            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", StrSubstNo('Background trx CODEUNIT.RUN error: %1', GetLastErrorText), '');
+            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", StrSubstNo(BackgroundTrxLbl, GetLastErrorText), '');
         end;
-        //+NPR5.53 [377533]
     end;
 
     local procedure StartTransaction(EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.")

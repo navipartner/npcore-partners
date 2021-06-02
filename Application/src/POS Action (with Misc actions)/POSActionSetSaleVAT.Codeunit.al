@@ -116,15 +116,16 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         POSSale.GetTotals(SalesAmount, PaidAmount, ChangeAmount, RoundingAmount);
 
         if MinSaleAmountLimit and (SalesAmount < MinSaleAmount) then
-            Error(StrSubstNo('%1 (%2)', ERROR_MINAMOUNT, MinSaleAmount));
+            Error('%1 (%2)', ERROR_MINAMOUNT, MinSaleAmount);
 
         if MaxSaleAmountLimit and (SalesAmount > MaxSaleAmount) then
-            Error(StrSubstNo('%1 (%2)', ERROR_MAXAMOUNT, MaxSaleAmount));
+            Error('%1 (%2)', ERROR_MAXAMOUNT, MaxSaleAmount);
     end;
 
     local procedure InsertComment(POSSaleLine: Codeunit "NPR POS Sale Line"; VATAmountDifference: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSDescLbl: Label '%1: %2', Locked = true;
     begin
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
 
@@ -132,9 +133,9 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
             exit
         else
             if VATAmountDifference > 0 then
-                SaleLinePOS.Description := StrSubstNo('%1: %2', COMMENT_VATREMOVED, VATAmountDifference)
+                SaleLinePOS.Description := StrSubstNo(SaleLinePOSDescLbl, COMMENT_VATREMOVED, VATAmountDifference)
             else
-                SaleLinePOS.Description := StrSubstNo('%1: %2', COMMENT_VATADDED, VATAmountDifference);
+                SaleLinePOS.Description := StrSubstNo(SaleLinePOSDescLbl, COMMENT_VATADDED, VATAmountDifference);
 
         POSSaleLine.InsertLine(SaleLinePOS);
     end;

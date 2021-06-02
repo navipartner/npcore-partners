@@ -467,14 +467,13 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         Value: Text;
         ParsePrint: Boolean;
         RequiredSignature: Boolean;
+        NameValuePairLbl: Label '%1  %2\', Locked = true;
     begin
         if JObject.Count() < 1 then
             exit;
 
-        //-NPR5.54 [387990]
         EntryNo := GetLastReceiptLineEntryNo(EFTTransactionRequest);
         ReceiptNo := GetLastReceiptNo(EFTTransactionRequest);
-        //+NPR5.54 [387990]
 
         for i := 0 to (JObject.Count() - 1) do begin
 
@@ -501,9 +500,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
 
             if ParsePrint then begin
                 if JObject.Item(i).Item('OutputContent').Item('OutputFormat').ToString() = 'Text' then begin
-                    //-NPR5.54 [387990]
                     ReceiptNo += 1;
-                    //+NPR5.54 [387990]
                     JToken := JObject.Item(i).Item('OutputContent').Item('OutputText');
                     for j := 0 to (JToken.Count() - 1) do begin
 
@@ -519,12 +516,10 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
                             end;
                         end;
 
-                        OutStream.WriteText(StrSubstNo('%1  %2\', Name, Value));
+                        OutStream.WriteText(StrSubstNo(NameValuePairLbl, Name, Value));
 
-                        //-NPR5.54 [387990]
                         EntryNo += 1;
                         InsertReceiptLine(Name, Value, ReceiptNo, EntryNo, EFTTransactionRequest);
-                        //+NPR5.54 [387990]
                     end;
                 end;
             end;

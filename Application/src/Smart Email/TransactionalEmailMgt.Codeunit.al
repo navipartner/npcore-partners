@@ -83,6 +83,7 @@ codeunit 6059820 "NPR Transactional Email Mgt."
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
         CampaignMonitorMgt: Codeunit "NPR CampaignMonitor Mgt.";
         MandrillTransEmailMgt: Codeunit "NPR Mandrill Trans. Email Mgt";
+        EmailLbl: Label '%1 %2', Locked = true;
     begin
         TransactionalEmailSetup.SetRange(Default, true);
         if not TransactionalEmailSetup.FindFirst() then begin
@@ -93,7 +94,7 @@ codeunit 6059820 "NPR Transactional Email Mgt."
             TransactionalEmailSetup.Provider::"Campaign Monitor":
                 begin
                     if (FromName <> '') and (FromName <> FromEmail) then
-                        FromEmail := StrSubstNo('%1 %2', FromName, FromEmail);
+                        FromEmail := StrSubstNo(EmailLbl, FromName, FromEmail);
                     CampaignMonitorMgt.SendClasicMail(
                         Recipient, Cc, Bcc, Subject, BodyHtml, BodyText,
                         FromEmail, ReplyTo, TrackOpen, TrackClick, Group,

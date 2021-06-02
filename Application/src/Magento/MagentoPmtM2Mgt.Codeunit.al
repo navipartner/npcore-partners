@@ -363,7 +363,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         HttpWebResponse.Content.ReadAs(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
         exit(Response);
     end;
 

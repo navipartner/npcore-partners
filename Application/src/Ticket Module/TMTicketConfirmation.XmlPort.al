@@ -228,13 +228,16 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
     end;
 
     procedure GetSummary(): Text[30]
+    var
+        SummaryLbl: Label '%1-%2', Locked = true;
     begin
-        exit(StrSubstNo('%1-%2', ExternalIdCount, QtySum));
+        exit(StrSubstNo(SummaryLbl, ExternalIdCount, QtySum));
     end;
 
     procedure SetReservationResult(DocumentID: Text[100])
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        InvalidTokenLbl: Label 'Invalid token [%1]';
     begin
         tmpTicketReservationResponse.DeleteAll();
         TicketReservationResponse.SetFilter("Session Token ID", '=%1', DocumentID);
@@ -247,7 +250,7 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
         end else begin
             tmpTicketReservationResponse.Reset();
             tmpTicketReservationResponse."Session Token ID" := DocumentID;
-            tmpTicketReservationResponse."Response Message" := StrSubstNo('Invalid token [%1]', DocumentID);
+            tmpTicketReservationResponse."Response Message" := StrSubstNo(InvalidTokenLbl, DocumentID);
             tmpTicketReservationResponse.Insert();
         end;
     end;

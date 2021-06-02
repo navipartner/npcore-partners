@@ -12,7 +12,7 @@ report 6014439 "NPR Item Sales Postings"
         {
             DataItemTableView = SORTING("Item No.", "Entry Type", "Posting Date") ORDER(Ascending) WHERE("Entry Type" = FILTER(Sale));
             RequestFilterFields = "Item No.", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code", "Salespers./Purch. Code", "Item Category Code", Quantity;
-            column(ItemFilters; StrSubstNo('%1: %2', TableCaption, ItemFilter))
+            column(ItemFilters; StrSubstNo(Pct1Lbl, TableCaption, ItemFilter))
             {
             }
             column(DimFilters; GetFilter("Global Dimension 1 Code"))
@@ -192,5 +192,6 @@ report 6014439 "NPR Item Sales Postings"
         ValueEntry: Record "Value Entry";
         ItemCOG: Decimal;
         ShowVendorNo: Boolean;
+        Pct1Lbl: Label '%1: %2', locked = true;
 }
 

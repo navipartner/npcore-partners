@@ -69,12 +69,13 @@
         NodeList: XmlNodeList;
         Node: XmlNode;
         XPath: Text;
+        XPathReservationEntryLbl: Label 'reservationentry[@sourcetype="37" and @sourcesubtype="%1" and @sourceid="%2" and @sourcebatchname="" and @sourceprodorderline="0" and @sourcerefno="%3" and @positive="false"]', Locked = true;
     begin
         if ItemXmlElement.IsEmpty then
             exit(false);
 
         InsertSalesLine(ItemXmlElement, SalesHeader, SalesLine, TempSalesLine);
-        XPath := StrSubstNo('reservationentry[@sourcetype="37" and @sourcesubtype="%1" and @sourceid="%2" and @sourcebatchname="" and @sourceprodorderline="0" and @sourcerefno="%3" and @positive="false"]',
+        XPath := StrSubstNo(XPathReservationEntryLbl,
                             Format(TempSalesLine."Document Type", 0, 2), TempSalesLine."Document No.", Format(TempSalesLine."Line No."));
         NpXmlDomMgt.FindNodes(ItemXmlElement.AsXmlNode(), XPath, NodeList);
         foreach Node in NodeList do

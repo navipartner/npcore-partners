@@ -375,12 +375,13 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     var
         InStream: InStream;
         FileName: Text;
+        FileNameLbl: Label 'EFT_Log_%1_%2', Locked = true;
     begin
         if not EFTTransactionRequest.Logs.HasValue() then
             exit;
         EFTTransactionRequest.CalcFields(Logs);
         EFTTransactionRequest.Logs.CreateInStream(InStream);
-        FileName := StrSubstNo('EFT_Log_%1_%2', EFTTransactionRequest."Integration Type", EFTTransactionRequest."Entry No.");
+        FileName := StrSubstNo(FileNameLbl, EFTTransactionRequest."Integration Type", EFTTransactionRequest."Entry No.");
         DownloadFromStream(InStream, 'Log Download', '', 'All Files (*.*)|*.*', FileName);
     end;
 

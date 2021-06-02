@@ -67,7 +67,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
                     if (SalesPriceRequest."Request ID" <> '') then begin
                         SalesPriceRequest.SetFilter("Request ID", '=%1', SalesPriceRequest."Request ID");
                         if (not SalesPriceRequest.IsEmpty()) then begin
-                            ImportMessage += StrSubstNo('Skipping duplicate Request Id %1;', SalesPriceRequest."Request ID");
+                            ImportMessage += StrSubstNo(DuplicateReqIdLbl, SalesPriceRequest."Request ID");
                             currXMLport.Skip();
                         end;
                     end;
@@ -82,7 +82,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
                     SalesPriceRequest.SetFilter("Minimum Quantity", '=%1', SalesPriceRequest."Minimum Quantity");
 
                     if (not SalesPriceRequest.IsEmpty()) then begin
-                        ImportMessage += StrSubstNo('Skipping duplicate request %1;', SalesPriceRequest.RecordId);
+                        ImportMessage += StrSubstNo(DuplicateReqLbl, SalesPriceRequest.RecordId);
                         currXMLport.Skip();
                     end;
                 end;
@@ -208,6 +208,9 @@ xmlport 6151146 "NPR M2 Item Price Request"
         RequestLineNo: Integer;
         StartTime: Time;
         ImportMessage: Text;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
+        DuplicateReqIdLbl: Label 'Skipping duplicate Request Id %1;', Locked = true;
+        DuplicateReqLbl: Label 'Skipping duplicate request %1;', Locked = true;
 
     procedure GetSalesPriceRequest(var TmpM2PriceCalculationBuffer: Record "NPR M2 Price Calc. Buffer" temporary)
     begin
@@ -225,10 +228,12 @@ xmlport 6151146 "NPR M2 Item Price Request"
     end;
 
     procedure SetSalesPriceResponse(var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary; var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; ResponseMessageIn: Text; ResponseCodeIn: Code[10])
+    var
+        PlaceHolder2Lbl: Label '%1; %2', Locked = true;
     begin
 
         SalesPriceRequest.Reset();
-        ExecutionTime := StrSubstNo('%1 (ms)', Time - StartTime);
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Time - StartTime);
 
         if (TmpSalesPriceResponse.FindSet()) then begin
             repeat
@@ -248,7 +253,7 @@ xmlport 6151146 "NPR M2 Item Price Request"
         ResponseMessage := ResponseMessageIn;
 
         if (ImportMessage <> '') then
-            ResponseMessage := StrSubstNo('%1; %2', ImportMessage, ResponseMessageIn);
+            ResponseMessage := StrSubstNo(PlaceHolder2Lbl, ImportMessage, ResponseMessageIn);
 
         if (ResponseCode <> 'ERROR') and (ImportMessage <> '') then
             ResponseCode := 'WARNING';

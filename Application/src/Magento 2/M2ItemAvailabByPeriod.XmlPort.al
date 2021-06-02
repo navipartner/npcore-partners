@@ -485,7 +485,7 @@
 
                             trigger OnBeforePassVariable()
                             begin
-                                AccumulatedExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+                                AccumulatedExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
                             end;
                         }
                     }
@@ -513,6 +513,7 @@
         ProjAvailableBalance: Decimal;
         ExpectedInventory: Decimal;
         QtyAvailable: Decimal;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure CalculateAvailability()
     var
@@ -633,6 +634,6 @@
                 TmpItemResponse.DeleteAll();
 
         if (StartTime <> 0T) then
-            ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+            ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 }

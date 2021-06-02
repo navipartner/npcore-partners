@@ -1,15 +1,9 @@
 codeunit 6151130 "NPR TM Seating Mgt."
 {
-    // TM1.45/TSA /20190809 CASE 322432 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure AddRoot(AdmissionCode: Code[20]; pDescription: Text[80]) EntryNo: Integer
     var
         SeatingTemplate: Record "NPR TM Seating Template";
+        PathLbl: Label '/%1', Locked = true;
     begin
 
         SeatingTemplate.Init();
@@ -17,7 +11,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
         SeatingTemplate."Admission Code" := AdmissionCode;
         SeatingTemplate.Description := pDescription;
-        SeatingTemplate.Path := StrSubstNo('/%1', SeatingTemplate."Entry No.");
+        SeatingTemplate.Path := StrSubstNo(PathLbl, SeatingTemplate."Entry No.");
         SeatingTemplate.Ordinal := SeatingTemplate."Entry No.";
         SeatingTemplate."Entry Type" := SeatingTemplate."Entry Type"::NODE;
         SeatingTemplate."Reservation Category" := SeatingTemplate."Reservation Category"::NA;
@@ -39,6 +33,8 @@ codeunit 6151130 "NPR TM Seating Mgt."
     var
         ParentSeatingTemplate: Record "NPR TM Seating Template";
         SeatingTemplate: Record "NPR TM Seating Template";
+        PathLbl: Label '%1/%2', Locked = true;
+        DescriptionLbl: Label 'Level %1';
     begin
 
         ParentSeatingTemplate.Get(ParentEntryNo);
@@ -59,11 +55,11 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
         SeatingTemplate.Description := Description;
         if (Description = '') then
-            SeatingTemplate.Description := StrSubstNo('Level %1', SeatingTemplate."Indent Level");
+            SeatingTemplate.Description := StrSubstNo(DescriptionLbl, SeatingTemplate."Indent Level");
 
         ParentSeatingTemplate.SetFilter("Parent Entry No.", '=%1', ParentEntryNo);
         SeatingTemplate.Ordinal := ParentSeatingTemplate.Count() + 1;
-        SeatingTemplate.Path := StrSubstNo('%1/%2', ParentSeatingTemplate.Path, Format(SeatingTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
+        SeatingTemplate.Path := StrSubstNo(PathLbl, ParentSeatingTemplate.Path, Format(SeatingTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
 
         SeatingTemplate.Modify();
 
@@ -73,12 +69,13 @@ codeunit 6151130 "NPR TM Seating Mgt."
     procedure AddSibling(SiblingEntryNo: Integer) EntryNo: Integer
     var
         SeatingTemplate: Record "NPR TM Seating Template";
+        SiblingLbl: Label '%1:2', Locked = true;
     begin
 
         SeatingTemplate.Get(SiblingEntryNo);
         if (SeatingTemplate.Get(SeatingTemplate."Parent Entry No.")) then;
 
-        exit(AddSiblingWorker(SiblingEntryNo, StrSubstNo('%1:2', SeatingTemplate.Description)));
+        exit(AddSiblingWorker(SiblingEntryNo, StrSubstNo(SiblingLbl, SeatingTemplate.Description)));
     end;
 
     procedure AddSiblingWorker(SiblingEntryNo: Integer; Description: Text[80]) EntryNo: Integer
@@ -207,6 +204,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
         NewDepth: Integer;
         NewOrdinal: Integer;
         NewPath: Code[250];
+        PathLbl: Label '%1/%2', Locked = true;
     begin
 
         CurrentTemplate.Get(CurrentEntryNumber);
@@ -217,7 +215,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
         ParentSeatingTemplate.SetFilter("Parent Entry No.", '=%1', NewParentEntryNumber);
         NewOrdinal := ParentSeatingTemplate.Count() + 1;
-        NewPath := StrSubstNo('%1/%2', NewTemplate.Path, Format(CurrentTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
+        NewPath := StrSubstNo(PathLbl, NewTemplate.Path, Format(CurrentTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
 
         UpdateTemporaryPathList(CurrentTemplate."Admission Code", CurrentTemplate.Path, NewPath, TmpSeatingTemplate);
         UpdatePersistentTemplate(TmpSeatingTemplate, (NewDepth - CurrentDepth));
@@ -238,6 +236,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
         NewDepth: Integer;
         NewOrdinal: Integer;
         NewPath: Code[250];
+        PathLbl: Label '%1/%2', Locked = true;
     begin
 
         CurrentTemplate.Get(CurrentEntryNumber);
@@ -248,7 +247,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
         ParentSeatingTemplate.SetFilter("Parent Entry No.", '=%1', NewParentEntryNumber);
         NewOrdinal := ParentSeatingTemplate.Count() + 1;
-        NewPath := StrSubstNo('%1/%2', NewTemplate.Path, Format(CurrentTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
+        NewPath := StrSubstNo(PathLbl, NewTemplate.Path, Format(CurrentTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
 
         UpdateTemporaryPathListN(CurrentTemplate."Admission Code", CurrentTemplate.Path, NewPath, TmpSeatingTemplate, 4);
         UpdatePersistentTemplate(TmpSeatingTemplate, (NewDepth - CurrentDepth));
@@ -324,10 +323,11 @@ codeunit 6151130 "NPR TM Seating Mgt."
     var
         SeatingTemplate: Record "NPR TM Seating Template";
         SeatCount: Integer;
+        PathLbl: Label '%1/*', Locked = true;
     begin
 
         SeatingTemplate.SetFilter("Admission Code", '=%1', AdmissionCode);
-        SeatingTemplate.SetFilter(Path, '%1', StrSubstNo('%1/*', PathA));
+        SeatingTemplate.SetFilter(Path, '%1', StrSubstNo(PathLbl, PathA));
         if (SeatingTemplate.FindSet()) then begin
             repeat
                 TmpSeatingTemplate.TransferFields(SeatingTemplate, true);
@@ -440,14 +440,15 @@ codeunit 6151130 "NPR TM Seating Mgt."
         Row: Integer;
         Seat: Integer;
         ParentEntryNo: Integer;
+        ChildLbl: Label '%1: %2', Locked = true;
     begin
 
         for Row := 1 to Rows do begin
 
-            ParentEntryNo := AddChildWorker(StartFromEntryNo, StrSubstNo('%1: %2', RowLabel, Row));
+            ParentEntryNo := AddChildWorker(StartFromEntryNo, StrSubstNo(ChildLbl, RowLabel, Row));
 
             for Seat := 1 to Seats do
-                AddChildWorker(ParentEntryNo, StrSubstNo('%1: %2', SeatLabel, Seat));
+                AddChildWorker(ParentEntryNo, StrSubstNo(ChildLbl, SeatLabel, Seat));
 
         end;
     end;
@@ -642,9 +643,11 @@ codeunit 6151130 "NPR TM Seating Mgt."
     end;
 
     local procedure StringAddOne(Value: Code[10]; DigitPos: Integer): Code[10]
+    var
+        StringLbl: Label 'A%1', Locked = true;
     begin
         if (DigitPos = 0) then
-            exit(StrSubstNo('A%1', Value));
+            exit(StrSubstNo(StringLbl, Value));
 
         if (Value[DigitPos] = 'Z') then begin
             Value[DigitPos] := 'A';

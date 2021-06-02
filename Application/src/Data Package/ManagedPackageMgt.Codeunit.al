@@ -30,6 +30,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
     procedure AddExpectedTableID(ID: Integer)
     var
         AllObjWithCaption: Record AllObjWithCaption;
+        PlaceHolder2Lbl: Label '%1: %2', Locked = true;
     begin
         AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Table, ID);
 
@@ -37,7 +38,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         GlobalTableListTmp."Object ID" := ID;
         GlobalTableListTmp.Insert();
 
-        GlobalTableString += '\' + StrSubstNo('%1: %2', AllObjWithCaption."Object ID", AllObjWithCaption."Object Caption");
+        GlobalTableString += '\' + StrSubstNo(PlaceHolder2Lbl, AllObjWithCaption."Object ID", AllObjWithCaption."Object Caption");
     end;
 
     procedure SetLoadMethod(LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst)
@@ -151,6 +152,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst;
         RecRef: RecordRef;
         Total: Integer;
+        PlaceHolder3Lbl: Label '%1,%2,%3', Locked = true;
     begin
         if JToken.IsArray then
             Total := JToken.AsArray().Count
@@ -163,7 +165,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
         if GlobalLoadMethodOverwritten then
             LoadMethod := GlobalLoadMethod
         else begin
-            Selection := StrMenu(StrSubstNo('%1,%2,%3', Caption_OnlyInsert, Caption_InsertModify, Caption_DeleteFirst), 1, Caption_LoadMethod);
+            Selection := StrMenu(StrSubstNo(PlaceHolder3Lbl, Caption_OnlyInsert, Caption_InsertModify, Caption_DeleteFirst), 1, Caption_LoadMethod);
             if Selection = 0 then
                 exit(false);
 

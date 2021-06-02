@@ -24,6 +24,7 @@
         RaptorAPI: Codeunit "NPR Raptor API";
         Baseurl: Text;
         Path: Text;
+        PathLbl: Label '/v1/%1/%2/%3/%4?%5=%6&json=True', Locked = true;
     begin
         if UserIdentifier = '' then
             exit;
@@ -39,7 +40,7 @@
 
         Baseurl := RaptorSetup."Base Url";
         Path :=
-            StrSubstNo('/v1/%1/%2/%3/%4?%5=%6&json=True',
+            StrSubstNo(PathLbl,
                 RaptorSetup."Customer ID",
                 RaptorAction.RaptorActionAPIReqString(),
                 RaptorAction."Number of Entries to Return",
@@ -55,6 +56,7 @@
         RaptorAPI: Codeunit "NPR Raptor API";
         ErrorMsg: Text;
         Result: Text;
+        ResultLbl: Label '/%1.%2', Locked = true;
     begin
         if not IsEnabled(1) then
             exit;
@@ -62,7 +64,7 @@
         Result :=
             RaptorAPI.SendRaptorRequest(
                 RaptorSetup."Tracking Service Url",
-                StrSubstNo('/%1.%2', RaptorSetup."Customer ID", RaptorSetup."Tracking Service Type") + GenerateUrlQueryString(Parameters),
+                StrSubstNo(ResultLbl, RaptorSetup."Customer ID", RaptorSetup."Tracking Service Type") + GenerateUrlQueryString(Parameters),
                 ErrorMsg);
 
         if ErrorMsg <> '' then
@@ -191,6 +193,7 @@
     local procedure GenerateUrlQueryString(var Parameters: Record "Name/Value Buffer") QueryString: Text
     var
         TypeHelper: Codeunit "Type Helper";
+        QueryStringLbl: Label '%1=%2', Locked = true;
     begin
         Parameters.SetFilter(Name, '<>%1', '_*');
         Parameters.SetFilter(Value, '<>%1', '');
@@ -201,7 +204,7 @@
                 else
                     QueryString := '?';
                 QueryString := QueryString +
-                    StrSubstNo('%1=%2', TypeHelper.UrlEncode(Parameters.Name), TypeHelper.UrlEncode(Parameters.Value));
+                    StrSubstNo(QueryStringLbl, TypeHelper.UrlEncode(Parameters.Name), TypeHelper.UrlEncode(Parameters.Value));
             until Parameters.Next() = 0;
     end;
 

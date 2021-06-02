@@ -274,6 +274,7 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
     procedure SetChangeRequestId(DocumentId: Text[100])
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        ResponseLbl: Label 'Invalid token [%1]';
     begin
 
         tmpTicketReservationResponse.Reset();
@@ -293,7 +294,7 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
 
         end else begin
             tmpTicketReservationResponse."Session Token ID" := DocumentId;
-            tmpTicketReservationResponse."Response Message" := StrSubstNo('Invalid token [%1]', DocumentId);
+            tmpTicketReservationResponse."Response Message" := StrSubstNo(ResponseLbl, DocumentId);
             tmpTicketReservationResponse.Insert();
 
             SetError(tmpTicketReservationResponse."Response Message");

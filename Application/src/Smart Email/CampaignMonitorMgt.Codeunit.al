@@ -404,8 +404,10 @@
     end;
 
     local procedure SendSmartEmailURL(SmartEmailID: Text): Text
+    var
+        UrlLbl: Label '/transactional/smartEmail/%1/send.json', Locked = true;
     begin
-        exit(GetFullURL(StrSubstNo('/transactional/smartEmail/%1/send.json', SmartEmailID)));
+        exit(GetFullURL(StrSubstNo(UrlLbl, SmartEmailID)));
     end;
 
     local procedure SendClassicEmailURL(ClientID: Text): Text
@@ -418,12 +420,14 @@
     end;
 
     local procedure AddParameter(ParameterName: Text; ParameterValue: Text; ParameterString: Text): Text
+    var
+        NameValuePairLbl: Label '%1=%2', Locked = true;
     begin
         if ParameterValue = '' then
             exit(ParameterString);
         if ParameterString <> '' then
             ParameterString += '&';
-        ParameterString += StrSubstNo('%1=%2', ParameterName, ParameterValue);
+        ParameterString += StrSubstNo(NameValuePairLbl, ParameterName, ParameterValue);
         exit(ParameterString);
     end;
 

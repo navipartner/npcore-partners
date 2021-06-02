@@ -105,9 +105,12 @@ page 6060112 "NPR TM Ticket Select Schedule"
         CapacityControl: Option;
         Admission: Record "NPR TM Admission";
         NonWorking: Boolean;
+        DateTimeLbl: Label '%1 %2', Locked = true;
+        RemainingLbl: Label '%1', Locked = true;
+        Remaining2Lbl: Label '%1 (%2)', Locked = true;
     begin
 
-        LocalDateTimeText := StrSubstNo('%1 %2', Format(Today), Format(Time));
+        LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today()), Format(Time()));
 
         Rec.CalcFields("Open Reservations", "Open Admitted", "Initial Entry");
 
@@ -132,17 +135,19 @@ page 6060112 "NPR TM Ticket Select Schedule"
         RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
             Rec.CalcFields("Waiting List Queue");
-            RemainingText := StrSubstNo('%1', WAITING_LIST);
+            RemainingText := StrSubstNo(RemainingLbl, WAITING_LIST);
             if (Rec."Waiting List Queue" > 0) then
-                RemainingText := StrSubstNo('%1 (%2)', WAITING_LIST, Rec."Waiting List Queue");
+                RemainingText := StrSubstNo(Remaining2Lbl, WAITING_LIST, Rec."Waiting List Queue");
         end;
 
         TicketManagement.CheckTicketBaseCalendar(Rec."Admission Code", gTicketItemNo, gTicketVariantCode, Rec."Admission Start Date", NonWorking, CalendarExceptionText);
     end;
 
     trigger OnInit()
+    var
+    DateTimeLbl: Label '%1 %2', Locked = true;
     begin
-        LocalDateTimeText := StrSubstNo('%1 %2', Format(Today), Format(Time));
+        LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today), Format(Time));
     end;
 
     trigger OnOpenPage()

@@ -91,6 +91,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
         EFTSetup: Record "NPR EFT Setup";
+        QueuedTrxSessionLbl: Label 'Queued trx session ID %1';
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
@@ -100,7 +101,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         Commit();
 
         StartSession(SessionId, CODEUNIT::"NPR EFT NETSCloud Bg. Req.", CompanyName, EFTTransactionAsyncRequest);
-        EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
+        EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo(QueuedTrxSessionLbl, SessionId), '');
 
         EFTNETSCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
     end;
@@ -137,6 +138,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
         EFTSetup: Record "NPR EFT Setup";
+        QueuedTrxSessionLbl: Label 'Queued trx session ID %1';
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
@@ -146,7 +148,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         Commit();
 
         StartSession(SessionId, CODEUNIT::"NPR EFT NETSCloud Bg. Req.", CompanyName, EFTTransactionAsyncRequest);
-        EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo('Queued trx session ID %1', SessionId), '');
+        EFTTransactionLoggingMgt.WriteLogEntry(EftTransactionRequest."Entry No.", StrSubstNo(QueuedTrxSessionLbl, SessionId), '');
 
         EFTNETSCloudTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
     end;
@@ -521,16 +523,15 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/administration', Locked = true;
     begin
         Body :=
         '{' +
           '"action":"reconciliation"' +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        //-NPR5.55 [405984]
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 60 * 1000, true);
-        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -539,6 +540,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         Body: Text;
         JsonConvert: DotNet NPRNetJsonConvert;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/transaction', Locked = true;
     begin
         Body :=
         '{' +
@@ -546,7 +548,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
           '"amount":' + JsonConvert.ToString(GetAmount(EftTransactionRequest)) +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
     end;
 
@@ -556,6 +558,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/transaction', Locked = true;
     begin
         Body :=
         '{' +
@@ -563,7 +566,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
           '"amount":' + JsonConvert.ToString(GetAmount(EftTransactionRequest)) +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
     end;
 
@@ -573,16 +576,15 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         JsonConvert: DotNet NPRNetJsonConvert;
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/transaction', Locked = true;
     begin
         Body :=
         '{' +
           '"amount":' + JsonConvert.ToString(GetAmount(EftTransactionRequest)) +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
-        //-NPR5.55 [405984]
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'DELETE', Endpoint, 60 * 1000, true);
-        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -590,14 +592,13 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/transaction', Locked = true;
     begin
         Body :=
         '';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/transaction', EftTransactionRequest."Hardware ID");
-        //-NPR5.55 [405984]
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, TimeoutMs, true);
-        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -605,16 +606,15 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/administration', Locked = true;
     begin
         Body :=
         '{' +
           '"action" : "cancelAction"' +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        //-NPR5.55 [405984]
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 10 * 1000, true);
-        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -622,16 +622,15 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/administration', Locked = true;
     begin
         Body :=
         '{' +
           '"action" : "downloadDataset"' +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        //-NPR5.55 [405984]
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
-        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -639,16 +638,15 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/administration', Locked = true;
     begin
         Body :=
         '{' +
           '"action" : "downloadSoftware"' +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        //-NPR5.55 [405984]
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
-        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -656,16 +654,15 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/administration', Locked = true;
     begin
         Body :=
         '{' +
           '"action" : "balanceInquiry"' +
         '}';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/administration', EftTransactionRequest."Hardware ID");
-        //-NPR5.55 [405984]
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetTokenFromRequestRecord(EftTransactionRequest), GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
-        //+NPR5.55 [405984]
     end;
 
     [TryFunction]
@@ -673,11 +670,12 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
     var
         Body: Text;
         Endpoint: Text;
+        EndpointLbl: Label '/v1/terminal/%1/settings', Locked = true;
     begin
         Body :=
         '';
 
-        Endpoint := StrSubstNo('/v1/terminal/%1/settings', EftTransactionRequest."Hardware ID");
+        Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
         Response := InvokeAPI(Body, GetToken(EFTSetup), GetServiceURL(EftTransactionRequest), 'GET', Endpoint, 10 * 1000, false);
     end;
 
@@ -709,6 +707,8 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         WebExceptionStatus: DotNet NPRNetWebExceptionStatus;
         TempBlob: Codeunit "Temp Blob";
         ResponseText: Text;
+        ReqRespLbl: Label '(%1)   \\%2', Locked = true;
+        ReqResp2Lbl: Label '(%1) %2   \\%3', Locked = true;
     begin
         ClearRequestResponseBuffer();
         ClearResponseErrorBodyBuffer();
@@ -742,7 +742,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
                 Response += ResponseText;
             end;
             ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
-            AppendRequestResponseBuffer(StrSubstNo('(%1)   \\%2', ResponseStatusCodeBuffer, Response), 'Response');
+            AppendRequestResponseBuffer(StrSubstNo(ReqRespLbl, ResponseStatusCodeBuffer, Response), 'Response');
             HttpWebResponse.Close();
         end else begin
             ResponseErrorBodyBuffer := WebRequestHelper.GetWebResponseError(WebException, URL);
@@ -755,7 +755,7 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
                     Response += ResponseText;
                 end;
             end;
-            AppendRequestResponseBuffer(StrSubstNo('(%1) %2   \\%3', ResponseStatusCodeBuffer, ResponseErrorBodyBuffer, Response), 'Response');
+            AppendRequestResponseBuffer(StrSubstNo(ReqResp2Lbl, ResponseStatusCodeBuffer, ResponseErrorBodyBuffer, Response), 'Response');
         end;
 
         if not ((ResponseStatusCodeBuffer in [200, 201]) or (AllowBadRequest and (ResponseStatusCodeBuffer = 400))) then begin

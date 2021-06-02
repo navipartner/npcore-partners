@@ -11,6 +11,7 @@ codeunit 6014641 "NPR BTF Service API"
         ProcessImportListLbl: Label 'process_import_list', Locked = true;
         ServiceEndPointsNotFoundLbl: Label '%1 not found for %2: %3 or endpoints exist but they are not enabled. Try to navigate to service endpoints through the setup by running an action "Show Setup Page"', Comment = '%1=ServiceEndPoint.TableCaption();%2=ServiceSetup.TableCaption();%3=ServiceSetup.Code';
         ImportTypeParameterLbl: Label 'import_type', locked = true;
+        BearerTokenLbl: Label 'bearer %1', locked = true;
 
     procedure VerifyServiceURL(var ServiceURL: Text)
     var
@@ -115,9 +116,11 @@ codeunit 6014641 "NPR BTF Service API"
     var
         Base64Convert: Codeunit "Base64 Convert";
         Base64Auth: Text;
+        BasicLbl: Label 'Basic %1', locked = true;
+        Pct2Lbl: Label '%1:%2', locked = true;
     begin
-        Base64Auth := StrSubstNo('%1:%2', Setup.Username, Setup.Password);
-        exit(StrSubstNo('Basic %1', Base64Convert.ToBase64(Base64Auth)));
+        Base64Auth := StrSubstNo(Pct2Lbl, Setup.Username, Setup.Password);
+        exit(StrSubstNo(BasicLbl, Base64Convert.ToBase64(Base64Auth)));
     end;
 
     [NonDebuggable]
@@ -258,6 +261,7 @@ codeunit 6014641 "NPR BTF Service API"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategory: Record "Job Queue Category";
+        PlaceHolder5Lbl: Label '%1=%2,%3=%4,%5', locked = true;
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Import List Processing");
@@ -275,7 +279,7 @@ codeunit 6014641 "NPR BTF Service API"
         JobQueueEntry."Rerun Delay (sec.)" := 180;
 
         JobQueueEntry."Parameter String" :=
-                            StrSubstNo('%1=%2,%3=%4,%5',
+                            StrSubstNo(PlaceHolder5Lbl,
                                         ImportTypeParameterLbl, ServiceEndPoint."EndPoint ID",
                                         ServiceEndPoint.TableName(), ServiceEndPoint.RecordId(),
                                         ProcessImportListLbl);
@@ -386,5 +390,10 @@ codeunit 6014641 "NPR BTF Service API"
 
         if EndPointIDFilter = '' then
             EndPointIDFilter := Format(JobQueueEntry."Record ID to Process");
+    end;
+
+    procedure GetBearerTokenLbl(): Text
+    begin
+        exit(BearerTokenLbl);
     end;
 }

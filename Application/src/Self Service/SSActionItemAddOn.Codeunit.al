@@ -93,9 +93,19 @@
         CommentText: Text;
         Quantity: Decimal;
         Value: Text;
+        JsonLbl: Label '{"caption":"%1","title":"%2","settings":[', Locked = true;
+        Json2Lbl: Label '{"caption":"%1", "type":"group", "expanded":%2, "settings":[', Locked = true;
+        Json3Lbl: Label '{"type":"plusminus","id":"%1","caption":"%2","value":%3}', Locked = true;
+        Json4Lbl: Label '{"type":"switch","id":"%1","caption":"%2","value":%3}', Locked = true;
+        Json5Lbl: Label '{"type":"text","id":"%1_text","caption":"%2","value":"%3"}', Locked = true;
+        Json6Lbl: Label '{"caption":"%1", "type":"group", "expanded":%2, "settings":[', Locked = true;
+        Json7Lbl: Label '{\"item\":\"%1\",\"variant\":\"%2\"}', Locked = true;
+        Json8Lbl: Label '{"type":"radio", "id":"%1", "caption":"%2", "value":"%3", "options":[', Locked = true;
+        Json9Lbl: Label '{"caption":"%1","value":"%2"}', Locked = true;
+        Json10Lbl: Label '{"type":"text","id":"%1_text","caption":"%2","value":"%3"}', Locked = true;
     begin
 
-        JsonString := StrSubstNo('{"caption":"%1","title":"%2","settings":[', FormatJson(), FormatJson());
+        JsonString := StrSubstNo(JsonLbl, FormatJson(), FormatJson());
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if (ItemAddOnLine.FindSet()) then begin
@@ -108,20 +118,20 @@
 
                     CommentText := '';
                     if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then
-                        Append(JsonString, StrSubstNo('{"caption":"%1", "type":"group", "expanded":%2, "settings":[', FormatJson(), 'true'));
+                        Append(JsonString, StrSubstNo(Json2Lbl, FormatJson(), 'true'));
 
                     Quantity := SaleLinePOS.Quantity;
                     if (Quantity = 0) then
                         Quantity := ItemAddOnLine.Quantity;
                     case (ItemAddOnLine."Fixed Quantity") of
                         false:
-                            Append(JsonString, StrSubstNo('{"type":"plusminus","id":"%1","caption":"%2","value":%3}', ItemAddOnLine."Line No.", FormatJson(), Quantity));
+                            Append(JsonString, StrSubstNo(Json3Lbl, ItemAddOnLine."Line No.", FormatJson(), Quantity));
                         true:
-                            Append(JsonString, StrSubstNo('{"type":"switch","id":"%1","caption":"%2","value":%3}', ItemAddOnLine."Line No.", FormatJson(), 'false'));
+                            Append(JsonString, StrSubstNo(Json4Lbl, ItemAddOnLine."Line No.", FormatJson(), 'false'));
                     end;
 
                     if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then begin
-                        Append(JsonString, StrSubstNo('{"type":"text","id":"%1_text","caption":"%2","value":"%3"}', ItemAddOnLine."Line No.", CommentCaption, CommentText));
+                        Append(JsonString, StrSubstNo(Json5Lbl, ItemAddOnLine."Line No.", CommentCaption, CommentText));
                         JsonString += ']}';
                     end;
 
@@ -134,22 +144,22 @@
                     if (ItemAddOnLineOption.FindSet()) then begin
                         CommentText := '';
                         if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then
-                            Append(JsonString, StrSubstNo('{"caption":"%1", "type":"group", "expanded":%2, "settings":[', FormatJson(), 'true'));
+                            Append(JsonString, StrSubstNo(Json6Lbl, FormatJson(), 'true'));
 
-                        Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(), FormatJson());
+                        Value := StrSubstNo(Json7Lbl, FormatJson(), FormatJson());
                         if ((SaleLinePOS."No." = '') and (SaleLinePOS."Variant Code" = '')) then
-                            Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(), FormatJson());
-                        Append(JsonString, StrSubstNo('{"type":"radio", "id":"%1", "caption":"%2", "value":"%3", "options":[', ItemAddOnLine."Line No.", FormatJson(), Value));
+                            Value := StrSubstNo(Json7Lbl, FormatJson(), FormatJson());
+                        Append(JsonString, StrSubstNo(Json8Lbl, ItemAddOnLine."Line No.", FormatJson(), Value));
 
                         repeat
-                            Value := StrSubstNo('{\"item\":\"%1\",\"variant\":\"%2\"}', FormatJson(), FormatJson());
-                            Append(JsonString, StrSubstNo('{"caption":"%1","value":"%2"}', FormatJson(), Value));
+                            Value := StrSubstNo(Json7Lbl, FormatJson(), FormatJson());
+                            Append(JsonString, StrSubstNo(Json9Lbl, FormatJson(), Value));
 
                         until (ItemAddOnLineOption.Next() = 0);
                         JsonString += ']}';
 
                         if (ItemAddOnLine."Comment Enabled") or (CommentText <> '') then begin
-                            Append(JsonString, StrSubstNo('{"type":"text","id":"%1_text","caption":"%2","value":"%3"}', ItemAddOnLine."Line No.", CommentCaption, CommentText));
+                            Append(JsonString, StrSubstNo(Json10Lbl, ItemAddOnLine."Line No.", CommentCaption, CommentText));
                             JsonString += ']}';
                         end;
 
@@ -191,6 +201,7 @@
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MasterLineNumber: Integer;
+        ItemAddOnLineNoLbl: Label '%1_text', Locked = true;
     begin
 
         POSSession.GetSale(POSSale);
@@ -227,7 +238,7 @@
                 end;
 
                 // Check if there is comment value
-                UserValue := Context.GetString(StrSubstNo('%1_text', Format(ItemAddOnLine."Line No.", 0, 9)));
+                UserValue := Context.GetString(StrSubstNo(ItemAddOnLineNoLbl, Format(ItemAddOnLine."Line No.", 0, 9)));
                 ApplyUserComment(UserValue, ItemAddOn, POSSaleLine);
 
             until (ItemAddOnLine.Next() = 0);

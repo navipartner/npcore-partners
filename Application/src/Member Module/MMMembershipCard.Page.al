@@ -703,17 +703,20 @@
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         ValidFromDate: Date;
         ValidUntilDate: Date;
+        PlaceHolder1Lbl: Label '%1 / %2 / %3', Locked = true;
+        PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
+        PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
     begin
         MembershipManagement.GetMemberCount(Rec."Entry No.", AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
-        ShowMemberCountAs := StrSubstNo('%1 / %2 / %3', AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
+        ShowMemberCountAs := StrSubstNo(PlaceHolder1Lbl, AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
 
         NeedsActivation := MembershipManagement.MembershipNeedsActivation(Rec."Entry No.");
         ShowCurrentPeriod := NOT_ACTIVATED;
         if (not NeedsActivation) then begin
             MembershipManagement.GetMembershipValidDate(Rec."Entry No.", Today, ValidFromDate, ValidUntilDate);
-            ShowCurrentPeriod := StrSubstNo('%1 - %2', ValidFromDate, ValidUntilDate);
+            ShowCurrentPeriod := StrSubstNo(PlaceHolder2Lbl, ValidFromDate, ValidUntilDate);
             if (ValidUntilDate < Today) then
-                ShowCurrentPeriod := StrSubstNo('%1 - %2 (%3)', ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
+                ShowCurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
         end;
 
         NPRAttrEditable := CurrPage.Editable();
@@ -963,18 +966,15 @@
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
+    var
+        PlaceHolderLbl: Label '6014555,%1,%2,2', Locked = true;
     begin
-
-        exit(StrSubstNo('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
-
+        exit(StrSubstNo(PlaceHolderLbl, GetAttributeTableId(), AttributeNumber));
     end;
 
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
-
-        //NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, FORMAT (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
         NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(Rec."Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
-
     end;
 
     local procedure IssueAdHocSponsorshipTickets(MembershipEntryNo: Integer)

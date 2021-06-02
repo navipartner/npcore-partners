@@ -72,20 +72,24 @@ codeunit 6059812 "NPR Retail Chart Mgt by Shop"
     local procedure Setdate(var StartDate: Date; var Enddate: Date; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; var BusChartBuf: Record "Business Chart Buffer")
     var
         Date: Record Date;
+        NextLbl: Label '<C%1+1%1>', Locked = true;
+        PreviousLbl: Label '<C%1-1%1>', Locked = true;
+        CurrentLbl: Label '<C%1>', Locked = true;
+        UntilLbl: Label '<-%1%2>', Locked = true;
     begin
         case Period of
             Period::Next:
-                Enddate := CalcDate(StrSubstNo('<C%1+1%1>', BusChartBuf.GetPeriodLength()), Enddate);
+                Enddate := CalcDate(StrSubstNo(NextLbl, BusChartBuf.GetPeriodLength()), Enddate);
             Period::Previous:
-                Enddate := CalcDate(StrSubstNo('<C%1-1%1>', BusChartBuf.GetPeriodLength()), Enddate);
+                Enddate := CalcDate(StrSubstNo(PreviousLbl, BusChartBuf.GetPeriodLength()), Enddate);
         end;
 
-        Enddate := CalcDate(StrSubstNo('<C%1>', BusChartBuf.GetPeriodLength()), Enddate);
+        Enddate := CalcDate(StrSubstNo(CurrentLbl, BusChartBuf.GetPeriodLength()), Enddate);
         if Enddate > Today then
             Enddate := Today();
 
         Date.SetRange("Period Type", PeriodType);
-        Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<-%1%2>', 'C', BusChartBuf.GetPeriodLength()), Enddate));
+        Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(UntilLbl, 'C', BusChartBuf.GetPeriodLength()), Enddate));
         if Date.FindFirst() then
             StartDate := Date."Period Start";
     end;

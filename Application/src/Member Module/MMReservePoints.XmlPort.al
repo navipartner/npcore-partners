@@ -135,6 +135,7 @@ xmlport 6151163 "NPR MM Reserve Points"
     var
         StartTime: Time;
         DocumentId: Text;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure SetDocumentId(var DocumentIdIn: Text)
     begin
@@ -189,7 +190,7 @@ xmlport 6151163 "NPR MM Reserve Points"
         MessageCode := '';
 
         if (StartTime <> 0T) then
-            ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+            ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
     procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)

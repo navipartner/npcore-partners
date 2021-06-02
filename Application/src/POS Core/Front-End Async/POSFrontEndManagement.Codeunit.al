@@ -304,7 +304,7 @@
 
         Request.GetView(RequestView);
 
-        if RequestView.Type() = RequestView.Type()::Uninitialized then
+        if RequestView.Type() = RequestView.Type() ::Uninitialized then
             ReportBugAndThrowError(StrSubstNo(Text003, ViewType));
 
         POSSession.GetCurrentView(CurrView);
@@ -313,7 +313,7 @@
                 OnBeforeChangeToLoginView(POSSession);
             DefaultView.Type::Sale:
                 begin
-                    if CurrView.Type() = CurrView.Type()::Login then
+                    if CurrView.Type() = CurrView.Type() ::Login then
                         POSViewChangeWorkflowMgt.InvokeOnAfterLoginWorkflow(POSSession);
 
                     OnBeforeChangeToSaleView(POSSession);
@@ -935,9 +935,11 @@
     end;
 
     procedure QueueWorkflow(ActionCode: Text; Context: Text)
+    var
+        QueuedWorkflowsLbl: Label '%1;%2', Locked = true;
     begin
         MakeSureFrameworkIsAvailableIn20(true);
-        QueuedWorkflows.Add(StrSubstNo('%1;%2', ActionCode, Context));
+        QueuedWorkflows.Add(StrSubstNo(QueuedWorkflowsLbl, ActionCode, Context));
     end;
 
     #region Dragonglass Awaitable Methods Response Context

@@ -80,11 +80,6 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         if Headers.Contains('SOAPAction') then
             Headers.Remove('SOAPAction');
         Headers.Add('SOAPAction', 'InsertPosSalesEntries');
-
-        // Basic Authorization?
-        //AuthText := StrSubstNo('%1:%2', NpGpGlobalSalesSetup."Service Username", ServicePassword);
-        //AuthText := Base64Convert.ToBase64(AuthText);
-        //Headers.Add('Authorization', StrSubstNo('Basic %1', AuthText));
         WebClient.UseWindowsAuthentication(NpGpGlobalSalesSetup."Service Username", ServicePassword);
 
         WebClient.Send(WebRequest, WebResponse);

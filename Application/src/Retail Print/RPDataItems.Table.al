@@ -60,7 +60,6 @@ table 6014561 "NPR RP Data Items"
                     "Data Source" := AllObj."Object Name";
                     "Table ID" := AllObj."Object ID";
                     Name := "Data Source";
-                    //Name := STRSUBSTNO('<%1>',"Data Source");
                 end;
                 FindParentItem();
             end;
@@ -77,7 +76,6 @@ table 6014561 "NPR RP Data Items"
                 "Data Source" := AllObj."Object Name";
                 "Table ID" := AllObj."Object ID";
                 Name := "Data Source";
-                //Name    := STRSUBSTNO('<%1>',"Data Source");
 
                 if "Data Source" <> xRec."Data Source" then
                     CheckLinks();

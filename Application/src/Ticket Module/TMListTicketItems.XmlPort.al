@@ -302,34 +302,10 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TmpItemVariantOut.Copy(TmpItemVariant, true);
     end;
 
-    local procedure GetFirstMagentoURL(ItemNo: Code[20]): Text
-    var
-        MagentoSetup: Record "NPR Magento Setup";
-        MagentoItemGroupLink: Record "NPR Magento Category Link";
-        Item: Record Item;
-    begin
-
-        MagentoItemGroupLink.SetFilter("Item No.", '=%1', ItemNo);
-        if (not MagentoItemGroupLink.FindFirst()) then
-            exit('');
-
-        if (not MagentoSetup.Get()) then
-            exit('');
-
-        if (MagentoSetup."Magento Url" = '') then
-            exit('');
-
-        Item.Get(ItemNo);
-
-        exit(StrSubstNo('%1%2%3',
-          MagentoSetup."Magento Url",
-          GetMagentoPath(MagentoItemGroupLink."Root No.", MagentoItemGroupLink."Category Id"),
-          Item."NPR Seo Link"));
-    end;
-
     local procedure GetMagentoPath(RootNodeNo: Code[20]; ParentCode: Code[20]): Text
     var
         MagentoItemGroup: Record "NPR Magento Category";
+        PathLbl: Label '%1%2/', Locked = true;
     begin
 
         MagentoItemGroup.SetFilter(Id, '=%1', ParentCode);
@@ -339,7 +315,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
         if (RootNodeNo = MagentoItemGroup."Parent Category Id") then
             exit('');
 
-        exit(StrSubstNo('%1%2/',
+        exit(StrSubstNo(PathLbl,
           GetMagentoPath(RootNodeNo, MagentoItemGroup."Parent Category Id"),
           MagentoItemGroup."Seo Link"));
     end;

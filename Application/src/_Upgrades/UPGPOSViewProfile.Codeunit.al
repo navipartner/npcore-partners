@@ -62,6 +62,7 @@ codeunit 6150931 "NPR UPG POS View Profile"
         InStr: InStream;
         TenantMediaDesc: Text;
         ModifyProfile: Boolean;
+        MimeLbl: Label 'image/%1', locked = true;
     begin
         if not POSViewProfile.FindSet(true) then
             exit;
@@ -71,7 +72,7 @@ codeunit 6150931 "NPR UPG POS View Profile"
                     POSViewProfile.CalcFields(Picture);
                     POSViewProfile.Picture.CreateInStream(InStr);
                     TenantMediaDesc := POSViewProfile.Code + ' ' + POSViewProfile.Description;
-                    POSViewProfile.Image.ImportStream(InStr, CopyStr(TenantMediaDesc, 1, MaxStrLen(TenantMedia.Description)), StrSubstNo('image/%1', POSViewProfile.GetDefaultExtension()));
+                    POSViewProfile.Image.ImportStream(InStr, CopyStr(TenantMediaDesc, 1, MaxStrLen(TenantMedia.Description)), StrSubstNo(MimeLbl, POSViewProfile.GetDefaultExtension()));
                     ModifyProfile := true;
                 end;
             end;

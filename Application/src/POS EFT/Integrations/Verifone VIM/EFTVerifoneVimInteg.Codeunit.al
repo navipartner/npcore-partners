@@ -301,10 +301,12 @@
     end;
 
     procedure GetPOSDescription(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    var
+        CardNumberLbl: Label '%1: %2', Locked = true;
     begin
         if EFTTransactionRequest."Card Name" <> '' then begin
             if (StrLen(EFTTransactionRequest."Card Number") > 8) then
-                exit(StrSubstNo('%1: %2', EFTTransactionRequest."Card Name", CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
+                exit(StrSubstNo(CardNumberLbl, EFTTransactionRequest."Card Name", CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
             else
                 exit(StrSubstNo(EFTTransactionRequest."Card Name"));
         end;

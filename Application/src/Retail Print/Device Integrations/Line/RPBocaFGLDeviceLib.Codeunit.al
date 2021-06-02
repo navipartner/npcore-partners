@@ -274,32 +274,32 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     procedure PrintData(Data: Text[100]; FontType: Text[30]; Bold: Boolean; UnderLine: Boolean; DoubleStrike: Boolean; Align: Integer; Width: Integer; Height: Integer; Column: Integer)
     var
         StringLib: Codeunit "NPR String Library";
+        PrintDataLbl: Label '<RC%1,%2>', Locked = true;
+        PrintData2Lbl: Label '<HW%1,%2>', Locked = true;
+        PrintData3Lbl: Label '<CTR%1>~', Locked = true;
     begin
         if UpperCase(FontType) = 'COMMAND' then
             SendCommand(Data)
         else
             if IsBarcodeFont(FontType) then
                 PrintBarcode(FontType, Data, Width, 10, Align)
-            //-NPR5.55 [404276]
             else
                 if FontType = 'Logo' then
                     PrintBitmapFromKeyword(Data, '')
-                //+NPR5.55 [404276]
                 else begin
                     if Column = 1 then begin
-                        AddTextToBuffer(StrSubstNo('<RC%1,%2>', PageWidth, yCoord));
+                        AddTextToBuffer(StrSubstNo(PrintDataLbl, PageWidth, yCoord));
                         AddTextToBuffer('<RL>'); // Orientation, perhaps set this as an option later?
                     end;
                     StringLib.Construct(FontType);
                     AddTextToBuffer('<' + StringLib.SelectStringSep(1, ' ') + '>');
 
-                    AddTextToBuffer(StrSubstNo('<HW%1,%2>', HeightModifier, WidthModifier)); // text modifier
+                    AddTextToBuffer(StrSubstNo(PrintData2Lbl, HeightModifier, WidthModifier)); // text modifier
 
                     if Column = 1 then begin
                         case Align of
                             1:
-                                AddTextToBuffer(StrSubstNo('<CTR%1>~', PageWidth));
-                        //2 : AddTextToBuffer(STRSUBSTNO('<RTJ%1>~', PageWidth));
+                                AddTextToBuffer(StrSubstNo(PrintData3Lbl, PageWidth));
                         end;
                     end;
 
@@ -309,7 +309,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
                         case Align of
                             1:
                                 AddTextToBuffer('~');
-                        //2 : AddTextToBuffer('~');
                         end;
                     end;
 
@@ -324,6 +323,13 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     var
         StringLib: Codeunit "NPR String Library";
         BarcodeXCoord: Integer;
+        PrintBarcodeLbl: Label '<RC%1,%2>', Locked = true;
+        PrintBarcode2Lbl: Label '<CTR%1>', Locked = true;
+        PrintBarcode3Lbl: Label '<X%1>', Locked = true;
+        PrintBarcode4Lbl: Label '<eL%1>', Locked = true;
+        PrintBarcode5Lbl: Label '%1J%2K%3L', Locked = true;
+        PrintBarcode6Lbl: Label '<oL%1>', Locked = true;
+        PrintBarcode7Lbl: Label '^%1^', Locked = true;
     begin
         StringLib.Construct(BarcodeType);
 
@@ -339,18 +345,17 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
             BarcodeXCoord := PageWidth;
 
         // TEMP
-        AddTextToBuffer(StrSubstNo('<RC%1,%2>', BarcodeXCoord, yCoord));
-        //-NPR5.55 [403786]
+        AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, BarcodeXCoord, yCoord));
         // Alignment, will only work on new firmware 150+
         case Alignment of
             1:
-                AddTextToBuffer(StrSubstNo('<CTR%1>', PageWidth));
+                AddTextToBuffer(StrSubstNo(PrintBarcode2Lbl, PageWidth));
         end;
         //+NPR5.55 [403786]
         AddTextToBuffer('<BI>');
 
         if Width > 1 then
-            AddTextToBuffer(StrSubstNo('<X%1>', Width)); // set after DPI?
+            AddTextToBuffer(StrSubstNo(PrintBarcode3Lbl, Width)); // set after DPI?
 
         AddTextToBuffer('<RL>'); // Orientation
 
@@ -358,18 +363,18 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
             'EAN13':
                 begin
                     if Height > 1 then
-                        AddTextToBuffer(StrSubstNo('<eL%1>', Height))
+                        AddTextToBuffer(StrSubstNo(PrintBarcode4Lbl, Height))
                     else
                         AddTextToBuffer('<eL>');
-                    AddTextToBuffer(StrSubstNo('%1J%2K%3L', CopyStr(Text, 1, 1), CopyStr(Text, 2, 6), CopyStr(Text, 8, 6)));
+                    AddTextToBuffer(StrSubstNo(PrintBarcode5Lbl, CopyStr(Text, 1, 1), CopyStr(Text, 2, 6), CopyStr(Text, 8, 6)));
                 end;
             'CODE128':
                 begin
                     if Height > 1 then
-                        AddTextToBuffer(StrSubstNo('<oL%1>', Height))
+                        AddTextToBuffer(StrSubstNo(PrintBarcode6Lbl, Height))
                     else
                         AddTextToBuffer('<oL>');
-                    AddTextToBuffer(StrSubstNo('^%1^', Text));
+                    AddTextToBuffer(StrSubstNo(PrintBarcode7Lbl, Text));
                 end;
         end;
 
@@ -380,11 +385,14 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
     end;
 
     local procedure PrintStoredLogo(ID: Integer; Height: Integer)
+    var
+        PrintStoredLogoLbl: Label '<SP%1,%2>', Locked = true;
+        PrintStoredLogo2Lbl: Label '<LD%1>', Locked = true;
     begin
         // 200dpi
-        AddTextToBuffer(StrSubstNo('<SP%1,%2>', 570, yCoord));
+        AddTextToBuffer(StrSubstNo(PrintStoredLogoLbl, 570, yCoord));
         AddTextToBuffer('<RL>');
-        AddTextToBuffer(StrSubstNo('<LD%1>', ID));
+        AddTextToBuffer(StrSubstNo(PrintStoredLogo2Lbl, ID));
         if Height > 0 then
             ySpace := Height
         else
@@ -470,8 +478,8 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         Encoding: DotNet NPRNetEncoding;
         RetailLogo: Record "NPR Retail Logo";
         StreamReader: DotNet NPRNetStreamReader;
+        PrintBitmapFromKeywordLbl: Label '<SP%1,%2><RL><bmp><G%3>%4', Locked = true;
     begin
-        //-NPR5.55 [404276]
         RetailLogo.SetAutoCalcFields(OneBitLogo);
 
         if RetailLogoMgt.GetRetailLogo(Keyword, RegisterNo, RetailLogo) then
@@ -483,15 +491,10 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
                     StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.GetEncoding('ibm850'));
                     LogoAsText := StreamReader.ReadToEnd();
 
-                    AddTextToBuffer(StrSubstNo('<SP%1,%2><RL><bmp><G%3>%4', (PageWidth div 1.077), yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future
+                    AddTextToBuffer(StrSubstNo(PrintBitmapFromKeywordLbl, (PageWidth div 1.077), yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future
                     yCoord += RetailLogo.Height + 30; // Might need to make this dynamic in the future
                 end;
             until RetailLogo.Next() = 0;
-        //+NPR5.55 [404276]
-    end;
-
-    procedure "// Info Functions"()
-    begin
     end;
 
     procedure GetPageWidth(FontFace: Text[30]) Width: Integer

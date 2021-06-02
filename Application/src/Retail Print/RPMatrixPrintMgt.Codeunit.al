@@ -415,6 +415,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         Handled: Boolean;
         Skip: Boolean;
         DecimalBuffer: Decimal;
+        TmplLineLbl: Label '%1%2', Locked = true;
     begin
         if TemplateLine."Root Record No." > HighestRootRecNo then
             HighestRootRecNo := TemplateLine."Root Record No.";
@@ -449,8 +450,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
         if TemplateLine."Default Value" <> '' then
             if TemplateLine."Processing Value" = '' then
-                //-NPR5.46 [314067]
-                //    TemplateLine."Processing Value" := TemplateLine."Default Value";
                 if TemplateLine."Default Value Record Required" then begin
                     if RecID.TableNo = 0 then //If not retrieved earlier
                         GetRecID(TemplateLine, DataJoinBuffer, RecID);
@@ -458,7 +457,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
                         TemplateLine."Processing Value" := TemplateLine."Default Value";
                 end else
                     TemplateLine."Processing Value" := TemplateLine."Default Value";
-        //+NPR5.46 [314067]
 
         //"Skip If Empty" overrules any buffer from previous lines
         if (StrLen(TemplateLine."Processing Value") = 0) and ((TemplateLine.Field > 0) or (TemplateLine.Attribute <> '')) then
@@ -468,10 +466,10 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
             end;
 
         if TemplateLine.Prefix <> '' then
-            TemplateLine."Processing Value" := StrSubstNo('%1%2', TemplateLine.Prefix, TemplateLine."Processing Value");
+            TemplateLine."Processing Value" := StrSubstNo(TmplLineLbl, TemplateLine.Prefix, TemplateLine."Processing Value");
 
         if TemplateLine.Postfix <> '' then
-            TemplateLine."Processing Value" := StrSubstNo('%1%2', TemplateLine."Processing Value", TemplateLine.Postfix);
+            TemplateLine."Processing Value" := StrSubstNo(TmplLineLbl, TemplateLine."Processing Value", TemplateLine.Postfix);
 
         if (TemplateLine."Max Length" > 0) and TemplateLine."Prefix Next Line" then
             TemplateLine."Processing Value" := CopyStr(TemplateLine."Processing Value", 1, TemplateLine."Max Length");

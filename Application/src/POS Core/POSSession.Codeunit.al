@@ -501,10 +501,11 @@ codeunit 6150700 "NPR POS Session"
 
     procedure AddServerStopwatch(Keyword: Text; Duration: Duration)
     var
+        ServerStopwatchLbl: Label '[%1:%2]', Locked = true;
         Durationms: Integer;
     begin
         Durationms := Duration;
-        ServerStopwatch += StrSubstNo('[%1:%2]', DelChr(Keyword, '=', '[:]'), Durationms);
+        ServerStopwatch += StrSubstNo(ServerStopwatchLbl, DelChr(Keyword, '=', '[:]'), Durationms);
     end;
 
     procedure ServerStopwatchFlush() Result: Text

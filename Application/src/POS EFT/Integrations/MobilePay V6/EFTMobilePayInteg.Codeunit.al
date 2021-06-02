@@ -96,6 +96,8 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
+    var
+        HardwareIdLbl: Label '%1_%2_%3', Locked = true;
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
@@ -109,7 +111,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if (PoSID = '') or (PoSUnitID = '') then
             Error(MissingPOSUnitSetup, POSUnit.TableCaption, EftTransactionRequest."Register No.", IntegrationType());
 
-        EftTransactionRequest."Hardware ID" := StrSubstNo('%1_%2_%3', MerchantID, LocationID, PoSID);
+        EftTransactionRequest."Hardware ID" := StrSubstNo(HardwareIdLbl, MerchantID, LocationID, PoSID);
         EftTransactionRequest."Integration Version Code" := 'V06';
         EftTransactionRequest.Insert(true);
     end;
@@ -409,11 +411,13 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     procedure PaymentStart(var EftTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    var
+        ReferenceNumberInputLbl: Label '%1-%2-%3', Locked = true;
     begin
         ClearLastError();
         InitializeGlobals(EftTransactionRequest."POS Payment Type Code", EftTransactionRequest."Register No.");
 
-        EftTransactionRequest."Reference Number Input" := StrSubstNo('%1-%2-%3', EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Entry No.");
+        EftTransactionRequest."Reference Number Input" := StrSubstNo(ReferenceNumberInputLbl, EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Entry No.");
         EftTransactionRequest.Modify();
 
         if MerchantID = '' then
@@ -482,6 +486,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1",', Locked = true;
+        RequestBody4Lbl: Label '"Name":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
@@ -489,10 +497,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         POSUNit.TestField(Name);
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody := RequestBody + StrSubstNo('"PosId":"%1",', PoSIdIn);
-        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', POSUNit.Name);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody := RequestBody + StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody := RequestBody + StrSubstNo(RequestBody3Lbl, PoSIdIn);
+        RequestBody := RequestBody + StrSubstNo(RequestBody4Lbl, POSUNit.Name);
 
         InvokeRESTHTTPRequest(RequestBody, 'RegisterPoS', ResponseText);
         ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
@@ -503,6 +511,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1",', Locked = true;
+        RequestBody4Lbl: Label '"Name":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
@@ -512,10 +524,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
         POSUnit.TestField(Name);
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody := RequestBody + StrSubstNo('"PosId":"%1",', PoSID);
-        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', POSUnit.Name);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody := RequestBody + StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody := RequestBody + StrSubstNo(RequestBody3Lbl, PoSID);
+        RequestBody := RequestBody + StrSubstNo(RequestBody4Lbl, POSUnit.Name);
 
         InvokeRESTHTTPRequest(RequestBody, 'UpdateRegisteredPoSName', ResponseText);
     end;
@@ -525,6 +537,9 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
@@ -533,9 +548,9 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if PoSID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody := RequestBody + StrSubstNo('"PosId":"%1"}', PoSID);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody := RequestBody + StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody := RequestBody + StrSubstNo(RequestBody3Lbl, PoSID);
 
         InvokeRESTHTTPRequest(RequestBody, 'UnRegisterPoS', ResponseText);
     end;
@@ -545,14 +560,12 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
 
-        //-NPR5.54 [388507]
-        //RequestBody := STRSUBSTNO('{"MerchantId":"%1"}',PaymentTypePOS."MobilePay Merchant ID");
-        RequestBody := StrSubstNo('{"MerchantId":"%1"}', MerchantID);
-        //+NPR5.54 [388507]
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
 
         InvokeRESTHTTPRequest(RequestBody, 'GetUniquePoSId', ResponseText);
         ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
@@ -563,6 +576,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1",', Locked = true;
+        RequestBody4Lbl: Label '"PoSUnitId":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
@@ -571,10 +588,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if PoSID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
-        RequestBody += StrSubstNo('"PoSUnitId":"%1"}', PoSUnitIdIn);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody += StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody += StrSubstNo(RequestBody3Lbl, PoSID);
+        RequestBody += StrSubstNo(RequestBody4Lbl, PoSUnitIdIn);
 
         InvokeRESTHTTPRequest(RequestBody, 'AssignPoSUnitIdToPoS', ResponseText);
     end;
@@ -584,6 +601,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1",', Locked = true;
+        RequestBody4Lbl: Label '"PoSUnitId":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
@@ -594,10 +615,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if PoSUnitID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS Unit ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
-        RequestBody += StrSubstNo('"PoSUnitId":"%1"}', PoSUnitID);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody += StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody += StrSubstNo(RequestBody3Lbl, PoSID);
+        RequestBody += StrSubstNo(RequestBody4Lbl, PoSUnitID);
 
         InvokeRESTHTTPRequest(RequestBody, 'UnAssignPoSUnitIdToPoS', ResponseText);
     end;
@@ -607,6 +628,9 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
@@ -615,9 +639,9 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if PoSID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1"}', PoSID);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody += StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody += StrSubstNo(RequestBody3Lbl, PoSID);
 
         InvokeRESTHTTPRequest(RequestBody, 'ReadPoSAssignPoSUnitId', ResponseText);
         ReadJSONValue(ResponseText, 'PoSUnitId', PoSUnitIdIn);
@@ -628,15 +652,18 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosUnitId":"%1"}', Locked = true;
     begin
         if MerchantID = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody += StrSubstNo('"PosUnitId":"%1"}', PoSUnitIdIn);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody += StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody += StrSubstNo(RequestBody3Lbl, PoSUnitIdIn);
 
         InvokeRESTHTTPRequest(RequestBody, 'ReadPoSUnitAssignedPoSId', ResponseText);
         ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
@@ -647,17 +674,26 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1",', Locked = true;
+        RequestBody4Lbl: Label '"OrderId":"%1",', Locked = true;
+        RequestBody5Lbl: Label '"Amount":"%1",', Locked = true;
+        RequestBody6Lbl: Label '"BulkRef":"%1",', Locked = true;
+        RequestBody7Lbl: Label '"ReceiptText":"%1",', Locked = true;
+        RequestBody8Lbl: Label '"CustomerTokenCalc":%1,', Locked = true;
+        RequestBody9Lbl: Label '"HMAC":"%1"}', Locked = true;
     begin
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
-        RequestBody += StrSubstNo('"OrderId":"%1",', EFTTransReq."Reference Number Input");
-        RequestBody += StrSubstNo('"Amount":"%1",', Format(EFTTransReq."Amount Input", 0, '<Precision,2:2><Standard Format,9>'));
-        RequestBody += StrSubstNo('"BulkRef":"%1",', '');
-        RequestBody += StrSubstNo('"ReceiptText":"%1",', '');
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody += StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody += StrSubstNo(RequestBody3Lbl, PoSID);
+        RequestBody += StrSubstNo(RequestBody4Lbl, EFTTransReq."Reference Number Input");
+        RequestBody += StrSubstNo(RequestBody5Lbl, Format(EFTTransReq."Amount Input", 0, '<Precision,2:2><Standard Format,9>'));
+        RequestBody += StrSubstNo(RequestBody6Lbl, '');
+        RequestBody += StrSubstNo(RequestBody7Lbl, '');
         RequestBody += '"Action":"Start",';
-        RequestBody += StrSubstNo('"CustomerTokenCalc":%1,', Format(false, 0, 2));
-        RequestBody += StrSubstNo('"HMAC":"%1"}', CalcPaymentHMAC(EFTTransReq));
+        RequestBody += StrSubstNo(RequestBody8Lbl, Format(false, 0, 2));
+        RequestBody += StrSubstNo(RequestBody9Lbl, CalcPaymentHMAC(EFTTransReq));
 
         InvokeRESTHTTPRequest(RequestBody, 'PaymentStart', ResponseText);
     end;
@@ -668,11 +704,15 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         RequestBody: Text[1024];
         ResponseText: Text[1024];
         PaymentStatusText: Text;
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1",', Locked = true;
+        RequestBody4Lbl: Label '"OrderId":"%1"}', Locked = true;
     begin
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1",', PoSID);
-        RequestBody += StrSubstNo('"OrderId":"%1"}', EFTTransReq."Reference Number Input");
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody += StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody += StrSubstNo(RequestBody3Lbl, PoSID);
+        RequestBody += StrSubstNo(RequestBody4Lbl, EFTTransReq."Reference Number Input");
 
         InvokeRESTHTTPRequest(RequestBody, 'GetPaymentStatus', ResponseText);
         if ReadJSONValue(ResponseText, 'PaymentStatus', PaymentStatusText) then begin
@@ -689,10 +729,13 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
+        RequestBodyLbl: Label '{"MerchantId":"%1",', Locked = true;
+        RequestBody2Lbl: Label '"LocationId":"%1",', Locked = true;
+        RequestBody3Lbl: Label '"PosId":"%1"}', Locked = true;
     begin
-        RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
-        RequestBody += StrSubstNo('"LocationId":"%1",', LocationID);
-        RequestBody += StrSubstNo('"PosId":"%1"}', PoSID);
+        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
+        RequestBody += StrSubstNo(RequestBody2Lbl, LocationID);
+        RequestBody += StrSubstNo(RequestBody3Lbl, PoSID);
 
         InvokeRESTHTTPRequest(RequestBody, 'PaymentCancel', ResponseText);
     end;
@@ -741,16 +784,18 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         AuthString: Text[1024];
         HashValue: Text[100];
         UnixTimeStamp: Integer;
+        AuthStringLbl: Label '%1 %2 %3', Locked = true;
+        HashValueLbl: Label '%1 %2', Locked = true;
     begin
         if APIKey = '' then
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'API Key');
 
         UnixTimeStamp := GetUnixTime(CurrentDateTime);
 
-        AuthString := StrSubstNo('%1 %2 %3', RequestUrl, ContentBody, UnixTimeStamp);
+        AuthString := StrSubstNo(AuthStringLbl, RequestUrl, ContentBody, UnixTimeStamp);
         HashValue := GetHmacSha256Hash(APIKey, AuthString, Encoding.UTF8);
 
-        exit(StrSubstNo('%1 %2', HashValue, UnixTimeStamp));
+        exit(StrSubstNo(HashValueLbl, HashValue, UnixTimeStamp));
     end;
 
     local procedure CalcPaymentHMAC(EftTransactionRequest: Record "NPR EFT Transaction Request"): Text[100]
@@ -759,8 +804,9 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         HMACString: Text[1024];
         MerchantKey: Text[50];
         HashValue: Text[100];
+        HMACStringLbl: Label '%1%2#%3#%4#%5#%6#%7', Locked = true;
     begin
-        HMACString := StrSubstNo('%1%2#%3#%4#%5#%6#%7', MerchantID,
+        HMACString := StrSubstNo(HMACStringLbl, MerchantID,
                                                        LocationID,
                                                        PoSID,
                                                        EftTransactionRequest."Reference Number Input",
@@ -803,8 +849,9 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         CR: Char;
         IsStringValue: Boolean;
         EndOfValue: Boolean;
+        ValueNameLbl: Label '"%1":', Locked = true;
     begin
-        ValueName := StrSubstNo('"%1":', ValueName);
+        ValueName := StrSubstNo(ValueNameLbl, ValueName);
         ValuePos := StrPos(JSONObject, ValueName);
         if ValuePos = 0 then
             exit(false);
@@ -854,26 +901,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         DurationMs: BigInteger;
         FromDateTime: DateTime;
     begin
-        //-NPR5.51 [363895]
-        // TypeOfDateTime := GETDOTNETTYPE(SystemDateTime);
-        //
-        // DotNetArray := DotNetArray.CreateInstance(GETDOTNETTYPE(GETDOTNETTYPE('')),1);
-        // DotNetArray.SetValue(TypeOfDateTime,0);
-        // MethodInfo := TypeOfDateTime.GetMethod('Subtract', DotNetArray);
-        //
-        // DotNetArray := DotNetArray.CreateInstance(GETDOTNETTYPE(SystemObject),1);
-        // DotNetArray.SetValue(SystemDateTime.DateTime(1970,1,1,0,0,0,DateTimeKind.Utc),0);
-        //
-        // Dur := MethodInfo.Invoke(ToDateTime,DotNetArray);
-        //
-        // TypeOfTimeSpan := GETDOTNETTYPE(Dur);
-        // UnixTimeStamp := Convert.ToInt32(TypeOfTimeSpan.GetProperty('TotalSeconds').GetValue(Dur));
-
         Evaluate(FromDateTime, '1970-01-01T00:00:00Z', 9);
         Duration := ToDateTime - FromDateTime;
         DurationMs := Duration;
         exit((DurationMs / 1000) div 1); //Seconds with miliseconds shaved off
-        //+NPR5.51 [363895]
     end;
 
     local procedure GetHmacSha256Hash("Key": Text; Value: Text; Encoding: DotNet NPRNetEncoding): Text
@@ -894,8 +925,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     procedure GetQRUri(): Text
+    var
+        QRUriLbl: Label 'mobilepaypos://pos?id=%1&source=qr', Locked = true;
     begin
-        exit(StrSubstNo('mobilepaypos://pos?id=%1&source=qr', PoSUnitID));
+        exit(StrSubstNo(QRUriLbl, PoSUnitID));
     end;
 
     local procedure GetPaymentStatusText(PaymentStatus: Integer): Text

@@ -298,7 +298,7 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
         HttpWebResponse.Content.ReadAs(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
         exit(Response);
     end;
 

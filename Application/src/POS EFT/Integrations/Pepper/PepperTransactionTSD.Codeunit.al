@@ -89,6 +89,7 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
     procedure SetPaymentOfGoods(OriginalAmountInDecimal: Decimal; PepperAmountInCents: Integer; CashBackAmountInCents: Integer; Currency: Code[10]; TrackPresence: Integer; CardInformation: Text[40]; TrxRefNbr: Text[12]; MbxPosRefNbr: Text[20]; Offline: Boolean) SuccessCode: Integer
     var
         TrxParam: DotNet NPRNetTrxParam0;
+        XmlParamsLbl: Label '<xml><CashBackAmount>%1</CashBackAmount></xml>', Locked = true;
     begin
         if not InitializedRequest then
             InitializeProtocol();
@@ -99,10 +100,8 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
         if (OriginalAmountInDecimal < 0) then
             exit(-998); //ERROR (NEGATIVE_NOT_ALLOWED, OriginalAmountInDecimal);
 
-        //-NPR5.35 [284379]
         if (CashBackAmountInCents < 0) then
             exit(-998); //ERROR (NEGATIVE_NOT_ALLOWED, CashBackAmountInDecimal);
-        //+NPR5.35 [284379]
 
         TrxParam := TrxParam.TrxParam();
 
@@ -112,11 +111,11 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
             TrxParam.TrxType := 10;
 
         TrxParam.Amount := Format(PepperAmountInCents);
-        //-NPR5.35 [284379]
+
         if CashBackAmountInCents <> 0 then begin
-            TrxParam.XmlAdditionalParameters := StrSubstNo('<xml><CashBackAmount>%1</CashBackAmount></xml>', CashBackAmountInCents);
+            TrxParam.XmlAdditionalParameters := StrSubstNo(XmlParamsLbl, CashBackAmountInCents);
         end;
-        //+NPR5.35 [284379]
+
         TrxParam.Currency := Currency;
         TrxParam.TrackPresence := TrackPresence;
         TrxParam.CardInformation := CardInformation;

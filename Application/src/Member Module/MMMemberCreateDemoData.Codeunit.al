@@ -556,20 +556,25 @@
     local procedure CreateAttribute(CodePrefix: Code[10]; AttributeNumber: Integer; BaseDescription: Text): Code[20];
     var
         NPRAttribute: Record "NPR Attribute";
+        PlaceHolder1Lbl: Label '%1 %2', Locked = true;
+        PlaceHolder2Lbl: Label '%1 %2 c', Locked = true;
+        PlaceHolder3Lbl: Label '%1 %2 f', Locked = true;
+        PlaceHolder4Lbl: Label '%1 %2 d', Locked = true;
+        PlaceHolder5Lbl: Label '%1-%2', Locked = true;
     begin
 
         if (CodePrefix <> '') then
-            NPRAttribute.Code := StrSubstNo('%1-%2', CodePrefix, AttributeNumber);
+            NPRAttribute.Code := StrSubstNo(PlaceHolder5Lbl, CodePrefix, AttributeNumber);
         if (NPRAttribute.Code = '') then
             NPRAttribute.Code := GenerateCode10();
 
         if (not NPRAttribute.Get(NPRAttribute.Code)) then
             NPRAttribute.Insert();
 
-        NPRAttribute.Name := StrSubstNo('%1 %2', BaseDescription, AttributeNumber);
-        NPRAttribute."Code Caption" := StrSubstNo('%1 %2 c', BaseDescription, AttributeNumber);
-        NPRAttribute."Filter Caption" := StrSubstNo('%1 %2 f', BaseDescription, AttributeNumber);
-        NPRAttribute.Description := StrSubstNo('%1 %2 d', BaseDescription, AttributeNumber);
+        NPRAttribute.Name := StrSubstNo(PlaceHolder1Lbl, BaseDescription, AttributeNumber);
+        NPRAttribute."Code Caption" := StrSubstNo(PlaceHolder2Lbl, BaseDescription, AttributeNumber);
+        NPRAttribute."Filter Caption" := StrSubstNo(PlaceHolder3Lbl, BaseDescription, AttributeNumber);
+        NPRAttribute.Description := StrSubstNo(PlaceHolder4Lbl, BaseDescription, AttributeNumber);
 
         NPRAttribute."Value Datatype" := NPRAttribute."Value Datatype"::DT_TEXT;
         NPRAttribute."On Validate" := NPRAttribute."On Validate"::DATATYPE;
@@ -770,6 +775,8 @@
     var
         LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members.";
         ChangeDirection: Option;
+        UpgradeFromLbl: Label 'Upgrade from %1 to %2';
+        DowngradeFromLbl: Label 'Downgrade from %1 to %2';
     begin
         ChangeDirection := LoyaltyAlterMembership."Change Direction"::DOWNGRADE;
         if (Upgrade) then
@@ -787,10 +794,10 @@
         LoyaltyAlterMembership."Sales Item No." := AlterationItem;
 
         if (Upgrade) then
-            LoyaltyAlterMembership.Description := StrSubstNo('Upgrade from %1 to %2', FromMembershipCode, ToMembershipCode);
+            LoyaltyAlterMembership.Description := StrSubstNo(UpgradeFromLbl, FromMembershipCode, ToMembershipCode);
 
         if (not Upgrade) then
-            LoyaltyAlterMembership.Description := StrSubstNo('Downgrade from %1 to %2', FromMembershipCode, ToMembershipCode);
+            LoyaltyAlterMembership.Description := StrSubstNo(DowngradeFromLbl, FromMembershipCode, ToMembershipCode);
 
         LoyaltyAlterMembership."Points Threshold" := Threshold;
         LoyaltyAlterMembership.Modify();

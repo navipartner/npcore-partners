@@ -47,6 +47,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         InvalidEntry: Boolean;
         ScheduleEntryNo: Integer;
         ExternalEntryNo: Integer;
+        RespLbl: Label '%1 %2', Locked = true;
     begin
 
         if (not OfflineTicketValidation.Get(EntryNo)) then
@@ -134,12 +135,12 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
 
             if (OfflineTicketValidation."Event Date" = 0D) then begin
                 OfflineTicketValidation."Event Date" := Today();
-                OfflineTicketValidation."Process Response Text" := StrSubstNo('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
+                OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
             end;
 
             if (OfflineTicketValidation."Event Time" = 0T) then begin
                 OfflineTicketValidation."Event Time" := Time;
-                OfflineTicketValidation."Process Response Text" := StrSubstNo('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
+                OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
             end;
             //+TM90.1.46 [376136]
 
@@ -249,6 +250,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        StationIdLbl: Label 'Offline on %1';
     begin
 
         TicketAccessEntry.LockTable();
@@ -270,7 +272,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         AdmittedTicketAccessEntry.Open := true;
         AdmittedTicketAccessEntry."Created Datetime" := CreateDateTime(pDate, pTime);
         AdmittedTicketAccessEntry."User ID" := UserId;
-        AdmittedTicketAccessEntry."Scanner Station ID" := StrSubstNo('Offline on %1', CurrentDateTime);
+        AdmittedTicketAccessEntry."Scanner Station ID" := StrSubstNo(StationIdLbl, CurrentDateTime);
         AdmittedTicketAccessEntry.Insert();
 
         //-TM90.1.46 [376136]
@@ -362,6 +364,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
     local procedure SetReservationTime(ExternalAdmSchEntryNo: Integer; ForceUpdate: Boolean; var OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.")
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        RespLbl: Label '%1 %2', Locked = true;
     begin
 
         //-TM90.1.46 [376136]
@@ -372,12 +375,12 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
 
         if (OfflineTicketValidation."Event Date" = 0D) or (ForceUpdate) then begin
             OfflineTicketValidation."Event Date" := AdmissionScheduleEntry."Admission Start Date";
-            OfflineTicketValidation."Process Response Text" := StrSubstNo('%1 %2', OfflineTicketValidation."Process Response Text", RESERVATION_DATE);
+            OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", RESERVATION_DATE);
         end;
 
         if (OfflineTicketValidation."Event Time" = 0T) or (ForceUpdate) then begin
             OfflineTicketValidation."Event Time" := AdmissionScheduleEntry."Admission Start Time";
-            OfflineTicketValidation."Process Response Text" := StrSubstNo('%1 %2', OfflineTicketValidation."Process Response Text", RESERVATION_TIME);
+            OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", RESERVATION_TIME);
         end;
 
         //+TM90.1.46 [376136]
@@ -414,6 +417,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
     local procedure SetInitialTime(ExternalAdmSchEntryNo: Integer; ForceUpdate: Boolean; var OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.")
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        RespLbl: Label '%1 %2', Locked = true;
     begin
 
         //-TM90.1.46 [376136]
@@ -424,12 +428,12 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
 
         if (OfflineTicketValidation."Event Date" = 0D) or (ForceUpdate) then begin
             OfflineTicketValidation."Event Date" := AdmissionScheduleEntry."Admission Start Date";
-            OfflineTicketValidation."Process Response Text" := StrSubstNo('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
+            OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
         end;
 
         if (OfflineTicketValidation."Event Time" = 0T) or (ForceUpdate) then begin
             OfflineTicketValidation."Event Time" := AdmissionScheduleEntry."Admission Start Time";
-            OfflineTicketValidation."Process Response Text" := StrSubstNo('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
+            OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
         end;
 
         //+TM90.1.46 [376136]

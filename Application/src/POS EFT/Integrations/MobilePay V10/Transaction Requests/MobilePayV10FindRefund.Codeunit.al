@@ -26,8 +26,10 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
     end;
 
     internal procedure GetRequestResponse(): text
+    var
+        ReqRespLbl: Label '==Request==\%1\\==Response==\(%2)\%3', Locked = true;
     begin
-        exit(StrSubstNo('==Request==\%1\\==Response==\(%2)\%3', _request, _responseHttpCode, _response));
+        exit(StrSubstNo(ReqRespLbl, _request, _responseHttpCode, _response));
     end;
 
     internal procedure SetRefundDetailBuffer(var MobilePayV10RefundBuffer: Record "NPR MobilePayV10 Refund" temporary)
@@ -46,6 +48,7 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
         eftSetup: Record "NPR EFT Setup";
         requestUrl: Text;
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
+        requestUrlLbl: Label '?%1', Locked = true;
     begin
         eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
@@ -56,7 +59,7 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
         reqMessage.Method := 'GET';
         requestUrl := mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/refunds';
         if (_filter <> '') then begin
-            requestUrl += StrSubstNo('?%1', _filter);
+            requestUrl += StrSubstNo(requestUrlLbl, _filter);
         end;
         reqMessage.SetRequestUri(requestUrl);
 

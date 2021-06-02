@@ -1369,6 +1369,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         TmpMembershipPointsSummary: Record "NPR MM Members. Points Summary" temporary;
         Period: Integer;
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
+        ExpireLbl: Label 'EXP-%1', Locked = true;
     begin
 
         if (not LoyaltySetup."Expire Uncollected Points") then
@@ -1390,7 +1391,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                 if (TmpMembershipPointsSummary."Burn Period End" < Today) then
                     AdjustPointsAbsoluteWorker2(Membership."Entry No.", MembershipPointsEntry."Entry Type"::EXPIRED, -1 * TmpMembershipPointsSummary."Points Remaining", 0,
                                                  TmpMembershipPointsSummary."Burn Period End", TmpMembershipPointsSummary."Burn Period End",
-                                                 StrSubstNo('EXP-%1', Format(Today, 0, 9)), 'Points Expiry');
+                                                 StrSubstNo(ExpireLbl, Format(Today(), 0, 9)), 'Points Expiry');
         end;
 
     end;
@@ -1514,6 +1515,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
+        MembershipChangedLbl: Label 'Membership Change %1->%2 (%3)';
     begin
 
         MemberInfoCapture.Init();
@@ -1529,7 +1531,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         MemberInfoCapture.Description :=
           CopyStr(
-            StrSubstNo('Membership Change %1->%2 (%3)', LoyaltyAlterMembership."From Membership Code", LoyaltyAlterMembership."To Membership Code", LoyaltyAlterMembership."Points Threshold"),
+            StrSubstNo(MembershipChangedLbl, LoyaltyAlterMembership."From Membership Code", LoyaltyAlterMembership."To Membership Code", LoyaltyAlterMembership."Points Threshold"),
             1, MaxStrLen(MemberInfoCapture.Description));
 
         exit(MembershipManagement.UpgradeMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price"));

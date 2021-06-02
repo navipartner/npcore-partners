@@ -43,7 +43,7 @@ xmlport 6060122 "NPR TM Ticket Get Print URL"
 
                     trigger OnBeforePassVariable()
                     begin
-                        ticket_url := StrSubstNo('%1%2', TicketSetup."Print Server Ticket URL", TmpTicketOut."External Ticket No.");
+                        ticket_url := StrSubstNo(TicketUrlLbl, TicketSetup."Print Server Ticket URL", TmpTicketOut."External Ticket No.");
                     end;
                 }
             }
@@ -65,7 +65,7 @@ xmlport 6060122 "NPR TM Ticket Get Print URL"
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         LineCounter: Integer;
-
+        TicketUrlLbl: Label '%1%2', Locked = true;
     procedure CreateResponse()
     var
         Ticket: Record "NPR TM Ticket";

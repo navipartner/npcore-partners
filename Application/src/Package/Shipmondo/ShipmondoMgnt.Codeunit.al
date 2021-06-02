@@ -60,13 +60,14 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         i: Integer;
         Jarray: JsonArray;
         Jtoken: Jsontoken;
+        QueryParamsLbl: Label 'page=%1&per_page=%2', Locked = true;
     begin
         RequestURL := 'https://app.pakkelabels.dk/api/public/v3/printers';
         QueryParams := '';
 
         if QueryParams <> '' then
             QueryParams += '&';
-        QueryParams += STRSUBSTNO('page=%1&per_page=%2', _CurrentPage, 20);
+        QueryParams += STRSUBSTNO(QueryParamsLbl, _CurrentPage, 20);
 
         if QueryParams <> '' then
             RequestURL := RequestURL + '?' + QueryParams;
@@ -101,6 +102,16 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         own_agreement: Text;
         ShippingAgent: Record "NPR Package Shipping Agent";
         test_mode: Text[10];
+        QueryParamsLbl: Label '"test_mode": %1,', Locked = true;
+        QueryParams2Lbl: Label '"own_agreement": %1,', Locked = true;
+        QueryParams3Lbl: Label '"product_code": "%1",', Locked = true;
+        QueryParams4Lbl: Label '"service_codes": "%1",', Locked = true;
+        QueryParams5Lbl: Label '"automatic_select_service_point": true,', Locked = true;
+        QueryParams6Lbl: Label '"sender": %1,', Locked = true;
+        QueryParams7Lbl: Label '"receiver": %1,', Locked = true;
+        QueryParams8Lbl: Label '"service_point": %1,', Locked = true;
+        QueryParams9Lbl: Label '"parcels": %1,', Locked = true;
+        QueryParams10Lbl: Label '"print_at": %1', Locked = true;
     begin
         if not InitPackageProvider() then
             exit;
@@ -120,30 +131,30 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             test_mode := 'false';
 
         Output := '{';
-        Output += STRSUBSTNO('"test_mode": %1,', test_mode);
+        Output += STRSUBSTNO(QueryParamsLbl, test_mode);
         Output += '"replace_http_status_code": true,';
 
-        Output += STRSUBSTNO('"own_agreement": %1,', own_agreement);
+        Output += STRSUBSTNO(QueryParams2Lbl, own_agreement);
 
         Output += '"label_format": null,';
-        Output += STRSUBSTNO('"product_code": "%1",', PakkelabelsShipment."Shipping Agent Code");
-        Output += STRSUBSTNO('"service_codes": "%1",', SetProductAndServices(PakkelabelsShipment));
+        Output += STRSUBSTNO(QueryParams3Lbl, PakkelabelsShipment."Shipping Agent Code");
+        Output += STRSUBSTNO(QueryParams4Lbl, SetProductAndServices(PakkelabelsShipment));
 
         if (PakkelabelsShipment."Delivery Location" = '') and (ShippingAgent."Automatic Drop Point Service") then
-            Output += STRSUBSTNO('"automatic_select_service_point": true,');
+            Output += STRSUBSTNO(QueryParams5Lbl);
 
 
-        Output += STRSUBSTNO('"sender": %1,', BuildSender());
-        Output += STRSUBSTNO('"receiver": %1,', BuildReceiver(PakkelabelsShipment));
+        Output += STRSUBSTNO(QueryParams6Lbl, BuildSender());
+        Output += STRSUBSTNO(QueryParams7Lbl, BuildReceiver(PakkelabelsShipment));
 
         if PakkelabelsShipment."Delivery Location" <> '' then
-            Output += STRSUBSTNO('"service_point": %1,', BuildServicePoint(PakkelabelsShipment));
+            Output += STRSUBSTNO(QueryParams8Lbl, BuildServicePoint(PakkelabelsShipment));
 
-        Output += STRSUBSTNO('"parcels": %1,', BuildParcels(PakkelabelsShipment));
+        Output += STRSUBSTNO(QueryParams9Lbl, BuildParcels(PakkelabelsShipment));
 
         if PrintAllowed(PakkelabelsShipment) then begin
             Output += '"print": true,';
-            Output += STRSUBSTNO('"print_at": %1', BuildPrintAt(PakkelabelsShipment));
+            Output += STRSUBSTNO(QueryParams10Lbl, BuildPrintAt(PakkelabelsShipment));
         end else
             Output += '"print": false';
 
@@ -153,61 +164,89 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     local procedure BuildSender() Output: Text;
     var
         CompanyInformation: Record "Company Information";
+        QueryParamsLbl: Label '"name": "%1",', Locked = true;
+        QueryParams2Lbl: Label '"address1": "%1",', Locked = true;
+        QueryParams3Lbl: Label '"address2": "%1",', Locked = true;
+        QueryParams4Lbl: Label '"zipcode": "%1",', Locked = true;
+        QueryParams5Lbl: Label '"city": "%1",', Locked = true;
+        QueryParams6Lbl: Label '"country_code": "%1",', Locked = true;
+        QueryParams7Lbl: Label '"mobile": "%1",', Locked = true;
+        QueryParams8Lbl: Label '"telephone": "%1",', Locked = true;
+        QueryParams9Lbl: Label '"email": "%1"', Locked = true;
+
     begin
         CompanyInformation.GET();
         Output := '{';
-        Output += STRSUBSTNO('"name": "%1",', CompanyInformation.Name);
+        Output += STRSUBSTNO(QueryParamsLbl, CompanyInformation.Name);
         Output += '"attention": null,';
-        Output += STRSUBSTNO('"address1": "%1",', CompanyInformation.Address);
-        Output += STRSUBSTNO('"address2": "%1",', CompanyInformation."Address 2");
-        Output += STRSUBSTNO('"zipcode": "%1",', CompanyInformation."Post Code");
-        Output += STRSUBSTNO('"city": "%1",', CompanyInformation.City);
-        Output += STRSUBSTNO('"country_code": "%1",', CompanyInformation."Country/Region Code");
-        Output += STRSUBSTNO('"mobile": "%1",', CompanyInformation."Phone No.");
-        Output += STRSUBSTNO('"telephone": "%1",', CompanyInformation."Phone No.");
-        Output += STRSUBSTNO('"email": "%1"', CompanyInformation."E-Mail");
+        Output += STRSUBSTNO(QueryParams2Lbl, CompanyInformation.Address);
+        Output += STRSUBSTNO(QueryParams3Lbl, CompanyInformation."Address 2");
+        Output += STRSUBSTNO(QueryParams4Lbl, CompanyInformation."Post Code");
+        Output += STRSUBSTNO(QueryParams5Lbl, CompanyInformation.City);
+        Output += STRSUBSTNO(QueryParams6Lbl, CompanyInformation."Country/Region Code");
+        Output += STRSUBSTNO(QueryParams7Lbl, CompanyInformation."Phone No.");
+        Output += STRSUBSTNO(QueryParams8Lbl, CompanyInformation."Phone No.");
+        Output += STRSUBSTNO(QueryParams9Lbl, CompanyInformation."E-Mail");
         Output += '}';
     end;
 
     local procedure BuildReceiver(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
+    var
+        QueryParamsLbl: Label '"name": "%1",', Locked = true;
+        QueryParams2Lbl: Label '"attention": "%1",', Locked = true;
+        QueryParams3Lbl: Label '"address1": "%1",', Locked = true;
+        QueryParams4Lbl: Label '"address2": "%1",', Locked = true;
+        QueryParams5Lbl: Label '"zipcode": "%1",', Locked = true;
+        QueryParams6Lbl: Label '"city": "%1",', Locked = true;
+        QueryParams7Lbl: Label '"country_code": "%1",', Locked = true;
+        QueryParams8Lbl: Label '"email": "%1",', Locked = true;
+        QueryParams9Lbl: Label '"mobile": "%1",', Locked = true;
+        QueryParams10Lbl: Label '"telephone": "%1"', Locked = true;
+        QueryParams11Lbl: Label ',"instruction":"%1",', Locked = true;
     begin
         Output := '{';
-        Output += STRSUBSTNO('"name": "%1",', PakkelabelsShipment.Name);
-        Output += STRSUBSTNO('"attention": "%1",', PakkelabelsShipment.Contact);
-        Output += STRSUBSTNO('"address1": "%1",', PakkelabelsShipment.Address);
+        Output += STRSUBSTNO(QueryParamsLbl, PakkelabelsShipment.Name);
+        Output += STRSUBSTNO(QueryParams2Lbl, PakkelabelsShipment.Contact);
+        Output += STRSUBSTNO(QueryParams3Lbl, PakkelabelsShipment.Address);
         if PakkelabelsShipment."Address 2" <> '' then
-            Output += STRSUBSTNO('"address2": "%1",', PakkelabelsShipment."Address 2");
+            Output += STRSUBSTNO(QueryParams4Lbl, PakkelabelsShipment."Address 2");
 
-        Output += STRSUBSTNO('"zipcode": "%1",', PakkelabelsShipment."Post Code");
-        Output += STRSUBSTNO('"city": "%1",', PakkelabelsShipment.City);
-        Output += STRSUBSTNO('"country_code": "%1",', PakkelabelsShipment."Country/Region Code");
-        Output += STRSUBSTNO('"email": "%1",', PakkelabelsShipment."E-Mail");
-        Output += STRSUBSTNO('"mobile": "%1",', PakkelabelsShipment."SMS No.");
-        Output += STRSUBSTNO('"telephone": "%1"', PakkelabelsShipment."SMS No.");
+        Output += STRSUBSTNO(QueryParams5Lbl, PakkelabelsShipment."Post Code");
+        Output += STRSUBSTNO(QueryParams6Lbl, PakkelabelsShipment.City);
+        Output += STRSUBSTNO(QueryParams7Lbl, PakkelabelsShipment."Country/Region Code");
+        Output += STRSUBSTNO(QueryParams8Lbl, PakkelabelsShipment."E-Mail");
+        Output += STRSUBSTNO(QueryParams9Lbl, PakkelabelsShipment."SMS No.");
+        Output += STRSUBSTNO(QueryParams10Lbl, PakkelabelsShipment."SMS No.");
+
+
 
         if (PackageProviderSetup."Send Delivery Instructions") and (PakkelabelsShipment."Delivery Instructions" <> '') then
-            Output += STRSUBSTNO(',"instruction":"%1",', PakkelabelsShipment."Delivery Instructions");
+            Output += STRSUBSTNO(QueryParams11Lbl, PakkelabelsShipment."Delivery Instructions");
         Output += '}';
     end;
 
     local procedure BuildServicePoint(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
+    var
+        QueryParamsLbl: Label '"id": "%1"', Locked = true;
     begin
         Output := '{';
-        Output += STRSUBSTNO('"id": "%1"', PakkelabelsShipment."Delivery Location");
+        Output += STRSUBSTNO(QueryParamsLbl, PakkelabelsShipment."Delivery Location");
         Output += '}';
     end;
 
     local procedure BuildParcels(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
     var
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
+        QueryParamsLbl: Label '"weight":"%1"', Locked = true;
+        QueryParams2Lbl: Label '"packaging":"%1"', Locked = true;
     begin
         PakkeShippingAgent.GET(PakkelabelsShipment."Shipping Agent Code");
         Output := '[';
         Output += '{';
-        Output += STRSUBSTNO('"weight":"%1"', FORMAT(PakkelabelsShipment."Total Weight", 0, 1));
+        Output += STRSUBSTNO(QueryParamsLbl, FORMAT(PakkelabelsShipment."Total Weight", 0, 1));
         IF PakkeShippingAgent."Package Type Required" THEN BEGIN
             Output += ',';
-            Output += STRSUBSTNO('"packaging":"%1"', FORMAT(PakkelabelsShipment."Package Code", 0, 1));
+            Output += STRSUBSTNO(QueryParams2Lbl, FORMAT(PakkelabelsShipment."Package Code", 0, 1));
         END;
         Output += '}';
         Output += ']';
@@ -231,13 +270,16 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     local procedure BuildPrintAt(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
+        QueryParamsLbl: Label '"host_name": "%1",', Locked = true;
+        QueryParams2Lbl: Label '"printer_name": "%1",', Locked = true;
+        QueryParams3Lbl: Label '"label_format": "%1"', Locked = true;
     begin
         PakkelabelsPrinter.SETRANGE("Location Code", PakkelabelsShipment."Location Code");
         if PakkelabelsPrinter.FINDFIRST() then begin
             Output := '{';
-            Output += STRSUBSTNO('"host_name": "%1",', PakkelabelsPrinter."Host Name");
-            Output += STRSUBSTNO('"printer_name": "%1",', PakkelabelsPrinter.Printer);
-            Output += STRSUBSTNO('"label_format": "%1"', PakkelabelsPrinter."Label Format");
+            Output += STRSUBSTNO(QueryParamsLbl, PakkelabelsPrinter."Host Name");
+            Output += STRSUBSTNO(QueryParams2Lbl, PakkelabelsPrinter.Printer);
+            Output += STRSUBSTNO(QueryParams3Lbl, PakkelabelsPrinter."Label Format");
             Output += '}';
         end;
     end;
@@ -264,13 +306,14 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     var
         QueryParams: Text;
         Jtoken: JsonToken;
+        QueryParamsLbl: Label 'page=%1&per_page=%2', Locked = true;
     begin
         RequestURL := 'https://app.pakkelabels.dk/api/public/v3/shipments';
         QueryParams := '';
 
         if QueryParams <> '' then
             QueryParams += '&';
-        QueryParams += STRSUBSTNO('page=%1&per_page=%2', _CurrentPage, 20);
+        QueryParams += STRSUBSTNO(QueryParamsLbl, _CurrentPage, 20);
 
         if QueryParams <> '' then
             RequestURL := RequestURL + '?' + QueryParams;
@@ -282,21 +325,23 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     local procedure GetProducts(CountryCode: Code[10]; CarrierCode: Text; _CurrentPage: Integer; silent: Boolean);
     var
         QueryParams: Text;
-
         Jtoken: JsonToken;
+        QueryParamsLbl: Label 'country_code=%1', Locked = true;
+        QueryParams2Lbl: Label 'carrier_code=%1', Locked = true;
+        QueryParams3Lbl: Label 'page=%1&per_page=%2', Locked = true;
     begin
         RequestURL := 'https://app.pakkelabels.dk/api/public/v3/products';
         QueryParams := '';
         if CountryCode <> '' then
-            QueryParams += STRSUBSTNO('country_code=%1', CountryCode);
+            QueryParams += STRSUBSTNO(QueryParamsLbl, CountryCode);
         if CarrierCode <> '' then begin
             if QueryParams <> '' then
                 QueryParams += '&';
-            QueryParams += STRSUBSTNO('carrier_code=%1', CarrierCode);
+            QueryParams += STRSUBSTNO(QueryParamsLbl, CarrierCode);
         end;
         if QueryParams <> '' then
             QueryParams += '&';
-        QueryParams += STRSUBSTNO('page=%1&per_page=%2', _CurrentPage, 20);
+        QueryParams += STRSUBSTNO(QueryParamsLbl, _CurrentPage, 20);
 
         if QueryParams <> '' then
             RequestURL := RequestURL + '?' + QueryParams;
@@ -308,15 +353,19 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     local procedure PrintJob(ShipmentDocument: Record "NPR Pacsoft Shipment Document") output: Text;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
+        QueryParamsLbl: Label '"document_id":%1', Locked = true;
+        QueryParams2Lbl: Label '"host_name": "%1",', Locked = true;
+        QueryParams3Lbl: Label '"printer_name": "%1",', Locked = true;
+        QueryParams4Lbl: Label '"label_format": "%1"', Locked = true;
     begin
         output := '{';
-        output += STRSUBSTNO('"document_id":%1', ShipmentDocument."Response Shipment ID");
+        output += STRSUBSTNO(QueryParamsLbl, ShipmentDocument."Response Shipment ID");
         output += '"document_type":"shipment"';
         PakkelabelsPrinter.SETRANGE("Location Code", ShipmentDocument."Location Code");
         if PakkelabelsPrinter.FINDFIRST() then;
-        output += STRSUBSTNO('"host_name": "%1",', PakkelabelsPrinter."Host Name");
-        output += STRSUBSTNO('"printer_name": "%1",', PakkelabelsPrinter.Printer);
-        output += STRSUBSTNO('"label_format": "%1"', PakkelabelsPrinter."Label Format");
+        output += STRSUBSTNO(QueryParams2Lbl, PakkelabelsPrinter."Host Name");
+        output += STRSUBSTNO(QueryParams3Lbl, PakkelabelsPrinter.Printer);
+        output += STRSUBSTNO(QueryParams4Lbl, PakkelabelsPrinter."Label Format");
         output += '}';
     end;
 

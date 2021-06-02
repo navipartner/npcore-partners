@@ -637,8 +637,9 @@
     end;
 
     local procedure validateDateField(fieldValue: Text; dateMask: Code[20]; fieldValueIs: Integer; fieldCaptionName: Text) rDate: Date
+    var
+        PlaceHolderLbl: Label '%1-%2-%3', Locked = true;
     begin
-
         rDate := 0D;
 
         if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
@@ -652,11 +653,11 @@
 
         case UpperCase(dateMask) of
             'YYYYMMDD':
-                if (not Evaluate(rDate, StrSubstNo('%1-%2-%3', CopyStr(fieldValue, 1, 4), CopyStr(fieldValue, 5, 2), CopyStr(fieldValue, 7, 2)), 9)) then
+                if (not Evaluate(rDate, StrSubstNo(PlaceHolderLbl, CopyStr(fieldValue, 1, 4), CopyStr(fieldValue, 5, 2), CopyStr(fieldValue, 7, 2)), 9)) then
                     Error(INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
 
             'YYYY-MM-DD':
-                if (not Evaluate(rDate, StrSubstNo('%1-%2-%3', CopyStr(fieldValue, 1, 4), CopyStr(fieldValue, 6, 2), CopyStr(fieldValue, 9, 2)), 9)) then
+                if (not Evaluate(rDate, StrSubstNo(PlaceHolderLbl, CopyStr(fieldValue, 1, 4), CopyStr(fieldValue, 6, 2), CopyStr(fieldValue, 9, 2)), 9)) then
                     Error(INVALID_DATE, fieldValue, fieldCaptionName, GLineCount, dateMask);
 
             else

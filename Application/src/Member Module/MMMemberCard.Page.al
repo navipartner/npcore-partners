@@ -927,18 +927,16 @@ page 6060136 "NPR MM Member Card"
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
+    var
+        PlaceHolderLbl: Label '6014555,%1,%2,2', Locked = true;
     begin
-
-        exit(StrSubstNo('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
+        exit(StrSubstNo(PlaceHolderLbl, GetAttributeTableId(), AttributeNumber));
 
     end;
 
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
-
-        //NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, FORMAT (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
         NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(Rec."Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
-
     end;
 }
 

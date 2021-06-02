@@ -78,6 +78,8 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
         AuthText: Text;
         XmlTxt: Text;
         i: Integer;
+        AuthLbl: Label '%1:%2', Locked = true;
+        BasicLbl: Label 'Basic %1', Locked = true;
     begin
         if MagentoInventoryCompany."Company Name" = CompanyName then begin
             Inventory := MagentoItemMgt.GetStockQty3(ItemNo, VariantCode, MagentoInventoryCompany);
@@ -117,8 +119,8 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
 
         if MagentoInventoryCompany."Api Username" <> '' then begin
             HttpWebRequest.GetHeaders(HeadersReq);
-            AuthText := StrSubstNo('%1:%2', MagentoInventoryCompany."Api Username", MagentoInventoryCompany.GetApiPassword());
-            HeadersReq.Add('Authorization', StrSubstNo('Basic %1', Base64Convert.ToBase64(AuthText)));
+            AuthText := StrSubstNo(AuthLbl, MagentoInventoryCompany."Api Username", MagentoInventoryCompany.GetApiPassword());
+            HeadersReq.Add('Authorization', StrSubstNo(BasicLbl, Base64Convert.ToBase64(AuthText)));
         end;
 
         HttpWebRequest.Content(Content);
@@ -133,7 +135,7 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
         XmlDocument.ReadFrom(Response, XmlDoc);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
         XmlDoc.SelectNodes('.//*[local-name()="item"]', XmlNodeList);
 

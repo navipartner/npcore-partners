@@ -847,11 +847,12 @@ table 6014405 "NPR POS Sale"
     procedure ShowDocDim()
     var
         OldDimSetID: Integer;
+        DimSetIdLbl: Label '%1 %2', Locked = true;
     begin
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet(
-            "Dimension Set ID", StrSubstNo('%1 %2', "Register No.", "Sales Ticket No."),
+            "Dimension Set ID", StrSubstNo(DimSetIdLbl, "Register No.", "Sales Ticket No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         if OldDimSetID <> "Dimension Set ID" then begin
             Modify();

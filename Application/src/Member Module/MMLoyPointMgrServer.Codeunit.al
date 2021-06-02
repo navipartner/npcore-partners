@@ -300,6 +300,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         BurnedPoints: Integer;
         EarnedAmount: Decimal;
         BurnedAmount: Decimal;
+        PlaceHolderLbl: Label '[%1,%2]', Locked = true;
     begin
 
         TmpSaleLines.Reset();
@@ -322,7 +323,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
                             exit(false);
                         end;
                     else begin
-                            ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo('[%1,%2]', TmpSaleLines.Type::SALES, TmpSaleLines.Type::RETURN));
+                            ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo(PlaceHolderLbl, TmpSaleLines.Type::SALES, TmpSaleLines.Type::RETURN));
                             ResponseMessageId := '-1152';
                             exit(false);
                         end;
@@ -359,7 +360,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
                             exit(false);
                         end;
                     else begin
-                            ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo('[%1,%2]', TmpPaymentLines.Type::PAYMENT, TmpPaymentLines.Type::REFUND));
+                            ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo(PlaceHolderLbl, TmpPaymentLines.Type::PAYMENT, TmpPaymentLines.Type::REFUND));
                             ResponseMessageId := '-1156';
                             exit(false);
                         end;
@@ -687,10 +688,9 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         GenJnlPostBatch: Codeunit "Gen. Jnl.-Post Batch";
         DocumentNo: Code[20];
         JnlType: Option;
+        PlaceHolderLbl: Label '%1,%2', Locked = true;
     begin
-
-        // GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
-        JnlType := StrMenu(StrSubstNo('%1,%2', Format(GenJournalBatch."Template Type"::General), Format(GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
+        JnlType := StrMenu(StrSubstNo(PlaceHolderLbl, Format(GenJournalBatch."Template Type"::General), Format(GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
         case JnlType of
             1:
                 GenJournalBatch.SetFilter("Template Type", '=%1', GenJournalBatch."Template Type"::General);
@@ -702,19 +702,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 
         GenJournalBatch.SetFilter(Recurring, '=%1', false);
         GenJournalBatch.FindFirst();
-
-        // GenJournalLine.SetFilter ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
-        // GenJournalLine.SetFilter ("Journal Batch Name", '=%1', GenJournalBatch.Name);
-        // IF (NOT GenJournalLine.IsEmpty ()) THEN
-        //  IF (NOT CONFIRM (JNL_NOT_EMPTY, FALSE, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) THEN
-        //    ERROR ('');
-        //
-        // GenJournalLine.DeleteALL ();
-        //
-        // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
-        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate());
-        //  Commit();
-        // END;
 
         if (GenJournalBatch."No. Series" <> '') then
             DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate());
@@ -746,10 +733,9 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         GenJnlPostBatch: Codeunit "Gen. Jnl.-Post Batch";
         DocumentNo: Code[20];
         JnlType: Option;
+        PlaceHolderLbl: Label '%1,%2', Locked = true;
     begin
-
-        // GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
-        JnlType := StrMenu(StrSubstNo('%1,%2', Format(GenJournalBatch."Template Type"::General), Format(GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
+        JnlType := StrMenu(StrSubstNo(PlaceHolderLbl, Format(GenJournalBatch."Template Type"::General), Format(GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
         case JnlType of
             1:
                 GenJournalBatch.SetFilter("Template Type", '=%1', GenJournalBatch."Template Type"::General);
@@ -761,19 +747,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 
         GenJournalBatch.SetFilter(Recurring, '=%1', false);
         GenJournalBatch.FindFirst();
-
-        // GenJournalLine.SetFilter ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
-        // GenJournalLine.SetFilter ("Journal Batch Name", '=%1', GenJournalBatch.Name);
-        // IF (NOT GenJournalLine.IsEmpty ()) THEN
-        //  IF (NOT CONFIRM (JNL_NOT_EMPTY, FALSE, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) THEN
-        //    ERROR ('');
-        //
-        // GenJournalLine.DeleteALL ();
-        //
-        // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
-        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate());
-        //  Commit();
-        // END;
 
         if (GenJournalBatch."No. Series" <> '') then
             DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate());
@@ -808,6 +781,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         PostingEarnAmount: Decimal;
         InvoiceNo: Code[20];
         DocType: Enum "Gen. Journal Document Type";
+        PeriodEarnBurnLbl: Label 'Period ..%1, Earn: %2, Burn: %3';
     begin
 
         case LoyaltyStoreSetup."Reconciliation Period" of
@@ -866,39 +840,13 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
           DocumentNo,
           DocType,
           LoyaltyStoreSetup."Customer No.",
-          StrSubstNo('Period ..%1, Earn: %2, Burn: %3', UntilDate, EarnPoints, BurnPoints),
+          StrSubstNo(PeriodEarnBurnLbl, UntilDate, EarnPoints, BurnPoints),
           PostingBurnCurrencyCode, // Note: the earned points are projected and valued in burn exchange rate when realized.
           PostingEarnAmount + PostingBurnAmount,
           LoyaltyStoreSetup."G/L Account No.",
           InvoiceNo);
         if (PostingEarnAmount + PostingBurnAmount <> 0) then
             GenJournalLine.Insert(true);
-
-        // MakeJournalLine (GenJournalLine,
-        //  UntilDate,
-        //  DocumentNo,
-        //  GenJournalLine."Document Type"::Invoice,
-        //  LoyaltyStoreSetup."Customer No.",
-        //  StrSubstNo ('Earn ..%1, points: %2', UntilDate, EarnPoints),
-        //  PostingBurnCurrencyCode, // Note: the earned points are projected and valued in burn exchange rate when realized.
-        //  PostingEarnAmount,
-        //  LoyaltyStoreSetup."G/L Account",
-        //  InvoiceNo);
-        // IF (PostingEarnAmount <> 0) THEN
-        //  GenJournalLine.Insert (TRUE);
-        //
-        // MakeJournalLine (GenJournalLine,
-        //  UntilDate,
-        //  DocumentNo,
-        //  GenJournalLine."Document Type"::"Credit Memo",
-        //  LoyaltyStoreSetup."Customer No.",
-        //  StrSubstNo ('Burn ..%1, points: %2', UntilDate, BurnPoints),
-        //  PostingBurnCurrencyCode,
-        //  PostingBurnAmount,
-        //  LoyaltyStoreSetup."G/L Account",
-        //  InvoiceNo);
-        // IF (PostingBurnAmount <> 0) THEN
-        //  GenJournalLine.Insert (TRUE);
     end;
 
     local procedure MakeJournalLine(var GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20]; DocType: Enum "Gen. Journal Document Type"; AccNo: Code[20]; Description: Text[50]; CurrencyCode: Code[10]; AmountToPost: Decimal; BalanceGLAccont: Code[20]; InvoiceNo: Code[20])

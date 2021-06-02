@@ -282,6 +282,7 @@ codeunit 6151150 "NPR M2 Account WebService"
     var
         TmpEFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary;
         EFTShopperRecognition: Codeunit "NPR EFT Shopper Recognition";
+        IntegrationTypeLbl: Label 'Integration Type "%1" exist with differnt Shopper Reference value for "%2" "%3", replace is not supported.', Locked = true;
     begin
         SelectLatestVersion();
         ShopperRecognition.Import();
@@ -290,7 +291,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         if (not EFTShopperRecognition.GetShopperReference(TmpEFTShopperRecognition)) then
             if (not EFTShopperRecognition.CreateShopperReference(TmpEFTShopperRecognition)) then
                 ShopperRecognition.SetErrorResponse(
-                  StrSubstNo('Integration Type "%1" exist with differnt Shopper Reference value for "%2" "%3", replace is not supported.',
+                  StrSubstNo(IntegrationTypeLbl,
                     TmpEFTShopperRecognition."Integration Type", Format(TmpEFTShopperRecognition."Entity Type"), TmpEFTShopperRecognition."Entity Key"));
 
         ShopperRecognition.SetResponse(TmpEFTShopperRecognition);
@@ -405,14 +406,16 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         iStream: InStream;
         oStream: OutStream;
+        EMailLbl: Label '<EMail>%1</EMail>', Locked = true;
+        PasswordLbl: Label '<PasswordMd5>%1</PasswordMd5>', Locked = true;
     begin
 
         xmltext :=
           '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
           '<Authenticate xmlns="urn:microsoft-dynamics-nav/xmlports/x6151150">' +
             '<Request>' +
-              StrSubstNo('<EMail>%1</EMail>', EMail) +
-              StrSubstNo('<PasswordMd5>%1</PasswordMd5>', PasswordMD5) +
+              StrSubstNo(EMailLbl, EMail) +
+              StrSubstNo(PasswordLbl, PasswordMD5) +
             '</Request>' +
           '</Authenticate>';
 
@@ -453,15 +456,18 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         iStream: InStream;
         oStream: OutStream;
+        EMailLbl: Label '<EMail>%1</EMail>', Locked = true;
+        PasswordLbl: Label '<PasswordMd5>%1</PasswordMd5>', Locked = true;
+        NewPasswordLbl: Label '<NewPasswordMd5>%1</NewPasswordMd5>', Locked = true;
     begin
 
         xmltext :=
           '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
           '<ChangeAccountPassword xmlns="urn:microsoft-dynamics-nav/xmlports/x6151149">' +
             '<Request>' +
-              StrSubstNo('<EMail>%1</EMail>', EMail) +
-              StrSubstNo('<PasswordMd5>%1</PasswordMd5>', CurrentPasswordMd5) +
-              StrSubstNo('<NewPasswordMd5>%1</NewPasswordMd5>', NewPasswordMd5) +
+              StrSubstNo(EMailLbl, EMail) +
+              StrSubstNo(PasswordLbl, CurrentPasswordMd5) +
+              StrSubstNo(NewPasswordLbl, NewPasswordMd5) +
             '</Request>' +
           '</ChangeAccountPassword>';
 
@@ -501,13 +507,14 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         iStream: InStream;
         oStream: OutStream;
+        EMailLbl: Label '<EMail>%1</EMail>', Locked = true;
     begin
 
         xmltext :=
           '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
           '<ResetAccountPassword xmlns="urn:microsoft-dynamics-nav/xmlports/x6151151">' +
             '<Request>' +
-              StrSubstNo('<EMail>%1</EMail>', EMail) +
+              StrSubstNo(EMailLbl, EMail) +
             '</Request>' +
           '</ResetAccountPassword>';
 

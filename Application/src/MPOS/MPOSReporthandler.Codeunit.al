@@ -50,6 +50,7 @@ codeunit 6059976 "NPR MPOS Report handler"
         JSON: Text;
         JSBridge: Page "NPR JS Bridge";
         Base64Convert: Codeunit "Base64 Convert";
+        FileNameLbl: Label '%1 - %2.pdf', Locked = true;
     begin
         AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Report, ReportId);
 
@@ -58,7 +59,7 @@ codeunit 6059976 "NPR MPOS Report handler"
             XmlParameters := GetXmlParameters(RecRef);
         end;
 
-        Filename := StrSubstNo('%1 - %2.pdf', AllObjWithCaption."Object Caption", CurrentDateTime);
+        Filename := StrSubstNo(FileNameLbl, AllObjWithCaption."Object Caption", CurrentDateTime);
         XmlParameters := REPORT.RunRequestPage(ReportId, XmlParameters);
         if XmlParameters = '' then
             Error('');

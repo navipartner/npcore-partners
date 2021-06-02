@@ -146,6 +146,7 @@ table 6150705 "NPR POS Parameter Value"
         CacheKey: Text;
         JsonMgt: Codeunit "NPR POS JSON Management";
         OptionToken: JsonToken;
+        CacheKeyLbl: Label 'Action_%1-Param_%2', Locked = true;
     begin
         case "Data Type" of
             "Data Type"::Boolean:
@@ -173,7 +174,7 @@ table 6150705 "NPR POS Parameter Value"
             "Data Type"::Option:
                 begin
                     Param.Options := GetOptions();
-                    CacheKey := StrSubstNo('Action_%1-Param_%2', "Action Code", Name);
+                    CacheKey := StrSubstNo(CacheKeyLbl, "Action Code", Name);
                     if OptionStringCache.Contains(CacheKey) then begin
                         OptionStringCache.Get(CacheKey, OptionToken);
                         JsonMgt.AddVariantValueToJsonObject(Target.Parameters(), '_option_' + Name, OptionToken.AsObject());

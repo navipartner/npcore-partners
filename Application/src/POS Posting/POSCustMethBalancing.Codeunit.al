@@ -157,6 +157,7 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
         CoinType: JsonObject;
         POSPaymentBinCheckPoint: Record "NPR POS Payment Bin Checkp.";
         PaymentMethodDenom: Record "NPR Payment Method Denom";
+        CoinTypeDescLbl: Label '%1 %2', Locked = true;
     begin
         POSPaymentBinCheckPoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', _POSWorkshiftCheckpoint."Entry No.");
         if (not POSPaymentBinCheckPoint.FindSet()) then
@@ -175,7 +176,7 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
                 repeat
                     CoinType.ReadFrom('{}');
                     CoinType.Add('type', PaymentMethodDenom."Denomination Type");
-                    CoinType.Add('description', StrSubstNo('%1 %2', PaymentMethodDenom.Denomination, PaymentMethodDenom."Denomination Type"));
+                    CoinType.Add('description', StrSubstNo(CoinTypeDescLbl, PaymentMethodDenom.Denomination, PaymentMethodDenom."Denomination Type"));
                     CoinType.Add('value', PaymentMethodDenom.Denomination);
                     CoinTypes.Add(CoinType);
                 until (PaymentMethodDenom.Next() = 0);
@@ -225,6 +226,7 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
     var
         Response: JsonObject;
         JsonText: Text;
+        ResponseLbl: Label '%1 - %2', Locked = true;
     begin
         if Method <> 'BalancingGetState' then
             exit;
@@ -235,7 +237,7 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
         _POSWorkshiftCheckpoint.FindLast();
         _POSUnit.Get(_POSWorkshiftCheckpoint."POS Unit No.");
 
-        Response.Add('caption', StrSubstNo('%1 - %2', _POSWorkshiftCheckpoint.TableCaption(), _POSWorkshiftCheckpoint."Entry No."));
+        Response.Add('caption', StrSubstNo(ResponseLbl, _POSWorkshiftCheckpoint.TableCaption(), _POSWorkshiftCheckpoint."Entry No."));
         Response.Add('statistics', GetStatistics());
         Response.Add('cashCount', GetCashCount());
         Response.Add('isStatisticsEnabled', false);

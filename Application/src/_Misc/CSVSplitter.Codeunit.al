@@ -302,6 +302,7 @@ codeunit 6060073 "NPR CSV Splitter"
         I: Integer;
         J: Integer;
         BuildingFileLbl: Label 'Building file %1.', Comment = '%1 = Number of building file';
+        FileLbl: Label 'File %1', Locked = true;
     begin
         if ExportToServer then
             if FileMgt.ServerDirectoryExists(GetDirectoryName()) then
@@ -332,7 +333,7 @@ codeunit 6060073 "NPR CSV Splitter"
                 if ExcelBuffer.FindSet() then
                     repeat
                         if ExcelBuffer.Comment = '' then begin
-                            ExcelBuffer.Validate(Comment, StrSubstNo('File %1', Format(I)));
+                            ExcelBuffer.Validate(Comment, StrSubstNo(FileLbl, Format(I)));
                             ExcelBuffer.Modify();
                             OutputFile.Write(BuildLine(ExcelBuffer."Row No."));
                         end;
