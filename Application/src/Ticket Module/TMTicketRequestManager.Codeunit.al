@@ -418,7 +418,7 @@
             exit; // Normal
 
         if (WaitingListReferenceCode = '') then
-            Error(StrSubstNo('[%1] - %2', -1202, WAITINGLIST_REQUIRED_1202));
+            Error('[%1] - %2', -1202, WAITINGLIST_REQUIRED_1202);
 
         if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry(WaitingListReferenceCode, CreateDateTime(Today, Time), true, AdmissionSchEntryWaitingList, TicketWaitingList, ResponseMessage)) then
             Error(ResponseMessage);
@@ -528,6 +528,7 @@
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        DateTimeLbl: Label '%1 - %2', Locked = true;
     begin
 
         TicketReservationRequest.RESET();
@@ -542,7 +543,7 @@
                 AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
                 AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', FALSE);
                 if (AdmissionScheduleEntry.FindLast()) then
-                    TicketReservationRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+                    TicketReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
             end;
             TicketReservationRequest.Modify();
 
@@ -744,6 +745,7 @@
         Admission: Record "NPR TM Admission";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TicketBom: Record "NPR TM Ticket Admission BOM";
+        DateTimeLbl: Label '%1-%2', Locked = true;
     begin
 
         Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
@@ -841,7 +843,7 @@
                 AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketChangeRequest."External Adm. Sch. Entry No.");
                 AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', FALSE);
                 AdmissionScheduleEntry.FindLast();
-                TicketChangeRequest."Scheduled Time Description" := StrSubstNo('%1-%2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+                TicketChangeRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
 
                 TicketChangeRequest.Insert();
             until (TicketAccessEntry.NEXT() = 0);
@@ -923,6 +925,7 @@
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
+        DateTimeLbl: Label '%1 - %2', Locked = true;
     begin
 
         Admission.Get(AdmissionCode);
@@ -966,7 +969,7 @@
                         if (AdmSchEntry.Get(TicketManagement.GetCurrentScheduleEntry(ItemNo, VariantCode, Admission."Admission Code", true))) then begin
                             if (AdmSchEntry."Admission Is" = AdmSchEntry."Admission Is"::OPEN) then begin
                                 ReservationRequest."External Adm. Sch. Entry No." := AdmSchEntry."External Schedule Entry No.";
-                                ReservationRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");
+                                ReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");
                             end;
                         end;
                     end;
@@ -2145,6 +2148,8 @@
         UserAgentTok: Label 'User-Agent', Locked = true;
         RequestOk: Boolean;
         Url: Text;
+        UrlLbl: Label '%1%2?sync=%3', Locked = true;
+        BearerLbl: Label 'Bearer %1', Locked = true;
     begin
 
         TicketSetup.Get();
@@ -2153,7 +2158,7 @@
         JSONOut := '';
         ClearLastError();
 
-        Url := StrSubstNo('%1%2?sync=%3', TicketSetup."NP-Pass Server Base URL",
+        Url := StrSubstNo(UrlLbl, TicketSetup."NP-Pass Server Base URL",
                                            StrSubstNo(TicketSetup."NP-Pass API", TicketNotificationEntry."eTicket Type Code", TicketNotificationEntry."eTicket Pass Id"),
                                            Format(TicketSetup."NP-Pass Notification Method", 0, 9));
 
@@ -2167,7 +2172,7 @@
         RequestHeaders.Clear();
         RequestHeaders.Add(UserAgentTok, UserAgentTxt);
         RequestHeaders.Add(AcceptTok, ContentTypeTxt);
-        RequestHeaders.Add(AuthorizationTok, StrSubstNo('Bearer %1', TicketSetup."NP-Pass Token"));
+        RequestHeaders.Add(AuthorizationTok, StrSubstNo(BearerLbl, TicketSetup."NP-Pass Token"));
 
         Client.Timeout := 10000;
         if (TicketSetup."Timeout (ms)" > 0) then

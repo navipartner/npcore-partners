@@ -24,6 +24,8 @@
         FunctionOptionString: Text;
         N: Integer;
         JSArr: Text;
+        JSArrLbl: Label '"%1",', Locked = true;
+        JSArr2Lbl: Label 'var optionNames = [%1];if (param.Function < 0) param.Function = 0;if (param.DefaultInputValue.length > 0) {context.show_dialog = false;}; ', Locked = true;
     begin
         if Sender.DiscoverAction(
           ActionCode(),
@@ -32,18 +34,10 @@
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
-
-            // FunctionOptionString := 'Select Membership,View Points,Redeem Points,Available Coupons';
-            // FOR N := 1 TO 4 DO
-            //   JSArr += StrSubstNo ('"%1",', SELECTSTR (N, FunctionOptionString));
-            // JSArr := StrSubstNo ('var optionNames = [%1];', COPYSTR (JSArr, 1, STRLEN(JSArr)-1));
-
             FunctionOptionString := 'Select Membership,View Points,Redeem Points,Available Coupons,Select Membership (EAN Box)';
             for N := 1 to 5 do
-                JSArr += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
-            JSArr := StrSubstNo('var optionNames = [%1];' +
-                                 'if (param.Function < 0) param.Function = 0;' +
-                                 'if (param.DefaultInputValue.length > 0) {context.show_dialog = false;}; ', CopyStr(JSArr, 1, StrLen(JSArr) - 1));
+                JSArr += StrSubstNo(JSArrLbl, SelectStr(N, FunctionOptionString));
+            JSArr := StrSubstNo(JSArr2Lbl, CopyStr(JSArr, 1, StrLen(JSArr) - 1));
 
             Sender.RegisterWorkflowStep('0', JSArr + 'windowTitle = labels.LoyaltyWindowTitle.substitute (optionNames[param.Function].toString()); ');
             Sender.RegisterWorkflowStep('membercard_number', 'context.show_dialog && input ({caption: labels.MemberCardPrompt, title: windowTitle}).cancel(abort);');
@@ -398,6 +392,7 @@
         RemainingPoints: Text;
         RemainingValue: Text;
         RedeemablePoints: Text;
+        PlaceHolderLbl: Label '%1', Locked = true;
     begin
 
         if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
@@ -418,9 +413,9 @@
             if (Membership."Remaining Points" > 0) then begin
                 MembershipSetup.Get(Membership."Membership Code");
                 LoyaltySetup.Get(MembershipSetup."Loyalty Code");
-                RemainingValue := StrSubstNo('%1', Round(Membership."Remaining Points" * LoyaltySetup."Point Rate"));
+                RemainingValue := StrSubstNo(PlaceHolderLbl, Round(Membership."Remaining Points" * LoyaltySetup."Point Rate"));
 
-                RedeemablePoints := StrSubstNo('%1', LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod(Membership."Entry No."));
+                RedeemablePoints := StrSubstNo(PlaceHolderLbl, LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod(Membership."Entry No."));
 
             end;
         end;
@@ -433,9 +428,6 @@
         Handled := true;
     end;
 
-    local procedure "--- Ean Box Event Handling"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
@@ -448,7 +440,6 @@
             EanBoxEvent.Code := EventCodeMemberSelect();
             EanBoxEvent."Module Name" := 'Membership Loyalty';
 
-            //EanBoxEvent.Description := MMMemberCard.FIELDCAPTION("External Card No.");
             EanBoxEvent.Description := CopyStr(MMMemberCard.FieldCaption("External Card No."), 1, MaxStrLen(EanBoxEvent.Description));
 
             EanBoxEvent."Action Code" := ActionCode();

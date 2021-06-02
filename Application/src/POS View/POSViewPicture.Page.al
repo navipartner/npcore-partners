@@ -37,6 +37,7 @@ page 6014406 "NPR POS View Picture"
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
                     FileName: Text;
+                    MimeTypeLbl: Label 'image/%1', Locked = true;
                 begin
                     Rec.TestField(Code);
 
@@ -53,7 +54,7 @@ page 6014406 "NPR POS View Picture"
 
                     Clear(Rec.Image);
                     TempBlob.CreateInStream(InStr);
-                    Rec.Image.ImportStream(InStr, FileManagement.GetFileNameWithoutExtension(FileName), StrSubstNo('image/%1', Rec.GetDefaultExtension()));
+                    Rec.Image.ImportStream(InStr, FileManagement.GetFileNameWithoutExtension(FileName), StrSubstNo(MimeTypeLbl, Rec.GetDefaultExtension()));
                     Rec.Modify(true);
                 end;
             }

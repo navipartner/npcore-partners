@@ -204,6 +204,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
     local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLbl: Label '@%1*', Locked = true;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -217,7 +218,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
                     ItemAddOn.SetRange(Enabled, true);
                     ItemAddOn."No." := POSParameterValue.Value;
                     if not ItemAddOn.Find() then begin
-                        ItemAddOn.SetFilter("No.", CopyStr(StrSubstNo('@%1*', POSParameterValue.Value), 1, MaxStrLen(ItemAddOn."No.")));
+                        ItemAddOn.SetFilter("No.", CopyStr(StrSubstNo(ItemAddOnLbl, POSParameterValue.Value), 1, MaxStrLen(ItemAddOn."No.")));
                         ItemAddOn.FindFirst();
                     end;
                     POSParameterValue.Value := ItemAddOn."No.";

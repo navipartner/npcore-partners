@@ -236,8 +236,10 @@
     end;
 
     local procedure FillJETBase(var POSAuditLog: Record "NPR POS Audit Log"; PreviousSignature: Text): Text
+    var
+        FillJETBaseLbl: Label '%1,%2,%3,%4,%5,%6,%7,%8', Locked = true;
     begin
-        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8',
+        exit(StrSubstNo(FillJETBaseLbl,
             FormatAlphanumeric(POSAuditLog."External ID"),
             POSAuditLog."External Code",
             FormatAlphanumeric(POSAuditLog."Additional Information"),
@@ -253,13 +255,14 @@
         TaxBreakdown: Text;
         TaxTotal: Decimal;
         POSEntry: Record "NPR POS Entry";
+        FillTicketBaseLbl: Label '%1,%2,%3,%4,%5,%6,%7', Locked = true;
     begin
         POSEntry.Get(POSAuditLog."Record ID");
 
         TaxBreakdown := GetSaleTaxBreakdownString(POSEntry, false);
         TaxTotal := GetSaleTotalInclTax(POSEntry, false);
 
-        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
+        exit(StrSubstNo(FillTicketBaseLbl,
             FormatAlphanumeric(TaxBreakdown),
             FormatNumeric(TaxTotal),
             FormatDatetime(POSAuditLog."Log Timestamp"),
@@ -277,6 +280,8 @@
         TaxBreakdown: Text;
         TaxTotal: Decimal;
         PerpetualAmount: Decimal;
+        POSAuditLogAdditionalInformationLbl: Label '%1|%2|%3', Locked = true;
+        FillGrandTotalBaseLbl: Label '%1,%2,%3,%4,%5,%6,%7', Locked = true;
     begin
         RecRef.Get(POSAuditLog."Record ID");
         case RecRef.Number of
@@ -288,7 +293,7 @@
                     TaxTotal := GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint);
                     POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
                     PerpetualAmount := GetWorkshiftPerpetualAmount(POSWorkshiftCheckpoint);
-                    POSAuditLog."Additional Information" := StrSubstNo('%1|%2|%3',
+                    POSAuditLog."Additional Information" := StrSubstNo(POSAuditLogAdditionalInformationLbl,
                         Format(TaxTotal, 0, '<Precision,2:2><Standard Format,9>'),
                         Format(GetWorkshiftPerpetualAbsoluteAmount(POSWorkshiftCheckpoint), 0, '<Precision,2:2><Standard Format,9>'),
                         Format(PerpetualAmount, 0, '<Precision,2:2><Standard Format,9>'));
@@ -300,14 +305,14 @@
                     TaxBreakdown := GetSaleTaxBreakdownString(POSEntry, true);
                     TaxTotal := GetSaleTotalInclTax(POSEntry, true);
                     PerpetualAmount := GetSalePerpetualAmount(POSEntry);
-                    POSAuditLog."Additional Information" := StrSubstNo('%1|%2|%3',
+                    POSAuditLog."Additional Information" := StrSubstNo(POSAuditLogAdditionalInformationLbl,
                         Format(TaxTotal, 0, '<Precision,2:2><Standard Format,9>'),
                         Format(GetSalePerpetualAbsoluteAmount(POSEntry), 0, '<Precision,2:2><Standard Format,9>'),
                         Format(PerpetualAmount, 0, '<Precision,2:2><Standard Format,9>'));
                 end;
         end;
 
-        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
+        exit(StrSubstNo(FillGrandTotalBaseLbl,
             FormatAlphanumeric(TaxBreakdown),
             FormatNumeric(TaxTotal),
             FormatNumeric(PerpetualAmount),
@@ -322,6 +327,7 @@
         ReprintNo: Integer;
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
         POSEntryOutputLog2: Record "NPR POS Entry Output Log";
+        FillDuplicatePrintBaseLbl: Label '%1,%2,%3,%4,%5,%6,%7,%8', Locked = true;
     begin
         POSEntryOutputLog.Get(POSAuditLog."Record ID");
 
@@ -335,7 +341,7 @@
 
         POSAuditLog."Additional Information" := Format(ReprintNo);
 
-        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8',
+        exit(StrSubstNo(FillDuplicatePrintBaseLbl,
             FormatAlphanumeric(POSAuditLog."External ID"),
             'Ticket',
             POSAuditLog."Additional Information",
@@ -351,13 +357,14 @@
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         TaxBreakdown: Text;
         TaxTotal: Decimal;
+        FillArchiveFileBaseLbl: Label '%1,%2,%3,%4,%5,%6,%7', Locked = true;
     begin
         POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
 
         TaxBreakdown := GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint);
         TaxTotal := GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint);
 
-        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
+        exit(StrSubstNo(FillArchiveFileBaseLbl,
             FormatAlphanumeric(TaxBreakdown),
             FormatNumeric(TaxTotal),
             FormatDatetime(POSAuditLog."Log Timestamp"),
@@ -902,6 +909,7 @@
         POSSalesLine: Record "NPR POS Entry Sales Line";
         AddInfo: Text;
         Amount: Decimal;
+        AddInfoLbl: Label '%1|%2', Locked = true;
     begin
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetFilter(Type, '<>%1&<>%2&<>%3', POSSalesLine.Type::Item, POSSalesLine.Type::Rounding, POSSalesLine.Type::Comment);
@@ -909,7 +917,7 @@
             exit;
 
         Amount := GetSaleTotalInclTax(POSEntry, false) - GetSaleTotalInclTax(POSEntry, true);
-        AddInfo := StrSubstNo('%1|%2', POSEntry."Fiscal No.", Format(Amount, 0, '<Precision,2:2><Standard Format,9>'));
+        AddInfo := StrSubstNo(AddInfoLbl, POSEntry."Fiscal No.", Format(Amount, 0, '<Precision,2:2><Standard Format,9>'));
 
         POSAuditLogMgt.CreateEntryCustom(POSEntry.RecordId, 'NON_ITEM_AMOUNT', POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", 'Sale amount not from items', AddInfo);
     end;
@@ -1324,6 +1332,7 @@
         POSUnit: Record "NPR POS Unit";
         FRAuditSetup: Record "NPR FR Audit Setup";
         CurrentYear: Text;
+        DisplayVersionLbl: Label '%1-%2/%3', Locked = true;
     begin
         POSSession.GetSession(POSSession, true);
         POSSession.GetSetup(POSSetup);
@@ -1333,7 +1342,7 @@
 
         CurrentYear := CopyStr(Format(Date2DMY(Today, 3)), 3, 2);
         FRAuditSetup.Get();
-        DisplayVersion += ',' + StrSubstNo('%1-%2/%3', FRAuditSetup."Certification Category", CurrentYear, FRAuditSetup."Certification No.");
+        DisplayVersion += ',' + StrSubstNo(DisplayVersionLbl, FRAuditSetup."Certification Category", CurrentYear, FRAuditSetup."Certification No.");
     end;
 
     [IntegrationEvent(false, false)]

@@ -270,6 +270,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         Salesperson: Record "Salesperson/Purchaser";
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
+        AssignedWiaterLbl: Label '%1 %2', Locked = true;
     begin
         if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
             exit;
@@ -300,6 +301,6 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         DataRow.Add('TableStatus', Seating."Status Description FF");
         DataRow.Add('WPadStatus', WaiterPad."Status Description FF");
         DataRow.Add('MealFlowStatus', WaiterPad."Serving Step Description");
-        DataRow.Add('AssignedWaiter', StrSubstNo('%1 %2', WaiterPad."Assigned Waiter Code", Salesperson.Name));
+        DataRow.Add('AssignedWaiter', StrSubstNo(AssignedWiaterLbl, WaiterPad."Assigned Waiter Code", Salesperson.Name));
     end;
 }

@@ -94,6 +94,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         ErrorCode: Code[10];
         ErrorText: Text;
+        FailReasonLbl: Label 'TicketServer: [%1] %2';
     begin
 
         TicketReservationRequest.Get(EntryNo);
@@ -120,7 +121,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
 
         // Examine fault code - might have been produced already
         if (WebExceptionResponse(ServiceResponse, ErrorCode, ErrorText)) then begin
-            FailReasonText := StrSubstNo('TicketServer: [%1] %2', ErrorCode, ErrorText);
+            FailReasonText := StrSubstNo(FailReasonLbl, ErrorCode, ErrorText);
 
             if ((StrPos(ErrorText, 'Bad Request: Ticket ') > 0) and (StrPos(ErrorText, ' already exists.') > 0)) then begin
                 TicketReservationRequest."DIY Print Order At" := CurrentDateTime;
@@ -139,6 +140,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         FailReason: Text;
+        TicketOrderLbl: Label '%1%2', Locked = true;
     begin
 
         TicketReservationRequest.Get(RequestEntryNo);
@@ -149,7 +151,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         if (not GenerateTicketPrint(RequestEntryNo, true, FailReason)) then
             Error(FailReason);
 
-        HyperLink(StrSubstNo('%1%2', TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID"));
+        HyperLink(StrSubstNo(TicketOrderLbl, TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID"));
     end;
 
     procedure ViewOnlineSingleTicket(TicketNo: Code[20])
@@ -158,6 +160,8 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         FailReason: Text;
+        HpyperLinkLbl: Label '%1%2', Locked = true;
+        HpyperLink2Lbl: Label '%1%2-%3', Locked = true;
     begin
 
         Ticket.Get(TicketNo);
@@ -168,13 +172,13 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         if (not GenerateTicketPrint(Ticket."Ticket Reservation Entry No.", true, FailReason)) then
             Error(FailReason);
 
-        HyperLink(StrSubstNo('%1%2', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
+        HyperLink(StrSubstNo(HpyperLinkLbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
         TicketReservationRequest.GET(Ticket."Ticket Reservation Entry No.");
         case TicketReservationRequest."Entry Type" of
             TicketReservationRequest."Entry Type"::PRIMARY:
-                HYPERLINK(STRSUBSTNO('%1%2', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
+                HYPERLINK(STRSUBSTNO(HpyperLinkLbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
             TicketReservationRequest."Entry Type"::CHANGE:
-                HYPERLINK(STRSUBSTNO('%1%2-%3', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.", Ticket."Ticket Reservation Entry No."));
+                HYPERLINK(STRSUBSTNO(HpyperLink2Lbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.", Ticket."Ticket Reservation Entry No."));
         end;
     end;
 
@@ -222,6 +226,8 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         UnexpectedResponseCodeErr: Label 'Ticket service did not return with a HTTP 200 return code (return code was: %1)';
         InvalidXmlErr: Label 'Ticket server did not respond with a valid XML document: (response was %1)';
         XmlErrorTxt: Label '<response><error><code>%1</code><message>%2 - %3</message></error></response>', Locked = true;
+        AuthLbl: Label '%1:%2', Locked = true;
+        BasicLbl: Label 'Basic %1', Locked = true;
     begin
 
         if (not TicketSetup.Get()) then
@@ -230,7 +236,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         Url := TicketSetup."Print Server Generator URL";
         UserName := TicketSetup."Print Server Gen. Username";
         Password := TicketSetup."Print Server Gen. Password";
-        B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', UserName, Password));
+        B64Credential := Base64Convert.ToBase64(StrSubstNo(AuthLbl, UserName, Password));
 
         XmlIn.WriteTo(RequestText);
         Content.WriteFrom(RequestText);
@@ -246,7 +252,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         Request.GetHeaders(RequestHeaders);
         RequestHeaders.Clear();
         RequestHeaders.Add(UserAgentTok, UserAgentTxt);
-        RequestHeaders.Add(AuthorizationTok, StrSubstNo('Basic %1', B64Credential));
+        RequestHeaders.Add(AuthorizationTok, StrSubstNo(BasicLbl, B64Credential));
 
         Client.Timeout := 10000;
         if (TicketSetup."Timeout (ms)" > 0) then

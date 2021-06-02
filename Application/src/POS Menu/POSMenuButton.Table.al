@@ -240,7 +240,7 @@ table 6150701 "NPR POS Menu Button"
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-    ObsoleteReason = 'Not used';
+            ObsoleteReason = 'Not used';
         }
         field(45; "Available in App"; Boolean)
         {
@@ -248,7 +248,7 @@ table 6150701 "NPR POS Menu Button"
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-    ObsoleteReason = 'Not used';
+            ObsoleteReason = 'Not used';
         }
     }
 
@@ -1032,13 +1032,14 @@ table 6150701 "NPR POS Menu Button"
     procedure CalculatePath()
     var
         MenuButton: Record "NPR POS Menu Button";
+        PathLbl: Label '%1.%2', Locked = true;
     begin
         MenuButton := Rec;
         Path := Format(MenuButton.ID);
         while MenuButton.Get("Menu Code", MenuButton."Parent ID") do begin
-            Path := StrSubstNo('%1.%2', MenuButton.ID, Path);
+            Path := StrSubstNo(PathLbl, MenuButton.ID, Path);
         end;
-        Path := StrSubstNo('%1.%2', "Menu Code", Path);
+        Path := StrSubstNo(PathLbl, "Menu Code", Path);
     end;
 
     local procedure CalculateLevel()

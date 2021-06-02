@@ -478,8 +478,8 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         Handled: Boolean;
         Skip: Boolean;
         DecimalBuffer: Decimal;
+        TmplLineLbl: Label '%1%2', Locked = true;
     begin
-        //-NPR5.55 [391841]
         if TemplateLine."Template Column No." < 1 then begin
             TemplateLine."Template Column No." := 1;
         end;
@@ -493,7 +493,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                 end;
             end;
         end;
-        //+NPR5.55 [391841]
 
         case TemplateLine.Type of
             TemplateLine.Type::Data:
@@ -577,10 +576,8 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                     Buffer.DeleteAll();
                     Buffer.SetRange("Line No.");
                 end;
-                //-NPR5.55 [391841]
                 SkipColumnsAboveNo := TemplateLine."Template Column No.";
                 SkipRemainingColumns := true;
-                //+NPR5.55 [391841]
             end;
             if (StrLen(LineBuffer) = 0) then begin
                 Clear(LineBuffer);
@@ -589,10 +586,10 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         end;
 
         if TemplateLine.Prefix <> '' then
-            TemplateLine."Processing Value" := StrSubstNo('%1%2', TemplateLine.Prefix, TemplateLine."Processing Value");
+            TemplateLine."Processing Value" := StrSubstNo(TmplLineLbl, TemplateLine.Prefix, TemplateLine."Processing Value");
 
         if TemplateLine.Postfix <> '' then
-            TemplateLine."Processing Value" := StrSubstNo('%1%2', TemplateLine."Processing Value", TemplateLine.Postfix);
+            TemplateLine."Processing Value" := StrSubstNo(TmplLineLbl, TemplateLine."Processing Value", TemplateLine.Postfix);
 
         if TemplateLine."Type Option" <> '' then
             Font := TemplateLine."Type Option";

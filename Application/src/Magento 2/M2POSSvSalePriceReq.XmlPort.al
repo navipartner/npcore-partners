@@ -162,6 +162,7 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
     var
         TicketNumber: Code[20];
         StartTime: Time;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure GetRequest(var TmpSalesHeader: Record "NPR POS Sale" temporary; var TmpSalesLine: Record "NPR POS Sale Line" temporary)
     begin
@@ -186,7 +187,7 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
     procedure SetResponse(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
     begin
 
-        ExecutionTime := StrSubstNo('%1 (ms)', Format((Time - StartTime), 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format((Time - StartTime), 0, 9));
 
         TmpSalesHeaderResponse.TransferFields(TmpSalePOS, true);
         TmpSalesHeaderResponse.Insert();

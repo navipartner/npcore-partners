@@ -34,9 +34,11 @@
     end;
 
     procedure Emphasize(TextToEmphasize: Text): Text
+    var
+        EmphasizeLbl: Label '<emphasize>%1</emphasize>', locked = true;
     begin
         if TextToEmphasize <> '' then
-            exit(StrSubstNo('<emphasize>%1</emphasize>', TextToEmphasize));
+            exit(StrSubstNo(EmphasizeLbl, TextToEmphasize));
     end;
 
     procedure GetHeadlineText(Qualifier: Text; Payload: Text; var ResultText: Text[250]): Boolean
@@ -67,15 +69,19 @@
     end;
 
     local procedure GetPayloadText(PayloadText: Text): Text
+    var
+        PayloadLbl: Label '<payload>%1</payload>', locked = true;
     begin
         if PayloadText <> '' then
-            exit(StrSubstNo('<payload>%1</payload>', PayloadText));
+            exit(StrSubstNo(PayloadLbl, PayloadText));
     end;
 
     local procedure GetQualifierText(QualifierText: Text): Text
+    var
+        QualifierLbl: Label '<qualifier>%1</qualifier>', locked = true;
     begin
         if QualifierText <> '' then
-            exit(StrSubstNo('<qualifier>%1</qualifier>', QualifierText));
+            exit(StrSubstNo(QualifierLbl, QualifierText));
     end;
 
     procedure GetUserGreetingText(var GreetingText: Text[250])

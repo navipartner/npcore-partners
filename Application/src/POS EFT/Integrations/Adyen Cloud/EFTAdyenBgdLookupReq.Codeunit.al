@@ -29,10 +29,11 @@ codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
     var
         EFTAdyenBackgndLookupReq: Codeunit "NPR EFT Adyen Bgd. Lookup Req.";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
+        BackgroundLookupLbl: Label 'Background lookup CODEUNIT.RUN error: %1';
     begin
         EFTAdyenBackgndLookupReq.SetExecutionMode(CodeunitExecutionMode::START_TRX);
         if not EFTAdyenBackgndLookupReq.Run(EFTTransactionAsyncRequest) then begin
-            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", StrSubstNo('Background lookup CODEUNIT.RUN error: %1', GetLastErrorText), '');
+            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", StrSubstNo(BackgroundLookupLbl, GetLastErrorText), '');
         end;
     end;
 

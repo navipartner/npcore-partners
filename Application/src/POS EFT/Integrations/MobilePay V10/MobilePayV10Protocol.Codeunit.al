@@ -455,9 +455,10 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     internal procedure GetQRBeaconId(eftTrxRequest: Record "NPR EFT Transaction Request"): Text
     var
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
+        MobilePayPosLbl: Label 'mobilepaypos://pos?id=%1&source=qr', Locked = true;
     begin
         mobilePayUnitSetup.Get(eftTrxRequest."Register No.");
-        exit(StrSubstNo('mobilepaypos://pos?id=%1&source=qr', mobilePayUnitSetup."Beacon ID").ToLower());
+        exit(StrSubstNo(MobilePayPosLbl, mobilePayUnitSetup."Beacon ID").ToLower());
     end;
 
     internal procedure GetClientVersion(): Text
@@ -695,6 +696,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         errorCode: Text;
         jsonToken: JsonToken;
         pollValue: JsonToken;
+        errorCodeLbl: Label '(%1) %2', Locked = true;
     begin
         if not respMessage.IsSuccessStatusCode() then begin
 
@@ -711,7 +713,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     if jsonResponse.SelectToken('code', jsonToken) then begin
                         errorCode := jsonToken.AsValue().AsText();
                         if jsonResponse.SelectToken('message', jsonToken) then begin
-                            error(StrSubstNo('(%1) %2', errorCode, jsonToken.AsValue().AsText()));
+                            error(StrSubstNo(errorCodeLbl, errorCode, jsonToken.AsValue().AsText()));
                         end;
 
                         error(errorCode);
@@ -747,6 +749,8 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         tempMobilePayV10Refund: Record "NPR MobilePayV10 Refund" temporary;
         success: Boolean;
         paymentEftTrxRequest: Record "NPR EFT Transaction Request";
+        FindPymReqLbl: Label 'orderId=%1&posId=%2', Locked = true;
+        PymIdLbl: Label 'paymentId=%1', Locked = true;
     begin
         originalEftTrxRequest.Get(EftTrxRequest."Processed Entry No.");
 
@@ -757,7 +761,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     tempMobilePayV10Payment.DeleteAll();
                     mobilePayFindPaymentReq.SetPaymentDetailBuffer(tempMobilePayV10Payment);
 
-                    mobilePayFindPaymentReq.SetFilter(StrSubstNo('orderId=%1&posId=%2',
+                    mobilePayFindPaymentReq.SetFilter(StrSubstNo(FindPymReqLbl,
                         format(originalEftTrxRequest."Entry No."),
                         format(originalEftTrxRequest."Hardware ID")));
                     success := mobilePayFindPaymentReq.Run(EftTrxRequest);
@@ -767,7 +771,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
                     if (success) then begin
                         GetPaymentDetails(tempMobilePayV10Payment, EftSetup);
-                        //SelectLatestVersion();
 
                         tempMobilePayV10Payment.Reset();
                         //if tempMobilePayV10Payment.FindFirst() then;    // temp only to see if the values have been updated
@@ -803,7 +806,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     tempMobilePayV10Refund.DeleteAll();
                     mobilePayFindRefundReq.SetRefundDetailBuffer(tempMobilePayV10Refund);
 
-                    mobilePayFindRefundReq.SetFilter(StrSubstNo('paymentId=%1',
+                    mobilePayFindRefundReq.SetFilter(StrSubstNo(PymIdLbl,
                         paymentEftTrxRequest."Reference Number Output"));
                     success := mobilePayFindRefundReq.Run(EftTrxRequest);
                     WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get trx ID', mobilePayFindRefundReq.GetRequestResponse());

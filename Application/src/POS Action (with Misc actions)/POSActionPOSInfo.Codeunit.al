@@ -45,8 +45,9 @@ codeunit 6150829 "NPR POS Action: POS Info"
     var
         MustBeSpecifiedLbl: Label 'You cannot leave this field blank.';
         ConfirmRetryQst: Label 'Do you want to try again?';
+        ConfirmRetryLbl: Label '%1 %2', Locked = true;
     begin
-        Captions.AddActionCaption(ActionCode(), 'ConfirmRetry', StrSubstNo('%1 %2', MustBeSpecifiedLbl, ConfirmRetryQst));
+        Captions.AddActionCaption(ActionCode(), 'ConfirmRetry', StrSubstNo(ConfirmRetryLbl, MustBeSpecifiedLbl, ConfirmRetryQst));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
@@ -112,12 +113,12 @@ codeunit 6150829 "NPR POS Action: POS Info"
         POSSale.GetCurrentSale(SalePOS);
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type() = CurrentView.Type()::Sale) then begin
+        if (CurrentView.Type() = CurrentView.Type() ::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         end;
 
-        if (CurrentView.Type() = CurrentView.Type()::Payment) then begin
+        if (CurrentView.Type() = CurrentView.Type() ::Payment) then begin
             POSSession.GetPaymentLine(POSPaymentLine);
             POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
         end;

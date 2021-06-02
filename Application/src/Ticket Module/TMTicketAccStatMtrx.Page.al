@@ -748,6 +748,8 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
     local procedure SetAutoFilterOnBlockedFacts()
     var
         TicketAccessFact: Record "NPR TM Ticket Access Fact";
+        BlockedTicketTypeFactFilterLbl: Label '<>%1', Locked = true;
+        BlockedTicketTypeFactFilter2Lbl: Label '%1&<>%2', Locked = true;
     begin
 
         TicketAccessFact.SetFilter(Block, '=%1', true);
@@ -757,47 +759,48 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 
                     TicketAccessFact."Fact Name"::TICKET_TYPE:
                         if (BlockedTicketTypeFactFilter = '') then
-                            BlockedTicketTypeFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                            BlockedTicketTypeFactFilter := StrSubstNo(BlockedTicketTypeFactFilterLbl, TicketAccessFact."Fact Code")
                         else
-                            BlockedTicketTypeFactFilter := StrSubstNo('%1&<>%2', BlockedTicketTypeFactFilter, TicketAccessFact."Fact Code");
+                            BlockedTicketTypeFactFilter := StrSubstNo(BlockedTicketTypeFactFilter2Lbl, BlockedTicketTypeFactFilter, TicketAccessFact."Fact Code");
 
                     TicketAccessFact."Fact Name"::ADMISSION_CODE:
                         if (BlockedAdmissionFactFilter = '') then
-                            BlockedAdmissionFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                            BlockedAdmissionFactFilter := StrSubstNo(BlockedTicketTypeFactFilterLbl, TicketAccessFact."Fact Code")
                         else
-                            BlockedAdmissionFactFilter := StrSubstNo('%1&<>%2', BlockedAdmissionFactFilter, TicketAccessFact."Fact Code");
+                            BlockedAdmissionFactFilter := StrSubstNo(BlockedTicketTypeFactFilter2Lbl, BlockedAdmissionFactFilter, TicketAccessFact."Fact Code");
 
                     TicketAccessFact."Fact Name"::ITEM:
                         if (BlockedItemFactFilter = '') then
-                            BlockedItemFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                            BlockedItemFactFilter := StrSubstNo(BlockedTicketTypeFactFilterLbl, TicketAccessFact."Fact Code")
                         else
-                            BlockedItemFactFilter := StrSubstNo('%1&<>%2', BlockedItemFactFilter, TicketAccessFact."Fact Code");
+                            BlockedItemFactFilter := StrSubstNo(BlockedTicketTypeFactFilter2Lbl, BlockedItemFactFilter, TicketAccessFact."Fact Code");
 
                     TicketAccessFact."Fact Name"::ADMISSION_HOUR:
                         if (BlockedHourFactFilter = '') then
-                            BlockedHourFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                            BlockedHourFactFilter := StrSubstNo(BlockedTicketTypeFactFilterLbl, TicketAccessFact."Fact Code")
                         else
-                            BlockedHourFactFilter := StrSubstNo('%1&<>%2', BlockedHourFactFilter, TicketAccessFact."Fact Code");
+                            BlockedHourFactFilter := StrSubstNo(BlockedTicketTypeFactFilter2Lbl, BlockedHourFactFilter, TicketAccessFact."Fact Code");
 
                     TicketAccessFact."Fact Name"::VARIANT_CODE:
                         if (BlockedVariantFactFilter = '') then
-                            BlockedVariantFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                            BlockedVariantFactFilter := StrSubstNo(BlockedTicketTypeFactFilterLbl, TicketAccessFact."Fact Code")
                         else
-                            BlockedVariantFactFilter := StrSubstNo('%1&<>%2', BlockedVariantFactFilter, TicketAccessFact."Fact Code");
+                            BlockedVariantFactFilter := StrSubstNo(BlockedTicketTypeFactFilter2Lbl, BlockedVariantFactFilter, TicketAccessFact."Fact Code");
                 end;
             until (TicketAccessFact.Next() = 0);
         end;
     end;
 
     local procedure FilterAndFilter(pFilter1: Text; pFilter2: Text) newFilter: Text
+    var
+        FilterLbl: Label '%1&%2', Locked = true;
     begin
-
         newFilter := pFilter1;
         if (newFilter = '') then
             newFilter := pFilter2
         else
             if (pFilter2 <> '') then
-                newFilter := StrSubstNo('%1&%2', pFilter1, pFilter2);
+                newFilter := StrSubstNo(FilterLbl, pFilter1, pFilter2);
 
         exit(newFilter);
     end;

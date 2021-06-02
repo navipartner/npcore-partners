@@ -77,8 +77,10 @@ xmlport 6060116 "NPR TM Ticket Cancel"
     end;
 
     procedure GetSummary(): Text[30]
+    var
+        SummaryLbl: Label '%1-%2', Locked = true;
     begin
-        exit(StrSubstNo('%1-%2', ExternalIdCount, QtySum));
+        exit(StrSubstNo(SummaryLbl, ExternalIdCount, QtySum));
     end;
 
     procedure SetReservationResult(DocumentID: Text[100]; Success: Boolean)

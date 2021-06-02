@@ -385,8 +385,9 @@
     procedure ShowGeolocation(NpCsStore: Record "NPR NpCs Store")
     var
         Url: Text;
+        UriLbl: Label 'http://maps.google.com/maps?q=%1,%2', Locked = true;
     begin
-        Url := StrSubstNo('http://maps.google.com/maps?q=%1,%2', NpCsStore."Geolocation Latitude", NpCsStore."Geolocation Longitude");
+        Url := StrSubstNo(UriLbl, NpCsStore."Geolocation Latitude", NpCsStore."Geolocation Longitude");
         HyperLink(Url);
     end;
 

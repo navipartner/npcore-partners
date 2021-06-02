@@ -186,6 +186,7 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
 
     var
         StartTime: Time;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure GenerateResponse()
     var
@@ -193,6 +194,7 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         Customer: Record Customer;
         BudgetFromDate: Date;
         BudgetUntilDate: Date;
+        SalesbudgetLbl: Label 'Salesbudget with name %1 not found.', Locked = true;
     begin
         if (not TmpItemBudgetEntryRequest.FindFirst()) then begin
             SetError(100, 'Missing request.');
@@ -200,7 +202,7 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         end;
 
         if (not ItemBudgetName.Get(ItemBudgetName."Analysis Area"::Sales, TmpItemBudgetEntryRequest."Budget Name")) then begin
-            SetError(101, StrSubstNo('Salesbudget with name %1 not found.', TmpItemBudgetEntryRequest."Budget Name"));
+            SetError(101, StrSubstNo(SalesbudgetLbl, TmpItemBudgetEntryRequest."Budget Name"));
             exit;
         end;
 
@@ -214,12 +216,12 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
             UntilDate := '2099-12-31';
 
         if (not Evaluate(BudgetFromDate, FromDate, 9)) then begin
-            SetError(102, StrSubstNo('FromDate does not evaluate to date of format YYYY-MM-DD.'));
+            SetError(102, 'FromDate does not evaluate to date of format YYYY-MM-DD.');
             exit;
         end;
 
         if (not Evaluate(BudgetUntilDate, UntilDate, 9)) then begin
-            SetError(103, StrSubstNo('UntilDate does not evaluate to date of format YYYY-MM-DD.'));
+            SetError(103, 'UntilDate does not evaluate to date of format YYYY-MM-DD.');
             exit;
         end;
 
@@ -240,7 +242,7 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
             end;
         end;
 
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'OK';
         ResponseMessage := 'Success';
         ResponseMessageId := Format(10);
@@ -296,6 +298,6 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         ResponseMessage := ErrorText;
         ResponseCode := 'ERROR';
         ResponseMessageId := Format(ErrorId);
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 }

@@ -100,6 +100,7 @@
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
+        NoSeriesDescriptionLbl: Label 'NPR Ticket Wizard (%1)';
     begin
 
         if (NoSeries.Get(NoSerieCode)) then
@@ -108,7 +109,7 @@
         NoSeries.Code := NoSerieCode;
         NoSeries.Insert();
 
-        NoSeries.Description := StrSubstNo('NPR Ticket Wizard (%1)', TypeDescription);
+        NoSeries.Description := StrSubstNo(NoSeriesDescriptionLbl, TypeDescription);
         NoSeries."Default Nos." := true;
         NoSeries.Modify();
 
@@ -199,6 +200,7 @@
         TicketSetup: Record "NPR TM Ticket Setup";
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
         ScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        AdmissionScheduleDescriptionLbl: Label '%1 [%2 - %3]', Locked = true;
     begin
 
         if (TmpSchedules.IsEmpty()) then
@@ -210,7 +212,7 @@
 
             AdmissionSchedule.Init();
             AdmissionSchedule.TransferFields(TmpSchedules, false);
-            AdmissionSchedule.Description := StrSubstNo('%1 [%2 - %3]', AdmissionCode, TmpSchedules."Start Time", TmpSchedules."Stop Time");
+            AdmissionSchedule.Description := StrSubstNo(AdmissionScheduleDescriptionLbl, AdmissionCode, TmpSchedules."Start Time", TmpSchedules."Stop Time");
             AdmissionSchedule."Schedule Type" := AdmissionSchedule."Schedule Type"::"EVENT";
             AdmissionSchedule."Admission Is" := AdmissionSchedule."Admission Is"::OPEN;
 

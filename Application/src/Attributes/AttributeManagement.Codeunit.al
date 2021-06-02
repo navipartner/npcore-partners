@@ -27,15 +27,16 @@
         AttributeID: Record "NPR Attribute ID";
         Attribute: Record "NPR Attribute";
         AttributeTranslation: Record "NPR Attribute Translation";
+        IllegalCaptionRefLbl: Label 'Illegal Caption Ref! [%1]', locked = true;
     begin
         if (not (Evaluate(AttributeTableID, SelectStr(1, CaptionRef)))) then
-            exit(StrSubstNo('Illegal Caption Ref! [%1]', CaptionRef));
+            exit(StrSubstNo(IllegalCaptionRefLbl, CaptionRef));
 
         if (not (Evaluate(AttributeReference, SelectStr(2, CaptionRef)))) then
-            exit(StrSubstNo('Illegal Caption Ref! [%1]', CaptionRef));
+            exit(StrSubstNo(IllegalCaptionRefLbl, CaptionRef));
 
         if (not (Evaluate(AttributeFieldReference, SelectStr(3, CaptionRef)))) then
-            exit(StrSubstNo('Illegal Caption Ref! [%1]', CaptionRef));
+            exit(StrSubstNo(IllegalCaptionRefLbl, CaptionRef));
 
         if (not GetAttributeShortcut(AttributeTableID, AttributeReference, AttributeID)) then
             exit(CopyStr(StrSubstNo(Text001, AttributeReference), 1, MaxStrLen(Caption)));
@@ -1121,6 +1122,7 @@
     var
         AttributeCodeValue: Record "NPR Attribute Lookup Value";
         myInt: BigInteger;
+        Pct1Lbl: Label '[%1] - %2', locked = true;
     begin
 
         case (Attribute."Value Datatype") of
@@ -1130,7 +1132,7 @@
                 begin
                     if (Attribute."On Format" = Attribute."On Format"::CUSTOM) then begin
                         if (AttributeCodeValue.Get(Attribute.Code, CopyStr(AttributeValueSet."Text Value", 1, 20))) then
-                            exit(StrSubstNo('[%1] - %2', AttributeCodeValue."Attribute Value Code", AttributeCodeValue."Attribute Value Name"));
+                            exit(StrSubstNo(Pct1Lbl, AttributeCodeValue."Attribute Value Code", AttributeCodeValue."Attribute Value Name"));
                     end;
                     exit(UpperCase(AttributeValueSet."Text Value"));
                 end;

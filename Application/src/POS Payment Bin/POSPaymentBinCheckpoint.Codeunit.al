@@ -28,6 +28,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         POSBinMovement: Boolean;
         LastCheckpointEntryNo: Integer;
+        PaymentBinCheckpointDescriptionLbl: Label '[%1] %2', Locked = true;
     begin
 
         POSUnit.Get(UnitNo);
@@ -71,7 +72,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         PaymentBinCheckpoint."Checkpoint Time" := Time;
         PaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
         PaymentBinCheckpoint.Comment := BinEntry.Comment;
-        PaymentBinCheckpoint.Description := CopyStr(StrSubstNo('[%1] %2', BinNo, POSPaymentMethod.Code), 1, MaxStrLen(PaymentBinCheckpoint.Description));
+        PaymentBinCheckpoint.Description := CopyStr(StrSubstNo(PaymentBinCheckpointDescriptionLbl, BinNo, POSPaymentMethod.Code), 1, MaxStrLen(PaymentBinCheckpoint.Description));
         PaymentBinCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
         PaymentBinCheckpoint.Insert();
 

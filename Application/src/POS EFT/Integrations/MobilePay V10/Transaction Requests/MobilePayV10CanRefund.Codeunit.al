@@ -21,8 +21,10 @@ codeunit 6014507 "NPR MobilePayV10 Can. Refund"
     end;
 
     internal procedure GetRequestResponse(): text
+    var
+        ReqRespLbl: Label '==Request==\%1\\==Response==\(%2)\%3', Locked = true;
     begin
-        exit(StrSubstNo('==Request==\%1\\==Response==\(%2)\%3', _request, _responseHttpCode, _response));
+        exit(StrSubstNo(ReqRespLbl, _request, _responseHttpCode, _response));
     end;
 
     local procedure SendRequest(var eftTrxRequest: Record "NPR EFT Transaction Request")

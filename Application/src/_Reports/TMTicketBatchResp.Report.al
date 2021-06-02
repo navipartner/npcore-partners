@@ -60,7 +60,7 @@ report 6060124 "NPR TM Ticket Batch Resp."
                 trigger OnAfterGetRecord()
                 begin
                     if (ReservationRequest."DIY Print Order Requested") then
-                        TicketURL := StrSubstNo('%1%2', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.");
+                        TicketURL := StrSubstNo(Pct1Lbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.");
                 end;
             }
         }
@@ -85,5 +85,6 @@ report 6060124 "NPR TM Ticket Batch Resp."
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketURL: Text;
+        Pct1Lbl: Label '%1%2', locked = true;
 }
 

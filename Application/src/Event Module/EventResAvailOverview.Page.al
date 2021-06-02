@@ -309,6 +309,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
         UpperBound: Integer;
         RemDays: Integer;
         Date: Record Date;
+        NoOfDaysLbl: Label '%1D', Locked = true;
     begin
         Clear(DateArray);
         Clear(DateColumnCaption);
@@ -321,7 +322,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
             if i = 1 then
                 DateArray[i] := FromDate
             else
-                DateArray[i] := CalcDate(StrSubstNo('%1D', i - 1), FromDate);
+                DateArray[i] := CalcDate(StrSubstNo(NoOfDaysLbl, i - 1), FromDate);
             Date.SetRange("Period Type", Date."Period Type"::Date);
             Date.SetRange("Period Start", DateArray[i]);
             Date.FindFirst();
@@ -445,13 +446,14 @@ page 6059833 "NPR Event Res. Avail. Overview"
     local procedure FindDateSet(Direction: Option Next,Previous)
     var
         FirstDate: Date;
+        NoOfDaysLbl: Label '-%1D', Locked = true;
     begin
         case Direction of
             Direction::Next:
                 FirstDate := CalcDate('1D', DateArray[ArrayLen(DateArray)]);
             Direction::Previous:
                 begin
-                    FirstDate := CalcDate(StrSubstNo('-%1D', ArrayLen(DateArray)), DateArray[1]);
+                    FirstDate := CalcDate(StrSubstNo(NoOfDaysLbl, ArrayLen(DateArray)), DateArray[1]);
                     if FirstDate < StartingDate then
                         FirstDate := StartingDate;
                 end;

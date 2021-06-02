@@ -155,6 +155,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         MembershipEntryNo: Integer;
         MemberEntryNo: Integer;
         ReusedToken: Text;
+        PlaceHolderLbl: Label '%1 [%2;%3]', Locked = true;
     begin
 
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
@@ -223,7 +224,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             end else begin
                 Error(MEMBERGUEST_TICKET, MembershipAdmissionSetup.TableCaption,
                   MembershipAdmissionSetup."Membership  Code", TmpTicketReservationRequest."Admission Code",
-                  StrSubstNo('%1 [%2;%3]', TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code"),
+                  StrSubstNo(PlaceHolderLbl, TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code"),
 
                   TicketAdmissionBOM.TableCaption);
             end;

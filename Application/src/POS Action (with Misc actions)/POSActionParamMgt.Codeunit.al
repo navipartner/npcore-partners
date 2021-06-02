@@ -181,6 +181,7 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
         ParamValue: Record "NPR POS Parameter Value";
         JObject: JsonObject;
         JObjectTextValue: Text;
+        JParamLbl: Label '{"parameters" : %1}', Locked = true;
     begin
         JObject.ReadFrom('{}');
 
@@ -191,6 +192,6 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
             until (ParamValue.Next() = 0);
 
         JObject.WriteTo(JObjectTextValue);
-        exit(StrSubstNo('{"parameters" : %1}', JObjectTextValue));
+        exit(StrSubstNo(JParamLbl, JObjectTextValue));
     end;
 }

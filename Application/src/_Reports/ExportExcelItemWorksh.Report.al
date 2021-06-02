@@ -197,12 +197,12 @@
 
                 ExcelBuf.CreateBook('', TextItemWorksheetLbl);
                 ExcelBuf.WriteSheet(
-                  PadStr(StrSubstNo('%1 %2', "Item Worksheet Line"."Worksheet Name", ItemWorksheet.Description), 30),
+                  PadStr(StrSubstNo(Pct1Lbl, "Item Worksheet Line"."Worksheet Name", ItemWorksheet.Description), 30),
                   CompanyName,
                   UserId);
 
                 ExcelBuf.CloseBook();
-                ExcelBuf.SetFriendlyFilename(StrSubstNo('%1-%2', "Item Worksheet Line"."Worksheet Name", ItemWorksheet.Description));
+                ExcelBuf.SetFriendlyFilename(StrSubstNo(Pct2Lbl, "Item Worksheet Line"."Worksheet Name", ItemWorksheet.Description));
                 ExcelBuf.OpenExcel();
             end;
 
@@ -324,6 +324,8 @@
         AttributeLbl: Label 'Attribute %1.', Comment = '%1 = Attribute';
         TextItemWorksheetLbl: Label 'Worksheet';
         ExportErr: Label 'You can only export one item worksheet at a time.';
+        Pct1Lbl: Label '%1 %2', locked = true;
+        Pct2Lbl: Label '%1-%2', locked = true;
         NPRAttrTextArray: array[40] of Text;
 
     local procedure EnterCell(RowNo: Integer; ColumnNo: Integer; CellValue: Text[250]; Bold: Boolean; UnderLine: Boolean; NumberFormat: Text[30]; CellType: Option)

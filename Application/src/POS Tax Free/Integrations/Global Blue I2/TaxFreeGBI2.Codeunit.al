@@ -342,10 +342,11 @@
     var
         VoucherService: Record "NPR Tax Free GB I2 Service";
         XMLDoc: XmlDocument;
+        NoOfDaysLbl: Label '<%1D>', Locked = true;
     begin
         if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
             if VoucherService."Void Limit In Days" <> 0 then
-                if CalcDate(StrSubstNo('<%1D>', VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
+                if CalcDate(StrSubstNo(NoOfDaysLbl, VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
                     Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
 
         if not Confirm(
@@ -412,10 +413,11 @@
     var
         VoucherService: Record "NPR Tax Free GB I2 Service";
         XMLDoc: XmlDocument;
+        NoOfDaysLbl: Label '<%1D>', Locked = true;
     begin
         if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
             if VoucherService."Void Limit In Days" <> 0 then
-                if CalcDate(StrSubstNo('<%1D>', VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
+                if CalcDate(StrSubstNo(NoOfDaysLbl, VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
                     Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
 
         if not Confirm(
@@ -1209,8 +1211,9 @@
     var
         Captured: Boolean;
         IDType: Integer;
+        CustomerIDLbl: Label '%1,%2,%3', Locked = true;
     begin
-        IDType := StrMenu(StrSubstNo('%1,%2,%3', Caption_MemberCard, Caption_MobileNo, Caption_Passport), 1, Caption_IdentifierType);
+        IDType := StrMenu(StrSubstNo(CustomerIDLbl, Caption_MemberCard, Caption_MobileNo, Caption_Passport), 1, Caption_IdentifierType);
 
         case IDType of
             0:
@@ -1653,6 +1656,8 @@
         Item: Record Item;
         PosSalesLine: Record "NPR POS Entry Sales Line";
         XML: Text;
+        XmlLbl: Label '<ReceiptDateTime>%1</ReceiptDateTime>', Locked = true;
+        Xml2Lbl: Label '<ReceiptNumber>%1</ReceiptNumber>', Locked = true;
     begin
         XML := '<PurchaseDetails>';
         tmpTaxFreeConsolidation.FindSet();
@@ -1666,8 +1671,8 @@
             POSSalesLine.CalcFields("Entry Date", "Ending Time");
 
             XML += '<Receipt>';
-            XML += StrSubstNo('<ReceiptDateTime>%1</ReceiptDateTime>', Format(CreateDateTime(PosSalesLine."Entry Date", PosSalesLine."Ending Time"), 0, 9));
-            XML += StrSubstNo('<ReceiptNumber>%1</ReceiptNumber>', Format(PosSalesLine."Document No.", 0, 9));
+            XML += StrSubstNo(XmlLbl, Format(CreateDateTime(PosSalesLine."Entry Date", PosSalesLine."Ending Time"), 0, 9));
+            XML += StrSubstNo(Xml2Lbl, Format(PosSalesLine."Document No.", 0, 9));
             XML += '<PurchaseItems>';
             repeat
                 Item.Get(PosSalesLine."No.");
@@ -1699,6 +1704,22 @@
     local procedure GetCustomerInfoXML(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary): Text
     var
         XML: Text;
+        XmlLbl: Label '<IdentifierLookupValue>%1</IdentifierLookupValue>', Locked = true;
+        Xml2Lbl: Label '<FirstName>%1</FirstName>', Locked = true;
+        Xml3Lbl: Label '<LastName>%1</LastName>', Locked = true;
+        Xml4Lbl: Label '<Email>%1</Email>', Locked = true;
+        Xml5Lbl: Label '<DateOfBirth>%1</DateOfBirth>', Locked = true;
+        Xml6Lbl: Label '<PassportNumber>%1</PassportNumber>', Locked = true;
+        Xml7Lbl: Label '<PassportCountryCode>%1</PassportCountryCode>', Locked = true;
+        Xml8Lbl: Label '<DepartureDate>%1</DepartureDate>', Locked = true;
+        Xml9Lbl: Label '<ArrivalDate>%1</ArrivalDate>', Locked = true;
+        Xml10Lbl: Label '<FinalDestinationCountryCode>%1</FinalDestinationCountryCode>', Locked = true;
+        Xml11Lbl: Label '<PostalCode>%1</PostalCode>', Locked = true;
+        Xml12Lbl: Label '<Street>%1</Street>', Locked = true;
+        Xml13Lbl: Label '<CountryCode>%1</CountryCode>', Locked = true;
+        Xml14Lbl: Label '<Town>%1</Town>', Locked = true;
+        Xml15Lbl: Label '<MobileNumber>%1</MobileNumber>', Locked = true;
+        Xml16Lbl: Label '<IdentifierLookupValue>%1</IdentifierLookupValue>', Locked = true;
     begin
         if (tmpCustomerInfoCapture."Global Blue Identifier" <> '') and (tmpCustomerInfoCapture."Is Identity Checked") then begin
             //Verified autofill - nothing else is required.
@@ -1706,40 +1727,40 @@
                      '<IsIdentityChecked>true</IsIdentityChecked>' +
                    '</Traveller>' +
                    '<TravellerIdentifier>' +
-                     StrSubstNo('<IdentifierLookupValue>%1</IdentifierLookupValue>', EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
+                     StrSubstNo(XmlLbl, EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
                    '</TravellerIdentifier>';
             exit(XML);
         end;
 
         XML += '<Traveller>';
         if tmpCustomerInfoCapture."First Name" <> '' then
-            XML += StrSubstNo('<FirstName>%1</FirstName>', EscapeSpecialChars(tmpCustomerInfoCapture."First Name"));
+            XML += StrSubstNo(Xml2Lbl, EscapeSpecialChars(tmpCustomerInfoCapture."First Name"));
         if tmpCustomerInfoCapture."Last Name" <> '' then
-            XML += StrSubstNo('<LastName>%1</LastName>', EscapeSpecialChars(tmpCustomerInfoCapture."Last Name"));
+            XML += StrSubstNo(Xml3Lbl, EscapeSpecialChars(tmpCustomerInfoCapture."Last Name"));
         if tmpCustomerInfoCapture."E-mail" <> '' then
-            XML += StrSubstNo('<Email>%1</Email>', EscapeSpecialChars(tmpCustomerInfoCapture."E-mail"));
+            XML += StrSubstNo(Xml4Lbl, EscapeSpecialChars(tmpCustomerInfoCapture."E-mail"));
         if tmpCustomerInfoCapture."Date Of Birth" <> 0D then
-            XML += StrSubstNo('<DateOfBirth>%1</DateOfBirth>', EscapeSpecialChars(Format(tmpCustomerInfoCapture."Date Of Birth", 0, 9)));
+            XML += StrSubstNo(Xml5Lbl, EscapeSpecialChars(Format(tmpCustomerInfoCapture."Date Of Birth", 0, 9)));
         if tmpCustomerInfoCapture."Global Blue Identifier" <> '' then //We have an identifier attached but manual entry was still used.
             XML += '<IsIdentityChecked>false</IsIdentityChecked>';
 
         if (tmpCustomerInfoCapture."Passport Number" <> '') or (tmpCustomerInfoCapture."Passport Country Code" <> 0) then begin
             XML += '<Passport>';
             if tmpCustomerInfoCapture."Passport Number" <> '' then
-                XML += StrSubstNo('<PassportNumber>%1</PassportNumber>', EscapeSpecialChars(tmpCustomerInfoCapture."Passport Number"));
+                XML += StrSubstNo(Xml6Lbl, EscapeSpecialChars(tmpCustomerInfoCapture."Passport Number"));
             if tmpCustomerInfoCapture."Passport Country Code" <> 0 then
-                XML += StrSubstNo('<PassportCountryCode>%1</PassportCountryCode>', Format(tmpCustomerInfoCapture."Passport Country Code"));
+                XML += StrSubstNo(Xml7Lbl, Format(tmpCustomerInfoCapture."Passport Country Code"));
             XML += '</Passport>';
         end;
 
         if (tmpCustomerInfoCapture."Departure Date" <> 0D) or (tmpCustomerInfoCapture."Arrival Date" <> 0D) or (tmpCustomerInfoCapture."Final Destination Country Code" <> 0) then begin
             XML += '<TravelDetails>';
             if tmpCustomerInfoCapture."Departure Date" <> 0D then
-                XML += StrSubstNo('<DepartureDate>%1</DepartureDate>', EscapeSpecialChars(Format(tmpCustomerInfoCapture."Departure Date", 0, 9)));
+                XML += StrSubstNo(Xml8Lbl, EscapeSpecialChars(Format(tmpCustomerInfoCapture."Departure Date", 0, 9)));
             if tmpCustomerInfoCapture."Arrival Date" <> 0D then
-                XML += StrSubstNo('<ArrivalDate>%1</ArrivalDate>', EscapeSpecialChars(Format(tmpCustomerInfoCapture."Arrival Date", 0, 9)));
+                XML += StrSubstNo(Xml9Lbl, EscapeSpecialChars(Format(tmpCustomerInfoCapture."Arrival Date", 0, 9)));
             if tmpCustomerInfoCapture."Final Destination Country Code" <> 0 then
-                XML += StrSubstNo('<FinalDestinationCountryCode>%1</FinalDestinationCountryCode>', Format(tmpCustomerInfoCapture."Final Destination Country Code"));
+                XML += StrSubstNo(Xml10Lbl, Format(tmpCustomerInfoCapture."Final Destination Country Code"));
             XML += '</TravelDetails>';
         end;
 
@@ -1750,26 +1771,26 @@
             then begin
             XML += '<Address>';
             if tmpCustomerInfoCapture."Postal Code" <> '' then
-                XML += StrSubstNo('<PostalCode>%1</PostalCode>', EscapeSpecialChars(tmpCustomerInfoCapture."Postal Code"));
+                XML += StrSubstNo(Xml11Lbl, EscapeSpecialChars(tmpCustomerInfoCapture."Postal Code"));
             if tmpCustomerInfoCapture.Street <> '' then
-                XML += StrSubstNo('<Street>%1</Street>', EscapeSpecialChars(tmpCustomerInfoCapture.Street));
+                XML += StrSubstNo(Xml12Lbl, EscapeSpecialChars(tmpCustomerInfoCapture.Street));
             if tmpCustomerInfoCapture."Country Of Residence Code" <> 0 then
-                XML += StrSubstNo('<CountryCode>%1</CountryCode>', Format(tmpCustomerInfoCapture."Country Of Residence Code"));
+                XML += StrSubstNo(Xml13Lbl, Format(tmpCustomerInfoCapture."Country Of Residence Code"));
             if tmpCustomerInfoCapture.Town <> '' then
-                XML += StrSubstNo('<Town>%1</Town>', EscapeSpecialChars(tmpCustomerInfoCapture.Town));
+                XML += StrSubstNo(Xml14Lbl, EscapeSpecialChars(tmpCustomerInfoCapture.Town));
             XML += '</Address>'
         end;
 
         if tmpCustomerInfoCapture."Mobile No." <> '' then //Docs doesn't specify if this should also be prefixed with 00 and country prefix.
             if tmpCustomerInfoCapture."Mobile No. Prefix" <> 0 then
-                XML += StrSubstNo('<MobileNumber>%1</MobileNumber>', EscapeSpecialChars('00' + Format(tmpCustomerInfoCapture."Mobile No. Prefix") + tmpCustomerInfoCapture."Mobile No."))
+                XML += StrSubstNo(Xml15Lbl, EscapeSpecialChars('00' + Format(tmpCustomerInfoCapture."Mobile No. Prefix") + tmpCustomerInfoCapture."Mobile No."))
             else
-                XML += StrSubstNo('<MobileNumber>%1</MobileNumber>', EscapeSpecialChars('00' + tmpCustomerInfoCapture."Mobile No."));
+                XML += StrSubstNo(Xml15Lbl, EscapeSpecialChars('00' + tmpCustomerInfoCapture."Mobile No."));
         XML += '</Traveller>';
 
         if (tmpCustomerInfoCapture."Global Blue Identifier" <> '') then
             XML += '<TravellerIdentifier>' +
-                     StrSubstNo('<IdentifierLookupValue>%1</IdentifierLookupValue>', EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
+                     StrSubstNo(Xml16Lbl, EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
                    '</TravellerIdentifier>';
 
         exit(XML);

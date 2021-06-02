@@ -46,6 +46,7 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
         ReceiptNo: Text;
         HTML: Text;
         JSON: Codeunit "NPR POS JSON Management";
+        HtmlLbl: Label '<center><table border="0" cellspacing="0"><tr><td align="left">Receipt No.</td><td align="right">%1</td></tr><tr><td align="left">Sales Amount</td><td align="right">%2</td></tr><tr><td align="left">Paid Amount</td><td align="right">%3</td></tr><tr><td>&nbsp;</td></tr><tr><td align="left"><h2>Amount to Return&nbsp;&nbsp;</h2></td><td align="right"><h2>%4</h2></td></tr></table>', Locked = true;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -58,14 +59,7 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
         ReturnAmount := Abs(ReturnAmount);
 
         HTML :=
-        StrSubstNo('<center>' +
-        '<table border="0" cellspacing="0">' +
-        '<tr><td align="left">Receipt No.</td><td align="right">%1</td></tr>' +
-        '<tr><td align="left">Sales Amount</td><td align="right">%2</td></tr>' +
-        '<tr><td align="left">Paid Amount</td><td align="right">%3</td></tr>' +
-        '<tr><td>&nbsp;</td></tr><tr><td align="left"><h2>Amount to Return&nbsp;&nbsp;</h2></td>' +
-        '<td align="right"><h2>%4</h2></td></tr>' +
-        '</table>',
+        StrSubstNo(HtmlLbl,
           ReceiptNo,
           Format(SalesAmount, 0, '<Precision,2:2><Standard Format,0>'),
           Format(PaidAmount, 0, '<Precision,2:2><Standard Format,0>'),

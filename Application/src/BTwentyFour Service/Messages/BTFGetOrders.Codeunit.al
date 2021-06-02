@@ -96,7 +96,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
         Headers.Add('User-Agent', 'Dynamics 365');
-        Headers.Add('Authorization', StrSubstNo('bearer %1', ServiceAPI.GetTokenFromResponse(ServiceEndPointForAuth, Response)));
+        Headers.Add('Authorization', StrSubstNo(ServiceAPI.GetBearerTokenLbl(), ServiceAPI.GetTokenFromResponse(ServiceEndPointForAuth, Response)));
         Headers.Add('Subscription-Key', ServiceSetup."Subscription-Key");
         Headers.Add('Username', ServiceSetup.Username);
 
@@ -380,6 +380,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
     begin
         exit('fced3743-2229-4bc6-9231-affd372ec9a0');
     end;
+
     procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
     begin
         exit("NPR Nc IL Update Handler"::B24GetOrder);

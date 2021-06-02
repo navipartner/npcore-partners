@@ -290,6 +290,8 @@ codeunit 6151131 "NPR TM Seating UI"
     var
         Admission: Record "NPR TM Admission";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        PlaceHolderLbl: Label '<text x="600" y="1060" class="btnText32" text-anchor="middle" alignment-baseline="middle">%1 - <%2> %3 - %4</text>', Locked = true;
+        PlaceHolder2Lbl: Label 'setSeatsToReserve (%1);', Locked = true;
     begin
 
         Admission.Get(AdmissionCode);
@@ -347,7 +349,7 @@ codeunit 6151131 "NPR TM Seating UI"
           '  <text x="930" y="1017" class="btnText24" text-anchor="middle" alignment-baseline="middle">Next</text>' +
           '</a>' +
 
-          StrSubstNo('<text x="600" y="1060" class="btnText32" text-anchor="middle" alignment-baseline="middle">%1 - <%2> %3 - %4</text>',
+          StrSubstNo(PlaceHolderLbl,
             Admission.Description,
             AdmissionScheduleEntry."Admission Start Date",
             AdmissionScheduleEntry."Admission Start Time",
@@ -523,7 +525,7 @@ codeunit 6151131 "NPR TM Seating UI"
             CreateInitialSeatReservationList(ExtAdmScheduleEntryNo) +
             GetSeatDisabledList(ExtAdmScheduleEntryNo) +
             GetSeatReservationEditList(EditReservation) +
-            StrSubstNo('setSeatsToReserve (%1);', TicketReservationRequest.Quantity) +
+            StrSubstNo(PlaceHolder2Lbl, TicketReservationRequest.Quantity) +
 
           ']]></script>' +
 
@@ -544,6 +546,9 @@ codeunit 6151131 "NPR TM Seating UI"
         SeatingSetup: Record "NPR TM Seating Setup";
         SvgCode: Code[10];
         OutStr: OutStream;
+        PlaceHolderLbl: Label '%1%2', Locked = true;
+        PlaceHolder2Lbl: Label 'AS-%1', Locked = true;
+        PlaceHolder3Lbl: Label 'Entry created at %1';
     begin
 
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmScheduleEntryNo);
@@ -557,9 +562,9 @@ codeunit 6151131 "NPR TM Seating UI"
             SeatingSetup."Template Cache"::ADMIN:
                 SvgCode := CopyStr(AdmissionScheduleEntry."Admission Code", 1, 10);
             SeatingSetup."Template Cache"::SCHEDULE:
-                SvgCode := StrSubstNo('%1%2', CopyStr(AdmissionScheduleEntry."Admission Code", 1, 10), CopyStr(AdmissionScheduleEntry."Schedule Code", 1, 5));
+                SvgCode := StrSubstNo(PlaceHolderLbl, CopyStr(AdmissionScheduleEntry."Admission Code", 1, 10), CopyStr(AdmissionScheduleEntry."Schedule Code", 1, 5));
             SeatingSetup."Template Cache"::ENTRY:
-                SvgCode := StrSubstNo('AS-%1', Format(ExtAdmScheduleEntryNo, 0, 9));
+                SvgCode := StrSubstNo(PlaceHolder2Lbl, Format(ExtAdmScheduleEntryNo, 0, 9));
         end;
 
         if (SvgCode <> '') then
@@ -573,7 +578,7 @@ codeunit 6151131 "NPR TM Seating UI"
             WebClientDependency.Type := WebClientDependency.Type::SVG;
 
             WebClientDependency.Code := SvgCode;
-            WebClientDependency.Description := StrSubstNo('Entry created at %1', CurrentDateTime());
+            WebClientDependency.Description := StrSubstNo(PlaceHolder3Lbl, CurrentDateTime());
             WebClientDependency.Insert();
 
             Clear(WebClientDependency.BLOB);
@@ -601,6 +606,9 @@ codeunit 6151131 "NPR TM Seating UI"
     var
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         CSV: Text;
+        PlaceHolderLbl: Label '%1', Locked = true;
+        PlaceHolder2Lbl: Label ',%1', Locked = true;
+        PlaceHolder3Lbl: Label 'reserveSeats ("%1");', Locked = true;
     begin
 
         // 'reservedSeats ("1,2,3,4")
@@ -611,22 +619,25 @@ codeunit 6151131 "NPR TM Seating UI"
         if (not SeatingReservationEntry.FindSet()) then
             exit('');
 
-        CSV := StrSubstNo('%1', SeatingReservationEntry.ElementId);
+        CSV := StrSubstNo(PlaceHolderLbl, SeatingReservationEntry.ElementId);
 
         if (SeatingReservationEntry.Next() <> 0) then
             repeat
-                CSV += StrSubstNo(',%1', SeatingReservationEntry.ElementId);
+                CSV += StrSubstNo(PlaceHolder2Lbl, SeatingReservationEntry.ElementId);
             until (SeatingReservationEntry.Next() = 0);
 
         ReservationUpdateEntryNo := SeatingReservationEntry."Entry No.";
 
-        exit(StrSubstNo('reserveSeats ("%1");', CSV));
+        exit(StrSubstNo(PlaceHolder3Lbl, CSV));
     end;
 
     local procedure GetSeatReservationEditList(EditMode: Boolean): Text
     var
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         CSV: Text;
+        PlaceHolderLbl: Label '%1', Locked = true;
+        PlaceHolder2Lbl: Label ',%1', Locked = true;
+        PlaceHolder3Lbl: Label 'editReservedSeats ("%1");', Locked = true;
     begin
 
         // 'editReservedSeats ("1,2,3,4")
@@ -637,14 +648,14 @@ codeunit 6151131 "NPR TM Seating UI"
         if (not SeatingReservationEntry.FindSet()) then
             exit('');
 
-        CSV := StrSubstNo('%1', SeatingReservationEntry.ElementId);
+        CSV := StrSubstNo(PlaceHolderLbl, SeatingReservationEntry.ElementId);
 
         if (SeatingReservationEntry.Next() <> 0) then
             repeat
-                CSV += StrSubstNo(',%1', SeatingReservationEntry.ElementId);
+                CSV += StrSubstNo(PlaceHolder2Lbl, SeatingReservationEntry.ElementId);
             until (SeatingReservationEntry.Next() = 0);
 
-        exit(StrSubstNo('editReservedSeats ("%1");', CSV));
+        exit(StrSubstNo(PlaceHolder3Lbl, CSV));
     end;
 
     local procedure GetSeatDisabledList(ExtAdmScheduleEntryNo: Integer): Text
@@ -652,6 +663,9 @@ codeunit 6151131 "NPR TM Seating UI"
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingTemplate: Record "NPR TM Seating Template";
         CSV: Text;
+        PlaceHolderLbl: Label '%1', Locked = true;
+        PlaceHolder2Lbl: Label ',%1', Locked = true;
+        PlaceHolder3Lbl: Label 'disableSeats ("%1");', Locked = true;
     begin
 
         // 'disabledSeats ("1,2,3,4")
@@ -666,14 +680,14 @@ codeunit 6151131 "NPR TM Seating UI"
         if (not SeatingTemplate.FindSet()) then
             exit('');
 
-        CSV := StrSubstNo('%1', SeatingTemplate.ElementId);
+        CSV := StrSubstNo(PlaceHolderLbl, SeatingTemplate.ElementId);
 
         if (SeatingTemplate.Next() <> 0) then
             repeat
-                CSV += StrSubstNo(',%1', SeatingTemplate.ElementId);
+                CSV += StrSubstNo(PlaceHolder2Lbl, SeatingTemplate.ElementId);
             until (SeatingTemplate.Next() = 0);
 
-        exit(StrSubstNo('disableSeats ("%1");', CSV));
+        exit(StrSubstNo(PlaceHolder3Lbl, CSV));
     end;
 
     local procedure SaveSeatReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; EventContents: Text)
@@ -803,6 +817,7 @@ codeunit 6151131 "NPR TM Seating UI"
         a: Integer;
         b: Integer;
         ViewPort: Decimal;
+        PlaceHolderLbl: Label '<svg viewbox="0 0 %1 %1" preserveaspectratio="none">', Locked = true;
     begin
 
         ViewPort := cols * 50;
@@ -812,7 +827,7 @@ codeunit 6151131 "NPR TM Seating UI"
 
         // small angle approximation of cos (x) is 1-x*x/2 (radians) in the range 0..1 (0..57 degrees)
 
-        SeatText := StrSubstNo('<svg viewbox="0 0 %1 %1" preserveaspectratio="none">', Format(ViewPort, 0, 9));
+        SeatText := StrSubstNo(PlaceHolderLbl, Format(ViewPort, 0, 9));
 
         for a := 0 to rows - 1 do begin
             for b := 0 to cols - 1 do begin
@@ -839,6 +854,10 @@ codeunit 6151131 "NPR TM Seating UI"
         CssClassName: Text;
         SeatSize: Integer;
         ScreenIllustrationHeight: Integer;
+        PlaceHolderLbl: Label '<svg x="%2" viewbox="0 0 %1 %1" preserveaspectratio="none">', Locked = true;
+        PlaceHolder2Lbl: Label '%1%3%2%3', Locked = true;
+        PlaceHolder3Lbl: Label '<polygon points="%1,%5 %2,%5 %3,%6 %4,%6" style="fill:%7;stroke:%7;stroke-width:1"/>', Locked = true;
+        PlaceHolder4Lbl: Label '<text x="%1" y="%2" class="btnText12" fill="white" text-anchor="middle" alignment-baseline="middle" >screen</text>', Locked = true;
     begin
 
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmScheduleEntryNo);
@@ -860,14 +879,14 @@ codeunit 6151131 "NPR TM Seating UI"
             ViewPort := (MaxRows + 1) * SeatSize;
         // end magic numbers
 
-        SeatText := StrSubstNo('<svg x="%2" viewbox="0 0 %1 %1" preserveaspectratio="none">', Format(ViewPort + 70, 0, 9), Round((800 / (MaxCols * SeatSize) * 35), 1));
+        SeatText := StrSubstNo(PlaceHolderLbl, Format(ViewPort + 70, 0, 9), Round((800 / (MaxCols * SeatSize) * 35), 1));
         Middle := Round(MaxCols * SeatSize / 2, 1);
         HalfScreenTop := Round(0.75 * Middle, 1);
         HalfScreenBottom := Round(HalfScreenTop * 0.25, 1);
         ScreenIllustrationHeight := Round(ViewPort * 0.05, 1);
 
-        SeatText += StrSubstNo('%1%3%2%3',
-          StrSubstNo('<polygon points="%1,%5 %2,%5 %3,%6 %4,%6" style="fill:%7;stroke:%7;stroke-width:1"/>',
+        SeatText += StrSubstNo(PlaceHolder2Lbl,
+          StrSubstNo(PlaceHolder3Lbl,
             Middle - HalfScreenTop + 5,
             Middle + HalfScreenTop + 5,
             Middle + HalfScreenTop - HalfScreenBottom + 5,
@@ -876,7 +895,7 @@ codeunit 6151131 "NPR TM Seating UI"
             10 + ScreenIllustrationHeight,
             '#000000'),
 
-          StrSubstNo('<text x="%1" y="%2" class="btnText12" fill="white" text-anchor="middle" alignment-baseline="middle" >screen</text>',
+          StrSubstNo(PlaceHolder4Lbl,
             Middle + 5,
             Round(10 + (ScreenIllustrationHeight / 2), 1)),
 
@@ -932,6 +951,13 @@ codeunit 6151131 "NPR TM Seating UI"
         v: Decimal;
         x: Decimal;
         y: Decimal;
+        PlaceHolderLbl: Label '<rect %1 %2 %3 %4 %5 %6 stroke="black"/>%7', Locked = true;
+        PlaceHolder2Lbl: Label 'class="%1"', Locked = true;
+        PlaceHolder3Lbl: Label 'id="%1"', Locked = true;
+        PlaceHolder4Lbl: Label 'x="%1" y="%2"', Locked = true;
+        PlaceHolder5Lbl: Label 'rx="%1" ry="%2"', Locked = true;
+        PlaceHolder6Lbl: Label 'width="%1" height="%2"', Locked = true;
+        PlaceHolder7Lbl: Label 'transform="rotate(%1 %2,%3)"', Locked = true;
     begin
 
         // small angle approximation of cos (x) is 1-x*x/2 (radians) in the range 0..1 (0..57 degrees)
@@ -942,13 +968,13 @@ codeunit 6151131 "NPR TM Seating UI"
         x := 5 + b * width + b * 10;
         y := 25 + a * height + a * 10 + arcfactor;
 
-        SeatText += StrSubstNo('<rect %1 %2 %3 %4 %5 %6 stroke="black"/>%7',
-          StrSubstNo('class="%1"', cssClassName),
-          StrSubstNo('id="%1"', Format(elementId, 0, 9)),
-          StrSubstNo('x="%1" y="%2"', Format(Round(x, 1), 0, 9), Format(Round(y, 1), 0, 9)),
-          StrSubstNo('rx="%1" ry="%2"', rx, ry),
-          StrSubstNo('width="%1" height="%2"', width, height),
-          StrSubstNo('transform="rotate(%1 %2,%3)"', Format(Round(v / 2 / 3.14 * 360, 1) * -1, 0, 9), Format(Round(x + width / 2, 1), 0, 9), Format(Round(y + height / 2, 1), 0, 9)), // rad to deg
+        SeatText += StrSubstNo(PlaceHolderLbl,
+          StrSubstNo(PlaceHolder2Lbl, cssClassName),
+          StrSubstNo(PlaceHolder3Lbl, Format(elementId, 0, 9)),
+          StrSubstNo(PlaceHolder4Lbl, Format(Round(x, 1), 0, 9), Format(Round(y, 1), 0, 9)),
+          StrSubstNo(PlaceHolder5Lbl, rx, ry),
+          StrSubstNo(PlaceHolder6Lbl, width, height),
+          StrSubstNo(PlaceHolder7Lbl, Format(Round(v / 2 / 3.14 * 360, 1) * -1, 0, 9), Format(Round(x + width / 2, 1), 0, 9), Format(Round(y + height / 2, 1), 0, 9)), // rad to deg
           CRLF());
     end;
 

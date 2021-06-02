@@ -17,8 +17,10 @@ codeunit 6014521 "NPR MobilePayV10 Start Payment"
     end;
 
     internal procedure GetRequestResponse(): text
+    var
+        ReqRespLbl: Label '==Request==\%1\\==Response==\(%2)\%3', Locked = true;
     begin
-        exit(StrSubstNo('==Request==\%1\\==Response==\(%2)\%3', _request, _responseHttpCode, _response));
+        exit(StrSubstNo(ReqRespLbl, _request, _responseHttpCode, _response));
     end;
 
     internal procedure GetResponse(): Text
@@ -42,6 +44,7 @@ codeunit 6014521 "NPR MobilePayV10 Start Payment"
         mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
         eftSetup: Record "NPR EFT Setup";
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
+        merchantPaymentLbl: Label '%1 - %2', Locked = true;
     begin
         eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
         mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
@@ -54,7 +57,7 @@ codeunit 6014521 "NPR MobilePayV10 Start Payment"
         jsonRequest.Add('orderId', eftTrxRequest."Reference Number Input");
         jsonRequest.Add('amount', eftTrxRequest."Amount Input");
         jsonRequest.Add('currencyCode', eftTrxRequest."Currency Code");
-        jsonRequest.Add('merchantPaymentLabel', CopyStr(StrSubstNo('%1 - %2', eftTrxRequest."Register No.", eftTrxRequest."Sales Ticket No."), 1, 36));
+        jsonRequest.Add('merchantPaymentLabel', CopyStr(StrSubstNo(merchantPaymentLbl, eftTrxRequest."Register No.", eftTrxRequest."Sales Ticket No."), 1, 36));
         jsonRequest.Add('plannedCaptureDelay', 'None'); //If we didn't capture immediately, a problem must have occurred.
         jsonRequest.WriteTo(_request);
         reqMessage.Content.WriteFrom(_request);

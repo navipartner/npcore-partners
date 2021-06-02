@@ -147,7 +147,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         Message(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('NetAxept: %1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('NetAxept: %1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
     end;
 
     #endregion

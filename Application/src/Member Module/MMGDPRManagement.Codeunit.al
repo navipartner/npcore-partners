@@ -139,6 +139,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         GDPRAgreement: Record "NPR GDPR Agreement";
         PointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         AnonymizationDate: Date;
+        ReasonLbl: Label 'Membership %1 has active roles and was not anonymized.';
     begin
 
         Membership.Get(MembershipEntryNo);
@@ -165,7 +166,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         if (not MembershipRole.IsEmpty()) then begin
-            ReasonText := StrSubstNo('Membership %1 has active roles and was not anonymized.', Membership."External Membership No.");
+            ReasonText := StrSubstNo(ReasonLbl, Membership."External Membership No.");
             exit(false);
         end;
 
@@ -183,6 +184,8 @@ codeunit 6151121 "NPR MM GDPR Management"
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipRoleGuardian: Record "NPR MM Membership Role";
+        ReasonLbl: Label 'Member %1 has been anonymized.';
+        Reason2Lbl: Label 'Member %1 has active roles and was not anonymized.';
     begin
 
         Member.Get(MemberEntryNo);
@@ -227,12 +230,12 @@ codeunit 6151121 "NPR MM GDPR Management"
 
         if (MembershipRole.IsEmpty()) then begin
             DoAnonymizeMember(MemberEntryNo);
-            ReasonText := StrSubstNo('Member %1 has been anonymized.', Member."External Member No.");
+            ReasonText := StrSubstNo(ReasonLbl, Member."External Member No.");
             exit(true);
         end;
 
         if (ReasonText = '') then
-            ReasonText := StrSubstNo('Member %1 has active roles and was not anonymized.', Member."External Member No.");
+            ReasonText := StrSubstNo(Reason2Lbl, Member."External Member No.");
 
         exit(false);
     end;
@@ -241,6 +244,7 @@ codeunit 6151121 "NPR MM GDPR Management"
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
+        DummyEMailAddressLbl: Label 'anonymous%1@nowhere.com', Locked = true;
     begin
 
         Member.Get(MemberEntryNo);
@@ -258,7 +262,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         Member.Gender := Member.Gender::NOT_SPECIFIED;
         Member.Birthday := 0D;
         Clear(Member.Image);
-        Member."E-Mail Address" := StrSubstNo('anonymous%1@nowhere.com', Member."External Member No.");
+        Member."E-Mail Address" := StrSubstNo(DummyEMailAddressLbl, Member."External Member No.");
         Member."Notification Method" := Member."Notification Method"::NONE;
         Member."E-Mail News Letter" := Member."E-Mail News Letter"::NOT_SPECIFIED;
         Member."Display Name" := '------ - -------';
@@ -334,15 +338,18 @@ codeunit 6151121 "NPR MM GDPR Management"
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
+        ReasonLbl: Label 'Membership with entry no. %1 not found.';
+        Reason2Lbl: Label 'Membership %1 has %2 %3, which is not found in the setup table %4';
+        Reason3Lbl: Label 'Membership %1 has not expired yet.';
     begin
 
         if (not Membership.Get(MembershipEntryNo)) then begin
-            ReasonText := StrSubstNo('Membership with entry no. %1 not found.', MembershipEntryNo);
+            ReasonText := StrSubstNo(ReasonLbl, MembershipEntryNo);
             exit(false);
         end;
 
         if (not MembershipSetup.Get(Membership."Membership Code")) then begin
-            ReasonText := StrSubstNo('Membership %1 has %2 %3, which is not found in the setup table %4',
+            ReasonText := StrSubstNo(Reason2Lbl,
               Membership."External Membership No.", Membership.FieldCaption("Membership Code"), Membership."Membership Code", MembershipSetup.TableCaption);
             exit(false);
         end;
@@ -351,7 +358,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.SetFilter("Valid Until Date", '>=%1', Today);
         if (not MembershipEntry.IsEmpty()) then begin
-            ReasonText := StrSubstNo('Membership %1 has not expired yet.', Membership."External Membership No.");
+            ReasonText := StrSubstNo(Reason3Lbl, Membership."External Membership No.");
             exit(false);
         end;
 
@@ -365,12 +372,13 @@ codeunit 6151121 "NPR MM GDPR Management"
         ValidUntil: Date;
         AnonymizationDate: Date;
         AnonymizationDateformula: DateFormula;
+        ReasonLbl: Label 'Membership %1 has not expired yet.';
     begin
 
         MembershipRole.Get(MembershipEntryNo, MemberEntryNo);
         ValidUntil := GetMembershipValidUntil(MembershipEntryNo);
         if (ValidUntil > Today) then begin
-            ReasonText := StrSubstNo('Membership %1 has not expired yet.', MembershipRole."External Membership No.");
+            ReasonText := StrSubstNo(ReasonLbl, MembershipRole."External Membership No.");
             exit(false);
         end;
 

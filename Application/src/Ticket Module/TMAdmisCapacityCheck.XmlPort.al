@@ -133,7 +133,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                                 -5:
                                     ResponseMessage := 'The admission schedule indicated that admission is closed.';
                                 else
-                                    ResponseMessage := StrSubstNo('Capacity Status Code %1 does not have a dedicated message yet.', CapacityStatusCode);
+                                    ResponseMessage := StrSubstNo(ResponseLbl, CapacityStatusCode);
                             end;
                         end;
                     }
@@ -256,6 +256,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
         RemainingCapacity: Integer;
         CapacityStatusCode: Integer;
         gExternalItemNo: Code[20];
+        ResponseLbl: Label 'Capacity Status Code %1 does not have a dedicated message yet.';
 
     procedure AddResponse()
     begin

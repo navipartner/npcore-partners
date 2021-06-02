@@ -411,6 +411,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
         NewDiscountCouponNodes: XmlNodeList;
         NewDiscountCouponNode: XmlNode;
         xSalePOS: Record "NPR POS Sale";
+        POSCrossRefLbl: Label '%1_%2', Locked = true;
     begin
         if not XmlDoc.GetRoot(Root) then
             exit;
@@ -563,7 +564,7 @@ codeunit 6151006 "NPR POS Saved Sale Mgt."
                 RecRef.SetTable(POSCrossReference);
                 Position := StrPos(POSCrossReference."Record Value", '_');
                 if Position <> 0 then
-                    POSCrossReference."Record Value" := StrSubstNo('%1_%2', SalePOS."Sales Ticket No.", CopyStr(POSCrossReference."Record Value", Position + 1))
+                    POSCrossReference."Record Value" := StrSubstNo(POSCrossRefLbl, SalePOS."Sales Ticket No.", CopyStr(POSCrossReference."Record Value", Position + 1))
                 else
                     POSCrossReference."Record Value" := SalePOS."Sales Ticket No.";
                 POSCrossReference.Insert(true);

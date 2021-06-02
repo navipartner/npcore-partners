@@ -177,12 +177,11 @@ codeunit 6184514 "NPR EFT MobilePay Prot."
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         PaymentStatus: Text;
         WebClientDependency: Record "NPR Web Client Dependency";
+        UriLbl: Label 'MBP-%1', Locked = true;
     begin
         EFTTransactionRequest.Get(EntryNo);
         if not EFTMobilePayIntegration.GetPaymentStatus(EFTTransactionRequest) then begin
-            //-NPR5.54 [388507]
             HandleProtocolError(FrontEnd, GetLastErrorText());
-            //+NPR5.54 [388507]
             exit;
         end;
 
@@ -190,15 +189,12 @@ codeunit 6184514 "NPR EFT MobilePay Prot."
             TransactionDone := true;
             EFTTransactionRequest."External Result Known" := true;
             FrontEnd.CloseModel(ActiveModelID);
-            //-NPR5.53 [375566]
-            //  CLEAR(ActiveModelID);
             DialogOpen := false;
-            //+NPR5.53 [375566]
             OnAfterProtocolResponse(EFTTransactionRequest);
         end else begin
             PaymentStatus := EFTTransactionRequest."Result Description";
 
-            Model.GetControlById('imgStatus').Set('Source', WebClientDependency.GetDataUri(StrSubstNo('MBP-%1', EFTTransactionRequest."Result Code")));
+            Model.GetControlById('imgStatus').Set('Source', WebClientDependency.GetDataUri(StrSubstNo(UriLbl, EFTTransactionRequest."Result Code")));
             Model.GetControlById('lb-status').Set('Caption', PaymentStatus);
 
             FrontEnd.UpdateModel(Model, ActiveModelID);

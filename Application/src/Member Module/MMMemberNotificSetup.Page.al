@@ -186,6 +186,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                     Path: Text;
                     PassData: Text;
                     TemplateOutStream: outstream;
+                    FileNameLbl: Label '%1 - %2.json', Locked = true;
                 begin
                     Rec.CalcFields("PUT Passes Template");
                     if (not Rec."PUT Passes Template".HasValue()) then begin
@@ -199,7 +200,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                     TempBlob.FromRecord(Rec, Rec.FieldNo("PUT Passes Template"));
                     if (not TempBlob.HasValue()) then
                         exit;
-                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo('%1 - %2.json', Rec.Code, Rec.Description), true);
+                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo(FileNameLbl, Rec.Code, Rec.Description), true);
 
                 end;
             }

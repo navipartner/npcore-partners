@@ -67,18 +67,6 @@ page 6014585 "NPR Advanced Sales Stats"
 
                     trigger OnValidate()
                     begin
-                        //HideLines()
-                        //IF HideItemGroup THEN BEGIN
-                        //-NPR4.21
-                        //CurrPage.ItemGroupStatisticsSubpage.PAGE.ChangeEmptyFilter;
-                        //CurrPage.ItemStatisticsSubpage.PAGE.ChangeEmptyFilter;
-                        //CurrPage."CustomerStatistics Subpage".PAGE.ChangeEmptyFilter;
-                        //CurrPage.VendorStatisticsSubpage.PAGE.ChangeEmptyFilter;
-                        //CurrPage.SalespersonStatisticsSubpage.PAGE.ChangeEmptyFilter;
-                        //CurrPage.UPDATE(TRUE);
-                        //END;
-                        //HideLines;
-                        //+NPR4.21
                         CurrPage.Update(false);
                     end;
                 }
@@ -89,17 +77,6 @@ page 6014585 "NPR Advanced Sales Stats"
                     TableRelation = Item."No.";
                     ToolTip = 'Specifies the value of the Item No. Filter field';
 
-                    trigger OnValidate()
-                    begin
-                        //-NPR4.21
-                        //CurrForm.SubSalesperson.FORM.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,
-                        //ItemNoFilter);
-                        //CurrPage.SalespersonStatisticsSubpage.PAGE.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,ItemNoFilter);
-                        //+NPR4.21
-                        //-NPR5.31
-                        //UpdateSubformFilters;
-                        //+NPR5.31
-                    end;
                 }
                 field(ItemCategoryCodeFilter; ItemCategoryCodeFilter)
                 {
@@ -121,12 +98,7 @@ page 6014585 "NPR Advanced Sales Stats"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.31
-                        //UpdateSubformFilters;
-                        //+NPR5.31
-                        //UpdateHiddenLines( ViewPosition, TRUE );
                         CurrPage.Update();
-                        //CurrForm.Update();
                     end;
                 }
                 field(Dim2Filter; Dim2Filter)
@@ -138,11 +110,6 @@ page 6014585 "NPR Advanced Sales Stats"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.31
-                        //UpdateSubformFilters;
-                        //+NPR5.31
-                        //UpdateHiddenLines( ViewPosition, TRUE );
-                        //CurrForm.Update();
                         CurrPage.Update();
                     end;
                 }
@@ -154,34 +121,10 @@ page 6014585 "NPR Advanced Sales Stats"
 
                     trigger OnValidate()
                     begin
-
-                        // Periode
-                        //CurrForm."Periode LastYear Sale (Qty.)".VISIBLE( ShowLastYear );
-                        //CurrForm."Periode LastYear Sale (£)".VISIBLE( ShowLastYear );
-                        //CurrForm."Periode LastYear Profit (£)".VISIBLE( ShowLastYear );
-                        //CurrForm."Periode LastYear Profit %".VISIBLE( ShowLastYear );
                         PLYSaleQty := ShowLastYear;
                         PLYSale := ShowLastYear;
                         PLYProfit := ShowLastYear;
                         "PLYProfit%" := ShowLastYear;
-                        //-NPR4.21
-                        // Varegruppe
-                        //CurrForm.SubItemGroup.FORM.ShowLastYear( ShowLastYear );
-                        //CurrPage.ItemGroupStatisticsSubpage.PAGE.ShowLastYear(ShowLastYear);
-
-                        // Sælger
-                        //CurrForm.SubSalesperson.FORM.ShowLastYear( ShowLastYear );
-                        //CurrPage.SalespersonStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
-                        // Vare
-                        //CurrForm.SubItem.FORM.ShowLastYear( ShowLastYear );
-                        //CurrPage.ItemStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
-                        // Debitor
-                        //CurrForm.SubCustomer.FORM.ShowLastYear( ShowLastYear );
-                        //CurrPage."CustomerStatistics Subpage".PAGE.ShowLastYear( ShowLastYear );
-                        // Kreditor
-                        //CurrForm.SubVendor.FORM.ShowLastYear( ShowLastYear );
-                        //CurrPage.VendorStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
-                        //+NPR4.21
                     end;
                 }
                 field(ShowSameWeekday; ShowSameWeekday)
@@ -369,17 +312,12 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         ItemStatistics: Page "NPR Item Statistics Subpage";
                     begin
-                        //-NPR4.21
                         ItemStatistics.InitForm();
-                        //-NPR5.51 [365732]
-                        //ItemStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc);
                         ItemStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemCategoryCodeFilter);
-                        //+NPR5.51 [365732]
                         ItemStatistics.ShowLastYear(ShowLastYear);
                         ItemStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         ItemStatistics.RunModal();
-                        //+NPR4.21
                     end;
                 }
                 action("Customer Statistics")
@@ -396,7 +334,6 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         CustomerStatistics: Page "NPR Customer Stats Subpage";
                     begin
-                        //-NPR4.21
                         CustomerStatistics.InitForm();
                         CustomerStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc);
 
@@ -404,7 +341,6 @@ page 6014585 "NPR Advanced Sales Stats"
                         CustomerStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         CustomerStatistics.RunModal();
-                        //+NPR4.21
                     end;
                 }
                 action("Vendor Statistics")
@@ -421,7 +357,6 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         VendorStatistics: Page "NPR Vendor Statistics Subpage";
                     begin
-                        //-NPR4.21
                         VendorStatistics.InitForm();
                         VendorStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc);
 
@@ -429,7 +364,6 @@ page 6014585 "NPR Advanced Sales Stats"
                         VendorStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         VendorStatistics.RunModal();
-                        //+NPR4.21
                     end;
                 }
                 action("Item Category Code Statistics")
@@ -446,15 +380,12 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         ItemCategoryStatsSubpage: Page "NPR Item Cat. Code Stats";
                     begin
-
-                        //-NPR5.31
                         ItemCategoryStatsSubpage.InitForm();
                         ItemCategoryStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemCategoryCodeFilter, ItemNoFilter);
                         ItemCategoryStatsSubpage.ShowLastYear(ShowLastYear);
                         ItemCategoryStatsSubpage.ChangeEmptyFilter();
                         Sleep(10);
                         ItemCategoryStatsSubpage.RunModal()
-                        //+NPR5.31
                     end;
                 }
                 action("Product Group Code Statistics")
@@ -471,15 +402,12 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         ProdGroupCodeStatsSubpage: Page "NPR Prod. Group Code Stats";
                     begin
-
-                        //-NPR5.31
                         ProdGroupCodeStatsSubpage.InitForm();
                         ProdGroupCodeStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemNoFilter, ItemCategoryCodeFilter);
                         ProdGroupCodeStatsSubpage.ShowLastYear(ShowLastYear);
                         ProdGroupCodeStatsSubpage.ChangeEmptyFilter();
                         Sleep(10);
                         ProdGroupCodeStatsSubpage.RunModal()
-                        //+NPR5.31
                     end;
                 }
             }
@@ -488,17 +416,11 @@ page 6014585 "NPR Advanced Sales Stats"
 
     trigger OnAfterGetCurrRecord()
     begin
-
         if not (UsingPeriod) then begin
-            DateFilter := CopyStr(StrSubstNo('%1..%2', Rec."Period Start", Rec."Period End"), 1, 50);
-            DateFilterLastYear := CopyStr(StrSubstNo('%1..%2', CalcDate(LastYearCalc, Rec."Period Start"),
+            DateFilter := CopyStr(StrSubstNo(DateFilterLbl, Rec."Period Start", Rec."Period End"), 1, 50);
+            DateFilterLastYear := CopyStr(StrSubstNo(DateFilterLbl, CalcDate(LastYearCalc, Rec."Period Start"),
             CalcDate(LastYearCalc, Rec."Period End")), 1, 50);
         end;
-        //-NPR5.31
-        //  UpdateSubformFilters;
-        //END ELSE
-        //  UpdateSubformFilters;
-        //+NPR5.31
     end;
 
     trigger OnAfterGetRecord()
@@ -524,7 +446,6 @@ page 6014585 "NPR Advanced Sales Stats"
 
     trigger OnOpenPage()
     begin
-        //HideItemGroup:=FALSE;
         ShowLastYear := false;
 
 
@@ -532,42 +453,11 @@ page 6014585 "NPR Advanced Sales Stats"
         PLYSale := ShowLastYear;
         PLYProfit := ShowLastYear;
         "PLYProfit%" := ShowLastYear;
-        //-NPR4.21
-        // Varegruppe
-        //CurrForm.SubItemGroup.FORM.ShowLastYear( ShowLastYear );
-        //CurrPage.ItemGroupStatisticsSubpage.PAGE.ShowLastYear(ShowLastYear);
-
-        // Sælger
-        //CurrForm.SubSalesperson.FORM.ShowLastYear( ShowLastYear );
-        //CurrPage.SalespersonStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
-        // Vare
-        //CurrForm.SubItem.FORM.ShowLastYear( ShowLastYear );
-        //CurrPage.ItemStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
-        // Debitor
-        //CurrForm.SubCustomer.FORM.ShowLastYear( ShowLastYear );
-        //CurrPage."CustomerStatistics Subpage".PAGE.ShowLastYear( ShowLastYear );
-        // Kreditor
-        //CurrForm.SubVendor.FORM.ShowLastYear( ShowLastYear );
-        //CurrPage.VendorStatisticsSubpage.PAGE.ShowLastYear( ShowLastYear );
-        //+NPR4.21
 
         HideItem := true;
         HideItemGroup := false;
         HideCustomer := true;
         HideVendor := true;
-        //-NPR4.21
-        //CurrForm.SubItemGroup.FORM.InitForm;
-        //CurrForm.SubSalesperson.FORM.InitForm;
-        //CurrForm.SubItem.FORM.InitForm;
-        //CurrForm.SubCustomer.FORM.InitForm;
-        //CurrForm.SubVendor.FORM.InitForm;
-        //CurrPage.ItemGroupStatisticsSubpage.PAGE.InitForm;
-        //CurrPage.SalespersonStatisticsSubpage.PAGE.InitForm;
-        //CurrPage.ItemStatisticsSubpage.PAGE.InitForm;
-        //CurrPage."CustomerStatistics Subpage".PAGE.InitForm;
-        //CurrPage.VendorStatisticsSubpage.PAGE.InitForm;
-        //CurrForm.SubProject.FORM.initForm;
-        //+NPR4.21
     end;
 
     var
@@ -610,13 +500,15 @@ page 6014585 "NPR Advanced Sales Stats"
         "PLYProfit%": Boolean;
         PeriodType: Option Day,Week,Month,Quarter,Year,Period;
         ItemCategoryCodeFilter: Code[20];
+        DateFilterLbl: Label '%1..%2', Locked = true;
+        CheckValueLbl: Label '%1%2%3', Locked = true;
+        CheckValue2Lbl: Label '%1%2%3%4', Locked = true;
 
     procedure Calc()
     var
         AuxValueEntry: Record "NPR Aux. Value Entry";
         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
     begin
-        //Calc()
         SetValueEntryFilter(AuxValueEntry);
         AuxValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
@@ -660,7 +552,6 @@ page 6014585 "NPR Advanced Sales Stats"
 
     procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry")
     begin
-        //SetItemLedgerEntryFilter
         AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
         if not LastYear then
@@ -717,139 +608,103 @@ page 6014585 "NPR Advanced Sales Stats"
 
     procedure GetCheckValue(): Text[250]
     begin
-        //GetCheckValue()
         case ViewPosition of
             ViewPosition::ItemGroup:
                 begin
-                    exit(StrSubstNo('%1%2%3', Dim1Filter, Dim2Filter, DateFilter));
+                    exit(StrSubstNo(CheckValueLbl, Dim1Filter, Dim2Filter, DateFilter));
                 end;
             ViewPosition::Item,
             ViewPosition::Customer,
             ViewPosition::Vendor:
                 begin
-                    exit(StrSubstNo('%1%2%3%4', Dim1Filter, Dim2Filter, ItemCategoryCodeFilter, DateFilter));
+                    exit(StrSubstNo(CheckValue2Lbl, Dim1Filter, Dim2Filter, ItemCategoryCodeFilter, DateFilter));
                 end;
         end;
     end;
 
     procedure UpdateHiddenLines(ViewPos: Integer; bForce: Boolean)
     begin
-        //UpdateHiddenLines()
-
         case ViewPos of
             ViewPosition::ItemGroup:
                 begin
                     if (ItemGroupCheck <> GetCheckValue()) or bForce then begin
-                        // CurrForm.SubItemGroup.FORM.UpdateHidden;
-                        //-NPR4.21
-                        //CurrPage.ItemGroupStatisticsSubpage.PAGE.UpdateHidden;
-                        //+NPR4.21
                         ItemGroupCheck := GetCheckValue();
                     end;
                 end;
             ViewPosition::Item:
                 begin
                     if (ItemCheck <> GetCheckValue()) or bForce then begin
-                        //CurrForm.SubItem.FORM.UpdateHidden;
-                        //-NPR4.21
-                        //CurrPage.ItemStatisticsSubpage.PAGE.UpdateHidden;
-                        //+NPR4.21
                         ItemCheck := GetCheckValue();
                     end;
                 end;
             ViewPosition::Customer:
                 begin
                     if (CustomerCheck <> GetCheckValue()) or bForce then begin
-                        //CurrForm.SubCustomer.FORM.UpdateHidden;
-                        //-NPR4.21
-                        //CurrPage."CustomerStatistics Subpage".PAGE.UpdateHidden;
-                        //+NPR4.21
                         CustomerCheck := GetCheckValue();
                     end;
                 end;
             ViewPosition::Vendor:
                 begin
                     if (VendorCheck <> GetCheckValue()) or bForce then begin
-                        //CurrForm.SubVendor.FORM.UpdateHidden;
-                        //-NPR4.21
-                        //CurrPage.VendorStatisticsSubpage.PAGE.UpdateHidden;
-                        //+NPR4.21
                         VendorCheck := GetCheckValue();
                     end;
                 end;
         end;
     end;
 
-    local procedure PeriodPeriodTypeOnPush()
-    begin
-        //-NPR5.31
-        //UpdateSubForm;
-        //+NPR5.31
-    end;
 
     local procedure DayPeriodTypeOnValidate()
     begin
 
         Day := PeriodType;
         Calc();
-        //DayPeriodTypeOnPush;
     end;
 
     local procedure WeekPeriodTypeOnValidate()
     begin
         Day := PeriodType;
         Calc();
-        //WeekPeriodTypeOnPush;
     end;
 
     local procedure MonthPeriodTypeOnValidate()
     begin
         Day := PeriodType;
         Calc();
-        //MonthPeriodTypeOnPush;
     end;
 
     local procedure QuarterPeriodTypeOnValidate()
     begin
         Day := PeriodType;
         Calc();
-        //QuarterPeriodTypeOnPush;
     end;
 
     local procedure YearPeriodTypeOnValidate()
     begin
         Day := PeriodType;
         Calc();
-        //YearPeriodTypeOnPush;
     end;
 
     local procedure PeriodPeriodTypeOnValidate()
     var
         tblPeriode: Record "NPR Periodes";
     begin
-        //Day:=PeriodType;
         if not UsingPeriod then
             UsingPeriod := true
         else
             UsingPeriod := false;
 
         if UsingPeriod then begin
-            //IF FORM.RUNMODAL(6060102,tblPeriode) = ACTION::LookupOK THEN BEGIN
             if PAGE.RunModal(6060102, tblPeriode) = ACTION::LookupOK then begin
                 Rec."Period Start" := tblPeriode."Start Date";
                 Rec."Period End" := tblPeriode."End Date";
-                DateFilter := StrSubstNo('%1..%2', Rec."Period Start", Rec."Period End");
+                DateFilter := StrSubstNo(DateFilterLbl, Rec."Period Start", Rec."Period End");
                 Rec.SetFilter("Period Start", DateFilter);
-                DateFilterLastYear := StrSubstNo('%1..%2', tblPeriode."Start Date Last Year", tblPeriode."End Date Last Year");
+                DateFilterLastYear := StrSubstNo(DateFilterLbl, tblPeriode."Start Date Last Year", tblPeriode."End Date Last Year");
                 Day := Day::Day;
             end;
         end else
             Rec.SetFilter("Period Start", '');
-        //-NPR5.31
-        //UpdateSubformFilters;
-        //+NPR5.31
         Calc();
-        PeriodPeriodTypeOnPush();
     end;
 }
 

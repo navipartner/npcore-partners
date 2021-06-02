@@ -30,10 +30,13 @@ codeunit 6151493 "NPR Raptor API"
         RequestMsg: HttpRequestMessage;
         ResponseMsg: HttpResponseMessage;
         AuthText: Text;
+        UriLbl: Label '%1%2', Locked = true;
+        AuthLbl: Label '%1:%2', Locked = true;
+        BasicLbl: Label 'Basic %1', Locked = true;
     begin
         RequestMsg.Method := Format(Parameters.get('restmethod'));
         if Parameters.ContainsKey('path') then
-            RequestMsg.SetRequestUri(strsubstno('%1%2', Parameters.get('baseurl'), Parameters.Get('path')))
+            RequestMsg.SetRequestUri(strsubstno(UriLbl, Parameters.get('baseurl'), Parameters.Get('path')))
         else
             RequestMsg.SetRequestUri(Parameters.get('baseurl'));
 
@@ -45,10 +48,10 @@ codeunit 6151493 "NPR Raptor API"
 
         if Parameters.ContainsKey('username') then begin
             if Parameters.ContainsKey('password') then
-                AuthText := StrSubstNo('%1:%2', Parameters.Get('username'), Parameters.Get('password'))
+                AuthText := StrSubstNo(AuthLbl, Parameters.Get('username'), Parameters.Get('password'))
             else
-                AuthText := StrSubstNo('%1:%2', Parameters.Get('username'), '');
-            Headers.Add('Authorization', StrSubstNo('Basic %1', Base64Convert.ToBase64(AuthText)));
+                AuthText := StrSubstNo(AuthLbl, Parameters.Get('username'), '');
+            Headers.Add('Authorization', StrSubstNo(BasicLbl, Base64Convert.ToBase64(AuthText)));
         end;
 
         if Parameters.ContainsKey('etag') then

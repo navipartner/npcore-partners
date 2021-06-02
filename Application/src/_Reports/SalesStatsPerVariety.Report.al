@@ -232,7 +232,7 @@ report 6014615 "NPR Sales Stats Per Variety"
             TextDateFilter := StrSubstNo(Text000, Item.GetFilter("Date Filter"));
 
         if Item.GetFilters <> '' then
-            TextItemFilter := StrSubstNo('%1: %2', Item.TableCaption, Item.GetFilters);
+            TextItemFilter := StrSubstNo(Pct1Lbl, Item.TableCaption, Item.GetFilters);
     end;
 
     var
@@ -262,6 +262,7 @@ report 6014615 "NPR Sales Stats Per Variety"
         Text000: Label 'Period: %1';
         TextDateFilter: Text;
         TextItemFilter: Text;
+        Pct1Lbl: Label '%1: %2', locked = true;
 
     procedure CalculateVariantCost(var Item2: Record Item; ItemVariant: Record "Item Variant")
     var

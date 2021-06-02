@@ -263,11 +263,12 @@ page 6060122 "NPR TM Admis. Schedule Entry"
         TicketManagement: Codeunit "NPR TM Ticket Management";
         Actual: Integer;
         MaxCapacity: Integer;
+        ResultLbl: Label '%1/%2', Locked = true;
     begin
 
         ResultText := '-/-';
         if (TicketManagement.CalculateConcurrentCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Admission Start Date", Actual, MaxCapacity)) then
-            ResultText := StrSubstNo('%1/%2', Actual, MaxCapacity);
+            ResultText := StrSubstNo(ResultLbl, Actual, MaxCapacity);
     end;
 }
 

@@ -619,16 +619,17 @@ codeunit 6059784 "NPR TM Ticket Management"
     end;
 
     local procedure IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date; ReferenceTime: Time; var ResponseMessage: Text; var ResponseCode: Integer): Boolean
+    var
+        DateTimeLbl: Label '%1  - %2', Locked = true;
     begin
-
         if (AdmissionSchEntry."Admission End Date" = ReferenceDate) then begin
 
             if ((AdmissionSchEntry."Event Arrival Until Time" = 0T) and
                 (AdmissionSchEntry."Admission End Time" < ReferenceTime)) then begin
                 ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
                     AdmissionSchEntry."External Schedule Entry No.",
-                    StrSubstNo('%1 - %2', Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
-                    StrSubstNo('%1 - %2', Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
+                    StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
+                    StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
                 Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO);
                 exit(true);
             end;
@@ -637,8 +638,8 @@ codeunit 6059784 "NPR TM Ticket Management"
                 (AdmissionSchEntry."Event Arrival Until Time" < ReferenceTime)) then begin
                 ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
                     AdmissionSchEntry."External Schedule Entry No.",
-                    StrSubstNo('%1 - %2', Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
-                    StrSubstNo('%1 - %2', Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
+                    StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission Start Time", 0, 9)),
+                    StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
                 Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO2);
                 exit(true);
             end;
@@ -648,8 +649,8 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (AdmissionSchEntry."Admission End Date" < ReferenceDate) then begin
             ResponseMessage := StrSubstNo(SCHEDULE_ENTRY_EXPIRED,
                 AdmissionSchEntry."External Schedule Entry No.",
-                StrSubstNo('%1 - %2', Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission End Time", 0, 9)),
-                StrSubstNo('%1 - %2', Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
+                StrSubstNo(DateTimeLbl, Format(AdmissionSchEntry."Admission End Date", 0, 9), Format(AdmissionSchEntry."Admission End Time", 0, 9)),
+                StrSubstNo(DateTimeLbl, Format(ReferenceDate, 0, 9), Format(ReferenceTime, 0, 9)));
             Evaluate(ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO3);
             exit(true);
         end;
@@ -1184,11 +1185,12 @@ codeunit 6059784 "NPR TM Ticket Management"
         DEPENDENT_ADMISSION: Label 'Admission not allowed. Ticket need to be validated for %1 first.';
         ADM_DAILY_SCAN_LIMIT: Label 'Admission to %1 has a daily limited of %2 visits.';
         ADM_SCAN_FREQUENCY: Label 'Admission to %1 is limited to once per %2 minutes, previous admission was %3 minute(s) ago.';
+        ResponseLbl: Label 'Dependency Rule %1, line %2 does not apply for ticket %3.';
     begin
         DependentAccessEntry.SetFilter("Ticket No.", '=%1', SourceAccessEntry."Ticket No.");
         DependentAccessEntry.SetFilter("Admission Code", '=%1', AdmissionDependencyLine."Admission Code");
         if (not DependentAccessEntry.FindFirst()) then begin
-            ResponseMessage := StrSubstNo('Dependency Rule %1, line %2 does not apply for ticket %3.', AdmissionDependencyLine."Admission Code", AdmissionDependencyLine."Line No.", SourceAccessEntry."Ticket No.");
+            ResponseMessage := StrSubstNo(ResponseLbl, AdmissionDependencyLine."Admission Code", AdmissionDependencyLine."Line No.", SourceAccessEntry."Ticket No.");
             exit(true);
         end;
 
@@ -1356,11 +1358,12 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure RaiseError(MessageText: Text; MessageId: Text)
     var
         ResponseMessage: Text;
+        ResponseLbl: Label '[%1] - %2', Locked = true;
     begin
         ResponseMessage := MessageText;
 
         if (MessageId <> '') then
-            ResponseMessage := StrSubstNo('[%1] - %2', MessageId, MessageText);
+            ResponseMessage := StrSubstNo(ResponseLbl, MessageId, MessageText);
 
         Error(ResponseMessage);
     end;
@@ -1375,6 +1378,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         Left: Text[10];
         Right: Text[10];
         Itt: Integer;
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
         if (GeneratePattern = '') then
             exit('');
@@ -1413,15 +1417,15 @@ codeunit 6059784 "NPR TM Ticket Management"
 
                 case Left of
                     'S':
-                        PatternOut := StrSubstNo('%1%2', PatternOut, TicketNo);
+                        PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, TicketNo);
                     'N', 'A', 'X', 'AN':
                         begin
                             Evaluate(PatternLength, Right);
                             for Itt := 1 to PatternLength do
-                                PatternOut := StrSubstNo('%1%2', PatternOut, GenerateRandom(Left));
+                                PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, GenerateRandom(Left));
                         end;
                     else begin
-                            PatternOut := StrSubstNo('%1%2', PatternOut, Pattern);
+                            PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, Pattern);
                         end;
                 end;
             end;
@@ -2434,6 +2438,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         CapacityExceeded: Boolean;
         MaxCapacity: Integer;
         CapacityControl: Option;
+        DateTimeLbl: Label '%1  - %2', Locked = true;
     begin
         Admission.Get(AdmissionScheduleEntry."Admission Code");
         CapacityExceeded := false;
@@ -2490,7 +2495,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         if (CapacityExceeded) then
             RaiseError(StrSubstNo(RESERVATION_EXCEEDED, Admission."Admission Code",
-                StrSubstNo('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time"),
+                StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time"),
                 MaxCapacity, AdmissionText."Capacity Control", AdmittedCount), RESERVATION_EXCEEDED_NO);
         exit;
     end;
@@ -2613,6 +2618,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         LastInvoiceNo: Code[20];
         InvoiceDetailsMessage: Text;
         ShowDialog: Boolean;
+        FromToInvLbl: Label '{%1..%2}', Locked = true;
     begin
         if (not Confirm(HANDLE_POSTPAID)) then
             Error('');
@@ -2633,7 +2639,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                 FirstInvoiceNo := CopyStr(TmpAggregatedPerRequest.Description, 1, 20);
                 TmpAggregatedPerRequest.FindLast();
                 LastInvoiceNo := CopyStr(TmpAggregatedPerRequest.Description, 1, 20);
-                InvoiceDetailsMessage := StrSubstNo('{%1..%2}', FirstInvoiceNo, LastInvoiceNo);
+                InvoiceDetailsMessage := StrSubstNo(FromToInvLbl, FirstInvoiceNo, LastInvoiceNo);
             end;
         end;
 

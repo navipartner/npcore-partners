@@ -76,6 +76,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
         ResponseMessage: Text;
         PosEntryNo: Integer;
         SalesIsCanceled: Boolean;
+        ResponseLbl: Label '{"message" : {"title":"%1", "caption":"%2"}}', Locked = true;
     begin
 
         POSSession.GetSetup(POSSetup);
@@ -91,7 +92,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
             PosEntryNo := POSResumeSaleMgt.DoSaveAsPOSQuote(POSSession, SalePOS, true, true);
             POSQuoteEntry.Get(PosEntryNo);
             ResponseMessage := StrSubstNo(REQUIRES_ATTENTION, POSQuoteEntry."Sales Ticket No.");
-            WorkflowResponseJson := StrSubstNo('{"message" : {"title":"%1", "caption":"%2"}}', SAVE_SALE, ResponseMessage);
+            WorkflowResponseJson := StrSubstNo(ResponseLbl, SAVE_SALE, ResponseMessage);
         end;
         POSSession.StartPOSSession();
     end;

@@ -232,13 +232,13 @@ report 6014432 "NPR Customer Analysis"
             column(CustomerBalanceTotal; CustomerBalanceTotal)
             {
             }
-            column(AvancePct_Value; StrSubstNo('%1%', AvancePct))
+            column(AvancePct_Value; StrSubstNo(Pct1Lbl, AvancePct))
             {
             }
-            column(Share_Value; StrSubstNo('%1%', Share))
+            column(Share_Value; StrSubstNo(Pct1Lbl, Share))
             {
             }
-            column(TotalPct_Value; StrSubstNo('%1%', TotalPct))
+            column(TotalPct_Value; StrSubstNo(Pct1Lbl, TotalPct))
             {
             }
             column(LastLocation; LastLocation)
@@ -579,6 +579,7 @@ report 6014432 "NPR Customer Analysis"
         ShowType: Option Sales,Balance,Margin;
         CustomerDateFilter: Text[30];
         CustomerFilter: Text[250];
+        Pct1Lbl: Label '%1%', locked = true;
 
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
     begin

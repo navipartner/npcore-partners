@@ -139,7 +139,7 @@ codeunit 6151402 "NPR Magento Mgt."
         XmlDocument.ReadFrom(Response, XmlDoc);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
         XmlDocument.ReadFrom(XmlDom.RemoveNamespaces(Response), XmlDoc);
         exit(true);
@@ -195,7 +195,7 @@ codeunit 6151402 "NPR Magento Mgt."
         XmlDocument.ReadFrom(Response, XmlDoc);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
         XmlDocument.ReadFrom(XmlDom.RemoveNamespaces(Response), XmlDoc);
         exit(true);

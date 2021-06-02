@@ -436,6 +436,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         OStream: OutStream;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        CardNumberLbl: Label '%1%2', Locked = true;
     begin
 
         if (not EFTTransactionRequest.Successful) then begin
@@ -467,7 +468,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         end;
 
         EFTTransactionRequest.Finished := CurrentDateTime();
-        EFTTransactionRequest."Card Number" := StrSubstNo('%1%2',
+        EFTTransactionRequest."Card Number" := StrSubstNo(CardNumberLbl,
                                                CopyStr('XXXXxxxxXXXXxxxxXXXXxxxx', 1, StrLen(EFTTransactionRequest."Card Number") - 2),
                                                CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 1));
     end;
@@ -479,6 +480,11 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         TicketWidth: Integer;
         Separator: Text;
         LastNChars: Integer;
+        AIDLbl: Label 'AID: ', Locked = true;
+        REFLbl: Label 'REF: ', Locked = true;
+        PlaceHolder1Lbl: Label '%1 (%2)', Locked = true;
+        PlaceHolder2Lbl: Label '%1 %2', Locked = true;
+        PlaceHolder3Lbl: Label '%1 / %2 / %3', Locked = true;
     begin
 
         TicketWidth := 28;
@@ -508,10 +514,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
 
-        // ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
-        //    EFTTransactionRequest.FIELDCAPTION ("Card Number") +' :',
-        //    COPYSTR (EFTTransactionRequest."Card Number", STRLEN(EFTTransactionRequest."Card Number")-7)));
-
         case StrLen(EFTTransactionRequest."Card Number") of
             1 .. 4:
                 LastNChars := 1;
@@ -531,8 +533,8 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
 
         if (EFTTransactionRequest.Successful) then begin
-            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo('AID: ' + EFTTransactionRequest."Authorisation Number"));
-            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo('REF: ' + EFTTransactionRequest."Reference Number Output"));
+            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo(AIDLbl + EFTTransactionRequest."Authorisation Number"));
+            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo(REFLbl + EFTTransactionRequest."Reference Number Output"));
             ReceiptText += WriteSlipLine(CreditCardTransaction, '');
             ReceiptText += WriteSlipLine(CreditCardTransaction, LeftRightText(TicketWidth,
               '****',
@@ -542,7 +544,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         if (not EFTTransactionRequest.Successful) then begin
             ReceiptText += WriteSlipLine(CreditCardTransaction, LeftRightText(TicketWidth,
               '****',
-              StrSubstNo('%1 (%2)', TEXT_DECLINED, EFTTransactionRequest."Result Code")));
+              StrSubstNo(PlaceHolder1Lbl, TEXT_DECLINED, EFTTransactionRequest."Result Code")));
         end;
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
@@ -557,12 +559,12 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         end;
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, CenterText(TicketWidth,
-            StrSubstNo('%1 %2',
+            StrSubstNo(PlaceHolder2Lbl,
               EFTTransactionRequest."Transaction Date",
               EFTTransactionRequest."Transaction Time")));
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, CenterText(TicketWidth,
-            StrSubstNo('%1 / %2 / %3',
+            StrSubstNo(PlaceHolder3Lbl,
               EFTTransactionRequest."Sales Ticket No.",
               POSUnit."POS Store Code",
               POSUnit."No.")));
@@ -582,6 +584,11 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         TicketWidth: Integer;
         Separator: Text;
         LastNChars: Integer;
+        AIDLbl: Label 'AID: ', Locked = true;
+        REFLbl: Label 'REF: ', Locked = true;
+        PlaceHolderLbl: Label '(%1)', Locked = true;
+        PlaceHolder2Lbl: Label '%1 %2', Locked = true;
+        PlaceHolder3Lbl: Label '%1 / %2 / %3', Locked = true;
     begin
 
         TicketWidth := 28;
@@ -614,12 +621,8 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         if (not EFTTransactionRequest.Successful) then begin
             ReceiptText += WriteSlipLine(CreditCardTransaction, LeftRightText(TicketWidth,
               '****',
-              StrSubstNo('(%1)', EFTTransactionRequest."Result Code")));
+              StrSubstNo(PlaceHolderLbl, EFTTransactionRequest."Result Code")));
         end;
-
-        // ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
-        //    EFTTransactionRequest.FIELDCAPTION ("Card Number") +' :',
-        //    COPYSTR (EFTTransactionRequest."Card Number", STRLEN(EFTTransactionRequest."Card Number")-7)));
 
         case StrLen(EFTTransactionRequest."Card Number") of
             1 .. 4:
@@ -640,8 +643,8 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
 
         if (EFTTransactionRequest.Successful) then begin
-            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo('AID: ' + EFTTransactionRequest."Authorisation Number"));
-            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo('REF: ' + EFTTransactionRequest."Reference Number Output"));
+            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo(AIDLbl + EFTTransactionRequest."Authorisation Number"));
+            ReceiptText += WriteSlipLine(CreditCardTransaction, StrSubstNo(REFLbl + EFTTransactionRequest."Reference Number Output"));
             ReceiptText += WriteSlipLine(CreditCardTransaction, '');
         end;
 
@@ -652,12 +655,12 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, CenterText(TicketWidth,
-            StrSubstNo('%1 %2',
+            StrSubstNo(PlaceHolder2Lbl,
               EFTTransactionRequest."Transaction Date",
               EFTTransactionRequest."Transaction Time")));
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, CenterText(TicketWidth,
-            StrSubstNo('%1 / %2 / %3',
+            StrSubstNo(PlaceHolder3Lbl,
               EFTTransactionRequest."Sales Ticket No.",
               POSUnit."POS Store Code",
               POSUnit."No.")));
@@ -669,6 +672,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     var
         EntryNo: Integer;
         CRLF: Text[2];
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
 
         EntryNo := CreditCardTransaction."Entry No." + 1;
@@ -681,25 +685,27 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
         CRLF[1] := 10;
         CRLF[2] := 13;
-        exit(StrSubstNo('%1%2', LineText, CRLF));
+        exit(StrSubstNo(PlaceHolderLbl, LineText, CRLF));
     end;
 
     local procedure CenterText(Width: Integer; InText: Text) OutText: Text
+    var
+        PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
-
         if (StrLen(InText) = 0) then
             exit(' ');
 
         InText := CopyStr(InText, 1, Width);
 
-        OutText := StrSubstNo('%1%2',
+        OutText := StrSubstNo(PlaceHolderLbl,
           PadStr('', Round(Width / 2 - StrLen(InText) / 2, 1), ' '),
           CopyStr(InText, 1, Width));
     end;
 
     local procedure LeftRightText(Width: Integer; LeftText: Text; RightText: Text) OutText: Text
+    var
+        PlaceHolderLbl: Label '%1%2%3', Locked = true;
     begin
-
         if ((StrLen(LeftText) = 0) and (StrLen(RightText) = 0)) then
             exit(' ');
 
@@ -708,7 +714,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
             RightText := CopyStr(RightText, 1, Round(Width / 2, 1));
         end;
 
-        OutText := StrSubstNo('%1%2%3',
+        OutText := StrSubstNo(PlaceHolderLbl,
           LeftText,
           PadStr('', Round(Width - StrLen(LeftText) - StrLen(RightText), 1), ' '),
           RightText);
@@ -812,19 +818,28 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     end;
 
     local procedure CreateAuthorizationSection(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary) XmlText: Text
+    var
+        Xml1Lbl: Label '<PosCompanyName>%1</PosCompanyName>', Locked = true;
+        Xml2Lbl: Label '<PosStoreCode>%1</PosStoreCode>', Locked = true;
+        Xml3Lbl: Label '<PosUnitCode>%1</PosUnitCode>', Locked = true;
+        Xml4Lbl: Label '<Token>%1</Token>', Locked = true;
+        Xml5Lbl: Label '<ClientCardNumber>%1</ClientCardNumber>', Locked = true;
+        Xml6Lbl: Label '<ReceiptNumber>%1</ReceiptNumber>', Locked = true;
+        Xml7Lbl: Label '<TransactionId>%1</TransactionId>', Locked = true;
+        Xml8Lbl: Label '<Date>%1</Date>', Locked = true;
+        Xml9Lbl: Label '<Time>%1</Time>', Locked = true;
     begin
-
         XmlText :=
         '<Authorization>' +
-          StrSubstNo('<PosCompanyName>%1</PosCompanyName>', TmpTransactionAuthorization."Company Name") +
-          StrSubstNo('<PosStoreCode>%1</PosStoreCode>', TmpTransactionAuthorization."POS Store Code") +
-          StrSubstNo('<PosUnitCode>%1</PosUnitCode>', TmpTransactionAuthorization."POS Unit Code") +
-          StrSubstNo('<Token>%1</Token>', TmpTransactionAuthorization."Authorization Code") +
-          StrSubstNo('<ClientCardNumber>%1</ClientCardNumber>', TmpTransactionAuthorization."Card Number") +
-          StrSubstNo('<ReceiptNumber>%1</ReceiptNumber>', TmpTransactionAuthorization."Reference Number") +
-          StrSubstNo('<TransactionId>%1</TransactionId>', TmpTransactionAuthorization."Foreign Transaction Id") +
-          StrSubstNo('<Date>%1</Date>', Format(TmpTransactionAuthorization."Transaction Date", 0, 9)) +
-          StrSubstNo('<Time>%1</Time>', Format(TmpTransactionAuthorization."Transaction Time", 0, 9)) +
+          StrSubstNo(Xml1Lbl, TmpTransactionAuthorization."Company Name") +
+          StrSubstNo(Xml2Lbl, TmpTransactionAuthorization."POS Store Code") +
+          StrSubstNo(Xml3Lbl, TmpTransactionAuthorization."POS Unit Code") +
+          StrSubstNo(Xml4Lbl, TmpTransactionAuthorization."Authorization Code") +
+          StrSubstNo(Xml5Lbl, TmpTransactionAuthorization."Card Number") +
+          StrSubstNo(Xml6Lbl, TmpTransactionAuthorization."Reference Number") +
+          StrSubstNo(Xml7Lbl, TmpTransactionAuthorization."Foreign Transaction Id") +
+          StrSubstNo(Xml8Lbl, Format(TmpTransactionAuthorization."Transaction Date", 0, 9)) +
+          StrSubstNo(Xml9Lbl, Format(TmpTransactionAuthorization."Transaction Time", 0, 9)) +
         '</Authorization>';
     end;
 
@@ -891,13 +906,15 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     var
         XmlSalesLines: Text;
         XmlPaymentLines: Text;
+        XmlSalesLinesLbl: Label '<Line Type="%1" ItemNumber="%2" VariantCode="%3" Quantity="%4" Description="%5" CurrencyCode="%6" Amount="%7" Points="%8"/>', Locked = true;
+        XmlPaymentLinesLbl: Label '<Line Type="%1" Description="%2" CurrencyCode="%3" Amount="%4" Points="%5" AuthorizationCode="%6"/>', Locked = true;
     begin
 
         TmpTransactionAuthorization.FindFirst();
 
         if (TmpRegisterSaleLines.FindSet()) then
             repeat
-                XmlSalesLines += StrSubstNo('<Line Type="%1" ItemNumber="%2" VariantCode="%3" Quantity="%4" Description="%5" CurrencyCode="%6" Amount="%7" Points="%8"/>',
+                XmlSalesLines += StrSubstNo(XmlSalesLinesLbl,
                   TmpRegisterSaleLines.Type,
                   TmpRegisterSaleLines."Item No.",
                   TmpRegisterSaleLines."Variant Code",
@@ -910,7 +927,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
         if (TmpRegisterPaymentLines.FindSet()) then
             repeat
-                XmlPaymentLines += StrSubstNo('<Line Type="%1" Description="%2" CurrencyCode="%3" Amount="%4" Points="%5" AuthorizationCode="%6"/>',
+                XmlPaymentLines += StrSubstNo(XmlPaymentLinesLbl,
                   TmpRegisterPaymentLines.Type,
                   TmpRegisterPaymentLines.Description,
                   TmpRegisterPaymentLines."Currency Code",
@@ -961,13 +978,14 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     local procedure CreateReservePointsXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
     var
         XmlReservationLines: Text;
+        XmlReservationLinesLbl: Label '<Line Type="%1" Description="%2" CurrencyCode="%3" Amount="%4" Points="%5"/>', Locked = true;
     begin
 
         TmpTransactionAuthorization.FindFirst();
 
         if (TmpRegisterPaymentLines.FindSet()) then
             repeat
-                XmlReservationLines += StrSubstNo('<Line Type="%1" Description="%2" CurrencyCode="%3" Amount="%4" Points="%5"/>',
+                XmlReservationLines += StrSubstNo(XmlReservationLinesLbl,
                   Format(TmpRegisterPaymentLines.Type, 0, 9),
                   TmpRegisterPaymentLines.Description,
                   TmpRegisterPaymentLines."Currency Code",

@@ -39,6 +39,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
         OutStr: OutStream;
+        FileNameLbl: Label '%1 %2 %3.json', Locked = true;
     begin
         RecRef.GetTable(Record);
 
@@ -48,7 +49,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
             exit;
 
         GetTypeNameVersionFromRecordRef(RecRef, FileType, Name, FileVersion);
-        FileName := StrSubstNo('%1 %2 %3.json', FileType, Name, FileVersion);
+        FileName := StrSubstNo(FileNameLbl, FileType, Name, FileVersion);
 
         CreateDependencyJObject(JObject, FileType, Name, '1.0');
         JObject.Add('Description', '');
@@ -113,6 +114,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         DependencyToken: JsonToken;
         i: Integer;
         KeysCount: Integer;
+        JFilterLbl: Label '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''', Locked = true;
     begin
         if not DependencyManagementConfigured(DepMgtSetup) then
             exit(false);
@@ -151,7 +153,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
               'ManagedDependency',
               DependencyToken,
               StrSubstNo(
-                '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''',
+                JFilterLbl,
                 GetJObjectValueAsText(DependencyObject, 'Type'),
                 GetJObjectValueAsText(DependencyObject, 'Name'),
                 GetJObjectValueAsText(DependencyObject, 'Version')),
@@ -338,13 +340,14 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     var
         WebClientDependency: Record "NPR Web Client Dependency";
         StargatePackage: Record "NPR POS Stargate Package";
+        FileNameLbl: Label '%1 %2', Locked = true;
     begin
         case RecRef.Number() of
             DATABASE::"NPR Web Client Dependency":
                 begin
                     RecRef.SetTable(WebClientDependency);
                     FileType := 'Web Client Dependency';
-                    Name := StrSubstNo('%1 %2', WebClientDependency.Type, WebClientDependency.Code);
+                    Name := StrSubstNo(FileNameLbl, WebClientDependency.Type, WebClientDependency.Code);
                     FileVersion := '1.0';
                 end;
             DATABASE::"NPR POS Stargate Package":

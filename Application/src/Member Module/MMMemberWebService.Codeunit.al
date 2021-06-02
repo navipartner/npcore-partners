@@ -85,12 +85,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetMembershipTicketList-%1.xml', Locked = true;
     begin
 
         Membership.Import();
 
         InsertImportEntry('GetMembershipTicketList', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetMembershipTicketList-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -131,12 +132,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetMembershipChangeItemsList-%1.xml', Locked = true;
     begin
 
         Membership.Import();
 
         InsertImportEntry('GetMembershipChangeItemsList', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetMembershipChangeItemsList-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -187,12 +189,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'CreateMembership-%1.xml', Locked = true;
     begin
 
         membership.Import();
 
         InsertImportEntry('CreateMembership', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('CreateMembership-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -226,12 +229,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'AddMembershipMember-%1.xml', Locked = true;
     begin
 
         member.Import();
 
         InsertImportEntry('AddMembershipMember', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('AddMembershipMember-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -264,12 +268,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'AddAnonymousMember-%1.xml', Locked = true;
     begin
 
         AnonymousMember.Import();
 
         InsertImportEntry('AddAnonymousMember', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('AddAnonymousMember-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -301,12 +306,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'ChangeMembership-%1.xml', Locked = true;
     begin
 
         membership.Import();
 
         InsertImportEntry('ChangeMembership', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('ChangeMembership-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -340,12 +346,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetMembership-%1.xml', Locked = true;
     begin
 
         membership.Import();
 
         InsertImportEntry('GetMembership', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetMembership-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -382,12 +389,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetMembershipMembers-%1.xml', Locked = true;
     begin
 
         member.Import();
 
         InsertImportEntry('GetMembershipMembers', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetMembershipMembers-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -425,12 +433,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'UpdateMember-%1.xml', Locked = true;
     begin
 
         member.Import();
 
         InsertImportEntry('UpdateMember', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('UpdateMember-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -487,12 +496,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'BlockMembership-%1.xml', Locked = true;
     begin
 
         member.Import();
 
         InsertImportEntry('BlockMembership', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('BlockMembership-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -530,12 +540,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'BlockMember-%1.xml', Locked = true;
     begin
 
         member.Import();
 
         InsertImportEntry('BlockMember', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('BlockMember-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -574,12 +585,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetMembershipRoles-%1.xml', Locked = true;
     begin
 
         roles.Import();
 
         InsertImportEntry('GetMembershipRoles', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetMembershipRoles-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -614,12 +626,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'SetGDPRApproval-%1.xml', Locked = true;
     begin
 
         gdpr.Import();
 
         InsertImportEntry('SetGDPRApproval', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('SetGDPRApproval-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -653,12 +666,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'ConfirmMembershipPayment-%1.xml', Locked = true;
     begin
 
         ConfirmMembershipPayment.Import();
 
         InsertImportEntry('ConfirmMembershipPayment', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('ConfirmMembershipPayment-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -697,12 +711,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'RegretMembership-%1.xml', Locked = true;
     begin
 
         Membership.Import();
 
         InsertImportEntry('RegretMembership', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('RegretMembership-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -773,12 +788,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'CreateWalletMemberPass-%1.xml', Locked = true;
     begin
 
         CreateMemberPass.Import();
 
         InsertImportEntry('CreateWalletMemberPass', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('CreateWalletMemberPass-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -829,6 +845,7 @@ codeunit 6060128 "NPR MM Member WebService"
     procedure ExpireNotificationToken(Token: Text[64])
     var
         MembershipRole: Record "NPR MM Membership Role";
+        TokenExpiredLbl: Label 'Token Expired at %1 %2';
     begin
 
         if (StrLen(Token) <> MaxStrLen(MembershipRole."Notification Token")) then
@@ -838,7 +855,7 @@ codeunit 6060128 "NPR MM Member WebService"
         if (not MembershipRole.FindFirst()) then
             exit;
 
-        MembershipRole."Notification Token" := StrSubstNo('Token Expired at %1 %2', Today, Time);
+        MembershipRole."Notification Token" := StrSubstNo(TokenExpiredLbl, Today(), Time());
         MembershipRole.Modify();
 
     end;
@@ -882,12 +899,14 @@ codeunit 6060128 "NPR MM Member WebService"
         MemberEntryNo: Integer;
         MembershipEntryNo: Integer;
         ResponseMessage: Text;
+        FileNameLbl: Label 'GetSetMemberComOption-%1.xml', Locked = true;
+        MemberNumberInvalidLbl: Label 'Member number "%1" or Membership number "%2" is invalid.';
     begin
 
         GetSetMemberComOptions.Import();
 
         InsertImportEntry('GetSetMemberComOption', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetSetMemberComOption-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -904,7 +923,7 @@ codeunit 6060128 "NPR MM Member WebService"
             MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(ExternalMembershipNo);
 
             if (MemberEntryNo = 0) or (MembershipEntryNo = 0) then begin
-                ResponseMessage := StrSubstNo('Member number "%1" or Membership number "%2" is invalid.', ExternalMemberNo, ExternalMembershipNo);
+                ResponseMessage := StrSubstNo(MemberNumberInvalidLbl, ExternalMemberNo, ExternalMembershipNo);
                 GetSetMemberComOptions.SetErrorResponse(ResponseMessage);
 
             end else begin
@@ -961,12 +980,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'GetMembershipAutoRenewProduct-%1.xml', Locked = true;
     begin
 
         Membership.Import();
 
         InsertImportEntry('GetMembershipAutoRenewProduct', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetMembershipAutoRenewProduct-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -1003,12 +1023,13 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'ConfirmAutoRenewPayment-%1.xml', Locked = true;
     begin
 
         Membership.Import();
 
         InsertImportEntry('ConfirmAutoRenewPayment', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('ConfirmAutoRenewPayment-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -1044,12 +1065,13 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
+        FileNameLbl: Label 'GetSetAutoRenewOption-%1.xml', Locked = true;
     begin
 
         GetSetAutoRenew.Import();
 
         InsertImportEntry('GetSetAutoRenewOption', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo('GetSetAutoRenewOption-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -1120,6 +1142,8 @@ codeunit 6060128 "NPR MM Member WebService"
         MemberCardEntryNo: Integer;
         MembershipEntryNo: Integer;
         TicketCreated: Boolean;
+        ExternalMemberNotFoundLbl: Label 'External Member Number %1, not found.';
+        MembershipNotActiveLbl: Label 'Membership is not active for today (%1).';
     begin
 
         MembershipEntryNo := MembershipMgr.GetMembershipFromExtMemberNo(ExternalMemberNo);
@@ -1137,12 +1161,12 @@ codeunit 6060128 "NPR MM Member WebService"
         end;
 
         if (MembershipEntryNo = 0) then begin
-            ResponseMessage := StrSubstNo('External Member Number %1, not found.', ExternalMemberNo);
+            ResponseMessage := StrSubstNo(ExternalMemberNotFoundLbl, ExternalMemberNo);
             MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1);
             exit(-1);
         end;
         if (not MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate(), true)) then begin
-            ResponseMessage := StrSubstNo('Membership is not active for today (%1).', Format(WorkDate(), 0, 9));
+            ResponseMessage := StrSubstNo(MembershipNotActiveLbl, Format(WorkDate(), 0, 9));
             MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1);
             exit(-1);
         end;
@@ -1173,6 +1197,8 @@ codeunit 6060128 "NPR MM Member WebService"
 
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
+    var
+        FileNameLbl: Label '%1-%2.xml', Locked = true;
     begin
         ImportEntry.Init();
         ImportEntry."Entry No." := 0;
@@ -1185,7 +1211,7 @@ codeunit 6060128 "NPR MM Member WebService"
         end;
 
         ImportEntry.Date := CurrentDateTime;
-        ImportEntry."Document Name" := StrSubstNo('%1-%2.xml', ImportEntry."Import Type", Format(ImportEntry.Date, 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, ImportEntry."Import Type", Format(ImportEntry.Date, 0, 9));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry.Insert(true);

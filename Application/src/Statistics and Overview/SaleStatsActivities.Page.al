@@ -414,6 +414,7 @@ page 6059988 "NPR Sale Stats Activities"
         Text0001: Label 'Sale (LCY),Sale (Qty.),Profit (LCY),Profit (Pct.)';
         Text0002: Label 'This Year';
         Text0003: Label 'Last Year';
+        PeriodNameLbl: Label '%1', Locked = true;
 
     procedure UpdateDiagram()
     var
@@ -429,7 +430,7 @@ page 6059988 "NPR Sale Stats Activities"
         if Date.FindSet() then
             repeat
                 Calc();
-                Rec.AddColumn(StrSubstNo('%1', Date."Period Name"));
+                Rec.AddColumn(StrSubstNo(PeriodNameLbl, Date."Period Name"));
                 case FigureToDisplay of
                     FigureToDisplay::"Sale (Qty.)":
                         begin
@@ -506,36 +507,48 @@ page 6059988 "NPR Sale Stats Activities"
     end;
 
     local procedure Scroll(Direction: Text[1])
+    var
+        DayLbl: Label '<%1%2D>', Locked = true;
+        WeekLbl: Label '<%1%2W>', Locked = true;
+        MonthLbl: Label '<%1%2M>', Locked = true;
+        QuarterLbl: Label '<%1%2Q>', Locked = true;
+        YearLbl: Label '<%1%2Y>', Locked = true;
     begin
         Date.FindSet();
         case PeriodType of
             PeriodType::Day:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2D>', Direction, 1), Date."Period Start"));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(DayLbl, Direction, 1), Date."Period Start"));
             PeriodType::Week:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2W>', Direction, 1), Date."Period Start"));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(WeekLbl, Direction, 1), Date."Period Start"));
             PeriodType::Month:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2M>', Direction, 1), Date."Period Start"));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(MonthLbl, Direction, 1), Date."Period Start"));
             PeriodType::Quarter:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2Q>', Direction, 1), Date."Period Start"));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(QuarterLbl, Direction, 1), Date."Period Start"));
             PeriodType::Year:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<%1%2Y>', Direction, 1), Date."Period Start"));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(YearLbl, Direction, 1), Date."Period Start"));
         end;
     end;
 
     local procedure ApplyDateFilter()
+    var
+        DayLbl: Label '<CW-1W-%1D+2D>', Locked = true;
+        WeekLbl: Label '<CW-%1W>', Locked = true;
+        MonthLbl: Label '<CM-%1M>', Locked = true;
+        QuarterLbl: Label '<CQ-%1Q>', Locked = true;
+        YearLbl: Label '<CY-%1Y>', Locked = true;
     begin
         Date.SetRange("Period Type", PeriodType);
         case PeriodType of
             PeriodType::Day:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CW-1W-%1D+2D>', ColumnCount), Today));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(DayLbl, ColumnCount), Today));
             PeriodType::Week:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CW-%1W>', ColumnCount), Today));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(WeekLbl, ColumnCount), Today));
             PeriodType::Month:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CM-%1M>', ColumnCount), Today));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(MonthLbl, ColumnCount), Today));
             PeriodType::Quarter:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CQ-%1Q>', ColumnCount), Today));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(QuarterLbl, ColumnCount), Today));
             PeriodType::Year:
-                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo('<CY-%1Y>', ColumnCount), Today));
+                Date.SetFilter("Period Start", '%1..', CalcDate(StrSubstNo(YearLbl, ColumnCount), Today));
         end;
     end;
 

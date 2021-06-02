@@ -464,13 +464,14 @@
     local procedure SelectBankBin()
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
+        PymMethodLbl: Label '%1 %2', Locked = true;
     begin
         if (Rec."Bank Deposit Amount" = 0) then begin
             Rec."Bank Deposit Bin Code" := '';
             exit;
         end;
 
-        Rec."Bank Deposit Reference" := StrSubstNo('%1 %2', Rec."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
+        Rec."Bank Deposit Reference" := StrSubstNo(PymMethodLbl, Rec."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
 
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::BANK);
         if POSPaymentBin.IsEmpty() then
@@ -506,12 +507,13 @@
     local procedure SelectSafeBin()
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
+        PymMethodLbl: Label '%1 %2', Locked = true;
     begin
         if (Rec."Move to Bin Amount" = 0) then begin
             Rec."Move to Bin Code" := '';
             exit;
         end;
-        Rec."Move to Bin Reference" := StrSubstNo('%1 %2', Rec."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
+        Rec."Move to Bin Reference" := StrSubstNo(PymMethodLbl, Rec."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
 
         POSPaymentBin.SetFilter("Bin Type", '=%1', POSPaymentBin."Bin Type"::SAFE);
         if POSPaymentBin.IsEmpty() then
@@ -594,6 +596,7 @@
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentBin: Record "NPR POS Payment Bin";
+        PymMethodLbl: Label '%1:%2', Locked = true;
     begin
         case PageMode of
             PageMode::TRANSFER:
@@ -619,7 +622,7 @@
 
                     POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
                     POSPaymentBinCheckpoint.Validate("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
-                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
+                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo(PymMethodLbl, POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, 7));
                     POSPaymentBinCheckpoint."New Float Amount" := 0;
                     POSPaymentBinCheckpoint.Comment := AutoCount;
                     POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;

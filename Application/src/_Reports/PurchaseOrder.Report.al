@@ -288,11 +288,11 @@ report 6014617 "NPR Purchase Order"
                             repeat
                                 OldDimText := DimText;
                                 if DimText = '' then
-                                    DimText := StrSubstNo('%1 %2', DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code")
+                                    DimText := StrSubstNo(Pct1Lbl, DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code")
                                 else
                                     DimText :=
                                       StrSubstNo(
-                                        '%1, %2 %3', DimText,
+                                        Pct2Lbl, DimText,
                                         DimSetEntry1."Dimension Code", DimSetEntry1."Dimension Value Code");
                                 if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                     DimText := OldDimText;
@@ -494,11 +494,11 @@ report 6014617 "NPR Purchase Order"
                                 repeat
                                     OldDimText := DimText;
                                     if DimText = '' then
-                                        DimText := StrSubstNo('%1 %2', DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code")
+                                        DimText := StrSubstNo(Pct1Lbl, DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code")
                                     else
                                         DimText :=
                                           StrSubstNo(
-                                            '%1, %2 %3', DimText,
+                                            Pct2Lbl, DimText,
                                             DimSetEntry2."Dimension Code", DimSetEntry2."Dimension Value Code");
                                     if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                         DimText := OldDimText;
@@ -873,11 +873,11 @@ report 6014617 "NPR Purchase Order"
                                 repeat
                                     OldDimText := DimText;
                                     if DimText = '' then
-                                        DimText := StrSubstNo('%1 %2', PrepmtDimSetEntry."Dimension Code", PrepmtDimSetEntry."Dimension Value Code")
+                                        DimText := StrSubstNo(Pct1Lbl, PrepmtDimSetEntry."Dimension Code", PrepmtDimSetEntry."Dimension Value Code")
                                     else
                                         DimText :=
                                           StrSubstNo(
-                                            '%1, %2 %3', DimText,
+                                            Pct2Lbl, DimText,
                                             PrepmtDimSetEntry."Dimension Code", PrepmtDimSetEntry."Dimension Value Code");
                                     if StrLen(DimText) > MaxStrLen(OldDimText) then begin
                                         DimText := OldDimText;
@@ -1282,6 +1282,8 @@ report 6014617 "NPR Purchase Order"
         VALSpecLCYHeader: Text[80];
         VATNoText: Text[80];
         DimText: Text[120];
+        Pct1Lbl: Label '%1 %2', locked = true;
+        Pct2Lbl: Label '%1, %2 %3', locked = true;
 
     procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewArchiveDocument: Boolean; NewLogInteraction: Boolean)
     begin

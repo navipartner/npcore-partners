@@ -124,6 +124,7 @@ page 6151222 "NPR PrintNode Printer Settings"
     procedure GetSettings(): Text;
     var
         SettingsJson: Text;
+        SettingsJsonLbl: Label '{%1}', Locked = true;
     begin
         if Tray <> '' then
             SettingsJson += TrayJson + ',';
@@ -138,7 +139,7 @@ page 6151222 "NPR PrintNode Printer Settings"
         if SettingsJson = '' then
             exit('');
         SettingsJson := SettingsJson.TrimEnd(',');
-        exit(StrSubstNo('{%1}', SettingsJson));
+        exit(StrSubstNo(SettingsJsonLbl, SettingsJson));
     end;
 
     procedure LoadExistingSettings(SettingsJson: Text)
@@ -146,35 +147,42 @@ page 6151222 "NPR PrintNode Printer Settings"
         JObject: JsonObject;
         TextValue: Text;
         BoolValue: Boolean;
+        JsonLbl: Label '"bin":"%1"', Locked = true;
+        Json2Lbl: Label '"color":%1', Locked = true;
+        Json3Lbl: Label '"rotate":%1', Locked = true;
+        Json4Lbl: Label '"duplex":"%1"', Locked = true;
+        Json5Lbl: Label '"paper":"%1"', Locked = true;
     begin
         if not JObject.ReadFrom(SettingsJson) then
             exit;
         Tray := GetString(JObject, 'bin', false);
         if Tray <> '' then
-            TrayJson := StrSubstNo('"bin":"%1"', Tray);
+            TrayJson := StrSubstNo(JsonLbl, Tray);
         TextValue := GetString(JObject, 'color', false);
         if Evaluate(BoolValue, TextValue) then begin
             Color := format(BoolValue);
-            ColorJson := StrSubstNo('"color":%1', Format(BoolValue, 0, 9));
+            ColorJson := StrSubstNo(Json2Lbl, Format(BoolValue, 0, 9));
         end;
         TextValue := GetString(JObject, 'rotate', false);
         if TextValue <> '' then begin
             PageOrientation := RotateValue2Option(TextValue);
-            PageOrientationJson := StrSubstNo('"rotate":%1', TextValue);
+            PageOrientationJson := StrSubstNo(Json3Lbl, TextValue);
         end;
         TextValue := GetString(JObject, 'duplex', false);
         if TextValue <> '' then begin
             Duplex := DuplexValue2Option(TextValue);
-            DuplexJson := StrSubstNo('"duplex":"%1"', TextValue);
+            DuplexJson := StrSubstNo(Json4Lbl, TextValue);
         end;
         Paper := GetString(JObject, 'paper', false);
         if Paper <> '' then
-            PaperJson := StrSubstNo('"paper":"%1"', Paper);
+            PaperJson := StrSubstNo(Json5Lbl, Paper);
     end;
 
     local procedure LookupValue(Attribute: Text; var OutValue: Text; var OutJson: Text): Boolean
     var
         TempRetailList: Record "NPR Retail List" temporary;
+        JsonLbl: Label '"%1":%2', Locked = true;
+        Json2Lbl: Label '"%1":"%2"', Locked = true;
     begin
         case Attribute of
             'color':
@@ -193,9 +201,9 @@ page 6151222 "NPR PrintNode Printer Settings"
                 OutValue := TempRetailList.Choice;
                 case Attribute of
                     'color', 'rotate':
-                        OutJson := StrSubstNo('"%1":%2', GetJsonName(Attribute), TempRetailList.Value);
+                        OutJson := StrSubstNo(JsonLbl, GetJsonName(Attribute), TempRetailList.Value);
                     else
-                        OutJson := StrSubstNo('"%1":"%2"', GetJsonName(Attribute), TempRetailList.Value);
+                        OutJson := StrSubstNo(Json2Lbl, GetJsonName(Attribute), TempRetailList.Value);
                 end;
             end;
             exit(true);

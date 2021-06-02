@@ -910,6 +910,7 @@
         ContentHtml: Text;
         DisplayContentLines: Record "NPR Display Content Lines";
         VideoCounter: Integer;
+        ContentIfStmtLbl: Label '      if (video_count == %1) video_count = 1;', Locked = true;
     begin
         DisplayContentLines.SetRange("Content Code", ContentCode);
         if DisplayContentLines.FindSet() then begin
@@ -938,7 +939,7 @@
             ContentHtml += '    function run() {';
             ContentHtml += '      video_count++;';
             ContentHtml += StrSubstNo(
-                           '      if (video_count == %1) video_count = 1;', VideoCounter);
+                           ContentIfStmtLbl, VideoCounter);
             ContentHtml += '      var nextVideo = "video" + video_count + ".mp4";';
             ContentHtml += '      videoPlayer.src = nextVideo;';
             ContentHtml += '      videoPlayer.play();';

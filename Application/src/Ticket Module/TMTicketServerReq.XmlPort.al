@@ -118,15 +118,15 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                         pincode := TmpTicketReservationRequest."Authorization Code";
                         ticket_uid := TmpTicket."External Ticket No.";
                         if (TmpTicketReservationRequest."Entry Type" = TmpTicketReservationRequest."Entry Type"::CHANGE) then
-                            ticket_uid := STRSUBSTNO('%1-%2', TmpTicket."External Ticket No.", TmpTicket."Ticket Reservation Entry No.");
+                            ticket_uid := STRSUBSTNO(TicketUidLbl, TmpTicket."External Ticket No.", TmpTicket."Ticket Reservation Entry No.");
 
                         DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', TmpTicket."No.");
                         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
                         if (DetTicketAccessEntry.FindFirst()) then begin
                             AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
                             if (AdmissionScheduleEntry.FindFirst()) then begin
-                                visit_date := StrSubstNo('%1 %2', Format(AdmissionScheduleEntry."Admission Start Date", 0, 9), Format(AdmissionScheduleEntry."Admission Start Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
-                                visit_end_date := StrSubstNo('%1 %2', Format(AdmissionScheduleEntry."Admission End Date", 0, 9), Format(AdmissionScheduleEntry."Admission End Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
+                                visit_date := StrSubstNo(DateTimeLbl, Format(AdmissionScheduleEntry."Admission Start Date", 0, 9), Format(AdmissionScheduleEntry."Admission Start Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
+                                visit_end_date := StrSubstNo(DateTimeLbl, Format(AdmissionScheduleEntry."Admission End Date", 0, 9), Format(AdmissionScheduleEntry."Admission End Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
 
                                 ticket_sub_title := GetDescription(TmpTicket, AdmissionScheduleEntry."Admission Code", TicketSetup.FieldNo("Ticket Sub Title"));
                                 TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
@@ -165,12 +165,15 @@ xmlport 6060123 "NPR TM Ticket Server Req."
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        DateTimeLbl: Label '%1 %2', Locked = true;
+        TicketUidLbl: Label '%1-%2', Locked = true;
 
     procedure SetRequestEntryNo(Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketType: Record "NPR TM Ticket Type";
         Ticket: Record "NPR TM Ticket";
+        FailureReasonLbl: Label '"DIY Print Layout Code" must not blank for "Ticket Type" %1.';
     begin
 
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -200,7 +203,7 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                     TmpTicket.TransferFields(Ticket, true);
                     TicketType.Get(TmpTicket."Ticket Type Code");
                     if (TicketType."DIY Print Layout Code" = '') then begin
-                        FailureReason := StrSubstNo('"DIY Print Layout Code" must not blank for "Ticket Type" %1.', TmpTicket."Ticket Type Code");
+                        FailureReason := StrSubstNo(FailureReasonLbl, TmpTicket."Ticket Type Code");
                         exit(false);
                     end;
 
@@ -303,11 +306,10 @@ xmlport 6060123 "NPR TM Ticket Server Req."
     local procedure GetPrice(TmpTicket: Record "NPR TM Ticket" temporary): Text
     var
         Item: Record Item;
+        ItemUnitPriceLbl: Label '%1 %2', Locked = true;
     begin
-
         Item.Get(TmpTicket."Item No.");
-        exit(StrSubstNo('%1 %2', Item."Unit Price", GeneralLedgerSetup."LCY Code"));
-
+        exit(StrSubstNo(ItemUnitPriceLbl, Item."Unit Price", GeneralLedgerSetup."LCY Code"));
     end;
 }
 

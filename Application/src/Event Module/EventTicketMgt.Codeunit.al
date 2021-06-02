@@ -491,9 +491,10 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     procedure GetTicketURL(Rec: Record "Job Planning Line"): Text
     var
         TMTicketSetup: Record "NPR TM Ticket Setup";
+        PlaceHolder2Lbl: Label '%1%2', Locked = true;
     begin
         TMTicketSetup.Get();
-        exit(StrSubstNo('%1%2', TMTicketSetup."Print Server Order URL", Rec."NPR Ticket Token"));
+        exit(StrSubstNo(PlaceHolder2Lbl, TMTicketSetup."Print Server Order URL", Rec."NPR Ticket Token"));
     end;
 
     procedure DownloadTicket(Rec: Record "Job Planning Line") FileName: Text

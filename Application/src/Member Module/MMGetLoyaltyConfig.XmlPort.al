@@ -97,6 +97,7 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
     var
         DocumentId: Text;
         StartTime: Time;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure SetDocumentId(var DocumentIdIn: Text)
     begin
@@ -144,7 +145,7 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
         MessageCode := '';
 
         if (StartTime <> 0T) then
-            ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+            ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
     procedure SetErrorResponse(ResponseMessageIn: Text; MessageId: Text)

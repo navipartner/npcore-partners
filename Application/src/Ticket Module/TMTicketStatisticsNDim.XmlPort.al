@@ -150,16 +150,18 @@ xmlport 6060110 "NPR TM Ticket Statistics N-Dim"
     end;
 
     procedure SetResponse(var TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary)
+    var
+        StatisticsNotFoundLbl: Label 'No statistics found for daterange %1..%2';
+        ExecutionTimeLbl: Label '%1 (ms)',Locked = true;
     begin
-
         ResponseStatus := 'ERROR';
-        ResponseMessage := StrSubstNo('No statistics found for daterange %1..%2', Format(RequestFromDate, 0, 9), Format(RequestUntilDate, 0, 9));
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ResponseMessage := StrSubstNo(StatisticsNotFoundLbl, Format(RequestFromDate, 0, 9), Format(RequestUntilDate, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
 
         TmpTicketAccessStatistics.Reset();
         if (TmpTicketAccessStatistics.FindSet()) then begin
             ResponseStatus := 'OK';
-            ResponseMessage := StrSubstNo('');
+            ResponseMessage := '';
 
             repeat
                 TicketStatisticsResponse.TransferFields(TmpTicketAccessStatistics, true);

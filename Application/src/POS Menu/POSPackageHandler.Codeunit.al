@@ -8,6 +8,7 @@ codeunit 6150900 "NPR POS Package Handler"
         i: Integer;
         FileName: Text;
         POSParameterValue: Record "NPR POS Parameter Value";
+        FileNameLbl: Label '%1 - %2', Locked = true;
     begin
         if not POSMenu.FindSet() then
             exit;
@@ -26,7 +27,7 @@ codeunit 6150900 "NPR POS Package Handler"
         until POSMenu.Next() = 0;
 
         if i = 1 then
-            FileName := StrSubstNo('%1 - %2', 'POS Menu', POSMenu2.Code)
+            FileName := StrSubstNo(FileNameLbl, 'POS Menu', POSMenu2.Code)
         else
             FileName := 'POS Menus';
 

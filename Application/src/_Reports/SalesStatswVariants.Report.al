@@ -65,7 +65,7 @@ report 6014611 "NPR Sales Stats w/ Variants"
             column(PrintAlsoWithoutSale; PrintAlsoWithoutSale)
             {
             }
-            column(ItemFilterTxt; StrSubstNo('%1: %2', Item.TableCaption, ItemFilter))
+            column(ItemFilterTxt; StrSubstNo(Pct1Lbl, Item.TableCaption, ItemFilter))
             {
             }
             column(Report_Caption; Report_Caption)
@@ -247,6 +247,7 @@ report 6014611 "NPR Sales Stats w/ Variants"
         ItemVendorNo_Caption: Label 'Vendor Item No.';
         PeriodText: Text[30];
         ItemFilter: Text[250];
+        Pct1Lbl: Label '%1: %2', locked = true;
 
     procedure Calculate()
     begin

@@ -119,6 +119,7 @@
         "Action": Integer;
         tmpTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
         SkipRecordHandling: Boolean;
+        ActionLbl: Label '%1,%2,%3', Locked = true;
     begin
         POSEntry.SetCurrentKey("Document No.");
         POSEntry.SetRange("Document No.", ReceiptNo);
@@ -128,7 +129,7 @@
         CreateRequest('VOUCHER_ISSUE', TaxFreeUnit, TaxFreeRequest);
 
         if TryGetActiveVoucherFromReceiptNo(ReceiptNo, TaxFreeVoucher) then begin //Another voucher is already linked to this receipt, we can't issue a new one.
-            Action := StrMenu(StrSubstNo('%1,%2,%3', Caption_Reissue, Caption_Void, Caption_Cancel), 3, Caption_ExistingVoucherFound);
+            Action := StrMenu(StrSubstNo(ActionLbl, Caption_Reissue, Caption_Void, Caption_Cancel), 3, Caption_ExistingVoucherFound);
             case Action of
                 1:
                     VoucherReissue(TaxFreeVoucher);
@@ -503,6 +504,7 @@
     local procedure HandleEventResponse(EventWasHandled: Boolean; TaxFreeUnit: Record "NPR Tax Free POS Unit"; TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean)
     var
         ErrorNo: Text;
+        TaxFreeReqLbl: Label ' - %1: %2', Locked = true;
     begin
         if not EventWasHandled then begin
             TaxFreeRequest."Error Message" := StrSubstNo(Error_MissingHandler, TaxFreeUnit."Handler ID Enum");
@@ -515,7 +517,7 @@
 
         if (not TaxFreeRequest.Success) and (not Silent) then begin
             if TaxFreeRequest."Error Code" <> '' then
-                ErrorNo := StrSubstNo(' - %1: %2', Caption_Code, TaxFreeRequest."Error Code");
+                ErrorNo := StrSubstNo(TaxFreeReqLbl, Caption_Code, TaxFreeRequest."Error Code");
             ShowError(TaxFreeRequest."Error Message" + ErrorNo);
         end;
     end;

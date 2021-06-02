@@ -232,11 +232,13 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
 
     var
         StartTime: Time;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
     procedure GenerateResponse()
     var
         ItemBudgetName: Record "Item Budget Name";
         GeneralLedgerSetup: Record "General Ledger Setup";
+        SalesbudgetLbl: Label 'Salesbudget with name %1 not found.', Locked = true;
     begin
 
         if (not (TmpItemBudgetNameRequest.FindFirst())) then begin
@@ -245,7 +247,7 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
         end;
 
         if (not ItemBudgetName.Get(TmpItemBudgetNameRequest."Analysis Area", TmpItemBudgetNameRequest.Name)) then begin
-            SetError(101, StrSubstNo('Salesbudget with name %1 not found.', TmpItemBudgetNameRequest.Name));
+            SetError(101, StrSubstNo(SalesbudgetLbl, TmpItemBudgetNameRequest.Name));
             exit;
         end;
 
@@ -260,7 +262,7 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
         GetDimensions(ItemBudgetName."Budget Dimension 2 Code", TmpDim2, TmpDimValue2);
         GetDimensions(ItemBudgetName."Budget Dimension 3 Code", TmpDim3, TmpDimValue3);
 
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
         ResponseCode := 'OK';
         ResponseMessage := 'Success';
         ResponseMessageId := Format(10);
@@ -271,7 +273,7 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
         ResponseMessage := ErrorText;
         ResponseCode := 'ERROR';
         ResponseMessageId := Format(ErrorId);
-        ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
+        ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
     local procedure GetDimensions("Code": Code[20]; var TmpDimension: Record Dimension temporary; var TmpDimensionValue: Record "Dimension Value" temporary)

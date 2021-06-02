@@ -93,11 +93,12 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
         ResolvingTable: Integer;
         NEW_MEMBER_TICKET: Label 'Ticket %1 for admission %2 was created for member %3.';
         MEMBER_TICKET: Label 'Ticket %1 for admission %2 was reused for member %3.';
+        ResponseMsg: Label '%1 does not translate to an item. Check Item Cross-Reference or Item table.';
         Token: Text[100];
     begin
 
         if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(TicketItemNo, ItemNo, VariantCode, ResolvingTable))) then begin
-            ResponseMessage := StrSubstNo('%1 does not translate to an item. Check Item Cross-Reference or Item table.', TicketItemNo);
+            ResponseMessage := StrSubstNo(ResponseMsg, TicketItemNo);
             exit(-1);
         end;
 
@@ -145,13 +146,14 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
         oStream: OutStream;
         TicketReservation: XMLport "NPR TM Ticket Reservation";
         TicketWebService: Codeunit "NPR TM Ticket WebService";
+        XmlLbl: Label '       <ticket external_id="%1" line_no="1" qty="1" admission_schedule_entry="0" member_number="%2" admission_code="%3"/>', Locked = true;
     begin
 
         xmltext :=
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
         '<tickets xmlns="urn:microsoft-dynamics-nav/xmlports/x6060114">' +
         '   <reserve_tickets token="">' +
-        StrSubstNo('       <ticket external_id="%1" line_no="1" qty="1" admission_schedule_entry="0" member_number="%2" admission_code="%3"/>', ExternalItemNumber, MemberReference, AdmissionCode) +
+        StrSubstNo(XmlLbl, ExternalItemNumber, MemberReference, AdmissionCode) +
         '   </reserve_tickets>' +
         '</tickets>';
 
@@ -182,13 +184,14 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
         TicketConfirmation: XMLport "NPR TM Ticket Confirmation";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         Ticket: Record "NPR TM Ticket";
+        XmlLbl: Label '      <ticket_token>%1</ticket_token>', Locked = true;
     begin
 
         xmltext :=
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
         '<tickets xmlns="urn:microsoft-dynamics-nav/xmlports/x6060117">' +
         '  <ticket_tokens>' +
-        StrSubstNo('      <ticket_token>%1</ticket_token>', Token) +
+        StrSubstNo(XmlLbl, Token) +
         '      <send_notification_to></send_notification_to>' +
         '      <external_order_no>prepaid</external_order_no>' +
         '  </ticket_tokens>' +

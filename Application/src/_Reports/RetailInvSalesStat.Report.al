@@ -20,7 +20,7 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
             column(PrintAlsoWithoutSale; PrintAlsoWithoutSale)
             {
             }
-            column(ItemFilterCaption; StrSubstNo('%1: %2', TableCaption, ItemFilter))
+            column(ItemFilterCaption; StrSubstNo(Pct1Lbl, TableCaption, ItemFilter))
             {
             }
             column(ItemFilter; ItemFilter)
@@ -178,6 +178,8 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
         UnitPriceCaptionLbl: Label 'Unit Price';
         ItemFilter: Text;
         PeriodText: Text;
+        Pct1Lbl: Label '%1: %2', locked = true;
+
 
     local procedure Calculate()
     begin

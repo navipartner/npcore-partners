@@ -243,6 +243,7 @@ xmlport 6151188 "NPR MM Member Comm."
     local procedure MessageTypeTextToOption(Name: Text) OptionValue: Integer
     var
         MemberCommunication: Record "NPR MM Member Communication";
+        InvalidMessageTypeLbl: Label 'Invalid MessageType option "%1". Valid options are "Welcome|Renew|Newsletter|Membercard|Tickets".';
     begin
 
         case UpperCase(Name) of
@@ -258,7 +259,7 @@ xmlport 6151188 "NPR MM Member Comm."
                 OptionValue := MemberCommunication."Message Type"::TICKETS;
             else begin
                     OptionValue := TmpMemberCommunicationRequest.Count() + 1 + 5; // part of the key - to avoid insert errors on multiple incorrect types;
-                    errordescription := StrSubstNo('Invalid MessageType option "%1". Valid options are "Welcome|Renew|Newsletter|Membercard|Tickets".', Name);
+                    errordescription := StrSubstNo(InvalidMessageTypeLbl, Name);
                 end;
         end;
     end;
@@ -266,6 +267,7 @@ xmlport 6151188 "NPR MM Member Comm."
     local procedure MethodTextToOption(Name: Text) OptionValue: Integer
     var
         MemberCommunication: Record "NPR MM Member Communication";
+        InvalidMethodOptionLbl: Label 'Invalid Method option "%1". Valid options are "Manual|SMS|E-Mail|Wallet (SMS)|Wallet (E-Mail)".';
     begin
 
         case UpperCase(Name) of
@@ -280,13 +282,14 @@ xmlport 6151188 "NPR MM Member Comm."
             '4', 'WALLET_EMAIL', 'WALLET (E-MAIL)', 'WALLET (EMAIL)':
                 OptionValue := MemberCommunication."Preferred Method"::WALLET_EMAIL;
             else
-                errordescription := StrSubstNo('Invalid Method option "%1". Valid options are "Manual|SMS|E-Mail|Wallet (SMS)|Wallet (E-Mail)".', Name);
+                errordescription := StrSubstNo(InvalidMethodOptionLbl, Name);
         end;
     end;
 
     local procedure AcceptedTextToOption(Name: Text) OptionValue: Integer
     var
         MemberCommunication: Record "NPR MM Member Communication";
+        InvalidAcceptedOptionLbl: Label 'Invalid Accepted option "%1". Valid options are "Pending|Opt-In|Opt-Out".';
     begin
 
         case UpperCase(Name) of
@@ -297,7 +300,7 @@ xmlport 6151188 "NPR MM Member Comm."
             '2', 'OPTOUT', 'OPT-OUT':
                 OptionValue := MemberCommunication."Accepted Communication"::"OPT-OUT";
             else
-                errordescription := StrSubstNo('Invalid Accepted option "%1". Valid options are "Pending|Opt-In|Opt-Out".', Name);
+                errordescription := StrSubstNo(InvalidAcceptedOptionLbl, Name);
         end;
     end;
 }
