@@ -7009,7 +7009,7 @@ body {
       cursor: default;
       display: flex; }
       .transcendence .grid__table table tbody tr.negative-row {
-        color: var(--color-danger); }
+        color: var(--color-danger-100); }
       .transcendence .grid__table table tbody tr.tr-highlight {
         background-color: var(--color-primary-300); }
     .transcendence .grid__table table tbody td {
@@ -7049,7 +7049,7 @@ body {
   background-color: var(--color-primary-100);
   padding: 0.5em; }
   .transcendence .subtotal .subtotal__container.negative {
-    color: var(--color-danger); }
+    color: var(--color-danger-100); }
   .transcendence .subtotal .subtotal__container span {
     font-weight: 600;
     display: inline-block; }
@@ -7172,7 +7172,7 @@ body {
     color: var(--color-text-100);
     background-color: var(--color-secondary-100); }
     .transcendence .input__textbox.error {
-      border-color: var(--color-danger);
+      border-color: var(--color-danger-100);
       background-color: #ffede8; }
     .transcendence .input__textbox.filteredinputactive {
       color: #7ba1c4; }
@@ -8765,8 +8765,7 @@ body {
       width: 100vw;
       display: flex;
       flex-direction: column;
-      flex: 1 1 auto;
-      overflow-y: scroll; }
+      flex: 1 1 auto; }
   .mobile-view .mobile {
     width: 100%;
     flex-grow: 1; }
@@ -9314,7 +9313,8 @@ body {
               flex: 0 auto; }
               #popup-host .dialog__container .dialog__body .numpad .buttongrid__row .button {
                 height: fit-content;
-                width: fit-content; }
+                width: fit-content;
+                border-radius: 50%; }
                 #popup-host .dialog__container .dialog__body .numpad .buttongrid__row .button > div {
                   border-radius: 50%;
                   width: 2.75em;
@@ -9658,12 +9658,21 @@ body {
       color: var(--color-text-100);
       padding: 0 2em;
       display: flex;
-      align-items: center; }
+      align-items: center;
+      position: relative;
+      overflow: visible;
+      z-index: 0; }
       .statistics .filter-container .filter--active {
-        background: var(--color-primary-300); }
+        z-index: 1; }
       .statistics .filter-container .filter:hover {
-        cursor: pointer;
-        background: var(--color-primary-300); }
+        cursor: pointer; }
+      .statistics .filter-container .filter__active-background {
+        background: var(--color-primary-300);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        z-index: -1; }
   .statistics .heading {
     height: 2em;
     padding-left: 0.25em;
@@ -9686,19 +9695,21 @@ body {
       justify-content: center;
       font-size: 0.95em; }
     .statistics .sections h2 {
-      font-size: 1.2em;
-      margin-top: 0; }
+      font-size: 1em;
+      margin-top: 0;
+      font-weight: 500; }
     .statistics .sections .section {
       height: fit-content;
-      width: 49.5%;
+      width: calc(50% - var(--section-margin) / 2);
       margin-bottom: var(--section-margin);
       padding: 1em;
       background: var(--color-secondary-100);
       border-radius: 3px;
       box-shadow: var(--box-shadow); }
       .statistics .sections .section h1 {
-        font-size: 1.4em;
-        border-bottom: 1px solid var(--color-primary-100); }
+        font-size: 1.2em;
+        border-bottom: 1px solid var(--color-primary-100);
+        font-weight: 500; }
       .statistics .sections .section--single {
         width: 75%;
         margin: 0 auto var(--section-margin) auto; }
@@ -9764,10 +9775,9 @@ body {
         justify-content: flex-start;
         padding: 0 0.5em; }
     .statistics .sections .section-title {
-      font-size: 1.8em;
+      font-size: 1.6em;
       text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 6px; }
+      font-weight: 400; }
   .statistics .buttons {
     display: flex;
     flex-direction: row;
@@ -9790,11 +9800,28 @@ body {
         .statistics .buttons__container .button:hover {
           cursor: pointer;
           background: var(--color-primary-200); }
-        .statistics .buttons__container .button--close {
-          background: var(--color-secondary-100);
-          color: var(--color-text-100); }
-          .statistics .buttons__container .button--close:hover {
-            background: var(--color-primary-300); }
+        .statistics .buttons__container .button--confirmed {
+          background: var(--green); }
+          .statistics .buttons__container .button--confirmed:hover {
+            background: var(--green-hover); }
+        .statistics .buttons__container .button--not-confirmed {
+          background: var(--color-danger-100);
+          width: unset;
+          flex: unset;
+          padding: 0 1em; }
+          .statistics .buttons__container .button--not-confirmed:hover {
+            background: var(--color-danger-200); }
+  .statistics .cash-count-warning {
+    background: var(--color-accent-100);
+    color: var(--color-text-200);
+    width: 100%;
+    margin: 0 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    box-shadow: var(--box-shadow);
+    font-size: 1.1em; }
 
 .counting-backdrop {
   height: 100%;
@@ -9815,88 +9842,63 @@ body {
     background: var(--color-secondary-200); }
     .counting-backdrop .counting--modal {
       height: fit-content;
-      max-width: 65%;
+      max-width: 80%;
       min-width: 35%;
       margin: 0 auto;
       border-radius: 3px;
       overflow: hidden; }
     .counting-backdrop .counting__view-options {
       display: flex;
+      justify-content: space-between;
       width: 100%;
       padding: 1em 2em; }
-      .counting-backdrop .counting__view-options .option {
-        padding: 0.75em 1em 0.75em 1em;
-        border-radius: 3px;
-        margin-right: 0.5em;
-        box-shadow: var(--box-shadow-light);
-        background: var(--color-secondary-100); }
-        .counting-backdrop .counting__view-options .option:hover {
-          background: var(--color-primary-300);
-          cursor: pointer; }
-        .counting-backdrop .counting__view-options .option.active {
-          background: var(--color-primary-300);
-          box-shadow: none; }
-      .counting-backdrop .counting__view-options .payment-type-selection {
-        border-radius: 3px;
-        box-shadow: var(--box-shadow-light);
-        background: var(--color-secondary-100);
-        margin-left: auto;
-        display: flex;
-        flex-direction: column;
-        position: relative; }
-        .counting-backdrop .counting__view-options .payment-type-selection--no-radius {
-          border-bottom-right-radius: 0; }
-        .counting-backdrop .counting__view-options .payment-type-selection__controls {
-          display: flex; }
-        .counting-backdrop .counting__view-options .payment-type-selection__go-to {
-          padding: 0.75em 1em;
-          border-right: 1px solid var(--color-secondary-200); }
-          .counting-backdrop .counting__view-options .payment-type-selection__go-to:hover {
-            background: var(--color-primary-300);
-            cursor: pointer; }
-        .counting-backdrop .counting__view-options .payment-type-selection__dropdown {
-          display: flex;
-          flex-direction: column;
-          padding: 0 1.25em;
-          justify-content: center; }
-          .counting-backdrop .counting__view-options .payment-type-selection__dropdown:hover {
-            background: var(--color-primary-300);
-            cursor: pointer; }
-          .counting-backdrop .counting__view-options .payment-type-selection__dropdown .dropdown-icon {
-            transition: transform 0.15s ease-in-out; }
-            .counting-backdrop .counting__view-options .payment-type-selection__dropdown .dropdown-icon--rotate {
-              transform: rotate(180deg); }
-        .counting-backdrop .counting__view-options .payment-type-selection__options {
-          display: flex;
-          flex-direction: column;
-          position: absolute;
-          right: 0;
-          top: 100%;
+      .counting-backdrop .counting__view-options .layouts {
+        display: flex; }
+        .counting-backdrop .counting__view-options .layouts__option {
+          font-size: 1.1em;
+          padding: 0.5em 0.75em;
+          border-radius: 3px;
+          margin-right: 0.5em;
+          box-shadow: var(--box-shadow-light);
           background: var(--color-secondary-100);
-          border-radius: 0 0 3px 3px;
-          z-index: 100;
-          overflow: hidden;
-          transition: height 0.15s ease-in-out;
-          height: 0; }
-          .counting-backdrop .counting__view-options .payment-type-selection__options--visible {
-            height: 250%;
-            border: 1px solid var(--color-primary-300); }
-          .counting-backdrop .counting__view-options .payment-type-selection__options span {
-            padding: 0.5em 2em;
-            text-align: center; }
-            .counting-backdrop .counting__view-options .payment-type-selection__options span:hover {
-              background: var(--color-primary-300);
-              cursor: pointer; }
-          .counting-backdrop .counting__view-options .payment-type-selection__options .active-payment-type {
-            background: var(--color-primary-300); }
+          height: fit-content; }
+          .counting-backdrop .counting__view-options .layouts__option:hover {
+            background: var(--color-primary-300);
+            cursor: pointer; }
+          .counting-backdrop .counting__view-options .layouts__option.active {
+            background: var(--color-primary-300);
+            box-shadow: none; }
+      .counting-backdrop .counting__view-options .payment-type-selection {
+        display: flex;
+        align-items: center; }
+        .counting-backdrop .counting__view-options .payment-type-selection__option {
+          padding: 0.5em 0.75em;
+          border-radius: 3px;
+          margin: 0 0.5em 0.5em 0;
+          box-shadow: var(--box-shadow-light);
+          background: var(--color-secondary-100); }
+          .counting-backdrop .counting__view-options .payment-type-selection__option:hover {
+            background: var(--color-primary-300);
+            cursor: pointer; }
+          .counting-backdrop .counting__view-options .payment-type-selection__option.active {
+            background: var(--color-primary-300);
+            box-shadow: none; }
+          .counting-backdrop .counting__view-options .payment-type-selection__option--active {
+            background: var(--color-primary-300);
+            box-shadow: none; }
+        .counting-backdrop .counting__view-options .payment-type-selection__icon-confirmed {
+          color: var(--green); }
+        .counting-backdrop .counting__view-options .payment-type-selection__icon-danger {
+          color: var(--color-danger-100); }
     .counting-backdrop .counting__content {
       background: var(--color-secondary-200);
-      padding: 1em 2em 2em 2em; }
+      padding: 1em 2em 0 2em; }
       .counting-backdrop .counting__content--default {
         display: flex;
         align-items: center; }
     .counting-backdrop .counting__data-container {
-      z-index: 2; }
+      z-index: 2;
+      margin-right: 2em; }
     .counting-backdrop .counting h1 {
       font-size: 1.2em;
       margin-top: 0;
@@ -9949,6 +9951,10 @@ body {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         border-bottom: none; }
+      .counting-backdrop .counting .inline-property.difference-not-confirmed {
+        background: var(--color-danger-100); }
+      .counting-backdrop .counting .inline-property.difference-confirmed {
+        background: var(--green); }
       .counting-backdrop .counting .inline-property__label {
         font-size: 1em;
         position: absolute;
@@ -9967,6 +9973,10 @@ body {
         .counting-backdrop .counting .inline-property__label--minimized {
           font-size: 0.7em;
           top: 0; }
+        .counting-backdrop .counting .inline-property__label.difference-not-confirmed {
+          color: var(--color-text-200); }
+        .counting-backdrop .counting .inline-property__label.difference-confirmed {
+          color: var(--color-text-200); }
       .counting-backdrop .counting .inline-property__value {
         text-align: right;
         font-size: 1.4em;
@@ -10004,6 +10014,17 @@ body {
             .counting-backdrop .counting .inline-property__value .input-with-lookup__row:hover {
               background: var(--color-primary-300);
               cursor: pointer; }
+        .counting-backdrop .counting .inline-property__value .input-icon {
+          font-size: 1.1em;
+          color: var(--color-primary-100); }
+          .counting-backdrop .counting .inline-property__value .input-icon:hover {
+            cursor: pointer;
+            color: var(--color-primary-200); }
+          .counting-backdrop .counting .inline-property__value .input-icon--confirm {
+            color: var(--green); }
+            .counting-backdrop .counting .inline-property__value .input-icon--confirm:hover {
+              cursor: auto;
+              color: var(--green); }
       .counting-backdrop .counting .inline-property__input {
         border: none;
         outline: none;
@@ -10019,15 +10040,24 @@ body {
         .counting-backdrop .counting .inline-property__input::selection {
           background: var(--color-primary-100);
           color: var(--color-text-200); }
+        .counting-backdrop .counting .inline-property__input.difference-not-confirmed {
+          color: var(--color-text-200); }
+        .counting-backdrop .counting .inline-property__input.difference-confirmed {
+          color: var(--color-text-200); }
     .counting-backdrop .counting__primary-data {
       display: flex;
       margin-bottom: 0.75em;
       justify-content: space-between; }
       .counting-backdrop .counting__primary-data .inline-property {
         margin: 0;
-        min-width: calc(33.33% - 0.5em);
+        margin-right: 0.75em;
+        min-width: 16em;
         width: calc(33.33% - 0.5em);
         max-width: 12em; }
+        .counting-backdrop .counting__primary-data .inline-property:last-child {
+          margin-right: 0; }
+        .counting-backdrop .counting__primary-data .inline-property__value {
+          height: 2.2em; }
     .counting-backdrop .counting__section {
       padding: 1em;
       background: var(--color-secondary-100);
@@ -10066,6 +10096,25 @@ body {
       .counting-backdrop .counting .button:hover {
         cursor: pointer;
         background: var(--color-primary-200); }
+    .counting-backdrop .counting .buttons {
+      padding: 0 2em 1em 2em;
+      display: flex;
+      justify-content: flex-end; }
+      .counting-backdrop .counting .buttons .button {
+        padding: 0.75em 1em;
+        flex: unset;
+        width: fit-content;
+        margin: 0; }
+        .counting-backdrop .counting .buttons .button--confirmed {
+          background: var(--green); }
+          .counting-backdrop .counting .buttons .button--confirmed:hover {
+            background: var(--green-hover); }
+        .counting-backdrop .counting .buttons .button--not-confirmed {
+          background: var(--color-danger-100); }
+          .counting-backdrop .counting .buttons .button--not-confirmed:hover {
+            background: var(--color-danger-200); }
+        .counting-backdrop .counting .buttons .button i {
+          margin-right: 0.25em; }
     .counting-backdrop .counting .nothing-to-do-here {
       min-height: 40vh;
       max-height: 60vh;
@@ -10123,7 +10172,8 @@ body {
   margin-bottom: 2em;
   max-height: 60vh;
   min-height: 40vh;
-  overflow: scroll; }
+  overflow: scroll;
+  margin-right: 3em; }
   .coin-types .row {
     display: flex;
     flex-direction: row;
@@ -10132,9 +10182,9 @@ body {
     .coin-types .row--heading {
       font-weight: 500;
       padding: 0.25em 0;
-      border: none; }
+      border-color: transparent; }
       .coin-types .row--heading:hover {
-        border: none !important;
+        border-color: transparent !important;
         cursor: auto !important; }
     .coin-types .row--highlight {
       background: var(--color-primary-300); }
@@ -10142,11 +10192,12 @@ body {
       background: var(--color-primary-100);
       color: var(--color-text-200);
       font-weight: 500;
-      padding: 0.25em 0;
+      padding: 0.25em 0 0.25em 5px;
       border-top: 3px solid var(--color-secondary-100);
       border-left: none; }
       .coin-types .row--total:hover {
-        border-left: none !important; }
+        border-left: none !important;
+        cursor: auto !important; }
     .coin-types .row--active, .coin-types .row:hover {
       font-weight: 500;
       cursor: pointer;
@@ -10154,11 +10205,15 @@ body {
       .coin-types .row--active input, .coin-types .row:hover input {
         font-weight: 500; }
     .coin-types .row .cell {
-      padding: 0 1em;
+      padding: 0;
       text-align: right;
       line-height: 2.3em;
       overflow: hidden;
-      width: 12em; }
+      width: 10em; }
+      .coin-types .row .cell:last-child {
+        padding-right: 1em; }
+      .coin-types .row .cell span {
+        margin-right: 0.25em; }
       .coin-types .row .cell input {
         width: 100%;
         height: 100%;
@@ -10166,12 +10221,11 @@ body {
         border: none;
         background: transparent;
         font-size: 1em;
-        color: var(--color-text-100);
-        margin-right: -1em; }
+        color: var(--color-text-100); }
         .coin-types .row .cell input:focus {
           outline: none; }
         .coin-types .row .cell input::-webkit-outer-spin-button, .coin-types .row .cell input::-webkit-inner-spin-button {
-          margin-left: 0.5em; }
+          -webkit-appearance: none; }
         .coin-types .row .cell input::placeholder {
           text-align: right; }
       .coin-types .row .cell ::-webkit-input-placeholder {
@@ -10185,11 +10239,9 @@ body {
   justify-items: center;
   grid-template-columns: repeat(3, auto);
   font-size: 1.4em;
-  margin-left: 0.75em;
   height: fit-content;
   position: relative;
-  z-index: 1;
-  padding: 1em; }
+  z-index: 1; }
   .counting .counting-numpad .button {
     width: 3.5em;
     height: 3.5em;
