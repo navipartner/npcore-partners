@@ -30,9 +30,9 @@ jobs:
       
       majorVersion: 1700    
       appJsonValues: 
-      -  platform: '17.0.0.0'
-      -  application: '17.0.0.0'
-      -  preprocessorSymbols: '@(''BC17'')'
+      - platform: '17.0.0.0'
+      - application: '17.0.0.0'
+      - preprocessorSymbols: [BC17]
 
     - name: BC18
       containerImageName: npretail.azurecr.io/np/dynamicsnav:18.0.23013.23795-w1
@@ -43,9 +43,10 @@ jobs:
 
       majorVersion: 1800
       appJsonValues:
-      -  platform: '18.0.0.0'
-      -  application: '18.0.0.0'
-      -  preprocessorSymbols: '@(''BC18'')'    
+      - platform: '18.0.0.0'
+      - application: '18.0.0.0'
+      - preprocessorSymbols: [BC18]    
+
     scriptsRepo: scriptsRepo
     stepList:
     - checkout: self
@@ -70,8 +71,8 @@ jobs:
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         containerName: $(containerName)
-        containerAdminUsername: $(containerAdminUsername)
-        containerAdminPassword: $(containerAdminPassword)
+        containerAdminUsername: $(username)
+        containerAdminPassword: $(password)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
@@ -97,8 +98,8 @@ jobs:
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         containerName: $(containerName)
-        containerAdminUsername: $(containerAdminUsername)
-        containerAdminPassword: $(containerAdminPassword)
+        containerAdminUsername: $(username)
+        containerAdminPassword: $(password)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test
         appVersion: $(NewAppVersion)
@@ -114,8 +115,8 @@ jobs:
     - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
       parameters:
         serverInstanceName: $(serverInstanceName)
-        username: $(containerAdminUsername)
-        password: $(containerAdminPassword)
+        username: $(username)
+        password: $(password)
         testRunName: '$(AppName)'
         testApps:
           - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/$(AppName).app

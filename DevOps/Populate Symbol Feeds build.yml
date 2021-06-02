@@ -26,8 +26,8 @@ jobs:
     artifactUrl: $(url)/w1
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
-    containerAdminUsername: $(containerAdminUsername) 
-    containerAdminPassword: $(containerAdminPassword)
+    containerAdminUsername: $(username) 
+    containerAdminPassword: $(password)
     licenseSecureFileName: 'DEV_BC OP 17.flf'
     scriptsRepo: scriptsRepo
     stepList:
