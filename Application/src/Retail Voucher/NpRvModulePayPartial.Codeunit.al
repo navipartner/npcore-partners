@@ -6,6 +6,9 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        GLAcc: Record "G/L Account";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -19,12 +22,13 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
 
         SaleLinePOS.Get(SaleLinePOSVoucher."Register No.", SaleLinePOSVoucher."Sales Ticket No.", SaleLinePOSVoucher."Sale Date", SaleLinePOSVoucher."Sale Type", SaleLinePOSVoucher."Sale Line No.");
         SaleLinePOS."Amount Including VAT" += Subtotal;
-        SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
-
-        SaleLinePOS.Modify();
-
-        if SaleLinePOS."Amount Including VAT" < 0 then
+        if SaleLinePOS."Amount Including VAT" < 0 then begin
             SaleLinePOS.Delete(true);
+            exit;
+        end;
+        SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
+        POSPaymentLine.ReverseUnrealizedSalesVAT(SaleLinePOS);
+        SaleLinePOS.Modify();
     end;
 
     procedure ApplyPaymentSalesDoc(NpRvVoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
