@@ -1,11 +1,5 @@
 page 6150700 "NPR POS (Transcendence)"
 {
-    // NPR5.38/MHA /20180108  CASE 298399 Added Publisher OnOpenPOSTranscendence()
-    // NPR5.40/VB  /20180213 CASE 306347 Performance improvement due to physical-table action discovery.
-    //                                   Rolling back changes from NPR5.38/MHA /20180108  CASE 298399, due to substantial performance degradation in demo.
-    // NPR5.41/MMV /20180410 CASE 307453 Changed implementation of 304310 to prevent double POS menu parse on first initialization.
-    // NPR5.43/MMV /20180606 CASE 318028 Refactored initialization and finalization.
-
     Caption = 'POS';
     PageType = List;
     UsageCategory = Administration;
@@ -21,20 +15,16 @@ page 6150700 "NPR POS (Transcendence)"
 
                 trigger OnFrameworkReady()
                 begin
-                    //-NPR5.43 [318028]
                     if POSSession.IsFinalized() then
                         exit;
-                    //+NPR5.43 [318028]
                     POSSession.DebugWithTimestamp('OnFrameworkReady');
                     Initialize();
                 end;
 
                 trigger OnInvokeMethod(method: Text; eventContext: JsonObject)
                 begin
-                    //-NPR5.43 [318028]
                     if POSSession.IsFinalized() then
                         exit;
-                    //+NPR5.43 [318028]
                     POSSession.DebugWithTimestamp('Method:' + method);
                     if not PreHandleMethod(method) then
                         JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd, JavaScript);
@@ -42,10 +32,8 @@ page 6150700 "NPR POS (Transcendence)"
 
                 trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; Context: JsonObject)
                 begin
-                    //-NPR5.43 [318028]
                     if POSSession.IsFinalized() then
                         Error(SESSION_FINALIZED_ERROR);
-                    //+NPR5.43 [318028]
                     POSSession.DebugWithTimestamp('Action:' + action);
                     JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, Context, POSSession, FrontEnd, JavaScript);
                 end;
@@ -66,6 +54,12 @@ page 6150700 "NPR POS (Transcendence)"
     var
         "Action": Record "NPR POS Action" temporary;
     begin
+        if not (CurrentClientType in [ClientType::Tablet, ClientType::Phone]) then
+            if Confirm(WarningMessageText1 + WarningMessageText2 + WarningMessageText3) then begin
+                Page.Run(Page::"NPR POS (Dragonglass)"); // Page 6150750
+                CurrPage.Close();
+            end;
+
         POSSession.DebugWithTimestamp('Action discovery starts');
         Action.SetSession(POSSession);
         Action.DiscoverActions();
@@ -78,33 +72,21 @@ page 6150700 "NPR POS (Transcendence)"
         JavaScript: Codeunit "NPR POS JavaScript Interface";
         FrontEnd: Codeunit "NPR POS Front End Management";
         SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
+        WarningMessageText1: Label 'You have accessed the old discontinued POS page.\\If you are using Major Tom, please make sure to either configure it to use Dragonglass framework, or upgrade to Major Tom 6.3.';
+        WarningMessageText2: Label '\If you are accessing this page directly through the browser, then please update your bookmarks to access page 6150750 instead.';
+        WarningMessageText3: Label '\\Would you like us to take you directly to the new POS page?';
 
     local procedure Initialize()
     var
         FrameworkTranscendence: Codeunit "NPR Framework: Transcendence";
     begin
-        //-NPR5.43 [318028]
-        // FrontEnd.Initialize(CurrPage.Framework,POSSession);
-        // POSSession.InitializeCodeunit(FrontEnd,Setup,POSSession);
-        // POSSession.DebugWithTimestamp('Page6150700 initialization first stage completed');
-        //
-        // FrontEndKeeper.Initialize(CurrPage.Framework,FrontEnd,POSSession);
-        // BINDSUBSCRIPTION(FrontEndKeeper);
         FrameworkTranscendence.Constructor(CurrPage.Framework);
         POSSession.Constructor(FrameworkTranscendence, FrontEnd, Setup, POSSession);
-        //+NPR5.43 [318028]
     end;
 
     local procedure Finalize()
     begin
-        //-NPR5.43 [318028]
-        // IF NOT Finalized THEN BEGIN
-        //  Finalized := TRUE;
-        //  UNBINDSUBSCRIPTION(FrontEndKeeper);
-        // END;
-
         POSSession.Destructor();
-        //+NPR5.43 [318028]
     end;
 
     local procedure PreHandleMethod(Method: Text): Boolean
@@ -134,4 +116,3 @@ page 6150700 "NPR POS (Transcendence)"
         exit(true);
     end;
 }
-
