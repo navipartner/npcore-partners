@@ -710,44 +710,90 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         CreateMembership.SetCreateMembership();
         CreateMembership.run(MemberInfoCapture);
 
-        AdmitMembersOnEndOfSalesWorker(MemberInfoCapture);
-        MemberInfoCapture.DeleteAll();
     end;
 
 
-    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    // This is outside of the end sales transactions, issuing tickets is considered same as printing
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
+    local procedure AdmitMembersOnEndOfSales(SalePOS: Record "NPR POS Sale")
+    var
+        MemberInfoCaptureSales: Record "NPR MM Member Info Capture";
+        MemberInfoCaptureLine: Record "NPR MM Member Info Capture";
+        ReasonCode: Integer;
+        ReasonText: Text;
+        PreviousLineNo: Integer;
+        AdmittedCount: Integer;
+        MemberTicketAdmitError: Label 'When auto-admitting member %1, the following error occurred: %2';
+        MemberTicketConfirm: Label '%1 member(s) automatically admitted.';
+    begin
+
+        if (SalePOS."Sales Ticket No." = '') then
+            exit;
+
+        MemberInfoCaptureSales.SetCurrentKey("Receipt No.", "Line No.");
+        MemberInfoCaptureSales.SetFilter("Receipt No.", '=%1', SalePOS."Sales Ticket No.");
+        if (not MemberInfoCaptureSales.FindSet()) then
+            exit;
+
+        PreviousLineNo := -1;
+        repeat
+            ReasonCode := 0;
+            if (PreviousLineNo <> MemberInfoCaptureSales."Line No.") then begin
+                MemberInfoCaptureLine.SetCurrentKey("Receipt No.", "Line No.");
+                MemberInfoCaptureLine.SetFilter("Receipt No.", '=%1', MemberInfoCaptureSales."Receipt No.");
+                MemberInfoCaptureLine.SetFilter("Line No.", '=%1', MemberInfoCaptureSales."Line No.");
+
+                if (not AdmitMembersOnEndOfSalesWorker(MemberInfoCaptureLine, AdmittedCount, ReasonCode, ReasonText)) then
+                    Message(MemberTicketAdmitError, MemberInfoCaptureLine."First Name" + ' ' + MemberInfoCaptureLine."Last Name", ReasonText);
+            end;
+            PreviousLineNo := MemberInfoCaptureSales."Line No.";
+        until ((MemberInfoCaptureSales.Next() = 0));
+
+        MemberInfoCaptureSales.DeleteAll();
+        Commit();
+
+        if (AdmittedCount > 0) then
+            Message(MemberTicketConfirm, AdmittedCount);
+
+    end;
+
+    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var AdmittedCount: Integer; var ReasonCode: Integer; var ReasonText: Text): Boolean
     var
         MemberCard: Record "NPR MM Member Card";
         AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         LogEntryNo: Integer;
-        ReasonCode: Integer;
-        ReasonText: Text;
     begin
-
         MemberInfoCapture.FindSet();
 
         if (not MemberInfoCapture."Auto-Admit Member") then
-            exit; // Must be consistent for all members on the same sales line
+            exit(true); // Is consistent for all members on the same sales line
 
         if (not (MemberInfoCapture."Information Context" in [MemberInfoCapture."Information Context"::NEW,
                                               MemberInfoCapture."Information Context"::RENEW,
                                               MemberInfoCapture."Information Context"::UPGRADE,
                                               MemberInfoCapture."Information Context"::EXTEND])) then
-            exit; // Nothing to do
+            exit(true); // Nothing to do
 
         // Check that member limitations allow arrival
         repeat
             MemberCard.Get(MemberInfoCapture."Card Entry No.");
             MemberLimitationMgr.POS_CheckLimitMemberCardArrival(MemberCard."External Card No.", '', '<auto>', LogEntryNo, ReasonText, ReasonCode);
             if (ReasonCode <> 0) then
-                Error(ReasonText);
+                exit(false);
         until (MemberInfoCapture.Next() = 0);
 
-        // Batch register arrival creating tickets.        
+        // Batch register arrival creating tickets.
+        Commit();
         AttemptArrival.AttemptMemberArrival(MemberInfoCapture, '', '<auto>');
-        AttemptArrival.Run();
-        exit;
+        if (not AttemptArrival.Run()) then begin
+            ReasonCode := AttemptArrival.GetAttemptMemberArrivalResponse(ReasonText);
+            MemberLimitationMgr.UpdateLogEntry(LogEntryNo, ReasonCode, ReasonText); // TODO: Add LogEntryNo to InfoCapture and update all entries ... 
+            exit(false);
+        end;
+
+        AdmittedCount += MemberInfoCapture.Count();
+        exit(true);
 
     end;
 

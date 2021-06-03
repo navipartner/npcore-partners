@@ -337,11 +337,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         if CarrierCode <> '' then begin
             if QueryParams <> '' then
                 QueryParams += '&';
-            QueryParams += STRSUBSTNO(QueryParamsLbl, CarrierCode);
+            QueryParams += STRSUBSTNO(QueryParams2Lbl, CarrierCode);
         end;
         if QueryParams <> '' then
             QueryParams += '&';
-        QueryParams += STRSUBSTNO(QueryParamsLbl, _CurrentPage, 20);
+        QueryParams += STRSUBSTNO(QueryParams3Lbl, _CurrentPage, 20);
 
         if QueryParams <> '' then
             RequestURL := RequestURL + '?' + QueryParams;

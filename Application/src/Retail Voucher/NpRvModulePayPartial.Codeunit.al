@@ -6,9 +6,6 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        VATPostingSetup: Record "VAT Posting Setup";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        GLAcc: Record "G/L Account";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
