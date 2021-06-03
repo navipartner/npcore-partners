@@ -374,7 +374,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                 MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
                     ContraintText := StrSubstNo(PlaceHolder2Lbl, MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
                 MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
-                    ContraintText := StrSubstNo(PlaceHolder2Lbl, Today());
+                    ContraintText := StrSubstNo(PlaceHolderLbl, Today());
             end;
         end;
 

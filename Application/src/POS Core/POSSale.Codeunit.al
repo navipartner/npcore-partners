@@ -349,8 +349,6 @@
         SubTotal: Decimal;
         StartTime: DateTime;
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
