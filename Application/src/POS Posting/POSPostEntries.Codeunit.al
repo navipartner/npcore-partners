@@ -41,6 +41,8 @@
         TextPostingSetupMissing: Label '%1 is missing for %2 in %3 %4.\\Values [%5].';
         TextClosingEntryFloat: Label 'Float Amount Closing POS Entry %1';
         TextPostingDifference: Label 'POS Posting Difference';
+        TaxSetup: Record "Tax Setup";
+        ReadTaxSetup: Boolean;
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
@@ -1276,14 +1278,12 @@
         TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line" temporary;
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
-        TaxSetup: Record "Tax Setup";
         IsNALocalized: Boolean;
     begin
         if (TempPOSEntryTaxLine.IsTemporary()) then
             TempPOSEntryTaxLine.DeleteAll();
 
         IsNALocalized := NALocalizationEnabled(GenJnlLine);
-        TaxSetup.Get();
 
         if IsNALocalized then begin
             POSEntry2.CopyFilters(POSEntry);
@@ -1293,6 +1293,7 @@
                     POSEntryTaxLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
                     POSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
                     if POSEntryTaxLine.FindSet() then begin
+                        GetTaxSetup();
                         repeat
                             TempPOSEntryTaxLine := POSEntryTaxLine;
                             TempPOSEntryTaxLine.Insert();
@@ -1311,6 +1312,7 @@
                     TempPOSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                     TempPOSEntryTaxLine.SetRange("Tax Calculation Type", TempPOSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
                     if TempPOSEntryTaxLine.FindSet() then begin
+                        GetTaxSetup();
                         repeat
                             LineNumber := LineNumber + 10000;
                             if ((TempPOSEntryTaxLine."Tax Base Amount" <> 0) and
@@ -1321,7 +1323,7 @@
                                 if TempPOSEntryTaxLine."Tax Liable" then begin
                                     CreateGenJournalLinesFromSalesTaxLiableNA(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile);
                                 end else begin
-                                    CreateGenJournalLinesFromSalesTaxUnliableNA(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile, TaxSetup);
+                                    CreateGenJournalLinesFromSalesTaxUnliableNA(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile);
                                 end;
                             end;
                         until TempPOSEntryTaxLine.Next() = 0;
@@ -1336,6 +1338,7 @@
                     POSEntryTaxLine.SetFilter("POS Entry No.", '=%1', POSEntry2."Entry No.");
                     POSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
                     if POSEntryTaxLine.FindSet() then begin
+                        GetTaxSetup();
                         repeat
                             TempPOSEntryTaxLine.Reset();
                             TempPOSEntryTaxLine.SetRange("Tax Calculation Type", POSEntryTaxLine."Tax Calculation Type");
@@ -1373,6 +1376,7 @@
                     TempPOSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                     TempPOSEntryTaxLine.SetRange("Tax Calculation Type", TempPOSEntryTaxLine."Tax Calculation Type"::"Sales Tax");
                     if TempPOSEntryTaxLine.FindSet() then begin
+                        GetTaxSetup();
                         repeat
                             LineNumber := LineNumber + 10000;
                             if ((TempPOSEntryTaxLine."Tax Base Amount" <> 0) and
@@ -1383,13 +1387,21 @@
                                 if TempPOSEntryTaxLine."Tax Liable" then begin
                                     CreateGenJournalLinesFromSalesTaxLiable(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile);
                                 end else begin
-                                    CreateGenJournalLinesFromSalesTaxUnliable(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile, TaxSetup);
+                                    CreateGenJournalLinesFromSalesTaxUnliable(POSEntry, TempPOSEntryTaxLine, GenJnlLine, POSPostingProfile);
                                 end;
                             end;
                         until TempPOSEntryTaxLine.Next() = 0;
                     end;
                 until POSEntry.Next() = 0;
             end;
+        end;
+    end;
+
+    local procedure GetTaxSetup()
+    begin
+        if not ReadTaxSetup then begin
+            TaxSetup.Get();
+            ReadTaxSetup := true;
         end;
     end;
 
@@ -1496,7 +1508,7 @@
         GenJnlLine.Insert();
     end;
 
-    local procedure CreateGenJournalLinesFromSalesTaxUnliable(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile"; TaxSetup: Record "Tax Setup")
+    local procedure CreateGenJournalLinesFromSalesTaxUnliable(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile")
     var
         CurrExchRate: Record "Currency Exchange Rate";
     begin
@@ -1650,7 +1662,7 @@
         GenJnlLine.Insert();
     end;
 
-    local procedure CreateGenJournalLinesFromSalesTaxUnliableNA(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile"; TaxSetup: Record "Tax Setup")
+    local procedure CreateGenJournalLinesFromSalesTaxUnliableNA(POSEntry: Record "NPR POS Entry"; TempPOSEntryTaxLine: Record "NPR POS Entry Tax Line"; var GenJnlLine: Record "Gen. Journal Line"; POSPostingProfile: Record "NPR POS Posting Profile")
     var
         CurrExchRate: Record "Currency Exchange Rate";
         RecRef: RecordRef;
