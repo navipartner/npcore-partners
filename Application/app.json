@@ -50,5 +50,6 @@
   "target": "OnPrem",
   "features": [ "TranslationFile" ],
   "keyVaultUrls": ["https://npcore.vault.azure.net/"],
+  "applicationInsightsKey": "af321a83-56bf-4105-92e8-872478d954f2",
   "preprocessorSymbols": ["BC17"]
 }
