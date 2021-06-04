@@ -2,15 +2,29 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
 {
     Subtype = Upgrade;
 
+    var
+        PrintProfileCode: Code[20];
+        EmailProfileCode: Code[20];
+        PrintAndEmailProfileCode: Code[20];
+        OIOProfileCode: Code[20];
+
     trigger OnUpgradePerCompany()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Document Send. Prof.', 'OnUpgradePerCompany');
+
+        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
         InsertDocumentSendingProfiles();
-        UpgradeDocumentSendingProfiles();
+        UpgradeCustomerDocumentSendingProfiles();
+        UpgradeVendorDocumentSendingProfiles();
         UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure GetMagentoPassUpgradeTag(): Text
@@ -22,19 +36,28 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
     var
         DocSendProfile: Record "Document Sending Profile";
     begin
+        PrintProfileCode := '';
+        EmailProfileCode := '';
+        PrintAndEmailProfileCode := '';
+        OIOProfileCode := '';
+
         if not HaveEmailProfile(DocSendProfile) then begin
             DocSendProfile.Init();
             DocSendProfile.Code := NprEmailLbl;
             DocSendProfile."E-Mail" := DocSendProfile."E-Mail"::"Yes (Prompt for Settings)";
             DocSendProfile."E-Mail Attachment" := DocSendProfile."E-Mail Attachment"::PDF;
             DocSendProfile.Insert(true);
-        end;
+        end; 
+        EmailProfileCode := DocSendProfile.Code;
+
         if not HavePrintProfile(DocSendProfile) then begin
             DocSendProfile.Init();
             DocSendProfile.Code := NprPrintLbl;
             DocSendProfile.Printer := DocSendProfile.Printer::"Yes (Prompt for Settings)";
             DocSendProfile.Insert(true);
         end;
+        PrintProfileCode := DocSendProfile.Code;
+
         if not HavePrintAndEmailProfile(DocSendProfile) then begin
             DocSendProfile.Code := NprPrintAndEmailLbl;
             DocSendProfile.Printer := DocSendProfile.Printer::"Yes (Prompt for Settings)";
@@ -42,78 +65,72 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
             DocSendProfile."E-Mail Attachment" := DocSendProfile."E-Mail Attachment"::PDF;
             DocSendProfile.Insert(true);
         end;
+        PrintAndEmailProfileCode := DocSendProfile.Code;
+
+        if DocSendProfile.Get('OIOUBL') then
+            OIOProfileCode := DocSendProfile.Code;
     end;
 
-    local procedure UpgradeDocumentSendingProfiles()
+    local procedure UpgradeCustomerDocumentSendingProfiles()
     var
-        CustomerVar: Record Customer;
-        VendorVar: Record Vendor;
-        CustomerVar1: Record Customer;
-        VendorVar1: Record Vendor;
-        DocSendProfile: Record "Document Sending Profile";
+        Customer: Record Customer;
     begin
-        CustomerVar.SetRange("Document Sending Profile", '');
-        if CustomerVar.FindSet() then
+        if Customer.FindSet(true) then
             repeat
-                case CustomerVar."NPR Document Processing" of
-                    CustomerVar."NPR Document Processing"::Print:
-                        if HavePrintProfile(DocSendProfile) then
-                            if CustomerVar1.Get(CustomerVar."No.") then begin
-                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                                CustomerVar1.Modify();
-                            end;
-                    CustomerVar."NPR Document Processing"::Email:
-                        if HaveEmailProfile(DocSendProfile) then
-                            if CustomerVar1.Get(CustomerVar."No.") then begin
-                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                                CustomerVar1.Modify();
-                            end;
-                    CustomerVar."NPR Document Processing"::OIO:
-                        if DocSendProfile.Get('OIOUBL') then
-                            if CustomerVar1.Get(CustomerVar."No.") then begin
-                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                                CustomerVar1.Modify();
-                            end;
-                    CustomerVar."NPR Document Processing"::PrintAndEmail:
-                        if HavePrintAndEmailProfile(DocSendProfile) then begin
-                            if CustomerVar1.Get(CustomerVar."No.") then begin
-                                CustomerVar1."Document Sending Profile" := DocSendProfile.Code;
-                                CustomerVar1.Modify();
-                            end;
+                case Customer."NPR Document Processing" of
+                    Customer."NPR Document Processing"::Print:
+                        if PrintProfileCode <> '' then begin
+                            Customer."Document Sending Profile" := PrintProfileCode;
+                            Customer.Modify();
+                        end;
+                    Customer."NPR Document Processing"::Email:
+                        if EmailProfileCode <> '' then begin
+                            Customer."Document Sending Profile" := EmailProfileCode;
+                            Customer.Modify();
+                        end;
+                    Customer."NPR Document Processing"::OIO:
+                        if OIOProfileCode <> '' then begin
+                            Customer."Document Sending Profile" := OIOProfileCode;
+                            Customer.Modify();
+                        end;
+                    Customer."NPR Document Processing"::PrintAndEmail:
+                        if PrintAndEmailProfileCode <> '' then begin
+                            Customer."Document Sending Profile" := PrintAndEmailProfileCode;
+                            Customer.Modify();
                         end;
                 end;
-            until CustomerVar.Next() = 0;
+            until Customer.Next() = 0;
+    end;
 
-        VendorVar.SetRange("Document Sending Profile", '');
-        if VendorVar.FindSet() then
+    local procedure UpgradeVendorDocumentSendingProfiles()
+    var
+        Vendor: Record Vendor;
+    begin
+        if Vendor.FindSet(true) then
             repeat
-                case VendorVar."NPR Document Processing" of
-                    VendorVar."NPR Document Processing"::Print:
-                        if HavePrintProfile(DocSendProfile) then
-                            if VendorVar1.Get(VendorVar."No.") then begin
-                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                                VendorVar1.Modify();
-                            end;
-                    VendorVar."NPR Document Processing"::Email:
-                        if HaveEmailProfile(DocSendProfile) then
-                            if VendorVar1.Get(VendorVar."No.") then begin
-                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                                VendorVar1.Modify();
-                            end;
-                    VendorVar."NPR Document Processing"::OIO:
-                        if DocSendProfile.Get('OIOUBL') then
-                            if VendorVar1.Get(VendorVar."No.") then begin
-                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                                VendorVar1.Modify();
-                            end;
-                    VendorVar."NPR Document Processing"::PrintAndEmail:
-                        if HavePrintAndEmailProfile(DocSendProfile) then
-                            if VendorVar1.Get(VendorVar."No.") then begin
-                                VendorVar1."Document Sending Profile" := DocSendProfile.Code;
-                                VendorVar1.Modify();
-                            end;
+                case Vendor."NPR Document Processing" of
+                    Vendor."NPR Document Processing"::Print:
+                        if PrintProfileCode <> '' then begin
+                            Vendor."Document Sending Profile" := PrintProfileCode;
+                            Vendor.Modify();
+                        end;
+                    Vendor."NPR Document Processing"::Email:
+                        if EmailProfileCode <> '' then begin
+                            Vendor."Document Sending Profile" := EmailProfileCode;
+                            Vendor.Modify();
+                        end;
+                    Vendor."NPR Document Processing"::OIO:
+                        if OIOProfileCode <> '' then begin
+                            Vendor."Document Sending Profile" := OIOProfileCode;
+                            Vendor.Modify();
+                        end;
+                    Vendor."NPR Document Processing"::PrintAndEmail:
+                        if PrintAndEmailProfileCode <> '' then begin
+                            Vendor."Document Sending Profile" := PrintAndEmailProfileCode;
+                            Vendor.Modify();
+                        end;
                 end;
-            until VendorVar.Next() = 0;
+            until Vendor.Next() = 0;
     end;
 
     local procedure HavePrintProfile(var DocSendProfilePar: Record "Document Sending Profile"): Boolean

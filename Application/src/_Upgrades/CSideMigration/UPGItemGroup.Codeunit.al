@@ -9,17 +9,24 @@ codeunit 6014468 "NPR UPG Item Group"
 
     local procedure Upgrade()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagLbl: Label 'NPRPUGItemGroup_Upgrade-20210430', Locked = true;
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UGP Item Group', 'Upgrade');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         UpgradeItemGroup();
         UpgradeItemGroupOnItem();
         UpgradeSalesPriceMaintGroups();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     procedure UpgradeItemGroup()
