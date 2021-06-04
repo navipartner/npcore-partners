@@ -428,6 +428,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvVoucher.CalcFields(Amount);
         if NpRvVoucher.Amount > 0 then begin
             ClearLastError();
+            Commit();
             if not Codeunit.Run(codeunit::"NPR NpRv Voucher Mgt.", NpRvVoucher) then begin
                 LastErrorText := GetLastErrorText;
                 if LastErrorText <> '' then
