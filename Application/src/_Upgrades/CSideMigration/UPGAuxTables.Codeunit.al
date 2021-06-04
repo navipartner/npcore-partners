@@ -9,11 +9,16 @@ codeunit 6014405 "NPR UPG Aux. Tables"
 
     local procedure Upgrade()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagLbl: Label 'NPRPUGAuxTables_Upgrade-20210315-01', Locked = true;
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Aux. Tables', 'Upgrade');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         // "Aux. Value Entry" and "Aux. Item Ledger Entry" must be upgraded on sql side.
         //
@@ -22,6 +27,8 @@ codeunit 6014405 "NPR UPG Aux. Tables"
         UpgradeGLAccount();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure UpgradeValueEntry()

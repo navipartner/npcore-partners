@@ -14,14 +14,21 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
 
     local procedure RemoveSourceCode()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTag.HasUpgradeTag(RemoveSourceCodeLbl) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NP Retail Setup Upgrade', 'RemoveSourceCode');
+
+        if UpgradeTag.HasUpgradeTag(RemoveSourceCodeLbl) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         DoRemoveSourceCode();
 
         UpgradeTag.SetUpgradeTag(RemoveSourceCodeLbl);
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure DoRemoveSourceCode()
@@ -42,17 +49,24 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
 
     local procedure UpgradeFiedsToDedicatedSetups()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagLbl: Label 'NPRetailSetup_MoveFieldsToDedicatedSetups-20210303', Locked = true;
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NP Retail Setup Upgrade', 'UpgradeFiedsToDedicatedSetups');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         UpgradeVarietySetup();
         UpgradeDiscountPriority();
         UpgradePOSViewProfile();
         UpgradeExchangeLabelSetup();
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure UpgradeVarietySetup()

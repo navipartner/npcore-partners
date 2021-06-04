@@ -12,6 +12,7 @@ codeunit 6014502 "NPR Enable Item Ref. Upgr."
 
     procedure AutoEnableItemReference()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         ItemReferenceMgt: Codeunit "Item Reference Management";
         FeatureKey: Record "Feature Key";
         FeatureUpdateDataStautus: Record "Feature Data Update Status";
@@ -20,12 +21,17 @@ codeunit 6014502 "NPR Enable Item Ref. Upgr."
         UpgradeTag: Codeunit "Upgrade Tag";
 
     begin
-        if UpgradeTag.HasUpgradeTag(AutoEnableItemReferenceTag) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Enable Item Ref. Upgr.', 'AutoEnableItemReference');
+
+        if UpgradeTag.HasUpgradeTag(AutoEnableItemReferenceTag) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         //If item reference is enabled, add tag and skip update
         if ItemReferenceMgt.IsEnabled() then begin
             UpgradeTag.SetUpgradeTag(AutoEnableItemReferenceTag);
+            LogMessageStopwatch.LogFinish();
             exit;
         end;
 
@@ -63,5 +69,7 @@ codeunit 6014502 "NPR Enable Item Ref. Upgr."
         Codeunit.Run(Codeunit::"Update Feature Data", FeatureUpdateDataStautus);
 
         UpgradeTag.SetUpgradeTag(AutoEnableItemReferenceTag);
+
+        LogMessageStopwatch.LogFinish();
     end;
 }

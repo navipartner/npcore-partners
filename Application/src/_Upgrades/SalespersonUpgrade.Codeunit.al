@@ -9,15 +9,22 @@
 
     local procedure Upgrade()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagLbl: Label 'NPRSalespersonUpgrade-20210414-01', Locked = true;
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Salesperson Upgrade', 'Upgrade');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         UpgradeSalesperson();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure UpgradeSalesperson()

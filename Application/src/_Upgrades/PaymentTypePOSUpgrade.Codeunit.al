@@ -12,14 +12,21 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
 
     local procedure MovePaymentTypePOS()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTag.HasUpgradeTag(MovePaymentTypePOSLbl) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Payment Type POS Upgrade', 'MovePaymentTypePos');
+
+        if UpgradeTag.HasUpgradeTag(MovePaymentTypePOSLbl) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         DoMovePaymentTypePOS();
 
         UpgradeTag.SetUpgradeTag(MovePaymentTypePOSLbl);
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure DoMovePaymentTypePOS()

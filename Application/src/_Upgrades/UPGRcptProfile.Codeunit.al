@@ -4,19 +4,25 @@ codeunit 6150935 "NPR UPG Rcpt. Profile"
 
     trigger OnUpgradePerCompany()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgTagDef: Codeunit "NPR UPG Rcpt. Profile Tag Def";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Rcpt. Profile', 'OnUpgradePerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         // Run upgrade code
         Upgrade();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure Upgrade()

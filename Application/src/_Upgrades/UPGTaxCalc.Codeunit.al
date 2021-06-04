@@ -5,19 +5,25 @@ codeunit 6150937 "NPR UPG Tax Calc."
 
     trigger OnCheckPreconditionsPerCompany()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgTagDef: Codeunit "NPR UPG Tax Calc. Tag Def";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Tax Calc.', 'OnCheckPreconditionsPerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         // Run upgrade preconditions
         ArchiveActiveSale();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure ArchiveActiveSale()

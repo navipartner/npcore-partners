@@ -4,13 +4,18 @@ codeunit 6014539 "NPR UPG Pos Menus"
 
     trigger OnUpgradePerCompany()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Pos Menus', 'OnUpgradePerCompany');
+
         ReplaceItemAddonPOSAction();
         if not UpgradeTagMgt.HasUpgradeTag(GetUpgradeTag()) then begin
             AdjustSplitBillPOSActionParameters();
             UpgradeTagMgt.SetUpgradeTag(GetUpgradeTag());
         end;
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure ReplaceItemAddonPOSAction()
