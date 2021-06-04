@@ -5,19 +5,25 @@ codeunit 6014653 "NPR UPG POS Cross Ref"
 
     trigger OnCheckPreconditionsPerCompany()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgTagDef: Codeunit "NPR UPG POS Cross Ref Tag Def";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Cross Ref', 'OnCheckPreconditionsPerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         // Run upgrade
         UpgradePOSCrossRef();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure UpgradePOSCrossRef()

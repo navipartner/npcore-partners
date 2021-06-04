@@ -4,15 +4,22 @@ codeunit 6014500 "NPR Upgrade Magento Passwords"
 
     trigger OnUpgradePerCompany()
     var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Upgrade Magento Passwords', 'OnUpgradePerCompany');
+
+        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         UpgradePasswordsInventoryCompanies();
         UpgradePasswordsPaymentGateway();
         UpgradePasswordsMagentoSetup();
         UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure GetMagentoPassUpgradeTag(): Text

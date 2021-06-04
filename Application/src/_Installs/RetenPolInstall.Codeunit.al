@@ -28,6 +28,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         tabledata "NPR Aux. Value Entry" = rd,
         tabledata "NPR Aux. Item Ledger Entry" = rd;
 
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
 
     trigger OnInstallAppPerCompany()
     begin
@@ -40,8 +42,12 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         UpgradeTag: Codeunit "Upgrade Tag";
         RtnPeriodEnum: Enum "Retention Period Enum";
     begin
-        if UpgradeTag.HasUpgradeTag(GetNPRRetenPolTablesUpgradeTag()) then
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Reten. Pol. Install', 'AddAllowedTables');
+
+        if UpgradeTag.HasUpgradeTag(GetNPRRetenPolTablesUpgradeTag()) then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
         // if additional filters are needed on record, see codeunit 3999 procedure AddChangeLogEntryToAllowedTables() in Base App
 
@@ -75,6 +81,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         // and to CDU permissions
 
         UpgradeTag.SetUpgradeTag(GetNPRRetenPolTablesUpgradeTag());
+
+        LogMessageStopwatch.LogFinish();
     end;
 
     local procedure AddAllowedTable(TableId: Integer; RtnPeriodEnum: Enum "Retention Period Enum")
