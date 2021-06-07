@@ -125,8 +125,8 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                         if (DetTicketAccessEntry.FindFirst()) then begin
                             AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
                             if (AdmissionScheduleEntry.FindFirst()) then begin
-                                visit_date := StrSubstNo(DateTimeLbl, Format(AdmissionScheduleEntry."Admission Start Date", 0, 9), Format(AdmissionScheduleEntry."Admission Start Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
-                                visit_end_date := StrSubstNo(DateTimeLbl, Format(AdmissionScheduleEntry."Admission End Date", 0, 9), Format(AdmissionScheduleEntry."Admission End Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
+                                visit_date := StrSubstNo(DateTimeLbl, Format(AdmissionScheduleEntry."Admission Start Date", 0, 9), Format(AdmissionScheduleEntry."Admission Start Time", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
+                                visit_end_date := StrSubstNo(DateTimeLbl, Format(AdmissionScheduleEntry."Admission End Date", 0, 9), Format(AdmissionScheduleEntry."Admission End Time", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
 
                                 ticket_sub_title := GetDescription(TmpTicket, AdmissionScheduleEntry."Admission Code", TicketSetup.FieldNo("Ticket Sub Title"));
                                 TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
