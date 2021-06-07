@@ -282,7 +282,6 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         eftTrxRequest.Find();
         if eftTrxRequest.Successful then begin
             Message(Lbl_POS_DELETE_SUCCESS);       // TODO: Problems with MESSAGE (BC17 RTM issue) - what to do now?
-            clear(mobilePayUnitSetup."Beacon ID");
             clear(mobilePayUnitSetup."MobilePay POS ID");
             mobilePayUnitSetup."Merchant POS ID" := mobilePayUnitSetup."POS Unit No.";
             mobilePayUnitSetup.Modify();
