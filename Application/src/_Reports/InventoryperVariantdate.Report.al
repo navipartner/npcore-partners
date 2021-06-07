@@ -201,8 +201,10 @@
                     Item1.Get(Item."No.");
                     Item1.CopyFilters(Item);
                     Item1.SetRange("Variant Filter", Code);
-                    if not ShowBlankLocation then
-                        Item1.SetFilter("Location Filter", '<>%1', '');
+                    IF Item1.GETFILTER("Location Filter") = '' THEN BEGIN
+                        if not ShowBlankLocation then
+                            Item1.SetFilter("Location Filter", '<>%1', '');
+                    END;
                     Item1.CalcFields("NPR Has Variants", "Net Change");
                     if Varermedbeholdning then begin
                         if Item1."Net Change" = 0 then
@@ -357,8 +359,10 @@
 
             trigger OnPreDataItem()
             begin
-                if not ShowBlankLocation then
-                    Item.SetFilter("Location Filter", '<>%1', '');
+                IF Item.GETFILTER("Location Filter") = '' THEN BEGIN
+                    IF NOT ShowBlankLocation THEN
+                        Item.SETFILTER("Location Filter",'<>%1','');
+                END;
             end;
         }
     }
@@ -441,6 +445,10 @@
             Error(Txt001);
 
         Itemfilter := Item.GetFilters;
+        Location.RESET;
+        IF Item.GETFILTER("Location Filter") <> '' THEN
+            Location.SETRANGE(Code,Item.GETFILTER("Location Filter"));
+        
     end;
 
     var
@@ -492,6 +500,7 @@
         ItemVendorItemNo_Caption: Label 'Vendor item no.';
         LocationText: Text;
         Itemfilter: Text[100];
+  
 
     procedure CheckInventory(var localItem: Record Item): Boolean
     var
