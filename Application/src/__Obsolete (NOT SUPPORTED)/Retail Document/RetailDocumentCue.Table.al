@@ -96,17 +96,12 @@ table 6059985 "NPR Retail Document Cue"
         }
         field(30; "Number of Open Orders"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      "NPR Order Type" = CONST(Order)));
             Caption = 'Open Orders';
-            Editable = false;
             FieldClass = FlowField;
         }
         field(31; "Number of Posted Orders"; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE("NPR Order Type" = CONST(Order)));
             Caption = 'Posted Orders';
-            Editable = false;
             FieldClass = FlowField;
         }
     }

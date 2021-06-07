@@ -42,7 +42,7 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             OptionCaption = ',Order,Lending';
             OptionMembers = ,"Order",Lending;
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Not used.';
         }
         field(6014450; "NPR Kolli"; Integer)
