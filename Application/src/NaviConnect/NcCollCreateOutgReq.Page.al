@@ -24,7 +24,7 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
                 {
                     ApplicationArea = All;
                     Lookup = true;
-                    TableRelation = Object.ID WHERE(Type = CONST(Table));
+                    TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table View"; Rec."Table View")
@@ -91,4 +91,3 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
         Message(TextCreated, NcCollectorRequest."No.");
     end;
 }
-

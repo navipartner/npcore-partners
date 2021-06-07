@@ -1,16 +1,16 @@
 codeunit 6014402 "NPR License Information"
 {
 
-    TableNo = Object;
+    TableNo = AllObj;
 
     trigger OnRun()
     begin
-        if not InLicenseFile(Rec.Type, Rec.ID) then
+        if not InLicenseFile(Rec."Object Type", Rec."Object ID") then
             Error('');
     end;
 
     var
-        "Object": Record "Object";
+        Object: Record AllObj;
         AppVersionLbl: Label 'NPR%1', locked = true;
 
     procedure InLicenseFile("Object Type": Integer; "Object No": Integer): Boolean
@@ -44,12 +44,12 @@ codeunit 6014402 "NPR License Information"
 
     procedure PaymentManagementLicensed(): Boolean
     begin
-        exit(InLicenseFile(Object.Type::Table, GranulePaymentManagement()))
+        exit(InLicenseFile(Object."Object Type"::Table, GranulePaymentManagement()))
     end;
 
     procedure DocumentCaptureLicensed(): Boolean
     begin
-        exit(InLicenseFile(Object.Type::Table, GranuleDocumentCapture()))
+        exit(InLicenseFile(Object."Object Type"::Table, GranuleDocumentCapture()))
     end;
 
     procedure GranulePaymentManagement(): Integer
@@ -70,4 +70,3 @@ codeunit 6014402 "NPR License Information"
         exit(StrSubstNo(AppVersionLbl, NPRApp.AppVersion()));
     end;
 }
-
