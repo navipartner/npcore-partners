@@ -8,6 +8,8 @@ codeunit 6014515 "NPR MobilePayV10 Auth"
         _request: text;
         _response: text;
         _responseHttpCode: Integer;
+        _eftSetup: Record "NPR EFT Setup";
+        _eftSetupSet: Boolean;
 
     trigger OnRun()
     begin
@@ -36,7 +38,11 @@ codeunit 6014515 "NPR MobilePayV10 Auth"
         eftSetup: Record "NPR EFT Setup";
         httpRequestHelper: Codeunit "NPR HttpRequest Helper";
     begin
-        eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
+        if (_eftSetupSet) then begin
+            eftSetup := _eftSetup;
+        end else begin
+            eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
+        end;
         mobilePayPaymentSetup.Get(eftTrxRequest."Original POS Payment Type Code");
 
         reqMessage.GetHeaders(headers);
@@ -75,5 +81,11 @@ codeunit 6014515 "NPR MobilePayV10 Auth"
         eftTrxRequest."External Result Known" := true;
         eftTrxRequest.Successful := true;
         eftTrxRequest.Modify();
+    end;
+
+    internal procedure SetGlobalEFTSetup(var EftSetup: Record "NPR EFT Setup")
+    begin
+        _eftSetup := EftSetup;
+        _eftSetupSet := true;
     end;
 }
