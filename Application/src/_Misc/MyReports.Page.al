@@ -68,11 +68,6 @@ page 6014618 "NPR My Reports"
         GetReport();
     end;
 
-    trigger OnNewRecord(BelowxRec: Boolean)
-    begin
-        Clear(ReportObj);
-    end;
-
     trigger OnOpenPage()
     begin
         Rec.SetRange("User ID", UserId);
@@ -80,7 +75,6 @@ page 6014618 "NPR My Reports"
 
     var
         AllObjwithCap: Record AllObjWithCaption;
-        ReportObj: Record "Object";
 
     local procedure GetReport()
     begin
@@ -99,4 +93,3 @@ page 6014618 "NPR My Reports"
             REPORT.Run(Rec."Report No.");
     end;
 }
-
