@@ -1634,7 +1634,7 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'Staff SalesPrice Calc Codeunit';
             DataClassification = CustomerContent;
-            TableRelation = Object.ID WHERE(Type = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -1827,10 +1827,6 @@ table 6014400 "NPR Retail Setup"
         key(Key1; "Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()
