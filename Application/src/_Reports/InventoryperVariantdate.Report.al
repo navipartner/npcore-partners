@@ -361,7 +361,7 @@
             begin
                 IF Item.GETFILTER("Location Filter") = '' THEN BEGIN
                     IF NOT ShowBlankLocation THEN
-                        Item.SETFILTER("Location Filter",'<>%1','');
+                        Item.SETFILTER("Location Filter", '<>%1', '');
                 END;
             end;
         }
@@ -445,10 +445,10 @@
             Error(Txt001);
 
         Itemfilter := Item.GetFilters;
-        Location.RESET;
+        Location.RESET();
         IF Item.GETFILTER("Location Filter") <> '' THEN
-            Location.SETRANGE(Code,Item.GETFILTER("Location Filter"));
-        
+            Location.SETRANGE(Code, Item.GETFILTER("Location Filter"));
+
     end;
 
     var
@@ -500,7 +500,7 @@
         ItemVendorItemNo_Caption: Label 'Vendor item no.';
         LocationText: Text;
         Itemfilter: Text[100];
-  
+
 
     procedure CheckInventory(var localItem: Record Item): Boolean
     var
