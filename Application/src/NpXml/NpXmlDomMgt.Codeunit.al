@@ -4,7 +4,13 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         Error003: Label 'Xml element %1 is missing in %2';
         Error004: Label 'Xml attribute %1 is missing in %2';
         Text000: Label 'XmlElement %1 is missing';
-        Text001: Label 'Value "%1" is not %2 in <%3>';
+        Text001: Label 'Value "%1" is not Boolean in <%2>';
+        Text002: Label 'Value "%1" is not Date in <%2>';
+        Text003: Label 'Value "%1" is not Decimal in <%2>';
+        Text004: Label 'Value "%1" is not DateTime in <%2>';
+        Text005: Label 'Value "%1" is not Integer in <%2>';
+        Text006: Label 'Value "%1" is not Duration in <%2>';
+        Text007: Label 'Value "%1" is not BigInteger in <%2>';
 
     procedure AddAttribute(var Node: XmlNode; AttributeName: Text[260]; AttributeValue: Text[260])
     begin
@@ -249,7 +255,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if not Required then
                 exit(false);
 
-            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+            Error(Text001, Element2.InnerText, Element.Name + '/' + Path);
         end;
 
         exit(ReturnValue);
@@ -289,7 +295,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if not Required then
                 exit(0D);
 
-            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+            Error(Text002, Element2.InnerText, Element.Name + '/' + Path);
         end;
 
         exit(ReturnValue);
@@ -309,7 +315,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if not Required then
                 exit(0);
 
-            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+            Error(Text003, Element2.InnerText, Element.Name + '/' + Path);
         end;
 
         exit(ReturnValue);
@@ -329,7 +335,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if not Required then
                 exit(0DT);
 
-            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+            Error(Text004, Element2.InnerText, Element.Name + '/' + Path);
         end;
 
         exit(ReturnValue);
@@ -349,7 +355,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if not Required then
                 exit(0);
 
-            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+            Error(Text005, Element2.InnerText, Element.Name + '/' + Path);
         end;
 
         exit(ReturnValue);
@@ -386,7 +392,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if not Required then
                 exit(0);
 
-            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+            Error(Text006, Element2.InnerText, Element.Name + '/' + Path);
         end;
 
         exit(ReturnValue);
@@ -415,7 +421,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if Path <> '' then
                 FullPath += '/' + Path;
             FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(ReturnValue), FullPath);
+            Error(Text007, TextValue, FullPath);
         end;
 
         exit(ReturnValue);
@@ -466,7 +472,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             if Path <> '' then
                 FullPath += '/' + Path;
             FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(ReturnValue), FullPath);
+            Error(Text005, TextValue, FullPath);
         end;
 
         exit(ReturnValue);
