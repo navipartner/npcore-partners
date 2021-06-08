@@ -20,8 +20,11 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
             exit;
         end;
         InsertDocumentSendingProfiles();
-        UpgradeCustomerDocumentSendingProfiles();
-        UpgradeVendorDocumentSendingProfiles();
+        // Uprade of document sending profiles on customers and vendors takes too long.
+        // It will be done on sql side after upgrade is done, setting all of them to PRINT profile by default.
+        //
+        // UpgradeCustomerDocumentSendingProfiles();
+        // UpgradeVendorDocumentSendingProfiles();
         UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
 
         LogMessageStopwatch.LogFinish();
