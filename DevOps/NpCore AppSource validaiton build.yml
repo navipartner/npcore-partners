@@ -2,7 +2,7 @@ trigger: none
 
 schedules:
   - cron: "0 22 * * *" #UTC TIME! mm HH DD MM DW
-    displayName: Daily after-midnight test runner build
+    displayName: Daily after-midnight AppSource Validation build
     branches:
       include:
       - master
