@@ -76,7 +76,7 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
-        analyzers: 'AppSourceCop,UICop'
+        analyzers: 'AppSourceCop,UICop,CodeCop'
 
         keyVaultCert:
           certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
