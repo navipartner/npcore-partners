@@ -28,13 +28,13 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         TempOldEftSetupTemp.reset();
         TempOldEftSetupTemp.DeleteAll(false);
 
-        TempEftSetupToRegisterInMobilePay.Reset;
+        TempEftSetupToRegisterInMobilePay.Reset();
         TempEftSetupToRegisterInMobilePay.DeleteAll(false);
 
         TempOldEFTTypePOSUnitGenParam.Reset();
         TempOldEFTTypePOSUnitGenParam.DeleteAll(false);
 
-        TempOldEFTTypePaymentGenParam.Reset;
+        TempOldEFTTypePaymentGenParam.Reset();
         TempOldEFTTypePaymentGenParam.DeleteAll(false);
 
         TempOldEFTTypePOSUnitBLOBParam.Reset();
@@ -293,10 +293,10 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
             exit;
         end;
 
-        tempMobilePayStores.Reset;
+        tempMobilePayStores.Reset();
         tempMobilePayStores.SetRange("Merchant Brand Id", merchantId);
         tempMobilePayStores.SetRange("Merchant Location Id", locationId);
-        if not (tempMobilePayStores.FINDFIRST) then
+        if not (tempMobilePayStores.FindFirst()) then
             exit;
 
         tempMobilePayStores.TestField("Store ID");
@@ -341,12 +341,11 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
     local procedure IsQROnlyPosUnit(var EftSetup: Record "NPR EFT Setup"; PosUnitId: Text): Boolean
     begin
         // TO-DO: How do we know what is the beacon id if there is a static one (white boxes)?
+        EftSetup.Get();
         Exit(PosUnitId = '');
     end;
 
     local procedure RegisterPOSInMobilePayBuffer(var EftSetup: Record "NPR EFT Setup")
-    var
-        mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         TempEftSetupToRegisterInMobilePay.Init();
         TempEftSetupToRegisterInMobilePay.TransferFields(EftSetup, true);
@@ -359,7 +358,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         mobilePayIntegration: Codeunit "NPR MobilePayV10 Integration";
     begin
         TempEftSetupToRegisterInMobilePay.Reset();
-        if not TempEftSetupToRegisterInMobilePay.FINDSET then begin
+        if not TempEftSetupToRegisterInMobilePay.FindSet() then begin
             exit;
         end;
 
@@ -367,12 +366,11 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
             eftSetup.Get(TempEftSetupToRegisterInMobilePay."Payment Type POS", TempEftSetupToRegisterInMobilePay."POS Unit No.");
             // Carefully, the following includes COMMITs:
             mobilePayIntegration.CreatePOS(eftSetup);
-        until TempEftSetupToRegisterInMobilePay.NEXT = 0;
+        until TempEftSetupToRegisterInMobilePay.Next() = 0;
     end;
 
     local procedure Authenticate(var EftSetup: Record "NPR EFT Setup"): Text
     var
-        MobilePayV10Protocol: Codeunit "NPR MobilePayV10 Protocol";
         mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         mobilePayAuthRequest: Codeunit "NPR MobilePayV10 Auth";
         eftTrxRequestTemp: Record "NPR EFT Transaction Request" temporary;
