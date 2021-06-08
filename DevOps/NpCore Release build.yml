@@ -54,6 +54,7 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
+        analyzers: 'AppSourceCop,UICop,CodeCop'
 
         translationsRepo: translations
         

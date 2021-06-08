@@ -270,7 +270,7 @@ codeunit 6014569 "NPR RegEx"
 #else
         Regex.Match(CodeString, '(\*\|)(.*?)(\|\*)', 1, Match);
         i := 0;
-        if Match.FindSet then
+        if Match.FindSet() then
             repeat
                 if Match.Success then begin
                     TempVariable.Init();
@@ -424,8 +424,9 @@ codeunit 6014569 "NPR RegEx"
                     Groups.Reset();
                     Groups.DeleteAll();
 
+
                     RegEx.Groups(Match, Groups);
-                    Groups.FindFirst();
+                    Groups.FindSet();
                     Group1 := Groups;
                     Groups.Next();
                     Group2 := Groups;
