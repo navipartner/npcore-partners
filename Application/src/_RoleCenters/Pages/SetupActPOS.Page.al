@@ -82,6 +82,15 @@
                             System.Hyperlink('https://nphardwareconnector.blob.core.windows.net/production/Setup.exe');
                         end;
                     }
+                    action("Download Template Data")
+                    {
+                        Caption = 'Download Template Data';
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies download URL for Template Data Setup';
+                        Image = TileCloud;
+
+                        RunObject = page "NPR RapidStart Base Data Imp.";
+                    }
                 }
             }
         }
