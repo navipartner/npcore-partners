@@ -49,11 +49,12 @@ jobs:
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         containerName: $(containerName)
-        containerAdminUsername: $(containerAdminUsername)
-        containerAdminPassword: $(containerAdminPassword)
+        containerAdminUsername: $(username)
+        containerAdminPassword: $(password)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         appVersion: $(NewAppVersion)
+        analyzers: 'AppSourceCop,UICop,CodeCop'
 
         translationsRepo: translations
         
