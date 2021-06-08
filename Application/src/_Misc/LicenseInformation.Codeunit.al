@@ -15,13 +15,12 @@ codeunit 6014402 "NPR License Information"
 
     procedure InLicenseFile("Object Type": Integer; "Object No": Integer): Boolean
     var
-        PermissionRange: Record "Permission Range";
+        Permission: Record Permission;
     begin
-        PermissionRange.SetRange("Object Type", "Object Type");
-        PermissionRange.SetFilter(From, '<=%1', "Object No");
-        PermissionRange.SetFilter("To", '>=%1', "Object No");
-        PermissionRange.SetRange("Execute Permission", PermissionRange."Execute Permission"::Yes);
-        exit(not PermissionRange.IsEmpty());
+        Permission.SetRange("Object Type", "Object Type");
+        Permission.SetRange("Object ID", "Object No");
+        Permission.SetRange("Execute Permission", Permission."Execute Permission"::Yes);
+        exit(not Permission.IsEmpty());
     end;
 
     procedure HasPermission("Object Type": Integer; "Object No": Integer): Boolean
