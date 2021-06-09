@@ -54,12 +54,6 @@ page 6150700 "NPR POS (Transcendence)"
     var
         "Action": Record "NPR POS Action" temporary;
     begin
-        if not (CurrentClientType in [ClientType::Tablet, ClientType::Phone]) then
-            if Confirm(WarningMessageText1 + WarningMessageText2 + WarningMessageText3) then begin
-                Page.Run(Page::"NPR POS (Dragonglass)"); // Page 6150750
-                CurrPage.Close();
-            end;
-
         POSSession.DebugWithTimestamp('Action discovery starts');
         Action.SetSession(POSSession);
         Action.DiscoverActions();
@@ -72,9 +66,6 @@ page 6150700 "NPR POS (Transcendence)"
         JavaScript: Codeunit "NPR POS JavaScript Interface";
         FrontEnd: Codeunit "NPR POS Front End Management";
         SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
-        WarningMessageText1: Label 'You have accessed the old discontinued POS page.\\If you are using Major Tom, please make sure to either configure it to use Dragonglass framework, or upgrade to Major Tom 6.3.';
-        WarningMessageText2: Label '\If you are accessing this page directly through the browser, then please update your bookmarks to access page 6150750 instead.';
-        WarningMessageText3: Label '\\Would you like us to take you directly to the new POS page?';
 
     local procedure Initialize()
     var
