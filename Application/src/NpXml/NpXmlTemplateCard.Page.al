@@ -297,6 +297,12 @@
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the FTP Filename (Fixed) field';
                     }
+                    field("FTP Files temporrary extension"; Rec."FTP Files temporrary extension")
+                    {
+                        ApplicationArea = All;
+                        Importance = Additional;
+                        ToolTip = 'Specifies temporrary file extension. If it is entered, file will be uploaded with this extension and then renamed to real (target) one.';
+                    }
                 }
                 group(API)
                 {
