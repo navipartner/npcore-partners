@@ -182,6 +182,7 @@
         tmpDiscountPriority.SetCurrentKey(Priority);
         if tmpDiscountPriority.FindSet() then begin
             repeat
+                TempSaleLinePOS.Reset();
                 ApplyDiscount(tmpDiscountPriority, SalePOS, TempSaleLinePOS, Rec, xRec, LineOperation, RecalculateAllLines);
             until tmpDiscountPriority.Next() = 0;
 
@@ -199,6 +200,7 @@
             exit;
 
         SaleLinePOS.SetSkipCalcDiscount(true);
+        TempSaleLinePOS.Reset();
         TempSaleLinePOS.FindSet();
         repeat
             if TempSaleLinePOS."Discount Calculated" or RecalculateAllLines then begin
@@ -311,7 +313,6 @@
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
-        SaleLinePOS.SetRange("Allow Line Discount", true);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         if SaleLinePOS.FindSet() then
             repeat
