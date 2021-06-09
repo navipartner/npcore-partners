@@ -25,7 +25,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         if (not FindAndSetDefaultMobilePayV10IntegrationType()) then
             exit;
 
-        TempOldEftSetupTemp.reset();
+        TempOldEftSetupTemp.Reset();
         TempOldEftSetupTemp.DeleteAll(false);
 
         TempEftSetupToRegisterInMobilePay.Reset();
@@ -304,7 +304,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         mobilePayUnitSetup."Store ID" := tempMobilePayStores."Store ID";
         mobilePayUnitSetup."Merchant POS ID" := EftSetup."POS Unit No.";
         mobilePayUnitSetup."Beacon ID" := posUnitId;
-        mobilePayUnitSetup."Only QR" := IsQROnlyPosUnit(EftSetup, posUnitId);
+        mobilePayUnitSetup."Only QR" := IsQROnlyPosUnit(posUnitId);
         if (mobilePayUnitSetup."Only QR") then begin
             Clear(mobilePayUnitSetup."Beacon ID");
         end else begin
@@ -338,10 +338,9 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         exit(RetVal);
     end;
 
-    local procedure IsQROnlyPosUnit(var EftSetup: Record "NPR EFT Setup"; PosUnitId: Text): Boolean
+    local procedure IsQROnlyPosUnit(PosUnitId: Text): Boolean
     begin
         // TO-DO: How do we know what is the beacon id if there is a static one (white boxes)?
-        EftSetup.Get();
         Exit(PosUnitId = '');
     end;
 
