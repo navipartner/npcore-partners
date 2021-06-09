@@ -235,6 +235,14 @@ table 6150616 "NPR POS Payment Method"
     {
     }
 
+    trigger OnModify()
+    var 
+        MinGreaterThanMax: Label 'The minimum amount has to be less than the maximum amount';
+    begin 
+        if rec."Minimum Amount" > rec."Maximum Amount" then
+        error(MinGreaterThanMax);
+    end;
+
     trigger OnDelete()
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
