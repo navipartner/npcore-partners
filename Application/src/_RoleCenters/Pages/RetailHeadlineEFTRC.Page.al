@@ -88,7 +88,6 @@ page 6151257 "NPR Retail Headline EFT RC"
         if not Uninitialized and Rec.WritePermission then begin
             Rec."User workdate" := WorkDate();
             Rec.Modify();
-            HeadlineManagement.ScheduleTask(Codeunit::"Headlines");
         end;
 
         HeadlineManagement.GetUserGreetingText(GreetingText);
