@@ -32,12 +32,12 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep('receipt', 'input(labels.title, labels.receiptprompt).respond().cancel(abort);');
             Sender.RegisterWorkflowStep('reason', 'context.PromptForReason && respond();');
             Sender.RegisterWorkflowStep('handle', 'respond();');
@@ -165,7 +165,7 @@ then begin
 
         JSON.SetScopeRoot();
 
-        ReturnReasonCode := JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode()));
+        ReturnReasonCode := JSON.GetString('ReturnReasonCode');
         ReverseSalesTicket(SalePOS, SalesTicketNo, ReturnReasonCode);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
