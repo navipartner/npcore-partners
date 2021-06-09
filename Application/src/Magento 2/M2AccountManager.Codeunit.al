@@ -1239,12 +1239,20 @@
         MembershipRole: Record "NPR MM Membership Role";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Member: Record "NPR MM Member";
     begin
         MembershipRole.SetFilter("Contact No.", '=%1', TmpContact."No.");
         if (not MembershipRole.FindFirst()) then
             exit(false);
 
+        Member.Get(MembershipRole."Member Entry No.");
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+
+        TransferMemberInfoToCapture(Member, MemberInfoCapture);
         TransferToInfoCapture(TmpContact, MemberInfoCapture);
+
         if (not MemberInfoCapture.Insert()) then
             exit(false);
 
@@ -1270,11 +1278,30 @@
         exit(true);
     end;
 
+    local procedure TransferMemberInfoToCapture(Member: Record "NPR MM Member"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    begin
+        MemberInfoCapture."First Name" := CopyStr(Member."First Name", 1, MaxStrLen(MemberInfoCapture."First Name"));
+        MemberInfoCapture."Middle Name" := CopyStr(Member."Middle Name", 1, MaxStrLen(MemberInfoCapture."Middle Name"));
+        MemberInfoCapture."Last Name" := CopyStr(Member."Last Name", 1, MaxStrLen(MemberInfoCapture."Last Name"));
+        MemberInfoCapture.Address := CopyStr(Member.Address, 1, MaxStrLen(MemberInfoCapture.Address));
+        MemberInfoCapture."Post Code Code" := CopyStr(Member."Post Code Code", 1, MaxStrLen(MemberInfoCapture."Post Code Code"));
+        MemberInfoCapture.City := CopyStr(Member.City, 1, MaxStrLen(MemberInfoCapture.City));
+        MemberInfoCapture."Country Code" := CopyStr(Member."Country Code", 1, MaxStrLen(MemberInfoCapture."Country Code"));
+        MemberInfoCapture.Country := CopyStr(Member.Country, 1, MaxStrLen(MemberInfoCapture.Country));
+
+        MemberInfoCapture."Phone No." := CopyStr(Member."Phone No.", 1, MaxStrLen(MemberInfoCapture."Phone No."));
+        MemberInfoCapture."E-Mail Address" := CopyStr(Member."E-Mail Address", 1, MaxStrLen(MemberInfoCapture."E-Mail Address"));
+
+        MemberInfoCapture."Social Security No." := CopyStr(Member."Social Security No.", 1, MaxStrLen(MemberInfoCapture."Social Security No."));
+        MemberInfoCapture.Gender := Member.Gender;
+        MemberInfoCapture.Birthday := Member.Birthday;
+        MemberInfoCapture."News Letter" := Member."E-Mail News Letter";
+        MemberInfoCapture."Notification Method" := Member."Notification Method";
+        MemberInfoCapture."Store Code" := CopyStr(Member."Store Code", 1, MaxStrLen(MemberInfoCapture."Store Code"));
+    end;
+
     local procedure TransferToInfoCapture(var TmpContact: Record Contact temporary; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
-        MemberInfoCapture.Init();
-        MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         MemberInfoCapture."Company Name" := CopyStr(TmpContact."Company Name", 1, MaxStrLen(MemberInfoCapture."Company Name"));
         MemberInfoCapture."First Name" := CopyStr(TmpContact."First Name", 1, MaxStrLen(MemberInfoCapture."First Name"));
         MemberInfoCapture."Middle Name" := CopyStr(TmpContact."Middle Name", 1, MaxStrLen(MemberInfoCapture."Middle Name"));
