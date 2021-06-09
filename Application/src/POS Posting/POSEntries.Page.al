@@ -222,7 +222,6 @@
                     if (ItemPosting) then begin
                         POSEntryToPost.Reset();
                         POSEntryToPost.CopyFilters(Rec);
-                        POSEntryToPost.SetFilter("Post Item Entry Status", '<2');
                         POSPostEntries.SetPostItemEntries(true);
                         POSPostEntries.SetPostPOSEntries(false);
                         repeat
@@ -242,7 +241,6 @@
                     if (POSPosting) then begin
                         POSEntryToPost.Reset();
                         POSEntryToPost.CopyFilters(Rec);
-                        POSEntryToPost.SetFilter("Post Entry Status", '<2');
                         POSPostEntries.SetPostItemEntries(false);
                         POSPostEntries.SetPostPOSEntries(true);
                         repeat

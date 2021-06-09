@@ -185,7 +185,7 @@
             ProgressWindow.Update(2, NoOfRecords);
         end;
 
-        if POSEntry.FindFirst() then
+        if POSEntry.FindSet() then
             repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;
@@ -685,126 +685,127 @@
     begin
         if POSSalesLineToBeCompressed.FindSet() then
             repeat
-
                 POSEntry.Get(POSSalesLineToBeCompressed."POS Entry No.");
-                POSPeriodRegister.Get(POSEntry."POS Period Register No.");
-                Compressionmethod := GetCompressionMethod(POSPeriodRegister, PostCompressedVar);
-                if Compressionmethod = Compressionmethod::"Per POS Period Register" then
-                    if POSSalesLineToBeCompressed."VAT Calculation Type" = POSSalesLineToBeCompressed."VAT Calculation Type"::"Sales Tax" then
-                        Error(TextErrorSalesTaxCompressed, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
+                if (POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"]) then begin
+                    POSPeriodRegister.Get(POSEntry."POS Period Register No.");
+                    Compressionmethod := GetCompressionMethod(POSPeriodRegister, PostCompressedVar);
+                    if Compressionmethod = Compressionmethod::"Per POS Period Register" then
+                        if POSSalesLineToBeCompressed."VAT Calculation Type" = POSSalesLineToBeCompressed."VAT Calculation Type"::"Sales Tax" then
+                            Error(TextErrorSalesTaxCompressed, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
 
-                Clear(POSPostingBuffer);
-                POSPostingBuffer.Init();
+                    Clear(POSPostingBuffer);
+                    POSPostingBuffer.Init();
 
-                POSPostingBuffer."Posting Date" := POSEntry."Posting Date";
-                POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Sales;
-                POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type;
-                case POSSalesLineToBeCompressed.Type of
-                    POSSalesLineToBeCompressed.Type::Rounding:
-                        begin
-                            POSPostingBuffer.Type := POSPostingBuffer.Type::"G/L Account";
-                            POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                        end;
-                    else
-                        POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type;
-                end;
-                if POSSalesLineToBeCompressed.Type in [POSSalesLineToBeCompressed.Type::"G/L Account", POSSalesLineToBeCompressed.Type::Customer] then
-                    POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                if POSSalesLineToBeCompressed.Type <> POSSalesLineToBeCompressed.Type::Customer then begin
-                    POSPostingBuffer."Gen. Bus. Posting Group" := POSSalesLineToBeCompressed."Gen. Bus. Posting Group";
-                    POSPostingBuffer."VAT Bus. Posting Group" := POSSalesLineToBeCompressed."VAT Bus. Posting Group";
-                end;
-                if POSSalesLineToBeCompressed.Type = POSSalesLineToBeCompressed.Type::Payout then begin
-                    POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                    Compressionmethod := Compressionmethod::Uncompressed;
-                end;
+                    POSPostingBuffer."Posting Date" := POSEntry."Posting Date";
+                    POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Sales;
+                    POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type;
+                    case POSSalesLineToBeCompressed.Type of
+                        POSSalesLineToBeCompressed.Type::Rounding:
+                            begin
+                                POSPostingBuffer.Type := POSPostingBuffer.Type::"G/L Account";
+                                POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                            end;
+                        else
+                            POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type;
+                    end;
+                    if POSSalesLineToBeCompressed.Type in [POSSalesLineToBeCompressed.Type::"G/L Account", POSSalesLineToBeCompressed.Type::Customer] then
+                        POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                    if POSSalesLineToBeCompressed.Type <> POSSalesLineToBeCompressed.Type::Customer then begin
+                        POSPostingBuffer."Gen. Bus. Posting Group" := POSSalesLineToBeCompressed."Gen. Bus. Posting Group";
+                        POSPostingBuffer."VAT Bus. Posting Group" := POSSalesLineToBeCompressed."VAT Bus. Posting Group";
+                    end;
+                    if POSSalesLineToBeCompressed.Type = POSSalesLineToBeCompressed.Type::Payout then begin
+                        POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                        Compressionmethod := Compressionmethod::Uncompressed;
+                    end;
 
-                if POSSalesLineToBeCompressed.type = POSSalesLineToBeCompressed.Type::Voucher then begin
-                    POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                    Compressionmethod := Compressionmethod::Uncompressed;
-                end;
+                    if POSSalesLineToBeCompressed.type = POSSalesLineToBeCompressed.Type::Voucher then begin
+                        POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                        Compressionmethod := Compressionmethod::Uncompressed;
+                    end;
 
-                POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
-                POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";
-                POSPostingBuffer."Gen. Prod. Posting Group" := POSSalesLineToBeCompressed."Gen. Prod. Posting Group";
-                POSPostingBuffer."VAT Prod. Posting Group" := POSSalesLineToBeCompressed."VAT Prod. Posting Group";
-                POSPostingBuffer."Global Dimension 1 Code" := POSSalesLineToBeCompressed."Shortcut Dimension 1 Code";
-                POSPostingBuffer."Global Dimension 2 Code" := POSSalesLineToBeCompressed."Shortcut Dimension 2 Code";
-                POSPostingBuffer."Dimension Set ID" := POSSalesLineToBeCompressed."Dimension Set ID";
-                POSPostingBuffer."Salesperson Code" := POSSalesLineToBeCompressed."Salesperson Code";
-                POSPostingBuffer."Reason Code" := POSSalesLineToBeCompressed."Reason Code";
-                POSPostingBuffer."Currency Code" := POSSalesLineToBeCompressed."Currency Code";
-                POSPostingBuffer."VAT Calculation Type" := POSSalesLineToBeCompressed."VAT Calculation Type";
-                POSPostingBuffer."Tax Area Code" := POSSalesLineToBeCompressed."Tax Area Code";
-                POSPostingBuffer."Tax Liable" := POSSalesLineToBeCompressed."Tax Liable";
-                POSPostingBuffer."Tax Group Code" := POSSalesLineToBeCompressed."Tax Group Code";
-                POSPostingBuffer."Use Tax" := POSSalesLineToBeCompressed."Use Tax";
-                POSPostingBuffer."VAT %" := POSSalesLineToBeCompressed."VAT %";
-                POSPostingBuffer."POS Store Code" := POSSalesLineToBeCompressed."POS Store Code";
-                POSPostingBuffer."POS Unit No." := POSSalesLineToBeCompressed."POS Unit No.";
-                POSPostingBuffer."POS Period Register" := POSSalesLineToBeCompressed."POS Period Register No.";
-                case Compressionmethod of
-                    Compressionmethod::Uncompressed:
-                        begin
-                            POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
-                            POSPostingBuffer."Line No." := POSSalesLineToBeCompressed."Line No.";
-                            POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                            if POSPeriodRegister."Document No." = '' then
-                                POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No."
-                            else
+                    POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
+                    POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";
+                    POSPostingBuffer."Gen. Prod. Posting Group" := POSSalesLineToBeCompressed."Gen. Prod. Posting Group";
+                    POSPostingBuffer."VAT Prod. Posting Group" := POSSalesLineToBeCompressed."VAT Prod. Posting Group";
+                    POSPostingBuffer."Global Dimension 1 Code" := POSSalesLineToBeCompressed."Shortcut Dimension 1 Code";
+                    POSPostingBuffer."Global Dimension 2 Code" := POSSalesLineToBeCompressed."Shortcut Dimension 2 Code";
+                    POSPostingBuffer."Dimension Set ID" := POSSalesLineToBeCompressed."Dimension Set ID";
+                    POSPostingBuffer."Salesperson Code" := POSSalesLineToBeCompressed."Salesperson Code";
+                    POSPostingBuffer."Reason Code" := POSSalesLineToBeCompressed."Reason Code";
+                    POSPostingBuffer."Currency Code" := POSSalesLineToBeCompressed."Currency Code";
+                    POSPostingBuffer."VAT Calculation Type" := POSSalesLineToBeCompressed."VAT Calculation Type";
+                    POSPostingBuffer."Tax Area Code" := POSSalesLineToBeCompressed."Tax Area Code";
+                    POSPostingBuffer."Tax Liable" := POSSalesLineToBeCompressed."Tax Liable";
+                    POSPostingBuffer."Tax Group Code" := POSSalesLineToBeCompressed."Tax Group Code";
+                    POSPostingBuffer."Use Tax" := POSSalesLineToBeCompressed."Use Tax";
+                    POSPostingBuffer."VAT %" := POSSalesLineToBeCompressed."VAT %";
+                    POSPostingBuffer."POS Store Code" := POSSalesLineToBeCompressed."POS Store Code";
+                    POSPostingBuffer."POS Unit No." := POSSalesLineToBeCompressed."POS Unit No.";
+                    POSPostingBuffer."POS Period Register" := POSSalesLineToBeCompressed."POS Period Register No.";
+                    case Compressionmethod of
+                        Compressionmethod::Uncompressed:
+                            begin
+                                POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
+                                POSPostingBuffer."Line No." := POSSalesLineToBeCompressed."Line No.";
+                                POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                                if POSPeriodRegister."Document No." = '' then
+                                    POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No."
+                                else
+                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                                PostingDescription := POSSalesLineToBeCompressed.Description;
+                            end;
+                        Compressionmethod::"Per POS Entry":
+                            begin
+                                POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
+                                if POSPeriodRegister."Document No." = '' then
+                                    POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No."
+                                else
+                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                                PostingDescription := StrSubstNo(TextDesc, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
+                            end;
+                        Compressionmethod::"Per POS Period Register":
+                            begin
+                                POSPeriodRegister.TestField("Document No.");
                                 POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                            PostingDescription := POSSalesLineToBeCompressed.Description;
-                        end;
-                    Compressionmethod::"Per POS Entry":
-                        begin
-                            POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
-                            if POSPeriodRegister."Document No." = '' then
-                                POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No."
-                            else
-                                POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                            PostingDescription := StrSubstNo(TextDesc, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
-                        end;
-                    Compressionmethod::"Per POS Period Register":
-                        begin
-                            POSPeriodRegister.TestField("Document No.");
-                            POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                            PostingDescription := StrSubstNo(TextDesc, POSPeriodRegister.TableCaption, POSSalesLineToBeCompressed."POS Period Register No.");
-                        end;
-                end;
+                                PostingDescription := StrSubstNo(TextDesc, POSPeriodRegister.TableCaption, POSSalesLineToBeCompressed."POS Period Register No.");
+                            end;
+                    end;
 
-                if not POSPostingBuffer.Find() then begin
-                    POSPostingBuffer."VAT Base Amount" := 0;
-                    POSPostingBuffer.Quantity := 0;
-                    POSPostingBuffer."VAT Difference" := 0;
-                    POSPostingBuffer."VAT Amount" := 0;
-                    POSPostingBuffer."VAT Amount (LCY)" := 0;
-                    POSPostingBuffer."Discount Amount" := 0;
-                    POSPostingBuffer."Discount Amount (LCY)" := 0;
-                    POSPostingBuffer.Amount := 0;
-                    POSPostingBuffer."Amount (LCY)" := 0;
-                    POSPostingBuffer."VAT Amount Discount" := 0;
-                    POSPostingBuffer."VAT Amount Discount (LCY)" := 0;
-                    POSPostingBuffer."Rounding Amount" := 0;
-                    POSPostingBuffer."Rounding Amount (LCY)" := 0;
-                    POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
-                    POSPostingBuffer.Insert();
+                    if not POSPostingBuffer.Find() then begin
+                        POSPostingBuffer."VAT Base Amount" := 0;
+                        POSPostingBuffer.Quantity := 0;
+                        POSPostingBuffer."VAT Difference" := 0;
+                        POSPostingBuffer."VAT Amount" := 0;
+                        POSPostingBuffer."VAT Amount (LCY)" := 0;
+                        POSPostingBuffer."Discount Amount" := 0;
+                        POSPostingBuffer."Discount Amount (LCY)" := 0;
+                        POSPostingBuffer.Amount := 0;
+                        POSPostingBuffer."Amount (LCY)" := 0;
+                        POSPostingBuffer."VAT Amount Discount" := 0;
+                        POSPostingBuffer."VAT Amount Discount (LCY)" := 0;
+                        POSPostingBuffer."Rounding Amount" := 0;
+                        POSPostingBuffer."Rounding Amount (LCY)" := 0;
+                        POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
+                        POSPostingBuffer.Insert();
+                    end;
+                    POSPostingBuffer."VAT Base Amount" := POSPostingBuffer."VAT Base Amount" - POSSalesLineToBeCompressed."VAT Base Amount";
+                    POSPostingBuffer.Quantity := POSPostingBuffer.Quantity + POSSalesLineToBeCompressed.Quantity;
+                    POSPostingBuffer."VAT Difference" := POSPostingBuffer."VAT Difference" - POSSalesLineToBeCompressed."VAT Difference";
+                    POSPostingBuffer."VAT Amount" := POSPostingBuffer."VAT Amount" - (POSSalesLineToBeCompressed."Amount Incl. VAT" - POSSalesLineToBeCompressed."Amount Excl. VAT");
+                    POSPostingBuffer."VAT Amount (LCY)" := POSPostingBuffer."VAT Amount (LCY)" - (POSSalesLineToBeCompressed."Amount Incl. VAT (LCY)" - POSSalesLineToBeCompressed."Amount Excl. VAT (LCY)");
+                    POSPostingBuffer."Discount Amount" := POSPostingBuffer."Discount Amount" - POSSalesLineToBeCompressed."Line Discount Amount Excl. VAT";
+                    POSPostingBuffer."Discount Amount (LCY)" := POSPostingBuffer."Discount Amount (LCY)" - POSSalesLineToBeCompressed."Line Dsc. Amt. Excl. VAT (LCY)";
+                    POSPostingBuffer.Amount := POSPostingBuffer.Amount - POSSalesLineToBeCompressed."Amount Excl. VAT";
+                    POSPostingBuffer."Amount (LCY)" := POSPostingBuffer."Amount (LCY)" - POSSalesLineToBeCompressed."Amount Excl. VAT (LCY)";
+                    POSPostingBuffer."VAT Amount Discount" := POSPostingBuffer."VAT Amount Discount" - (POSSalesLineToBeCompressed."Line Discount Amount Incl. VAT" - POSSalesLineToBeCompressed."Line Discount Amount Excl. VAT");
+                    POSPostingBuffer."VAT Amount Discount (LCY)" := POSPostingBuffer."VAT Amount Discount (LCY)" - (POSSalesLineToBeCompressed."Line Dsc. Amt. Incl. VAT (LCY)" - POSSalesLineToBeCompressed."Line Dsc. Amt. Excl. VAT (LCY)");
+                    if POSSalesLineToBeCompressed.Type = POSSalesLineToBeCompressed.Type::Rounding then begin
+                        POSPostingBuffer."Rounding Amount" -= POSSalesLineToBeCompressed."Amount Incl. VAT";
+                        POSPostingBuffer."Rounding Amount (LCY)" -= POSSalesLineToBeCompressed."Amount Incl. VAT (LCY)";
+                    end;
+                    POSPostingBuffer.Modify();
                 end;
-                POSPostingBuffer."VAT Base Amount" := POSPostingBuffer."VAT Base Amount" - POSSalesLineToBeCompressed."VAT Base Amount";
-                POSPostingBuffer.Quantity := POSPostingBuffer.Quantity + POSSalesLineToBeCompressed.Quantity;
-                POSPostingBuffer."VAT Difference" := POSPostingBuffer."VAT Difference" - POSSalesLineToBeCompressed."VAT Difference";
-                POSPostingBuffer."VAT Amount" := POSPostingBuffer."VAT Amount" - (POSSalesLineToBeCompressed."Amount Incl. VAT" - POSSalesLineToBeCompressed."Amount Excl. VAT");
-                POSPostingBuffer."VAT Amount (LCY)" := POSPostingBuffer."VAT Amount (LCY)" - (POSSalesLineToBeCompressed."Amount Incl. VAT (LCY)" - POSSalesLineToBeCompressed."Amount Excl. VAT (LCY)");
-                POSPostingBuffer."Discount Amount" := POSPostingBuffer."Discount Amount" - POSSalesLineToBeCompressed."Line Discount Amount Excl. VAT";
-                POSPostingBuffer."Discount Amount (LCY)" := POSPostingBuffer."Discount Amount (LCY)" - POSSalesLineToBeCompressed."Line Dsc. Amt. Excl. VAT (LCY)";
-                POSPostingBuffer.Amount := POSPostingBuffer.Amount - POSSalesLineToBeCompressed."Amount Excl. VAT";
-                POSPostingBuffer."Amount (LCY)" := POSPostingBuffer."Amount (LCY)" - POSSalesLineToBeCompressed."Amount Excl. VAT (LCY)";
-                POSPostingBuffer."VAT Amount Discount" := POSPostingBuffer."VAT Amount Discount" - (POSSalesLineToBeCompressed."Line Discount Amount Incl. VAT" - POSSalesLineToBeCompressed."Line Discount Amount Excl. VAT");
-                POSPostingBuffer."VAT Amount Discount (LCY)" := POSPostingBuffer."VAT Amount Discount (LCY)" - (POSSalesLineToBeCompressed."Line Dsc. Amt. Incl. VAT (LCY)" - POSSalesLineToBeCompressed."Line Dsc. Amt. Excl. VAT (LCY)");
-                if POSSalesLineToBeCompressed.Type = POSSalesLineToBeCompressed.Type::Rounding then begin
-                    POSPostingBuffer."Rounding Amount" -= POSSalesLineToBeCompressed."Amount Incl. VAT";
-                    POSPostingBuffer."Rounding Amount (LCY)" -= POSSalesLineToBeCompressed."Amount Incl. VAT (LCY)";
-                end;
-                POSPostingBuffer.Modify();
             until POSSalesLineToBeCompressed.Next() = 0;
     end;
 
@@ -818,108 +819,109 @@
     begin
         if POSPaymentLineToBeCompressed.FindSet() then
             repeat
-
                 POSEntry.Get(POSPaymentLineToBeCompressed."POS Entry No.");
-                POSPeriodRegister.Get(POSEntry."POS Period Register No.");
-                Compressionmethod := GetCompressionMethod(POSPeriodRegister, PostCompressedVar);
+                if (POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"]) then begin
+                    POSPeriodRegister.Get(POSEntry."POS Period Register No.");
+                    Compressionmethod := GetCompressionMethod(POSPeriodRegister, PostCompressedVar);
 
-                Clear(POSPostingBuffer);
-                POSPostingBuffer.Init();
+                    Clear(POSPostingBuffer);
+                    POSPostingBuffer.Init();
 
-                POSPostingBuffer."Posting Date" := POSEntry."Posting Date";
-                POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Payment;
-                POSPostingBuffer."No." := POSPaymentLineToBeCompressed."POS Payment Method Code";
-                POSPostingBuffer."POS Payment Method Code" := POSPaymentLineToBeCompressed."POS Payment Method Code";
-                POSPostingBuffer."Global Dimension 1 Code" := POSPaymentLineToBeCompressed."Shortcut Dimension 1 Code";
-                POSPostingBuffer."Global Dimension 2 Code" := POSPaymentLineToBeCompressed."Shortcut Dimension 2 Code";
-                POSPostingBuffer."Dimension Set ID" := POSPaymentLineToBeCompressed."Dimension Set ID";
-                POSPostingBuffer."Salesperson Code" := POSEntry."Salesperson Code";
-                POSPostingBuffer."Currency Code" := POSPaymentLineToBeCompressed."Currency Code";
-                POSPostingBuffer."POS Store Code" := POSPaymentLineToBeCompressed."POS Store Code";
-                POSPostingBuffer."POS Unit No." := POSPaymentLineToBeCompressed."POS Unit No.";
-                POSPostingBuffer."POS Period Register" := POSPaymentLineToBeCompressed."POS Period Register No.";
-                POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
-                POSPostingBuffer."Applies-to Doc. Type" := POSPostingBuffer."Applies-to Doc. Type";
-                POSPostingBuffer."Applies-to Doc. No." := POSPostingBuffer."Applies-to Doc. No.";
-                POSPostingBuffer."VAT Prod. Posting Group" := POSPaymentLineToBeCompressed."VAT Prod. Posting Group";
-                POSPostingBuffer."VAT Bus. Posting Group" := POSPaymentLineToBeCompressed."VAT Bus. Posting Group";
-                PostingDescription := POSPaymentLineToBeCompressed.Description;
-                if POSPaymentMethod.Get(POSPaymentLineToBeCompressed."POS Payment Method Code") then begin
-                    if not POSPaymentMethod."Post Condensed" then begin
-                        POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
-                        POSPostingBuffer."Line No." := POSPaymentLineToBeCompressed."Line No.";
-                        POSPostingBuffer."External Document No." := POSPaymentLineToBeCompressed."External Document No.";
-                    end else begin
-                        if (POSPaymentMethod."Condensed Posting Description" = '') then
-                            case Compressionmethod of
-                                Compressionmethod::Uncompressed:
-                                    POSPaymentMethod."Condensed Posting Description" := '%6 - %3';
-                                Compressionmethod::"Per POS Entry":
-                                    POSPaymentMethod."Condensed Posting Description" := '%6 - %3';
-                                Compressionmethod::"Per POS Period Register":
-                                    POSPaymentMethod."Condensed Posting Description" := '%2/%1/%6 - %4/%3';
-                            end;
-
-                        if POSPaymentMethod."Condensed Posting Description" <> '' then
-                            PostingDescription := CopyStr(StrSubstNo(POSPaymentMethod."Condensed Posting Description",
-                                   POSPaymentLineToBeCompressed."POS Unit No.",
-                                   POSPaymentLineToBeCompressed."POS Store Code",
-                                   POSEntry."Posting Date",
-                                   POSEntry."POS Period Register No.",
-                                   POSPaymentLineToBeCompressed."POS Payment Bin Code",
-                                   POSPaymentMethod.Code
-                                   ), 1, MaxStrLen(POSPostingBuffer.Description))
-                        else
-                            PostingDescription := CopyStr(StrSubstNo(TextPaymentDescription, POSPaymentMethod.Code, POSEntry."Posting Date"), 1, MaxStrLen(POSPostingBuffer.Description));
-                    end;
-                end;
-
-                case Compressionmethod of
-                    Compressionmethod::Uncompressed:
-                        begin
-                            POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
+                    POSPostingBuffer."Posting Date" := POSEntry."Posting Date";
+                    POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Payment;
+                    POSPostingBuffer."No." := POSPaymentLineToBeCompressed."POS Payment Method Code";
+                    POSPostingBuffer."POS Payment Method Code" := POSPaymentLineToBeCompressed."POS Payment Method Code";
+                    POSPostingBuffer."Global Dimension 1 Code" := POSPaymentLineToBeCompressed."Shortcut Dimension 1 Code";
+                    POSPostingBuffer."Global Dimension 2 Code" := POSPaymentLineToBeCompressed."Shortcut Dimension 2 Code";
+                    POSPostingBuffer."Dimension Set ID" := POSPaymentLineToBeCompressed."Dimension Set ID";
+                    POSPostingBuffer."Salesperson Code" := POSEntry."Salesperson Code";
+                    POSPostingBuffer."Currency Code" := POSPaymentLineToBeCompressed."Currency Code";
+                    POSPostingBuffer."POS Store Code" := POSPaymentLineToBeCompressed."POS Store Code";
+                    POSPostingBuffer."POS Unit No." := POSPaymentLineToBeCompressed."POS Unit No.";
+                    POSPostingBuffer."POS Period Register" := POSPaymentLineToBeCompressed."POS Period Register No.";
+                    POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
+                    POSPostingBuffer."Applies-to Doc. Type" := POSPostingBuffer."Applies-to Doc. Type";
+                    POSPostingBuffer."Applies-to Doc. No." := POSPostingBuffer."Applies-to Doc. No.";
+                    POSPostingBuffer."VAT Prod. Posting Group" := POSPaymentLineToBeCompressed."VAT Prod. Posting Group";
+                    POSPostingBuffer."VAT Bus. Posting Group" := POSPaymentLineToBeCompressed."VAT Bus. Posting Group";
+                    PostingDescription := POSPaymentLineToBeCompressed.Description;
+                    if POSPaymentMethod.Get(POSPaymentLineToBeCompressed."POS Payment Method Code") then begin
+                        if not POSPaymentMethod."Post Condensed" then begin
                             POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
                             POSPostingBuffer."Line No." := POSPaymentLineToBeCompressed."Line No.";
-                            if POSPeriodRegister."Document No." = '' then
-                                POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
+                            POSPostingBuffer."External Document No." := POSPaymentLineToBeCompressed."External Document No.";
+                        end else begin
+                            if (POSPaymentMethod."Condensed Posting Description" = '') then
+                                case Compressionmethod of
+                                    Compressionmethod::Uncompressed:
+                                        POSPaymentMethod."Condensed Posting Description" := '%6 - %3';
+                                    Compressionmethod::"Per POS Entry":
+                                        POSPaymentMethod."Condensed Posting Description" := '%6 - %3';
+                                    Compressionmethod::"Per POS Period Register":
+                                        POSPaymentMethod."Condensed Posting Description" := '%2/%1/%6 - %4/%3';
+                                end;
+
+                            if POSPaymentMethod."Condensed Posting Description" <> '' then
+                                PostingDescription := CopyStr(StrSubstNo(POSPaymentMethod."Condensed Posting Description",
+                                       POSPaymentLineToBeCompressed."POS Unit No.",
+                                       POSPaymentLineToBeCompressed."POS Store Code",
+                                       POSEntry."Posting Date",
+                                       POSEntry."POS Period Register No.",
+                                       POSPaymentLineToBeCompressed."POS Payment Bin Code",
+                                       POSPaymentMethod.Code
+                                       ), 1, MaxStrLen(POSPostingBuffer.Description))
                             else
+                                PostingDescription := CopyStr(StrSubstNo(TextPaymentDescription, POSPaymentMethod.Code, POSEntry."Posting Date"), 1, MaxStrLen(POSPostingBuffer.Description));
+                        end;
+                    end;
+
+                    case Compressionmethod of
+                        Compressionmethod::Uncompressed:
+                            begin
+                                POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
+                                POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
+                                POSPostingBuffer."Line No." := POSPaymentLineToBeCompressed."Line No.";
+                                if POSPeriodRegister."Document No." = '' then
+                                    POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
+                                else
+                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                            end;
+                        Compressionmethod::"Per POS Entry":
+                            begin
+                                POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
+                                if POSPeriodRegister."Document No." = '' then
+                                    POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
+                                else
+                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                            end;
+                        Compressionmethod::"Per POS Period Register":
+                            begin
+                                POSPeriodRegister.TestField("Document No.");
                                 POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                        end;
-                    Compressionmethod::"Per POS Entry":
-                        begin
-                            POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
-                            if POSPeriodRegister."Document No." = '' then
-                                POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
-                            else
-                                POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                        end;
-                    Compressionmethod::"Per POS Period Register":
-                        begin
-                            POSPeriodRegister.TestField("Document No.");
-                            POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                        end;
+                            end;
+                    end;
+
+                    if not POSPostingBuffer.Find() then begin
+                        POSPostingBuffer.Amount := 0;
+                        POSPostingBuffer."Amount (LCY)" := 0;
+                        POSPostingBuffer."Rounding Amount" := 0;
+                        POSPostingBuffer."Rounding Amount (LCY)" := 0;
+                        POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
+                        POSPostingBuffer."VAT Amount (LCY)" := 0;
+                        POSPostingBuffer."VAT Base Amount" := 0;
+                        POSPostingBuffer.Insert();
+                    end;
+
+                    POSPostingBuffer."Rounding Amount" := POSPostingBuffer."Rounding Amount" + POSPaymentLineToBeCompressed."Rounding Amount";
+                    POSPostingBuffer."Rounding Amount (LCY)" := POSPostingBuffer."Rounding Amount" + POSPaymentLineToBeCompressed."Rounding Amount (LCY)";
+                    POSPostingBuffer.Amount := POSPostingBuffer.Amount + POSPaymentLineToBeCompressed.Amount - POSPaymentLineToBeCompressed."VAT Amount (LCY)";
+                    POSPostingBuffer."Amount (LCY)" := POSPostingBuffer."Amount (LCY)" + POSPaymentLineToBeCompressed."Amount (LCY)" - POSPaymentLineToBeCompressed."VAT Amount (LCY)";
+
+                    POSPostingBuffer."VAT Amount" += POSPaymentLineToBeCompressed."VAT Amount (LCY)"; // VAT reversal in foreign currency not supported.
+                    POSPostingBuffer."VAT Amount (LCY)" += POSPaymentLineToBeCompressed."VAT Amount (LCY)";
+                    POSPostingBuffer."VAT Base Amount" += POSPaymentLineToBeCompressed."VAT Base Amount (LCY)";
+                    POSPostingBuffer.Modify();
                 end;
-
-                if not POSPostingBuffer.Find() then begin
-                    POSPostingBuffer.Amount := 0;
-                    POSPostingBuffer."Amount (LCY)" := 0;
-                    POSPostingBuffer."Rounding Amount" := 0;
-                    POSPostingBuffer."Rounding Amount (LCY)" := 0;
-                    POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
-                    POSPostingBuffer."VAT Amount (LCY)" := 0;
-                    POSPostingBuffer."VAT Base Amount" := 0;
-                    POSPostingBuffer.Insert();
-                end;
-
-                POSPostingBuffer."Rounding Amount" := POSPostingBuffer."Rounding Amount" + POSPaymentLineToBeCompressed."Rounding Amount";
-                POSPostingBuffer."Rounding Amount (LCY)" := POSPostingBuffer."Rounding Amount" + POSPaymentLineToBeCompressed."Rounding Amount (LCY)";
-                POSPostingBuffer.Amount := POSPostingBuffer.Amount + POSPaymentLineToBeCompressed.Amount - POSPaymentLineToBeCompressed."VAT Amount (LCY)";
-                POSPostingBuffer."Amount (LCY)" := POSPostingBuffer."Amount (LCY)" + POSPaymentLineToBeCompressed."Amount (LCY)" - POSPaymentLineToBeCompressed."VAT Amount (LCY)";
-
-                POSPostingBuffer."VAT Amount" += POSPaymentLineToBeCompressed."VAT Amount (LCY)"; // VAT reversal in foreign currency not supported.
-                POSPostingBuffer."VAT Amount (LCY)" += POSPaymentLineToBeCompressed."VAT Amount (LCY)";
-                POSPostingBuffer."VAT Base Amount" += POSPaymentLineToBeCompressed."VAT Base Amount (LCY)";
-                POSPostingBuffer.Modify();
             until POSPaymentLineToBeCompressed.Next() = 0;
     end;
 
