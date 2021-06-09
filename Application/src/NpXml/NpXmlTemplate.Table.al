@@ -288,6 +288,12 @@ table 6151551 "NPR NpXml Template"
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
+        field(5146; "FTP Files temporrary extension"; Text[4])
+        {
+            Caption = 'FTP Files temporrary extension';
+            DataClassification = CustomerContent;
+            CharAllowed = 'az';
+        }
         field(5150; "FTP Port"; Integer)
         {
             Caption = 'FTP Port';

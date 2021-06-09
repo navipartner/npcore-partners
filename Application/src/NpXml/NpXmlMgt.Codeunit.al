@@ -12,6 +12,7 @@ codeunit 6151551 "NPR NpXml Mgt."
         Error002: Label 'Record in %1 within the filters does not exist';
         Error003: Label 'Upload failed with status code: %1 and description: %2';
         Error004: Label 'Authorization failed. Wrong FTP username/password.';
+        Error005: Label 'File %1 could not be renamed back to original file name %2 after it was uploaded with temporrary extension .%3.';
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
         RecRef: RecordRef;
@@ -828,6 +829,7 @@ codeunit 6151551 "NPR NpXml Mgt."
         Result: Text;
         StatusCode: Text;
         ErrorDescription: Text;
+        OriginalFileName: Text;
     begin
         if not NPXmlTemplate."FTP Transfer" then
             exit;
@@ -836,6 +838,11 @@ codeunit 6151551 "NPR NpXml Mgt."
 
         if NPXmlTemplate."FTP Filename (Fixed)" <> '' then
             Filename := NPXmlTemplate."FTP Filename (Fixed)";
+
+        if NPXmlTemplate."FTP Files temporrary extension" <> '' then begin
+            OriginalFileName := Filename;
+            Filename := Filename + '.' + NPXmlTemplate."FTP Files temporrary extension";
+        end;
 
         AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server", NPXmlTemplate."Do Not Add Comment Line");
         OutputTempBlob.CreateInStream(InStr);
@@ -851,6 +858,17 @@ codeunit 6151551 "NPR NpXml Mgt."
                 begin
                     Field.Get(DATABASE::"NPR NpXml Template", NPXmlTemplate.FieldNo("FTP Transfer"));
                     AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NPXmlTemplate."FTP Server" + ' -->' + GetChar(13) + GetChar(10));
+
+                    if NPXmlTemplate."FTP Files temporrary extension" <> '' then begin
+                        FTPResponse := FTPClient.RenameFile(NPXmlTemplate."FTP Directory" + '/' + Filename, NPXmlTemplate."FTP Directory" + '/' + OriginalFileName);
+
+                        FTPResponse.Get('StatusCode', JToken);
+                        StatusCode := JToken.AsValue().AsText();
+
+                        if StatusCode <> '200' then
+                            Error(Error005, Filename, OriginalFileName, NPXmlTemplate."FTP Files temporrary extension");
+                    end;
+
                     exit;
                 end;
             '401':
