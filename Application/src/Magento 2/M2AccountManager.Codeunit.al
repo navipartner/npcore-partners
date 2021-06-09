@@ -1426,19 +1426,24 @@ codeunit 6151151 "NPR M2 Account Manager"
         MembershipRole: Record "NPR MM Membership Role";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Member: Record "NPR MM Member";
     begin
-
-        //-NPR5.51 [356090]
         MembershipRole.SetFilter("Contact No.", '=%1', TmpContact."No.");
         if (not MembershipRole.FindFirst()) then
             exit(false);
 
+        Member.Get(MembershipRole."Member Entry No.");
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+
+        TransferMemberInfoToCapture(Member, MemberInfoCapture);
         TransferToInfoCapture(TmpContact, MemberInfoCapture);
+
         if (not MemberInfoCapture.Insert()) then
             exit(false);
 
         exit(MembershipManagement.UpdateMember(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", MemberInfoCapture));
-        //+NPR5.51 [356090]
     end;
 
     local procedure BlockMember(Contact: Record Contact): Boolean
@@ -1463,6 +1468,27 @@ codeunit 6151151 "NPR M2 Account Manager"
 
         exit(true);
         //+NPR5.51 [356090]
+    end;
+
+    local procedure TransferMemberInfoToCapture(Member: Record "NPR MM Member"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    begin
+        MemberInfoCapture."First Name" := CopyStr(Member."First Name", 1, MaxStrLen(MemberInfoCapture."First Name"));
+        MemberInfoCapture."Middle Name" := CopyStr(Member."Middle Name", 1, MaxStrLen(MemberInfoCapture."Middle Name"));
+        MemberInfoCapture."Last Name" := CopyStr(Member."Last Name", 1, MaxStrLen(MemberInfoCapture."Last Name"));
+        MemberInfoCapture.Address := CopyStr(Member.Address, 1, MaxStrLen(MemberInfoCapture.Address));
+        MemberInfoCapture."Post Code Code" := CopyStr(Member."Post Code Code", 1, MaxStrLen(MemberInfoCapture."Post Code Code"));
+        MemberInfoCapture.City := CopyStr(Member.City, 1, MaxStrLen(MemberInfoCapture.City));
+        MemberInfoCapture."Country Code" := CopyStr(Member."Country Code", 1, MaxStrLen(MemberInfoCapture."Country Code"));
+        MemberInfoCapture.Country := CopyStr(Member.Country, 1, MaxStrLen(MemberInfoCapture.Country));
+
+        MemberInfoCapture."Phone No." := CopyStr(Member."Phone No.", 1, MaxStrLen(MemberInfoCapture."Phone No."));
+        MemberInfoCapture."E-Mail Address" := CopyStr(Member."E-Mail Address", 1, MaxStrLen(MemberInfoCapture."E-Mail Address"));
+
+        MemberInfoCapture."Social Security No." := CopyStr(Member."Social Security No.", 1, MaxStrLen(MemberInfoCapture."Social Security No."));
+        MemberInfoCapture.Gender := Member.Gender;
+        MemberInfoCapture.Birthday := Member.Birthday;
+        MemberInfoCapture."News Letter" := Member."E-Mail News Letter";
+        MemberInfoCapture."Notification Method" := Member."Notification Method";
     end;
 
     local procedure TransferToInfoCapture(var TmpContact: Record Contact temporary; var MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -1522,6 +1548,7 @@ codeunit 6151151 "NPR M2 Account Manager"
         AccountComTemplate: Record "NPR M2 Account Com. Template";
         AccountSetup: Record "NPR M2 Account Setup";
         AuthenticationLog: Record "NPR Authentication Log";
+        Base64Convert: Codeunit "Base64 Convert";
     begin
 
         if (not AccountSetup.Get()) then;
@@ -1535,7 +1562,7 @@ codeunit 6151151 "NPR M2 Account Manager"
         AccountComTemplate."Last Name" := Contact.Surname;
         AccountComTemplate."E-Mail" := LowerCase(Contact."E-Mail");
         AccountComTemplate."Security Token" := Token;
-        AccountComTemplate."B64 Email" := ToBase64(LowerCase(Contact."E-Mail"));
+        AccountComTemplate."B64 Email" := Base64Convert.ToBase64(LowerCase(Contact."E-Mail"));
         AccountComTemplate.URL1 := StrSubstNo(AccountSetup."Reset Password URL", Token, AccountComTemplate."B64 Email");
 
         AccountComTemplate.Insert();

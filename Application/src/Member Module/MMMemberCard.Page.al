@@ -399,7 +399,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = PrintCheck;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Print Member Account Card action';
@@ -411,28 +411,41 @@ page 6060136 "NPR MM Member Card"
                         MemberRetailIntegration.PrintMemberAccountCard("External Member No.");
                 end;
             }
-            action(PrintCard)
+            Action(PrintCard)
             {
                 Caption = 'Print Member Card';
                 Ellipsis = true;
                 Image = PrintVoucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Print Member Card action';
-
                 trigger OnAction()
                 var
                     MembershipManagement: Codeunit "NPR MM Membership Mgt.";
                     MemberCardEntryNo: Integer;
+                    MemberCard: Record "NPR MM Member Card";
+                    Membership: Record "NPR MM Membership";
+                    MembershipSetup: Record "NPR MM Membership Setup";
+                    CONFIRM_CARD_BLOCKED: Label 'This member card is blocked, do you want to continue anyway?';
                 begin
 
-                    if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
-                        //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
-                        MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo();
-                        MemberRetailIntegration.PrintMemberCard("Entry No.", MemberCardEntryNo);
+                    if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, Rec."External Member No.", Rec."Display Name"))) then begin
+                        MemberCardEntryNo := CurrPage.MemberCardsSubpage.Page.GetCurrentEntryNo();
+
+                        MemberCard.Get(MemberCardEntryNo);
+                        Membership.Get(MemberCard."Membership Entry No.");
+                        MembershipSetup.Get(Membership."Membership Code");
+
+                        if ((MemberCard.Blocked) or (Membership.Blocked)) then
+                            if (not Confirm(CONFIRM_CARD_BLOCKED, true)) then
+                                Error('');
+
+                        MemberCard.SetFilter("Entry No.", '=%1', MemberCardEntryNo);
+                        MemberRetailIntegration.PrintMemberCardWorker(MemberCard, MembershipSetup);
+
                     end;
                 end;
             }
@@ -441,7 +454,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Generate New Card';
                 Image = PostedPayableVoucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -494,7 +507,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Take Picture';
                 Image = Camera;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -512,7 +525,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Import Picture';
                 Image = Import;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -552,7 +565,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Create Welcome Notification';
                 Image = Interaction;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Welcome Notification action';
@@ -584,7 +597,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Send Wallet Notification';
                 Image = Interaction;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Creates a wallet notification message and sends it when processing method is set to inline';
@@ -693,7 +706,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Issued Tickets';
                 Image = ShowList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
@@ -707,7 +720,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = ChangeDimensions;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
@@ -732,7 +745,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -749,7 +762,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
@@ -779,7 +792,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Ledger Entries action';
@@ -808,7 +821,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'F7';
                     ApplicationArea = All;
@@ -840,7 +853,7 @@ page 6060136 "NPR MM Member Card"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -865,7 +878,7 @@ page 6060136 "NPR MM Member Card"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
