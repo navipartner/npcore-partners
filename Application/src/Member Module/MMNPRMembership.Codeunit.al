@@ -453,6 +453,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         StatusCode: Code[10];
         StatusDescription: Text[50];
         B64Credential: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
 
         ReasonText := '';
@@ -473,7 +474,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
             NPRRemoteEndpointSetup."Credentials Type"::BASIC:
                 begin
-                    B64Credential := ToBase64(StrSubstNo('%1:%2', NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password"));
+                    B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password"));
                     HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
                 end;
 
@@ -1255,32 +1256,6 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         XmlDocOut := XmlDocOut.XmlDocument;
         XmlDocOut.LoadXml(XmlText);
-
-    end;
-
-    local procedure ToBase64(StringToEncode: Text) B64String: Text
-    var
-        TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
-        Outstr: OutStream;
-    begin
-
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(Outstr);
-        Outstr.WriteText(StringToEncode);
-
-        TempBlob.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        B64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
 
     end;
 

@@ -57,31 +57,6 @@ codeunit 6151164 "NPR MM Loy. Point WS (Client)"
 
     end;
 
-    procedure ToBase64(StringToEncode: Text) B64String: Text
-    var
-        TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
-        Outstr: OutStream;
-    begin
-
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(Outstr);
-        Outstr.WriteText(StringToEncode);
-
-        TempBlob.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        B64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-    end;
-
     procedure XmlSafe(InText: Text): Text
     begin
 
