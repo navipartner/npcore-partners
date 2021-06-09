@@ -2,6 +2,9 @@ report 6014423 "NPR UPG RetDataMod AR Upgr."
 {
     ProcessingOnly = true;
     Caption = 'UPG Retail Data Model A/R Upgrade';
+    UsageCategory = Administration;
+    ApplicationArea = All;
+
     requestpage
     {
         layout
