@@ -33,7 +33,7 @@ jobs:
       - platform: '17.0.0.0'
       - application: '17.0.0.0'
       - preprocessorSymbols: [BC17]
-      - runtime: '"7.0"'
+      - runtime: '"6.0"'
 
     - name: BC18
       containerImageName: npretail.azurecr.io/np/dynamicsnav:18.0.23013.23795-w1
@@ -47,7 +47,7 @@ jobs:
       - platform: '18.0.0.0'
       - application: '18.0.0.0'
       - preprocessorSymbols: [BC18]
-      - runtime: '"8.0"'   
+      - runtime: '"7.0"'   
 
     scriptsRepo: scriptsRepo
     stepList:
