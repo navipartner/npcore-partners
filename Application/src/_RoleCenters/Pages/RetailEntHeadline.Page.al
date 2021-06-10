@@ -77,10 +77,8 @@ page 6151332 "NPR Retail Ent Headline"
             end else
                 Uninitialized := true;
 
-        if not Uninitialized and Rec.WritePermission then begin
+        if not Uninitialized and Rec.WritePermission then
             Rec.Modify();
-            HeadlineManagement.ScheduleTask(Codeunit::"RC Headlines Executor");
-        end;
 
         HeadlineManagement.GetUserGreetingText(GreetingText);
 
