@@ -103,7 +103,9 @@ page 6150713 "NPR POS Stargate Packages"
     }
 
     var
+#if BC17
         Text001: Label 'Select Stargate Package file';
+#endif
         Text002: Label 'Package %1 is already registered with version %2. You are importing it with version %3, %4. If you continue with the import, the existing version will be overwritten.\\Are you sure you want to continue?';
         Text003: Label 'which is newer';
         Text004: Label 'which is older';
@@ -114,7 +116,9 @@ page 6150713 "NPR POS Stargate Packages"
         StargatePackage: Record "NPR POS Stargate Package";
         PackageMethod: Record "NPR POS Stargate Pckg. Method";
         Package: DotNet NPRNetPackage;
+#if BC17
         FilePath: Text;
+#endif
         Method: Text;
         WhichIs: Text;
         DefaultYes: Boolean;
@@ -122,7 +126,11 @@ page 6150713 "NPR POS Stargate Packages"
         FileContent: Text;
         InStr: InStream;
     begin
+#if BC17
         if not UploadIntoStream(Text001, '', 'Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json', FilePath, InStr) then
+#else
+        if not UploadIntoStream('Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json', InStr) then
+#endif
             exit;
 
         InStr.ReadText(FileContent);

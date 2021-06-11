@@ -619,13 +619,19 @@
     procedure UploadAndCheckImage(var ImageInStream: InStream)
     var
         FileExtension: Text;
+#if BC17
         ReturnedFilePath: Text;
         SelectImage: Label 'Select image';
+#endif
         ImageFileFilter: Label 'Image Files (*.gif;*.png;*.jpg;*.jpeg;*.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp';
         ImageHelpers: Codeunit "Image Helpers";
         ImgCantBeProcessed: Label 'Media not supported \ \Image can''t be processed. \Please use .gif .png .jpg .jpeg or .bmp images .';
     begin
+#if BC17
         if not UploadIntoStream(SelectImage, '', ImageFileFilter, ReturnedFilePath, ImageInStream) then
+#else
+        if not UploadIntoStream(ImageFileFilter, ImageInStream) then
+#endif
             Error('');
 
         FileExtension := ImageHelpers.GetImageType(ImageInStream);
