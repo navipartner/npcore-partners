@@ -350,6 +350,7 @@
 
         DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
         DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
+        DataLogField.SetAutoCalcFields("Obsolete State");
         if not DataLogField.FindSet() then begin
             if Previous then
                 exit(false);
@@ -362,11 +363,13 @@
         RecRef.Open(DataLogRecord."Table ID");
         RecRef.Init();
         repeat
-            FieldRef := RecRef.Field(DataLogField."Field No.");
-            if Previous and DataLogField."Field Value Changed" then
-                AssignValue(FieldRef, DataLogField."Previous Field Value")
-            else
-                AssignValue(FieldRef, DataLogField."Field Value");
+            if DataLogField."Obsolete State" <> DataLogField."Obsolete State"::Removed then begin
+                FieldRef := RecRef.Field(DataLogField."Field No.");
+                if Previous and DataLogField."Field Value Changed" then
+                    AssignValue(FieldRef, DataLogField."Previous Field Value")
+                else
+                    AssignValue(FieldRef, DataLogField."Field Value");
+            end;
         until DataLogField.Next() = 0;
         exit(true);
     end;
