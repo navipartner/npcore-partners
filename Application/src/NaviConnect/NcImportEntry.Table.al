@@ -176,7 +176,7 @@ table 6151504 "NPR Nc Import Entry"
         if not "Document Source".HasValue() then
             exit(false);
 
-        "Document Source".CreateInStream(InStr, TextEncoding::UTF8);
+        "Document Source".CreateInStream(InStr);
         XML := '';
         while not InStr.EOS() do begin
             InStr.ReadText(BufferText);

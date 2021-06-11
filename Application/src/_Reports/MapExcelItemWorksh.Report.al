@@ -70,7 +70,11 @@ report 6060044 "NPR Map Excel Item Worksh."
             FileUploaded: Boolean;
         begin
             if CloseAction = ACTION::OK then begin
+#if BC17                
                 FileUploaded := UploadIntoStream(ImportExcelLbl, '', '', FileName, InStr);
+#else
+                FileUploaded := UploadIntoStream('', InStr);
+#endif
                 if not FileUploaded then
                     exit;
 
@@ -100,10 +104,12 @@ report 6060044 "NPR Map Excel Item Worksh."
         InStr: InStream;
         BoolTryMatch: Boolean;
         HeaderRow: Integer;
+#if BC17
         ImportExcelLbl: Label 'Import Excel File';
+        FileName: Text;
+#endif
         HeaderRowErr: Label 'Please indicate the Header Row';
         ImportItemWorksheetErr: Label 'Please start this import from the Item Worksheet Page.';
-        FileName: Text;
         SheetName: Text[250];
 
     local procedure AnalyzeData()

@@ -124,7 +124,9 @@
     var
         InStream: InStream;
         OutStream: OutStream;
+#if BC17
         FileName: Text;
+#endif
         X509Certificate2: DotNet NPRNetX509Certificate2;
         MemoryStream: DotNet NPRNetMemoryStream;
         RSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
@@ -137,7 +139,11 @@
         end;
 
         FRCertificationSetup."Signing Certificate".CreateOutStream(OutStream);
+#if BC17
         if not UploadIntoStream('Upload Certificate', '', 'Certificate File (*.PFX)|*.PFX', FileName, InStream) then
+#else
+        if not UploadIntoStream('Certificate File (*.PFX)|*.PFX', InStream) then
+#endif
             exit;
 
         MemoryStream := MemoryStream.MemoryStream();
