@@ -139,9 +139,15 @@
         InStream: InStream;
         OutStream: OutStream;
         Pos: Integer;
+#if BC17
         UploadFileMsg: Label 'Upload Attachment.';
+#endif
     begin
+#if BC17
         if not UploadIntoStream(UploadFileMsg, '', '', Filename, InStream) then
+#else
+        if not UploadIntoStream('', InStream) then
+#endif
             exit;
 
         EmailAttachmentTemp.Init();

@@ -41,7 +41,7 @@
         if not XmlDoc.GetRoot(XmlElement) then
             exit;
 
-        if not XmlElement.SelectNodes('sales_order', XNodeList) then
+        if not XmlElement.SelectNodes('//sales_order', XNodeList) then
             exit;
         foreach XNode in XNodeList do begin
             ImportSalesOrder(XNode.AsXmlElement());
