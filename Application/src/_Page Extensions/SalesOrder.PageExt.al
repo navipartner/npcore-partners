@@ -65,6 +65,14 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the value of the NPR Kolli field';
             }
         }
+        addlast("Invoice Details")
+        {
+            field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Specifies the sum of Payment Lines attached to the Sales Order';
+            }
+        }
         modify(Control1900316107)
         {
             Visible = false;
