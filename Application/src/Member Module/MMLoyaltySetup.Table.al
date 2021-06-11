@@ -108,6 +108,15 @@ table 6060140 "NPR MM Loyalty Setup"
             DecimalPlaces = 2 : 5;
             InitValue = 1;
         }
+
+        field(61; "Rounding on Earning"; Option)
+        {
+            Caption = 'Rounding on Earning';
+            DataClassification = CustomerContent;
+            OptionMembers = NEAREST,UP,DOWN;
+            OptionCaption = 'Nearest,Up,Down';
+            InitValue = NEAREST;
+        }
         field(65; "Point Rate"; Decimal)
         {
             Caption = 'Point Rate';

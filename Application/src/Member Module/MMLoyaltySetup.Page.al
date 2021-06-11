@@ -99,7 +99,7 @@ page 6060105 "NPR MM Loyalty Setup"
                         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
                     begin
 
-                        LoyaltyPointManagement.CalcultatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
+                        LoyaltyPointManagement.CalculatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
                         CurrPage.Update(true);
 
                     end;
@@ -159,6 +159,11 @@ page 6060105 "NPR MM Loyalty Setup"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Factor field';
+                }
+                field("Rounding on Earning"; Rec."Rounding on Earning")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies how the price * amount factor is rounded when earning points.';
                 }
                 field("Point Rate"; Rec."Point Rate")
                 {
@@ -290,7 +295,7 @@ page 6060105 "NPR MM Loyalty Setup"
         CollectionPeriodStart := 0D;
         ReasonText := '';
         if (Rec."Collection Period" = Rec."Collection Period"::FIXED) then begin
-            LoyaltyPointManagement.CalcultatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
+            LoyaltyPointManagement.CalculatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
 
             ExpirePointsAt := 0D;
             if (Rec."Expire Uncollected Points") then
