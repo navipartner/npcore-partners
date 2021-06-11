@@ -65,6 +65,15 @@ table 6059899 "NPR Data Log Field"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(1010; "Obsolete State"; Option)
+        {
+            OptionMembers = No,Pending,Removed;
+            OptionCaption = 'No,Pending,Removed';
+            Caption = 'Obsolete State';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("Field".ObsoleteState where(TableNo = field("Table ID"), "No." = field("Field No.")));
+        }
     }
 
     keys
