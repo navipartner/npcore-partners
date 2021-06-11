@@ -43,13 +43,13 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         TotalBurnAmount: Decimal;
     begin
 
-        if (not ValidateAuthorizarion(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
             exit(false);
 
         if (not ValidateRegisterSales(TmpSaleLinesIn, TmpPaymentLinesIn, ResponseMessage, ResponseMessageId)) then
             exit(false);
 
-        // valdiations are done in the validate functions
+        // validations are done in the validate functions
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
@@ -79,7 +79,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
             until (TmpPaymentLinesIn.Next() = 0);
         end;
 
-        // Create compensation for amount not eligable for earn
+        // Create compensation for amount not eligible for earn
         if (TotalBurnAmount <> 0) then
             CreateNotEligibleEntry(LoyaltySetup, LoyaltyStoreLedger, Membership, TotalEarnAmount, TotalBurnAmount);
 
@@ -105,13 +105,13 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipEntryNo: Integer;
     begin
 
-        if (not ValidateAuthorizarion(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
             exit(false);
 
         if (not ValidateReservePoints(TmpReserveLinesIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
             exit(false);
 
-        // valdiations are done in the validate functions
+        // validations are done in the validate functions
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
@@ -154,10 +154,10 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipEntryNo: Integer;
     begin
 
-        if (not ValidateAuthorizarion(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
             exit(false);
 
-        // valdiations are done in the validate functions
+        // validations are done in the validate functions
         if (MembershipEntryNo <> 0) then begin
             Membership.Get(MembershipEntryNo);
             MembershipSetup.Get(Membership."Membership Code");
@@ -173,7 +173,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 
     end;
 
-    local procedure ValidateAuthorizarion(BasicCheck: Boolean; var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    local procedure ValidateAuthorization(BasicCheck: Boolean; var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         LoyaltyServerStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         StoreSetup: Record "NPR MM Loyalty Store Setup";
@@ -400,7 +400,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
                         end;
                     end;
 
-                    // payment points is transfered as positive, but stored as a negative
+                    // payment points is transferred as positive, but stored as a negative
                     if ((LoyaltyServerStoreLedger."Burned Points" + TmpPaymentLines."Total Points") <> 0) then begin
                         ResponseMessage := StrSubstNo(PAYMENT_2, TmpPaymentLines."Authorization Code");
                         ResponseMessageId := '-1160';
@@ -511,7 +511,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipPointsEntry."Item No." := TmpBuffer."Item No.";
         MembershipPointsEntry."Variant Code" := TmpBuffer."Variant Code";
 
-        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
+        LoyaltyPointManagement.CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
         case TmpBuffer.Type of
             TmpBuffer.Type::SALES:
@@ -561,7 +561,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
         MembershipPointsEntry."Authorization Code" := TmpBuffer."Authorization Code";
 
-        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
+        LoyaltyPointManagement.CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
         MembershipPointsEntry.Points := 0;
         case TmpBuffer.Type of
@@ -610,7 +610,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
         MembershipPointsEntry."Authorization Code" := LoyaltyStoreLedger."Authorization Code";
 
-        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
+        LoyaltyPointManagement.CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
         case TmpBuffer.Type of
             TmpBuffer.Type::PAYMENT:
@@ -654,7 +654,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
         MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
 
-        LoyaltyPointManagement.CalcultatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
+        LoyaltyPointManagement.CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
         EarnRatio := LoyaltyStoreLedger."Earned Points" / TotalEarnAmount;
 
