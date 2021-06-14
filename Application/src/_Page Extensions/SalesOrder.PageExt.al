@@ -220,6 +220,20 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                         NpRvSalesDocMgt.IssueVoucherAction(Rec);
                     end;
                 }
+                action("NPR Redeem Voucher")
+                {
+                    Caption = 'Redeem Voucher';
+                    Image = PostedReceivableVoucher;
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Redeem Voucher action';
+
+                    trigger OnAction()
+                    var
+                        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+                    begin
+                        NpRvSalesDocMgt.RedeemVoucherAction(Rec);
+                    end;
+                }
             }
         }
         addafter("Pick Instruction")
