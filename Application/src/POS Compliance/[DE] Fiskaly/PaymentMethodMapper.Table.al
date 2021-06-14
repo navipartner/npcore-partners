@@ -16,6 +16,11 @@ table 6014533 "NPR Payment Method Mapper"
             Caption = 'Fiscal Name';
             DataClassification = CustomerContent;
         }
+        field(20; "DSFINVK Type"; Enum "NPR DSFINVK Payment Type")
+        {
+            Caption = 'DSFINVK Type';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

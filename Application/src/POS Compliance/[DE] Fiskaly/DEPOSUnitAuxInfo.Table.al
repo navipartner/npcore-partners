@@ -11,6 +11,18 @@ table 6014532 "NPR DE POS Unit Aux. Info"
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit"."No.";
         }
+        field(2; "Cash Register Brand"; Text[50])
+        {
+            Caption = 'Cash Register Brand';
+            Description = 'Cash Register Brand for DE Fiskaly DSFINKV';
+            DataClassification = CustomerContent;
+        }
+        field(3; "Cash Register Model"; Text[50])
+        {
+            Caption = 'Cash Register Model';
+            Description = 'Cash Register Model for DE Fiskaly DSFINKV';
+            DataClassification = CustomerContent;
+        }
         field(10; "Client ID"; Guid)
         {
             Caption = 'Client ID';
@@ -29,6 +41,12 @@ table 6014532 "NPR DE POS Unit Aux. Info"
         {
             Caption = 'Serial Number';
             Description = 'Serial Number for DE Fiskaly';
+            DataClassification = CustomerContent;
+        }
+        field(40; "Cash Register Created"; Boolean)
+        {
+            Caption = 'Cash Register Created';
+            Description = 'Is Cash Register Created for DE Fiskaly DSFINVK';
             DataClassification = CustomerContent;
         }
     }

@@ -15,6 +15,12 @@ table 6014529 "NPR DE Audit Setup"
             Caption = 'Fiskaly API URL';
             DataClassification = CustomerContent;
         }
+
+        field(21; "DSFINVK Api URL"; Text[250])
+        {
+            Caption = 'DSFINVK API URL';
+            DataClassification = CustomerContent;
+        }
         field(30; "Last Fiskaly Context"; Blob)
         {
             Caption = 'Last Fiskaly Context';

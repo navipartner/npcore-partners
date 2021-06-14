@@ -251,7 +251,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         HttpWebResponse.Content.ReadAs(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
 
         ResponseJsonPar.ReadFrom(Response);
         CheckForErrors(ResponseJsonPar, RequestBodyTxt);
@@ -298,6 +298,44 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
 
         ErrorMessage += '\' + RequestJsonLbl + '\';
         Error(ErrorMessage + '\' + RequestJsonPar);
+    end;
+
+    [TryFunction]
+    internal procedure SendDSFINVK(DSFINVKJson: JsonObject; var ResponseJsonPar: JsonObject; DEAuditSetupPar: Record "NPR DE Audit Setup"; Method: Text; URLFunction: Text; AccessToken: Text)
+    var
+        HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        RequestBodyTxt: Text;
+        Response: Text;
+    begin
+        if Method <> 'GET' then begin
+            DSFINVKJson.WriteTo(RequestBodyTxt);
+            Content.WriteFrom(RequestBodyTxt);
+
+            Content.GetHeaders(Headers);
+            if Headers.Contains('Content-Type') then
+                Headers.Remove('Content-Type');
+            Headers.Add('Content-Type', 'application/json');
+            HttpWebRequest.Content(Content);
+        end;
+        HttpWebRequest.SetRequestUri(DEAuditSetupPar."DSFINVK Api URL" + URLFunction);
+        HttpWebRequest.Method := Method;
+
+        if AccessToken <> '' then begin
+            HttpWebRequest.GetHeaders(Headers);
+            Headers.Add('Authorization', StrSubstNo('Bearer %1', AccessToken));
+        end;
+
+        Client.Send(HttpWebRequest, HttpWebResponse);
+        HttpWebResponse.Content.ReadAs(Response);
+
+        if not HttpWebResponse.IsSuccessStatusCode then
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+
+        ResponseJsonPar.ReadFrom(Response);
     end;
 
     var
