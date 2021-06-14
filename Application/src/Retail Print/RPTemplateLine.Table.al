@@ -28,30 +28,30 @@ table 6014445 "NPR RP Template Line"
 
             trigger OnLookup()
             var
-                TemplateHeader: Record "NPR RP Template Header";
+                RPTemplateHeader: Record "NPR RP Template Header";
                 MatrixInterface: Codeunit "NPR RP Matrix Printer Interf.";
                 LineInterface: Codeunit "NPR RP Line Printer Interf.";
                 LookupOK: Boolean;
                 Value: Text;
                 RetailLogo: Record "NPR Retail Logo";
             begin
-                TemplateHeader.Get("Template Code");
-                TemplateHeader.TestField("Printer Device");
+                RPTemplateHeader.Get("Template Code");
+                RPTemplateHeader.TestField("Printer Device");
 
                 case Type of
                     Type::Data,
                     Type::FieldCaption:
                         begin
-                            case TemplateHeader."Printer Type" of
-                                TemplateHeader."Printer Type"::Line:
+                            case RPTemplateHeader."Printer Type" of
+                                RPTemplateHeader."Printer Type"::Line:
                                     begin
-                                        LineInterface.Construct(TemplateHeader."Printer Device");
+                                        LineInterface.Construct(RPTemplateHeader."Printer Device");
                                         LineInterface.OnLookupFont(LookupOK, Value);
                                         LineInterface.Dispose();
                                     end;
-                                TemplateHeader."Printer Type"::Matrix:
+                                RPTemplateHeader."Printer Type"::Matrix:
                                     begin
-                                        MatrixInterface.Construct(TemplateHeader."Printer Device");
+                                        MatrixInterface.Construct(RPTemplateHeader."Printer Device");
                                         MatrixInterface.OnLookupFont(LookupOK, Value);
                                         MatrixInterface.Dispose();
                                     end;
@@ -62,16 +62,16 @@ table 6014445 "NPR RP Template Line"
 
                     Type::Command:
                         begin
-                            case TemplateHeader."Printer Type" of
-                                TemplateHeader."Printer Type"::Line:
+                            case RPTemplateHeader."Printer Type" of
+                                RPTemplateHeader."Printer Type"::Line:
                                     begin
-                                        LineInterface.Construct(TemplateHeader."Printer Device");
+                                        LineInterface.Construct(RPTemplateHeader."Printer Device");
                                         LineInterface.OnLookupCommand(LookupOK, Value);
                                         LineInterface.Dispose();
                                     end;
-                                TemplateHeader."Printer Type"::Matrix:
+                                RPTemplateHeader."Printer Type"::Matrix:
                                     begin
-                                        MatrixInterface.Construct(TemplateHeader."Printer Device");
+                                        MatrixInterface.Construct(RPTemplateHeader."Printer Device");
                                         MatrixInterface.OnLookupCommand(LookupOK, Value);
                                         MatrixInterface.Dispose();
                                     end;
@@ -476,25 +476,25 @@ table 6014445 "NPR RP Template Line"
 
     procedure FindParentLine()
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
     begin
-        TemplateLine.SetRange("Template Code", "Template Code");
-        TemplateLine.SetFilter("Line No.", '<%1', "Line No.");
-        TemplateLine.SetFilter(Level, '<%1', Level);
-        if TemplateLine.FindLast() then
-            "Parent Line No." := TemplateLine."Line No."
+        RPTemplateLine.SetRange("Template Code", "Template Code");
+        RPTemplateLine.SetFilter("Line No.", '<%1', "Line No.");
+        RPTemplateLine.SetFilter(Level, '<%1', Level);
+        if RPTemplateLine.FindLast() then
+            "Parent Line No." := RPTemplateLine."Line No."
         else
             "Parent Line No." := 0;
     end;
 
     local procedure ModifiedRec()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if IsTemporary then
             exit;
-        if TemplateHeader.Get("Template Code") then
-            TemplateHeader.Modify(true);
+        if RPTemplateHeader.Get("Template Code") then
+            RPTemplateHeader.Modify(true);
     end;
 
     local procedure DataItemLookup()

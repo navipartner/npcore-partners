@@ -536,7 +536,7 @@
     procedure MakeMessage(Template: Record "NPR SMS Template Header"; RecordVariant: Variant) SMSMessage: Text
     var
         RecRef: RecordRef;
-        TemplateLine: Record "NPR SMS Template Line";
+        SMSTemplateLine: Record "NPR SMS Template Line";
         DataTypeManagement: Codeunit "Data Type Management";
         MergeRecord: Boolean;
         Char13: Char;
@@ -548,17 +548,17 @@
         if DataTypeManagement.GetRecordRef(RecordVariant, RecRef) then
             MergeRecord := not IsRecRefEmpty(RecRef);
 
-        TemplateLine.SetRange("Template Code", Template.Code);
-        if TemplateLine.FindSet() then
+        SMSTemplateLine.SetRange("Template Code", Template.Code);
+        if SMSTemplateLine.FindSet() then
             repeat
                 if SMSMessage <> '' then
                     SMSMessage += Format(Char13) + Format(Char10);
                 if MergeRecord then
-                    SMSMessage += NpRegex.MergeDataFields(TemplateLine."SMS Text", RecRef, Template."Report ID", AFReportLinkTag())
+                    SMSMessage += NpRegex.MergeDataFields(SMSTemplateLine."SMS Text", RecRef, Template."Report ID", AFReportLinkTag())
                 else
-                    SMSMessage += TemplateLine."SMS Text";
+                    SMSMessage += SMSTemplateLine."SMS Text";
 
-            until TemplateLine.Next() = 0;
+            until SMSTemplateLine.Next() = 0;
         exit(SMSMessage);
     end;
 

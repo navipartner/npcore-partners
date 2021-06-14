@@ -71,12 +71,12 @@ table 6014566 "NPR RP Template Media Info"
 
     local procedure ModifiedRec()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if IsTemporary then
             exit;
-        if TemplateHeader.Get(Template) then
-            TemplateHeader.Modify(true);
+        if RPTemplateHeader.Get(Template) then
+            RPTemplateHeader.Modify(true);
     end;
 
     procedure GetImageContent(var TenantMedia: Record "Tenant Media")

@@ -71,10 +71,10 @@ page 6014639 "NPR RP Template List"
                 trigger OnAction()
                 var
                     TemplateMgt: Codeunit "NPR RP Template Mgt.";
-                    TemplateHeader: Record "NPR RP Template Header";
+                    RPTemplateHeader: Record "NPR RP Template Header";
                 begin
-                    CurrPage.SetSelectionFilter(TemplateHeader);
-                    TemplateMgt.CreateCopy(TemplateHeader);
+                    CurrPage.SetSelectionFilter(RPTemplateHeader);
+                    TemplateMgt.CreateCopy(RPTemplateHeader);
                 end;
             }
             action(ExportPackageSingle)
@@ -86,11 +86,11 @@ page 6014639 "NPR RP Template List"
 
                 trigger OnAction()
                 var
-                    TemplateHeader: Record "NPR RP Template Header";
+                    RPTemplateHeader: Record "NPR RP Template Header";
                     PackageHandler: Codeunit "NPR RP Package Handler";
                 begin
-                    CurrPage.SetSelectionFilter(TemplateHeader);
-                    PackageHandler.ExportPackageToFile(TemplateHeader);
+                    CurrPage.SetSelectionFilter(RPTemplateHeader);
+                    PackageHandler.ExportPackageToFile(RPTemplateHeader);
                 end;
             }
             action(ExportPackageAll)
@@ -103,10 +103,10 @@ page 6014639 "NPR RP Template List"
                 trigger OnAction()
                 var
                     PackageHandler: Codeunit "NPR RP Package Handler";
-                    TemplateHeader: Record "NPR RP Template Header";
+                    RPTemplateHeader: Record "NPR RP Template Header";
                 begin
-                    TemplateHeader.Copy(Rec);
-                    PackageHandler.ExportPackageToFile(TemplateHeader);
+                    RPTemplateHeader.Copy(Rec);
+                    PackageHandler.ExportPackageToFile(RPTemplateHeader);
                 end;
             }
             action(ImportPackage)

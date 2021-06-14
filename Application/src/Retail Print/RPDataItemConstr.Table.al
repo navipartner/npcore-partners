@@ -86,12 +86,12 @@ table 6014563 "NPR RP Data Item Constr."
 
     local procedure ModifiedRec()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeder: Record "NPR RP Template Header";
     begin
         if IsTemporary then
             exit;
-        if TemplateHeader.Get("Data Item Code") then
-            TemplateHeader.Modify(true);
+        if RPTemplateHeder.Get("Data Item Code") then
+            RPTemplateHeder.Modify(true);
     end;
 
     local procedure SetLineNo()

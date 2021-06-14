@@ -539,27 +539,27 @@
 
     local procedure SetFieldMapping(Template: Code[20]; ParentDataItem: Record "NPR RP Data Items")
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
         RecRef: RecordRef;
         KeyRef: KeyRef;
         FieldRef: FieldRef;
     begin
         AddFieldToMap(ParentDataItem.Name, 0);
 
-        TemplateLine.SetRange("Template Code", Template);
-        TemplateLine.SetFilter(Type, '%1|%2', TemplateLine.Type::Data, TemplateLine.Type::Loop);
-        TemplateLine.SetFilter("Data Item Name", '<>%1', '');
-        if TemplateLine.FindSet() then
+        RPTemplateLine.SetRange("Template Code", Template);
+        RPTemplateLine.SetFilter(Type, '%1|%2', RPTemplateLine.Type::Data, RPTemplateLine.Type::Loop);
+        RPTemplateLine.SetFilter("Data Item Name", '<>%1', '');
+        if RPTemplateLine.FindSet() then
             repeat
-                RecRef.Open(TemplateLine."Data Item Table");
+                RecRef.Open(RPTemplateLine."Data Item Table");
                 KeyRef := RecRef.KeyIndex(RecRef.CurrentKeyIndex());
                 FieldRef := KeyRef.FieldIndex(1);
-                AddFieldToMap(TemplateLine."Data Item Name", FieldRef.Number);
+                AddFieldToMap(RPTemplateLine."Data Item Name", FieldRef.Number);
                 Clear(RecRef);
-                AddFieldToMap(TemplateLine."Data Item Name", TemplateLine.Field);
-                if TemplateLine."Field 2" > 0 then
-                    AddFieldToMap(TemplateLine."Data Item Name", TemplateLine."Field 2");
-            until TemplateLine.Next() = 0;
+                AddFieldToMap(RPTemplateLine."Data Item Name", RPTemplateLine.Field);
+                if RPTemplateLine."Field 2" > 0 then
+                    AddFieldToMap(RPTemplateLine."Data Item Name", RPTemplateLine."Field 2");
+            until RPTemplateLine.Next() = 0;
     end;
 
     local procedure ShouldProcessingContinue(DataItem: Record "NPR RP Data Items"; DataFound: Boolean): Boolean

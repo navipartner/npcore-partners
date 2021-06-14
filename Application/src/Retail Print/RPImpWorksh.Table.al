@@ -92,9 +92,9 @@ table 6014569 "NPR RP Imp. Worksh."
 
     procedure SetDefaultAction()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
-        if not TemplateHeader.Get(Template) then begin
+        if not RPTemplateHeader.Get(Template) then begin
             "New Template" := true;
             Action := Action::Create;
             exit;
