@@ -143,13 +143,14 @@ codeunit 6014444 "NPR DE Audit Mgt."
     local procedure GetVatRates(EntryNo: Integer) TaxArray: JsonArray
     var
         TaxAmountLine: Record "NPR POS Entry Tax Line";
-        TaxMapper: Record "NPR VAT Posting Group Mapper";
+        TaxMapper: Record "NPR VAT Post. Group Mapper";
         TaxJsonObject: JsonObject;
     begin
         TaxAmountLine.Reset();
         TaxAmountLine.SetRange("POS Entry No.", EntryNo);
         if TaxAmountLine.FindSet() then
             repeat
+                Clear(TaxJsonObject);
                 TaxMapper.RESET();
                 TaxMapper.SETRANGE("VAT Identifier", TaxAmountLine."VAT Identifier");
                 TaxMapper.FINDFIRST();
@@ -169,6 +170,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
         PaymentLine.SetRange("POS Entry No.", EntryNo);
         if PaymentLine.FindSet() then
             repeat
+                Clear(PaymentJsonObject);
                 PaymentMapper.Get(PaymentLine."POS Payment Method Code");
                 PaymentJsonObject.Add('payment_type', PaymentMapper."Fiscal Name");
                 PaymentJsonObject.Add('amount', Format(PaymentLine.Amount, 0, '<Precision,2:26><Standard Format,2>'));
@@ -280,7 +282,81 @@ codeunit 6014444 "NPR DE Audit Mgt."
 
         CompanyInformation.Get();
         CompanyInformation.TestField("VAT Registration No.");
-        CheckJobQueue();
+        CheckTssJobQueue();
+        CheckDSFINVKJobQueue();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
+    local procedure OnAfterEndWorkshiftDeFiscaly(Mode: Option; UnitNo: Code[20]; Successful: Boolean; PosEntryNo: Integer)
+    var
+        POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
+        POSUnit: Record "NPR POS Unit";
+        DSFINVKClosing: Record "NPR DSFINVK Closing";
+        DSFINVKMng: Codeunit "NPR DE Fiskaly DSFINVK";
+        DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
+        DSFINVKJson: JsonObject;
+        DSFINVKResponseJson: JsonObject;
+        AccessToken: Text;
+        NextClosingId: Integer;
+    begin
+        if not Successful then
+            exit;
+
+        if not POSUnit.Get(UnitNo) then
+            exit;
+
+        if not IsEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSWorkshifCheckpoint.Reset();
+        POSWorkshifCheckpoint.SetRange("POS Entry No.", PosEntryNo);
+        if not POSWorkshifCheckpoint.FindFirst() then
+            exit;
+        if not (POSWorkshifCheckpoint.Type = POSWorkshifCheckpoint.Type::ZREPORT) then
+            exit;
+
+        DSFINVKClosing.Reset();
+        DSFINVKClosing.SetRange("POS Unit No.", UnitNo);
+        DSFINVKClosing.SetRange("Closing Date", WorkDate());
+        if not DSFINVKClosing.FindFirst() then begin
+            DSFINVKClosing.LockTable();
+            DSFINVKClosing.Reset();
+            DSFINVKClosing.SetRange("POS Unit No.", UnitNo);
+            if DSFINVKClosing.FindLast() then
+                NextClosingId := DSFINVKClosing."DSFINVK Closing No." + 1
+            else
+                NextClosingId := 1;
+
+            DSFINVKClosing.Init();
+            DSFINVKClosing."DSFINVK Closing No." := NextClosingId;
+            DSFINVKClosing."POS Unit No." := UnitNo;
+            DSFINVKClosing."POS Entry No." := PosEntryNo;
+            DSFINVKClosing."Closing Date" := WorkDate();
+            DSFINVKClosing.Insert();
+        end
+        else
+            if DSFINVKClosing.State <> DSFINVKClosing.State::" " then
+                exit;
+
+        if not DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, DSFINVKClosing) then begin
+            SetDSFINVKErrorMsg(DSFINVKClosing);
+            exit;
+        end;
+
+        if not GetJwtToken(AccessToken) then begin
+            SetDSFINVKErrorMsg(DSFINVKClosing);
+            exit;
+        end;
+
+        DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
+        if not DEFiskalyCommunication.SendDSFINVK(DSFINVKJson, DSFINVKResponseJson, DEAuditSetup, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4), AccessToken) then begin
+            SetDSFINVKErrorMsg(DSFINVKClosing);
+            exit;
+        end;
+        DSFINVKClosing.State := DSFINVKClosing.State::PENDING;
+        DSFINVKClosing."Has Error" := false;
+        Clear(DSFINVKClosing."Error Message");
+        DSFINVKClosing.Modify();
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -288,10 +364,9 @@ codeunit 6014444 "NPR DE Audit Mgt."
         exit(CODEUNIT::"NPR DE Audit Mgt.");
     end;
 
-    local procedure CheckJobQueue()
+    local procedure CheckTssJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
-        JobQueueCategory: Record "Job Queue Category";
         JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
     begin
         JobQueueEntry.Reset();
@@ -300,16 +375,56 @@ codeunit 6014444 "NPR DE Audit Mgt."
         if JobQueueEntry.FindFirst() then
             exit;
 
-        JobQueueCategory.Init();
-        JobQueueCategory.InsertRec('NPR_AUDIT', 'NPR Audit Jobs');
-
         JobQueueEntry.InitRecurringJob(10);
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
         JobQueueEntry."Object ID to Run" := Codeunit::"NPR DE Fiskaly Job";
         JobQueueEntry."User ID" := CopyStr(UserId, 1, 65);
         JobQueueEntry.Description := JobDescLbl;
-        JobQueueEntry."Job Queue Category Code" := JobQueueCategory.Code;
         JobQueueEntry.Insert(true);
+    end;
+
+    local procedure CheckDSFINVKJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobDescLbl: Label 'Auto-created for sending DSFINVK', Locked = true;
+    begin
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly DSFINVK Job");
+        if JobQueueEntry.FindFirst() then
+            exit;
+
+        JobQueueEntry.InitRecurringJob(10);
+        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+        JobQueueEntry."Object ID to Run" := Codeunit::"NPR DE Fiskaly DSFINVK Job";
+        JobQueueEntry."User ID" := CopyStr(UserId, 1, 65);
+        JobQueueEntry.Description := JobDescLbl;
+        JobQueueEntry.Insert(true);
+    end;
+
+    procedure GetJwtToken(var AccessTokenPar: Text): Boolean
+    var
+        FiskalyJWT: Codeunit "NPR FiskalyJWT";
+        DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
+        RefreshTokenJson: JsonObject;
+        JWTResponseJson: JsonObject;
+        RefreshToken: Text;
+    begin
+        if not FiskalyJWT.GetToken(AccessTokenPar, RefreshToken) then begin
+            DEAuditSetup.Get();
+            if RefreshToken <> '' then
+                RefreshTokenJson.Add('refresh_token', RefreshToken)
+            else begin
+                RefreshTokenJson.Add('api_key', DEAuditSetup.GetApiKey());
+                RefreshTokenJson.Add('api_secret', DEAuditSetup.GetApiSecret());
+            end;
+            if not DEFiskalyCommunication.SendDSFINVK(RefreshTokenJson, JWTResponseJson, DEAuditSetup, 'POST', '/auth', '') then begin
+                exit(false);
+            end
+            else
+                FiskalyJWT.SetJWT(JWTResponseJson, AccessTokenPar);
+        end;
+        exit(true);
     end;
 
     procedure SetErrorMsg(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
@@ -318,6 +433,17 @@ codeunit 6014444 "NPR DE Audit Mgt."
     begin
         DeAuditAux."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
         StrOut.Write(GetLastErrorText);
+    end;
+
+    procedure SetDSFINVKErrorMsg(var DSFINVKClosing: Record "NPR DSFINVK Closing")
+    var
+        StrOut: OutStream;
+    begin
+        DSFINVKClosing."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
+        StrOut.Write(GetLastErrorText);
+        DSFINVKClosing."Has Error" := true;
+        Clear(DSFINVKClosing."Closing ID");
+        DSFINVKClosing.Modify();
     end;
 
     [IntegrationEvent(false, false)]

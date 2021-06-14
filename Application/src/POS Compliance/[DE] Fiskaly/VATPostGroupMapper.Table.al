@@ -1,9 +1,7 @@
-table 6014545 "NPR VAT Posting Group Mapper"
+table 6014578 "NPR VAT Post. Group Mapper"
 {
     Caption = 'VAT Product Posting Group Mapper';
     DataClassification = CustomerContent;
-    ObsoleteState = Removed;
-    ObsoleteReason = 'PR Key changed';
 
     fields
     {
@@ -51,7 +49,7 @@ table 6014545 "NPR VAT Posting Group Mapper"
 
     keys
     {
-        key(PK; "VAT Prod. Pos. Group")
+        key(PK; "VAT Prod. Pos. Group", "VAT Bus. Posting Group")
         {
             Clustered = true;
         }

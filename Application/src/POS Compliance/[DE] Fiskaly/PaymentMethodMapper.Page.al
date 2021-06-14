@@ -16,12 +16,17 @@ page 6014433 "NPR Payment Method Mapper"
                 field("POS Payment Method"; Rec."POS Payment Method")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Payment Method field';
+                    ToolTip = 'POS Payment Method for Fiskaly.';
                 }
                 field("Fiscal Name"; Rec."Fiscal Name")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Fiscal Name field';
+                    ToolTip = 'Fiscal Name for Fiskaly API.';
+                }
+                field("DSFINVK Type"; Rec."DSFINVK Type")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Type for Fiskaly DSFINVK API.';
                 }
             }
         }

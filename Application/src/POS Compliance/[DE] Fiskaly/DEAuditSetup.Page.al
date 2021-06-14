@@ -25,6 +25,13 @@ page 6014421 "NPR DE Audit Setup"
                         Rec.Modify();
                     end;
                 }
+
+                field("DSFINVK Api URL"; Rec."DSFINVK Api URL")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies URL of the DSFINVK API';
+                }
+
                 field(ApiKeyField; ApiKeyField)
                 {
                     ApplicationArea = All;
