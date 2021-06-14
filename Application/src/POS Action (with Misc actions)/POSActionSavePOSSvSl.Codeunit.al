@@ -4,8 +4,6 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         Text000: Label 'Save POS Sale as POS Quote';
         Text001: Label 'POS Quote';
         Text002: Label 'Save current Sale as POS Quote?';
-        SaleWasParkedTxt: Label 'Sale was saved as POS Quote (parked) at %1';
-        ErrorCancelling: Label 'System was not able to cancel current sale after parking. Please do it manually.';
 
     local procedure ActionCode(): Text
     begin
@@ -116,7 +114,8 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
     var
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
-        POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -124,13 +123,12 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
 
         CreatePOSQuote(SalePOS, POSQuoteEntry);
 
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.DeleteAll();
+        SalePOS.Delete();
+        POSCreateEntry.InsertParkSaleEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
         Commit();
-        Clear(POSActionCancelSale);
-        POSActionCancelSale.SetAlternativeDescription(StrSubstNo(SaleWasParkedTxt, CurrentDateTime));
-        if not POSActionCancelSale.CancelSale(POSSession) then
-            Error(ErrorCancelling);
 
-        Commit();
         POSSale.SelectViewForEndOfSale(POSSession);
     end;
 

@@ -1,4 +1,4 @@
-codeunit 85007 "NPR POS Quote Tests"
+codeunit 85007 "NPR POS Saved Sale Tests"
 {
     Subtype = Test;
 
@@ -11,17 +11,25 @@ codeunit 85007 "NPR POS Quote Tests"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
-    procedure Test1()
+    procedure SaveAndLoadPOSSale()
     begin
         POSQuote_SaveAndLoad(Today, Today);
     end;
 
     [Test]
-    procedure Test2()
+    procedure SaveAndLoadPOSSaleFromPreviousDate()
     begin
         POSQuote_SaveAndLoad(CalcDate('<-2D>', Today), Today);
     end;
 
+    [Test]
+    procedure SaveAndLoadAndFinishPOSSale()
+    var
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+    begin
+        POSQuote_SaveAndLoad(Today, Today);
+        NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 10, '');
+    end;
 
     local procedure POSQuote_SaveAndLoad(InitialSaleDate: Date; LoadSaleDate: Date)
     var
