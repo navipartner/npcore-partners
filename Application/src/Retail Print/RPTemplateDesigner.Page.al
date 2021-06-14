@@ -142,11 +142,11 @@ page 6014560 "NPR RP Template Designer"
 
     trigger OnOpenPage()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
-        TemplateHeader.Get(Rec.Code);
-        MatrixVisible := TemplateHeader."Printer Type" = TemplateHeader."Printer Type"::Matrix;
-        LineVisible := TemplateHeader."Printer Type" = TemplateHeader."Printer Type"::Line;
+        RPTemplateHeader.Get(Rec.Code);
+        MatrixVisible := RPTemplateHeader."Printer Type" = RPTemplateHeader."Printer Type"::Matrix;
+        LineVisible := RPTemplateHeader."Printer Type" = RPTemplateHeader."Printer Type"::Line;
     end;
 
     var

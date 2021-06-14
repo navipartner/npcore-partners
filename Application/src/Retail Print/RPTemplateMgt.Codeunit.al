@@ -17,7 +17,7 @@
 
     procedure PrintTemplate(TemplateCode: Code[20]; "Record": Variant; MatrixIterationField: Integer)
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
         MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         RecRef: RecordRef;
@@ -27,12 +27,12 @@
         else
             RecRef.GetTable(Record);
 
-        TemplateHeader.Get(TemplateCode);
-        case TemplateHeader."Printer Type" of
-            TemplateHeader."Printer Type"::Line:
+        RPTemplateHeader.Get(TemplateCode);
+        case RPTemplateHeader."Printer Type" of
+            RPTemplateHeader."Printer Type"::Line:
                 LinePrintMgt.ProcessTemplate(TemplateCode, RecRef);
 
-            TemplateHeader."Printer Type"::Matrix:
+            RPTemplateHeader."Printer Type"::Matrix:
                 begin
                     MatrixPrintMgt.SetPrintIterationFieldNo(MatrixIterationField);
                     MatrixPrintMgt.ProcessTemplate(TemplateCode, RecRef);
@@ -46,19 +46,19 @@
 
     procedure GetNextVersionNumber(var TemplateHeader: Record "NPR RP Template Header") NewVersion: Text
     var
-        TemplateArchive: Record "NPR RP Template Archive";
-        TemplateSetup: Record "NPR RP Template Setup";
+        RPTemplateArchive: Record "NPR RP Template Archive";
+        RPTemplateSetup: Record "NPR RP Template Setup";
     begin
-        if not TemplateSetup.Get() then begin
-            TemplateSetup.Init();
-            TemplateSetup.Insert(true);
+        if not RPTemplateSetup.Get() then begin
+            RPTemplateSetup.Init();
+            RPTemplateSetup.Insert(true);
         end;
 
         NewVersion := IncrementVersionNumber(TemplateHeader.Version);
-        if TemplateArchive.Get(TemplateHeader.Code, NewVersion) then begin //Assume RPTemplateArchive holds the highest version number instead.
-            TemplateArchive.SetCurrentKey("Archived at");
-            TemplateArchive.FindLast();
-            NewVersion := IncrementVersionNumber(TemplateArchive.Version);
+        if RPTemplateArchive.Get(TemplateHeader.Code, NewVersion) then begin //Assume RPTemplateArchive holds the highest version number instead.
+            RPTemplateArchive.SetCurrentKey("Archived at");
+            RPTemplateArchive.FindLast();
+            NewVersion := IncrementVersionNumber(RPTemplateArchive.Version);
         end;
     end;
 
@@ -69,21 +69,21 @@
         NewVersion: Text;
         VersionMatch: Boolean;
         MajorVersion: Integer;
-        TemplateSetup: Record "NPR RP Template Setup";
+        RPTemplateSetup: Record "NPR RP Template Setup";
     begin
-        TemplateSetup.Get();
+        RPTemplateSetup.Get();
 
         VersionList := VersionIn.Split(',');
         foreach Version in VersionList do begin
-            if StrPos(Version, TemplateSetup."Version Prefix") = 1 then
-                if Evaluate(MajorVersion, CopyStr(Version, StrLen(TemplateSetup."Version Prefix") + 1, (StrPos(Version, '.') - StrLen(TemplateSetup."Version Prefix")))) then begin
-                    if MajorVersion = TemplateSetup."Version Major Number" then
+            if StrPos(Version, RPTemplateSetup."Version Prefix") = 1 then
+                if Evaluate(MajorVersion, CopyStr(Version, StrLen(RPTemplateSetup."Version Prefix") + 1, (StrPos(Version, '.') - StrLen(RPTemplateSetup."Version Prefix")))) then begin
+                    if MajorVersion = RPTemplateSetup."Version Major Number" then
                         Version := IncStr(Version)
                     else
-                        if MajorVersion < TemplateSetup."Version Major Number" then
-                            Version := Format(TemplateSetup."Version Major Number") + '.00'
+                        if MajorVersion < RPTemplateSetup."Version Major Number" then
+                            Version := Format(RPTemplateSetup."Version Major Number") + '.00'
                         else
-                            Error(Error_VersionDown, MajorVersion, TemplateSetup."Version Major Number");
+                            Error(Error_VersionDown, MajorVersion, RPTemplateSetup."Version Major Number");
                     VersionMatch := true;
                 end;
 
@@ -95,7 +95,7 @@
         if not VersionMatch then begin
             if NewVersion <> '' then
                 NewVersion += ',';
-            NewVersion += TemplateSetup."Version Prefix" + Format(TemplateSetup."Version Major Number") + '.00';
+            NewVersion += RPTemplateSetup."Version Prefix" + Format(RPTemplateSetup."Version Major Number") + '.00';
         end;
 
         exit(NewVersion);
@@ -114,7 +114,7 @@
 
     procedure RollbackVersion(TemplateArchive: Record "NPR RP Template Archive")
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
         RPPackageHandler: Codeunit "NPR RP Package Handler";
         TempBlob: Codeunit "Temp Blob";
     begin
@@ -122,11 +122,11 @@
             exit;
 
         //Archive current version, if any is present, before rolling back
-        TemplateHeader.SetRange(Code, TemplateArchive.Code);
-        if TemplateHeader.FindFirst() then begin
-            TemplateHeader."Version Comments" := Caption_AutoArchive;
-            TemplateHeader.Validate(Archived, true);
-            TemplateHeader.Delete(true);
+        RPTemplateHeader.SetRange(Code, TemplateArchive.Code);
+        if RPTemplateHeader.FindFirst() then begin
+            RPTemplateHeader."Version Comments" := Caption_AutoArchive;
+            RPTemplateHeader.Validate(Archived, true);
+            RPTemplateHeader.Delete(true);
         end;
 
         TemplateArchive.CalcFields(Template);
@@ -139,8 +139,8 @@
         InputDialog: Page "NPR Input Dialog";
         NewTemplateCode: Code[20];
         ID: Integer;
-        TemplateHeader2: Record "NPR RP Template Header";
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateHeader2: Record "NPR RP Template Header";
+        RPTemplateLine: Record "NPR RP Template Line";
         DataItem: Record "NPR RP Data Items";
         DataItemLink: Record "NPR RP Data Item Links";
         DataItemConstraint: Record "NPR RP Data Item Constr.";
@@ -166,10 +166,10 @@
         if ID = 0 then
             exit;
 
-        if TemplateHeader2.Get(NewTemplateCode) then
+        if RPTemplateHeader2.Get(NewTemplateCode) then
             Error(Error_TemplateAlreadyExists, NewTemplateCode);
 
-        TemplateLine.SetRange("Template Code", TemplateHeader.Code);
+        RPTemplateLine.SetRange("Template Code", TemplateHeader.Code);
         DataItem.SetRange(Code, TemplateHeader.Code);
         DataItemLink.SetRange("Data Item Code", TemplateHeader.Code);
         DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
@@ -211,12 +211,12 @@
                 CopyDataItemConstraintLink.Insert();
             until DataItemConstraintLink.Next() = 0;
 
-        if TemplateLine.FindSet() then
+        if RPTemplateLine.FindSet() then
             repeat
-                CopyTemplateLine := TemplateLine;
+                CopyTemplateLine := RPTemplateLine;
                 CopyTemplateLine."Template Code" := NewTemplateCode;
                 CopyTemplateLine.Insert();
-            until TemplateLine.Next() = 0;
+            until RPTemplateLine.Next() = 0;
 
         if DeviceSettings.FindSet() then
             repeat
@@ -256,63 +256,63 @@
     [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyTemplateLine(var Rec: Record "NPR RP Template Line"; var xRec: Record "NPR RP Template Line"; RunTrigger: Boolean)
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
     begin
         if Rec.IsTemporary or (not RunTrigger) then
             exit;
 
         //Was parent before
-        TemplateLine.SetRange("Parent Line No.", Rec."Line No.");
-        if TemplateLine.FindSet() then
+        RPTemplateLine.SetRange("Parent Line No.", Rec."Line No.");
+        if RPTemplateLine.FindSet() then
             repeat
-                TemplateLine.FindParentLine();
-                TemplateLine.Modify();
-            until TemplateLine.Next() = 0;
+                RPTemplateLine.FindParentLine();
+                RPTemplateLine.Modify();
+            until RPTemplateLine.Next() = 0;
 
-        TemplateLine.Reset();
+        RPTemplateLine.Reset();
         //Is parent now
-        TemplateLine.SetFilter("Line No.", '>%1', Rec."Line No.");
-        TemplateLine.SetFilter(Level, '>%1', 0);
-        TemplateLine.SetFilter("Parent Line No.", '<%1', Rec."Line No.");
-        if TemplateLine.FindSet() then
+        RPTemplateLine.SetFilter("Line No.", '>%1', Rec."Line No.");
+        RPTemplateLine.SetFilter(Level, '>%1', 0);
+        RPTemplateLine.SetFilter("Parent Line No.", '<%1', Rec."Line No.");
+        if RPTemplateLine.FindSet() then
             repeat
-                TemplateLine.FindParentLine();
-                TemplateLine.Modify();
-            until TemplateLine.Next() = 0;
+                RPTemplateLine.FindParentLine();
+                RPTemplateLine.Modify();
+            until RPTemplateLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertTemplateLine(var Rec: Record "NPR RP Template Line"; RunTrigger: Boolean)
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
     begin
         if Rec.IsTemporary or (not RunTrigger) then
             exit;
 
-        TemplateLine.SetFilter("Line No.", '>%1', Rec."Line No.");
-        TemplateLine.SetFilter(Level, '>%1', 0);
-        TemplateLine.SetFilter("Parent Line No.", '<%1', Rec."Line No.");
-        if TemplateLine.FindSet() then
+        RPTemplateLine.SetFilter("Line No.", '>%1', Rec."Line No.");
+        RPTemplateLine.SetFilter(Level, '>%1', 0);
+        RPTemplateLine.SetFilter("Parent Line No.", '<%1', Rec."Line No.");
+        if RPTemplateLine.FindSet() then
             repeat
-                TemplateLine.FindParentLine();
-                TemplateLine.Modify();
-            until TemplateLine.Next() = 0;
+                RPTemplateLine.FindParentLine();
+                RPTemplateLine.Modify();
+            until RPTemplateLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnAfterDeleteTemplateLine(var Rec: Record "NPR RP Template Line"; RunTrigger: Boolean)
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
     begin
         if Rec.IsTemporary or (not RunTrigger) then
             exit;
 
-        TemplateLine.SetRange("Parent Line No.", Rec."Line No.");
-        if TemplateLine.FindSet() then
+        RPTemplateLine.SetRange("Parent Line No.", Rec."Line No.");
+        if RPTemplateLine.FindSet() then
             repeat
-                TemplateLine.FindParentLine();
-                TemplateLine.Modify();
-            until TemplateLine.Next() = 0;
+                RPTemplateLine.FindParentLine();
+                RPTemplateLine.Modify();
+            until RPTemplateLine.Next() = 0;
     end;
 
     local procedure "// Data Upgrade"()

@@ -210,7 +210,7 @@ table 6014446 "NPR RP Template Header"
 
     trigger OnDelete()
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
         DataItem: Record "NPR RP Data Items";
         DataItemLinks: Record "NPR RP Data Item Links";
         DataItemConstraint: Record "NPR RP Data Item Constr.";
@@ -221,8 +221,8 @@ table 6014446 "NPR RP Template Header"
         if IsTemporary then
             exit;
 
-        TemplateLine.SetRange("Template Code", Code);
-        TemplateLine.DeleteAll();
+        RPTemplateLine.SetRange("Template Code", Code);
+        RPTemplateLine.DeleteAll();
 
         DataItem.SetRange(Code, Code);
         DataItem.DeleteAll();
@@ -284,10 +284,10 @@ table 6014446 "NPR RP Template Header"
 
     procedure ArchiveTemplate()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
         PackageHandler: Codeunit "NPR RP Package Handler";
         TempBlob: Codeunit "Temp Blob";
-        TemplateArchive: Record "NPR RP Template Archive";
+        RPTemplateArchive: Record "NPR RP Template Archive";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
         RecRef: RecordRef;
     begin
@@ -306,22 +306,22 @@ table 6014446 "NPR RP Template Header"
 
         Modify();
 
-        TemplateHeader.Copy(Rec);
-        TemplateHeader.SetRecFilter();
-        PackageHandler.ExportPackageToBlob(TemplateHeader, TempBlob);
+        RPTemplateHeader.Copy(Rec);
+        RPTemplateHeader.SetRecFilter();
+        PackageHandler.ExportPackageToBlob(RPTemplateHeader, TempBlob);
 
-        TemplateArchive.Init();
-        TemplateArchive.Code := TemplateHeader.Code;
-        TemplateArchive.Version := TemplateHeader.Version;
-        TemplateArchive."Archived at" := CreateDateTime(Today, Time);
-        TemplateArchive."Archived by" := UserId;
-        TemplateArchive."Version Comments" := TemplateHeader."Version Comments";
+        RPTemplateArchive.Init();
+        RPTemplateArchive.Code := RPTemplateHeader.Code;
+        RPTemplateArchive.Version := RPTemplateHeader.Version;
+        RPTemplateArchive."Archived at" := CreateDateTime(Today, Time);
+        RPTemplateArchive."Archived by" := UserId;
+        RPTemplateArchive."Version Comments" := RPTemplateHeader."Version Comments";
 
-        RecRef.GetTable(TemplateArchive);
-        TempBlob.ToRecordRef(RecRef, TemplateArchive.FieldNo(Template));
-        RecRef.SetTable(TemplateArchive);
+        RecRef.GetTable(RPTemplateArchive);
+        TempBlob.ToRecordRef(RecRef, RPTemplateArchive.FieldNo(Template));
+        RecRef.SetTable(RPTemplateArchive);
 
-        TemplateArchive.Insert();
+        RPTemplateArchive.Insert();
     end;
 
     procedure LookupDevice()

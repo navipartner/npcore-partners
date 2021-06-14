@@ -157,42 +157,42 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
     procedure ProcessTemplate(Template: Code[20]; var RecRef: RecordRef)
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
         Variant: Variant;
         Skip: Boolean;
     begin
         // For printing via template setup
 
-        TemplateHeader.Get(Template);
-        TemplateHeader.TestField("Printer Type", TemplateHeader."Printer Type"::Matrix);
+        RPTemplateHeader.Get(Template);
+        RPTemplateHeader.TestField("Printer Type", RPTemplateHeader."Printer Type"::Matrix);
 
         //-NPR5.48 [327107]
-        OnBeforePrintMatrix(RecRef, TemplateHeader, Skip);
+        OnBeforePrintMatrix(RecRef, RPTemplateHeader, Skip);
         if Skip then
             exit;
         //+NPR5.48 [327107]
 
         Variant := RecRef;
-        if TemplateHeader."Pre Processing Codeunit" > 0 then
-            if not CODEUNIT.Run(TemplateHeader."Pre Processing Codeunit", Variant) then
+        if RPTemplateHeader."Pre Processing Codeunit" > 0 then
+            if not CODEUNIT.Run(RPTemplateHeader."Pre Processing Codeunit", Variant) then
                 exit;
 
-        if TemplateHeader."Print Processing Object ID" = 0 then
-            RunPrintEngine(TemplateHeader, RecRef)
+        if RPTemplateHeader."Print Processing Object ID" = 0 then
+            RunPrintEngine(RPTemplateHeader, RecRef)
         else
-            case TemplateHeader."Print Processing Object Type" of
-                TemplateHeader."Print Processing Object Type"::Codeunit:
-                    CODEUNIT.Run(TemplateHeader."Print Processing Object ID", Variant);
-                TemplateHeader."Print Processing Object Type"::Report:
-                    REPORT.Run(TemplateHeader."Print Processing Object ID", GuiAllowed, false, Variant);
+            case RPTemplateHeader."Print Processing Object Type" of
+                RPTemplateHeader."Print Processing Object Type"::Codeunit:
+                    CODEUNIT.Run(RPTemplateHeader."Print Processing Object ID", Variant);
+                RPTemplateHeader."Print Processing Object Type"::Report:
+                    REPORT.Run(RPTemplateHeader."Print Processing Object ID", GuiAllowed, false, Variant);
             end;
 
         //-NPR5.48 [327107]
-        OnAfterPrintMatrix(RecRef, TemplateHeader);
+        OnAfterPrintMatrix(RecRef, RPTemplateHeader);
         //+NPR5.48 [327107]
 
-        if TemplateHeader."Post Processing Codeunit" > 0 then
-            CODEUNIT.Run(TemplateHeader."Post Processing Codeunit", Variant);
+        if RPTemplateHeader."Post Processing Codeunit" > 0 then
+            CODEUNIT.Run(RPTemplateHeader."Post Processing Codeunit", Variant);
     end;
 
     procedure ProcessBufferForCodeunit(CodeunitID: Integer; NoOfPrints: Integer)
@@ -219,24 +219,24 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     local procedure GetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer): Text
     var
         DeviceType: Text;
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if TemplateCode <> '' then begin
-            TemplateHeader.Get(TemplateCode);
-            if TemplateHeader."Printer Device" <> '' then
-                exit(TemplateHeader."Printer Device");
+            RPTemplateHeader.Get(TemplateCode);
+            if RPTemplateHeader."Printer Device" <> '' then
+                exit(RPTemplateHeader."Printer Device");
         end;
 
         OnGetDeviceType(TemplateCode, CodeunitId, ReportId, DeviceType);
         if DeviceType = '' then
-            Error(Error_MissingDevice, TemplateHeader.Code, CodeunitId, ReportId);
+            Error(Error_MissingDevice, RPTemplateHeader.Code, CodeunitId, ReportId);
 
         exit(DeviceType);
     end;
 
     local procedure ProcessLayout(DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."; DataItems: Record "NPR RP Data Items"; TemplateHeader: Record "NPR RP Template Header")
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
         i: Integer;
         "Integer": Integer;
         Itt: Integer;
@@ -266,13 +266,13 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
             //    DataJoinBuffer.FindSubset(CurrentRecNo, 0);
             //+NPR5.51 [359771]
 
-            TemplateLine.SetRange("Template Code", TemplateHeader.Code);
-            TemplateLine.SetRange(Type, TemplateLine.Type::Data);
-            TemplateLine.SetRange(Level, 0);
-            if TemplateLine.FindSet() then
+            RPTemplateLine.SetRange("Template Code", TemplateHeader.Code);
+            RPTemplateLine.SetRange(Type, RPTemplateLine.Type::Data);
+            RPTemplateLine.SetRange(Level, 0);
+            if RPTemplateLine.FindSet() then
                 repeat
-                    MergeField(TemplateLine, DataJoinBuffer);
-                until TemplateLine.Next() = 0;
+                    MergeField(RPTemplateLine, DataJoinBuffer);
+                until RPTemplateLine.Next() = 0;
 
             Itt := 1;
             if PrintIterationFieldNo > 0 then begin

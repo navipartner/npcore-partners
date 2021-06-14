@@ -286,11 +286,11 @@ page 6014638 "NPR RP Template Card"
 
                 trigger OnAction()
                 var
-                    TemplateHeader: Record "NPR RP Template Header";
+                    RPTemplateHeader: Record "NPR RP Template Header";
                     TemplateMgt: Codeunit "NPR RP Template Mgt.";
                 begin
-                    TemplateHeader.Get(Rec.Code);
-                    TemplateMgt.CreateNewVersion(TemplateHeader);
+                    RPTemplateHeader.Get(Rec.Code);
+                    TemplateMgt.CreateNewVersion(RPTemplateHeader);
                 end;
             }
             action(Archive)
@@ -306,10 +306,10 @@ page 6014638 "NPR RP Template Card"
 
                 trigger OnAction()
                 var
-                    TemplateHeader: Record "NPR RP Template Header";
+                    RPTemplateHeader: Record "NPR RP Template Header";
                 begin
-                    TemplateHeader.Get(Rec.Code);
-                    TemplateHeader.Validate(Archived, true);
+                    RPTemplateHeader.Get(Rec.Code);
+                    RPTemplateHeader.Validate(Archived, true);
                 end;
             }
             action("Show Log")

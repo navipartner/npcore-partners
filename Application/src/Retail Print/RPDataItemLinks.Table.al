@@ -286,11 +286,11 @@ table 6014562 "NPR RP Data Item Links"
 
     local procedure ModifiedRec()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if IsTemporary then
             exit;
-        if TemplateHeader.Get("Data Item Code") then
-            TemplateHeader.Modify(true);
+        if RPTemplateHeader.Get("Data Item Code") then
+            RPTemplateHeader.Modify(true);
     end;
 }
