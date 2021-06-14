@@ -397,7 +397,9 @@ codeunit 6014569 "NPR RegEx"
         Group2: Record Groups temporary;
 #endif
         Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
+        InStr: InStream;
     begin
         Clear(RegEx);
 #if BC17
@@ -412,8 +414,10 @@ codeunit 6014569 "NPR RegEx"
             TempMagentoPicture.Name := PictureName;
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
             TempMagentoPicture."Mime Type" := Group1.Value();
-            TempMagentoPicture.Image.ExportStream(OutStr);
+            TempBlob.CreateOutStream(OutStr);
             Convert.FromBase64(Group2.Value(), OutStr);
+            TempBlob.CreateInStream(InStr);
+            TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
             TempMagentoPicture.Insert();
         end;
 #else
@@ -423,8 +427,6 @@ codeunit 6014569 "NPR RegEx"
                 if Match.Success then begin
                     Groups.Reset();
                     Groups.DeleteAll();
-
-
                     RegEx.Groups(Match, Groups);
                     Groups.FindSet();
                     Group1 := Groups;
@@ -435,8 +437,10 @@ codeunit 6014569 "NPR RegEx"
                     TempMagentoPicture.Name := PictureName;
                     TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
                     TempMagentoPicture."Mime Type" := Group1.ReadValue();
-                    TempMagentoPicture.Image.ExportStream(OutStr);
+                    TempBlob.CreateOutStream(OutStr);
                     Convert.FromBase64(Group2.ReadValue(), OutStr);
+                    TempBlob.CreateInStream(InStr);
+                    TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
                     TempMagentoPicture.Insert();
                 end;
             until Match.Next() = 0;
