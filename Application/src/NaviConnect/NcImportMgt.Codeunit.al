@@ -214,18 +214,18 @@
 
     procedure SendTestErrorMail(NcImportType: Record "NPR Nc Import Type")
     var
-        TempNcImportEntry: Record "NPR Nc Import Entry";
+        NcImportEntry: Record "NPR Nc Import Entry";
         OutStream: OutStream;
     begin
-        TempNcImportEntry.Init();
-        TempNcImportEntry."Import Type" := NcImportType.Code;
-        TempNcImportEntry.Date := CurrentDateTime;
-        TempNcImportEntry."Document Name" := 'Test ' + NcImportType.Description + '.xml';
-        TempNcImportEntry."Last Error Message".CreateOutStream(OutStream);
+        NcImportEntry.Init();
+        NcImportEntry."Import Type" := NcImportType.Code;
+        NcImportEntry.Date := CurrentDateTime;
+        NcImportEntry."Document Name" := 'Test ' + NcImportType.Description + '.xml';
+        NcImportEntry."Last Error Message".CreateOutStream(OutStream);
         OutStream.WriteText('Test Error Line 1' + NewLine() + 'Test Error Line 2');
-        TempNcImportEntry.Insert();
+        NcImportEntry.Insert();
 
-        SendErrorMail(TempNcImportEntry);
+        SendErrorMail(NcImportEntry);
         Message(Text000, NcImportType."E-mail address on Error");
     end;
 }

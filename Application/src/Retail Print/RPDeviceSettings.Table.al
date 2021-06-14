@@ -20,23 +20,23 @@ table 6014560 "NPR RP Device Settings"
 
             trigger OnLookup()
             var
-                TemplateHeader: Record "NPR RP Template Header";
+                RPTemplateHeader: Record "NPR RP Template Header";
                 LinePrinterInterface: Codeunit "NPR RP Line Printer Interf.";
                 MatrixPrinterInterface: Codeunit "NPR RP Matrix Printer Interf.";
                 LookupOK: Boolean;
                 tmpDeviceSetting: Record "NPR RP Device Settings" temporary;
             begin
-                TemplateHeader.Get(GetFilter(Template));
-                TemplateHeader.TestField("Printer Device");
-                case TemplateHeader."Printer Type" of
-                    TemplateHeader."Printer Type"::Line:
+                RPTemplateHeader.Get(GetFilter(Template));
+                RPTemplateHeader.TestField("Printer Device");
+                case RPTemplateHeader."Printer Type" of
+                    RPTemplateHeader."Printer Type"::Line:
                         begin
-                            LinePrinterInterface.Construct(TemplateHeader."Printer Device");
+                            LinePrinterInterface.Construct(RPTemplateHeader."Printer Device");
                             LinePrinterInterface.OnLookupDeviceSetting(LookupOK, tmpDeviceSetting);
                         end;
-                    TemplateHeader."Printer Type"::Matrix:
+                    RPTemplateHeader."Printer Type"::Matrix:
                         begin
-                            MatrixPrinterInterface.Construct(TemplateHeader."Printer Device");
+                            MatrixPrinterInterface.Construct(RPTemplateHeader."Printer Device");
                             MatrixPrinterInterface.OnLookupDeviceSetting(LookupOK, tmpDeviceSetting);
                         end;
                 end;
@@ -128,12 +128,12 @@ table 6014560 "NPR RP Device Settings"
 
     local procedure ModifiedRec()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if IsTemporary then
             exit;
-        if TemplateHeader.Get(Template) then
-            TemplateHeader.Modify(true);
+        if RPTemplateHeader.Get(Template) then
+            RPTemplateHeader.Modify(true);
     end;
 }
 

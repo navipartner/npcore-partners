@@ -103,9 +103,9 @@ table 6150701 "NPR POS Menu Button"
 
             trigger OnLookup()
             var
-                TempDataSource: Record "NPR POS Data Source Discovery";
+                POSTempDataSourceDiscovery: Record "NPR POS Data Source Discovery";
             begin
-                TempDataSource.LookupDataSource("Data Source Name");
+                POSTempDataSourceDiscovery.LookupDataSource("Data Source Name");
             end;
         }
         field(19; Blocked; Boolean)

@@ -6,8 +6,8 @@
     procedure ExportPackageToFile(var TemplateHeader: Record "NPR RP Template Header")
     var
         ManagedPackageBuilder: Codeunit "NPR Managed Package Builder";
-        TemplateHeader2: Record "NPR RP Template Header";
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateHeader2: Record "NPR RP Template Header";
+        RPTemplateLine: Record "NPR RP Template Line";
         DataItems: Record "NPR RP Data Items";
         DataItemLinks: Record "NPR RP Data Item Links";
         DataItemConstraint: Record "NPR RP Data Item Constr.";
@@ -22,18 +22,18 @@
             exit;
 
         repeat
-            TemplateLine.SetRange("Template Code", TemplateHeader.Code);
+            RPTemplateLine.SetRange("Template Code", TemplateHeader.Code);
             DataItems.SetRange(Code, TemplateHeader.Code);
             DataItemLinks.SetRange("Data Item Code", TemplateHeader.Code);
             DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
             DataItemConstraintLinks.SetRange("Data Item Code", TemplateHeader.Code);
             DeviceSettings.SetRange(Template, TemplateHeader.Code);
             MediaInfo.SetRange(Template, TemplateHeader.Code);
-            TemplateHeader2 := TemplateHeader;
-            TemplateHeader2.SetRecFilter();
+            RPTemplateHeader2 := TemplateHeader;
+            RPTemplateHeader2.SetRecFilter();
 
-            ManagedPackageBuilder.AddRecord(TemplateHeader2);
-            ManagedPackageBuilder.AddRecord(TemplateLine);
+            ManagedPackageBuilder.AddRecord(RPTemplateHeader2);
+            ManagedPackageBuilder.AddRecord(RPTemplateLine);
             ManagedPackageBuilder.AddRecord(DataItems);
             ManagedPackageBuilder.AddRecord(DataItemLinks);
             ManagedPackageBuilder.AddRecord(DataItemConstraint);
@@ -55,8 +55,8 @@
     procedure ExportPackageToBlob(var TemplateHeader: Record "NPR RP Template Header"; var TempBlobOut: Codeunit "Temp Blob")
     var
         ManagedPackageBuilder: Codeunit "NPR Managed Package Builder";
-        TemplateHeader2: Record "NPR RP Template Header";
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateHeader2: Record "NPR RP Template Header";
+        RPTemplateLine: Record "NPR RP Template Line";
         DataItems: Record "NPR RP Data Items";
         DataItemLinks: Record "NPR RP Data Item Links";
         DataItemConstraint: Record "NPR RP Data Item Constr.";
@@ -70,17 +70,17 @@
             exit;
 
         repeat
-            TemplateLine.SetRange("Template Code", TemplateHeader.Code);
+            RPTemplateLine.SetRange("Template Code", TemplateHeader.Code);
             DataItems.SetRange(Code, TemplateHeader.Code);
             DataItemLinks.SetRange("Data Item Code", TemplateHeader.Code);
             DataItemConstraint.SetRange("Data Item Code", TemplateHeader.Code);
             DataItemConstraintLinks.SetRange("Data Item Code", TemplateHeader.Code);
             DeviceSettings.SetRange(Template, TemplateHeader.Code);
-            TemplateHeader2 := TemplateHeader;
-            TemplateHeader2.SetRecFilter();
+            RPTemplateHeader2 := TemplateHeader;
+            RPTemplateHeader2.SetRecFilter();
 
-            ManagedPackageBuilder.AddRecord(TemplateHeader2);
-            ManagedPackageBuilder.AddRecord(TemplateLine);
+            ManagedPackageBuilder.AddRecord(RPTemplateHeader2);
+            ManagedPackageBuilder.AddRecord(RPTemplateLine);
             ManagedPackageBuilder.AddRecord(DataItems);
             ManagedPackageBuilder.AddRecord(DataItemLinks);
             ManagedPackageBuilder.AddRecord(DataItemConstraint);
@@ -150,7 +150,7 @@
         tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary;
         tmpDeviceSettings: Record "NPR RP Device Settings" temporary;
         tmpMediaInfo: Record "NPR RP Template Media Info" temporary;
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if Handled then
             exit;
@@ -171,10 +171,10 @@
             tmpImportWorksheet."New Description" := tmpTemplateHeader.Description;
             tmpImportWorksheet."New Last Modified At" := tmpTemplateHeader."Last Modified At";
             tmpImportWorksheet."New Version" := tmpTemplateHeader.Version;
-            if TemplateHeader.Get(tmpTemplateHeader.Code) then begin
-                tmpImportWorksheet."Existing Description" := TemplateHeader.Description;
-                tmpImportWorksheet."Existing Last Modified At" := TemplateHeader."Last Modified At";
-                tmpImportWorksheet."Existing Version" := TemplateHeader.Version;
+            if RPTemplateHeader.Get(tmpTemplateHeader.Code) then begin
+                tmpImportWorksheet."Existing Description" := RPTemplateHeader.Description;
+                tmpImportWorksheet."Existing Last Modified At" := RPTemplateHeader."Last Modified At";
+                tmpImportWorksheet."Existing Version" := RPTemplateHeader.Version;
             end;
             tmpImportWorksheet.Insert(true);
         until tmpTemplateHeader.Next() = 0;
@@ -249,8 +249,8 @@
 
     local procedure ImportPackage(var tmpImportWorksheet: Record "NPR RP Imp. Worksh."; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary)
     var
-        TemplateHeader: Record "NPR RP Template Header";
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateHeader: Record "NPR RP Template Header";
+        RPTemplateLine: Record "NPR RP Template Line";
         DataItems: Record "NPR RP Data Items";
         DataItemLinks: Record "NPR RP Data Item Links";
         DataItemConstraint: Record "NPR RP Data Item Constr.";
@@ -278,15 +278,15 @@
                 tmpDeviceSettings.SetRange(Template, tmpImportWorksheet.Template);
                 tmpMediaInfo.SetRange(Template, tmpImportWorksheet.Template);
 
-                TemplateHeader.Init();
-                TemplateHeader := tmpTemplateHeader;
-                TemplateHeader.Insert();
+                RPTemplateHeader.Init();
+                RPTemplateHeader := tmpTemplateHeader;
+                RPTemplateHeader.Insert();
 
                 if tmpTemplateLine.FindSet() then
                     repeat
-                        TemplateLine.Init();
-                        TemplateLine := tmpTemplateLine;
-                        TemplateLine.Insert();
+                        RPTemplateLine.Init();
+                        RPTemplateLine := tmpTemplateLine;
+                        RPTemplateLine.Insert();
                     until tmpTemplateLine.Next() = 0;
 
                 if tmpDataItem.FindSet() then
@@ -339,26 +339,26 @@
 
     local procedure DeleteTemplate("Code": Text)
     var
-        TemplateHeader: Record "NPR RP Template Header";
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateHeader: Record "NPR RP Template Header";
+        RPTemplateLine: Record "NPR RP Template Line";
         DataItems: Record "NPR RP Data Items";
         DataItemLinks: Record "NPR RP Data Item Links";
         DataItemConstraint: Record "NPR RP Data Item Constr.";
         DataItemConstraintLinks: Record "NPR RP Data Item Constr. Links";
         DeviceSettings: Record "NPR RP Device Settings";
         MediaInfo: Record "NPR RP Template Media Info";
-        TemplateArchive: Record "NPR RP Template Archive";
+        RPTemplateArchive: Record "NPR RP Template Archive";
     begin
-        TemplateHeader.Get(Code);
-        if not TemplateHeader.Archived then begin
-            if not TemplateArchive.Get(Code, TemplateHeader.Version) then begin
-                TemplateHeader."Version Comments" := 'Auto archiving before import';
-                TemplateHeader.Validate(Archived, true);
+        RPTemplateHeader.Get(Code);
+        if not RPTemplateHeader.Archived then begin
+            if not RPTemplateArchive.Get(Code, RPTemplateHeader.Version) then begin
+                RPTemplateHeader."Version Comments" := 'Auto archiving before import';
+                RPTemplateHeader.Validate(Archived, true);
             end;
         end;
 
-        TemplateHeader.SetRange(Code, Code);
-        TemplateLine.SetRange("Template Code", Code);
+        RPTemplateHeader.SetRange(Code, Code);
+        RPTemplateLine.SetRange("Template Code", Code);
         DataItems.SetRange(Code, Code);
         DataItemLinks.SetRange("Data Item Code", Code);
         DataItemConstraint.SetRange("Data Item Code", Code);
@@ -366,8 +366,8 @@
         DeviceSettings.SetRange(Template, Code);
         MediaInfo.SetRange(Template, Code);
 
-        TemplateHeader.DeleteAll();
-        TemplateLine.DeleteAll();
+        RPTemplateHeader.DeleteAll();
+        RPTemplateLine.DeleteAll();
         DataItems.DeleteAll();
         DataItemLinks.DeleteAll();
         DataItemConstraint.DeleteAll();

@@ -225,24 +225,24 @@ page 6014630 "NPR RP Templ. Line Designer"
 
     procedure IndentLine()
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
     begin
         //-NPR5.34 [284505]
         // FIND;
         // VALIDATE(Level,Level+1);
         // MODIFY(TRUE);
-        CurrPage.SetSelectionFilter(TemplateLine);
-        if TemplateLine.FindSet() then
+        CurrPage.SetSelectionFilter(RPTemplateLine);
+        if RPTemplateLine.FindSet() then
             repeat
-                TemplateLine.Validate(Level, TemplateLine.Level + 1);
-                TemplateLine.Modify(true);
-            until TemplateLine.Next() = 0;
+                RPTemplateLine.Validate(Level, RPTemplateLine.Level + 1);
+                RPTemplateLine.Modify(true);
+            until RPTemplateLine.Next() = 0;
         //+NPR5.34 [284505]
     end;
 
     procedure UnindentLine()
     var
-        TemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine: Record "NPR RP Template Line";
     begin
         //-NPR5.34 [284505]
         // FIND;
@@ -250,14 +250,14 @@ page 6014630 "NPR RP Templ. Line Designer"
         //  VALIDATE(Level,Level-1);
         // MODIFY(TRUE);
 
-        CurrPage.SetSelectionFilter(TemplateLine);
-        if TemplateLine.FindSet() then
+        CurrPage.SetSelectionFilter(RPTemplateLine);
+        if RPTemplateLine.FindSet() then
             repeat
-                if TemplateLine.Level > 0 then begin
-                    TemplateLine.Validate(Level, TemplateLine.Level - 1);
-                    TemplateLine.Modify(true);
+                if RPTemplateLine.Level > 0 then begin
+                    RPTemplateLine.Validate(Level, RPTemplateLine.Level - 1);
+                    RPTemplateLine.Modify(true);
                 end;
-            until TemplateLine.Next() = 0;
+            until RPTemplateLine.Next() = 0;
         //+NPR5.34 [284505]
     end;
 }

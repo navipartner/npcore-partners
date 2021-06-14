@@ -359,12 +359,12 @@ table 6014561 "NPR RP Data Items"
 
     local procedure ModifiedRec()
     var
-        TemplateHeader: Record "NPR RP Template Header";
+        RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if IsTemporary then
             exit;
-        if TemplateHeader.Get(Code) then
-            TemplateHeader.Modify(true);
+        if RPTemplateHeader.Get(Code) then
+            RPTemplateHeader.Modify(true);
     end;
 
     local procedure CheckLinks()

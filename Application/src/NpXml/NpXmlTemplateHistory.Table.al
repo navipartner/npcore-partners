@@ -69,30 +69,30 @@ table 6151560 "NPR NpXml Template History"
 
     procedure InsertHistory(XmlTemplate: Code[20]; TemplateVersionNo: Code[20]; EventType: Option New,Modification,Restore; VersionDescription: Text[250])
     var
-        TemplateHistory: Record "NPR NpXml Template History";
-        TemplateHistory2: Record "NPR NpXml Template History";
+        NpXm1TemplateHistory: Record "NPR NpXml Template History";
+        NpXm1TemplateHistory2: Record "NPR NpXml Template History";
     begin
-        TemplateHistory2.SetRange("Template Code", XmlTemplate);
-        if TemplateHistory2.FindLast() and (TemplateHistory2."Changed by" = UserId) and (TemplateHistory2."Event Type" = EventType) and (TemplateVersionNo = TemplateHistory2."Template Version No.") then
+        NpXm1TemplateHistory2.SetRange("Template Code", XmlTemplate);
+        if NpXm1TemplateHistory2.FindLast() and (NpXm1TemplateHistory2."Changed by" = UserId) and (NpXm1TemplateHistory2."Event Type" = EventType) and (TemplateVersionNo = NpXm1TemplateHistory2."Template Version No.") then
             exit;
 
-        TemplateHistory.Init();
-        TemplateHistory."Entry No." := 0;
-        TemplateHistory."Template Code" := XmlTemplate;
-        TemplateHistory."Template Version No." := TemplateVersionNo;
+        NpXm1TemplateHistory.Init();
+        NpXm1TemplateHistory."Entry No." := 0;
+        NpXm1TemplateHistory."Template Code" := XmlTemplate;
+        NpXm1TemplateHistory."Template Version No." := TemplateVersionNo;
         case EventType of
             EventType::New:
-                TemplateHistory.Description := Text000;
+                NpXm1TemplateHistory.Description := Text000;
             EventType::Restore:
-                TemplateHistory.Description := StrSubstNo(Text001, TemplateVersionNo);
+                NpXm1TemplateHistory.Description := StrSubstNo(Text001, TemplateVersionNo);
             EventType::Modification:
-                TemplateHistory.Description := Text002;
+                NpXm1TemplateHistory.Description := Text002;
         end;
-        TemplateHistory."Version Description" := VersionDescription;
-        TemplateHistory."Event Type" := EventType;
-        TemplateHistory."Changed by" := UserId;
-        TemplateHistory."Change at" := CreateDateTime(Today, Time);
-        TemplateHistory.Insert();
+        NpXm1TemplateHistory."Version Description" := VersionDescription;
+        NpXm1TemplateHistory."Event Type" := EventType;
+        NpXm1TemplateHistory."Changed by" := UserId;
+        NpXm1TemplateHistory."Change at" := CreateDateTime(Today, Time);
+        NpXm1TemplateHistory.Insert();
     end;
 }
 
