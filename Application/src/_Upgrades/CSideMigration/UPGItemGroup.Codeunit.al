@@ -126,12 +126,12 @@ codeunit 6014468 "NPR UPG Item Group"
     begin
         Database.SelectLatestVersion();
         Item.SetFilter("NPR Item Group", '<>%1', '');
-        if not Item.FindSet(true) then
-            exit;
-
-        Item."Item Category Code" := Item."NPR Item Group";
-        Item.UpdateItemCategoryId();
-        Item.Modify(true);
+        if Item.FindSet(true) then
+            repeat
+                Item."Item Category Code" := Item."NPR Item Group";
+                Item.UpdateItemCategoryId();
+                Item.Modify(true);
+            until Item.Next() = 0;
     end;
 
     local procedure UpgradeSalesPriceMaintGroups()
