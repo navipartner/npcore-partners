@@ -792,12 +792,12 @@
         if xRec."NpCs From Store Code" <> Rec."NpCs From Store Code" then begin
             if (xRec."NpCs From Store Code" <> '') and NpCsStore.Get(xRec."NpCs From Store Code") then begin
                 RecRef.GetTable(NpCsStore);
-                DataLogMgt.OnDatabaseModify(RecRef);
+                DataLogMgt.LogDatabaseModify(RecRef);
             end;
 
             if (Rec."NpCs From Store Code" <> '') and NpCsStore.Get(Rec."NpCs From Store Code") then begin
                 RecRef.GetTable(NpCsStore);
-                DataLogMgt.OnDatabaseModify(RecRef);
+                DataLogMgt.LogDatabaseModify(RecRef);
             end;
         end;
     end;

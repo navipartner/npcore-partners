@@ -27,7 +27,7 @@
         NcCollection."Creation Date" := CurrentDateTime;
         NcCollection.Insert(true);
         RecRef.GetTable(NcCollection);
-        DataLogMgt.OnDatabaseInsert(RecRef);
+        DataLogMgt.LogDatabaseInsert(RecRef);
         exit(NcCollection."No.");
     end;
 
@@ -127,7 +127,7 @@
         PopulatePKFields(NcCollectionLine, RecRef);
         NcCollectionLine.Insert(true);
         RecRef2.GetTable(NcCollectionLine);
-        DataLogMgt.OnDatabaseInsert(RecRef2);
+        DataLogMgt.LogDatabaseInsert(RecRef2);
 
         MarkPreviousCollectionLinesAsObsolete(NcCollectionLine);
     end;
@@ -239,7 +239,7 @@
         NcCollectorRequest.Validate("Only New and Modified Records", OnlyNewAndModified);
         NcCollectorRequest.Insert(true);
         RecRef2.GetTable(NcCollectorRequest);
-        DataLogMgt.OnDatabaseInsert(RecRef2);
+        DataLogMgt.LogDatabaseInsert(RecRef2);
 
         RecRef.GetTable(RecordToRequest);
         InsertFilterRecords(NcCollectorRequest, RecRef);
@@ -274,7 +274,7 @@
                         NcCollectorRequestFilter.Validate("Filter Text", FilterText);
                         NcCollectorRequestFilter.Insert(true);
                         RecRef2.GetTable(NcCollectorRequestFilter);
-                        DataLogMgt.OnDatabaseInsert(RecRef2);
+                        DataLogMgt.LogDatabaseInsert(RecRef2);
                     end;
                 until FieldRec.Next() = 0;
         end;

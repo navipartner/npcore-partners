@@ -50,7 +50,7 @@
         NcCollectorManagement.PopulatePKFields(NcCollectionLine, RecRef);
         NcCollectionLine.Insert(true);
         RecRef.GetTable(NcCollectionLine);
-        DataLogMgt.OnDatabaseInsert(RecRef);
+        DataLogMgt.LogDatabaseInsert(RecRef);
 
         if NcCollectionLine."Type of Change" in [NcCollectionLine."Type of Change"::Modify, NcCollectionLine."Type of Change"::Delete] then
             NcCollectorManagement.MarkPreviousCollectionLinesAsObsolete(NcCollectionLine);
