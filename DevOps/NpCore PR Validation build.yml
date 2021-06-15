@@ -36,18 +36,19 @@ jobs:
       - runtime: '"6.0"'
 
     - name: BC18
-      containerImageName: npretail.azurecr.io/np/dynamicsnav:18.0.23013.23795-w1
+      containerImageName: npretail.azurecr.io/np/dynamicsnav:18.2.26217.26490-w1
       artifactUrl: ''
       endpointName: npretail_ACR
       serverInstanceName: BC
       licenseSecureFileName: 'DEV_BC OP 18.flf'
 
-      majorVersion: 1800
+      majorVersion: 1802
       appJsonValues:
-      - platform: '18.0.0.0'
-      - application: '18.0.0.0'
-      - preprocessorSymbols: [BC18]
-      - runtime: '"7.0"'   
+      -  platform: '18.0.0.0'
+      -  application: '18.0.0.0'
+      -  preprocessorSymbols: [BC18.2]
+      -  runtime: '"7.1"'   
+
 
     scriptsRepo: scriptsRepo
     stepList:
