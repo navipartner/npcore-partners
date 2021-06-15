@@ -1,3 +1,4 @@
+#pragma warning disable AL0432
 tableextension 6014436 "NPR Invoice Post. Buffer" extends "Invoice Post. Buffer"
 {
     fields
@@ -20,3 +21,4 @@ tableextension 6014436 "NPR Invoice Post. Buffer" extends "Invoice Post. Buffer"
         }
     }
 }
+#pragma warning restore

@@ -1,3 +1,4 @@
+#pragma warning disable AL0432
 tableextension 6014443 "NPR Item Cross Reference" extends "Item Cross Reference"
 {
     fields
@@ -23,4 +24,4 @@ tableextension 6014443 "NPR Item Cross Reference" extends "Item Cross Reference"
         }
     }
 }
-
+#pragma warning restore
