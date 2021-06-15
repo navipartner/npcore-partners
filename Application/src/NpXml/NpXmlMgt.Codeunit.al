@@ -490,6 +490,7 @@
             RequestContent.WriteFrom(JsonRequest);
         end else begin
             XmlDoc2.WriteTo(RequestText);
+            AddTextToOutputTempBlob(RequestText);
             RequestContent.WriteFrom(RequestText);
         end;
 

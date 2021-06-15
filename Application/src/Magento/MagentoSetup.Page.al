@@ -76,60 +76,53 @@ page 6151401 "NPR Magento Setup"
                         ToolTip = 'Specifies the value of the Api Authorization field';
                     }
                 }
-                field("FORMAT(""Generic Setup"".HASVALUE)"; Format(Rec."Generic Setup".HasValue))
+            }
+            group("Xml Templates")
+            {
+                field("Products Xml Templates Enabled"; Rec."Products XmlTemplates Enabled")
                 {
                     ApplicationArea = All;
-                    Caption = 'NpXml Setup';
-                    Importance = Additional;
-                    ToolTip = 'Specifies the value of the NpXml Setup field';
-
-                    trigger OnAssistEdit()
-                    var
-                        MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
-                    begin
-                        MagentoGenericSetupMgt.EditGenericMagentoSetup('//template_setup');
-                        CurrPage.Update(false);
-                    end;
+                    ToolTip = 'Downloads XML Templates for products from Azure Blob Storage';
                 }
-                group("Managed Nav Module")
+                field("Stock Updat. XmlTempl. Enabled"; Rec."Stock Updat. XmlTempl. Enabled")
                 {
-                    Caption = 'Managed Nav Module';
-                    field("Managed Nav Modules Enabled"; Rec."Managed Nav Modules Enabled")
-                    {
-                        ApplicationArea = All;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Managed Nav Modules Enabled field';
-                    }
-                    field("Managed Nav Api Url"; Rec."Managed Nav Api Url")
-                    {
-                        ApplicationArea = All;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Managed Nav Api Url field';
-                    }
-                    field("Managed Nav Api Username"; Rec."Managed Nav Api Username")
-                    {
-                        ApplicationArea = All;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Managed Nav api brugernavn field';
-                    }
-                    field(NavPassword; NavPassword)
-                    {
-                        ApplicationArea = All;
-                        Caption = 'Managed Nav Api Password';
-                        ExtendedDatatype = Masked;
-                        ToolTip = 'Specifies the value of the Managed Nav Api Password field';
-
-                        trigger OnValidate()
-                        begin
-                            Rec.SetNavApiPassword(NavPassword);
-                            Commit();
-                        end;
-                    }
-                    field("Version No."; Rec."Version No.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Version No. field';
-                    }
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Stock updates from Azure Blob Storage';
+                }
+                field("Product Att. XmlTempl. Enabled"; Rec."Product Att. XmlTempl. Enabled")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Product Attributes from Azure Blob Storage';
+                }
+                field("Prod. Attr. Sets XmlTem. Enab."; Rec."Prod. Attr. Sets XmlTem. Enab.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Product Attribute Sets from Azure Blob Storage';
+                }
+                field("Order Updat. XmlTempl. Enabled"; Rec."Order Updat. XmlTempl. Enabled")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Order Updates from Azure Blob Storage';
+                }
+                field("Multi Store XmlTempl. Enabled"; Rec."Multi Store XmlTempl. Enabled")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Multi Stores from Azure Blob Storage';
+                }
+                field("Ticket Adm. XmlTempl. Enabled"; Rec."Ticket Adm. XmlTempl. Enabled")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Ticket Admission from Azure Blob Storage';
+                }
+                field("Coll. Stores XmlTempl. Enabled"; Rec."Coll. Stores XmlTempl. Enabled")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Collect Stores from Azure Blob Storage';
+                }
+                field("Delete Cust. XmlTempl. Enabled"; Rec."Delete Cust. XmlTempl. Enabled")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Downloads XML Templates for Delete Customer from Azure Blob Storage';
                 }
             }
             group(Moduler)
@@ -794,26 +787,6 @@ page 6151401 "NPR Magento Setup"
                     }
                 }
             }
-            group("Managed Nav Modules")
-            {
-                Caption = 'Managed Nav Modules';
-                Enabled = Rec."Managed Nav Modules Enabled" AND (Rec."Managed Nav Api Url" <> '');
-                action("Update Version No.")
-                {
-                    Caption = 'Update Version No.';
-                    Image = UpdateXML;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Update Version No. action';
-
-                    trigger OnAction()
-                    var
-                        MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
-                    begin
-                        MagentoSetupMgt.UpdateVersionNo(Rec);
-                        CurrPage.Update(true);
-                    end;
-                }
-            }
             action("Setup Import Types")
             {
                 Caption = 'Setup Import Types';
@@ -830,25 +803,6 @@ page 6151401 "NPR Magento Setup"
                     MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                 begin
                     MagentoSetupMgt.SetupImportTypes();
-                end;
-            }
-            action("Setup Control Add-ins")
-            {
-                Caption = 'Setup Control Add-ins';
-                Image = Setup;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Setup Control Add-ins action';
-
-                trigger OnAction()
-                var
-                    MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
-                begin
-                    CurrPage.Update(true);
-                    MagentoSetupMgt.SetupClientAddIns();
                 end;
             }
             group(Resync)
@@ -927,14 +881,11 @@ page 6151401 "NPR Magento Setup"
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
         Password := '';
-        NavPassword := '';
         HasSetupCategories := MagentoSetupMgt.HasSetupCategories();
         HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
 
         if not IsNullGuid(Rec."Api Password Key") then
             Password := '***';
-        if not IsNullGuid(Rec."Managed Nav Api Password Key") then
-            NavPassword := '***';
 
         VariantSystem := Rec."Variant System".AsInteger() = 2;
         PictureVarietyType := Rec."Picture Variety Type".AsInteger() = 0;
@@ -946,6 +897,8 @@ page 6151401 "NPR Magento Setup"
             Rec.Insert();
 
         CurrPage.NpCsStoreCardWorkflows.PAGE.SetStoreCodeVisible(true);
+
+        Rec.UpdateXmlEnabledFields();
     end;
 
     var
@@ -958,5 +911,4 @@ page 6151401 "NPR Magento Setup"
         Text003: Label 'Category update initiated';
         Text004: Label 'Brand update initiated';
         Password: Text;
-        NavPassword: Text;
 }

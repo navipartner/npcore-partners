@@ -367,8 +367,6 @@ codeunit 6151403 "NPR Magento Webservice"
 
         NaviConnectSetupMgt.InitNaviConnectSetup();
 
-        MagentoSetupMgt.SetupClientAddIns();
-        Commit();
         MagentoSetupMgt.SetupImportTypes();
         Commit();
         NaviConnectSetupMgt.SetupTaskQueue();

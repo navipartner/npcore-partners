@@ -89,21 +89,6 @@ page 6151242 "NPR Retail Magento Setup List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Authorization field';
                 }
-                field("Managed Nav Modules Enabled"; Rec."Managed Nav Modules Enabled")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Managed Nav Modules Enabled field';
-                }
-                field("Managed Nav Api Url"; Rec."Managed Nav Api Url")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Managed Nav Api Url field';
-                }
-                field("Managed Nav Api Username"; Rec."Managed Nav Api Username")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Managed Nav api brugernavn field';
-                }
                 field(NavPassword; NavPassword)
                 {
                     ApplicationArea = All;
@@ -116,16 +101,6 @@ page 6151242 "NPR Retail Magento Setup List"
                         Rec.SetNavApiPassword(NavPassword);
                         Commit();
                     end;
-                }
-                field("Version No."; Rec."Version No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Version No. field';
-                }
-                field("Version Coverage"; Rec."Version Coverage")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Version Coverage field';
                 }
                 field("Brands Enabled"; Rec."Brands Enabled")
                 {

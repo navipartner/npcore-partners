@@ -38,13 +38,13 @@
 
             PrevRec := Format(MagentoCategory);
 
-            MagentoCategory.Name := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), '//name', MaxStrLen(MagentoCategory.Name), false);
+            MagentoCategory.Name := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'name', MaxStrLen(MagentoCategory.Name), false);
             MagentoCategory.Name := TypeHelper.HtmlDecode(MagentoCategory.Name);
-            MagentoCategory."Parent Category Id" := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), '//parent', MaxStrLen(MagentoCategory."Parent Category Id"), false);
-            MagentoCategory.Level := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), '//level', false);
-            MagentoCategory.Path := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), '//path', MaxStrLen(MagentoCategory.Path), false);
-            MagentoCategory.Sorting := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), '//position', false);
-            MagentoCategory."Root No." := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), '//root', MaxStrLen(MagentoCategory."Root No."), false);
+            MagentoCategory."Parent Category Id" := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'parent', MaxStrLen(MagentoCategory."Parent Category Id"), false);
+            MagentoCategory.Level := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), 'level', false);
+            MagentoCategory.Path := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'path', MaxStrLen(MagentoCategory.Path), false);
+            MagentoCategory.Sorting := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), 'position', false);
+            MagentoCategory."Root No." := NpXmlDomMgt.GetElementCode(XNode.AsXmlElement(), 'root', MaxStrLen(MagentoCategory."Root No."), false);
             MagentoCategory.Root := MagentoCategory.Id = MagentoCategory."Root No.";
 
             if PrevRec <> Format(MagentoCategory) then

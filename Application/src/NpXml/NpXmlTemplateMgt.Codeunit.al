@@ -218,6 +218,7 @@
         NodeList: XmlNodeList;
         Node: XmlNode;
         Attribute: XmlAttribute;
+        MagentoNpXmlSetupMgt: Codeunit "NPR Magento NpXml Setup Mgt";
     begin
         if (TemplateCode = '') or (TemplateUrl = '') then
             exit(false);
@@ -245,8 +246,10 @@
                 end;
             end;
 
-            if NpXmlTemplate.Get(TemplateCode) then
+            if NpXmlTemplate.Get(TemplateCode) then begin
                 NpXmlTemplate.UpdateNaviConnectSetup();
+                MagentoNpXmlSetupMgt.SetupExistingTemplate(TemplateCode, true);
+            end;
         end;
 
         exit(NpXmlTemplate.Get(TemplateCode));
