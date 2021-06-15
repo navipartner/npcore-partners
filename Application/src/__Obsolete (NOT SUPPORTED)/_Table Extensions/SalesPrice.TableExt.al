@@ -1,3 +1,4 @@
+#pragma warning disable AL0432
 tableextension 6014450 "NPR Sales Price" extends "Sales Price"
 {
     fields
@@ -36,4 +37,4 @@ tableextension 6014450 "NPR Sales Price" extends "Sales Price"
         }
     }
 }
-
+#pragma warning restore
