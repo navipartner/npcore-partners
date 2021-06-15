@@ -204,7 +204,7 @@ page 6059897 "NPR Data Log Setup"
         repeat
             Counter += 1;
             Window.Update(1, Round((Counter / Total) * 10000, 1));
-            DataLogMgt.OnDatabaseInsert(RecRef);
+            DataLogMgt.LogDatabaseInsert(RecRef);
         until RecRef.Next() = 0;
         Window.Close();
     end;

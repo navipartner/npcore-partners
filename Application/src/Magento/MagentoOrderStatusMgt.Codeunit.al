@@ -1,7 +1,7 @@
 codeunit 6151405 "NPR Magento Order Status Mgt."
 {
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
-    procedure Cu80OnAfterPostSalesDoc(SalesInvHdrNo: Code[20])
+    local procedure Cu80OnAfterPostSalesDoc(SalesInvHdrNo: Code[20])
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
@@ -28,7 +28,7 @@ codeunit 6151405 "NPR Magento Order Status Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterInsertEvent', '', true, true)]
-    procedure SalesHeaderOnInsert(var Rec: Record "Sales Header"; RunTrigger: Boolean)
+    local procedure SalesHeaderOnInsert(var Rec: Record "Sales Header"; RunTrigger: Boolean)
     var
         MagentoOrderStatus: Record "NPR Magento Order Status";
         MagentoSetup: Record "NPR Magento Setup";
@@ -55,7 +55,7 @@ codeunit 6151405 "NPR Magento Order Status Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterDeleteEvent', '', true, true)]
-    procedure SalesHeaderOnDelete(var Rec: Record "Sales Header"; RunTrigger: Boolean)
+    local procedure SalesHeaderOnDelete(var Rec: Record "Sales Header"; RunTrigger: Boolean)
     var
         MagentoOrderStatus: Record "NPR Magento Order Status";
         MagentoSetup: Record "NPR Magento Setup";

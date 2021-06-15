@@ -9,7 +9,7 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Assisted Setup", 'OnAfterRun', '', false, false)]
-    procedure UpdateSetupStatus_OnUpdateAssistedSetupStatusp(PageID: Integer)
+    local procedure UpdateSetupStatus_OnUpdateAssistedSetupStatusp(PageID: Integer)
     begin
         UpdateMagentoWizardStatus();
     end;
