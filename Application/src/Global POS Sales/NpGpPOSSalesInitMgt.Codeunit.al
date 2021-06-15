@@ -50,7 +50,7 @@
         NpGpPOSSalesEntry.Insert(true);
         DataLogMgt.DisableDataLog(false);
         RecRef.GetTable(NpGpPOSSalesEntry);
-        DataLogMgt.OnDatabaseInsert(RecRef);
+        DataLogMgt.LogDatabaseInsert(RecRef);
 
         TempNpGpPOSSalesLine2.Copy(TempNpGpPOSSalesLine, true);
         Clear(TempNpGpPOSSalesLine2);

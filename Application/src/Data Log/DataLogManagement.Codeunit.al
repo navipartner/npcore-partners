@@ -19,8 +19,8 @@
 
     //--- Debug ---
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterGetDatabaseTableTriggerSetup', '', true, false)]
-    procedure GetDatabaseTableTriggerSetup(TableId: Integer; var OnDatabaseInsert: Boolean; var OnDatabaseModify: Boolean; var OnDatabaseDelete: Boolean; var OnDatabaseRename: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterGetDatabaseTableTriggerSetup', '', true, false)]
+    local procedure GetDatabaseTableTriggerSetup(TableId: Integer; var OnDatabaseInsert: Boolean; var OnDatabaseModify: Boolean; var OnDatabaseDelete: Boolean; var OnDatabaseRename: Boolean)
     var
         DataLogSetupTable: Record "NPR Data Log Setup (Table)";
     begin
@@ -48,8 +48,31 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseInsert', '', true, false)]
-    procedure OnDatabaseInsert(RecRef: RecordRef)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseInsert', '', true, false)]
+    local procedure OnDatabaseInsert(RecRef: RecordRef)
+    begin
+        LogDatabaseInsert(RecRef);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseModify', '', true, false)]
+    local procedure OnDatabaseModify(RecRef: RecordRef)
+    begin
+        LogDatabaseModify(RecRef);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseDelete', '', true, false)]
+    local procedure OnDatabaseDelete(RecRef: RecordRef)
+    begin
+        LogDatabaseDelete(RecRef);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseRename', '', true, false)]
+    local procedure OnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
+    begin
+        LogDatabaseRename(RecRef, xRecRef);
+    end;
+
+    procedure LogDatabaseInsert(RecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
@@ -79,8 +102,7 @@
         ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseModify', '', true, false)]
-    procedure OnDatabaseModify(RecRef: RecordRef)
+    procedure LogDatabaseModify(RecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
@@ -113,8 +135,7 @@
         ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseDelete', '', true, false)]
-    procedure OnDatabaseDelete(RecRef: RecordRef)
+    procedure LogDatabaseDelete(RecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
@@ -144,8 +165,7 @@
         ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseRename', '', true, false)]
-    procedure OnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
+    procedure LogDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;

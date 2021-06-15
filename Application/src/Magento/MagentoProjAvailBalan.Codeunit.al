@@ -290,7 +290,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Item Mgt.", 'OnUpsertStockTriggers', '', true, true)]
-    procedure UpsertStockTriggers(MagentoSetup: Record "NPR Magento Setup"; NpXmlTemplate: Record "NPR NpXml Template"; var Handled: Boolean)
+    local procedure UpsertStockTriggers(MagentoSetup: Record "NPR Magento Setup"; NpXmlTemplate: Record "NPR NpXml Template"; var Handled: Boolean)
     var
         Item: Record Item;
         ItemLedgerEntry: Record "Item Ledger Entry";

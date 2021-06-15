@@ -44,7 +44,7 @@
     //Setup Parameters
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'HasTemplateParameters', '', true, true)]
-    procedure HasTemplateParameters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasParameters: Boolean)
+    local procedure HasTemplateParameters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasParameters: Boolean)
     begin
         if NpRiReimbursementTemplate."Reimbursement Module" <> PurchDocDiscCode() then
             exit;
@@ -53,7 +53,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'SetupTemplateParameters', '', true, true)]
-    procedure SetupTemplateParameters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
+    local procedure SetupTemplateParameters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         NpRiPurchDocDiscSetup: Record "NPR NpRi Purch.Doc.Disc. Setup";
         Summary: Text;

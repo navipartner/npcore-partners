@@ -259,7 +259,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
-    procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -283,7 +283,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
-    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -307,7 +307,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
-    procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;

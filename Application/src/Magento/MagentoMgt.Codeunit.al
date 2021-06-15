@@ -215,7 +215,7 @@ codeunit 6151402 "NPR Magento Mgt."
 
         repeat
             RecRef.GetTable(Item);
-            DataLogMgt.OnDatabaseInsert(RecRef);
+            DataLogMgt.LogDatabaseInsert(RecRef);
         until Item.Next() = 0;
     end;
 }

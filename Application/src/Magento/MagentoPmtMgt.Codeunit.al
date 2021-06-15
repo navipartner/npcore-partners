@@ -165,7 +165,7 @@
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterDeleteEvent', '', true, true)]
-    procedure SalesHeaderOnDelete(var Rec: Record "Sales Header"; RunTrigger: Boolean)
+    local procedure SalesHeaderOnDelete(var Rec: Record "Sales Header"; RunTrigger: Boolean)
     var
         PaymentLine: Record "NPR Magento Payment Line";
     begin

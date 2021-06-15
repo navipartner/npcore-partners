@@ -29,7 +29,7 @@
     //Setup Filters
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'HasTemplateFilters', '', true, true)]
-    procedure HasTemplateFilters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasFilters: Boolean)
+    local procedure HasTemplateFilters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasFilters: Boolean)
     begin
         if NpRiReimbursementTemplate."Data Collection Module" <> MemberLoyaltyPointsCode() then
             exit;
@@ -38,7 +38,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'SetupTemplateFilters', '', true, true)]
-    procedure SetupTemplateFilters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
+    local procedure SetupTemplateFilters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         MMMembershipPointsEntry: Record "NPR MM Members. Points Entry";
         TempField: Record "Field" temporary;
