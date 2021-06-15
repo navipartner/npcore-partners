@@ -86,6 +86,8 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Generic Setup';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy';
         }
         field(50; "Inventory Location Filter"; Text[100])
         {
@@ -153,24 +155,30 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Managed Nav Modules Enabled';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(85; "Managed Nav Api Url"; Text[250])
         {
             Caption = 'Managed Nav Api Url';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(90; "Managed Nav Api Username"; Text[100])
         {
             Caption = 'Managed Nav api brugernavn';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(95; "Managed Nav Api Password"; Text[100])
         {
-            ObsoleteState = Pending;
-            ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Managed Nav Api Password';
             DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(96; "Managed Nav Api Password Key"; Guid)
         {
@@ -188,6 +196,8 @@ table 6151401 "NPR Magento Setup"
             Caption = 'Version Coverage';
             DataClassification = CustomerContent;
             Editable = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(100; "Brands Enabled"; Boolean)
         {
@@ -600,6 +610,167 @@ table 6151401 "NPR Magento Setup"
                     Validate("NpCs Workflow Code", NpCsStoreWorkflowRelation."Workflow Code");
             end;
         }
+        field(870; "Products XmlTemplates Enabled"; Boolean)
+        {
+            Caption = 'Products';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Products XmlTemplates Enabled" then begin
+                    DownloadAndConfigureXmlTemplate('Latest/upd_item.xml');
+                    DownloadAndConfigureXmlTemplate('Latest/del_item.xml');
+                    DownloadAndConfigureXmlTemplate('Latest/del_mag_picture.xml');
+                end else begin
+                    NpXmlTemplate.SetFilter(Code, '%1|%2|%3', 'UPD_ITEM', 'DEL_ITEM', 'DEL_MAG_PICTURE');
+                    NpXmlTemplate.DeleteAll(true);
+                end;
+            end;
+        }
+
+        field(875; "Stock Updat. XmlTempl. Enabled"; Boolean)
+        {
+            Caption = 'Stock Updates';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Stock Updat. XmlTempl. Enabled" then
+                    DownloadAndConfigureXmlTemplate('Latest/upd_item__stock.xml')
+                else
+                    if NpXmlTemplate.Get('UPD_ITEM__STOCK') then
+                        NpXmlTemplate.Delete(true);
+            end;
+        }
+
+        field(880; "Product Att. XmlTempl. Enabled"; Boolean)
+        {
+            Caption = 'Product Attributes';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Product Att. XmlTempl. Enabled" then begin
+                    DownloadAndConfigureXmlTemplate('Latest/upd_prod_attr.xml');
+                    DownloadAndConfigureXmlTemplate('Latest/del_prod_attr.xml');
+                end else begin
+                    NpXmlTemplate.SetFilter(Code, '%1|%2', 'UPD_PROD_ATTR', 'DEL_PROD_ATTR');
+                    NpXmlTemplate.DeleteAll(true);
+                end;
+            end;
+        }
+
+        field(885; "Prod. Attr. Sets XmlTem. Enab."; Boolean)
+        {
+            Caption = 'Product Attribute Sets';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Prod. Attr. Sets XmlTem. Enab." then begin
+                    DownloadAndConfigureXmlTemplate('Latest/upd_prod_attr_set.xml');
+                    DownloadAndConfigureXmlTemplate('Latest/del_prod_attr_set.xml');
+                end else begin
+                    NpXmlTemplate.SetFilter(Code, '%1|%2', 'UPD_PROD_ATTR_SET', 'DEL_PROD_ATTR_SET');
+                    NpXmlTemplate.DeleteAll(true);
+                end;
+            end;
+        }
+
+        field(890; "Order Updat. XmlTempl. Enabled"; Boolean)
+        {
+            Caption = 'Order Updates';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Order Updat. XmlTempl. Enabled" then
+                    DownloadAndConfigureXmlTemplate('Latest/upd_order_status.xml')
+                else
+                    if NpXmlTemplate.Get('UPD_ORDER_STATUS') then
+                        NpXmlTemplate.Delete(true);
+            end;
+        }
+
+        field(895; "Multi Store XmlTempl. Enabled"; Boolean)
+        {
+            Caption = 'Multi Store';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Multi Store XmlTempl. Enabled" then
+                    DownloadAndConfigureXmlTemplate('Latest/upd_item__store.xml')
+                else
+                    if NpXmlTemplate.Get('UPD_ITEM__STORE') then
+                        NpXmlTemplate.Delete(true);
+            end;
+        }
+
+        field(900; "Ticket Adm. XmlTempl. Enabled"; Boolean)
+        {
+            Caption = 'Ticket Admission';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Ticket Adm. XmlTempl. Enabled" then
+                    DownloadAndConfigureXmlTemplate('Latest/upd_ticket_admission.xml')
+                else
+                    if NpXmlTemplate.Get('UPD_TICKET_ADMISSION') then
+                        NpXmlTemplate.Delete(true);
+            end;
+        }
+
+        field(905; "Coll. Stores XmlTempl. Enabled"; Boolean)
+        {
+            Caption = 'Collect Stores';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Coll. Stores XmlTempl. Enabled" then begin
+                    DownloadAndConfigureXmlTemplate('Latest/upd_collect_store.xml');
+                    DownloadAndConfigureXmlTemplate('Latest/del_collect_store.xml');
+                end else begin
+                    NpXmlTemplate.SetFilter(Code, '%1|%2', 'UPD_COLLECT_STORE', 'DEL_COLLECT_STORE');
+                    NpXmlTemplate.DeleteAll(true);
+                end;
+            end;
+        }
+
+        field(910; "Delete Cust. XmlTempl. Enabled"; Boolean)
+        {
+            Caption = 'Delete Customer';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NpXmlTemplate: Record "NPR NpXml Template";
+            begin
+                if "Delete Cust. XmlTempl. Enabled" then
+                    DownloadAndConfigureXmlTemplate('Latest/del_contact.xml')
+                else
+                    if NpXmlTemplate.Get('DEL_CONTACT') then
+                        NpXmlTemplate.Delete(true);
+            end;
+        }
     }
 
     keys
@@ -608,6 +779,9 @@ table 6151401 "NPR Magento Setup"
         {
         }
     }
+
+    var
+        Text001: Label 'XML Template %1 already exist. Do you want to overwrite it with the template from Azure Blob Storage?';
 
     [NonDebuggable]
     procedure SetApiPassword(NewPassword: Text)
@@ -620,7 +794,7 @@ table 6151401 "NPR Magento Setup"
     [NonDebuggable]
     procedure GetApiPassword() PasswordValue: Text
     begin
-        IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
+        if IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue) then;
     end;
 
     [NonDebuggable]
@@ -713,5 +887,60 @@ table 6151401 "NPR Magento Setup"
     local procedure GetStockPublisherFunctionName(): Text
     begin
         exit('OnCalcStockQty');
+    end;
+
+    local procedure DownloadAndConfigureXmlTemplate(XmlTemplateFileName: Text)
+    var
+        XmlTemplate: Record "NPR NpXml Template";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
+        TemplateCode: Text;
+        BaseURL: Text;
+    begin
+        TemplateCode := XmlTemplateFileName.Substring(XmlTemplateFileName.LastIndexOf('/') + 1);
+        TemplateCode := TemplateCode.Substring(1, TemplateCode.IndexOf('.xml') - 1);
+
+        if XmlTemplate.Get(TemplateCode) then
+            if Confirm(StrSubstNo(Text001, UpperCase(TemplateCode))) then
+                XmlTemplate.Delete(true)
+            else
+                exit;
+
+        BaseURL := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplateFileName.Substring(1, XmlTemplateFileName.LastIndexOf('/'));
+        NpXmlTemplateMgt.ImportNpXmlTemplateUrl(TemplateCode, BaseURL);
+    end;
+
+    procedure UpdateXmlEnabledFields()
+    var
+        NpXmlTemplate: Record "NPR NpXml Template";
+    begin
+        NpXmlTemplate.SetFilter(Code, '%1|%2|%3', 'UPD_ITEM', 'DEL_ITEM', 'DEL_MAG_PICTURE');
+        Rec."Products XmlTemplates Enabled" := NpXmlTemplate.Count = 3;
+
+        NpXmlTemplate.SetRange(Code, 'UPD_ITEM__STOCK');
+        Rec."Stock Updat. XmlTempl. Enabled" := not (NpXmlTemplate.IsEmpty);
+
+        NpXmlTemplate.SetFilter(Code, '%1|%2', 'UPD_PROD_ATTR', 'DEL_PROD_ATTR');
+        Rec."Product Att. XmlTempl. Enabled" := NpXmlTemplate.Count = 2;
+
+        NpXmlTemplate.SetFilter(Code, '%1|%2', 'UPD_PROD_ATTR_SET', 'DEL_PROD_ATTR_SET');
+        Rec."Prod. Attr. Sets XmlTem. Enab." := NpXmlTemplate.Count = 2;
+
+        NpXmlTemplate.SetRange(Code, 'UPD_ORDER_STATUS');
+        Rec."Order Updat. XmlTempl. Enabled" := not (NpXmlTemplate.IsEmpty);
+
+        NpXmlTemplate.SetRange(Code, 'UPD_ITEM__STORE');
+        Rec."Multi Store XmlTempl. Enabled" := not (NpXmlTemplate.IsEmpty);
+
+        NpXmlTemplate.SetRange(Code, 'UPD_TICKET_ADMISSION');
+        Rec."Ticket Adm. XmlTempl. Enabled" := not (NpXmlTemplate.IsEmpty);
+
+        NpXmlTemplate.SetFilter(Code, '%1|%2', 'UPD_COLLECT_STORE', 'DEL_COLLECT_STORE');
+        Rec."Coll. Stores XmlTempl. Enabled" := NpXmlTemplate.Count = 2;
+
+        NpXmlTemplate.SetRange(Code, 'DEL_CONTACT');
+        Rec."Delete Cust. XmlTempl. Enabled" := not (NpXmlTemplate.IsEmpty);
+
+        Rec.Modify();
     end;
 }

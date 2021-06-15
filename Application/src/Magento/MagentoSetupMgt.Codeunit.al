@@ -103,54 +103,6 @@
         until ItemGroup.Next() = 0;
     end;
 
-    procedure SetupClientAddIns()
-    var
-        ClientAddinName: Text[220];
-        Description: Text[250];
-        PublicKeyToken: Text[20];
-        Version: Text[25];
-    begin
-        Version := '';
-        PublicKeyToken := '867142ff84820aec';
-
-        Description := 'NaviPartner.NaviConnect.PictureViewer';
-        ClientAddinName := 'NaviPartner.NaviConnect.DragDropPicture.1.05';
-        SetupClientAddIn(ClientAddinName, PublicKeyToken, Version, Description);
-
-        Description := 'NaviPartner.NaviConnect.TextEditor';
-        ClientAddinName := 'NaviPartner.NaviConnect.TextEditor.1.01';
-        SetupClientAddIn(ClientAddinName, PublicKeyToken, Version, Description);
-    end;
-
-    procedure SetupClientAddIn(Name: Text[220]; PublicKeyToken: Text[20]; Version: Text[25]; Description: Text[250])
-    var
-        ClientAddin: Record "Add-in";
-        HttpClientVar: HttpClient;
-        HttpResponse: HttpResponseMessage;
-        StreamIn: InStream;
-        FileName: Text;
-        OutStream: OutStream;
-    begin
-        FileName := Name + '.zip';
-        HttpClientVar.Get('http://xsd.navipartner.dk/naviconnect/client_addins/' + FileName, HttpResponse);
-        HttpResponse.Content.ReadAs(StreamIn);
-
-        if not ClientAddin.Get(Name, PublicKeyToken) then begin
-            ClientAddin.Init();
-            ClientAddin."Add-in Name" := Name;
-            ClientAddin."Public Key Token" := PublicKeyToken;
-            ClientAddin.Version := Version;
-            ClientAddin.Description := Description;
-            ClientAddin.Insert(true);
-        end;
-
-        ClientAddin.Version := Version;
-        ClientAddin.Description := Description;
-        ClientAddin.Resource.CreateOutStream(OutStream);
-        CopyStream(OutStream, StreamIn);
-        ClientAddin.Modify(true);
-    end;
-
     procedure SetupImportTypeOrder()
     var
         NaviConnectImportType: Record "NPR Nc Import Type";
@@ -427,77 +379,20 @@
     local procedure SetupNpXmlTemplates()
     var
         MagentoSetup: Record "NPR Magento Setup";
-        TempBlob: Codeunit "Temp Blob";
-        MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
-        NpXmlSetupMgt: Codeunit "NPR Magento NpXml Setup Mgt";
     begin
         if not MagentoSetup.Get() then
             exit;
 
-        MagentoGenericSetupMgt.InitGenericMagentoSetup(MagentoSetup);
-        TempBlob.FromRecord(MagentoSetup, MagentoSetup.FieldNo("Generic Setup"));
-
-        NpXmlSetupMgt.SetupTemplateItem(TempBlob, MagentoSetup."Magento Enabled");
-        NpXmlSetupMgt.SetupTemplatePicture(TempBlob, MagentoSetup."Magento Enabled");
-        NpXmlSetupMgt.SetupTemplateItemInventory(TempBlob, MagentoSetup."Magento Enabled");
-        NpXmlSetupMgt.SetupTemplateItemStore(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Multistore Enabled");
-        NpXmlSetupMgt.SetupTemplateItemGroup(TempBlob, MagentoSetup."Magento Enabled");
-        NpXmlSetupMgt.SetupTemplateOrderStatus(TempBlob, MagentoSetup."Magento Enabled");
-        NpXmlSetupMgt.SetupTemplateBrand(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Brands Enabled");
-        NpXmlSetupMgt.SetupTemplateGiftVoucher(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Gift Voucher Enabled");
-        NpXmlSetupMgt.SetupTemplateCreditVoucher(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Gift Voucher Enabled");
-        NpXmlSetupMgt.SetupTemplateAttribute(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Attributes Enabled");
-        NpXmlSetupMgt.SetupTemplateAttributeSet(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Attributes Enabled");
-        NpXmlSetupMgt.SetupTemplateCustomer(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled");
-        NpXmlSetupMgt.SetupTemplateDisplayConfig(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled");
-        NpXmlSetupMgt.SetupTemplateSalesPrice(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Sales Prices Enabled");
-        NpXmlSetupMgt.SetupTemplateSalesLineDiscount(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Sales Line Discounts Enabled");
-        NpXmlSetupMgt.SetupTemplateItemDiscountGroup(TempBlob, MagentoSetup."Magento Enabled" and MagentoSetup."Item Disc. Group Enabled");
-        NpXmlSetupMgt.SetupTemplateTicket(TempBlob, MagentoSetup."Tickets Enabled");
-        NpXmlSetupMgt.SetupTemplateMember(TempBlob, MagentoSetup."Tickets Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/manufacturer', '', MagentoSetup."Brands Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/product_external_attributes', '', MagentoSetup."Attributes Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/related_products', '', MagentoSetup."Product Relations Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/special_price', '', MagentoSetup."Special Prices Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/special_price_from', '', MagentoSetup."Special Prices Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/special_price_to', '', MagentoSetup."Special Prices Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/tier_prices', '', MagentoSetup."Tier Prices Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/group_prices', '', MagentoSetup."Customer Group Prices Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/custom_options', '', MagentoSetup."Custom Options Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/bundled_options', '', MagentoSetup."Bundled Products Enabled");
-        NpXmlSetupMgt.SetSalesPriceEnabled(TempBlob, 'product/unit_codes', '', MagentoSetup."Sales Prices Enabled" or MagentoSetup."Sales Line Discounts Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/ticket_setup', '', MagentoSetup."Tickets Enabled");
-        NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer', '', MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety);
-        case MagentoSetup."Variant System" of
-            MagentoSetup."Variant System"::Variety:
-                begin
-                    NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                      '', 'fixed_variety_1_buffer', '', 6059970, MagentoSetup."Variant Picture Dimension");
-                    NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                      '', 'fixed_variety_2_buffer', '', 6059973, MagentoSetup."Variant Picture Dimension");
-                    NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                      '', 'fixed_variety_3_buffer', '', 6059976, MagentoSetup."Variant Picture Dimension");
-                    NpXmlSetupMgt.SetItemFilterValue(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery',
-                      '', 'fixed_variety_4_buffer', '', 6059979, MagentoSetup."Variant Picture Dimension");
-
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_1_buffer',
-                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_2_buffer',
-                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_3_buffer',
-                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_4_buffer',
-                      '', MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_1_buffer',
-                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 1"]);
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_2_buffer',
-                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 2"]);
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_3_buffer',
-                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 3"]);
-                    NpXmlSetupMgt.SetItemElementEnabled(TempBlob, 'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_4_buffer',
-                      '', MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item", MagentoSetup."Picture Variety Type"::"Variety 4"]);
-                end;
-        end;
+        MagentoSetup.Validate("Products XmlTemplates Enabled", true);
+        MagentoSetup.Validate("Stock Updat. XmlTempl. Enabled", true);
+        MagentoSetup.Validate("Product Att. XmlTempl. Enabled", true);
+        MagentoSetup.Validate("Prod. Attr. Sets XmlTem. Enab.", true);
+        MagentoSetup.Validate("Order Updat. XmlTempl. Enabled", true);
+        MagentoSetup.Validate("Multi Store XmlTempl. Enabled", true);
+        MagentoSetup.Validate("Ticket Adm. XmlTempl. Enabled", true);
+        MagentoSetup.Validate("Coll. Stores XmlTempl. Enabled", true);
+        MagentoSetup.Validate("Delete Cust. XmlTempl. Enabled", true);
+        MagentoSetup.Modify();
     end;
 
     procedure SetupVATBusinessPostingGroups()
@@ -903,7 +798,8 @@
 
     #region Aux
 
-    procedure IsMagentoSetupEventSubscriber(SetupSubscriptionType: Enum "NPR Mag. Setup Event Sub. Type"; CodeunitId: Integer; FunctionName: Text): Boolean
+    procedure IsMagentoSetupEventSubscriber(SetupSubscriptionType: Enum "NPR Mag. Setup Event Sub. Type"; CodeunitId: Integer;
+                                                                       FunctionName: Text): Boolean
     var
         MagentoSetupSubscription: Record "NPR Magento Setup Event Sub.";
     begin

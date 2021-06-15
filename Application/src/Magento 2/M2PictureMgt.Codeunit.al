@@ -101,13 +101,18 @@ codeunit 6151462 "NPR M2 Picture Mgt."
         MagentoSetup: Record "NPR Magento Setup";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
+        RequestHeaders: HttpHeaders;
         Content: HttpContent;
         Headers: HttpHeaders;
         Client: HttpClient;
         Response: Text;
+        Xml: Text;
     begin
         if MagentoApiUrl = '' then
             exit(false);
+
+        XmlDoc.WriteTo(Xml);
+        Content.WriteFrom(Xml);
 
         HttpWebRequest.SetRequestUri(MagentoApiUrl + Method);
         HttpWebRequest.Method('POST');
@@ -115,14 +120,14 @@ codeunit 6151462 "NPR M2 Picture Mgt."
         if Headers.Contains('Content-Type') then
             Headers.Remove('Content-Type');
         Headers.Add('Content-Type', 'naviconnect/xml');
-        HttpWebRequest.Content(Content);
 
-        HttpWebRequest.GetHeaders(Headers);
-        Headers.Add('Accept', 'naviconnect/xml');
+        HttpWebRequest.GetHeaders(RequestHeaders);
+        RequestHeaders.Add('Accept', 'naviconnect/xml');
 
         MagentoSetup.Get();
-        Headers.Add('Authorization', MagentoSetup."Api Authorization");
+        RequestHeaders.Add('Authorization', MagentoSetup."Api Authorization");
 
+        HttpWebRequest.Content(Content);
         Client.Timeout := 300000;
         Client.Send(HttpWebRequest, HttpWebResponse);
         HttpWebResponse.Content.ReadAs(Response);

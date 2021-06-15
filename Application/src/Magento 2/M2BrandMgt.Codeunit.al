@@ -37,9 +37,9 @@
 
             PrevRec := Format(MagentoBrand);
 
-            MagentoBrand.Name := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), '//name', MaxStrLen(MagentoBrand.Name), false);
+            MagentoBrand.Name := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), 'name', MaxStrLen(MagentoBrand.Name), false);
             MagentoBrand.Name := TypeHelper.HtmlDecode(MagentoBrand.Name);
-            MagentoBrand.Sorting := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), '//sort_order', false);
+            MagentoBrand.Sorting := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), 'sort_order', false);
 
             if PrevRec <> Format(MagentoBrand) then
                 MagentoBrand.Modify(true);
