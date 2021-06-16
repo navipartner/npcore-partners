@@ -34,6 +34,16 @@ table 6150678 "NPR NPRE Kitchen Request"
             OptionCaption = 'Not Started,Started,On Hold,Finished,Cancelled';
             OptionMembers = "Not Started",Started,"On Hold",Finished,Cancelled;
         }
+        field(45; "Station Production Status"; Option)
+        {
+            Caption = 'Station Production Status';
+            OptionCaption = 'Not Started,Started,,Finished,Cancelled';
+            OptionMembers = "Not Started",Started,,Finished,Cancelled;
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR NPRE Kitchen Req. Station"."Production Status"
+                where("Request No." = field("Request No."), "Production Restaurant Code" = field("Production Restaurant Filter"), "Kitchen Station" = field("Kitchen Station Filter")));
+        }
         field(50; "Restaurant Code"; Code[20])
         {
             Caption = 'Restaurant Code';
@@ -44,7 +54,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         {
             Caption = 'Serving Step';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
+            TableRelation = "NPR NPRE Flow Status".Code where("Status Object" = const(WaiterPadLineMealFlow));
         }
         field(70; "Created Date-Time"; DateTime)
         {
@@ -109,7 +119,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(120; Description; Text[100])
         {
@@ -118,7 +128,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
         field(130; Quantity; Decimal)
         {
-            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link".Quantity WHERE("Request No." = FIELD("Request No.")));
+            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link".Quantity where("Request No." = field("Request No.")));
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -128,8 +138,8 @@ table 6150678 "NPR NPRE Kitchen Request"
         {
             Caption = 'Unit of Measure Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item),
-                                "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item),
+                                "No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("No."));
 
             trigger OnValidate()
             var
@@ -156,7 +166,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
         field(160; "Quantity (Base)"; Decimal)
         {
-            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link"."Quantity (Base)" WHERE("Request No." = FIELD("Request No.")));
+            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link"."Quantity (Base)" where("Request No." = field("Request No.")));
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -171,7 +181,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         {
             Caption = 'Kitchen Station Filter';
             FieldClass = FlowFilter;
-            TableRelation = "NPR NPRE Kitchen Station".Code WHERE("Restaurant Code" = FIELD("Production Restaurant Filter"));
+            TableRelation = "NPR NPRE Kitchen Station".Code where("Restaurant Code" = field("Production Restaurant Filter"));
         }
         field(1010; "Production Restaurant Filter"; Code[20])
         {
@@ -181,26 +191,26 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
         field(1100; "Applicable for Kitchen Station"; Boolean)
         {
-            CalcFormula = Exist("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No."),
-                                                                      "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
-                                                                      "Kitchen Station" = FIELD("Kitchen Station Filter")));
+            CalcFormula = Exist("NPR NPRE Kitchen Req. Station" where("Request No." = field("Request No."),
+                                                                      "Production Restaurant Code" = field("Production Restaurant Filter"),
+                                                                      "Kitchen Station" = field("Kitchen Station Filter")));
             Caption = 'Applicable for Kitchen Station';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1110; "No. of Kitchen Stations"; Integer)
         {
-            CalcFormula = Count("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No.")));
+            CalcFormula = Count("NPR NPRE Kitchen Req. Station" where("Request No." = field("Request No.")));
             Caption = 'No. of Kitchen Stations';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1120; "Qty. Changed"; Boolean)
         {
-            CalcFormula = Exist("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No."),
-                                                                      "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
-                                                                      "Kitchen Station" = FIELD("Kitchen Station Filter"),
-                                                                      "Qty. Change Not Accepted" = CONST(true)));
+            CalcFormula = Exist("NPR NPRE Kitchen Req. Station" where("Request No." = field("Request No."),
+                                                                      "Production Restaurant Code" = field("Production Restaurant Filter"),
+                                                                      "Kitchen Station" = field("Kitchen Station Filter"),
+                                                                      "Qty. Change Not Accepted" = const(true)));
             Caption = 'Qty. Changed';
             Editable = false;
             FieldClass = FlowField;

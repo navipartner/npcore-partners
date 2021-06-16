@@ -87,7 +87,15 @@ page 6150689 "NPR NPRE Kitchen Req."
                 field("Production Status"; Rec."Production Status")
                 {
                     ApplicationArea = All;
+                    Visible = IsExpediteMode;
                     ToolTip = 'Specifies the value of the Production Status field';
+                }
+                field("Station Production Status"; Rec."Station Production Status")
+                {
+                    ApplicationArea = All;
+                    Visible = not IsExpediteMode;
+                    ToolTip = 'Specifies the value of the Station Production Status field';
+                    DrillDown = false;
                 }
                 field("No. of Kitchen Stations"; Rec."No. of Kitchen Stations")
                 {
@@ -111,11 +119,28 @@ page 6150689 "NPR NPRE Kitchen Req."
             part("Kitchen Stations"; "NPR NPRE Kitchen Req. Subpage")
             {
                 Caption = 'Kitchen Stations';
-                SubPageLink = "Request No." = FIELD("Request No."),
-                              "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
-                              "Kitchen Station" = FIELD("Kitchen Station Filter");
+                SubPageLink = "Request No." = field("Request No."),
+                              "Production Restaurant Code" = field("Production Restaurant Filter"),
+                              "Kitchen Station" = field("Kitchen Station Filter");
                 Visible = IsExpediteMode;
                 ApplicationArea = All;
+            }
+            usercontrol(TimerControl; "NPR TimerControl")
+            {
+                ApplicationArea = All;
+
+                trigger ControlAddInReady()
+                begin
+                    CurrPage.TimerControl.StartTimer(5000);
+                    TimerStarted := true;
+                end;
+
+                trigger RefreshPage()
+                begin
+                    CurrPage.Update();
+                    if IsExpediteMode then
+                        CurrPage."Kitchen Stations".Page.Update();
+                end;
             }
         }
     }
@@ -224,9 +249,11 @@ page 6150689 "NPR NPRE Kitchen Req."
                         if Rec.GetFilter("Production Status") <> '' then
                             if Rec.GetRangeMax("Production Status") = Rec."Production Status"::Finished then begin
                                 Rec.SetRange("Production Status", Rec."Production Status"::"Not Started", Rec."Production Status"::"On Hold");
+                                Rec.SetRange("Station Production Status", Rec."Station Production Status"::"Not Started", Rec."Station Production Status"::Started);
                                 exit;
                             end;
                         Rec.SetRange("Production Status", Rec."Production Status"::"Not Started", Rec."Production Status"::Finished);
+                        Rec.SetRange("Station Production Status", Rec."Station Production Status"::"Not Started", Rec."Station Production Status"::Finished);
                     end;
                 }
                 action(ToggleServed)
@@ -272,19 +299,30 @@ page 6150689 "NPR NPRE Kitchen Req."
         CurrPage."Kitchen Stations".Page.SetViewMode(ViewMode);
     end;
 
+    trigger OnClosePage()
+    begin
+        if TimerStarted then
+            CurrPage.TimerControl.StopTimer();
+    end;
+
     var
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         KitchenStationAction: Option "Accept Qty. Change","Start Production","End Production";
         ViewMode: Option Expedite,"Kitchen Station";
         StationNotFound: Label 'System was not able to identify kitchen station to apply the action to.';
         IsExpediteMode: Boolean;
+        TimerStarted: Boolean;
         ViewModeListLbl: Label 'Expedite View,Kitchen Station View';
 
     local procedure GetPageCaption(): Text
     var
+        NewPageCaption: Text;
         PageCaptionLbl: Label '(%1)', Locked = true;
     begin
-        exit(StrSubstNo(PageCaptionLbl, SelectStr(ViewMode + 1, ViewModeListLbl)));
+        NewPageCaption := StrSubstNo(PageCaptionLbl, SelectStr(ViewMode + 1, ViewModeListLbl));
+        if ViewMode = ViewMode::"Kitchen Station" then
+            NewPageCaption := NewPageCaption + ' - ' + Rec.GetFilter("Kitchen Station Filter");
+        exit(NewPageCaption);
     end;
 
     local procedure RunKitchenStationRelatedAction(ActionToRun: Option)

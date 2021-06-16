@@ -3,9 +3,7 @@
     var
         GlobalKitchenOrder: Record "NPR NPRE Kitchen Order";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
-        AlreadyFinishedMsg: Label 'The production of the item has already been marked as finished. Are you sure you want to start over?';
         MustBeTempMsg: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';
-        RequestCancelledMsg: Label 'The kitchen request is cancelled. Are you sure you want to continue?';
 
     procedure SendWPLinesToKitchen(var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
     var
@@ -17,7 +15,7 @@
             exit(false);
 
         if SentDateTime = 0DT then
-            SentDateTime := CurrentDateTime;
+            SentDateTime := CurrentDateTime();
 
         WaiterPadLine.Copy(WaiterPadLineIn);
         if WaiterPadLine.FindSet() then
@@ -244,7 +242,7 @@
         KitchenOrdLineStation.SetRange("Production Restaurant Code", KitchenStation."Restaurant Code");
         KitchenOrdLineStation.SetRange("Kitchen Station", KitchenStation.Code);
         KitchenOrdLineStation.SetFilter("Production Status", '<>%1', KitchenOrdLineStation."Production Status"::Cancelled);
-        if KitchenOrdLineStation.IsEmpty then begin
+        if KitchenOrdLineStation.IsEmpty() then begin
             KitchenOrdLineStation.Init();
             KitchenOrdLineStation."Request No." := KitchenRequest."Request No.";
             KitchenOrdLineStation."Line No." := KitchenRequest.GetNextStationReqLineNo();
@@ -263,7 +261,7 @@
         SeatingLocation: Record "NPR NPRE Seating Location";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        if not KitchenStationBuffer.IsTemporary then
+        if not KitchenStationBuffer.IsTemporary() then
             Error(MustBeTempMsg, 'CU6150674.FindKitchenStations');
 
         Clear(KitchenStationBuffer);
@@ -271,7 +269,7 @@
 
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
         SeatingWaiterPadLink.SetFilter("Seating Code", '<>%1', '');
-        if SeatingWaiterPadLink.IsEmpty then
+        if SeatingWaiterPadLink.IsEmpty() then
             SeatingWaiterPadLink.SetRange("Seating Code");
         if SeatingWaiterPadLink.FindFirst() then begin
             Seating.Get(SeatingWaiterPadLink."Seating Code");
@@ -305,25 +303,25 @@
         KitchenStationSelection.SetRange("Seating Location", KitchenStationSelection."Seating Location");
         KitchenStationSelection.SetRange("Serving Step", KitchenStationSelection."Serving Step");
         KitchenStationSelection.SetRange("Print Category Code", KitchenStationSelection."Print Category Code");
-        if KitchenStationSelection.IsEmpty then begin
+        if KitchenStationSelection.IsEmpty() then begin
             KitchenStationSelection.SetRange("Seating Location", '');
-            if KitchenStationSelection.IsEmpty then begin
+            if KitchenStationSelection.IsEmpty() then begin
                 KitchenStationSelection.SetRange("Seating Location", KitchenStationSelection."Seating Location");
                 KitchenStationSelection.SetRange("Serving Step", '');
-                if KitchenStationSelection.IsEmpty then begin
+                if KitchenStationSelection.IsEmpty() then begin
                     KitchenStationSelection.SetRange("Seating Location", '');
-                    if KitchenStationSelection.IsEmpty then begin
+                    if KitchenStationSelection.IsEmpty() then begin
                         KitchenStationSelection.SetRange("Seating Location", KitchenStationSelection."Seating Location");
                         KitchenStationSelection.SetRange("Serving Step", KitchenStationSelection."Serving Step");
                         KitchenStationSelection.SetRange("Print Category Code", '');
-                        if KitchenStationSelection.IsEmpty then begin
+                        if KitchenStationSelection.IsEmpty() then begin
                             KitchenStationSelection.SetRange("Seating Location", '');
-                            if KitchenStationSelection.IsEmpty then begin
+                            if KitchenStationSelection.IsEmpty() then begin
                                 KitchenStationSelection.SetRange("Seating Location", KitchenStationSelection."Seating Location");
                                 KitchenStationSelection.SetRange("Serving Step", '');
-                                if KitchenStationSelection.IsEmpty then begin
+                                if KitchenStationSelection.IsEmpty() then begin
                                     KitchenStationSelection.SetRange("Seating Location", '');
-                                    if KitchenStationSelection.IsEmpty and (KitchenStationSelection."Restaurant Code" <> '') then begin
+                                    if KitchenStationSelection.IsEmpty() and (KitchenStationSelection."Restaurant Code" <> '') then begin
                                         KitchenStationSelection."Restaurant Code" := '';
                                         exit(GetKitchenStationSelection(KitchenStationSelection));
                                     end;
@@ -345,6 +343,8 @@
     procedure StartProduction(var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
+        AlreadyFinishedMsg: Label 'Production of the item has already been marked as finished. Are you sure you want to start over?';
+        RequestCancelledMsg: Label 'The kitchen request is cancelled. Are you sure you want to continue?';
     begin
         if KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::Started then
             exit;
@@ -357,7 +357,7 @@
                 Error('');
 
         if KitchenRequestStation."Start Date-Time" = 0DT then
-            KitchenRequestStation."Start Date-Time" := CurrentDateTime;
+            KitchenRequestStation."Start Date-Time" := CurrentDateTime();
         KitchenRequestStation."End Date-Time" := 0DT;
         KitchenRequestStation."On Hold" := false;
         KitchenRequestStation."Production Status" := KitchenRequestStation."Production Status"::Started;
@@ -367,14 +367,12 @@
 
     procedure EndProduction(var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station")
     begin
-        if KitchenRequestStation."Production Status" in [KitchenRequestStation."Production Status"::"Not Started",
-        KitchenRequestStation."Production Status"::Finished, KitchenRequestStation."Production Status"::Cancelled] then
+        if KitchenRequestStation."Production Status" in
+            [KitchenRequestStation."Production Status"::"Not Started", KitchenRequestStation."Production Status"::Finished, KitchenRequestStation."Production Status"::Cancelled]
+        then
             KitchenRequestStation.FieldError("Production Status");
 
-        KitchenRequestStation."End Date-Time" := CurrentDateTime;
-        KitchenRequestStation."On Hold" := false;
-        KitchenRequestStation."Production Status" := KitchenRequestStation."Production Status"::Finished;
-        KitchenRequestStation.Modify();
+        KitchenRequestStation.SetFinished();
         UpdateRequestStatusesFromStation(KitchenRequestStation);
     end;
 
@@ -382,7 +380,7 @@
     begin
         if KitchenRequestStation."Qty. Change Not Accepted" then begin
             KitchenRequestStation."Qty. Change Not Accepted" := false;
-            KitchenRequestStation."Last Qty. Change Accepted" := CurrentDateTime;
+            KitchenRequestStation."Last Qty. Change Accepted" := CurrentDateTime();
             KitchenRequestStation.Modify();
         end;
     end;
@@ -443,7 +441,7 @@
             (KitchenRequest."Line Status" = KitchenRequest."Line Status"::"Serving Requested") and (KitchenRequest."Production Status" = KitchenRequest."Production Status"::Finished):
                 KitchenRequest."Line Status" := KitchenRequest."Line Status"::"Ready for Serving";
 
-            (KitchenRequest."Line Status" in [KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Served]) and
+            (KitchenRequest."Line Status" = KitchenRequest."Line Status"::"Ready for Serving") and
             not (KitchenRequest."Production Status" in [KitchenRequest."Production Status"::Finished, KitchenRequest."Production Status"::Cancelled]):
                 if KitchenRequest."Serving Requested Date-Time" <> 0DT then
                     KitchenRequest."Line Status" := KitchenRequest."Line Status"::"Serving Requested"
@@ -490,20 +488,47 @@
     var
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
     begin
+        if KitchenRequest.IsEmpty() then
+            exit;
+
+        CheckLineStatusesBeforeServing(KitchenRequest);
+
         if KitchenRequest.FindSet() then
             repeat
                 KitchenRequest2 := KitchenRequest;
-                SetRequestLineAsServed(KitchenRequest);
+                SetRequestLineAsServed(KitchenRequest2);
             until KitchenRequest.Next() = 0;
     end;
 
     local procedure SetRequestLineAsServed(var KitchenRequest: Record "NPR NPRE Kitchen Request")
     begin
-        KitchenRequest.TestField("Line Status", KitchenRequest."Line Status"::"Ready for Serving");
+        if KitchenRequest."Line Status" in [KitchenRequest."Line Status"::Served, KitchenRequest."Line Status"::Cancelled] then
+            KitchenRequest.FieldError("Line Status");
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::Served;
         KitchenRequest.Modify();
 
+        CancelKitchenStationRequests(KitchenRequest, true);
         UpdateOrderStatus(KitchenRequest."Order ID");
+    end;
+
+    local procedure CheckLineStatusesBeforeServing(var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        KitchenRequest2: Record "NPR NPRE Kitchen Request";
+        AlreadyServedOrCancelledMsg: Label 'Served or cancelled kitchen requests have been skipped, as those cannot be served again.';
+        ConfirmServingQst: Label 'One or more selected serving requests are not in Ready for Serving status. Are you sure want to mark them as served anyway?';
+    begin
+        KitchenRequest2.Copy(KitchenRequest);
+        KitchenRequest2.FilterGroup(2);
+        KitchenRequest2.SetRange("Line Status", KitchenRequest2."Line Status"::Served, KitchenRequest2."Line Status"::Cancelled);
+        if not KitchenRequest2.IsEmpty() then
+            Message(AlreadyServedOrCancelledMsg);
+        KitchenRequest2.SetRange("Line Status", KitchenRequest2."Line Status"::"Serving Requested", KitchenRequest2."Line Status"::Planned);
+        if not KitchenRequest2.IsEmpty() then
+            if not Confirm(ConfirmServingQst, false) then
+                Error('');
+        KitchenRequest2.SetRange("Line Status", KitchenRequest2."Line Status"::"Ready for Serving", KitchenRequest2."Line Status"::Planned);
+        KitchenRequest2.FilterGroup(0);
+        KitchenRequest.Copy(KitchenRequest2);
     end;
 
     procedure KDSAvailable(): Boolean
@@ -565,12 +590,11 @@
             until KitchenReqSourceLink.Next() = 0;
     end;
 
-    procedure CancelKitchenOrder(var KitchenOrderIn: Record "NPR NPRE Kitchen Order")
+    procedure CancelKitchenOrder(var KitchenOrder: Record "NPR NPRE Kitchen Order")
     var
-        KitchenOrder: Record "NPR NPRE Kitchen Order";
         KitchenRequest: Record "NPR NPRE Kitchen Request";
+        KitchenRequest2: Record "NPR NPRE Kitchen Request";
     begin
-        KitchenOrder := KitchenOrderIn;
         KitchenOrder.Status := KitchenOrder.Status::Cancelled;
         KitchenOrder.Modify();
 
@@ -578,16 +602,58 @@
         KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
         if KitchenRequest.FindSet() then
             repeat
-                CancelKitchenRequest(KitchenRequest);
+                KitchenRequest := KitchenRequest2;
+                CancelKitchenRequest(KitchenRequest2);
             until KitchenRequest.Next() = 0;
     end;
 
-    procedure CancelKitchenRequest(var KitchenRequestIn: Record "NPR NPRE Kitchen Request")
-    var
-        KitchenRequest: Record "NPR NPRE Kitchen Request";
+    procedure CancelKitchenRequest(var KitchenRequest: Record "NPR NPRE Kitchen Request")
     begin
-        KitchenRequest := KitchenRequestIn;
-        KitchenRequest."Line Status" := KitchenRequest."Line Status"::Cancelled;
-        KitchenRequest.Modify();
+        if not (KitchenRequest."Line Status" in [KitchenRequest."Line Status"::Served, KitchenRequest."Line Status"::Cancelled]) then begin
+            KitchenRequest."Line Status" := KitchenRequest."Line Status"::Cancelled;
+            KitchenRequest.Modify();
+        end;
+
+        CancelKitchenStationRequests(KitchenRequest, false);
+    end;
+
+    procedure CancelKitchenStationRequests(var KitchenRequest: Record "NPR NPRE Kitchen Request"; HandleNotFinished: Boolean)
+    var
+        KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
+        KitchenRequestStation2: Record "NPR NPRE Kitchen Req. Station";
+    begin
+        KitchenRequestStation.SetRange("Request No.", KitchenRequest."Request No.");
+        KitchenRequest.CopyFilter("Kitchen Station Filter", KitchenRequestStation."Kitchen Station");
+        if KitchenRequestStation.FindSet() then
+            repeat
+                KitchenRequestStation2 := KitchenRequestStation;
+                CancelKitchenStationRequest(KitchenRequest, KitchenRequestStation2, HandleNotFinished);
+            until KitchenRequestStation.Next() = 0;
+    end;
+
+    procedure CancelKitchenStationRequest(KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station"; HandleNotFinished: Boolean)
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+        HandleAction: Integer;
+    begin
+        if KitchenRequestStation."Production Status" in [KitchenRequestStation."Production Status"::Finished, KitchenRequestStation."Production Status"::Cancelled] then
+            exit;
+
+        if HandleNotFinished then begin
+            SetupProxy.SetRestaurant(KitchenRequest."Restaurant Code");
+            HandleAction := SetupProxy.StationReqHandlingOnServing();
+            case true of
+                (HandleAction = Restaurant."Station Req. Handl. On Serving"::"Finish All"),
+                (HandleAction in [Restaurant."Station Req. Handl. On Serving"::"Finish Started", Restaurant."Station Req. Handl. On Serving"::"Finish Started/Cancel Not Started"]) and
+                (KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::Started):
+                    KitchenRequestStation.SetFinished();
+
+                (HandleAction = Restaurant."Station Req. Handl. On Serving"::"Cancel All Unfinished"),
+                (HandleAction = Restaurant."Station Req. Handl. On Serving"::"Finish Started/Cancel Not Started") and
+                (KitchenRequestStation."Production Status" = KitchenRequestStation."Production Status"::"Not Started"):
+                    KitchenRequestStation.SetCancelled();
+            end;
+        end else
+            KitchenRequestStation.SetCancelled();
     end;
 }

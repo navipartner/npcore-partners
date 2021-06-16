@@ -81,4 +81,18 @@ table 6150679 "NPR NPRE Kitchen Req. Station"
         {
         }
     }
+
+    procedure SetFinished()
+    begin
+        "End Date-Time" := CurrentDateTime();
+        "On Hold" := false;
+        "Production Status" := "Production Status"::Finished;
+        Modify();
+    end;
+
+    procedure SetCancelled()
+    begin
+        "Production Status" := "Production Status"::Cancelled;
+        Modify();
+    end;
 }

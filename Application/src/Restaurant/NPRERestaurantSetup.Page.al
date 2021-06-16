@@ -99,6 +99,11 @@ page 6150669 "NPR NPRE Restaurant Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Order ID Assign. Method field';
                     }
+                    field("Station Req. Handl. On Serving"; Rec."Station Req. Handl. On Serving")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies how kitchen station production requests should be handled, if product has been served prior to finishing production';
+                    }
                 }
             }
             group(POSActions)
