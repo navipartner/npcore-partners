@@ -335,26 +335,32 @@ table 6014410 "NPR Item Group"
         key(Key1; "No.")
         {
             ObsoleteState = Removed;
+            ObsoleteReason = 'Key Removed';
         }
         key(Key2; "Entry No.", "Primary Key Length")
         {
             ObsoleteState = Removed;
+            ObsoleteReason = 'Key Removed';
         }
         key(Key3; "Parent Item Group No.")
         {
             ObsoleteState = Removed;
+            ObsoleteReason = 'Key Removed';
         }
         key(Key4; "Main Item Group")
         {
             ObsoleteState = Removed;
+            ObsoleteReason = 'Key Removed';
         }
         key(Key5; "Sorting-Key")
         {
             ObsoleteState = Removed;
+            ObsoleteReason = 'Key Removed';
         }
         key(Key6; Description)
         {
             ObsoleteState = Removed;
+            ObsoleteReason = 'Key Removed';
         }
     }
 }
