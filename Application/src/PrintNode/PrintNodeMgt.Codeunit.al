@@ -138,7 +138,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
         if not JObject.SelectToken(JPath, JToken) then begin
             if WithError then begin
                 JObject.WriteTo(JSonString);
-                Error(StrSubstNo(KeyNotFoundTxt, JPath, JSonString));
+                Error(KeyNotFoundTxt, JPath, JSonString);
             end;
             exit(false);
         end;

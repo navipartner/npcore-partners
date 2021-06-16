@@ -100,6 +100,6 @@
         MagentoAttributeGroup.SetFilter(Description, '%1', Rec.Description);
         MagentoAttributeGroup.SetRange("Attribute Set ID", Rec."Attribute Set ID");
         if MagentoAttributeGroup.FindFirst() then
-            Error(StrSubstNo(Text00001, Rec."Attribute Set ID", Rec.Description));
+            Error(Text00001, Rec."Attribute Set ID", Rec.Description);
     end;
 }

@@ -524,7 +524,7 @@ table 6184490 "NPR Pepper Config."
     begin
         if ("Min. Length Authorisation No." <> 0) and ("Max. Length Authorisation No." <> 0) then
             if "Min. Length Authorisation No." > "Max. Length Authorisation No." then
-                Error(StrSubstNo(Txt001, FieldCaption("Min. Length Authorisation No."), FieldCaption("Max. Length Authorisation No.")));
+                Error(Txt001, FieldCaption("Min. Length Authorisation No."), FieldCaption("Max. Length Authorisation No."));
     end;
 }
 

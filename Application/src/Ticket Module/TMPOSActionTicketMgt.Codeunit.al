@@ -786,7 +786,7 @@
 
         if (AdmissionCode <> '') then
             if (not Admission.Get(AdmissionCode)) then
-                Error(StrSubstNo(INVALID_ADMISSION, 'Admission Code', AdmissionCode));
+                Error(INVALID_ADMISSION, 'Admission Code', AdmissionCode);
 
         TicketRequestManager.LockResources();
         TicketManagement.ValidateTicketForDeparture(1, ExternalTicketNumber, AdmissionCode);
@@ -802,7 +802,7 @@
 
         if (AdmissionCode <> '') then begin
             if (not Admission.Get(AdmissionCode)) then
-                Error(StrSubstNo(INVALID_ADMISSION, 'Admission Code', AdmissionCode));
+                Error(INVALID_ADMISSION, 'Admission Code', AdmissionCode);
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         end;
 

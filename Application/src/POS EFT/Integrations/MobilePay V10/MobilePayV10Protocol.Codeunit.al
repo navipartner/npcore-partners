@@ -713,7 +713,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     if jsonResponse.SelectToken('code', jsonToken) then begin
                         errorCode := jsonToken.AsValue().AsText();
                         if jsonResponse.SelectToken('message', jsonToken) then begin
-                            error(StrSubstNo(errorCodeLbl, errorCode, jsonToken.AsValue().AsText()));
+                            error(errorCodeLbl, errorCode, jsonToken.AsValue().AsText());
                         end;
 
                         error(errorCode);
