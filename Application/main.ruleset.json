@@ -123,6 +123,11 @@
             "justification": "To avoid confusion, do not give methods the same name as fields or actions in the same scope."
         },
         {
+            "id": "AA0207",
+            "action":"Error",
+            "justification": "The EventSubscriber method must be local."
+        },
+        {
             "id": "AA0211",
             "action":"Error",
             "justification": "The CalcFields method should only be used with FlowFields or fields of type Blob. The field Cost Amount (Actual) is not a FlowField or of type Blob."

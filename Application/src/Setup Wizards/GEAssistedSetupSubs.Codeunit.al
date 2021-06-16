@@ -9,7 +9,7 @@ codeunit 6014490 "NPR GE Assisted Setup Subs"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Guided Experience", 'OnAfterRunAssistedSetup', '', false, false)]
-    procedure UpdateSetupStatus_OnUpdateAssistedSetupStatusp(ExtensionID: Guid; ObjectID: Integer; ObjectType: ObjectType)
+    local procedure UpdateSetupStatus_OnUpdateAssistedSetupStatusp(ExtensionID: Guid; ObjectID: Integer; ObjectType: ObjectType)
     begin
         UpdateMagentoWizardStatus();
     end;
