@@ -97,7 +97,7 @@ then begin
         CodeBarcode := CopyStr(iBarcode, 1, MaxStrLen(CodeBarcode));
 
         if not BarCodeIsExchangeLabel(CodeBarcode) then
-            Error(StrSubstNo(ErrNotExchLabel, iBarcode));
+            Error(ErrNotExchLabel, iBarcode);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

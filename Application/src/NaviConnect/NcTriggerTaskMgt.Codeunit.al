@@ -19,7 +19,7 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
         NcTriggerCode := '';
         if GetNcTriggerCode(Rec, NcTriggerCode) then begin
             if not IsEnabled(NcTriggerCode) then
-                Error(StrSubstNo(TriggerDisabledErr, NcTriggerCode));
+                Error(TriggerDisabledErr, NcTriggerCode);
             AddOutputToTask(NcTriggerCode, Rec, Output, CurrentIteration, MaxIteration, Filename, Subject, Body);
             ExpectedIteration := 1;
             if CurrentIteration < MaxIteration then

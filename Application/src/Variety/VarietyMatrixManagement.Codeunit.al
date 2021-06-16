@@ -7,6 +7,7 @@
         Text002: Label 'You can''t update %1 from this form';
         Text003: Label 'This Barcode cant be used, because its already used on item %1';
         NotUsedText: Label 'Not Used';
+        FieldTypeNotSupported: Label 'FieldType Not Supported %1';
 
     procedure SetRecord(MasterRecRef: RecordRef; ItemNo: Code[20])
     begin
@@ -170,7 +171,7 @@
                                     FRef.Value(Bool);
                             end;
                         else
-                            Error('FieldType Not Supported ' + Format(FRef.Type));
+                            Error(FieldTypeNotSupported, Format(FRef.Type));
                     end;
                     RecRef.Modify();
                 end;

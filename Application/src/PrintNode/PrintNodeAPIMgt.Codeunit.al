@@ -75,7 +75,7 @@ codeunit 6151220 "NPR PrintNode API Mgt."
         ResponseMessage.Content().ReadAs(ResponseText);
 
         if not ResponseMessage.IsSuccessStatusCode then
-            Error(StrSubstNo(ServiceResultTxt, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ResponseText));
+            Error(ServiceResultTxt, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ResponseText);
 
         JArray.ReadFrom(ResponseText);
     end;
