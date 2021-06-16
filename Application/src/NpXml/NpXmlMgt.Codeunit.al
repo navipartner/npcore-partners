@@ -738,7 +738,7 @@
         end;
 
         AddTextToResponseTempBlob(StrSubstNo(Error003, StatusCode, ErrorDescription));
-        Error(StrSubstNo(Error003, StatusCode, ErrorDescription));
+        Error(Error003, StatusCode, ErrorDescription);
     end;
 
     local procedure TransferXml(NpXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text[250]): Boolean

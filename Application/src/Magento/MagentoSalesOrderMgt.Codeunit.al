@@ -731,7 +731,7 @@
         end;
         if not Item.Get(ItemNo) then
             if not (TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, TableId)) then
-                Error(StrSubstNo(Error002, ExternalItemNo, XmlElement.Name));
+                Error(Error002, ExternalItemNo, XmlElement.Name);
 
         if VariantCode <> '' then
             ItemVariant.Get(ItemNo, VariantCode);

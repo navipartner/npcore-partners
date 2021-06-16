@@ -1,7 +1,7 @@
 ﻿codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
 {
     var
-        Text000: Label 'Quickpay error:\%1';
+        Text000: Label 'Quickpay error:\%1 - %2  \%3';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', false, false)]
     local procedure CapturePaymentSalesInvoice(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
@@ -131,7 +131,7 @@
         HttpWebResponse.Content.ReadAs(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo(Text000 + ' - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error(Text000, HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
     end;
 
     local procedure SetupHttpWebRequest(var HttpWebRequest: HttpRequestMessage; RequestMethod: Code[10]; PaymentLine: Record "NPR Magento Payment Line"; RequestService: Text; RequestBody: Text)

@@ -509,7 +509,7 @@
             if AttributeValueSet.FindSet() then
                 repeat
                     if not AttributeID.Get(DATABASE::Item, AttributeValueSet."Attribute Code") then
-                        Error(StrSubstNo(TxtAttributeNotSetUp, AttributeValueSet."Attribute Code", ItemWkshLine."Item No."));
+                        Error(TxtAttributeNotSetUp, AttributeValueSet."Attribute Code", ItemWkshLine."Item No.");
                     AttributeManagement.SetMasterDataAttributeValue(DATABASE::Item, AttributeID."Shortcut Attribute ID", ItemWkshLine."Item No.", AttributeValueSet."Text Value");
                 until AttributeValueSet.Next() = 0;
         end;

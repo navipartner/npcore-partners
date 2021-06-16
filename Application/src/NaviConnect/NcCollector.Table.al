@@ -157,7 +157,7 @@ table 6151525 "NPR Nc Collector"
     local procedure CheckCriteriaActiveCollector()
     begin
         if Active and ("Wait to Send" = 0) and ("Max. Lines per Collection" = 0) then
-            Error(StrSubstNo(TxtActivationNotAllowed, Code, FieldCaption("Wait to Send"), FieldCaption("Max. Lines per Collection")));
+            Error(TxtActivationNotAllowed, Code, FieldCaption("Wait to Send"), FieldCaption("Max. Lines per Collection"));
     end;
 }
 

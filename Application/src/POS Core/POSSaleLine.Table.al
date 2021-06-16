@@ -1706,8 +1706,7 @@ table 6014406 "NPR POS Sale Line"
         TotalItemLedgerEntryQuantity: Decimal;
         TotalAuditRollQuantity: Decimal;
         SkipCalcDiscount: Boolean;
-        Text002: Label '%1 %2 is used more than once.';
-        Text003: Label 'Adjust the inventory first, and then continue the transaction';
+        Text002: Label '%1 %2 is used more than once. Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
         ERR_EFT_DELETE: Label 'Cannot delete externally approved electronic funds transfer. Please attempt refund or void of the original transaction instead.';
         SkipDependantQuantityUpdate: Boolean;
@@ -1857,7 +1856,7 @@ table 6014406 "NPR POS Sale Line"
             ItemLedgerEntry.CalcSums(Quantity);
             TotalItemLedgerEntryQuantity := ItemLedgerEntry.Quantity;
             if ItemLedgerEntry.Count() > 1 then
-                Error(Text002 + Text003, FieldName("Serial No."), "Serial No.");
+                Error(Text002, FieldName("Serial No."), "Serial No.");
         end;
     end;
 

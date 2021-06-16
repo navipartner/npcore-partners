@@ -29,7 +29,7 @@
             StartPos := StrPos(NewLine, StartTag);
             EndPos := StrPos(NewLine, EndTag);
             if EndPos = 0 then
-                Error(StrSubstNo(Text003, EndTag, StartTag, Line));
+                Error(Text003, EndTag, StartTag, Line);
             Evaluate(FieldNo, CopyStr(NewLine, StartPos + StartLength, EndPos - StartPos - StartLength));
 
             NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + EndLength);

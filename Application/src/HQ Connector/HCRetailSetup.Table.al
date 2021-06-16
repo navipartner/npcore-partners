@@ -27,8 +27,7 @@ table 6150904 "NPR HC Retail Setup"
             begin
                 if "Amount Rounding Precision" <> 0 then
                     if not Evaluate(Integer, StrSubstNo(t001, 1 / "Amount Rounding Precision")) then
-                        Error(Text1060006 +
-                              Text1060007);
+                        Error(Text1060006);
             end;
         }
         field(20; "Posting Source Code"; Code[10])
@@ -128,7 +127,6 @@ table 6150904 "NPR HC Retail Setup"
     }
 
     var
-        Text1060006: Label 'Rounding precision must be divisible by 1.';
-        Text1060007: Label 'Example: 0,25 * 4 = 1';
+        Text1060006: Label 'Rounding precision must be divisible by 1. Example: 0,25 * 4 = 1';
 }
 

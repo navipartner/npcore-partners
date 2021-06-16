@@ -101,7 +101,7 @@
             XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
             ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
             ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
         end;
     end;
 
@@ -232,7 +232,7 @@
             XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
             ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
             ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
         end;
     end;
 
@@ -348,7 +348,7 @@
             XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
             ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
             ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
         end;
     end;
 
@@ -426,7 +426,7 @@
             XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
             ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
             ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
         end;
 
         Response.Content.ReadAs(ResponseText);
@@ -549,7 +549,7 @@
             XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
             ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
             ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
         end;
     end;
 
@@ -629,7 +629,7 @@
             XmlDocument.ReadFrom(ResponseText, ErrorXmlDoc);
             ErrorXmlDoc.SelectSingleNode('//Envelope/Body/Fault/faultstring', ErrorXmlNode);
             ErrorXmlElement := ErrorXmlNode.AsXmlElement();
-            Error(Response.ReasonPhrase + '\\' + ErrorXmlElement.InnerText);
+            Error('%1\\%2', Response.ReasonPhrase, ErrorXmlElement.InnerText);
         end;
     end;
 

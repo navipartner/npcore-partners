@@ -360,7 +360,7 @@ page 6151222 "NPR PrintNode Printer Settings"
         if not JObject.Get(TokenKey, JToken) then begin
             if WithError then begin
                 JObject.WriteTo(JSonString);
-                Error(StrSubstNo(KeyNotFoundTxt, TokenKey, JSonString));
+                Error(KeyNotFoundTxt, TokenKey, JSonString);
             end;
             exit(false);
         end;

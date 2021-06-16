@@ -190,15 +190,15 @@
 
         Item.Get(ItemNo);
         if (not TicketType.Get(Item."NPR Ticket Type")) then
-            Error(StrSubstNo(NOT_TICKET_ITEM, ItemNo, Item.FieldCaption("NPR Ticket Type"), Item."NPR Ticket Type"));
+            Error(NOT_TICKET_ITEM, ItemNo, Item.FieldCaption("NPR Ticket Type"), Item."NPR Ticket Type");
 
         if ((not TicketType."Is Ticket") or (TicketType.Code = '')) then
-            Error(StrSubstNo(NOT_TICKET_ITEM, ItemNo, Item.FieldCaption("NPR Ticket Type"), Item."NPR Ticket Type"));
+            Error(NOT_TICKET_ITEM, ItemNo, Item.FieldCaption("NPR Ticket Type"), Item."NPR Ticket Type");
 
         TicketBom.SetFilter("Item No.", '=%1', ItemNo);
         TicketBom.SetFilter("Variant Code", '=%1', VariantCode);
         if (TicketBom.IsEmpty()) then
-            Error(StrSubstNo(NO_TICKET_BOM, TicketBom.TableCaption, TicketBom.GetFilters));
+            Error(NO_TICKET_BOM, TicketBom.TableCaption, TicketBom.GetFilters);
 
         TicketBom.Reset();
 
@@ -431,10 +431,10 @@
         if ((TicketBom.Default) and (Quantity > 0)) then begin
 
             if ((TicketBom."Sales From Date" <> 0D) and (ReferenceDate < TicketBom."Sales From Date")) then
-                Error(StrSubstNo(SALES_NOT_STARTED_1200, TicketBom."Sales From Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code"));
+                Error(SALES_NOT_STARTED_1200, TicketBom."Sales From Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code");
 
             if ((TicketBom."Sales Until Date" <> 0D) and (ReferenceDate > TicketBom."Sales Until Date")) then
-                Error(StrSubstNo(SALES_STOPPED_1201, TicketBom."Sales Until Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code"));
+                Error(SALES_STOPPED_1201, TicketBom."Sales Until Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code");
 
         end;
 

@@ -25,7 +25,7 @@
         if GenJnlCheckLine.DateNotAllowed(POSEntry."Posting Date") then
             POSEntry.FieldError("Posting Date", TextDateNotAllowed);
         if POSEntry."Post Item Entry Status" = POSEntry."Post Entry Status"::Posted then
-            Error(StrSubstNo(TextAllreadyPosted, POSEntry."Entry No."));
+            Error(TextAllreadyPosted, POSEntry."Entry No.");
 
         CheckPostingrestrictions(POSEntry);
 

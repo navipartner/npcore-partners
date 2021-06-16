@@ -275,14 +275,14 @@
     begin
         if BarCode <> '' then
             if not IsInternalBarcode(BarCode) then
-                Error(StrSubstNo(InternalBarcodeErr, BarCode));
+                Error(InternalBarcodeErr, BarCode);
     end;
 
     procedure CheckExternalBarCode(BarCode: Code[20])
     begin
         if BarCode <> '' then
             if IsInternalBarcode(BarCode) then
-                Error(StrSubstNo(ExternalBarcodeErr, BarCode));
+                Error(ExternalBarcodeErr, BarCode);
     end;
 
     procedure IsInternalBarcode(BarCode: Code[20]): Boolean

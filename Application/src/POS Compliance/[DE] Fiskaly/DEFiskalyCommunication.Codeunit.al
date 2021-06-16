@@ -251,7 +251,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         HttpWebResponse.Content.ReadAs(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
         ResponseJsonPar.ReadFrom(Response);
         CheckForErrors(ResponseJsonPar, RequestBodyTxt);
@@ -297,7 +297,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
             ErrorMessage += '; ' + HTTPErrorMessageLbl + Base64Convert.FromBase64(HTTPMessageToken.AsValue().AsText());
 
         ErrorMessage += '\' + RequestJsonLbl + '\';
-        Error(ErrorMessage + '\' + RequestJsonPar);
+        Error('%1\%2', ErrorMessage, RequestJsonPar);
     end;
 
     [TryFunction]
@@ -333,7 +333,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         HttpWebResponse.Content.ReadAs(Response);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
         ResponseJsonPar.ReadFrom(Response);
     end;

@@ -188,6 +188,11 @@
             "justification": "The value of the Caption property of Fields must be filled in."
         },
         {
+            "id": "AA0231",
+            "action":"Error",
+            "justification": "StrSubstNo or string concatenation must not be used as a parameter in the Error method."
+        },    
+        {
             "id": "AA0233",
             "action":"Error",
             "justification": "The 'FindFirst', 'FindLast' and 'Get' methods must be used without the Next() method."

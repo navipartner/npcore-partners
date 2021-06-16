@@ -333,7 +333,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         XmlDocument.ReadFrom(XmlAsText, XmlResponseDoc);
 
         if (not XmlResponseDoc.GetRoot(Element)) then
-            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlAsText)));
+            Error(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlAsText));
 
         // Status
         ElementPath := '//Body/ReservePoints_Result/reservePoints/Response/';
@@ -394,7 +394,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         XmlDocument.ReadFrom(XmlAsText, XmlResponseDoc);
 
         if (not XmlResponseDoc.GetRoot(Element)) then
-            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlAsText)));
+            Error(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlAsText));
 
         // Status
         ElementPath := '//Body/RegisterSale_Result/registerSale/Response/';
