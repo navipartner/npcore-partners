@@ -61,6 +61,13 @@ table 6150669 "NPR NPRE Restaurant Setup"
             Caption = 'KDS Active';
             DataClassification = CustomerContent;
         }
+        field(40; "Station Req. Handl. On Serving"; Option)
+        {
+            Caption = 'Station Req. Handl. On Serving';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Do Nothing,Finish Started,Finish All,Finish Started/Cancel Not Started,Cancel All Unfinished';
+            OptionMembers = "Do Nothing","Finish Started","Finish All","Finish Started/Cancel Not Started","Cancel All Unfinished";
+        }
         field(60; "Order ID Assign. Method"; Option)
         {
             Caption = 'Order ID Assign. Method';

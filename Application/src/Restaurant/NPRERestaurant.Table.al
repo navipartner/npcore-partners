@@ -38,6 +38,13 @@ table 6150681 "NPR NPRE Restaurant"
             OptionCaption = 'Default,No,Yes,Ask';
             OptionMembers = Default,No,Yes,Ask;
         }
+        field(30; "Station Req. Handl. On Serving"; Option)
+        {
+            Caption = 'Station Req. Handl. On Serving';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Default,Do Nothing,Finish Started,Finish All,Finish Started/Cancel Not Started,Cancel All Unfinished';
+            OptionMembers = Default,"Do Nothing","Finish Started","Finish All","Finish Started/Cancel Not Started","Cancel All Unfinished";
+        }
         field(40; "Kitchen Printing Active"; Option)
         {
             Caption = 'Kitchen Printing Active';
