@@ -102,8 +102,9 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         ReturnRcptHeader: Record "Return Receipt Header";
-        ReportSelection: Record "Report Selections";
         "Record": Variant;
+        ReportUsage: Enum "Report Selection Usage";
+        CurstomerNoFieldNo: Integer;
     begin
         //Can be silent in webclient via REPORT.RUN wrapper and does not auto print shipment or receivals unless nothing was invoiced.
         case Type of
@@ -115,14 +116,16 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
                                 if SalesHeader.Invoice then begin
                                     SalesInvHeader."No." := SalesHeader."Last Posting No.";
                                     SalesInvHeader.SetRecFilter();
-                                    Record := SalesInvHeader;
-                                    ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Invoice");
+                                    "Record" := SalesInvHeader;
+                                    CurstomerNoFieldNo := SalesInvHeader.FieldNo("Bill-to Customer No.");
+                                    ReportUsage := ReportUsage::"S.Invoice";
                                 end else
                                     if SalesHeader.Ship then begin
                                         SalesShptHeader."No." := SalesHeader."Last Shipping No.";
                                         SalesShptHeader.SetRecFilter();
-                                        Record := SalesShptHeader;
-                                        ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Shipment");
+                                        "Record" := SalesShptHeader;
+                                        CurstomerNoFieldNo := SalesShptHeader.FieldNo("Sell-to Customer No.");
+                                        ReportUsage := ReportUsage::"S.Shipment";
                                     end;
                             end;
                         SalesHeader."Document Type"::Invoice:
@@ -132,22 +135,25 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
                                 else
                                     SalesInvHeader."No." := SalesHeader."Last Posting No.";
                                 SalesInvHeader.SetRecFilter();
-                                Record := SalesInvHeader;
-                                ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Invoice");
+                                "Record" := SalesInvHeader;
+                                CurstomerNoFieldNo := SalesInvHeader.FieldNo("Bill-to Customer No.");
+                                ReportUsage := ReportUsage::"S.Invoice";
                             end;
                         SalesHeader."Document Type"::"Return Order":
                             begin
                                 if SalesHeader.Invoice then begin
                                     SalesCrMemoHeader."No." := SalesHeader."Last Posting No.";
                                     SalesCrMemoHeader.SetRecFilter();
-                                    Record := SalesCrMemoHeader;
-                                    ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Cr.Memo");
+                                    "Record" := SalesCrMemoHeader;
+                                    CurstomerNoFieldNo := SalesCrMemoHeader.FieldNo("Bill-to Customer No.");
+                                    ReportUsage := ReportUsage::"S.Cr.Memo";
                                 end else
                                     if SalesHeader.Receive then begin
                                         ReturnRcptHeader."No." := SalesHeader."Last Return Receipt No.";
                                         ReturnRcptHeader.SetRecFilter();
-                                        Record := ReturnRcptHeader;
-                                        ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Ret.Rcpt.");
+                                        "Record" := ReturnRcptHeader;
+                                        CurstomerNoFieldNo := ReturnRcptHeader.FieldNo("Sell-to Customer No.");
+                                        ReportUsage := ReportUsage::"S.Ret.Rcpt.";
                                     end;
                             end;
                         SalesHeader."Document Type"::"Credit Memo":
@@ -157,28 +163,31 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
                                 else
                                     SalesCrMemoHeader."No." := SalesHeader."Last Posting No.";
                                 SalesCrMemoHeader.SetRecFilter();
-                                Record := SalesCrMemoHeader;
-                                ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Cr.Memo");
+                                "Record" := SalesCrMemoHeader;
+                                CurstomerNoFieldNo := SalesCrMemoHeader.FieldNo("Bill-to Customer No.");
+                                ReportUsage := ReportUsage::"S.Cr.Memo";
                             end;
                     end;
                 end;
             Type::PrepayInvoice:
                 begin
-                    ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Invoice");
                     SalesInvHeader."No." := SalesHeader."Last Prepayment No.";
                     SalesInvHeader.SetRecFilter();
-                    Record := SalesInvHeader;
+                    "Record" := SalesInvHeader;
+                    CurstomerNoFieldNo := SalesInvHeader.FieldNo("Bill-to Customer No.");
+                    ReportUsage := ReportUsage::"S.Invoice";
                 end;
             Type::PrepayCredit:
                 begin
-                    ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Cr.Memo");
                     SalesCrMemoHeader."No." := SalesHeader."Last Prepmt. Cr. Memo No.";
                     SalesCrMemoHeader.SetRecFilter();
-                    Record := SalesCrMemoHeader;
+                    "Record" := SalesCrMemoHeader;
+                    CurstomerNoFieldNo := SalesCrMemoHeader.FieldNo("Bill-to Customer No.");
+                    ReportUsage := ReportUsage::"S.Cr.Memo";
                 end;
         end;
 
-        PrintReportSelection(ReportSelection, Record);
+        PrintReportSelection_Customer(ReportUsage, "Record", CurstomerNoFieldNo);
     end;
 
     procedure SendPdf2NavDocument(SalesHeader: Record "Sales Header"; Type: Option Standard,PrepayInvoice,PrepayCredit)
@@ -188,6 +197,14 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
         SalesPostandPdf2Nav.DontHandlePrint();
         SalesPostandPdf2Nav.SetMode(Type);
         SalesPostandPdf2Nav.GetReport(SalesHeader);
+    end;
+
+    local procedure PrintReportSelection_Customer(ReportUsage: Enum "Report Selection Usage"; var RecordVariant: Variant; CustomerNoFieldNo: Integer)
+    var
+        TempReportSelections: Record "Report Selections" temporary;
+    begin
+        TempReportSelections.FindReportUsageForCust(ReportUsage, GetAccountNo(RecordVariant, CustomerNoFieldNo), TempReportSelections);
+        PrintReportSelection(TempReportSelections, RecordVariant);
     end;
 
     procedure PrintReportSelection(var ReportSelections: Record "Report Selections"; var RecordVariant: Variant)
@@ -201,8 +218,22 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
             exit;
 
         repeat
-            ReportPrinterInterface.RunReport(ReportSelections."Report ID", false, false, RecordVariant);
+            ReportPrinterInterface.RunReport(ReportSelections."Report ID", ReportSelections."Custom Report Layout Code", false, false, RecordVariant);
         until ReportSelections.Next() = 0;
     end;
-}
 
+    local procedure GetAccountNo(var RecordVariant: Variant; AccountNoFieldNo: Integer): Code[20]
+    var
+        RecRef: RecordRef;
+        AccountNoFieldRef: FieldRef;
+    begin
+        if AccountNoFieldNo <> 0 then begin
+            RecRef.GetTable(RecordVariant);
+            if RecRef.Find() then begin
+                AccountNoFieldRef := RecRef.Field(AccountNoFieldNo);
+                exit(CopyStr(AccountNoFieldRef.Value, 1, 20));
+            end;
+        end;
+        exit('');
+    end;
+}

@@ -5,12 +5,18 @@ codeunit 6014583 "NPR Report Printer Interface"
     end;
 
     var
+        ReportLayoutSelection: Record "Report Layout Selection";
         SuppressError: Boolean;
         LastErrorText: Text;
         Err_ReportPrint: Label 'Error when printing report %1 %2';
         RecordSpecified: Boolean;
 
     procedure RunReport(Number: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
+    begin
+        RunReport(Number, '', ReqWindow, SystemPrinter, "Record");
+    end;
+
+    procedure RunReport(Number: Integer; CustomReportLayoutCode: Code[20]; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
     var
         POSSession: Codeunit "NPR POS Session";
         POSFrontEndMgt: Codeunit "NPR POS Front End Management";
@@ -21,28 +27,35 @@ codeunit 6014583 "NPR Report Printer Interface"
 
         if GuiAllowed then
             if not POSSession.IsActiveSession(POSFrontEndMgt) then begin
-                RunStandardReportFlow(Number, ReqWindow, SystemPrinter, Record);
+                RunStandardReportFlow(Number, CustomReportLayoutCode, ReqWindow, SystemPrinter, Record);
                 exit;
             end;
 
         if not ObjectOutputMgt.TryGetOutputRec(ObjectOutputSelection."Object Type"::Report, Number, '', UserId, ObjectOutputSelection) then begin
             if GuiAllowed then
-                RunStandardReportFlow(Number, ReqWindow, SystemPrinter, Record);
+                RunStandardReportFlow(Number, CustomReportLayoutCode, ReqWindow, SystemPrinter, Record);
             exit;
         end;
 
-        RunCustomReportFlow(Number, ReqWindow, Record, ObjectOutputSelection);
+        RunCustomReportFlow(Number, CustomReportLayoutCode, ReqWindow, Record, ObjectOutputSelection);
     end;
 
-    local procedure RunStandardReportFlow(Number: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
+    local procedure RunStandardReportFlow(Number: Integer; CustomReportLayoutCode: Code[20]; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
     begin
+        if CustomReportLayoutCode <> '' then
+            ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutCode)
+        else
+            ReportLayoutSelection.SetTempLayoutSelected('');
+
         if RecordSpecified then
             REPORT.Run(Number, ReqWindow, SystemPrinter, Record)
         else
             REPORT.Run(Number, ReqWindow, SystemPrinter);
+
+        ReportLayoutSelection.SetTempLayoutSelected('');
     end;
 
-    local procedure RunCustomReportFlow(Number: Integer; ReqWindow: Boolean; "Record": Variant; ObjectOutputSelection: Record "NPR Object Output Selection")
+    local procedure RunCustomReportFlow(Number: Integer; CustomReportLayoutCode: Code[20]; ReqWindow: Boolean; "Record": Variant; ObjectOutputSelection: Record "NPR Object Output Selection")
     var
         PDFStream: DotNet NPRNetMemoryStream;
     begin
@@ -51,7 +64,7 @@ codeunit 6014583 "NPR Report Printer Interface"
                                                         ObjectOutputSelection."Output Type"::"E-mail"]) then
             ObjectOutputSelection.FieldError("Output Type");
 
-        if not CreatePDF(Number, ReqWindow, Record, PDFStream) then
+        if not CreatePDF(Number, CustomReportLayoutCode, ReqWindow, Record, PDFStream) then
             exit;
 
         if PDFStream.Length < 1 then
@@ -78,11 +91,7 @@ codeunit 6014583 "NPR Report Printer Interface"
         exit(LastErrorText);
     end;
 
-    local procedure "-- Aux"()
-    begin
-    end;
-
-    local procedure CreatePDF(Number: Integer; ReqWindow: Boolean; var "Record": Variant; var OutPDFStream: DotNet NPRNetMemoryStream): Boolean
+    local procedure CreatePDF(Number: Integer; CustomReportLayoutCode: Code[20]; ReqWindow: Boolean; var "Record": Variant; var OutPDFStream: DotNet NPRNetMemoryStream): Boolean
     var
         Parameters: Text;
         OutStr: OutStream;
@@ -103,11 +112,17 @@ codeunit 6014583 "NPR Report Printer Interface"
         OutPDFStream := OutPDFStream.MemoryStream();
         OutStr := OutPDFStream;
 
+        if CustomReportLayoutCode <> '' then
+            ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutCode)
+        else
+            ReportLayoutSelection.SetTempLayoutSelected('');
+
         if RecordSpecified then begin
             REPORT.SaveAs(Number, Parameters, REPORTFORMAT::Pdf, OutStr, RecRef)
         end else
             REPORT.SaveAs(Number, Parameters, REPORTFORMAT::Pdf, OutStr);
 
+        ReportLayoutSelection.SetTempLayoutSelected('');
         exit(true);
     end;
 
@@ -132,4 +147,3 @@ codeunit 6014583 "NPR Report Printer Interface"
         end;
     end;
 }
-
