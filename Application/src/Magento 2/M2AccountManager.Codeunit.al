@@ -1377,6 +1377,9 @@ codeunit 6151151 "NPR M2 Account Manager"
         if (not MembershipSalesSetup.FindFirst()) then
             exit(false);
 
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         TransferToInfoCapture(TmpContact, MemberInfoCapture);
         if (not MemberInfoCapture.Insert()) then
             exit(false);
@@ -1404,6 +1407,9 @@ codeunit 6151151 "NPR M2 Account Manager"
         if (not MembershipRole.FindFirst()) then
             exit(false);
 
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         TransferToInfoCapture(TmpContact, MemberInfoCapture);
 
         if (not MemberInfoCapture.Insert()) then
@@ -1496,9 +1502,6 @@ codeunit 6151151 "NPR M2 Account Manager"
 
         //-NPR5.51 [356090]
         with MemberInfoCapture do begin
-            Init;
-            "Entry No." := 0;
-            "Information Context" := MemberInfoCapture."Information Context"::NEW;
             "Company Name" := CopyStr(TmpContact."Company Name", 1, MaxStrLen("Company Name"));
             "First Name" := CopyStr(TmpContact."First Name", 1, MaxStrLen("First Name"));
             "Middle Name" := CopyStr(TmpContact."Middle Name", 1, MaxStrLen("Middle Name"));
