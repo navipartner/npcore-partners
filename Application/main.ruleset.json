@@ -128,6 +128,11 @@
             "justification": "The CalcFields method should only be used with FlowFields or fields of type Blob. The field Cost Amount (Actual) is not a FlowField or of type Blob."
         },
         {
+            "id": "AA0213",
+            "action":"Error",
+            "justification": "Obsoleted object must have a state 'Pending' or 'Removed' and a justification specifying why this field is being obsoleted."
+        },
+        {
             "id": "AA0214",
             "action":"Hidden",
             "justification": "The local record should be modified before saving to the database."
