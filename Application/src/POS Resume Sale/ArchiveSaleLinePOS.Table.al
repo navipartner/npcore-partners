@@ -1049,6 +1049,7 @@ table 6014419 "NPR Archive Sale Line POS"
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
+            ObsoleteReason = 'Key Removed';
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Line No.")
         {
