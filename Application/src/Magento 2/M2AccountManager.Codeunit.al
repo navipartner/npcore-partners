@@ -1194,6 +1194,9 @@
         if (not MembershipSalesSetup.FindFirst()) then
             exit(false);
 
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         TransferToInfoCapture(TmpContact, MemberInfoCapture);
         if (not MemberInfoCapture.Insert()) then
             exit(false);
@@ -1218,6 +1221,9 @@
         if (not MembershipRole.FindFirst()) then
             exit(false);
 
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         TransferToInfoCapture(TmpContact, MemberInfoCapture);
 
         if (not MemberInfoCapture.Insert()) then
