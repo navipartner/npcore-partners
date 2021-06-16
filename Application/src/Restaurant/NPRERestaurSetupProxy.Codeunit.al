@@ -92,6 +92,9 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
         if Restaurant."Service Flow Profile" = '' then
             Restaurant."Service Flow Profile" := NPRESetup."Default Service Flow Profile";
 
+        if Restaurant."Station Req. Handl. On Serving" = Restaurant."Station Req. Handl. On Serving"::Default then
+            Restaurant."Station Req. Handl. On Serving" := NPRESetup."Station Req. Handl. On Serving" + 1;
+
         Initialized := true;
     end;
 
@@ -151,5 +154,11 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
     begin
         GetNPRESetup();
         exit(NPRESetup."Serving Step Discovery Method");
+    end;
+
+    procedure StationReqHandlingOnServing(): Integer
+    begin
+        MakeSureIsInitialized();
+        exit(Restaurant."Station Req. Handl. On Serving");
     end;
 }

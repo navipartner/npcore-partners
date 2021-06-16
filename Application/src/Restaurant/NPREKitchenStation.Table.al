@@ -51,12 +51,14 @@ table 6150682 "NPR NPRE Kitchen Station"
         KitchenRequests: Page "NPR NPRE Kitchen Req.";
     begin
         KitchenRequest.SetRange("Line Status",
-          KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Planned);
+            KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Served);
         KitchenRequest.SetRange("Production Status",
-          KitchenRequest."Production Status"::"Not Started", KitchenRequest."Production Status"::"On Hold");
+            KitchenRequest."Production Status"::"Not Started", KitchenRequest."Production Status"::"On Hold");
         KitchenRequest.SetRange("Production Restaurant Filter", "Restaurant Code");
         KitchenRequest.SetRange("Kitchen Station Filter", Code);
         KitchenRequest.SetRange("Applicable for Kitchen Station", true);
+        KitchenRequest.SetRange("Station Production Status",
+            KitchenRequest."Station Production Status"::"Not Started", KitchenRequest."Station Production Status"::Started);
 
         Clear(KitchenRequests);
         KitchenRequests.SetViewMode(1);
