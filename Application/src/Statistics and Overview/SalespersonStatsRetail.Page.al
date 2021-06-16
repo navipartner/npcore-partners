@@ -148,7 +148,7 @@ page 6014586 "NPR Salesperson Stats Retail"
         CalcLastYear := LastYearCalc;
         ItemNoFilter := ItemFilter;
 
-        CurrPage.Update();
+        CurrPage.Update(false);
     end;
 
     procedure Calc()
@@ -306,7 +306,7 @@ page 6014586 "NPR Salesperson Stats Retail"
             Rec.MarkedOnly(false);
         end;
 
-        CurrPage.Update();
+        CurrPage.Update(false);
 
         exit(HideEmpty);
     end;
