@@ -43,7 +43,7 @@ page 6014585 "NPR Advanced Sales Stats"
                         if PeriodType = PeriodType::Day then
                             DayPeriodTypeOnValidate();
 
-                        CurrPage.Update();
+                        CurrPage.Update(false);
                     end;
                 }
                 field(DateFilter; DateFilter)
@@ -254,8 +254,6 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         SalesStatisticsReport: Report "NPR Advanced Sales Stat.";
                     begin
-                        //-NPR4.13
-
                         SalesStatisticsReport.setFilter(ViewPosition, Day, Dim1Filter, Dim2Filter, Rec."Period Start",
                                            Rec."Period End", ItemCategoryCodeFilter, LastYearCalc,
                                            (((ViewPosition = ViewPosition::ItemGroup) and HideItemGroup) or
@@ -264,8 +262,6 @@ page 6014585 "NPR Advanced Sales Stats"
                                              ((ViewPosition = ViewPosition::Vendor) and HideVendor) or
                                              ((ViewPosition = ViewPosition::Projectcode) and false)));
                         SalesStatisticsReport.RunModal();
-
-                        //+NPR4.13
                     end;
                 }
             }
@@ -288,14 +284,12 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         SalespersonStatistics: Page "NPR Salesperson Stats Retail";
                     begin
-                        //-NPR4.21
                         SalespersonStatistics.InitForm();
                         SalespersonStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc, ItemNoFilter);
                         SalespersonStatistics.ShowLastYear(ShowLastYear);
                         SalespersonStatistics.ChangeEmptyFilter();
                         Sleep(10);
                         SalespersonStatistics.RunModal();
-                        //+NPR4.21
                     end;
                 }
                 action("Item Statistics")
@@ -447,8 +441,6 @@ page 6014585 "NPR Advanced Sales Stats"
     trigger OnOpenPage()
     begin
         ShowLastYear := false;
-
-
         PLYSaleQty := ShowLastYear;
         PLYSale := ShowLastYear;
         PLYProfit := ShowLastYear;
@@ -557,8 +549,7 @@ page 6014585 "NPR Advanced Sales Stats"
         if not LastYear then
             AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Rec."Period Start", Rec."Period End")
         else
-            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, Rec."Period Start"), CalcDate(LastYearCalc, Rec."Period End")
-          );
+            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(LastYearCalc, Rec."Period Start"), CalcDate(LastYearCalc, Rec."Period End"));
 
         if Dim1Filter <> '' then
             AuxItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
@@ -583,7 +574,6 @@ page 6014585 "NPR Advanced Sales Stats"
 
     procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
     begin
-        //SetValueEntryFilter
         AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
         if not LastYear then
             AuxValueEntry.SetFilter("Posting Date", '%1..%2', Rec."Period Start", Rec."Period End")
@@ -655,7 +645,6 @@ page 6014585 "NPR Advanced Sales Stats"
 
     local procedure DayPeriodTypeOnValidate()
     begin
-
         Day := PeriodType;
         Calc();
     end;
