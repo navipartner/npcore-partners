@@ -396,21 +396,21 @@ report 6014441 "NPR POS Item Sales with Dim."
 
     local procedure SetDimSelectionMultiple(ObjectType: Integer; ObjectID: Integer; var SelectedDimText: Text[250])
     var
-        Dim: Record Dimension;
+        Dimension: Record Dimension;
         TempDimSelectionBuf: Record "Dimension Selection Buffer" temporary;
-        SelectedDim: Record "Selected Dimension";
+        SelectedDimension: Record "Selected Dimension";
         DimSelectionMultiple: Page "NPR Dim. Select.Mul.w.Filter";
         Selected: Boolean;
     begin
         Clear(DimSelectionMultiple);
-        if Dim.FindSet() then
+        if Dimension.FindSet() then
             repeat
-                Selected := SelectedDim.Get(UserId, ObjectType, ObjectID, '', Dim.Code);
+                Selected := SelectedDimension.Get(UserId, ObjectType, ObjectID, '', Dimension.Code);
                 if not Selected then
-                    SelectedDim.Init();
+                    SelectedDimension.Init();
                 DimSelectionMultiple.InsertDimSelBuf(
-                  Selected, Dim.Code, Dim.GetMLName(GlobalLanguage), SelectedDim."Dimension Value Filter");
-            until Dim.Next() = 0;
+                  Selected, Dimension.Code, Dimension.GetMLName(GlobalLanguage), SelectedDimension."Dimension Value Filter");
+            until Dimension.Next() = 0;
 
         if DimSelectionMultiple.RunModal() = ACTION::OK then begin
             DimSelectionMultiple.GetDimSelBuf(TempDimSelectionBuf);

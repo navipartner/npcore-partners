@@ -14,7 +14,7 @@
         RetailJournalList: Page "NPR Retail Journal List";
         Dialog: Dialog;
         Counter: Integer;
-        LineNo: Integer;
+        RetailJournalLineNo: Integer;
         LineCounter: Integer;
         TotalHeaders: Integer;
         Text001: Label 'Transferring...';
@@ -53,7 +53,7 @@
                         RetailJournalLine2.Init();
                         RetailJournalLine2 := RetailJournalLine;
                         RetailJournalLine2."No." := RetailJournalHeader."No.";
-                        RetailJournalLine2."Line No." := LineNo + LineCounter * 10000;
+                        RetailJournalLine2."Line No." := RetailJournalLineNo + LineCounter * 10000;
                         RetailJournalLine2.Insert(true);
                     until RetailJournalLine.Next() = 0;
             until RetailJournalHeader.Next() = 0;
@@ -198,7 +198,7 @@
         RequisitionWkshName: Record "Requisition Wksh. Name";
         ReqWkshTemplate: Record "Req. Wksh. Template";
         ReqFilter: Text[250];
-        LineNo: Integer;
+        RequisitionLineNo: Integer;
     begin
         RetailJournalHeader.Get(RetailJournalLine."No.");
 
@@ -217,7 +217,7 @@
             RequisitionLine.SetRange("Worksheet Template Name", RequisitionWkshName."Worksheet Template Name");
             RequisitionLine.SetRange("Journal Batch Name", RequisitionWkshName.Name);
             if RequisitionLine.Find('+') then;
-            LineNo := RequisitionLine."Line No." + 10000;
+            RequisitionLineNo := RequisitionLine."Line No." + 10000;
 
             if RetailJournalLine.Find('-') then
                 repeat
@@ -225,7 +225,7 @@
                         RequisitionLine.Init();
                         RequisitionLine.Validate("Worksheet Template Name", RequisitionWkshName."Worksheet Template Name");
                         RequisitionLine.Validate("Journal Batch Name", RequisitionWkshName.Name);
-                        RequisitionLine.Validate("Line No.", LineNo);
+                        RequisitionLine.Validate("Line No.", RequisitionLineNo);
                         RequisitionLine.Validate(Type, RequisitionLine.Type::Item);
                         RequisitionLine.Validate("No.", RetailJournalLine."Item No.");
                         RequisitionLine.Validate(Quantity, RetailJournalLine."Quantity to Print");
@@ -233,7 +233,7 @@
                         RequisitionLine.Validate("Shortcut Dimension 2 Code", RetailJournalHeader."Shortcut Dimension 2 Code");
                         RequisitionLine.Validate("Location Code", RetailJournalHeader."Location Code");
                         RequisitionLine.Insert(true);
-                        LineNo += 10000;
+                        RequisitionLineNo += 10000;
                     end;
                 until RetailJournalLine.Next() = 0;
         end;

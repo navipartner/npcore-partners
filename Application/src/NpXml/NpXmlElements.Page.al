@@ -454,7 +454,6 @@
     local procedure InsertNewElement(ElementType: Option Sibling,Child,Parent)
     var
         NpXmlElement: Record "NPR NpXml Element";
-        NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
     begin
         if ElementType = ElementType::Parent then
             NpXmlTemplateMgt.InitNpXmlElementAbove(Rec."Xml Template Code", Rec."Line No.", NpXmlElement)

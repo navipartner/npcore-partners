@@ -121,10 +121,10 @@ page 6060146 "NPR MM Foreign Members. Setup"
 
     local procedure ShowSetup()
     var
-        ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
+        MMForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
     begin
 
-        ForeignMembershipMgr.ShowSetup(Rec);
+        MMForeignMembershipMgr.ShowSetup(Rec);
     end;
 
     local procedure ShowDashboard()
