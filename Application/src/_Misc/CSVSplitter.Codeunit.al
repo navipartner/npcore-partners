@@ -298,7 +298,7 @@ codeunit 6060073 "NPR CSV Splitter"
     var
         AllLinesExported: Boolean;
         OutputFile: File;
-        Instr: InStream;
+        LocalInstr: InStream;
         I: Integer;
         J: Integer;
         BuildingFileLbl: Label 'Building file %1.', Comment = '%1 = Number of building file';
@@ -320,7 +320,7 @@ codeunit 6060073 "NPR CSV Splitter"
             if ExcelBuffer.FindFirst() then begin
                 CreateOutputfile(I, OutputFile);
                 if not ExportToServer then
-                    OutputFile.CreateInStream(Instr);
+                    OutputFile.CreateInStream(LocalInstr);
                 ExcelBuffer.SetRange("Cell Value as Text", ExcelBuffer."Cell Value as Text");
                 ExcelBuffer.SetRange(ExcelBuffer.Comment);
                 if HeaderRows > 0 then begin
@@ -339,7 +339,7 @@ codeunit 6060073 "NPR CSV Splitter"
                         end;
                     until ExcelBuffer.Next() = 0;
                 if not ExportToServer then begin
-                    DownloadFromStream(Instr, 'Export', '', 'All Files (*.*)|*.*', FileName);
+                    DownloadFromStream(LocalInstr, 'Export', '', 'All Files (*.*)|*.*', FileName);
                 end;
                 OutputFile.Close();
                 Clear(OutputFile);

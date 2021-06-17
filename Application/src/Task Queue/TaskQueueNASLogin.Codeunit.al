@@ -331,19 +331,19 @@
 
     local procedure CheckIfWorkerUpdateIsUnnecessary(var LastCheckTime: DateTime): Boolean
     var
-        TaskWorker2: Record "NPR Task Worker";
+        NPRTaskWorker2: Record "NPR Task Worker";
     begin
         //-TQ1.34 [326930]
         if (LastCheckTime > (CurrentDateTime - HeartBeatCheckInterval)) then
             exit(true);
 
 
-        TaskWorker2.SetCurrentKey("Last HeartBeat (When Idle)");
-        TaskWorker2.SetRange("Last HeartBeat (When Idle)", 0DT, LastCheckTime);
+        NPRTaskWorker2.SetCurrentKey("Last HeartBeat (When Idle)");
+        NPRTaskWorker2.SetRange("Last HeartBeat (When Idle)", 0DT, LastCheckTime);
 
         LastCheckTime := CurrentDateTime;
 
-        exit(TaskWorker2.IsEmpty());
+        exit(NPRTaskWorker2.IsEmpty());
         //+TQ1.34 [326930]
     end;
 

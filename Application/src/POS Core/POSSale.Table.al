@@ -814,15 +814,15 @@ table 6014405 "NPR POS Sale"
 
     procedure GetPOSSourceCode() SourceCode: Code[10]
     var
-        POSUnit: Record "NPR Pos Unit";
-        POSStore: Record "NPR POS Store";
+        NPRPOSUnit: Record "NPR Pos Unit";
+        NPRPOSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         SourceCode := '';
 
-        if POSUnit.Get("Register No.") then begin
-            POSStore.Get(POSUnit."POS Store Code");
-            if POSStore.GetProfile(POSPostingProfile) then begin
+        if NPRPOSUnit.Get("Register No.") then begin
+            NPRPOSStore.Get(NPRPOSUnit."POS Store Code");
+            if NPRPOSStore.GetProfile(POSPostingProfile) then begin
                 SourceCode := POSPostingProfile."Source Code";
             end;
         end;

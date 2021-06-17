@@ -640,11 +640,11 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         POSSale: Codeunit "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
-        Setup: Codeunit "NPR POS Setup";
+        POSSetup: Codeunit "NPR POS Setup";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
     begin
         POSSession.GetSale(POSSale);
-        POSSession.GetSetup(Setup);
+        POSSession.GetSetup(POSSetup);
 
         POSSale.SetModified();
         POSSession.RequestRefreshData();
@@ -652,7 +652,7 @@ codeunit 6150725 "NPR POS Action: Payment"
             exit;
 
         if POSPaymentMethod."Auto End Sale" then begin
-            POSUnit.Get(Setup.GetPOSUnitNo());
+            POSUnit.Get(POSSetup.GetPOSUnitNo());
             ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
             POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
         end;

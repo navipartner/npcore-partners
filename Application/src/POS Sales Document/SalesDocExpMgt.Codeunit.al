@@ -732,7 +732,7 @@
     local procedure PostPrepaymentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
-        Print: Boolean;
+        POSPrint: Boolean;
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
         Send: Boolean;
         Pdf2Nav: Boolean;
@@ -747,7 +747,7 @@
 
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
         Send := SaleLinePOS."Sales Document Send";
-        Print := SaleLinePOS."Sales Document Print";
+        POSPrint := SaleLinePOS."Sales Document Print";
         SaleLinePOS."Sales Document Prepayment" := false;
         SaleLinePOS."Sales Document Print" := false;
         SaleLinePOS."Sales Document Pdf2Nav" := false;
@@ -763,7 +763,7 @@
 
         Commit();
 
-        if Print then begin
+        if POSPrint then begin
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 1);
         end;
 
@@ -780,14 +780,14 @@
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         DeleteAfter: Boolean;
-        Print: Boolean;
+        POSPrint: Boolean;
         Send: Boolean;
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
         DeleteAfter := SaleLinePOS."Sales Document Delete";
-        Print := SaleLinePOS."Sales Document Print";
+        POSPrint := SaleLinePOS."Sales Document Print";
         Send := SaleLinePOS."Sales Document Send";
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
         SaleLinePOS."Sales Document Prepay. Refund" := false;
@@ -809,7 +809,7 @@
 
         Commit();
 
-        if Print then begin
+        if POSPrint then begin
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 2);
         end;
 
@@ -825,7 +825,7 @@
     local procedure PostDocumentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalesPost: Codeunit "Sales-Post";
-        Print: Boolean;
+        POSPrint: Boolean;
         Send: Boolean;
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
@@ -836,7 +836,7 @@
         SalesHeader.Invoice := SaleLinePOS."Sales Document Invoice";
         SalesHeader.Receive := SaleLinePOS."Sales Document Receive";
         SalesHeader.Modify(true);
-        Print := SaleLinePOS."Sales Document Print";
+        POSPrint := SaleLinePOS."Sales Document Print";
         Send := SaleLinePOS."Sales Document Send";
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
 
@@ -901,7 +901,7 @@
         SaleLinePOS.Modify(true);
         Commit();
 
-        if Print then begin
+        if POSPrint then begin
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
         end;
 
