@@ -208,6 +208,11 @@
             "justification": "When using 'OnInstallPerCompany' you should also add 'Company - Initialize'::'OnCompanyInitialize' event subscriber."
         },
         {
+            "id": "AA0237",
+            "action":"Error",
+            "justification": "The name of non-temporary variables must not be prefixed with Temp."
+        },
+        {
             "id": "AA0241",
             "action":"Error",
             "justification": "Use all lowercase letters for reserved language keywords."
