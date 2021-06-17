@@ -198,8 +198,6 @@
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'NPR Seo Link', true, true)]
     local procedure ItemOnAfterValidateSeoLink(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
-    var
-        MagentoFunctions: Codeunit "NPR Magento Functions";
     begin
         if Rec.IsTemporary then
             exit;
@@ -243,8 +241,6 @@
     end;
 
     procedure GetStockQty(ItemNo: Code[20]; VariantFilter: Text) StockQty: Decimal
-    var
-        MagentoSetup: Record "NPR Magento Setup";
     begin
         if MagentoSetup.Get() then;
         StockQty := CalcStockQty(ItemNo, VariantFilter, MagentoSetup."Inventory Location Filter");
@@ -360,7 +356,6 @@
 
     procedure UpsertStockTriggers()
     var
-        MagentoSetup: Record "NPR Magento Setup";
         NpXmlTemplate: Record "NPR NpXml Template";
         Item: Record Item;
         ItemLedgerEntry: Record "Item Ledger Entry";
@@ -466,7 +461,6 @@
     local procedure TriggerStockUpdate(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
     var
         TempItem: Record Item temporary;
-        MagentoSetup: Record "NPR Magento Setup";
     begin
         if Handled then
             exit;
@@ -579,10 +573,6 @@
     local procedure GetTriggerStockFunctionName(): Text
     begin
         exit('TriggerStockUpdate');
-    end;
-
-    local procedure "--- Stock Calculation Interface"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

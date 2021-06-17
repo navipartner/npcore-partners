@@ -2393,7 +2393,7 @@ table 6014406 "NPR POS Sale Line"
     procedure SerialNoValidate()
     var
         SaleLinePOS2: Record "NPR POS Sale Line";
-        SalePOS: Record "NPR POS Sale";
+        NPRSalePOS: Record "NPR POS Sale";
         ItemTrackingCode: Record "Item Tracking Code";
         Positive: Boolean;
         Txt004: Label '%2 %1 has already sold!';
@@ -2416,7 +2416,7 @@ table 6014406 "NPR POS Sale Line"
         SaleLinePOS2.SetRange("Serial No.", "Serial No.");
         if SaleLinePOS2.FindSet() then
             repeat
-                SalePOS.Get(SaleLinePOS2."Register No.", SaleLinePOS2."Sales Ticket No.");
+                NPRSalePOS.Get(SaleLinePOS2."Register No.", SaleLinePOS2."Sales Ticket No.");
                 if (SaleLinePOS2."Sales Ticket No." <> "Sales Ticket No.") or (SaleLinePOS2."Line No." <> "Line No.") then
                     Error(Text004, FieldName("Serial No."), "Serial No.");
             until SaleLinePOS2.Next() = 0;

@@ -199,7 +199,7 @@
         HCAuditRollToSalesDocument: Record "NPR HC Audit Roll";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        HCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
+        LocalHCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
         LineNo: Integer;
         SuccessPosting: Boolean;
         HCAuditRollPosting: Record "NPR HC Audit Roll Posting";
@@ -282,8 +282,8 @@
 
         if PostPayment then begin
             HCAuditRoll.SetRecFilter();
-            HCPostTempAuditRoll.RunTransfer(HCAuditRollPosting, HCAuditRoll);
-            HCPostTempAuditRoll.PostTransaction(
+            LocalHCPostTempAuditRoll.RunTransfer(HCAuditRollPosting, HCAuditRoll);
+            LocalHCPostTempAuditRoll.PostTransaction(
                   HCAuditRoll."Customer No.",
                   HCAuditRoll."Amount Including VAT",
                   HCAuditRoll."Register No.",
@@ -293,7 +293,7 @@
                   HCAuditRoll."Sale Date",
                   HCAuditRollPosting);
             if HCPaymentTypePOS."HQ Post Sales Document" and SuccessPosting then
-                HCPostTempAuditRoll.ApplyToSalesDoc(SalesHeader);
+                LocalHCPostTempAuditRoll.ApplyToSalesDoc(SalesHeader);
 
             //Balancing entry
             case HCPaymentTypePOS."Account Type" of
@@ -308,7 +308,7 @@
                         AccountNo := HCPaymentTypePOS."Bank Acc. No.";
                     end;
             end;
-            HCPostTempAuditRoll.PostTransaction(
+            LocalHCPostTempAuditRoll.PostTransaction(
              AccountNo,
               HCAuditRoll."Amount Including VAT",
               HCAuditRoll."Register No.",
@@ -318,7 +318,7 @@
               HCAuditRoll."Sale Date",
               HCAuditRollPosting);
             if HCRetailSetup."Gen. Journal Batch" = '' then
-                HCPostTempAuditRoll.PostTodaysGLEntries(HCAuditRollPosting);
+                LocalHCPostTempAuditRoll.PostTodaysGLEntries(HCAuditRollPosting);
         end;
     end;
 
