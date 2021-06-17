@@ -139,6 +139,9 @@ table 6151014 "NPR NpRv Voucher Entry"
         key(Key4; "Entry Type", "Document Type", "Document No.")
         {
         }
+        key(Key5; "Voucher Type")
+        {
+        }
     }
 }
 
