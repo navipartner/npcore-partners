@@ -98,6 +98,11 @@
             "justification": "Only use a correct values of ApplicationArea."
         },
         {
+            "id": "AA0198",
+            "action":"Error",
+            "justification": "Do not use identical names for local and global variables."
+        },
+        {
             "id": "AA0199",
             "action":"Hidden",
             "justification": "Use only a correct order for ApplicationArea."

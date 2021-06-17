@@ -142,17 +142,17 @@
 
     procedure PostRegisterTransactionsPerEntry(var RevRulle: Record "NPR HC Audit Roll Posting" temporary)
     var
-        Betalingsvalg: Record "NPR HC Payment Type POS";
+        HCPaymentTypePOS: Record "NPR HC Payment Type POS";
         BankAccount: Record "Bank Account";
     begin
         GeneralLedgerSetup.Get();
 
-        Betalingsvalg.Get(RevRulle."No.");
+        HCPaymentTypePOS.Get(RevRulle."No.");
 
-        if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::"G/L Account" then begin
+        if HCPaymentTypePOS."Account Type" = HCPaymentTypePOS."Account Type"::"G/L Account" then begin
             if RevRulle."Amount Including VAT" <> 0 then begin
                 PostTransaction(
-                  GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."),
+                  GetPaymentPostingSetup(HCPaymentTypePOS, RevRulle."Register No."),
                   RevRulle."Amount Including VAT",
                   RevRulle."Register No.",
                   AccountType::"G/L",
@@ -161,16 +161,16 @@
                   BogfDate,
                   RevRulle);
                 if (RevRulle."Posting Date" <> 0D) and (RevRulle."Posting Date" <> RevRulle."Sale Date") then begin
-                    PostDayClearing(RevRulle, Betalingsvalg, RevRulle."Amount Including VAT");
+                    PostDayClearing(RevRulle, HCPaymentTypePOS, RevRulle."Amount Including VAT");
                 end;
             end;
         end;
 
-        if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::Customer then begin
-            Betalingsvalg.TestField("Customer No.");
+        if HCPaymentTypePOS."Account Type" = HCPaymentTypePOS."Account Type"::Customer then begin
+            HCPaymentTypePOS.TestField("Customer No.");
             if RevRulle."Amount Including VAT" <> 0 then
                 PostTransaction(
-                  Betalingsvalg."Customer No.",
+                  HCPaymentTypePOS."Customer No.",
                   RevRulle."Amount Including VAT",
                   RevRulle."Register No.",
                   AccountType::Customer,
@@ -180,11 +180,11 @@
                   RevRulle);
         end;
 
-        if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::Bank then begin
-            BankAccount.Get(GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."));
+        if HCPaymentTypePOS."Account Type" = HCPaymentTypePOS."Account Type"::Bank then begin
+            BankAccount.Get(GetPaymentPostingSetup(HCPaymentTypePOS, RevRulle."Register No."));
             if (BankAccount."Currency Code" <> '') and (BankAccount."Currency Code" <> GeneralLedgerSetup."LCY Code") and (RevRulle."Currency Amount" <> 0) then
                 PostTransaction(
-                             GetPaymentPostingSetup(Betalingsvalg, RevRulle."Register No."),
+                             GetPaymentPostingSetup(HCPaymentTypePOS, RevRulle."Register No."),
                              RevRulle."Currency Amount",
                              RevRulle."Register No.",
                              AccountType::Bank,
@@ -351,7 +351,7 @@
     var
         DiffTekst: Label 'Cash register %1, Difference %2 %3';
         AuditRoll: Record "NPR HC Audit Roll";
-        Betalingsvalg: Record "NPR HC Payment Type POS";
+        HCPaymentTypePOS: Record "NPR HC Payment Type POS";
         HCAuditRoll2: Record "NPR HC Audit Roll";
         CurrencyAmount: Decimal;
         Amount2: Decimal;
@@ -368,11 +368,11 @@
         HCAuditRoll2.SetRange("Register No.", Rec."Register No.");
         HCAuditRoll2.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
 
-        Betalingsvalg.SetRange("To be Balanced", true);
-        Betalingsvalg.SetRange("Processing Type",
-                               Betalingsvalg."Processing Type"::"Foreign Currency");
+        HCPaymentTypePOS.SetRange("To be Balanced", true);
+        HCPaymentTypePOS.SetRange("Processing Type",
+                               HCPaymentTypePOS."Processing Type"::"Foreign Currency");
 
-        if Betalingsvalg.FindSet() then
+        if HCPaymentTypePOS.FindSet() then
             repeat
                 Amount2 := 0;
                 CurrencyAmount := 0;
@@ -383,10 +383,10 @@
                     repeat
                         if (AuditRoll."Sale Type" = AuditRoll."Sale Type"::Payment) and
                           (AuditRoll.Type = AuditRoll.Type::Payment) and
-                          (AuditRoll."No." = Betalingsvalg."No.") then
+                          (AuditRoll."No." = HCPaymentTypePOS."No.") then
                             CurrencyAmount += AuditRoll."Currency Amount";
                     until (AuditRoll.Next() = 0) or (AuditRoll.Type = AuditRoll.Type::"Open/Close");
-                HCAuditRoll2.SetRange("Payment Type No.", Betalingsvalg."No.");
+                HCAuditRoll2.SetRange("Payment Type No.", HCPaymentTypePOS."No.");
 
                 if HCAuditRoll2.FindSet() then
                     repeat
@@ -418,25 +418,25 @@
                     if Difference < 0 then
                         FinKldLinie.Validate("Account No.", Kasse."Difference Account - Neg.");
 
-                    if (Betalingsvalg."Fixed Rate" <= 0) and
-                       (Betalingsvalg."Processing Type" <> Betalingsvalg."Processing Type"::Cash) then
-                        Error(ErrNotSet, Betalingsvalg."No.");
+                    if (HCPaymentTypePOS."Fixed Rate" <= 0) and
+                       (HCPaymentTypePOS."Processing Type" <> HCPaymentTypePOS."Processing Type"::Cash) then
+                        Error(ErrNotSet, HCPaymentTypePOS."No.");
 
-                    if Betalingsvalg."Processing Type" <> Betalingsvalg."Processing Type"::Cash then
-                        FinKldLinie.Validate(Amount, Difference * Betalingsvalg."Fixed Rate" / 100)
+                    if HCPaymentTypePOS."Processing Type" <> HCPaymentTypePOS."Processing Type"::Cash then
+                        FinKldLinie.Validate(Amount, Difference * HCPaymentTypePOS."Fixed Rate" / 100)
                     else
-                        FinKldLinie.Validate(Amount, Difference * Betalingsvalg."Fixed Rate" / 100);
+                        FinKldLinie.Validate(Amount, Difference * HCPaymentTypePOS."Fixed Rate" / 100);
 
-                    if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::"G/L Account" then begin
+                    if HCPaymentTypePOS."Account Type" = HCPaymentTypePOS."Account Type"::"G/L Account" then begin
                         FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
-                        FinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(Betalingsvalg, Rec."Register No."));
+                        FinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(HCPaymentTypePOS, Rec."Register No."));
                     end;
-                    if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::Bank then begin
+                    if HCPaymentTypePOS."Account Type" = HCPaymentTypePOS."Account Type"::Bank then begin
                         FinKldLinie."Account Type" := FinKldLinie."Account Type"::"Bank Account";
-                        FinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(Betalingsvalg, Rec."Register No."));
+                        FinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(HCPaymentTypePOS, Rec."Register No."));
                     end;
 
-                    FinKldLinie.Description := StrSubstNo(DiffTekst, Rec."Register No.", Difference, Betalingsvalg.Description);
+                    FinKldLinie.Description := StrSubstNo(DiffTekst, Rec."Register No.", Difference, HCPaymentTypePOS.Description);
 
                     FinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
                     FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
@@ -452,7 +452,7 @@
                         GenJournalLine.Insert(true);
                     end;
                 end;
-            until Betalingsvalg.Next() = 0;
+            until HCPaymentTypePOS.Next() = 0;
     end;
 
     procedure PosterVarekladde(var RevRulle: Record "NPR HC Audit Roll Posting" temporary; Straks: Boolean; Bogfdate: Date): Boolean
@@ -582,7 +582,7 @@
 
     procedure PosterDebitorIndbetaling(var RevRulle: Record "NPR HC Audit Roll Posting" temporary)
     var
-        Kasse: Record "NPR HC Register";
+        HCRegister: Record "NPR HC Register";
         txtIndbetaling: Label 'Payment';
         txtIndbetalingSales: Label 'Payment on %1 %2';
         Bogf1: Label 'POS-Debitsale on %1 Register %2';
@@ -662,7 +662,7 @@
             FinKldLinie.Description := StrSubstNo(txtKasse, RevRulle.Description, RevRulle."Register No.")
         end;
 
-        Kasse.Get(RevRulle."Register No.");
+        HCRegister.Get(RevRulle."Register No.");
 
         FinKldLinie."Document Date" := BogfDate;
         FinKldLinie."Applies-to Doc. Type" := RevRulle."Buffer Document Type";
@@ -1284,10 +1284,10 @@
 
     procedure RunTest(var Rec: Record "NPR HC Audit Roll Posting" temporary)
     var
-        Vare: Record Item;
+        Item: Record Item;
         Debitor: Record Customer;
         Finanskonto: Record "G/L Account";
-        Betalingsvalg: Record "NPR HC Payment Type POS";
+        HCPaymentTypePOS: Record "NPR HC Payment Type POS";
         "BogfOps.": Record "General Posting Setup";
         MomsbogfOps: Record "VAT Posting Setup";
         VirksBogfGrp: Record "Gen. Business Posting Group";
@@ -1316,8 +1316,8 @@
                     /*-1-*/
                     Rec."Sale Type"::Sale:
                         begin
-                            if Vare."VAT Bus. Posting Gr. (Price)" <> '' then
-                                Rec."VAT Bus. Posting Group" := Vare."VAT Bus. Posting Gr. (Price)"
+                            if Item."VAT Bus. Posting Gr. (Price)" <> '' then
+                                Rec."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)"
                             else begin
                                 HCRetailSetup.Get();
                                 HCRetailSetup.TestField("Vat Bus. Posting Group");
@@ -1378,21 +1378,21 @@
                     Rec."Sale Type"::Payment:
                         begin
 
-                            Betalingsvalg.Get(Rec."No.");
+                            HCPaymentTypePOS.Get(Rec."No.");
                             /*##########################################################
                              ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
                              ## fra tekstbaseret Navision ---30112000 NP-MD          ##
                              ##########################################################*/
 
-                            case Betalingsvalg."Account Type" of
-                                Betalingsvalg."Account Type"::"G/L Account":
+                            case HCPaymentTypePOS."Account Type" of
+                                HCPaymentTypePOS."Account Type"::"G/L Account":
                                     begin
-                                        Finanskonto.Get(GetPaymentPostingSetup(Betalingsvalg, Rec."Register No."));
+                                        Finanskonto.Get(GetPaymentPostingSetup(HCPaymentTypePOS, Rec."Register No."));
                                     end;
-                                Betalingsvalg."Account Type"::Customer:
+                                HCPaymentTypePOS."Account Type"::Customer:
                                     begin
-                                        Betalingsvalg.TestField("Customer No.");
-                                        Debitor.Get(Betalingsvalg."Customer No.");
+                                        HCPaymentTypePOS.TestField("Customer No.");
+                                        Debitor.Get(HCPaymentTypePOS."Customer No.");
                                     end;
                             end;
 
@@ -1620,27 +1620,27 @@
 
     local procedure GetLastGenJournalLine(): Integer
     var
-        GenJournalLine: Record "Gen. Journal Line";
+        GeneralJournalLine: Record "Gen. Journal Line";
     begin
         if HCRetailSetup."Gen. Journal Batch" = '' then
             exit(0);
-        GenJournalLine.SetRange("Journal Template Name", HCRetailSetup."Gen. Journal Template");
-        GenJournalLine.SetRange("Journal Batch Name", HCRetailSetup."Gen. Journal Batch");
-        if GenJournalLine.FindLast() then
-            exit(GenJournalLine."Line No.");
+        GeneralJournalLine.SetRange("Journal Template Name", HCRetailSetup."Gen. Journal Template");
+        GeneralJournalLine.SetRange("Journal Batch Name", HCRetailSetup."Gen. Journal Batch");
+        if GeneralJournalLine.FindLast() then
+            exit(GeneralJournalLine."Line No.");
         exit(0);
     end;
 
     local procedure GetLastItemJournalLine(): Integer
     var
-        ItemJournalLine: Record "Item Journal Line";
+        ItemJournalLines: Record "Item Journal Line";
     begin
         if HCRetailSetup."Item Journal Batch" = '' then
             exit(0);
-        ItemJournalLine.SetRange("Journal Template Name", HCRetailSetup."Item Journal Template");
-        ItemJournalLine.SetRange("Journal Batch Name", HCRetailSetup."Item Journal Batch");
-        if ItemJournalLine.FindLast() then
-            exit(ItemJournalLine."Line No.");
+        ItemJournalLines.SetRange("Journal Template Name", HCRetailSetup."Item Journal Template");
+        ItemJournalLines.SetRange("Journal Batch Name", HCRetailSetup."Item Journal Batch");
+        if ItemJournalLines.FindLast() then
+            exit(ItemJournalLines."Line No.");
         exit(0);
     end;
 

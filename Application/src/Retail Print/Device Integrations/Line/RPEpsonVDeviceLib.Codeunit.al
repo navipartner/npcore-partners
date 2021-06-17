@@ -450,12 +450,12 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         PrintBufferInStream: InStream;
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
-        Encoding: DotNet NPRNetEncoding;
+        NetEncoding: DotNet NPRNetEncoding;
     begin
         PrintBuffer.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
         MemoryStream := PrintBufferInStream;
         MemoryStream.Position := 0;
-        StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
+        StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.UTF8);
         exit(StreamReader.ReadToEnd());
     end;
 
@@ -561,7 +561,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         ESCPOS: Text;
         InStream: InStream;
         MemoryStream: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
+        NetEncoding: DotNet NPRNetEncoding;
         RetailLogo: Record "NPR Retail Logo";
         StreamReader: DotNet NPRNetStreamReader;
     begin
@@ -573,7 +573,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
                     RetailLogo.ESCPOSLogo.CreateInStream(InStream);
                     MemoryStream := InStream;
                     MemoryStream.Position := 0;
-                    StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
+                    StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.UTF8);
                     ESCPOS := StreamReader.ReadToEnd();
                     PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
                 end;

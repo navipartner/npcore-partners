@@ -358,7 +358,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
 
     local procedure PrintGraphicsInBuffer()
     var
-        TempPattern: Text;
+        TemporaryPattern: Text;
         pL: Char;
         pH: Char;
         m: Char;
@@ -369,8 +369,8 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         m := 48;
         fn := 50;
 
-        TempPattern := 'GS ( L %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, Format(pL), Format(pH), Format(m), Format(fn)));
+        TemporaryPattern := 'GS ( L %1 %2 %3 %4';
+        AddToBuffer(StrSubstNo(TemporaryPattern, Format(pL), Format(pH), Format(m), Format(fn)));
     end;
 
     local procedure PrintDataInPageMode()

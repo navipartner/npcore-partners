@@ -151,11 +151,11 @@ table 6060151 "NPR Event Word Layout"
     procedure CopyRecord()
     var
         EventCopy: Page "NPR Event Copy Attr./Templ.";
-        Job: Record Job;
+        LocalJob: Record Job;
     begin
         TestField(Usage);
-        GetJobFromRecID(Job);
-        EventCopy.SetFromEvent(Job."No.", Usage);
+        GetJobFromRecID(LocalJob);
+        EventCopy.SetFromEvent(LocalJob."No.", Usage);
         EventCopy.RunModal();
     end;
 

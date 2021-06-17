@@ -19,7 +19,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
 
     procedure DrillDown(var BusChartBuf: Record "Business Chart Buffer")
     var
-        PurchHeader: Record "Purchase Header";
+        PurchaseHeader: Record "Purchase Header";
         ToDate: Date;
         Measure: Integer;
     begin
@@ -27,15 +27,15 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         if (Measure < 0) or (Measure > 3) then
             exit;
         TrailingPurchOrdersSetup.Get(UserId);
-        PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
         if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
-            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate());
-        if Evaluate(PurchHeader.Status, BusChartBuf.GetMeasureValueString(Measure), 9) then
-            PurchHeader.SetRange(Status, PurchHeader.Status);
+            PurchaseHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate());
+        if Evaluate(PurchaseHeader.Status, BusChartBuf.GetMeasureValueString(Measure), 9) then
+            PurchaseHeader.SetRange(Status, PurchaseHeader.Status);
 
         ToDate := BusChartBuf.GetXValueAsDate(BusChartBuf."Drill-Down X Index");
-        PurchHeader.SetRange("Document Date", 0D, ToDate);
-        PAGE.Run(PAGE::"Purchase Order List", PurchHeader);
+        PurchaseHeader.SetRange("Document Date", 0D, ToDate);
+        PAGE.Run(PAGE::"Purchase Order List", PurchaseHeader);
     end;
 
     procedure UpdateData(var BusChartBuf: Record "Business Chart Buffer")
@@ -139,11 +139,11 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
 
     procedure CreateMap(var Map: array[4] of Enum "Purchase Document Status")
     var
-        PurchHeader: Record "Purchase Header";
+        PurchaseHeader: Record "Purchase Header";
     begin
-        Map[1] := PurchHeader.Status::Released;
-        Map[2] := PurchHeader.Status::"Pending Prepayment";
-        Map[3] := PurchHeader.Status::"Pending Approval";
-        Map[4] := PurchHeader.Status::Open;
+        Map[1] := PurchaseHeader.Status::Released;
+        Map[2] := PurchaseHeader.Status::"Pending Prepayment";
+        Map[3] := PurchaseHeader.Status::"Pending Approval";
+        Map[4] := PurchaseHeader.Status::Open;
     end;
 }

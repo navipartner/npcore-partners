@@ -23,7 +23,7 @@
         SupportedAuxFunction: Option ,ABORT,PANSUPPRESSIONON,PANSUPPRESSIONOFF,CUSTOMMENU,TICKETREPRINT,SUMMARYREPORT,DIAGNOSTICS,SYSTEMINFO,DISPWITHNUMINPUT,TINAACTIVATION,TINADEACTIVATION,TINAQUERY,SHOWCUSTOMMENU;
         PepperDescription: Label 'Interface';
         EftPaymentFailed: Label 'Payment was declined.\\%2 (%1)';
-        EFTSetup: Record "NPR EFT Setup";
+        SharedEFTSetup: Record "NPR EFT Setup";
 
     local procedure InitializePepperSetup(RegisterNo: Code[10])
     begin
@@ -31,7 +31,7 @@
         if (PepperSetupInitialized) then
             exit;
 
-        PepperSetupInitialized := FindTerminalSetupFromRegister(RegisterNo, PepperTerminal, PepperInstance, PepperConfiguration, PepperVersion, EFTSetup);
+        PepperSetupInitialized := FindTerminalSetupFromRegister(RegisterNo, PepperTerminal, PepperInstance, PepperConfiguration, PepperVersion, SharedEFTSetup);
 
         if (not PepperSetupInitialized) then
             Error(PepperSetupNotFound, RegisterNo);
@@ -1164,44 +1164,44 @@
 
     local procedure CheckCardInformation(ParCardTypeText: Text[4]; ParCardNameText: Text[24]; ParCardNumberText: Text[30]; ParCardExpiryDate: Text[4])
     var
-        Text001: Label 'Card Type not received from Terminal.';
-        Text002: Label 'Card Name not received from Terminal.';
-        Text003: Label 'Card Number not received from Terminal';
-        Text004: Label 'Card Expiry Date not received from Terminal';
+        CardTypeNotRcvdLbl: Label 'Card Type not received from Terminal.';
+        CardNameNotRcvdLbl: Label 'Card Name not received from Terminal.';
+        CardNoNotRcvdLbl: Label 'Card Number not received from Terminal';
+        CardExpNotRcvdLbl: Label 'Card Expiry Date not received from Terminal';
         PepperCardType: Record "NPR Pepper Card Type";
         Month: Integer;
         Year: Integer;
-        Text005: Label 'Card Expiry Date should be MMYY';
-        Text006: Label 'Card Expiry Date is in the past.';
-        Text008: Label 'No Card Information received from Terminal.';
+        CardExpDateFormatLbl: Label 'Card Expiry Date should be MMYY';
+        CardExpInPastLbl: Label 'Card Expiry Date is in the past.';
+        NoInfoRcvdLbl: Label 'No Card Information received from Terminal.';
     begin
         if (ParCardTypeText = '') and (ParCardNameText = '') and (ParCardNumberText = '') and (ParCardExpiryDate = '') then begin
-            AddToCommentBatch(Text008);
+            AddToCommentBatch(NoInfoRcvdLbl);
             exit;
         end;
         if ParCardTypeText = '' then
-            AddToCommentBatch(Text001)
+            AddToCommentBatch(CardTypeNotRcvdLbl)
         else
             if not PepperCardType.Get(ParCardTypeText) then
                 if ParCardNameText = '' then
-                    AddToCommentBatch(Text002);
+                    AddToCommentBatch(CardNameNotRcvdLbl);
 
         if ParCardNumberText = '' then
-            AddToCommentBatch(Text003);
+            AddToCommentBatch(CardNoNotRcvdLbl);
 
         if StrLen(ParCardExpiryDate) < 4 then begin
-            AddToCommentBatch(Text004);
+            AddToCommentBatch(CardExpNotRcvdLbl);
         end else begin
             if (Evaluate(Month, CopyStr(ParCardExpiryDate, 1, 2))) and (Evaluate(Year, CopyStr(ParCardExpiryDate, 3, 2))) then begin
                 if (Month < 1) or (Month > 12) then begin
-                    AddToCommentBatch(Text005);
+                    AddToCommentBatch(CardExpDateFormatLbl);
                 end else begin
                     if ((2000 + Year) < Date2DMY(Today, 3)) or (((2000 + Year) = Date2DMY(Today, 3)) and (Month < Date2DMY(Today, 2))) then begin
-                        AddToCommentBatch(Text006);
+                        AddToCommentBatch(CardExpInPastLbl);
                     end;
                 end;
             end else begin
-                AddToCommentBatch(Text005);
+                AddToCommentBatch(CardExpDateFormatLbl);
             end;
         end;
     end;
@@ -1209,7 +1209,7 @@
     local procedure GetTimeout(PepperConfigurationCode: Code[10]; PepperTransactionCode: Code[10]): Integer
     var
         PepperTransactionType: Record "NPR Pepper EFT Trx Type";
-        PepperConfiguration: Record "NPR Pepper Config.";
+        PepperConfig: Record "NPR Pepper Config.";
     begin
 
         //TODO EFT Transaction Type
@@ -1217,8 +1217,8 @@
             if PepperTransactionType."POS Timeout (Seconds)" <> 0 then
                 exit(PepperTransactionType."POS Timeout (Seconds)" * 1000);
 
-        PepperConfiguration.Get(PepperConfigurationCode);
-        exit(PepperConfiguration."Default POS Timeout (Seconds)" * 1000);
+        PepperConfig.Get(PepperConfigurationCode);
+        exit(PepperConfig."Default POS Timeout (Seconds)" * 1000);
     end;
 
     local procedure GetPepperReceiptEncoding(PepperTerminal: Record "NPR Pepper Terminal"): Code[20]
@@ -1262,19 +1262,19 @@
 
     local procedure GetTransactionDate(DateText: Text): Date
     var
-        Text001: Label 'Transaction Date not specified.';
-        Text002: Label 'Transaction Date not formatted DDMMYYYY. Value received: %1';
+        TransDateNotSpecifiedLbl: Label 'Transaction Date not specified.';
+        TransDateNotFormattedLbl: Label 'Transaction Date not formatted DDMMYYYY. Value received: %1';
         TDate: Date;
     begin
 
         if DateText = '' then begin
-            AddToCommentBatch(Text001);
+            AddToCommentBatch(TransDateNotSpecifiedLbl);
             exit(Today);
         end;
 
         TDate := GetDateFromText(DateText);
         if TDate = 0D then
-            AddToCommentBatch(StrSubstNo(Text002, DateText));
+            AddToCommentBatch(StrSubstNo(TransDateNotFormattedLbl, DateText));
 
         if (TDate = 0D) then
             TDate := Today();
@@ -1285,16 +1285,16 @@
     local procedure GetTransactionTime(TimeText: Text): Time
     var
         TTime: Time;
-        Text001: Label 'Transaction Time not specified.';
-        Text002: Label 'Transaction Time not formatted HHMMSS. Value received: %1';
+        TransTimeNotSpecifiedLbl: Label 'Transaction Time not specified.';
+        TransTimeNotFormattedLbl: Label 'Transaction Time not formatted HHMMSS. Value received: %1';
     begin
         if TimeText = '' then begin
-            AddToCommentBatch(Text001);
+            AddToCommentBatch(TransTimeNotSpecifiedLbl);
             exit(0T);
         end;
         TTime := GetTimeFromText(TimeText);
         if TTime = 0T then
-            AddToCommentBatch(StrSubstNo(Text002, TimeText));
+            AddToCommentBatch(StrSubstNo(TransTimeNotFormattedLbl, TimeText));
         exit(TTime);
     end;
 
@@ -1607,33 +1607,33 @@
 
     procedure SetTerminalToOfflineMode(POSUnit: Record "NPR POS Unit"; CommandType: Option Activate,Deactivate) Success: Boolean
     var
-        PepperTerminal: Record "NPR Pepper Terminal";
+        NPRPepperTerminal: Record "NPR Pepper Terminal";
     begin
         InitializePepperSetup(POSUnit."No.");
         Success := false;
         case CommandType of
             CommandType::Activate:
                 begin
-                    if (PepperTerminal.Status = PepperTerminal.Status::ActiveOffline) then begin
+                    if (NPRPepperTerminal.Status = NPRPepperTerminal.Status::ActiveOffline) then begin
                         exit(true);
                     end;
-                    if (PepperTerminal.Status <> PepperTerminal.Status::Open) then begin
+                    if (NPRPepperTerminal.Status <> NPRPepperTerminal.Status::Open) then begin
                         exit(false)
                     end;
-                    PepperTerminal.Validate(Status, PepperTerminal.Status::ActiveOffline);
-                    PepperTerminal.Modify(true);
+                    NPRPepperTerminal.Validate(Status, NPRPepperTerminal.Status::ActiveOffline);
+                    NPRPepperTerminal.Modify(true);
                     Commit();
                 end;
             CommandType::Deactivate:
                 begin
-                    if (PepperTerminal.Status = PepperTerminal.Status::Open) then begin
+                    if (NPRPepperTerminal.Status = NPRPepperTerminal.Status::Open) then begin
                         exit(true);
                     end;
-                    if (PepperTerminal.Status <> PepperTerminal.Status::ActiveOffline) then begin
+                    if (NPRPepperTerminal.Status <> NPRPepperTerminal.Status::ActiveOffline) then begin
                         exit(false);
                     end;
-                    PepperTerminal.Validate(Status, PepperTerminal.Status::Open);
-                    PepperTerminal.Modify(true);
+                    NPRPepperTerminal.Validate(Status, NPRPepperTerminal.Status::Open);
+                    NPRPepperTerminal.Modify(true);
                     Commit();
                 end;
         end;
@@ -1784,7 +1784,7 @@
                 if (not Confirm('Customer must sign the receipt.\\Confirm signature.')) then begin
                     DoNotResume := true;
                     InitializePepperSetup(EftTransactionRequest."Register No.");
-                    EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, EFTSetup, EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Entry No.", false);
+                    EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, SharedEFTSetup, EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Entry No.", false);
                     EFTFrameworkMgt.SendRequest(VoidEFTTransactionRequest);
                 end;
 
@@ -1927,15 +1927,15 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     var
-        PepperTerminal: Record "NPR Pepper Terminal";
+        PepperTerm: Record "NPR Pepper Terminal";
     begin
         if EFTSetup."EFT Integration Type" <> GetIntegrationType() then
             exit;
 
         if EFTSetup."POS Unit No." <> '' then
-            PepperTerminal.SetRange("Register No.", EFTSetup."POS Unit No.");
+            PepperTerm.SetRange("Register No.", EFTSetup."POS Unit No.");
 
-        PAGE.RunModal(0, PepperTerminal);
+        PAGE.RunModal(0, PepperTerm);
 
     end;
 

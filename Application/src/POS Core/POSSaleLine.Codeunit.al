@@ -156,13 +156,13 @@
         Rec.Type := Line.Type;
         Rec."Sale Type" := Line."Sale Type";
 
-            Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
+        Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
-            if ((Line.Type = Line.Type::Item) and (Line."Variant Code" = '') and (ItemVariantIsRequired(Line."No."))) then begin
+        if ((Line.Type = Line.Type::Item) and (Line."Variant Code" = '') and (ItemVariantIsRequired(Line."No."))) then begin
             FillVariantThroughLookUp(Line."No.", Line."Variant Code");
             if Line."Variant Code" = '' then
                 Error(ITEM_REQUIRES_VARIANT, Line."No.");
-                Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
+            Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
         end;
 
         Rec."Variant Code" := Line."Variant Code";
@@ -170,7 +170,7 @@
         if Line."Unit of Measure Code" <> '' then
             Rec.Validate("Unit of Measure Code", Line."Unit of Measure Code");
 
-            Rec.SetSkipUpdateDependantQuantity(false);
+        Rec.SetSkipUpdateDependantQuantity(false);
 
         if Line.Description <> '' then
             Rec.Description := Line.Description;
@@ -227,37 +227,37 @@
 
     procedure DeleteLine()
     var
-        xRec: Record "NPR POS Sale Line";
+        LocalxRec: Record "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
     begin
         if (not RefreshCurrent()) then
             exit;
 
         OnBeforeDeletePOSSaleLine(Rec);
-        xRec := Rec;
+        LocalxRec := Rec;
         Rec.Delete(true);
 
-        POSSalesDiscountCalcMgt.OnAfterDeleteSaleLinePOS(xRec);
+        POSSalesDiscountCalcMgt.OnAfterDeleteSaleLinePOS(LocalxRec);
 
         if (Rec.Find('><')) then begin
             Rec.UpdateAmounts(Rec);
             Rec.Modify();
         end;
-        OnAfterDeletePOSSaleLine(xRec);
+        OnAfterDeletePOSSaleLine(LocalxRec);
 
         POSSale.RefreshCurrent();
     end;
 
     procedure DeleteAll()
     var
-        xRec: Record "NPR POS Sale Line";
+        LocalxRec: Record "NPR POS Sale Line";
     begin
         if Rec.FindSet(true) then
             repeat
                 OnBeforeDeletePOSSaleLine(Rec);
-                xRec := Rec;
+                LocalxRec := Rec;
                 Rec.Delete(true);
-                OnAfterDeletePOSSaleLine(xRec);
+                OnAfterDeletePOSSaleLine(LocalxRec);
             until Rec.Next() = 0;
 
         POSSale.RefreshCurrent();

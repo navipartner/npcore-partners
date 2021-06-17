@@ -4,6 +4,7 @@
 
     trigger OnRun()
     var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
         NotInitialized: Label 'Codeunit 6151416 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';
     begin
         case PaymentEventType of
@@ -17,7 +18,7 @@
     end;
 
     var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
+
         PaymentEventType: Option " ",Capture,Refund;
         Text000: Label 'Error during Payment Capture:\%1';
         Text004: Label 'You may not invoice more than the paid amount %1.';
@@ -25,6 +26,8 @@
         Text006: Label 'Document not Found';
 
     procedure SetProcessingOptions(PaymentGatewayIn: Record "NPR Magento Payment Gateway"; PaymentEventTypeIn: Option " ",Capture,Refund)
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
         PaymentGateway := PaymentGatewayIn;
         PaymentEventType := PaymentEventTypeIn;

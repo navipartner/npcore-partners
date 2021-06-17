@@ -455,12 +455,12 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         PrintBufferInStream: InStream;
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
-        Encoding: DotNet NPRNetEncoding;
+        NetEncoding: DotNet NPRNetEncoding;
     begin
         PrintBuffer.CreateInStream(PrintBufferInStream, TEXTENCODING::UTF8);
         MemoryStream := PrintBufferInStream;
         MemoryStream.Position := 0;
-        StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.UTF8);
+        StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.UTF8);
         exit(StreamReader.ReadToEnd());
     end;
 
@@ -475,7 +475,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         LogoAsText: Text;
         InStream: InStream;
         MemoryStream: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
+        NetEncoding: DotNet NPRNetEncoding;
         RetailLogo: Record "NPR Retail Logo";
         StreamReader: DotNet NPRNetStreamReader;
         PrintBitmapFromKeywordLbl: Label '<SP%1,%2><RL><bmp><G%3>%4', Locked = true;
@@ -488,7 +488,7 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
                     RetailLogo.OneBitLogo.CreateInStream(InStream);
                     MemoryStream := InStream;
                     MemoryStream.Position := 0;
-                    StreamReader := StreamReader.StreamReader(MemoryStream, Encoding.GetEncoding('ibm850'));
+                    StreamReader := StreamReader.StreamReader(MemoryStream, NetEncoding.GetEncoding('ibm850'));
                     LogoAsText := StreamReader.ReadToEnd();
 
                     AddTextToBuffer(StrSubstNo(PrintBitmapFromKeywordLbl, (PageWidth div 1.077), yCoord, RetailLogo.OneBitLogoByteSize, LogoAsText)); // Might need to update placement of logo in the future

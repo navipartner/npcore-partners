@@ -85,7 +85,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
     local procedure CreateDeFiskalyOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
-        DEAuditSetup: Record "NPR DE Audit Setup";
+        NPRDEAuditSetup: Record "NPR DE Audit Setup";
         POSUnitAux: Record "NPR DE POS Unit Aux. Info";
         DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
@@ -105,7 +105,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
             EXIT;
         IF NOT DeAuditAux.GET(PosEntry."Entry No.") THEN
             EXIT;
-        IF NOT DEAuditSetup.GET() THEN
+        IF NOT NPRDEAuditSetup.GET() THEN
             EXIT;
 
         if PosEntry."Entry Type" <> PosEntry."Entry Type"::"Direct Sale" then
@@ -113,7 +113,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
 
         CreateDocumentJson(PosEntry."Entry No.", POSUnitAux, DocumentJson);
 
-        if not DEFiskalyCommunication.SendDocument(DeAuditAux, DocumentJson, ResponseJson, DEAuditSetup) then
+        if not DEFiskalyCommunication.SendDocument(DeAuditAux, DocumentJson, ResponseJson, NPRDEAuditSetup) then
             SetErrorMsg(DeAuditAux)
         else
             if not DeAuxInfoInsertResponse(DeAuditAux, ResponseJson) then
@@ -121,7 +121,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
 
         OnHandleDEAuditAuxLogBeforeModify(DeAuditAux, ResponseJson);
         DeAuditAux.Modify();
-        DEAuditSetup.Modify();
+        NPRDEAuditSetup.Modify();
     end;
 
     procedure CreateDocumentJson(POSEntryNo: Integer; POSUnitAudit: Record "NPR DE POS Unit Aux. Info"; var DocumentJson: JsonObject)
@@ -237,7 +237,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
         POSStore: Record "NPR POS Store";
-        DEAuditSetup: Record "NPR DE Audit Setup";
+        NPRDEAuditSetup: Record "NPR DE Audit Setup";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         POSAuditProfile: Record "NPR POS Audit Profile";
         CompanyInformation: Record "Company Information";
@@ -258,11 +258,11 @@ codeunit 6014444 "NPR DE Audit Mgt."
         POSUnitAudit.TestField("Client ID");
         POSUnitAudit.TestField("Serial Number");
 
-        DEAuditSetup.Get();
-        DEAuditSetup.TestField("Api URL");
-        if not DEAuditSetup.HasApiKey() then
+        NPRDEAuditSetup.Get();
+        NPRDEAuditSetup.TestField("Api URL");
+        if not NPRDEAuditSetup.HasApiKey() then
             Error(NoApiKeyLbl);
-        if not DEAuditSetup.HasApiSecret() then
+        if not NPRDEAuditSetup.HasApiSecret() then
             Error(NoApiSecretLbl);
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
