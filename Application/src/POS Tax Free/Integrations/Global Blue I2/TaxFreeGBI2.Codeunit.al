@@ -1807,19 +1807,19 @@
 
     procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
     var
-        GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
+        GlobalBlueI2Parameters: Record "NPR Tax Free GB I2 Param.";
         GlobalBlueParameterPage: Page "NPR Tax Free GB I2 Param.";
     begin
         Handled := true;
 
-        if not GlobalBlueParameters.Get(TaxFreeUnit."POS Unit No.") then begin
-            GlobalBlueParameters.Init();
-            GlobalBlueParameters."Tax Free Unit" := TaxFreeUnit."POS Unit No.";
-            GlobalBlueParameters.Insert();
+        if not GlobalBlueI2Parameters.Get(TaxFreeUnit."POS Unit No.") then begin
+            GlobalBlueI2Parameters.Init();
+            GlobalBlueI2Parameters."Tax Free Unit" := TaxFreeUnit."POS Unit No.";
+            GlobalBlueI2Parameters.Insert();
             Commit();
         end;
 
-        GlobalBlueParameterPage.SetRecord(GlobalBlueParameters);
+        GlobalBlueParameterPage.SetRecord(GlobalBlueI2Parameters);
         GlobalBlueParameterPage.Editable := true;
         GlobalBlueParameterPage.RunModal();
     end;
@@ -1936,8 +1936,8 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR Tax Free POS Unit", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnAfterTaxFreeUnitDelete(var Rec: Record "NPR Tax Free POS Unit"; RunTrigger: Boolean)
     var
-        GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
-        GlobalBlueServices: Record "NPR Tax Free GB I2 Service";
+        GlobalBlueI2Parameters: Record "NPR Tax Free GB I2 Param.";
+        GlobalBlueI2Services: Record "NPR Tax Free GB I2 Service";
     begin
         if Rec.IsTemporary or (not RunTrigger) then
             exit;
@@ -1946,11 +1946,11 @@
         if not (Rec."Handler ID Enum" = Rec."Handler ID Enum"::GLOBALBLUE_I2) then
             exit;
 
-        GlobalBlueParameters.SetRange("Tax Free Unit", Rec."POS Unit No.");
-        GlobalBlueParameters.DeleteAll(true);
+        GlobalBlueI2Parameters.SetRange("Tax Free Unit", Rec."POS Unit No.");
+        GlobalBlueI2Parameters.DeleteAll(true);
 
-        GlobalBlueServices.SetRange("Tax Free Unit", Rec."POS Unit No.");
-        GlobalBlueServices.DeleteAll(true);
+        GlobalBlueI2Services.SetRange("Tax Free Unit", Rec."POS Unit No.");
+        GlobalBlueI2Services.DeleteAll(true);
     end;
 
     #endregion

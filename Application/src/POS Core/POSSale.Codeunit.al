@@ -84,13 +84,13 @@
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
         POSAuditProfile: Record "NPR POS Audit Profile";
-        POSUnit: Record "NPR POS Unit";
+        NPRPOSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
         DuplicateReceiptNo: Label 'Duplicate Receipt Number %1';
     begin
-        POSUnit.Get(POSUnitNo);
-        POSUnit.TestField("POS Audit Profile");
-        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        NPRPOSUnit.Get(POSUnitNo);
+        NPRPOSUnit.TestField("POS Audit Profile");
+        POSAuditProfile.Get(NPRPOSUnit."POS Audit Profile");
         POSAuditProfile.TestField("Sales Ticket No. Series");
 
         ReceiptNo := NoSeriesManagement.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today, true);
@@ -438,7 +438,7 @@
         ErrServiceNoCust: Label 'A Customer must be chosen, because the sale contains items which are to be transferred to service items.';
         saleNegCashSum: Decimal;
         POSInfoManagement: Codeunit "NPR POS Info Management";
-        POSUnit: Record "NPR POS Unit";
+        NPRPOSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
         TotalItemAmountInclVat: Decimal;
         ErrReturnCashExceeded: Label 'Return cash exceeded. Create credit voucher instead.';
@@ -566,10 +566,10 @@
                 SaleLinePOS."Location Code" := POSStore."Location Code";
             end;
             if SaleLinePOS."Shortcut Dimension 1 Code" = '' then
-                SaleLinePOS.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");
+                SaleLinePOS.Validate("Shortcut Dimension 1 Code", NPRPOSUnit."Global Dimension 1 Code");
 
             if SaleLinePOS."Shortcut Dimension 2 Code" = '' then
-                SaleLinePOS.Validate("Shortcut Dimension 2 Code", POSUnit."Global Dimension 2 Code");
+                SaleLinePOS.Validate("Shortcut Dimension 2 Code", NPRPOSUnit."Global Dimension 2 Code");
         until SaleLinePOS.Next() = 0;
 
         POSInfoManagement.PostPOSInfo(Sale);
@@ -679,11 +679,11 @@
     local procedure LogStopwatch(Keyword: Text; Duration: Duration)
     var
         POSSession: Codeunit "NPR POS Session";
-        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        if not POSSession.IsActiveSession(FrontEnd) then
+        if not POSSession.IsActiveSession(POSFrontEnd) then
             exit;
-        FrontEnd.GetSession(POSSession);
+        POSFrontEnd.GetSession(POSSession);
         POSSession.AddServerStopwatch(Keyword, Duration);
     end;
 
@@ -778,7 +778,7 @@
 
     procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
-        POSUnit: Record "NPR POS Unit";
+        NPRPOSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         StartTime: DateTime;
@@ -786,7 +786,7 @@
         StartTime := CurrentDateTime;
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
         POSSalesWorkflowStep.SetFilter("Set Code", '=%1', '');
-        if POSUnit.Get(SalePOS."Register No.") and (POSUnit."POS Sales Workflow Set" <> '') and POSSalesWorkflowSetEntry.Get(POSUnit."POS Sales Workflow Set", OnFinishSaleCode()) then
+        if NPRPOSUnit.Get(SalePOS."Register No.") and (NPRPOSUnit."POS Sales Workflow Set" <> '') and POSSalesWorkflowSetEntry.Get(NPRPOSUnit."POS Sales Workflow Set", OnFinishSaleCode()) then
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);

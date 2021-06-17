@@ -12,12 +12,10 @@
         end;
     end;
 
-    var
-        NcCollection: Record "NPR Nc Collection";
-
     local procedure SetBufferCollectionToProcessed(var NpXmlCustomValueBuffer: Record "NPR NpXml Custom Val. Buffer")
     var
         RecRef: RecordRef;
+        NcCollection: Record "NPR Nc Collection";
     begin
         Clear(RecRef);
         RecRef.Open(NpXmlCustomValueBuffer."Table No.");

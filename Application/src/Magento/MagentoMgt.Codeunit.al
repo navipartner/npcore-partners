@@ -5,7 +5,6 @@ codeunit 6151402 "NPR Magento Mgt."
 
     procedure GetCustTemplate(Customer: Record Customer) TemplateCode: Code[20]
     var
-        MagentoSetup: Record "NPR Magento Setup";
         MagentoCustomerMapping: Record "NPR Magento Customer Mapping";
     begin
         if MagentoCustomerMapping.Get(Customer."Country/Region Code", Customer."Post Code") then
@@ -25,7 +24,6 @@ codeunit 6151402 "NPR Magento Mgt."
 
     procedure GetCustConfigTemplate(TaxClass: Text; Customer: Record Customer) ConfigTemplateCode: Code[10]
     var
-        MagentoSetup: Record "NPR Magento Setup";
         MagentoTaxClass: Record "NPR Magento Tax Class";
         MagentoCustomerMapping: Record "NPR Magento Customer Mapping";
     begin
@@ -50,7 +48,6 @@ codeunit 6151402 "NPR Magento Mgt."
 
     procedure GetCustomerConfigTemplate(TaxClass: Text) ConfigTemplateCode: Code[10]
     var
-        MagentoSetup: Record "NPR Magento Setup";
         MagentoTaxClass: Record "NPR Magento Tax Class";
     begin
         if not MagentoSetup.Get() then

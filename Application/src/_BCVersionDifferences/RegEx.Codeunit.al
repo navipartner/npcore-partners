@@ -145,7 +145,6 @@ codeunit 6014569 "NPR RegEx"
         GroupCollection: Codeunit DotNet_GroupCollection;
         DotNetGroup: Codeunit DotNet_Group;
 #else
-        RegEx: Codeunit Regex;
         Matches: Record Matches temporary;
         Groups: Record Groups temporary;
 #endif

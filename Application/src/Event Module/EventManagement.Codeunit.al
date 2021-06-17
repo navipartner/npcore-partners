@@ -1234,7 +1234,7 @@
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         JobPlanningLine: Record "Job Planning Line";
-        NextEntryNo: Integer;
+        LocalNextEntryNo: Integer;
     begin
         Clear(PostedJobPlanningLineInvoice);
         if NonPostedJobPlanningLineInvoice.FindSet() then
@@ -1249,7 +1249,7 @@
                 JobPlanningLineInvoice."Invoiced Date" := PostingDate;
                 JobPlanningLineInvoice."Invoiced Amount (LCY)" := CalcLineAmountLCY(JobPlanningLine, JobPlanningLineInvoice."Quantity Transferred");
                 JobPlanningLineInvoice."Invoiced Cost Amount (LCY)" := JobPlanningLineInvoice."Quantity Transferred" * JobPlanningLine."Unit Cost (LCY)";
-                JobPlanningLineInvoice."Job Ledger Entry No." := NextEntryNo;
+                JobPlanningLineInvoice."Job Ledger Entry No." := LocalNextEntryNo;
                 JobPlanningLineInvoice.Modify();
                 JobPlanningLine.UpdateQtyToInvoice();
                 JobPlanningLine.Modify();

@@ -554,7 +554,7 @@
 
     procedure TransferToMix()
     var
-        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        NPRMixedDiscountLine: Record "NPR Mixed Discount Line";
         ErrorNo1: Label 'No Items has been selected for transfer';
         ErrorNo2: Label 'Item No. %1 allready exists in the mix';
         OkMsg: Label '%1 Item(s) has been transferred to Mix No. %2';
@@ -564,25 +564,25 @@
             Error(ErrorNo1);
         Clear(MixedDiscountList);
         repeat
-            if MixedDiscountLine.Get(Rec.Code, Item."No.") then
+            if NPRMixedDiscountLine.Get(Rec.Code, Item."No.") then
                 Error(ErrorNo2, Item."No.");
-            MixedDiscountLine.Init();
-            MixedDiscountLine.Code := Rec.Code;
-            MixedDiscountLine."No." := Item."No.";
-            MixedDiscountLine.Quantity := 1;
-            MixedDiscountLine.Description := Item.Description;
-            MixedDiscountLine."Unit cost" := Item."Unit Cost";
-            MixedDiscountLine."Unit price incl. VAT" := Item."Price Includes VAT";
-            MixedDiscountLine.Status := Rec.Status;
-            MixedDiscountLine."Unit price" := Item."Unit Price";
-            MixedDiscountLine.Insert();
+            NPRMixedDiscountLine.Init();
+            NPRMixedDiscountLine.Code := Rec.Code;
+            NPRMixedDiscountLine."No." := Item."No.";
+            NPRMixedDiscountLine.Quantity := 1;
+            NPRMixedDiscountLine.Description := Item.Description;
+            NPRMixedDiscountLine."Unit cost" := Item."Unit Cost";
+            NPRMixedDiscountLine."Unit price incl. VAT" := Item."Price Includes VAT";
+            NPRMixedDiscountLine.Status := Rec.Status;
+            NPRMixedDiscountLine."Unit price" := Item."Unit Price";
+            NPRMixedDiscountLine.Insert();
         until Item.Next() = 0;
         Message(OkMsg, Item.Count, Rec.Code);
     end;
 
     procedure CollapseToItemDiscGroup()
     var
-        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        NPRMixedDiscountLine: Record "NPR Mixed Discount Line";
         ItemDiscGrpRec: Record "Item Discount Group";
     begin
         if not Confirm(TxtCompChngeContinue) then
@@ -594,34 +594,34 @@
         ItemDiscGrpRec.Description := CopyStr(TxtCompressItems, 1, MaxStrLen(ItemDiscGrpRec.Description));
         if ItemDiscGrpRec.Insert(true) then;
 
-        Clear(MixedDiscountLine);
-        MixedDiscountLine.ClearMarks();
-        MixedDiscountLine.SetRange(Code, Rec.Code);
-        if MixedDiscountLine.Find('-') then
+        Clear(NPRMixedDiscountLine);
+        NPRMixedDiscountLine.ClearMarks();
+        NPRMixedDiscountLine.SetRange(Code, Rec.Code);
+        if NPRMixedDiscountLine.Find('-') then
             repeat
-                if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::Item then begin
+                if NPRMixedDiscountLine."Disc. Grouping Type" = NPRMixedDiscountLine."Disc. Grouping Type"::Item then begin
                     Item.Reset();
-                    if Item.Get(MixedDiscountLine."No.") then
+                    if Item.Get(NPRMixedDiscountLine."No.") then
                         if not Item."NPR Group sale" then begin
                             Item."Item Disc. Group" := Rec.Code;
                             Item.Modify(true);
-                            MixedDiscountLine.Mark(true);
+                            NPRMixedDiscountLine.Mark(true);
                         end;
                 end;
-            until MixedDiscountLine.Next() = 0;
+            until NPRMixedDiscountLine.Next() = 0;
 
-        MixedDiscountLine.MarkedOnly(true);
-        MixedDiscountLine.DeleteAll(true);
+        NPRMixedDiscountLine.MarkedOnly(true);
+        NPRMixedDiscountLine.DeleteAll(true);
 
-        MixedDiscountLine.ClearMarks();
-        Clear(MixedDiscountLine);
-        MixedDiscountLine.Init();
-        MixedDiscountLine.Validate(Code, Rec.Code);
-        MixedDiscountLine."Disc. Grouping Type" := MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group";
-        MixedDiscountLine."No." := Rec.Code;
-        MixedDiscountLine.Description := TxtCompressItems;
-        if not MixedDiscountLine.Insert(true) then
-            if MixedDiscountLine.Modify(true) then;
+        NPRMixedDiscountLine.ClearMarks();
+        Clear(NPRMixedDiscountLine);
+        NPRMixedDiscountLine.Init();
+        NPRMixedDiscountLine.Validate(Code, Rec.Code);
+        NPRMixedDiscountLine."Disc. Grouping Type" := NPRMixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group";
+        NPRMixedDiscountLine."No." := Rec.Code;
+        NPRMixedDiscountLine.Description := TxtCompressItems;
+        if not NPRMixedDiscountLine.Insert(true) then
+            if NPRMixedDiscountLine.Modify(true) then;
     end;
 
     local procedure GetFieldCaption(CaptionFieldNo: Integer) Caption: Text

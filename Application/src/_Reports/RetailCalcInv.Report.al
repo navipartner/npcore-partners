@@ -311,8 +311,8 @@ report 6014663 "NPR Retail Calc. Inv."
         DimValue: Record "Dimension Value";
         ItemLedgEntry: Record "Item Ledger Entry";
         ReservEntry: Record "Reservation Entry";
-        WhseEntry: Record "Warehouse Entry";
-        WhseEntry2: Record "Warehouse Entry";
+        WarehouseEntry: Record "Warehouse Entry";
+        WarehouseEntry2: Record "Warehouse Entry";
         CreateReservEntry: Codeunit "Create Reserv. Entry";
         DimMgt: Codeunit DimensionManagement;
         NoBinExist: Boolean;
@@ -377,45 +377,45 @@ report 6014663 "NPR Retail Calc. Inv."
 
             if Location.Code <> '' then
                 if Location."Directed Put-away and Pick" then begin
-                    WhseEntry.SetCurrentKey(
+                    WarehouseEntry.SetCurrentKey(
                       "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
                       "Lot No.", "Serial No.", "Entry Type");
-                    WhseEntry.SetRange("Item No.", ItemJnlLine."Item No.");
-                    WhseEntry.SetRange("Bin Code", Location."Adjustment Bin Code");
-                    WhseEntry.SetRange("Location Code", ItemJnlLine."Location Code");
-                    WhseEntry.SetRange("Variant Code", ItemJnlLine."Variant Code");
+                    WarehouseEntry.SetRange("Item No.", ItemJnlLine."Item No.");
+                    WarehouseEntry.SetRange("Bin Code", Location."Adjustment Bin Code");
+                    WarehouseEntry.SetRange("Location Code", ItemJnlLine."Location Code");
+                    WarehouseEntry.SetRange("Variant Code", ItemJnlLine."Variant Code");
                     if ItemJnlLine."Entry Type" = ItemJnlLine."Entry Type"::"Positive Adjmt." then
                         EntryType := EntryType::"Negative Adjmt.";
                     if ItemJnlLine."Entry Type" = ItemJnlLine."Entry Type"::"Negative Adjmt." then
                         EntryType := EntryType::"Positive Adjmt.";
-                    WhseEntry.SetRange("Entry Type", EntryType);
-                    if WhseEntry.Find('-') then
+                    WarehouseEntry.SetRange("Entry Type", EntryType);
+                    if WarehouseEntry.Find('-') then
                         repeat
-                            WhseEntry.SetRange("Lot No.", WhseEntry."Lot No.");
-                            WhseEntry.SetRange("Serial No.", WhseEntry."Serial No.");
-                            WhseEntry.CalcSums("Qty. (Base)");
+                            WarehouseEntry.SetRange("Lot No.", WarehouseEntry."Lot No.");
+                            WarehouseEntry.SetRange("Serial No.", WarehouseEntry."Serial No.");
+                            WarehouseEntry.CalcSums("Qty. (Base)");
 
-                            WhseEntry2.SetCurrentKey(
+                            WarehouseEntry2.SetCurrentKey(
                               "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
                               "Lot No.", "Serial No.", "Entry Type");
-                            WhseEntry2.CopyFilters(WhseEntry);
+                            WarehouseEntry2.CopyFilters(WarehouseEntry);
                             case EntryType of
                                 EntryType::"Positive Adjmt.":
-                                    WhseEntry2.SetRange("Entry Type", WhseEntry2."Entry Type"::"Negative Adjmt.");
+                                    WarehouseEntry2.SetRange("Entry Type", WarehouseEntry2."Entry Type"::"Negative Adjmt.");
                                 EntryType::"Negative Adjmt.":
-                                    WhseEntry2.SetRange("Entry Type", WhseEntry2."Entry Type"::"Positive Adjmt.");
+                                    WarehouseEntry2.SetRange("Entry Type", WarehouseEntry2."Entry Type"::"Positive Adjmt.");
                             end;
-                            WhseEntry2.CalcSums("Qty. (Base)");
-                            if Abs(WhseEntry2."Qty. (Base)") > Abs(WhseEntry."Qty. (Base)") then
-                                WhseEntry."Qty. (Base)" := 0
+                            WarehouseEntry2.CalcSums("Qty. (Base)");
+                            if Abs(WarehouseEntry2."Qty. (Base)") > Abs(WarehouseEntry."Qty. (Base)") then
+                                WarehouseEntry."Qty. (Base)" := 0
                             else
-                                WhseEntry."Qty. (Base)" := WhseEntry."Qty. (Base)" + WhseEntry2."Qty. (Base)";
+                                WarehouseEntry."Qty. (Base)" := WarehouseEntry."Qty. (Base)" + WarehouseEntry2."Qty. (Base)";
 
-                            if WhseEntry."Qty. (Base)" <> 0 then begin
+                            if WarehouseEntry."Qty. (Base)" <> 0 then begin
                                 if ItemJnlLine."Order Type" = ItemJnlLine."Order Type"::Production then
                                     OrderLineNo := ItemJnlLine."Order Line No.";
-                                ReservEntry."Serial No." := WhseEntry."Serial No.";
-                                ReservEntry."Lot No." := WhseEntry."Lot No.";
+                                ReservEntry."Serial No." := WarehouseEntry."Serial No.";
+                                ReservEntry."Lot No." := WarehouseEntry."Lot No.";
                                 CreateReservEntry.CreateReservEntryFor(
                                   DATABASE::"Item Journal Line",
                                   ItemJnlLine."Entry Type".AsInteger(),
@@ -424,11 +424,11 @@ report 6014663 "NPR Retail Calc. Inv."
                                   OrderLineNo,
                                   ItemJnlLine."Line No.",
                                   ItemJnlLine."Qty. per Unit of Measure",
-                                  Abs(WhseEntry.Quantity),
-                                  Abs(WhseEntry."Qty. (Base)"),
+                                  Abs(WarehouseEntry.Quantity),
+                                  Abs(WarehouseEntry."Qty. (Base)"),
                                   ReservEntry);
-                                if WhseEntry."Qty. (Base)" < 0 then             // only Date on positive adjustments
-                                    CreateReservEntry.SetDates(WhseEntry."Warranty Date", WhseEntry."Expiration Date");
+                                if WarehouseEntry."Qty. (Base)" < 0 then             // only Date on positive adjustments
+                                    CreateReservEntry.SetDates(WarehouseEntry."Warranty Date", WarehouseEntry."Expiration Date");
                                 CreateReservEntry.CreateEntry(
                                   ItemJnlLine."Item No.",
                                   ItemJnlLine."Variant Code",
@@ -439,10 +439,10 @@ report 6014663 "NPR Retail Calc. Inv."
                                   0,
                                   ReservEntry."Reservation Status"::Prospect);
                             end;
-                            WhseEntry.Find('+');
-                            WhseEntry.SetRange("Lot No.");
-                            WhseEntry.SetRange("Serial No.");
-                        until WhseEntry.Next() = 0;
+                            WarehouseEntry.Find('+');
+                            WarehouseEntry.SetRange("Lot No.");
+                            WarehouseEntry.SetRange("Serial No.");
+                        until WarehouseEntry.Next() = 0;
                 end;
 
             if ColumnDim = '' then
@@ -502,8 +502,8 @@ report 6014663 "NPR Retail Calc. Inv."
     local procedure CalcWhseQty(AdjmtBin: Code[20]; var PosQuantity: Decimal; var NegQuantity: Decimal)
     var
         WhseItemTrackingSetup: Record "Item Tracking Setup";
-        WhseEntry: Record "Warehouse Entry";
-        WhseEntry2: Record "Warehouse Entry";
+        WarehouseEntry: Record "Warehouse Entry";
+        WarehouseEntry2: Record "Warehouse Entry";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         NoWhseEntry: Boolean;
         NoWhseEntry2: Boolean;
@@ -512,51 +512,51 @@ report 6014663 "NPR Retail Calc. Inv."
         AdjustPosQty := false;
         ItemTrackingMgt.GetWhseItemTrkgSetup(QuantityOnHandBuffer."Item No.", WhseItemTrackingSetup);
         ItemTrackingSplit := WhseItemTrackingSetup."Serial No. Required" or WhseItemTrackingSetup."Lot No. Required";
-        WhseEntry.SetCurrentKey(
+        WarehouseEntry.SetCurrentKey(
           "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
           "Lot No.", "Serial No.", "Entry Type");
 
-        WhseEntry.SetRange("Item No.", QuantityOnHandBuffer."Item No.");
-        WhseEntry.SetRange("Location Code", QuantityOnHandBuffer."Location Code");
-        WhseEntry.SetRange("Variant Code", QuantityOnHandBuffer."Variant Code");
-        WhseEntry.CalcSums("Qty. (Base)");
-        WhseQuantity := WhseEntry."Qty. (Base)";
-        WhseEntry.SetRange("Bin Code", AdjmtBin);
+        WarehouseEntry.SetRange("Item No.", QuantityOnHandBuffer."Item No.");
+        WarehouseEntry.SetRange("Location Code", QuantityOnHandBuffer."Location Code");
+        WarehouseEntry.SetRange("Variant Code", QuantityOnHandBuffer."Variant Code");
+        WarehouseEntry.CalcSums("Qty. (Base)");
+        WhseQuantity := WarehouseEntry."Qty. (Base)";
+        WarehouseEntry.SetRange("Bin Code", AdjmtBin);
 
         if WhseItemTrackingSetup."Serial No. Required" then begin
-            WhseEntry.SetRange("Entry Type", WhseEntry."Entry Type"::"Positive Adjmt.");
-            WhseEntry.CalcSums("Qty. (Base)");
-            PosQuantity := WhseQuantity - WhseEntry."Qty. (Base)";
-            WhseEntry.SetRange("Entry Type", WhseEntry."Entry Type"::"Negative Adjmt.");
-            WhseEntry.CalcSums("Qty. (Base)");
-            NegQuantity := WhseQuantity - WhseEntry."Qty. (Base)";
-            WhseEntry.SetRange("Entry Type", WhseEntry."Entry Type"::Movement);
-            WhseEntry.CalcSums("Qty. (Base)");
-            if WhseEntry."Qty. (Base)" <> 0 then begin
-                if WhseEntry."Qty. (Base)" > 0 then
-                    PosQuantity := PosQuantity + WhseQuantity - WhseEntry."Qty. (Base)"
+            WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::"Positive Adjmt.");
+            WarehouseEntry.CalcSums("Qty. (Base)");
+            PosQuantity := WhseQuantity - WarehouseEntry."Qty. (Base)";
+            WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::"Negative Adjmt.");
+            WarehouseEntry.CalcSums("Qty. (Base)");
+            NegQuantity := WhseQuantity - WarehouseEntry."Qty. (Base)";
+            WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::Movement);
+            WarehouseEntry.CalcSums("Qty. (Base)");
+            if WarehouseEntry."Qty. (Base)" <> 0 then begin
+                if WarehouseEntry."Qty. (Base)" > 0 then
+                    PosQuantity := PosQuantity + WhseQuantity - WarehouseEntry."Qty. (Base)"
                 else
-                    NegQuantity := NegQuantity - WhseQuantity - WhseEntry."Qty. (Base)";
+                    NegQuantity := NegQuantity - WhseQuantity - WarehouseEntry."Qty. (Base)";
             end;
 
-            WhseEntry.SetRange("Entry Type", WhseEntry."Entry Type"::"Positive Adjmt.");
-            if WhseEntry.Find('-') then begin
+            WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::"Positive Adjmt.");
+            if WarehouseEntry.Find('-') then begin
                 repeat
-                    WhseEntry.SetRange("Serial No.", WhseEntry."Serial No.");
-                    WhseEntry2.Reset();
-                    WhseEntry2.SetCurrentKey(
+                    WarehouseEntry.SetRange("Serial No.", WarehouseEntry."Serial No.");
+                    WarehouseEntry2.Reset();
+                    WarehouseEntry2.SetCurrentKey(
                       "Item No.", "Bin Code", "Location Code", "Variant Code",
                       "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type");
 
-                    WhseEntry2.CopyFilters(WhseEntry);
-                    WhseEntry2.SetRange("Entry Type", WhseEntry2."Entry Type"::"Negative Adjmt.");
-                    WhseEntry2.SetRange("Serial No.", WhseEntry."Serial No.");
-                    if WhseEntry2.Find('-') then
+                    WarehouseEntry2.CopyFilters(WarehouseEntry);
+                    WarehouseEntry2.SetRange("Entry Type", WarehouseEntry2."Entry Type"::"Negative Adjmt.");
+                    WarehouseEntry2.SetRange("Serial No.", WarehouseEntry."Serial No.");
+                    if WarehouseEntry2.Find('-') then
                         repeat
                             PosQuantity := PosQuantity + 1;
                             NegQuantity := NegQuantity - 1;
-                            NoWhseEntry := WhseEntry.Next() = 0;
-                            NoWhseEntry2 := WhseEntry2.Next() = 0;
+                            NoWhseEntry := WarehouseEntry.Next() = 0;
+                            NoWhseEntry2 := WarehouseEntry2.Next() = 0;
                         until NoWhseEntry2 or NoWhseEntry
                     else
                         AdjustPosQty := true;
@@ -564,24 +564,24 @@ report 6014663 "NPR Retail Calc. Inv."
                     if not NoWhseEntry and NoWhseEntry2 then
                         AdjustPosQty := true;
 
-                    WhseEntry.Find('+');
-                    WhseEntry.SetRange("Serial No.");
-                until WhseEntry.Next() = 0;
+                    WarehouseEntry.Find('+');
+                    WarehouseEntry.SetRange("Serial No.");
+                until WarehouseEntry.Next() = 0;
             end;
         end else begin
-            if WhseEntry.Find('-') then
+            if WarehouseEntry.Find('-') then
                 repeat
-                    WhseEntry.SetRange("Lot No.", WhseEntry."Lot No.");
-                    WhseEntry.CalcSums("Qty. (Base)");
-                    if WhseEntry."Qty. (Base)" <> 0 then begin
-                        if WhseEntry."Qty. (Base)" > 0 then
-                            NegQuantity := NegQuantity - WhseEntry."Qty. (Base)"
+                    WarehouseEntry.SetRange("Lot No.", WarehouseEntry."Lot No.");
+                    WarehouseEntry.CalcSums("Qty. (Base)");
+                    if WarehouseEntry."Qty. (Base)" <> 0 then begin
+                        if WarehouseEntry."Qty. (Base)" > 0 then
+                            NegQuantity := NegQuantity - WarehouseEntry."Qty. (Base)"
                         else
-                            PosQuantity := PosQuantity + WhseEntry."Qty. (Base)";
+                            PosQuantity := PosQuantity + WarehouseEntry."Qty. (Base)";
                     end;
-                    WhseEntry.Find('+');
-                    WhseEntry.SetRange("Lot No.");
-                until WhseEntry.Next() = 0;
+                    WarehouseEntry.Find('+');
+                    WarehouseEntry.SetRange("Lot No.");
+                until WarehouseEntry.Next() = 0;
             if PosQuantity <> WhseQuantity then
                 PosQuantity := WhseQuantity - PosQuantity;
             if NegQuantity <> -WhseQuantity then
@@ -688,16 +688,16 @@ report 6014663 "NPR Retail Calc. Inv."
 
     local procedure UpdateQuantityOnHandBuffer(ItemNo: Code[20])
     var
-        Location: Record Location;
+        LocalLocation: Record Location;
     begin
         QuantityOnHandBuffer.SetRange("Item No.", ItemNo);
         if QuantityOnHandBuffer.IsEmpty() then begin
-            Item.CopyFilter("Location Filter", Location.Code);
-            Location.SetRange("Use As In-Transit", false);
-            if (Item.GetFilter("Location Filter") <> '') and Location.FindSet() then
+            Item.CopyFilter("Location Filter", LocalLocation.Code);
+            LocalLocation.SetRange("Use As In-Transit", false);
+            if (Item.GetFilter("Location Filter") <> '') and LocalLocation.FindSet() then
                 repeat
-                    InsertQuantityOnHandBuffer(ItemNo, Location.Code);
-                until Location.Next() = 0
+                    InsertQuantityOnHandBuffer(ItemNo, LocalLocation.Code);
+                until LocalLocation.Next() = 0
             else
                 InsertQuantityOnHandBuffer(ItemNo, '');
         end;
