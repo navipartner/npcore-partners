@@ -272,9 +272,9 @@
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         Sku: Text;
-        ItemNo: Code[20];
+        LocalItemNo: Code[20];
     begin
-        ItemNo := '0000000001';
+        LocalItemNo := '0000000001';
 
         Item.SetRange("NPR Magento Item", true);
         Item.SetRange(Blocked, false);
@@ -285,9 +285,9 @@
                 if ItemVariant.FindSet() then begin
                     repeat
                         Sku := ItemVariant."Item No." + '_' + ItemVariant.Code;
-                        ItemNo := IncStr(ItemNo);
+                        LocalItemNo := IncStr(LocalItemNo);
                         TempItem.Init();
-                        TempItem."No." := ItemNo;
+                        TempItem."No." := LocalItemNo;
                         TempItem."Search Description" := Sku;
                         TempItem.Description := ItemVariant."Item No.";
                         TempItem."Description 2" := ItemVariant.Code;
@@ -296,9 +296,9 @@
                     until ItemVariant.Next() = 0;
                 end else begin
                     Sku := Item."No.";
-                    ItemNo := IncStr(ItemNo);
+                    LocalItemNo := IncStr(LocalItemNo);
                     TempItem.Init();
-                    TempItem."No." := ItemNo;
+                    TempItem."No." := LocalItemNo;
                     TempItem."Search Description" := Sku;
                     TempItem.Description := Item."No.";
                     TempItem."Description 2" := '';

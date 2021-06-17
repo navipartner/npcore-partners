@@ -127,9 +127,9 @@
 #if BC17
         FileName: Text;
 #endif
-        X509Certificate2: DotNet NPRNetX509Certificate2;
+        NPRX509Certificate2: DotNet NPRNetX509Certificate2;
         MemoryStream: DotNet NPRNetMemoryStream;
-        RSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
+        LocalRSACryptoServiceProvider: DotNet NPRNetRSACryptoServiceProvider;
     begin
         FRCertificationSetup.Get();
         if FRCertificationSetup."Signing Certificate".HasValue() then begin
@@ -149,12 +149,12 @@
         MemoryStream := MemoryStream.MemoryStream();
         CopyStream(MemoryStream, InStream);
 
-        X509Certificate2 := X509Certificate2.X509Certificate2(MemoryStream.ToArray(), FRCertificationSetup."Signing Certificate Password");
-        if (not X509Certificate2.HasPrivateKey) then
+        NPRX509Certificate2 := NPRX509Certificate2.X509Certificate2(MemoryStream.ToArray(), FRCertificationSetup."Signing Certificate Password");
+        if (not NPRX509Certificate2.HasPrivateKey) then
             Error(ERROR_MISSING_KEY);
-        RSACryptoServiceProvider := X509Certificate2.PrivateKey;
+        LocalRSACryptoServiceProvider := NPRX509Certificate2.PrivateKey;
 
-        FRCertificationSetup."Signing Certificate Thumbprint" := X509Certificate2.Thumbprint;
+        FRCertificationSetup."Signing Certificate Thumbprint" := NPRX509Certificate2.Thumbprint;
 
         MemoryStream.Position := 0;
         CopyStream(OutStream, MemoryStream);

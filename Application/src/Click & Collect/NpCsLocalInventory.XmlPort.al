@@ -75,19 +75,19 @@ xmlport 6151199 "NPR NpCs Local Inventory"
     var
         ItemReference: Record "Item Reference";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
-        ItemNo: Text;
+        ItemVariantNo: Text;
         VariantCode: Text;
         Position: Integer;
         ItemRefNo: Text;
     begin
-        ItemNo := UpperCase(Sku);
-        Position := StrPos(ItemNo, '_');
+        ItemVariantNo := UpperCase(Sku);
+        Position := StrPos(ItemVariantNo, '_');
         if Position > 0 then begin
-            VariantCode := CopyStr(ItemNo, Position + 1);
-            ItemNo := DelStr(ItemNo, Position);
+            VariantCode := CopyStr(ItemVariantNo, Position + 1);
+            ItemVariantNo := DelStr(ItemVariantNo, Position);
         end;
 
-        ItemVariant."Item No." := CopyStr(ItemNo, 1, MaxStrLen(ItemVariant."Item No."));
+        ItemVariant."Item No." := CopyStr(ItemVariantNo, 1, MaxStrLen(ItemVariant."Item No."));
         ItemVariant.Code := CopyStr(VariantCode, 1, MaxStrLen(ItemVariant.Code));
         if ItemVariant.Find() then
             exit;

@@ -457,7 +457,7 @@
         MagentoWebsite: Record "NPR Magento Website";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
         PaymentMapping: Record "NPR Magento Payment Mapping";
-        MagentoMgt: Codeunit "NPR Magento Mgt.";
+        NPRMagentoMgt: Codeunit "NPR Magento Mgt.";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         XmlElement2: XmlElement;
         XNode: XmlNode;
@@ -514,7 +514,7 @@
                 begin
                     TempCustomer."Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2, 'post_code', MaxStrLen(Customer."Post Code"), true));
                     TempCustomer."Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2, 'country_code', MaxStrLen(Customer."Country/Region Code"), false));
-                    if SalesHeader."Sell-to Customer No." = MagentoMgt.GetFixedCustomerNo(TempCustomer) then begin
+                    if SalesHeader."Sell-to Customer No." = NPRMagentoMgt.GetFixedCustomerNo(TempCustomer) then begin
                         SalesHeader."Bill-to Name" := SalesHeader."Sell-to Customer Name";
                         SalesHeader."Bill-to Name 2" := SalesHeader."Sell-to Customer Name 2";
                         SalesHeader."Bill-to Address" := SalesHeader."Sell-to Address";
