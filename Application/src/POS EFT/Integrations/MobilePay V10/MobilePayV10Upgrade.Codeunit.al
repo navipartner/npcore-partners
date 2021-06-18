@@ -115,8 +115,6 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
                 TempOldEFTTypePOSUnitGenParam.Insert(false);
             until EFTTypePOSUnitGenParam.next() = 0;
         end;
-
-        EFTTypePOSUnitGenParam.DeleteAll();
     end;
 
     local procedure CreateOldEftTypePaymentGenParamsTempRecords(var OldEftSetup: Record "NPR EFT Setup")
@@ -149,8 +147,6 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
                 TempOldEFTTypePOSUnitBLOBParam.Insert(false);
             until EFTTypePOSUnitBLOBParam.next() = 0;
         end;
-
-        EFTTypePOSUnitBLOBParam.DeleteAll(false);
     end;
 
     local procedure CreateOldEftSetupTempRecords(var OldEftSetup: Record "NPR EFT Setup")
@@ -177,7 +173,6 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
                 EftSetup.Init();
                 EftSetup."Payment Type POS" := TempOldEftSetupTemp."Payment Type POS";
                 EftSetup."POS Unit No." := TempOldEftSetupTemp."POS Unit No.";
-                EftSetup.Insert();
                 EftSetup.Validate("EFT Integration Type", TempDefaultMobilePayEftIntType.Code);
                 if not EftSetup.Insert() then
                     EftSetup.Modify();
