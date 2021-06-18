@@ -93,6 +93,11 @@
             "justification": "Only use AssertError in Test Codeunits."
         },
         {
+            "id": "AA0181",
+            "action":"Hidden",
+            "justification": "The FindSet() or Find() methods must be used only in connection with the Next() method."
+        },
+        {
             "id": "AA0189",
             "action":"Hidden",
             "justification": "Only use a correct values of ApplicationArea."
@@ -196,7 +201,12 @@
             "id": "AA0231",
             "action":"Error",
             "justification": "StrSubstNo or string concatenation must not be used as a parameter in the Error method."
-        },    
+        },
+        {
+            "id": "AA0232",
+            "action":"Hidden",
+            "justification": "The FlowField of a table should be indexed."
+        },
         {
             "id": "AA0233",
             "action":"Error",
