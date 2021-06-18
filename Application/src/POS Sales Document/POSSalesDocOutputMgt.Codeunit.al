@@ -201,9 +201,10 @@ codeunit 6014429 "NPR POS Sales Doc. Output Mgt."
 
     local procedure PrintReportSelection_Customer(ReportUsage: Enum "Report Selection Usage"; var RecordVariant: Variant; CustomerNoFieldNo: Integer)
     var
+        ReportSelections: Record "Report Selections";
         TempReportSelections: Record "Report Selections" temporary;
     begin
-        TempReportSelections.FindReportUsageForCust(ReportUsage, GetAccountNo(RecordVariant, CustomerNoFieldNo), TempReportSelections);
+        ReportSelections.FindReportUsageForCust(ReportUsage, GetAccountNo(RecordVariant, CustomerNoFieldNo), TempReportSelections);
         PrintReportSelection(TempReportSelections, RecordVariant);
     end;
 
