@@ -39,9 +39,12 @@ table 6151126 "NPR NpIa Item AddOn Line"
             trigger OnValidate()
             var
                 Item: Record Item;
+                xItemAddonLine: Record "NPR NpIa Item AddOn Line";
             begin
                 if "Item No." = '' then begin
+                    xItemAddonLine := Rec;
                     Init();
+                    Type := xItemAddonLine.Type;
                     exit;
                 end;
                 TestField(Type, Type::Quantity);
