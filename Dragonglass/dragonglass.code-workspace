@@ -1,0 +1,81 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": ".workspace"
+		},
+		{
+			"name": "dragonglass-core",
+			"path": "packages/dragonglass-core"
+		},
+		{
+			"name": "dragonglass-nav",
+			"path": "packages/dragonglass-nav"
+		},
+		{
+			"name": "dragonglass-transcendence",
+			"path": "packages/dragonglass-transcendence"
+		},
+		{
+			"name": "dragonglass-redux",
+			"path": "packages/dragonglass-redux"
+		},
+		{
+			"name": "dragonglass-front-end-async",
+			"path": "packages/dragonglass-front-end-async"
+		},
+		{
+			"name": "dragonglass-workflows",
+			"path": "packages/dragonglass-workflows"
+		},
+		{
+			"name": "dragonglass-react",
+			"path": "packages/dragonglass-react"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"dist": true,
+			"node_modules": true,
+			"packages": true,
+			"dragonglass.code-workspace": false
+		},
+		"todo-tree.general.enableFileWatcher": true,
+		"todo-tree.general.statusBar": "total",
+		"todo-tree.tree.showCountsInTree": true,
+		"javascript.referencesCodeLens.enabled": true,
+		"javascript.referencesCodeLens.showOnAllFunctions": true,
+		"jest.disabledWorkspaceFolders": [
+			"*"
+		],
+		"jest.autoEnable": false,
+		"jest.coverageFormatter": "GutterFormatter",
+		"jest.showCoverageOnLoad": true,
+		"workbench.colorCustomizations": {
+			"debugConsole.infoForeground": "#555555",
+			"debugConsole.warningForeground": "#ffbb55",
+			"debugConsole.errorForeground": "#ff5555"
+		},
+		"[markdown]": {
+			"editor.wordWrap": "on"
+		},
+		"javascript.preferences.quoteStyle": "double",
+		"typescript.preferences.quoteStyle": "double",
+		"autoimport.doubleQuotes": true,
+		"typescript.implementationsCodeLens.enabled": true,
+		"typescript.referencesCodeLens.enabled": true,
+		"typescript.referencesCodeLens.showOnAllFunctions": true,
+		"editor.tabSize": 2,
+		"editor.formatOnSave": true
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Gulp Deploy",
+				"type": "shell",
+				"command": "gulp prepare"
+			}
+		]
+	}
+}
