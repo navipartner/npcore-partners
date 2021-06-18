@@ -7028,6 +7028,50 @@ body {
         .transcendence .grid__table table tbody td.loading span {
           background-color: var(--color-primary-300);
           color: var(--color-primary-300); }
+  .transcendence .grid__table .custom-checkbox {
+    display: block;
+    position: relative;
+    width: 1.75em;
+    height: 100%;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; }
+    .transcendence .grid__table .custom-checkbox input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0; }
+      .transcendence .grid__table .custom-checkbox input:checked ~ .checkmark {
+        background-color: var(--color-primary-100); }
+      .transcendence .grid__table .custom-checkbox input:checked ~ .checkmark:after {
+        display: block; }
+    .transcendence .grid__table .custom-checkbox:hover input ~ .checkmark {
+      background-color: var(--color-primary-200); }
+    .transcendence .grid__table .custom-checkbox .checkmark:after {
+      left: 50%;
+      top: 50%;
+      width: 0.2em;
+      height: 0.5em;
+      border: solid var(--color-text-200);
+      border-width: 0 2px 2px 0;
+      -webkit-transform: translate(-50%, -50%) rotate(45deg);
+      -ms-transform: translate(-50%, -50%) rotate(45deg);
+      transform: translate(-50%, -50%) rotate(45deg); }
+  .transcendence .grid__table .checkmark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: var(--color-secondary-200);
+    transform: translateY(-50%); }
+    .transcendence .grid__table .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none; }
 
 .transcendence .grid__table--head {
   flex: 0 0 auto;
