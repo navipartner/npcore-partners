@@ -115,40 +115,6 @@
         end;
     end;
 
-    procedure GetNames(var TaskJnlLine: Record "NPR Task Line"; var JobDescription: Text[50]; var AccName: Text[50])
-    begin
-        /*
-        IF (TaskJnlLine."Job No." = '') OR
-           (TaskJnlLine."Job No." <> LastTaskJnlLine."Job No.")
-        THEN BEGIN
-          JobDescription := '';
-          IF Job.GET(TaskJnlLine."Job No.") THEN
-            JobDescription := Job.Description;
-        END;
-        
-        IF (TaskJnlLine.Type <> LastTaskJnlLine.Type) OR
-           (TaskJnlLine."No." <> LastTaskJnlLine."No.")
-        THEN BEGIN
-          AccName := '';
-          IF TaskJnlLine."No." <> '' THEN
-            CASE TaskJnlLine.Type OF
-              TaskJnlLine.Type::Resource:
-                IF Res.GET(TaskJnlLine."No.") THEN
-                  AccName := Res.Name;
-              TaskJnlLine.Type::Item:
-                IF Item.GET(TaskJnlLine."No.") THEN
-                  AccName := Item.Description;
-              TaskJnlLine.Type::"G/L Account":
-                IF GLAcc.GET(TaskJnlLine."No.") THEN
-                  AccName := GLAcc.Name;
-            END;
-        END;
-        
-        LastTaskJnlLine := TaskJnlLine;
-        */
-
-    end;
-
     procedure SyncroniseCompanies(TaskLine: Record "NPR Task Line"; ChangeType: Option Insert,Modify,Delete,Rename)
     var
         TaskBatch: Record "NPR Task Batch";

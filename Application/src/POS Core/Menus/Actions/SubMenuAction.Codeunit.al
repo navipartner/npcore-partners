@@ -24,7 +24,9 @@ codeunit 6150888 "NPR SubMenu Action" implements "NPR IAction", "NPR IJsonSerial
         Error(TextDoNotUse);
     end;
 
-    procedure CheckConfiguration(POSSession: Codeunit "NPR POS Session"; Source: Text; var ActionMoniker: Text; var ErrorText: Text; var Severity: Integer): Boolean;
+#pragma warning disable AA0150
+    Procedure CheckConfiguration(POSSession: Codeunit "NPR POS Session"; Source: Text; var ActionMoniker: Text; var ErrorText: Text; var Severity: Integer): Boolean;
+#pragma warning restore
     begin
         exit(true);
     end;

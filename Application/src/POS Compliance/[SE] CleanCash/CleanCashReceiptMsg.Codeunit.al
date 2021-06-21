@@ -2,12 +2,16 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
 {
 
     // This method is not implement for receipt message type
+#pragma warning disable AA0150
     procedure CreateRequest(PosUnitNo: Code[10]; var EntryNo: Integer): Boolean
+#pragma warning restore
     begin
         exit(false);
     end;
 
+#pragma warning disable AA0150
     procedure CreateRequest(PosEntry: Record "NPR POS Entry"; RequestType: Enum "NPR CleanCash Request Type"; var EntryNo: Integer): Boolean
+#pragma warning restore
     var
         TmpVat: Record "NPR CleanCash Trans. VAT" temporary;
         Amount: Decimal;
@@ -195,7 +199,9 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         exit(true);
     end;
 
+#pragma warning disable AA0150
     procedure SerializeResponse(var CleanCashTransactionRequest: Record "NPR CleanCash Trans. Request"; XmlDoc: XmlDocument; var ResponseEntryNo: Integer) Success: Boolean
+#pragma warning restore
     var
         CleanCashResponse: Record "NPR CleanCash Trans. Response";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";

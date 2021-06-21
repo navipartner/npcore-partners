@@ -641,7 +641,7 @@
         end;
     end;
 
-    procedure SelectRetailJournal(var RetailJournalCode: Code[40]) JournalSelected: Boolean
+    procedure SelectRetailJournal(RetailJournalCode: Code[40]) JournalSelected: Boolean
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
         POSUnit: Record "NPR POS Unit";

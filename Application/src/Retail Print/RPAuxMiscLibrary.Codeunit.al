@@ -1,6 +1,9 @@
 codeunit 6014550 "NPR RP Aux - Misc. Library"
 {
+
+#pragma warning disable AA0150
     procedure ApplyCipher(var "Proccesing Value": Text[30]; HandleDecimals: Boolean) CifferCodeValue: Code[10]
+#pragma warning restore
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         CifferCode: Code[10];
@@ -24,7 +27,9 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         "Proccesing Value" := CifferCodeValue;
     end;
 
+#pragma warning disable AA0150
     procedure ApplyCurrencyConversion(var "Processing Value": Text[30]; "Conversion String": Code[30])
+#pragma warning restore
     var
         CurrencyExchangeRate: Record "Currency Exchange Rate";
         String: Codeunit "NPR String Library";
@@ -52,7 +57,9 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         "Processing Value" := FormatDecimal("Amount (FCY)");
     end;
 
+#pragma warning disable AA0150
     procedure ApplyExchangeDeadline(var "Processing Value": Text[30])
+#pragma warning restore
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         Date: Date;
@@ -62,7 +69,9 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
             "Processing Value" := Format(CalcDate(ExchangeLabelSetup."Exchange Label Exchange Period", Date));
     end;
 
+#pragma warning disable AA0150
     procedure FormatNumberNoDecimal(var "Processing Value": Text[30])
+#pragma warning restore
     var
         Dec: Decimal;
     begin

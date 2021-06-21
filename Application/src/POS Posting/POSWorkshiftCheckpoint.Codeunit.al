@@ -1348,7 +1348,7 @@
     end;
 
 
-    local procedure AggregateVat_PE(WorkshiftCheckpointEntryNo: Integer; PosUnitNo: Code[10]; var FromPosEntryNo: Integer)
+    local procedure AggregateVat_PE(WorkshiftCheckpointEntryNo: Integer; PosUnitNo: Code[10]; FromPosEntryNo: Integer)
     var
         TmpPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
