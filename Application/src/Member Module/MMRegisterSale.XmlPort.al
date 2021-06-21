@@ -193,7 +193,7 @@ xmlport 6151162 "NPR MM Register Sale"
         DocumentId: Text;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure SetDocumentId(var DocumentIdIn: Text)
+    procedure SetDocumentId(DocumentIdIn: Text)
     begin
         // For test framework
         DocumentId := DocumentIdIn;

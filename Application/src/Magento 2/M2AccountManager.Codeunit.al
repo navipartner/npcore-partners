@@ -144,7 +144,7 @@
         end;
     end;
 
-    procedure DeleteAccount(var ContactNo: Code[20]; var ReasonText: Text): Boolean
+    procedure DeleteAccount(ContactNo: Code[20]; var ReasonText: Text): Boolean
     begin
         if (TryDeleteAccount(ContactNo)) then begin
             ReasonText := '';
@@ -477,7 +477,7 @@
         exit(bOk);
     end;
 
-    local procedure TryDeleteAccount(var ContactNo: Code[20]) bOk: Boolean
+    local procedure TryDeleteAccount(ContactNo: Code[20]) bOk: Boolean
     var
         Account: Record Contact;
         TmpContact: Record Contact temporary;

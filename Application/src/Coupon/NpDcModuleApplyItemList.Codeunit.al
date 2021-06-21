@@ -118,7 +118,7 @@
         until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
-    local procedure ApplyDiscountSaleLinePOS(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; var AppliedQty: Decimal; var RemainingQty: Decimal)
+    local procedure ApplyDiscountSaleLinePOS(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; AppliedQty: Decimal; var RemainingQty: Decimal)
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
         LineNo: Integer;

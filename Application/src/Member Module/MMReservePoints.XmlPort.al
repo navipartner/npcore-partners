@@ -137,7 +137,7 @@ xmlport 6151163 "NPR MM Reserve Points"
         DocumentId: Text;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure SetDocumentId(var DocumentIdIn: Text)
+    procedure SetDocumentId(DocumentIdIn: Text)
     begin
         // For test framework
         DocumentId := DocumentIdIn;

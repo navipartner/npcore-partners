@@ -1800,7 +1800,9 @@
 
     #region Interface integration
 
+#pragma warning disable AA0150
     procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
+#pragma warning restore
     begin
         Error(Error_NotSupported, TaxFreeUnit."Handler ID Enum");
     end;
@@ -1851,7 +1853,9 @@
         DownloadDeskConfiguration(TaxFreeRequest);
     end;
 
+#pragma warning disable AA0150
     procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var SkipRecordHandling: Boolean)
+#pragma warning restore
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
         tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;

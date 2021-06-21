@@ -662,7 +662,7 @@ report 6014535 "NPR Sales Statistics By Dept."
         txtLabeldim1: Text[100];
         FilterList: Text[200];
 
-    procedure pct(var Value: Decimal; var total: Decimal) resultat: Decimal
+    procedure pct(Value: Decimal; total: Decimal) resultat: Decimal
     begin
         if Value <> 0 then
             if total <> 0 then

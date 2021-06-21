@@ -787,7 +787,7 @@ report 6014457 "NPR Sales Stat/Analysis"
         TxtDim1: Text[30];
         TxtLabeldim1: Text[100];
 
-    procedure Pct(var Value: Decimal; var Total: Decimal) Calculation: Decimal
+    procedure Pct(Value: Decimal; Total: Decimal) Calculation: Decimal
     begin
         if (Value <> 0) and (Total <> 0) then
             Calculation := (Value / Total) * 100

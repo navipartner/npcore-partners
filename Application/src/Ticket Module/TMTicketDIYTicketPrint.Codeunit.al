@@ -290,7 +290,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         Error(ResponseText);
     end;
 
-    local procedure CreateTicketPrintOrderXml(var XmlDoc: XmlDocument; var Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
+    local procedure CreateTicketPrintOrderXml(var XmlDoc: XmlDocument; Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
     var
         XmlString: Text;
         TempBlob: Codeunit "Temp Blob";

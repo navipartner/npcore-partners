@@ -49,7 +49,9 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
     end;
 
     [BusinessEvent(TRUE)]
+#pragma warning disable AA0150
     local procedure OnSecureMethodValidatePassword(Method: Text; Password: Text; POSUnit: Record "NPR POS Unit"; var Handled: Boolean)
+#pragma warning restore
     begin
     end;
 

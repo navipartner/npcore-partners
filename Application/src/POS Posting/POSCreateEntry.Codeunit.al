@@ -431,7 +431,7 @@
         OnAfterInsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
     end;
 
-    local procedure InsertPOSBalancingLine(PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."; POSEntry: Record "NPR POS Entry"; var LineNo: Integer; IsBinTransfer: Boolean)
+    local procedure InsertPOSBalancingLine(PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."; POSEntry: Record "NPR POS Entry"; LineNo: Integer; IsBinTransfer: Boolean)
     var
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSBinEntry: Record "NPR POS Bin Entry";
@@ -880,7 +880,7 @@
         exit(GetPOSPeriodRegisterForPOSUnit(SalePOS."Register No.", POSPeriodRegister, CheckOpen));
     end;
 
-    local procedure GetPOSPeriodRegisterForPOSUnit(var POSUnitNo: Code[10]; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
+    local procedure GetPOSPeriodRegisterForPOSUnit(POSUnitNo: Code[10]; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
     begin
         POSPeriodRegister.Reset();
         POSPeriodRegister.SetRange("POS Unit No.", POSUnitNo);

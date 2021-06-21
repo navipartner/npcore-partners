@@ -88,6 +88,11 @@
             "justification": "Do not declare variables that are unused."
         },
         {
+            "id": "AA0150",
+            "action":"Error",
+            "justification": "Do not declare parameters by reference if their values are never changed."
+        }, 
+        {
             "id": "AA0161",
             "action":"Error",
             "justification": "Only use AssertError in Test Codeunits."

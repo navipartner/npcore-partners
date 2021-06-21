@@ -275,11 +275,6 @@ page 6059902 "NPR Task Journal"
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        JobJnlManagement.GetNames(Rec, JobDescription, AccName);
-    end;
-
     trigger OnAfterGetRecord()
     begin
         NextExecutionTime := Rec.LookupNextRunTime();

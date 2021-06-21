@@ -74,7 +74,7 @@ codeunit 6151534 "NPR Nc Try Catch Mgt."
         GetJValueFromArg(JObject, 'Body', Body);
     end;
 
-    local procedure WriteArgsForManualTransferOutputNcTriggerTaskMgt(var Rec: Record "NPR Nc Task Output"; NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var FileName: text; var Subject: Text; var Body: Text)
+    local procedure WriteArgsForManualTransferOutputNcTriggerTaskMgt(var Rec: Record "NPR Nc Task Output"; NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; Output: Text; FileName: text; Subject: Text; Body: Text)
     var
         JObject: JsonObject;
         OutStr: OutStream;

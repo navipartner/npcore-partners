@@ -939,7 +939,9 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
             Error(Error_WrongIINDecision);
     end;
 
+#pragma warning disable AA0150
     procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var SkipRecordHandling: Boolean)
+#pragma warning restore
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
         RecRef: RecordRef;

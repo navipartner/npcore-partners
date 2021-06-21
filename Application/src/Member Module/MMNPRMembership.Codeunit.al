@@ -792,7 +792,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(true);
     end;
 
-    procedure CreateMembershipSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; var ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
+    procedure CreateMembershipSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlText: Text;
         XmlLbl: Label '<mem:scannerStationId>%1</mem:scannerStationId>', Locked = true;
@@ -877,7 +877,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(true);
     end;
 
-    local procedure CreateMemberSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; var ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
+    local procedure CreateMemberSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlText: Text;
         XmlLbl: Label '<mem:scannerStationId>%1</mem:scannerStationId>', Locked = true;

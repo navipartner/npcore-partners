@@ -796,7 +796,7 @@
         ResponseOutStr.WriteText(Response);
     end;
 
-    local procedure AddTextToOutputTempBlob(var OutputText: Text)
+    local procedure AddTextToOutputTempBlob(OutputText: Text)
     begin
         InitializeOutput();
         if OutputTempBlob.HasValue() then

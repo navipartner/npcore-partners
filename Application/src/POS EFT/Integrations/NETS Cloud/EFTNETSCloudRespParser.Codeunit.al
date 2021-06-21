@@ -488,7 +488,7 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     end;
 
     [TryFunction]
-    procedure IsConclusiveLookupResult(Response: Text; var InnerResponse: Text)
+    procedure IsConclusiveLookupResult(Response: Text; InnerResponse: Text)
     var
         JObject: DotNet NPRNetJObject;
     begin

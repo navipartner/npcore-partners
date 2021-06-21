@@ -99,7 +99,7 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
-    procedure SetDocumentId(var DocumentIdIn: Text)
+    procedure SetDocumentId(DocumentIdIn: Text)
     begin
 
         // For test framework

@@ -58,7 +58,7 @@
         exit(IsSuccess);
     end;
 
-    procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text; var ResponseMessage: Text): Boolean
+    procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; ReusedTokenId: Text; var ResponseMessage: Text): Boolean
     begin
 
         _TmpTicketReservationRequest.Copy(TmpTicketReservationRequest, true);

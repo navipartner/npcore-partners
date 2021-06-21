@@ -572,7 +572,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     [TryFunction]
-    local procedure InvokeAssignPoSUnitIdToPoS(var PoSUnitIdIn: Text[30])
+    local procedure InvokeAssignPoSUnitIdToPoS(PoSUnitIdIn: Text[30])
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
@@ -740,7 +740,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         InvokeRESTHTTPRequest(RequestBody, 'PaymentCancel', ResponseText);
     end;
 
-    local procedure InvokeRESTHTTPRequest(var JSONRequestBody: Text[1024]; ServiceName: Text[30]; var JSONResponseText: Text[1024]): Boolean
+    local procedure InvokeRESTHTTPRequest(JSONRequestBody: Text[1024]; ServiceName: Text[30]; var JSONResponseText: Text[1024]): Boolean
     var
         HttpWebRequest: DotNet NPRNetHttpWebRequest;
         ReqStream: DotNet NPRNetStream;
@@ -839,7 +839,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             PoSUnitId := PoSUnitIdString;
     end;
 
-    local procedure ReadJSONValue(var JSONObject: Text[1024]; ValueName: Text[100]; var ValueAsText: Text[100]): Boolean
+    local procedure ReadJSONValue(JSONObject: Text[1024]; ValueName: Text[100]; var ValueAsText: Text[100]): Boolean
     var
         Buffer: Text[1024];
         ValuePos: Integer;

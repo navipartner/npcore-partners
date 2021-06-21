@@ -4,7 +4,7 @@ codeunit 6060057 "NPR Item Works. Purch. Integr."
         RegisteredButNotFoundErr: Label 'And Item Worksheet Line was registered but not found in Registered Item Lines.';
         OneLineFoundQst: Label 'One Item Worksheet Line found. Would you like to created the item with description %1?', Comment = '%1 = Description';
 
-    procedure CreateItemFromWorksheet(VendorNo: Code[20]; VendorItemNo: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]): Boolean
+    procedure CreateItemFromWorksheet(VendorNo: Code[20]; VendorItemNo: Text[50]; var ItemNo: Code[20]): Boolean
     var
         ItemWorksheet: Record "NPR Item Worksheet";
     begin

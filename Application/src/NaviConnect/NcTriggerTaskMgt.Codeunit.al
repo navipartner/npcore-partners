@@ -145,7 +145,7 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
         NcTask.Modify(true);
     end;
 
-    procedure TransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var Filename: Text; var Subject: Text; var Body: Text)
+    procedure TransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; Output: Text; Filename: Text; Subject: Text; Body: Text)
     begin
         OnAfterGetOutputTriggerTask(NcTriggerCode, Output, NcTask, Filename, Subject, Body);
     end;
@@ -192,7 +192,7 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
         end;
     end;
 
-    local procedure WriteArgsForManualTransferOutputNcTriggerTaskMgt(var Rec: Record "NPR Nc Task Output"; NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var FileName: text; var Subject: Text; var Body: Text)
+    local procedure WriteArgsForManualTransferOutputNcTriggerTaskMgt(var Rec: Record "NPR Nc Task Output"; NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; Output: Text; FileName: text; Subject: Text; Body: Text)
     var
         JObject: JsonObject;
         OutStr: OutStream;

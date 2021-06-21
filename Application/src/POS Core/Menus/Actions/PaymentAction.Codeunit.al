@@ -36,7 +36,9 @@ codeunit 6150885 "NPR Payment Action" implements "NPR IAction", "NPR IJsonSerial
         Json.Add('Code', _code);
     end;
 
+#pragma warning disable AA0150
     procedure CheckConfiguration(POSSession: Codeunit "NPR POS Session"; Source: Text; var ActionMoniker: Text; var ErrorText: Text; var Severity: Integer): Boolean;
+#pragma warning restore
     begin
         exit(true);
     end;

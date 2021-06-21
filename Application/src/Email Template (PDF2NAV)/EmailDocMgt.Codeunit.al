@@ -797,7 +797,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         exit(19);
     end;
 
-    local procedure GetNewTemplateCode(var TemplateCode: Code[20]) NewTemplateCode: Code[20]
+    local procedure GetNewTemplateCode(TemplateCode: Code[20]) NewTemplateCode: Code[20]
     var
         EmailTemplate: Record "NPR E-mail Template Header";
     begin

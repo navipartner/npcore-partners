@@ -11,79 +11,6 @@
       <rd:DataSourceID>7979b68c-0c33-4193-b4d4-0c52b24c71b9</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="No">
-          <DataField>No</DataField>
-        </Field>
-        <Field Name="VoucherType">
-          <DataField>VoucherType</DataField>
-        </Field>
-        <Field Name="Description">
-          <DataField>Description</DataField>
-        </Field>
-        <Field Name="IssueDate">
-          <DataField>IssueDate</DataField>
-        </Field>
-        <Field Name="Initial_Amount">
-          <DataField>Initial_Amount</DataField>
-        </Field>
-        <Field Name="Initial_AmountFormat">
-          <DataField>Initial_AmountFormat</DataField>
-        </Field>
-        <Field Name="Amount">
-          <DataField>Amount</DataField>
-        </Field>
-        <Field Name="AmountFormat">
-          <DataField>AmountFormat</DataField>
-        </Field>
-        <Field Name="Arch__No_">
-          <DataField>Arch__No_</DataField>
-        </Field>
-        <Field Name="StartingDate">
-          <DataField>StartingDate</DataField>
-        </Field>
-        <Field Name="EndingDate">
-          <DataField>EndingDate</DataField>
-        </Field>
-        <Field Name="ReferenceNo">
-          <DataField>ReferenceNo</DataField>
-        </Field>
-        <Field Name="Name">
-          <DataField>Name</DataField>
-        </Field>
-        <Field Name="IssueRegisterNo">
-          <DataField>IssueRegisterNo</DataField>
-        </Field>
-        <Field Name="IssueDocumentType">
-          <DataField>IssueDocumentType</DataField>
-        </Field>
-        <Field Name="IssueDocumentNo">
-          <DataField>IssueDocumentNo</DataField>
-        </Field>
-        <Field Name="IssueExternalDocumentNo">
-          <DataField>IssueExternalDocumentNo</DataField>
-        </Field>
-        <Field Name="IssueUserID">
-          <DataField>IssueUserID</DataField>
-        </Field>
-        <Field Name="IssuePartnerCode">
-          <DataField>IssuePartnerCode</DataField>
-        </Field>
-        <Field Name="TotalLbl">
-          <DataField>TotalLbl</DataField>
-        </Field>
-        <Field Name="TitleLbl">
-          <DataField>TitleLbl</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2504,4 +2431,77 @@ End Function
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="No">
+          <DataField>No</DataField>
+        </Field>
+        <Field Name="VoucherType">
+          <DataField>VoucherType</DataField>
+        </Field>
+        <Field Name="Description">
+          <DataField>Description</DataField>
+        </Field>
+        <Field Name="IssueDate">
+          <DataField>IssueDate</DataField>
+        </Field>
+        <Field Name="Initial_Amount">
+          <DataField>Initial_Amount</DataField>
+        </Field>
+        <Field Name="Initial_AmountFormat">
+          <DataField>Initial_AmountFormat</DataField>
+        </Field>
+        <Field Name="Amount">
+          <DataField>Amount</DataField>
+        </Field>
+        <Field Name="AmountFormat">
+          <DataField>AmountFormat</DataField>
+        </Field>
+        <Field Name="Arch__No_">
+          <DataField>Arch__No_</DataField>
+        </Field>
+        <Field Name="StartingDate">
+          <DataField>StartingDate</DataField>
+        </Field>
+        <Field Name="EndingDate">
+          <DataField>EndingDate</DataField>
+        </Field>
+        <Field Name="ReferenceNo">
+          <DataField>ReferenceNo</DataField>
+        </Field>
+        <Field Name="Name">
+          <DataField>Name</DataField>
+        </Field>
+        <Field Name="IssueRegisterNo">
+          <DataField>IssueRegisterNo</DataField>
+        </Field>
+        <Field Name="IssueDocumentType">
+          <DataField>IssueDocumentType</DataField>
+        </Field>
+        <Field Name="IssueDocumentNo">
+          <DataField>IssueDocumentNo</DataField>
+        </Field>
+        <Field Name="IssueExternalDocumentNo">
+          <DataField>IssueExternalDocumentNo</DataField>
+        </Field>
+        <Field Name="IssueUserID">
+          <DataField>IssueUserID</DataField>
+        </Field>
+        <Field Name="IssuePartnerCode">
+          <DataField>IssuePartnerCode</DataField>
+        </Field>
+        <Field Name="TotalLbl">
+          <DataField>TotalLbl</DataField>
+        </Field>
+        <Field Name="TitleLbl">
+          <DataField>TitleLbl</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

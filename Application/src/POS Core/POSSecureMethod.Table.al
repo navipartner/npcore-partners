@@ -84,7 +84,9 @@ table 6150725 "NPR POS Secure Method"
     end;
 
     [BusinessEvent(false)]
+#pragma warning disable AA0150
     local procedure OnDiscoverCustomSecureMethodCode("Code": Code[10]; var CustomCode: Text; var Handled: Boolean)
+#pragma warning restore    
     begin
     end;
 }

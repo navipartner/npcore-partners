@@ -94,7 +94,7 @@ codeunit 6014540 "NPR RP Escape Code Library"
         Result := TranslateEscapeSequence(Sequence);
     end;
 
-    procedure WriteSequenceToBuffer(var Sequence: Text[1024]; var Text: Text)
+    procedure WriteSequenceToBuffer(Sequence: Text[1024]; var Text: Text)
     var
         String: Codeunit "NPR String Library";
         Token: Text[30];
@@ -177,7 +177,7 @@ codeunit 6014540 "NPR RP Escape Code Library"
         end;
     end;
 
-    local procedure TranslateEscapeSequence(var Sequence: Text[1024]) ReturnSequence: Text[1024]
+    local procedure TranslateEscapeSequence(Sequence: Text[1024]) ReturnSequence: Text[1024]
     var
         String: Codeunit "NPR String Library";
         Token: Text[100];
@@ -259,7 +259,7 @@ codeunit 6014540 "NPR RP Escape Code Library"
         end;
     end;
 
-    procedure C2ESC(var Char: Char) ReturnESCCode: Text[30]
+    procedure C2ESC(Char: Char) ReturnESCCode: Text[30]
     begin
         case Char of
             cNUL:

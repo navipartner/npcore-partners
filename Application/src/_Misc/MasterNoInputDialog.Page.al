@@ -37,11 +37,12 @@ page 6014420 "NPR Master No. Input Dialog"
         Evaluate(OutVar, "InputNo.");
     end;
 
-    local procedure StoreInput(var Value: Text)
+    local procedure StoreInput(Value: Text)
     var
         CodeVar: Code[20];
     begin
         Evaluate(CodeVar, Value);
+        Clear(CodeVar);
     end;
 }
 

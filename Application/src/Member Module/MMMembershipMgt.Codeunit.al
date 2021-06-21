@@ -1587,7 +1587,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(ExtendMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    procedure ExtendMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
+    procedure ExtendMembershipVerbose(MemberInfoCapture: Record "NPR MM Member Info Capture"; WithConfirm: Boolean; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; ReasonText: Text): Boolean
     begin
 
         exit(ExtendMembershipWorker(MemberInfoCapture, WithConfirm, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
@@ -2531,7 +2531,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
     end;
 
-    procedure GetMembershipChangeOptions(var MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary): Boolean
+    procedure GetMembershipChangeOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary): Boolean
     var
         TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         Item: Record Item;
