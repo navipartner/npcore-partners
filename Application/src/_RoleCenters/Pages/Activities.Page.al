@@ -32,8 +32,8 @@
             }
             cuegroup(Control6150624)
             {
-                Caption = 'SALES'; 
-                ShowCaption = true; 
+                Caption = 'SALES';
+                ShowCaption = true;
                 field("Daily Sales Orders"; Rec."Daily Sales Orders")
                 {
                     ApplicationArea = All;
@@ -47,13 +47,6 @@
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the value of the Sales Orders field';
                 }
-                field("Sales Return Orders"; Rec."Sales Return Orders")
-                {
-                    ApplicationArea = All;
-                    DrillDownPageID = "Sales Return Order List";
-                    ToolTip = 'Specifies the value of the Sales Return Orders field';
-                }
-
                 field("Shipped Sales Orders"; Rec."Shipped Sales Orders")
                 {
                     ApplicationArea = All;
@@ -63,6 +56,14 @@
                     ToolTip = 'Specifies the value of the Shipped Sales Orders field';
 
                 }
+                field("Sales Return Orders"; Rec."Sales Return Orders")
+                {
+                    ApplicationArea = All;
+                    DrillDownPageID = "Sales Return Order List";
+                    ToolTip = 'Specifies the value of the Sales Return Orders field';
+                }
+
+
             }
         }
     }

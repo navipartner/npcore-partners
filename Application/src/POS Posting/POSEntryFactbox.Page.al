@@ -93,6 +93,12 @@
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Payment Lines field';
             }
+            field("EFT Transaction"; Rec."Transaction Type")////need to check if this is EFT transaction
+            {
+                ApplicationArea = All;
+                ToolTip = 'Specifies the value of the EFT Transaction field';// where to get EFT transaction
+            }
+
             field("Tax Lines"; Rec."Tax Lines")
             {
                 ApplicationArea = All;

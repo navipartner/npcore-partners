@@ -31,11 +31,6 @@ page 6151241 "NPR Retail Manager Role Center"
                 ApplicationArea = All;
                 Visible = false;
             }
-            part(Control21; "Report Inbox Part")
-            {
-                AccessByPermission = TableData "Report Inbox" = R;
-                ApplicationArea = Suite;
-            }
             part(MyjobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
@@ -45,6 +40,12 @@ page 6151241 "NPR Retail Manager Role Center"
             {
                 ApplicationArea = All;
             }
+            part(Control21; "Report Inbox Part")
+            {
+                AccessByPermission = TableData "Report Inbox" = R;
+                ApplicationArea = Suite;
+            }
+
         }
     }
     actions
@@ -659,6 +660,18 @@ page 6151241 "NPR Retail Manager Role Center"
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Invoices";
                     ToolTip = 'View Sales Invoices that have been done.';
+                    ApplicationArea = All;
+                }
+
+                action("Posted Sales Shipment List")
+                {
+                    Caption = 'Posted Sales Shipment List';
+                    Image = RegisteredDocs;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    RunObject = Page "Posted Sales Shipments";
+                    ToolTip = 'View Posted Sales Shipments that have been done.';
                     ApplicationArea = All;
                 }
 
