@@ -46,6 +46,9 @@ table 6151412 "NPR Magento Picture Link"
                 MagPicture: Record "NPR Magento Picture Link";
             begin
                 MagPicture.SetRange("Variant Value Code", "Variant Value Code");
+                MagPicture.SetRange("Variety Type", "Variety Type");
+                MagPicture.SetRange("Variety Table", "Variety Table");
+                MagPicture.SetRange("Variety Value", "Variety Value");
                 MagPicture.SetRange("Item No.", "Item No.");
                 MagPicture.SetFilter("Line No.", '<>%1', "Line No.");
                 if "Base Image" then
@@ -62,6 +65,9 @@ table 6151412 "NPR Magento Picture Link"
                 MagPicture: Record "NPR Magento Picture Link";
             begin
                 MagPicture.SetRange("Variant Value Code", "Variant Value Code");
+                MagPicture.SetRange("Variety Type", "Variety Type");
+                MagPicture.SetRange("Variety Table", "Variety Table");
+                MagPicture.SetRange("Variety Value", "Variety Value");
                 MagPicture.SetRange("Item No.", "Item No.");
                 MagPicture.SetFilter("Line No.", '<>%1', "Line No.");
                 if "Small Image" then
@@ -78,6 +84,9 @@ table 6151412 "NPR Magento Picture Link"
                 MagPicture: Record "NPR Magento Picture Link";
             begin
                 MagPicture.SetRange("Variant Value Code", "Variant Value Code");
+                MagPicture.SetRange("Variety Type", "Variety Type");
+                MagPicture.SetRange("Variety Table", "Variety Table");
+                MagPicture.SetRange("Variety Value", "Variety Value");
                 MagPicture.SetRange("Item No.", "Item No.");
                 MagPicture.SetFilter("Line No.", '<>%1', "Line No.");
                 if Thumbnail then
@@ -145,6 +154,9 @@ table 6151412 "NPR Magento Picture Link"
     begin
         TestField("Picture Name");
         MagPicture.SetRange("Variant Value Code", "Variant Value Code");
+        MagPicture.SetRange("Variety Type", "Variety Type");
+        MagPicture.SetRange("Variety Table", "Variety Table");
+        MagPicture.SetRange("Variety Value", "Variety Value");
         MagPicture.SetRange("Item No.", "Item No.");
 
         MagPicture.SetRange("Base Image", true);
