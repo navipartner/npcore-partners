@@ -13,13 +13,6 @@
 
             {
                 Caption = 'Purchase';
-                field("NP Purchase Order"; Rec."NPR Purchase Order")
-                {
-                    Caption = 'Purchase Order';
-                    ApplicationArea = Basic, Suite;
-                    DrillDownPageID = "Purchase Order List";
-                    ToolTip = 'Specifies the number of purchase orders.';
-                }
                 field("NP Purchase Quote"; Rec."NPR Purchase Quote")
                 {
                     Caption = 'Purchase Quote';
@@ -27,6 +20,14 @@
                     DrillDownPageID = "Purchase Quotes";
                     ToolTip = 'Specifies the number of purchase quotes.';
                 }
+                field("NP Purchase Order"; Rec."NPR Purchase Order")
+                {
+                    Caption = 'Purchase Order';
+                    ApplicationArea = Basic, Suite;
+                    DrillDownPageID = "Purchase Order List";
+                    ToolTip = 'Specifies the number of purchase orders.';
+                }
+
                 field("Purchase Return Orders"; Rec."Purchase Return Orders")
                 {
                     ApplicationArea = PurchReturnOrder;
