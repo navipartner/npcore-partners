@@ -56,8 +56,9 @@ codeunit 6014454 "NPR CleanCash Identity Msg." implements "NPR CleanCash XCCSP I
         exit(true);
 
     end;
-
+#pragma warning disable AA0150
     procedure SerializeResponse(var CleanCashTransactionRequest: Record "NPR CleanCash Trans. Request"; XmlDoc: XmlDocument; var ResponseEntryNo: Integer) Success: Boolean
+#pragma warning restore
     var
         CleanCashResponse: Record "NPR CleanCash Trans. Response";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";

@@ -16,7 +16,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
         exit(TicketManagement.AttemptValidateTicketForArrival(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, MessageText));
     end;
 
-    procedure ValidateTicketDeparture(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; var MessageText: Text): Boolean
+    procedure ValidateTicketDeparture(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; MessageText: Text): Boolean
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin

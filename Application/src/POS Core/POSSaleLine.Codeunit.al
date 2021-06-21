@@ -442,7 +442,7 @@
         end;
     end;
 
-    local procedure ItemVariantIsRequired(var ItemNo: Code[20]) IsRequired: Boolean
+    local procedure ItemVariantIsRequired(ItemNo: Code[20]) IsRequired: Boolean
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";

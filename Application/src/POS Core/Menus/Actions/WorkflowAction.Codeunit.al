@@ -91,7 +91,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
     end;
 
     [TryFunction]
-    local procedure IsCorrectParameterValueType(Parameter: Record "NPR POS Action Parameter"; var Value: Text)
+    local procedure IsCorrectParameterValueType(Parameter: Record "NPR POS Action Parameter"; Value: Text)
     begin
         Parameter.Validate("Default Value", Value);
         if (Parameter."Data Type" = Parameter."Data Type"::Option) and (Value = '-1') then

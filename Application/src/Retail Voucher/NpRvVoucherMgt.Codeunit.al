@@ -937,7 +937,7 @@
         VoucherEntry.Insert();
     end;
 
-    procedure PrepareVoucherBuffer(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; var ReferenceNo: Text)
+    procedure PrepareVoucherBuffer(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text)
     begin
         NpRvVoucherBuffer.Init();
         NpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
@@ -970,7 +970,7 @@
         NpRvSalesLine.Insert(true);
     end;
 
-    procedure ApplyVoucherPayment(var VoucherTypeCode: Code[20]; var VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line")
+    procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line")
     var
         NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";

@@ -268,7 +268,7 @@ page 6014401 "NPR Debit sale info"
     }
 
 
-    procedure SetCustomer(var Text: Text[30])
+    procedure SetCustomer(Text: Text[30])
     begin
         Rec."Your Reference" := Text;
     end;

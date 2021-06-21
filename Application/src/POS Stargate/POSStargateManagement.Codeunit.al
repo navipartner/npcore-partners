@@ -340,7 +340,9 @@ codeunit 6150716 "NPR POS Stargate Management"
     end;
 
     [BusinessEvent(false)]
+#pragma warning disable AA0150
     local procedure OnDeviceErrorResponse(ActionName: Text; Step: Text; Response: DotNet NPRNetErrorResponse0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+#pragma warning restore
     begin
     end;
 
@@ -350,12 +352,16 @@ codeunit 6150716 "NPR POS Stargate Management"
     end;
 
     [BusinessEvent(false)]
+#pragma warning disable AA0150
     local procedure OnAppGatewayProtocol(FrontEnd: Codeunit "NPR POS Front End Management"; ActionName: Text; Step: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
+#pragma warning restore
     begin
     end;
 
     [BusinessEvent(false)]
+#pragma warning disable AA0150
     local procedure OnAppGatewayProtocolClosed(FrontEnd: Codeunit "NPR POS Front End Management"; ActionName: Text; Step: Text; Data: Text; Forced: Boolean; var Handled: Boolean)
+#pragma warning restore
     begin
     end;
 }

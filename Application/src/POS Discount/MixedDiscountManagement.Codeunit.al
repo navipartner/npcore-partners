@@ -407,7 +407,7 @@
         until (TempPriorityBuffer.Next() = 0) or (DiscQty >= TotalDiscQty);
     end;
 
-    local procedure CalcLineMultiLevelDiscAmount(MixedDiscount: Record "NPR Mixed Discount"; MixedDiscountLevel: Record "NPR Mixed Discount Level"; SaleLinePOSApply: Record "NPR POS Sale Line"; QtyToApply: Decimal; var RemainderAmt: Decimal): Decimal
+    local procedure CalcLineMultiLevelDiscAmount(MixedDiscount: Record "NPR Mixed Discount"; MixedDiscountLevel: Record "NPR Mixed Discount Level"; SaleLinePOSApply: Record "NPR POS Sale Line"; QtyToApply: Decimal; RemainderAmt: Decimal): Decimal
     var
         LineDiscountAmount: Decimal;
     begin

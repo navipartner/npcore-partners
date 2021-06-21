@@ -359,7 +359,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         exit(AccountManager.UpdateAccount(TmpContact, TmpCustomer, TmpAccount, ReasonText));
     end;
 
-    local procedure DoDeleteAccount(var ContactNo: Code[20]): Boolean
+    local procedure DoDeleteAccount(ContactNo: Code[20]): Boolean
     var
         AccountManager: Codeunit "NPR M2 Account Manager";
         ReasonText: Text;

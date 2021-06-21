@@ -36,7 +36,9 @@ codeunit 6150883 "NPR Item Action" implements "NPR IAction", "NPR IJsonSerializa
         Json.Add('Code', _code);
     end;
 
+#pragma warning disable AA0150
     procedure CheckConfiguration(POSSession: Codeunit "NPR POS Session"; Source: Text; var ActionMoniker: Text; var ErrorText: Text; var Severity: Integer): Boolean;
+#pragma warning restore
     begin
         exit(true);
     end;

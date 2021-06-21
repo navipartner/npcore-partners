@@ -33,7 +33,7 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     end;
 
     // This method, products the request XML, sends the request and stores the response XML
-    procedure HandleRequest(RequestEntryNo: Integer; var ResponseEntryNo: Integer; Verbose: Boolean) Success: Boolean
+    procedure HandleRequest(RequestEntryNo: Integer; ResponseEntryNo: Integer; Verbose: Boolean) Success: Boolean
     var
         CleanCashTransaction: Record "NPR CleanCash Trans. Request";
         CleanCashResponse: Record "NPR CleanCash Trans. Response";
@@ -190,13 +190,18 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     end;
 
     // Default or unknown request type implementation returns false;
+
+#pragma warning disable AA0150
     procedure CreateRequest(PosUnitNo: Code[10]; var EntryNo: Integer): Boolean
+#pragma warning restore
     begin
         exit(false);
     end;
 
     // Default or unknown request type implementation returns false;
+#pragma warning disable AA0150
     procedure CreateRequest(PosEntry: Record "NPR POS Entry"; RequestType: Enum "NPR CleanCash Request Type"; var EntryNo: Integer): Boolean
+#pragma warning restore
     begin
         exit(false);
     end;
@@ -209,7 +214,9 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     end;
 
     // Default or unknown request type implementation returns false;
+#pragma warning disable AA0150
     procedure SerializeResponse(var CleanCashTransactionRequest: Record "NPR CleanCash Trans. Request"; XmlDoc: XmlDocument; var ResponseEntryNo: Integer) Success: Boolean
+#pragma warning restore
     var
     begin
         exit(false);

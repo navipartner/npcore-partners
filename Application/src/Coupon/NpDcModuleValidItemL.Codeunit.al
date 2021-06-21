@@ -43,7 +43,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
         until NpDcCouponListItem.Next() = 0;
     end;
 
-    local procedure ValidateCouponQuantity(SalePOS: Record "NPR POS Sale"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var ValidationQty: Decimal)
+    local procedure ValidateCouponQuantity(SalePOS: Record "NPR POS Sale"; var NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; ValidationQty: Decimal)
     var
         TotalQty: Decimal;
     begin

@@ -156,7 +156,7 @@ page 6014684 "NPR POS Payment Bins Step"
         if TempAllPOSUnit.FindSet() then;
     end;
 
-    procedure CreateTempPOSPaymentBins(NoOfPOSPaymentBins: integer; WantedStartingNo: Code[10]; var SelectedPOSStore: Code[10]; SelectedPOSPaymentBin: Code[10]; var POSPaymentBinTemp: Record "NPR POS Payment Bin")
+    procedure CreateTempPOSPaymentBins(NoOfPOSPaymentBins: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; SelectedPOSPaymentBin: Code[10]; var POSPaymentBinTemp: Record "NPR POS Payment Bin")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";

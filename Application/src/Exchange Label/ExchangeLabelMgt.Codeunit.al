@@ -142,7 +142,7 @@
         end;
     end;
 
-    procedure PrintLabelsFromPOSWithoutPrompts(PrintType: Option Single,LineQuantity,All,Selection,Package; var SaleLinePOS: Record "NPR POS Sale Line"; var ValidFromDate: Date)
+    procedure PrintLabelsFromPOSWithoutPrompts(PrintType: Option Single,LineQuantity,All,Selection,Package; var SaleLinePOS: Record "NPR POS Sale Line"; ValidFromDate: Date)
     var
         RecRef: RecordRef;
     begin
@@ -191,7 +191,7 @@
         end;
     end;
 
-    procedure ScanExchangeLabel(var SalePOS: Record "NPR POS Sale"; var Validering: Code[20]; var CopyValidering: Code[20]) Found: Boolean
+    procedure ScanExchangeLabel(var SalePOS: Record "NPR POS Sale"; var Validering: Code[20]; CopyValidering: Code[20]) Found: Boolean
     var
         ExchangeLabel: Record "NPR Exchange Label";
         Item: Record Item;

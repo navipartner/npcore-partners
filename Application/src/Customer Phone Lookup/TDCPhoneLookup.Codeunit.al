@@ -31,7 +31,7 @@ codeunit 6184550 "NPR TDC Phone Lookup"
         LoadToBuffer(Result, PhoneLookupBuf);
     end;
 
-    local procedure LoadToBuffer(var Stringtxt: Text; var TMPPhoneLookupBuf: Record "NPR Phone Lookup Buffer")
+    local procedure LoadToBuffer(Stringtxt: Text; var TMPPhoneLookupBuf: Record "NPR Phone Lookup Buffer")
     var
         Seperator: Char;
         StringArray: array[22] of Text;

@@ -239,7 +239,7 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
         EftTransactionRequest: Record "NPR EFT Transaction Request";

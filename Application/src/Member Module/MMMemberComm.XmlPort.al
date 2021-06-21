@@ -180,7 +180,7 @@ xmlport 6151188 "NPR MM Member Comm."
         TmpMemberCommunicationRequest.Reset();
     end;
 
-    procedure SetErrorResponse(var ResponseText: Text)
+    procedure SetErrorResponse(ResponseText: Text)
     begin
 
         status := 'ERROR';

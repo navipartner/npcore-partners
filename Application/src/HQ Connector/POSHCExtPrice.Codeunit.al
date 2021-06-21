@@ -150,7 +150,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         exit(true);
     end;
 
-    procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; var XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseText: Text): Boolean
+    procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseText: Text): Boolean
     var
         XMLDomManagement: Codeunit "XML DOM Management";
         Base64Convert: codeunit "Base64 Convert";

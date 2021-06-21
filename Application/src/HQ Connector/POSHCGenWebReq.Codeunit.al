@@ -114,7 +114,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         end;
     end;
 
-    procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; var XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseXmlText: Text): Boolean
+    procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseXmlText: Text): Boolean
     var
         XMLDomManagement: Codeunit "XML DOM Management";
         Base64Convert: codeunit "Base64 Convert";
