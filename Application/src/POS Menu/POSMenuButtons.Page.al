@@ -345,20 +345,17 @@ page 6150702 "NPR POS Menu Buttons"
     var
         POSAction: Record "NPR POS Action";
     begin
-        SetColumnVisibleAttributes();
         CurrPage.Caption := StrSubstNo(Text001, Rec."Menu Code");
         POSAction.DiscoverActions();
     end;
 
     var
         Text001: Label 'Menu Buttons Setup: %1';
-        MenuCodeVisible: Boolean;
         UnindentEnabled: Boolean;
         IndentEnabled: Boolean;
         MoveUpEnabled: Boolean;
         MoveDownEnabled: Boolean;
         HasSubMenus: Boolean;
-        ActionTypeEnabled: Boolean;
         IsParametersEnabled: Boolean;
         IsPopupEnabled: Boolean;
         IsBlockingUIEnabled: Boolean;
@@ -429,11 +426,6 @@ page 6150702 "NPR POS Menu Buttons"
         NeedParameterRefresh := Rec.RefreshParametersRequired();
     end;
 
-    local procedure SetColumnVisibleAttributes()
-    begin
-        MenuCodeVisible := (Rec.GetRangeMin("Menu Code") = Rec.GetRangeMax("Menu Code")) and (Rec.GetRangeMax("Menu Code") = '');
-    end;
-
     local procedure SetActionEnabledAttributes()
     var
         MenuButton: Record "NPR POS Menu Button";
@@ -442,7 +434,6 @@ page 6150702 "NPR POS Menu Buttons"
         MoveDownEnabled := Rec.MoveDownAllowed();
         UnindentEnabled := Rec.UnIndentAllowed();
         IndentEnabled := Rec.IndentAllowed();
-        ActionTypeEnabled := Rec.ActionIsEditable();
 
         MenuButton.SetRange("Menu Code", Rec."Menu Code");
         MenuButton.SetRange("Parent ID", Rec.ID);

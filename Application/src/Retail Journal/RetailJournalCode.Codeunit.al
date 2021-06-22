@@ -2,7 +2,6 @@
 {
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
-        LineNo: Integer;
         Text003: Label 'Filters - %1', Comment = '%1 = Table Name';
         Selection: Integer;
         Text004: Label '&Quantity,Quantity &to Receive,Quantity &Received';
@@ -592,8 +591,6 @@
     end;
 
     procedure SetRetailJnl(var RetailJnlCode: Code[40]) Selected: Boolean
-    var
-        RetailJnlLine: Record "NPR Retail Journal Line";
     begin
         if RetailJnlCode <> '' then begin
             if RetailJnlHeader."No." <> RetailJnlCode then
@@ -603,10 +600,6 @@
                 exit(false);
             RetailJnlCode := RetailJnlHeader."No.";
         end;
-
-        RetailJnlLine.SetRange("No.", RetailJnlHeader."No.");
-        if RetailJnlLine.FindLast() then
-            LineNo := RetailJnlLine."Line No." + 10000;
 
         exit(true);
     end;

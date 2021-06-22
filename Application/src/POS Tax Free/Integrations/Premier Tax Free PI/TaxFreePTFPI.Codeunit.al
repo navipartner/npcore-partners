@@ -517,7 +517,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         Printer: Codeunit "NPR RP Line Print Mgt.";
         InStream: InStream;
         i: Integer;
-        OutputType: Integer;
         Line: Text;
         Output: Text;
         XMLDoc: XmlDocument;
@@ -526,7 +525,6 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     begin
         //See page 55 of doc. for print line prefix explanations.
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
-        OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Tax Free Receipt");
 
         if Output = '' then
             Error(Error_MissingPrintSetup);

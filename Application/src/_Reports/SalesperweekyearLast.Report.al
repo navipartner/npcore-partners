@@ -279,7 +279,6 @@ report 6014456 "NPR Sales per week year/Last"
             Title := text1;
         end;
 
-        EndDateLastYear := CalcDate('<1M>', StartDateLastYear);
         CurrentDateLastYear := StartDateLastYear;
     end;
 
@@ -294,7 +293,6 @@ report 6014456 "NPR Sales per week year/Last"
         CurrentDate: Date;
         CurrentDateLastYear: Date;
         EndDate: Date;
-        EndDateLastYear: Date;
         StartDate: Date;
         StartDateLastYear: Date;
         GrandTotal: Decimal;

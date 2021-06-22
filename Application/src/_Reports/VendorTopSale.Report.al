@@ -291,7 +291,6 @@ report 6014426 "NPR Vendor Top/Sale"
                 DgLastYear := "Pct."(Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)", Vendor2."NPR Sales (LCY)");
 
                 SalesPct := "Pct."(Vendor."NPR Sales (LCY)", VendorSales);
-                BalancePct := "Pct."(Vendor."Balance (LCY)", VendorBalance);
                 ProfitPct2 := "Pct."(Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)", DbLastYear);
                 SalesPct2 := "Pct."(Vendor2."NPR Sales (LCY)", SalesLastYear);
                 IndexSales[1] := "Pct."(Vendor."NPR Sales (LCY)", Vendor2."NPR Sales (LCY)");
@@ -447,7 +446,6 @@ report 6014426 "NPR Vendor Top/Sale"
         StartDate: Date;
         StartDateLastYear: Date;
         AmountLastYear: Decimal;
-        BalancePct: Decimal;
         CostAmtFooter: Decimal;
         DbLastYear: Decimal;
         DgLastYear: Decimal;
@@ -467,7 +465,6 @@ report 6014426 "NPR Vendor Top/Sale"
         SalesPct2: Decimal;
         Share: Decimal;
         StockQty: Decimal;
-        VendorBalance: Decimal;
         VendorProfit: Decimal;
         VendorSales: Decimal;
         Counter: Integer;

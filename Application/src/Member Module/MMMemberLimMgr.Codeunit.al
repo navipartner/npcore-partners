@@ -290,13 +290,11 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         RelativeDateTime: DateTime;
-        MyTime: Time;
         PlaceHolderLbl: Label '%1', Locked = true;
         PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
     begin
 
         MembershipLimitationSetup.Get(RuleEntryNo);
-        MyTime := DT2Time(CurrentDateTime()); // TIME from webclient and webservice is not same
 
         MemberArrivalLogEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', false);

@@ -45,17 +45,14 @@ page 6059952 "NPR Display Content Lines"
     begin
         DisplayContent.Get(Rec.GetFilter("Content Code"));
         if (DisplayContent.Type = DisplayContent.Type::Image) then begin
-            ImageIsVisible := true;
             UrlIsVisible := false;
         end else begin
-            ImageIsVisible := false;
             UrlIsVisible := true;
         end;
     end;
 
     var
         UrlIsVisible: Boolean;
-        ImageIsVisible: Boolean;
         DisplayContent: Record "NPR Display Content";
         DisplayContentLines: Record "NPR Display Content Lines";
         Txt001: Label 'Only 1 webpage url is allowed';

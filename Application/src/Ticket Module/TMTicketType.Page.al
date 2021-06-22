@@ -270,14 +270,8 @@ page 6059784 "NPR TM Ticket Type"
         }
     }
 
-    trigger OnOpenPage()
-    begin
-        WebClient := IsWebClient();
-    end;
-
     var
         IMPORT_FILE: Label 'Import File';
-        Webclient: Boolean;
 
     procedure HideTickets()
     begin

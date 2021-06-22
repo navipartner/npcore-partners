@@ -126,7 +126,6 @@ codeunit 6060073 "NPR CSV Splitter"
     local procedure FillArray()
     var
         LineEnumerator: Integer;
-        NoOfFields: Integer;
         Size: Integer;
         BuildingLinesLbl: Label 'Parsing Lines.';
         CSVLine: Text;
@@ -139,12 +138,13 @@ codeunit 6060073 "NPR CSV Splitter"
             LineEnumerator += 1;
             Size := Instr.ReadText(CSVLine);
             if Size <> 0 then begin
-                NoOfFields := ParseLine(LineEnumerator, CSVLine);
+                ParseLine(LineEnumerator, CSVLine);
             end;
         end;
         NumberOfLines := LineEnumerator;
         InputFile.Close();
     end;
+
 
     local procedure ParseLine(LineEnumarator: Integer; CSVLine: Text): Integer
     var

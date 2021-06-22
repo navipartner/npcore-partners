@@ -735,6 +735,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
 
         for i := 1 to Length do begin
             Numeric := Evaluate(DummyDecimal, Value[i]);
+            Clear(DummyDecimal);
 
             if (not Numeric) and (ConsecutiveNumbers > 4) then
                 if (StrLen(Code128) = 0) or (ConsecutiveNumbers > 6) then

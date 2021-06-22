@@ -111,7 +111,6 @@
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        HasPrompted: Boolean;
         UsePresetUnitPrice: Boolean;
         ItemQuantity: Decimal;
         ItemMinQuantity: Decimal;
@@ -119,7 +118,8 @@
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemIdentifier: Text;
     begin
-        HasPrompted := JSON.GetBoolean('promptPrice') or JSON.GetBoolean('promptSerial');
+        JSON.GetBoolean('promptPrice');
+        JSON.GetBoolean('promptSerial');
 
         JSON.SetScopeParameters(ActionCode());
         ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_AddSalesLine', ActionCode()));
@@ -197,7 +197,6 @@
         Item: Record Item;
         ItemReference: Record "Item Reference";
         ItemQuantity: Decimal;
-        ItemMinQuantity: Decimal;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemIdentifier: Text;
     begin
@@ -205,7 +204,7 @@
         ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_IncreaseQuantity', ActionCode()));
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
         ItemQuantity := JSON.GetDecimal('itemQuantity');
-        ItemMinQuantity := JSON.GetDecimal('minimumAllowedQuantity');
+        JSON.GetDecimal('minimumAllowedQuantity');
         JSON.SetScopeRoot();
 
         if ItemIdentifierType < 0 then

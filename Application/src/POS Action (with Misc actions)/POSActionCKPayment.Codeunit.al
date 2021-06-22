@@ -93,7 +93,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        EFTHandled: Boolean;
         PaymentTypeNo: Code[10];
         JSON: Codeunit "NPR POS JSON Management";
         AmountToCapture: Decimal;
@@ -125,7 +124,7 @@
                     JSON.SetContext('TransactionRequest_EntryNo', '');
                     FrontEnd.SetActionContext(ActionCode(), JSON);
 
-                    EFTHandled := CreateTransaction(POSSession, AmountToCapture, PaymentTypeNo, NumpadAmount);
+                    CreateTransaction(POSSession, AmountToCapture, PaymentTypeNo, NumpadAmount);
                 end;
 
             'InvokeDevice':

@@ -355,7 +355,6 @@ page 6060103 "NPR TM Ticket Request"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         RequestCount: Integer;
         TicketCount: Integer;
-        RequestDateTime: DateTime;
         AmountToReverse: Decimal;
         QtyToRevoke: Integer;
         Token: Text[100];
@@ -370,7 +369,6 @@ page 6060103 "NPR TM Ticket Request"
             if (not Confirm(CONFIRM_REVOKE_REQUEST, false, RequestCount)) then
                 Error('');
 
-        RequestDateTime := CurrentDateTime();
         TicketReservationRequest.FindSet(true, true);
         repeat
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");

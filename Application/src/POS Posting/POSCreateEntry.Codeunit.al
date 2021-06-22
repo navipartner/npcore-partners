@@ -767,10 +767,10 @@
     procedure InsertTransferLocation(POSUnitNo: Code[10]; SalespersonCode: Code[20]; OldDocumentNo: Code[20]; NewDocumentNo: Code[20])
     var
         POSEntry: Record "NPR POS Entry";
-        CreatedEntryNo: Integer;
         SystemEventLbl: Label '[System Event] %1 transferred to location receipt %2', Locked = true;
     begin
-        CreatedEntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo(SystemEventLbl, OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
+        CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo(SystemEventLbl, OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
+
     end;
 
     local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; Description: Text[80]): Integer

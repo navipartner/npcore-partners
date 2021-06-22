@@ -81,7 +81,6 @@ codeunit 6014483 "NPR Service Process"
     var
         UserSubscribed: Boolean;
         CustomerSubscribed: Boolean;
-        AccountCreated: Boolean;
         ServiceUsed: Boolean;
         CustomerNo: Code[20];
         SubscriptionUserId: Text[50];
@@ -93,7 +92,7 @@ codeunit 6014483 "NPR Service Process"
             if not UserSubscribed then begin
                 CustomerSubscribed := IsCustomerSubscribed(CustomerNo, serviceid);
                 if CustomerSubscribed then begin
-                    AccountCreated := CreateUserAccount(SubscriptionUserId, CustomerNo, serviceid);
+                    CreateUserAccount(SubscriptionUserId, CustomerNo, serviceid);
                     CreateTransactionLogEntry(UserId, CustomerNo, serviceid);
                     ServiceUsed := true;
                 end;
@@ -110,7 +109,6 @@ codeunit 6014483 "NPR Service Process"
     var
         UserSubscribed: Boolean;
         CustomerSubscribed: Boolean;
-        AccountCreated: Boolean;
         ServiceUsed: Boolean;
         CustomerNo: Code[20];
         SubscriptionUserId: Text[50];
@@ -126,7 +124,7 @@ codeunit 6014483 "NPR Service Process"
             if not UserSubscribed then begin
                 CustomerSubscribed := IsCustomerSubscribed(CustomerNo, ServiceId);
                 if CustomerSubscribed then begin
-                    AccountCreated := CreateUserAccount(SubscriptionUserId, CustomerNo, ServiceId);
+                    CreateUserAccount(SubscriptionUserId, CustomerNo, ServiceId);
                     CreateTransactionLogEntryAmt(SubscriptionUserId, CustomerNo, QtyUsed, LogDescription, AmountUsed);
                     ServiceUsed := true;
                 end;

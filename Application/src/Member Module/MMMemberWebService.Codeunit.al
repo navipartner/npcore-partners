@@ -1141,7 +1141,6 @@ codeunit 6060128 "NPR MM Member WebService"
         LimitLogEntry: Integer;
         MemberCardEntryNo: Integer;
         MembershipEntryNo: Integer;
-        TicketCreated: Boolean;
         ExternalMemberNotFoundLbl: Label 'External Member Number %1, not found.';
         MembershipNotActiveLbl: Label 'Membership is not active for today (%1).';
     begin
@@ -1185,8 +1184,8 @@ codeunit 6060128 "NPR MM Member WebService"
             exit(0);
 
         AttempArrival.AttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member);
-        TicketCreated := AttempArrival.run();
-        ResponseCode := AttempArrival.GetAttemptMemberArrivalResponse(ResponseMessage);
+        if AttempArrival.run() then
+            ResponseCode := AttempArrival.GetAttemptMemberArrivalResponse(ResponseMessage);
 
         MemberLimitationMgr.UpdateLogEntry(LimitLogEntry, ResponseCode, ResponseMessage);
 

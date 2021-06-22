@@ -155,7 +155,6 @@ page 6060071 "NPR MM Members. AutoRenew Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        AutoRenewCompleted := (Rec."Completed At" <> CreateDateTime(0D, 0T));
         AllowEdit := true;
     end;
 
@@ -169,7 +168,6 @@ page 6060071 "NPR MM Members. AutoRenew Card"
     end;
 
     var
-        AutoRenewCompleted: Boolean;
         AllowEdit: Boolean;
 }
 

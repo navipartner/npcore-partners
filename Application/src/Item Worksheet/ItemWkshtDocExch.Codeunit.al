@@ -148,10 +148,13 @@
                                     ItemGroupText := ErrorMessage2.Description;
                                 ItemWorksheetLine.FieldNo(Description):
                                     VendorItemDescription := ErrorMessage2.Description;
-                                ItemWorksheetLine.FieldNo("Direct Unit Cost"):
-                                    Evaluate(DirectUnitCost, ErrorMessage2.Description, 9);
                                 ItemWorksheetLine.FieldNo("Vendor No."):
                                     VendorNo := ErrorMessage2.Description;
+                                ItemWorksheetLine.FieldNo("Direct Unit Cost"):
+                                    begin
+                                        Evaluate(DirectUnitCost, ErrorMessage2.Description, 9);
+                                        Clear(DirectUnitCost);
+                                    end;
                             end;
                         end;
                     until ErrorMessage2.Next() = 0;

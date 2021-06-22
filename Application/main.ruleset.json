@@ -137,6 +137,11 @@
             "action":"Error",
             "justification": "To avoid confusion, do not give methods the same name as fields or actions in the same scope."
         },
+                {
+            "id": "AA0206",
+            "action":"Error",
+            "justification": "The value assigned to a variable must be used."
+        },
         {
             "id": "AA0207",
             "action":"Error",

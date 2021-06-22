@@ -37,9 +37,6 @@ page 6014411 "NPR Turnover Statistics"
         Netto: Decimal;
         BarPct: Decimal;
         MidPct: Decimal;
-        Label: Decimal;
-        Bar1: Integer;
-        Bar2: Integer;
         Int: Integer;
         D: Integer;
         W: Integer;
@@ -232,13 +229,7 @@ page 6014411 "NPR Turnover Statistics"
                 I := I + 1;
                 BarPct := Abs(BarPct) / 2;
             until Abs(BarPct) < 100;
-        if MidPct < 0 then begin
-            Bar1 := Abs(Round(BarPct, 0.01)) * 100;
-        end else begin
-            Bar2 := Abs(Round(BarPct, 1)) * 100;
-        end;
         BarPct := Round(MidPct, 0.01);
-        Label := 100 * Power(2, I);
     end;
 
     procedure PushDay()

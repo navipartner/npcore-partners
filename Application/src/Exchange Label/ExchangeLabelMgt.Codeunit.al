@@ -461,7 +461,6 @@
         ErrEAN: Label 'Check No. is invalid for EAN-No.';
         ErrLength: Label 'EAN Creation number is too long.';
         VarietySetup: Record "NPR Variety Setup";
-        EAN1: Code[20];
         POSUnit: Record "NPR POS Unit";
         INVALID_EAN_VALUE: Label 'Only digits are allowed when creating EAN: %1';
         UserSetup: Record "User Setup";
@@ -482,7 +481,6 @@
                 '':
                     begin
                         Prefix := Format(VarietySetup."EAN-Internal");
-                        EAN1 := PadStr('', 10 - StrLen(Format(Unique)), '0');
                         EAN := Format(Prefix) + PadStr('', 10 - StrLen(Format(Unique)), '0') + Format(Unique);
                     end;
                 else begin

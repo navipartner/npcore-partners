@@ -29,7 +29,6 @@ codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
     local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
-        SeatingCode: Code[20];
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -37,6 +36,6 @@ codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
         Handled := true;
 
         WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
-        SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
+        Context.GetStringParameterOrFail('SeatingCode', ActionCode());
     end;
 }

@@ -930,13 +930,12 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberNotification: Codeunit "NPR MM Member Notification";
         ResponseMessage: Text;
-        CreateSynchronous: Boolean;
         NotificationEntryNo: Integer;
     begin
 
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        CreateSynchronous := GetCreateWalletRequest(Request, MemberInfoCapture);
+        GetCreateWalletRequest(Request, MemberInfoCapture);
 
         MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", Today, ResponseMessage);
         if (MemberInfoCapture."Membership Entry No." = 0) then
