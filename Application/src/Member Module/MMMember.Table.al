@@ -154,7 +154,7 @@ table 6060126 "NPR MM Member"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(33; Image; Media)
