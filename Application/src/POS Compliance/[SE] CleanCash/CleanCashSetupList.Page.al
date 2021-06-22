@@ -45,8 +45,8 @@ page 6184500 "NPR CleanCash Setup List"
                 {
                     ApplicationArea = All;
                     Visible = false;
-                    ToolTip = '';
                     Description = 'Unknow or unclear usage.';
+                    ToolTip = 'Specifies the value of the Last Report Time field';
                 }
 
                 field(Training; Rec.Training)
