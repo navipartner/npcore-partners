@@ -48,7 +48,6 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         LookupResult: Boolean;
         LookupAttempt: Integer;
         ErrorText: Text;
-        TransactionStarted: Boolean;
     begin
         if (EFTTrxBackgroundSessionMgt.IsRequestAbortAttempted(EFTTransactionAsyncRequest."Request Entry No", true)) then begin
             EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Trx abort already requested. Skipping start on background session', '');
@@ -62,7 +61,6 @@ codeunit 6184536 "NPR EFT NETSCloud Bg. Req."
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
         TrxResult := SendRequest(EFTTransactionRequest, EFTSetup, TrxResponse, EFTNETSCloudProtocol);
-        TransactionStarted := TrxResult or (EFTNETSCloudProtocol.GetResponseStatusCodeBuffer() in [0, 200, 201, 400]);
         LogTrxRequest(EFTTransactionAsyncRequest."Request Entry No", EFTSetup, EFTNETSCloudProtocol, TrxResult);
         Commit(); //Log
 

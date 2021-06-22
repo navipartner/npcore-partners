@@ -3077,8 +3077,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
     procedure CheckAgeConstraint(ReferenceDate1: Date; ReferenceDate2: Date; ReferenceDateType: Option; ConstraintType: Option NA,LT,LTE,GT,GTE,E; Years: Integer) ConstraintOK: Boolean
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        LowRange: Date;
-        HighRange: Date;
         LowDate: Date;
         HighDate: Date;
         DateToValidate: Date;
@@ -3101,8 +3099,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
             HighDate := ReferenceDate1;
         end;
 
-        LowRange := CalcDate('<CY-1Y+1D>', HighDate);
-        HighRange := CalcDate('<CY>', HighDate);
         DateToValidate := CalcDate(StrSubstNo(PlaceHolderLbl, Years), LowDate); // Birth date + constraint in years
 
         // Always check year
@@ -5045,13 +5041,12 @@ codeunit 6060127 "NPR MM Membership Mgt."
     local procedure OnAfterNavigateFindRecordsSubscriber(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
     var
         MembershipEntry: Record "NPR MM Membership Entry";
-        Entries: Integer;
     begin
 
         if (MembershipEntry.ReadPermission()) then begin
             if (not MembershipEntry.SetCurrentKey("Receipt No.")) then;
             MembershipEntry.SetFilter("Receipt No.", '%1', DocNoFilter);
-            Entries := InsertIntoDocEntry(DocumentEntry, Database::"NPR MM Membership Entry", 0, CopyStr(DocNoFilter, 1, 20), MembershipEntry.TableCaption(), MembershipEntry.Count());
+            InsertIntoDocEntry(DocumentEntry, Database::"NPR MM Membership Entry", 0, CopyStr(DocNoFilter, 1, 20), MembershipEntry.TableCaption(), MembershipEntry.Count());
         end;
 
     end;

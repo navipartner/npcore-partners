@@ -88,14 +88,12 @@
 
     trigger OnAfterGetRecord()
     begin
-        SetActivityGroupVisibility();
+
     end;
 
     trigger OnOpenPage()
     var
-        CRMConnectionSetup: Record "CRM Connection Setup";
         IntegrationSynchJobErrors: Record "Integration Synch. Job Errors";
-        OCRServiceMgt: Codeunit "OCR Service Mgt.";
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
@@ -106,11 +104,7 @@
             Commit();
         end;
 
-        ShowAwaitingIncomingDoc := OCRServiceMgt.OcrServiceIsEnable();
-        ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
-        ShowIntelligentCloud := not EnvironmentInformation.IsSaaS();
         IntegrationSynchJobErrors.SetDataIntegrationUIElementsVisible(ShowDataIntegrationCues);
-        ShowD365SIntegrationCues := CRMConnectionSetup.IsEnabled();
         RoleCenterNotificationMgt.ShowNotifications();
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
 
@@ -127,33 +121,8 @@
     var
         CueAndKPIs: Codeunit "Cues And KPIs";
         O365GettingStartedMgt: Codeunit "O365 Getting Started Mgt.";
-        ClientTypeManagement: Codeunit "Client Type Management";
-        EnvironmentInformation: Codeunit "Environment Information";
-
-
-
-        ShowDocumentsPendingDocExchService: Boolean;
-        ShowAwaitingIncomingDoc: Boolean;
-        ShowIntercompanyActivities: Boolean;
-        ShowProductVideosActivities: Boolean;
-        ShowIntelligentCloud: Boolean;
         WhatIsNewTourVisible: Boolean;
-        ShowD365SIntegrationCues: Boolean;
         ShowDataIntegrationCues: Boolean;
-
-
-    local procedure SetActivityGroupVisibility()
-    var
-        DocExchServiceSetup: Record "Doc. Exch. Service Setup";
-        CompanyInformation: Record "Company Information";
-    begin
-        if DocExchServiceSetup.Get() then
-            ShowDocumentsPendingDocExchService := DocExchServiceSetup.Enabled;
-
-        if CompanyInformation.Get() then
-            ShowIntercompanyActivities :=
-              (CompanyInformation."IC Partner Code" <> '') and ((Rec."IC Inbox Transactions" <> 0) or (Rec."IC Outbox Transactions" <> 0));
-    end;
 
     local procedure StartWhatIsNewTour()
     var

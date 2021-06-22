@@ -864,7 +864,6 @@ page 6060134 "NPR MM Member Info Capture"
         INVALID_ACTIVATION_DATE: Label 'The activation date %1 is not valid. The resulting membership must have remaining time when applying the membership duration formula to activation date.';
         ActivationDate: Date;
         ExternalMembershipNo: Code[20];
-        ShowMemberOverviewSection: Boolean;
         ShowNewMemberSection: Boolean;
         ShowNewCardSection: Boolean;
         ShowAddToMembershipSection: Boolean;
@@ -1116,7 +1115,6 @@ page 6060134 "NPR MM Member Info Capture"
         ValidUntilBaseDate: Date;
     begin
 
-        ShowMemberOverviewSection := (Rec.Count() > 1);
         ShowNewMemberSection := true;
 
         ShowAddToMembershipSection := false;

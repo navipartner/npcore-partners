@@ -18,6 +18,7 @@ page 6014420 "NPR Master No. Input Dialog"
                 begin
                     StoreInput("InputNo.");
                 end;
+
             }
         }
     }

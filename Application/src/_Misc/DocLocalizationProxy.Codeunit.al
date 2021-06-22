@@ -60,10 +60,8 @@ codeunit 6014699 "NPR Doc. Localization Proxy"
     end;
 
     procedure T18_GetFieldValue(Customer: Record Customer; FieldName: Text[100]; var Value: Variant)
-    var
-        FieldNo: Integer;
     begin
-        FieldNo := GetFieldNo(DATABASE::Customer, FieldName);
+        GetFieldNo(DATABASE::Customer, FieldName);
         Error(NotLocalizedErr);
     end;
 
@@ -73,11 +71,8 @@ codeunit 6014699 "NPR Doc. Localization Proxy"
     end;
 
     procedure T37_GetFieldValue(SalesLine: Record "Sales Line"; FieldName: Text[100]; var Value: Variant)
-    var
-        FieldNo: Integer;
     begin
-        FieldNo := GetFieldNo(DATABASE::"Sales Line", FieldName);
-
+        GetFieldNo(DATABASE::"Sales Line", FieldName);
         Error(NotLocalizedErr);
     end;
 
@@ -87,38 +82,26 @@ codeunit 6014699 "NPR Doc. Localization Proxy"
     end;
 
     procedure T112_GetFieldValue(SalesInvoiceHeader: Record "Sales Invoice Header"; FieldName: Text[100]; var Value: Variant)
-    var
-        FieldNo: Integer;
     begin
-        FieldNo := GetFieldNo(DATABASE::"Sales Invoice Header", FieldName);
-
+        GetFieldNo(DATABASE::"Sales Invoice Header", FieldName);
         Error(NotLocalizedErr);
     end;
 
     procedure T114_GetFieldValue(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; FieldName: Text[100]; var Value: Variant)
-    var
-        FieldNo: Integer;
     begin
-        FieldNo := GetFieldNo(DATABASE::"Sales Cr.Memo Header", FieldName);
-
+        GetFieldNo(DATABASE::"Sales Cr.Memo Header", FieldName);
         Error(NotLocalizedErr);
     end;
 
     procedure T297_GetFieldValue(IssuedReminderHeader: Record "Issued Reminder Header"; FieldName: Text[100]; var Value: Variant)
-    var
-        FieldNo: Integer;
     begin
-        FieldNo := GetFieldNo(DATABASE::"Issued Reminder Header", FieldName);
-
+        GetFieldNo(DATABASE::"Issued Reminder Header", FieldName);
         Error(NotLocalizedErr);
     end;
 
     procedure T304_GetFieldValue(IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header"; FieldName: Text[100]; var Value: Variant)
-    var
-        FieldNo: Integer;
     begin
-        FieldNo := GetFieldNo(DATABASE::"Issued Fin. Charge Memo Header", FieldName);
-
+        GetFieldNo(DATABASE::"Issued Fin. Charge Memo Header", FieldName);
         Error(NotLocalizedErr);
     end;
 

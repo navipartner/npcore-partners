@@ -1,11 +1,6 @@
 ﻿codeunit 6014406 "NPR Sales Doc. Imp. Mgt."
 {
     var
-        OrderType: Integer;
-        OrderTypeSet: Boolean;
-        ERRORDERTYPE: Label 'Wrong Order Type. Order Type is set to %1. It must be one of %2, %3, %4.';
-        DeleteDocumentOnImportToPOS: Boolean;
-        ConfirmDeleteDocumentOnImportToPOS: Boolean;
         ERR_DUPLICATE_DOCUMENT: Label 'Only one sales document can be processed per sale.';
         DOCUMENT_IMPORTED_DELETED: Label '%1 %2 was imported in POS. The document has been deleted.';
         DOCUMENT_IMPORTED: Label '%1 %2 was imported in POS.';
@@ -164,35 +159,6 @@
         end;
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-    end;
-
-    procedure SetOrderType(OrderTypeOption: Option NotSet,"Order",Lending)
-    begin
-        case OrderTypeOption of
-            OrderTypeOption::NotSet:
-                begin
-                    OrderType := 0;
-                    OrderTypeSet := false;
-                end;
-            OrderTypeOption::Order:
-                begin
-                    OrderType := 1;
-                    OrderTypeSet := true;
-                end;
-            OrderTypeOption::Lending:
-                begin
-                    OrderType := 2;
-                    OrderTypeSet := true;
-                end;
-            else
-                Error(ERRORDERTYPE, Format(OrderTypeOption), Format(OrderTypeOption::NotSet), Format(OrderTypeOption::Order), Format(OrderTypeOption::Lending));
-        end;
-    end;
-
-    procedure SetDeleteDocumentOnImport(SetDelete: Boolean; SetConfirm: Boolean)
-    begin
-        DeleteDocumentOnImportToPOS := SetDelete;
-        ConfirmDeleteDocumentOnImportToPOS := SetConfirm;
     end;
 
     procedure SelectSalesDocument(TableView: Text; var SalesHeader: Record "Sales Header"): Boolean

@@ -67,7 +67,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         DialogMethodType: Option;
         POSWorkflowType: Option;
         AdmissionCode: Code[20];
-        ConfirmMember: Boolean;
         DefaultInputValue: Text;
     begin
 
@@ -111,7 +110,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         AdmissionCode := JSON.GetStringParameter('AdmissionCode');
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ConfirmMember := JSON.GetBooleanParameterOrFail('ConfirmMember', ActionCode());
+        JSON.GetBooleanParameterOrFail('ConfirmMember', ActionCode());
 
         if (DefaultInputValue <> '') then
             MemberCardNumber := DefaultInputValue;

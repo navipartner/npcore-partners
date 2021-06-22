@@ -124,12 +124,8 @@
     end;
 
     trigger OnAfterGetRecord()
-    var
-        DocExchServiceSetup: Record "Doc. Exch. Service Setup";
     begin
         CalculateCueFieldValues();
-        if DocExchServiceSetup.Get() then
-            ShowDocumentsPendingDodExchService := DocExchServiceSetup.Enabled;
     end;
 
     trigger OnOpenPage()
@@ -153,7 +149,6 @@
     end;
 
     var
-        ShowDocumentsPendingDodExchService: Boolean;
 
     local procedure CalculateCueFieldValues()
     begin

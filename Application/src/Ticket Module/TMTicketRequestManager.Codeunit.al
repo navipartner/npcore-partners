@@ -1432,7 +1432,6 @@
         OutStr: OutStream;
         NewStream: InStream;
         ToFile: Text;
-        ReturnValue: Boolean;
     begin
 
         // The link to ticket is only on the first request
@@ -1450,7 +1449,7 @@
         TempBlob.CreateInStream(NewStream);
         ToFile := 'TicketReport.xls';
 
-        ReturnValue := DownloadFromStream(
+        DownloadFromStream(
           NewStream,
           'Save file to client',
           '',

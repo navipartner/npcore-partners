@@ -17,7 +17,6 @@
 
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        InvoiceDiscountAmt: Decimal;
 
     procedure EnableMenu()
     begin
@@ -105,14 +104,6 @@
                         Clear(CustInvoiceDisc);
                 end else
                     Clear(CustInvoiceDisc);
-            if CustInvoiceDisc."Discount %" <> 0 then begin
-                SaleLinePOS2.SetRange("Allow Invoice Discount", true);
-                if SaleLinePOS2.Find('-') then
-                    repeat
-                        if SaleLinePOS2.Quantity <> 0 then
-                            InvoiceDiscountAmt += Round(SaleLinePOS2.Amount * CustInvoiceDisc."Discount %" / 100, 0.00001);
-                    until SaleLinePOS2.Next() = 0;
-            end;
         end;
     end;
 
