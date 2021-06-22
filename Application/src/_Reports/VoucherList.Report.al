@@ -121,6 +121,7 @@ report 6014401 "NPR Voucher List"
                     {
                         Caption = 'Show Summary';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Summary field';
                     }
                 }
             }

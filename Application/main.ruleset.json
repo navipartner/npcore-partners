@@ -173,6 +173,11 @@
             "justification": "Use a text constant for passing user messages and errors without concatenations."
         },
         {
+            "id": "AA0218",
+            "action":"Error",
+            "justification": "You must write a tooltip in the Tooltip property for all controls of type Action and Field that exist on page objects."
+        },
+        {
             "id": "AA0220",
             "action":"Error",
             "justification": "The value of the Tooltip property of Fields must be filled."

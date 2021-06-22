@@ -20,28 +20,34 @@ page 6014457 "NPR MM Member Capture List"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("R_PhoneNo"; Rec."Phone No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("R_FirstName"; Rec."First Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the First Name field';
                 }
                 field("R_LastName"; Rec."Last Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Name field';
                 }
                 field("R_Email"; Rec."E-Mail Address")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
                 field("R_ExternalCardNo"; Rec."External Card No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Card No. field';
                 }
             }
         }
