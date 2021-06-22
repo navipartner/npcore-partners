@@ -357,6 +357,14 @@ table 6150621 "NPR POS Entry"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(611; "EFT Transaction Requests"; Integer)
+        {
+            CalcFormula = Count("NPR EFT Transaction Request" WHERE("Sales Ticket No." = FIELD("Document No."), "Register No." = FIELD("POS Unit No.")));
+            Caption = 'EFT Transaction Requests';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+
         field(620; "Tax Lines"; Integer)
         {
             CalcFormula = Count("NPR POS Entry Tax Line" WHERE("POS Entry No." = FIELD("Entry No.")));
