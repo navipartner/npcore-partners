@@ -72,7 +72,7 @@ table 6059964 "NPR MPOS QR Code"
             Caption = 'QR code';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(21; "Cash Register Id"; Code[10])

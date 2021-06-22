@@ -349,7 +349,7 @@ table 6151013 "NPR NpRv Voucher"
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
             SubType = Bitmap;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(306; "Barcode Image"; Media)
