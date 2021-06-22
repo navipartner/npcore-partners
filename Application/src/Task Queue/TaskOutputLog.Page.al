@@ -71,7 +71,6 @@ page 6059911 "NPR Task Output Log"
                 trigger OnAction()
                 var
                     Instr: InStream;
-                    Downloaded: Boolean;
                 begin
                     Rec.CalcFields(File);
                     if not Rec.File.HasValue() then begin
@@ -80,7 +79,7 @@ page 6059911 "NPR Task Output Log"
                     end;
 
                     Rec.File.CreateInStream(Instr);
-                    Downloaded := DownloadFromStream(Instr, FileDownLoadTxt, '', '', Rec."File Name");
+                    DownloadFromStream(Instr, FileDownLoadTxt, '', '', Rec."File Name");
                 end;
             }
         }

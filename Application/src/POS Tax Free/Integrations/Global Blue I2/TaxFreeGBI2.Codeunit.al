@@ -1182,7 +1182,6 @@
     local procedure CaptureCustomerInfo(): Text
     var
         tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
-        LookupCompleted: Boolean;
     begin
         tmpCustomerInfoCapture.Init();
         tmpCustomerInfoCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
@@ -1191,7 +1190,6 @@
         if Confirm(Caption_UseID) then begin
             if not ScanCustomerID(tmpCustomerInfoCapture) then
                 exit(CaptureCustomerInfo()); //Aborted - Restart capture flow
-            LookupCompleted := true;
         end;
 
         if not IsAllRequiredCustomerInfoCaptured(tmpCustomerInfoCapture) then begin

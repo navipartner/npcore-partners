@@ -265,13 +265,14 @@ page 6014463 "NPR Item ListPart"
     var
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
+        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
         if CRMIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
+            CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
 
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
+        ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
+        ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
         WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
 
@@ -314,33 +315,23 @@ page 6014463 "NPR Item ListPart"
     trigger OnOpenPage()
     var
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
-        ClientTypeManagement: Codeunit "Client Type Management";
     begin
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
         IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled();
         SetWorkflowManagementEnabledState();
-        IsOnPhone := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
     end;
 
     var
         TempItemFilteredFromAttributes: Record Item temporary;
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
-        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         IsFoundationEnabled: Boolean;
         CRMIntegrationEnabled: Boolean;
-        CRMIsCoupledToRecord: Boolean;
-        OpenApprovalEntriesExist: Boolean;
-        EnabledApprovalWorkflowsExist: Boolean;
-        CanCancelApprovalForRecord: Boolean;
-        IsOnPhone: Boolean;
         RunOnTempRec: Boolean;
         EventFilter: Text;
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
         [InDataSet]
         IsNonInventoriable: Boolean;
-        [InDataSet]
-        IsInventoriable: Boolean;
 
     procedure SelectInItemList(var Item: Record Item): Text
     var
@@ -356,17 +347,14 @@ page 6014463 "NPR Item ListPart"
     local procedure EnableControls()
     begin
         IsNonInventoriable := Rec.IsNonInventoriableType();
-        IsInventoriable := Rec.IsInventoriableType();
     end;
 
     local procedure SetWorkflowManagementEnabledState()
     var
-        WorkflowManagement: Codeunit "Workflow Management";
         WorkflowEventHandling: Codeunit "Workflow Event Handling";
     begin
         EventFilter := WorkflowEventHandling.RunWorkflowOnSendItemForApprovalCode() + '|' +
           WorkflowEventHandling.RunWorkflowOnItemChangedCode();
 
-        EnabledApprovalWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::Item, EventFilter);
     end;
 }

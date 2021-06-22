@@ -642,7 +642,6 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         retry: Boolean;
         retryCounter: Integer;
         attempts: Integer;
-        succsss: Boolean;
         Request: HttpRequestMessage;
         mobilePayCallThrtl: Codeunit "NPR MobilePayV10 Call Thrtl.";
     begin
@@ -657,7 +656,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             HttpRequestHelper.CopyRequest(ReqMessage, Request);
 
             Clear(respMessage);
-            succsss := TrySend(Request, RespMessage, Timeout);
+            TrySend(Request, RespMessage, Timeout);
 
             case respMessage.HttpStatusCode of
                 0, 500:

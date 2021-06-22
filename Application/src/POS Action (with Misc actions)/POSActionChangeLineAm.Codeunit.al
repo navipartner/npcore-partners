@@ -109,6 +109,7 @@ then begin
             exit;
 
         InScope := Evaluate(Amount, EanBoxValue);
+        Clear(Amount);
     end;
 
     local procedure EanEventCode(): Code[20]

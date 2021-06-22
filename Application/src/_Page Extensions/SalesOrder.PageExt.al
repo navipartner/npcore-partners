@@ -311,24 +311,4 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             }
         }
     }
-
-    var
-        HasRetailVouchers: Boolean;
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        SetHasRetailVouchers();
-    end;
-
-    local procedure SetHasRetailVouchers()
-    var
-        NpRvSaleLinePOSVoucher: Record "NPR NpRv Sales Line";
-    begin
-        if Rec."No." = '' then
-            exit;
-
-        NpRvSaleLinePOSVoucher.SetRange("Document Type", Rec."Document Type");
-        NpRvSaleLinePOSVoucher.SetRange("Document No.", Rec."No.");
-        HasRetailVouchers := not NpRvSaleLinePOSVoucher.IsEmpty();
-    end;
 }

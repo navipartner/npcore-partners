@@ -60,10 +60,8 @@
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
-                            var
-                                LineTypeFound: Boolean;
                             begin
-                                LineTypeFound := LineTypeDict.Get(SalesInvLine.Type.AsInteger(), SalesInvLineType);
+                                if LineTypeDict.Get(SalesInvLine.Type.AsInteger(), SalesInvLineType) then;
                             end;
                         }
                         fieldelement(no; SalesInvLine."No.")
@@ -221,10 +219,8 @@
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
-                            var
-                                LineTypeFound: Boolean;
                             begin
-                                LineTypeFound := LineTypeDict.Get(SalesCrMemoLine.Type.AsInteger(), SalesCrMemoLineType);
+                                if LineTypeDict.Get(SalesCrMemoLine.Type.AsInteger(), SalesCrMemoLineType) then;
                             end;
                         }
                         fieldelement(no; SalesCrMemoLine."No.")
@@ -402,12 +398,9 @@
                         textelement(saleslinetype)
                         {
                             XmlName = 'type';
-
                             trigger OnBeforePassVariable()
-                            var
-                                LineTypeFound: Boolean;
                             begin
-                                LineTypeFound := LineTypeDict.Get(SalesLine.Type.AsInteger(), SalesLineType);
+                                if LineTypeDict.Get(SalesLine.Type.AsInteger(), SalesLineType) then;
                             end;
                         }
                         fieldelement(no; SalesLine."No.")
@@ -624,10 +617,8 @@
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
-                            var
-                                LineTypeFound: Boolean;
                             begin
-                                LineTypeFound := LineTypeDict.Get(SalesShipmentLine.Type.AsInteger(), ShipmentLineType);
+                                If LineTypeDict.Get(SalesShipmentLine.Type.AsInteger(), ShipmentLineType) then;
                             end;
                         }
                         fieldelement(no; SalesShipmentLine."No.")
@@ -782,10 +773,8 @@
                             XmlName = 'type';
 
                             trigger OnBeforePassVariable()
-                            var
-                                LineTypeFound: Boolean;
                             begin
-                                LineTypeFound := LineTypeDict.Get(SalesLine.Type.AsInteger(), QuoteLineType);
+                                if LineTypeDict.Get(SalesLine.Type.AsInteger(), QuoteLineType) then;
                             end;
                         }
                         fieldelement(no; QuoteLine."No.")

@@ -139,7 +139,6 @@ report 6014543 "NPR Item - Loss - Top 10"
 
                 if Rank = 1 then
                     MaxAmt := ItemCostAmount;
-                TestAmt := Round(ItemCostAmount / MaxAmt * 45, 1);
                 if ItemCostAmount > 0 then
                     ProgressText := PadStr('', Round(ItemCostAmount / MaxAmt * 45, 1), '*')
                 else
@@ -234,7 +233,6 @@ report 6014543 "NPR Item - Loss - Top 10"
         ItemReportSorting: Record "NPR TEMP Buffer";
         ShrinkagePct: Decimal;
         Rank: Integer;
-        TestAmt: Decimal;
         MaxAmt: Decimal;
         Vare_Svind___Top_10CaptionLbl: Label 'Item Shrinkage - Top 10';
         Page_CaptionLbl: Label 'Page.';

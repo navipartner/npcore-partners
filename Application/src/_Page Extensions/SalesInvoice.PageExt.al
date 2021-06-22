@@ -95,24 +95,4 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
             }
         }
     }
-
-    var
-        HasRetailVouchers: Boolean;
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        NPRSetHasRetailVouchers();
-    end;
-
-    local procedure NPRSetHasRetailVouchers()
-    var
-        NpRvSaleLinePOSVoucher: Record "NPR NpRv Sales Line";
-    begin
-        if Rec."No." = '' then
-            exit;
-
-        NpRvSaleLinePOSVoucher.SetRange("Document Type", Rec."Document Type");
-        NpRvSaleLinePOSVoucher.SetRange("Document No.", Rec."No.");
-        HasRetailVouchers := not NpRvSaleLinePOSVoucher.IsEmpty();
-    end;
 }
