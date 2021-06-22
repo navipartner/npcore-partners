@@ -223,7 +223,7 @@
         InitMailAdrSeparators(Separators);
         EmailSendingHandler.CreateEmailItem(EmailItem,
           EmailTemplateHeader."From E-mail Name", EmailTemplateHeader."From E-mail Address",
-          EmailTemplateHeader."Default Recipient Address".Split(Separators), '', '', false);
+          EmailTemplateHeader."Default Recipient Address".Split(Separators), '', '', true);
 
         if EmailTemplateHeader."Sender as bcc" then
             EmailSendingHandler.AddRecipientBCC(EmailItem, EmailTemplateHeader."From E-mail Address".Split(Separators));
