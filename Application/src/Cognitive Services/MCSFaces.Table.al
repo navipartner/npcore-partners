@@ -87,7 +87,7 @@ table 6059959 "NPR MCS Faces"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(25; "Action"; Enum "NPR MCS Faces Action")
