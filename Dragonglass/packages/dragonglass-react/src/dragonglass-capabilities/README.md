@@ -1,0 +1,1 @@
+This folder must go out and be refactored. Capabilities are being phased out and replaced with window.top.npDragonglass interface.

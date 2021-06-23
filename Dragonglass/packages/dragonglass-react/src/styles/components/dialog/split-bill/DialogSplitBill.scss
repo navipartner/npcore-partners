@@ -1,0 +1,96 @@
+.transcendence {
+  .dialog__container--split-bill {
+    .dialog__body {
+      min-height: 50vh;
+      display: flex;
+    }
+
+    .simplebar-content {
+      padding: 10px !important;
+    }
+  }
+
+  .dialog__split-bill__body {
+    display: flex;
+    max-height: 50vh;
+
+    .split-bill__container {
+      flex: 1 1 50%;
+      padding: 10px;
+
+      &:last-child {
+        margin-left: 30px;
+        height: calc(100% - 60px);
+        padding: 0;
+      }
+
+      .grid {
+        margin-bottom: 30px;
+        overflow: visible;
+        transition: transform 0.2s, background-color 0.2s;
+      }
+
+      .grid--active-drop-area {
+        transform: scale(1.01);
+        background-color: #686868;
+      }
+    }
+
+    .grid__table table th,
+    .grid__table table td {
+      width: 20%;
+      text-align: left;
+      justify-content: left;
+      white-space: initial;
+      align-items: center;
+      padding: 0.5% 1%;
+      min-height: 35px;
+      display: flex;
+
+      &:first-child {
+        width: 80%;
+      }
+    }
+
+    .grid__table--body {
+      flex-basis: auto;
+    }
+
+    .button {
+      min-width: 200px;
+      float: right;
+      margin-top: 30px;
+      height: auto;
+    }
+  }
+
+  .bill-table {
+    display: block;
+    min-height: 40px;
+  }
+
+  .bill-table--split {
+    .bill-item {
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+
+      &:last-child {
+        border: none;
+      }
+
+      &.dragging {
+        position: fixed;
+        z-index: 9;
+        background-color: #686868;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+        border: none;
+
+        transform: scale(1.01);
+      }
+    }
+
+    .bill-item:not(.dragging) {
+      animation: fadeIn-slideIn-dark 0.3s;
+    }
+  }
+}

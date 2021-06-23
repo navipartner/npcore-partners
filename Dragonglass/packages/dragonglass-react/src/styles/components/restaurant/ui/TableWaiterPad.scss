@@ -1,0 +1,30 @@
+.transcendence {
+  .table-waiter-pad {
+    align-items: center;
+    box-shadow: $boxShadow;
+    display: flex;
+    font-size: 0.7em;
+    height: 2.5em;
+    justify-content: center;
+    margin: 0 1em 0 0;
+    padding: 1.5em 3.5em;
+    position: relative;
+    width: 2.5em;
+    z-index: 9;
+    background: $colorPrimary100;
+    color: $colorText200;
+    border-radius: $borderRadius;
+
+    span {
+      margin-right: 0.75em;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &.is-active {
+      background: $colorPrimary200;
+    }
+  }
+}

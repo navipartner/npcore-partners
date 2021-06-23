@@ -1,0 +1,58 @@
+.transcendence {
+  .table__chairs {
+    span {
+      width: 1.4vw;
+      height: 1vw;
+      background: #acd8ec;
+      position: absolute;
+      left: calc(50% - 0.7vw);
+      top: -1.1vw;
+      border-radius: 0.3vw 0.3vw 0 0;
+      display: block;
+      transition: all 0.3s ease-in-out;
+
+      &:nth-child(2) {
+        left: -1.33vw;
+        top: calc(50% - 0.5vw);
+        transform: (rotate(-90deg));
+      }
+
+      &:nth-child(3) {
+        bottom: -1.1vw;
+        top: auto;
+        transform: (rotate(180deg));
+      }
+
+      &:nth-child(4) {
+        left: auto;
+        right: -1.33vw;
+        transform: (rotate(90deg));
+        top: calc(50% - 0.5vw);
+      }
+
+      &:nth-child(5) {
+        left: calc(20% - 0.7vw);
+      }
+
+      &:nth-child(6) {
+        right: calc(20% - 0.7vw);
+        left: auto;
+      }
+
+      &:nth-child(7) {
+        top: auto;
+        bottom: -1.1vw;
+        transform: (rotate(180deg));
+        left: calc(20% - 0.7vw);
+      }
+
+      &:nth-child(8) {
+        top: auto;
+        bottom: -1.1vw;
+        left: auto;
+        right: calc(20% - 0.7vw);
+        transform: (rotate(180deg));
+      }
+    }
+  }
+}

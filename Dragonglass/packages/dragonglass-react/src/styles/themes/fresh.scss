@@ -1,0 +1,333 @@
+@import "../utilities/theme";
+
+$colors: (
+  "--color-primary": #549ad3,
+  "--color-secondary": #ffffff,
+  "--green": #5eb267,
+  "--red": #db3439,
+  "--dark-red": #982420,
+  "--gray": #a4b4c8,
+  "--light-gray": #555555,
+  "--purple": #80588c,
+  "--indigo": #655093,
+  "--yellow": #e5d736,
+  "--orange": #f0aa35,
+  "--white": #d8d8d8,
+  "--dark-gray": #222222,
+  "--blue": #0f1011,
+  "--dark-blue": #24323f,
+  "--light-blue": #4a5560,
+);
+
+$colors-hover: (
+  "--color-primary-hover": #29578d,
+  "--color-secondary-hover": #555555,
+  "--green-hover": #34803c,
+  "--red-hover": #b30d13,
+  "--dark-red-hover": #6c1714,
+  "--gray-hover": #76889c,
+  "--purple-hover": #5e3b69,
+  "--indigo-hover": #45346a,
+  "--yellow-hover": #aea115,
+  "--orange-hover": #a76b07,
+  "--white-hover": #9c9c9c,
+  "--light-gray-hover": #686868,
+  "--dark-gray-hover": #363636,
+  "--blue-hover": #415467,
+  "--dark-blue-hover": #314355,
+  "--light-blue-hover": #596877,
+);
+
+$colors-mobile: (
+  "--primary-mobile": rgba(255, 255, 255, 0.3),
+  "--secondary-mobile": #ffffff80,
+  "--green-mobile": #5eb26780,
+  "--red-mobile": #db343980,
+  "--dark-red-mobile": #98242080,
+  "--gray-mobile": #a4b4c880,
+  "--light-gray-mobile": #55555580,
+  "--purple-mobile": #80588c80,
+  "--indigo-mobile": #65509380,
+  "--yellow-mobile": #e5d73680,
+  "--orange-mobile": #f0aa3580,
+  "--white-mobile": #d8d8d880,
+  "--dark-gray-mobile": #22222280,
+  "--blue-mobile": #0f101180,
+  "--dark-blue-mobile": #24323f80,
+  "--light-blue-mobile": #4a556080,
+);
+
+$font: (
+  "--primary-font": (
+    "Segoe UI",
+    Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif,
+  ),
+  "--light-font": (
+    "Segoe UI Light" Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif,
+  ),
+  "--default-font-size": 1.6rem,
+  "--text-color": #494949,
+  "--text-color-secondary": #cccccc,
+  "--text-color-disabled": #dedede20,
+  "--input-text-color": #494949,
+  "--font-weight": 400,
+);
+
+$loginPad: (
+  "--login-left-width": 60%,
+  "--login-right-width": 40%,
+  "--last-sale-text-color": #eee,
+  "--last-sale-bg": #4b4b4b,
+  "--login-bg": #ffffff,
+  "--login-button-grid-padding": 0,
+  "--login-padding": 0,
+  "--input-with-caption-bg": #549ad3,
+);
+
+$layout: (
+  "--view-padding": 1em,
+  "--container--space": 1.25em,
+);
+
+$buttons: (
+  "--button-space": 0.3em,
+  "--button-padding": 0.5em,
+  "--button-bg-disabled": #caddf0,
+  "--button-text-color": #ffffff,
+  "--button-color-disabled": #ffffff,
+  "--button-shadow": none,
+  "--button-shadow-disabled": none,
+  "--button-bg": #549ad3,
+  "--button-bg-hover": #21659c,
+  "--button-switch-bg":
+    linear-gradient(
+      to right bottom,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.2)
+    ),
+);
+
+$labels: (
+  "--label-bg-color": inherit,
+  "--label-padding": 0,
+  "--label-color": #ffffff,
+);
+
+$inputs: (
+  "--input-border": none,
+  "--input-erase-bg": #549ad3,
+  "--input-bg": #ffffff,
+  "--input-selection-bg": #549ad3,
+  "--input-selection-color": #ffffff,
+);
+
+$infobox: (
+  "--info-box-title-height": 2.25em,
+  "--info-box-caption-height": 1.17em,
+  "--info-box-color": #444,
+  "--info-box-bg": #ffffff,
+  "--caption-box-bg": #e9e9e9,
+  "--info-box-border-color": #c7c7c7,
+);
+
+$grid: (
+  "--grid-head-color": #ffffff,
+  "--grid-column-border": none,
+  "--grid-column-padding": 0.5% 1%,
+  "--grid-column-width": 11%,
+  "--grid-first-column-width": 45%,
+  "--grid-row-border": 1px solid #f1f4fa,
+  "--grid-row-highlight-bg": #a3d5fd,
+  "--grid-text-color": #444,
+);
+
+$subtotal: (
+  "--subtotal-color": #ffffff,
+  "--subtotal-padding": 5px,
+);
+
+$popup: (
+  "--popup-max-height": 75%,
+  "--popup-max-width": 60%,
+  "--popup-min-width": 40%,
+  "--popup-shadow": 0 0 30px 0 rgba(0, 0, 0, 0.47),
+  "--popup-title-bg": #dfdfdf,
+  "--popup-title-height": 40px,
+  "--popup-title-color": #6f6f6f,
+  "--popup-title-font-size": 1.5em,
+  "--popup-body-bg": #f3f3f3,
+  "--popup-button-bg": #e4e4e4,
+  "--popup-button-height": 100px,
+  "--popup-button-width": 115px,
+  "--popup-body-text-color": #ffffff,
+  "--popup-border-radius": 8px,
+  "--popup-backdrop-filter": blur(2rem),
+);
+
+$datepicker: (
+  "--date-picker-height": 300px,
+);
+
+$statusbar: (
+  "--statusbar-color": #eee,
+  "--statusbar-shadow": none,
+);
+
+$misc: (
+  "--danger": firebrick,
+  "--overlay-bg": rgba(224, 224, 224, 0.3),
+  "--shadow": none,
+  "--border-radius": 3px,
+  "--body-bg": #ffffff,
+  "--backdrop-filter": blur(0.5rem),
+  "--notifications-panel-bg": #3c79ab,
+);
+
+$loading-grid-row: (
+  "--dot-width": 5px,
+  "--dot-height": 5px,
+  "--left-pos": -9999px,
+);
+
+$lookup: (
+  "--lookup-row-shadow": none,
+  "--lookup-row-hover": #cee5f9,
+  "--lookup-row-selected": #cee5f9,
+  "--lookup-row-selected-hover": #b4d0e9,
+  "--lookup-row-text-dark": #626262,
+  "--lookup-row-text-light": #868686,
+);
+
+$toolbar: (
+  "--toolbar-bg": rgba(255, 255, 255, 0.3),
+  "--toolbar-button-bg": transparent,
+  "--toolbar-button-border": none,
+  "--toolbar-button-color": #ffffff,
+  "--toolbar-button-padding": 1rem 0 0.4rem 0,
+  "--toolbar-button-bg-hover": transparent,
+  "--toolbar-button-color-hover": #ffffff,
+  "--toolbar-button-bg-disabled": transparent,
+  "--toolbar-button-color-disabled": #6d6d6d,
+  "--toolbar-button-space": 0.4em,
+  "--toolbar-icon-font-size": 1.5rem,
+  "--toolbar-caption-font-size": 1.2rem,
+  "--toolbar-active-item-indicator": #ffffff,
+  "--toolbar-active-item-background": #ffffff86,
+);
+
+$mobile: (
+  "--bg-shade-one": rgba(255, 255, 255, 0.3),
+  "--bg-shade-two": rgba(255, 255, 255, 0.1),
+  "--bg-shade-three": rgba(255, 255, 255, 0.15),
+  "--bg-shade-four": rgba(255, 255, 255, 0.05),
+  "--bg-button": rgba(255, 255, 255, 0.3),
+  "--bg-numpad-button":
+    linear-gradient(
+      to right bottom,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.1)
+    ),
+  "--bg-numpad-button-transparent":
+    linear-gradient(
+      to right bottom,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.05)
+    ),
+  "--bg-numpad-button-disabled":
+    linear-gradient(
+      to right bottom,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.05)
+    ),
+  "--bg-body": transparent,
+  "--bg-password": transparent,
+  "--bg-ripple-dark": rgba(255, 255, 255, 0.4),
+  "--bg-ripple-light": rgba(255, 255, 255, 0.4),
+  "--bg-drawer": rgba(19, 29, 46, 0.331),
+  "--bg-error": transparent,
+  "--bg-popup-section":
+    linear-gradient(
+      to right bottom,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.05)
+    ),
+  "--bg-popup-switch": #7dc984,
+  "--bg-notifications-panel": rgba(255, 255, 255, 0.2),
+  "--text-shade-one": #ffffff,
+  "--text-shade-two": rgba(255, 255, 255, 0.2),
+  "--text-shade-three": #ffffff,
+  "--text-accent": #ffffff,
+  "--text-numpad-button": #ffffff,
+  "--text-price-total": #ffffff,
+  "--text-alert-title": #ffffff,
+  "--box-shadow": none,
+  "--box-shadow-light": none,
+  "--box-shadow-top": none,
+  "--accent": #ffffff,
+  "--font-mobile": (
+    "Raleway",
+    sans-serif,
+  ),
+);
+
+:root {
+  @include spread-map($colors);
+  @include spread-map($colors-hover);
+  @include spread-map($colors-mobile);
+  @include spread-map($font);
+  @include spread-map($loginPad);
+  @include spread-map($layout);
+  @include spread-map($buttons);
+  @include spread-map($labels);
+  @include spread-map($inputs);
+  @include spread-map($infobox);
+  @include spread-map($grid);
+  @include spread-map($subtotal);
+  @include spread-map($popup);
+  @include spread-map($datepicker);
+  @include spread-map($statusbar);
+  @include spread-map($misc);
+  @include spread-map($loading-grid-row);
+  @include spread-map($lookup);
+  @include spread-map($toolbar);
+  @include spread-map($mobile);
+}
+
+.transcendence .input__holder {
+  border-radius: 6px;
+  box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.25);
+}
+
+.transcendence .grid {
+  background-color: #e5ecf3 !important;
+  border-radius: 6px !important;
+}
+
+.transcendence .grid__table table tbody tr.tr-highlight {
+  border-bottom: 1px solid #a2d1f8 !important;
+  background-color: #bce1ff !important;
+  box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.15) !important;
+  // box-shadow: none !important;
+}
+
+.transcendence .grid__table table tbody tr.tr-highlight td {
+  color: #1e374b !important;
+}
+
+.transcendence .dialog__body .input__holder {
+  border: 0;
+  box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.25);
+}
+
+.transcendence .notification__entry {
+  background-color: #1f425e !important;
+  color: #dddddd !important;
+  border-radius: 6px;
+  box-shadow: none !important;
+}

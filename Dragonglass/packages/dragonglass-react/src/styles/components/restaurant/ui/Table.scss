@@ -1,0 +1,39 @@
+.transcendence {
+  .table {
+    align-items: center;
+    background: #2d577f;
+    border-radius: 2px;
+    color: #fff;
+    display: flex;
+    flex-flow: column;
+    height: 3vw;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+    width: 3vw;
+  }
+
+  .table--round {
+    border-radius: 100%;
+  }
+
+  .table__icon {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5em;
+  }
+
+  .table__caption {
+    display: block;
+    font-size: 0.9em;
+  }
+
+  .number-of-guests {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0.5em;
+  }
+}

@@ -1,0 +1,102 @@
+.dragonglass {
+  .dialog__container--calendarplusgrid {
+    width: 1000px;
+    height: 650px;
+    max-height: initial;
+    min-height: auto;
+    max-width: initial;
+    min-width: auto;
+
+    .dialog__body {
+      display: flex;
+      height: 100%;
+
+      .datepicker-host {
+        width: 35%;
+      }
+
+      .grid {
+        width: 65%;
+        flex: 1;
+        flex-direction: column;
+
+        .grid__table {
+          width: 100%;
+          overflow-y: auto;
+          flex: 1 1 auto;
+
+          table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+
+            thead {
+              background-color: $primary-color;
+              color: #eeeeee;
+            }
+
+            th,
+            td {
+              float: left;
+              line-height: 1.6em;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              vertical-align: middle;
+              white-space: nowrap;
+              width: 11%;
+
+              &:first-child {
+                width: 45%;
+              }
+            }
+
+            th {
+              font-weight: 600;
+              height: 2em;
+              padding: 0.2em;
+              text-align: center;
+            }
+
+            td {
+              border-right: 1px solid #c1c4ca;
+              padding: 0.5% 1%;
+              justify-content: flex-end;
+              display: flex;
+
+              &:first-child {
+                justify-content: flex-start;
+              }
+
+              &:last-child {
+                border: none;
+              }
+            }
+
+            tbody tr {
+              border-bottom: 1px solid #f1f4fa;
+              cursor: default;
+              display: flex;
+
+              &.tr-highlight {
+                background-color: #cee5f9;
+              }
+            }
+          }
+
+          &.grid__table--head {
+            flex: 0 0 auto;
+            overflow: hidden;
+            height: auto;
+          }
+
+          &.grid__table--body {
+            border: 1px solid #c1c4ca;
+            border-top: none;
+            flex-basis: 0;
+            height: auto;
+          }
+        }
+      }
+    }
+  }
+}

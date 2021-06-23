@@ -1,0 +1,16 @@
+.transcendence {
+  .seating-setup-context-menu {
+    animation: width-height2 cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+    background: $colorSecondary100;
+    overflow: hidden;
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    transform: translateX(100%);
+    width: 0px;
+
+    .seating-setup-menu-button {
+      padding: 5px 10px;
+    }
+  }
+}

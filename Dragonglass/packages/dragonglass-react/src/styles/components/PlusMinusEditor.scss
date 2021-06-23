@@ -1,0 +1,99 @@
+.transcendence {
+  .dialog-configuration__group__content {
+    .plus-minus-editor {
+      margin: 0 0 15px;
+    }
+  }
+
+  .plus-minus-editor {
+    @extend %dialogConfigContainer;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .plus-minus-editor__buttons {
+    display: flex;
+    border: none;
+    border-radius: 20px;
+
+    .subtract,
+    .add {
+      background: $colorPrimary100;
+      border-radius: 20px 0 0 20px;
+      color: $colorText200;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 5px 0;
+      text-align: center;
+      transition: all 0.3s ease-out;
+      width: 40px;
+      position: relative;
+      height: 36px;
+      box-shadow: $boxShadow;
+
+      span {
+        position: absolute;
+        top: 2px;
+        width: 100%;
+        left: 1px;
+      }
+
+      &:hover {
+        background: $colorPrimary200;
+      }
+
+      &.disabled {
+        background-color: $colorPrimary300;
+        color: $colorText200;
+        cursor: default;
+      }
+    }
+
+    .add {
+      border-radius: 0 20px 20px 0;
+
+      span {
+        left: auto;
+        right: 1px;
+      }
+    }
+
+    .value {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      background-color: $colorSecondary100;
+      cursor: pointer;
+
+      span {
+        color: $colorText100 !important;
+      }
+
+      &:hover {
+        background-color: #bababa; // TODO: Aleksandar, please fix this - I took it from a different branch, didn't know which variable this should be
+      }
+    }
+
+    .remove {
+      color: $colorText100;
+      margin-right: 20px;
+      border-right: 1px solid $colorPrimary100;
+      padding-right: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      .label {
+        padding-right: 10px;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .plus-minus-editor__caption {
+    display: flex;
+    align-items: center;
+    color: $colorText100;
+  }
+}

@@ -1,0 +1,7 @@
+{
+    "jest.autoEnable": false,
+    "files.exclude": {
+        "dist": true,
+        "node_modules": true
+    }
+}

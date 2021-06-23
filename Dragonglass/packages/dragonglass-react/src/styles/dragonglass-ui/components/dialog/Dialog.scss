@@ -1,0 +1,85 @@
+.dragonglass {
+  .dialog-host {
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    z-index: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1), pointer-events 0s;
+
+    &--show {
+      pointer-events: initial;
+      background: rgba(224, 224, 224, 0.3);
+      z-index: 1000;
+      backdrop-filter: blur(1px) grayscale(33%);
+    }
+  }
+
+  .dialog__container {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px) grayscale(25%);
+    border-radius: 4px;
+    box-shadow: 4px 3px 29px -1px rgba(0, 0, 0, 0.83);
+    padding: 48px 48px 32px 48px;
+    display: flex;
+    flex-direction: column;
+    max-height: 75%;
+    max-width: 60%;
+    min-width: 40%;
+    position: absolute;
+  }
+
+  .dialog__titlebar {
+    text-align: center;
+    align-self: center;
+    font-weight: 300;
+    font-size: 1.5em;
+    margin-bottom: 1em;
+  }
+
+  .dialog__body {
+    flex: 1;
+  }
+
+  .dialog__buttons {
+    display: flex;
+    margin-top: 48px;
+    flex-direction: row;
+    justify-content: center;
+
+    .button {
+      width: auto;
+
+      > div {
+        align-items: center;
+        background-color: $primary-color;
+        border-radius: 3px;
+        box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.55);
+        color: white;
+        display: flex;
+        justify-content: center;
+        margin-left: 16px;
+        margin-right: 16px;
+        padding: 16px;
+        width: 115px;
+        transition: 0.3s ease-out;
+
+        &.button--disabled {
+          background-color: color("grey", "lighten-1");
+          cursor: default;
+
+          &:hover {
+            background-color: color("grey", "lighten-1");
+          }
+        }
+
+        &:hover {
+          background: $primary-color-hover;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+// Primary colors
+$colorPrimary100: var(--color-primary-100);
+$colorPrimary200: var(--color-primary-200);
+$colorPrimary300: var(--color-primary-300);
+$colorPrimary400: var(--color-primary-400);
+$colorPrimaryMobile100: var(--color-primary-mobile-100);
+$colorPrimaryMobile200: var(--color-primary-mobile-200);
+$colorSecondary100: var(--color-secondary-100);
+$colorSecondary200: var(--color-secondary-200);
+$colorText100: var(--color-text-100);
+$colorText200: var(--color-text-200);
+$colorText300: var(--color-text-300);
+$colorText400: var(--color-text-400);
+$colorAccent100: var(--color-accent-100);
+$colorAccent200: var(--color-accent-200);
+$colorAccentConfirm100: var(--green);
+$colorAccentConfirm200: var(--green-hover);
+$colorDanger100: var(--color-danger-100);
+$colorDanger200: var(--color-danger-200);
+
+// Font
+$primaryFont: var(--primary-font);
+$lightFont: var(--light-font);
+$fontWeight: 500;
+$fontMobile: var(--font-mobile);
+
+// Box shadow
+$boxShadow: var(--box-shadow);
+$boxShadowLight: var(--box-shadow-light);
+$boxShadowTop: var(--box-shadow-top);
+
+$borderRadius: 3px;
+
+// Utility colors (button / icon backgrounds generated in _colors.scss)
+$utility-colors: (
+  "primary": var(--primary),
+  "primary-mobile": var(--primary-mobile),
+  "secondary": var(--secondary),
+  "green": var(--green),
+  "red": var(--red),
+  "dark-red": var(--dark-red),
+  "gray": var(--gray),
+  "light-gray": var(--light-gray),
+  "purple": var(--purple),
+  "indigo": var(--indigo),
+  "yellow": var(--yellow),
+  "orange": var(--orange),
+  "white": var(--white),
+  "dark-gray": var(--dark-gray),
+  "blue": var(--blue),
+  "dark-blue": var(--dark-blue),
+  "light-blue": var(--light-blue),
+);
+
+$utility-colors-hover: (
+  "default": var(--color-primary-hover),
+  "green": var(--green-hover),
+  "red": var(--red-hover),
+  "dark-red": var(--dark-red-hover),
+  "gray": var(--gray-hover),
+  "light-gray": var(--light-gray-hover),
+  "purple": var(--purple-hover),
+  "indigo": var(--indigo-hover),
+  "yellow": var(--yellow-hover),
+  "orange": var(--orange-hover),
+  "white": var(--white-hover),
+  "dark-gray": var(--dark-gray-hover),
+  "blue": var(--blue-hover),
+  "dark-blue": var(--dark-blue-hover),
+  "light-blue": var(--light-blue-hover),
+);

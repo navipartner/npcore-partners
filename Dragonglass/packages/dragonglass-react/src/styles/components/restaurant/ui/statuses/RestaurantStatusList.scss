@@ -1,0 +1,36 @@
+.transcendence {
+  .npre-status-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .npre-status {
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
+    width: 160px;
+    margin-right: 1em;
+    cursor: pointer;
+    justify-content: center;
+    margin-top: 1em;
+    color: $colorText100;
+    transition: all 300ms;
+    border-radius: $borderRadius;
+    box-shadow: $boxShadow;
+  }
+
+  .npre-status__icon {
+    padding-right: 10px;
+  }
+
+  .npre-status--is-active {
+    transform: scale(1.125);
+    color: $colorText200;
+    box-shadow: none;
+  }
+
+  .npre-status--unbound {
+    color: #dedede20;
+  }
+}

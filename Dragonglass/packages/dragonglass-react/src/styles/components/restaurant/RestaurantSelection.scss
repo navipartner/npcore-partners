@@ -1,0 +1,64 @@
+.transcendence {
+  .restaurant__selection {
+    color: $colorText100;
+    position: absolute;
+    top: 1.75em;
+    left: 2.3em;
+    z-index: 1;
+    border: 1px solid $colorPrimary300;
+    border-radius: $borderRadius;
+
+    &.is-active {
+      .restaurant__selection__list {
+        max-height: 500px;
+      }
+
+      .restaurant__selection__current {
+        > span {
+          transform: rotate(180deg);
+        }
+      }
+    }
+  }
+
+  .restaurant__selection__current {
+    background: $colorSecondary100;
+    cursor: pointer;
+    padding: 0.5em 1em;
+    min-width: 150px;
+
+    > span {
+      font-size: 1.5em;
+      float: right;
+      margin: 0 0 0 10px;
+      transition: transform 0.2s ease-in-out;
+    }
+  }
+
+  .restaurant__selection__item {
+    cursor: pointer;
+    padding: 0.75em;
+    border-bottom: 1px solid $colorPrimary300;
+    color: $colorText100;
+    font-size: 0.9em;
+    background-color: $colorSecondary100;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: $colorPrimary300;
+    }
+
+    &.is-active {
+      background-color: $colorPrimary300;
+    }
+  }
+
+  .restaurant__selection__list {
+    max-height: 0;
+    transition: all 0.2s ease-in-out;
+    overflow: hidden;
+  }
+}

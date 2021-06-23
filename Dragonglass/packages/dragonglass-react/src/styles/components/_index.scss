@@ -1,0 +1,30 @@
+// Main Components SCSS file
+// When adding new scss files/partials to components folder
+// make sure they are included here
+
+@import "./cart/CartView";
+
+@import "./dialog/index";
+
+@import "./Button";
+@import "./ButtonGrid";
+@import "./DatePicker";
+@import "./Grid";
+@import "./Icon";
+@import "./Image";
+@import "./InfoBox";
+@import "./Input";
+@import "./InputWithBinding";
+@import "./LoginPad";
+@import "./MobileCore";
+@import "./Notification";
+@import "./Numpad";
+@import "./PlusMinusEditor";
+@import "./Switch";
+@import "./View";
+
+@import "./restaurant/index";
+
+@import "./renderers/index";
+
+@import "./balance/index";

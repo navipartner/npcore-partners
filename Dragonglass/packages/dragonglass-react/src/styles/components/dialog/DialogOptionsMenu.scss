@@ -1,0 +1,32 @@
+.transcendence {
+  .dialog__container--options {
+    width: 60%;
+    max-width: none;
+    min-width: auto;
+
+    .dialog__body {
+      min-height: 10vh;
+    }
+
+    .dialog__options__body--vertical {
+      .buttongrid__row {
+        flex-flow: column;
+
+        .button {
+          flex: auto;
+        }
+      }
+    }
+
+    .buttongrid__row {
+      flex-flow: row wrap;
+
+      .button {
+        width: auto;
+        flex: 0 1 calc(20% - 0.5em);
+        margin-bottom: 0.3em;
+        height: 80px;
+      }
+    }
+  }
+}

@@ -1,0 +1,150 @@
+.data-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  height: 100%;
+
+  &__item {
+    width: 100%;
+    height: fit-content;
+    font-size: 1.5em;
+    display: flex;
+    margin-top: 0.125em;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  &__slider {
+    color: $colorText100;
+    width: 100%;
+    max-width: 100vw;
+    background: $colorSecondary100;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    z-index: 10;
+
+    .item-data {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+
+      &__name-container {
+        width: 60%;
+        padding: 1.5em 1em;
+        display: flex;
+      }
+
+      &__name {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-right: 0.25em;
+      }
+
+      &__caption {
+        font-size: 0.6em;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        margin-top: 0.25em;
+        padding-top: 0.25em;
+      }
+
+      &__price-per-unit {
+        height: 100%;
+        width: 15%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-right: 1em;
+        opacity: 0.6;
+      }
+
+      &__price-total {
+        font-size: 1.4em;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 25%;
+
+        .item-data__caption {
+          opacity: 0.6;
+        }
+      }
+
+      &__price-total-value {
+        color: $colorAccent200;
+      }
+    }
+  }
+
+  &__hidden-menu {
+    // Makes hidden menus stack on top of each other with full width.
+    // Changing this will break data grid and toolbar layout.
+
+    width: 100%;
+    margin-left: -100%;
+    z-index: 1;
+    color: $colorText200;
+    display: flex;
+    align-items: center;
+    font-size: 1.5em;
+    height: 100%;
+
+    &--left {
+      background-color: $colorAccent100;
+    }
+
+    &--right {
+      background-color: $colorPrimaryMobile100;
+      justify-content: flex-end;
+    }
+
+    .hidden-menu-button {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      width: 2.5em;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @keyframes slideFromTop {
+      from {
+        top: -100%;
+      }
+      to {
+        top: 0;
+      }
+    }
+  }
+}
+
+.expanded-item {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  z-index: 25;
+  background: $colorSecondary100;
+  box-shadow: $boxShadow;
+
+  padding: 0.5em 1em;
+
+  p {
+    line-height: 1;
+    margin: 0.5em 0;
+  }
+}
+
+.expanded-item-container {
+  width: 100%;
+  position: fixed;
+}

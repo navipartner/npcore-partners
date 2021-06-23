@@ -1,0 +1,48 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* 1rem = 10px */
+  font-size: 62.5%;
+  touch-action: none;
+}
+
+body {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  background-color: white;
+  border: none;
+  cursor: default;
+  display: flex;
+  flex-flow: column;
+  font-family: $primaryFont;
+  font-size: 1.6rem;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  user-select: none;
+
+  @include respond-between(xxs, sm) {
+    font-size: 1.2rem !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 1em;
+}
+
+::-webkit-scrollbar-track {
+  background: $colorSecondary100;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $colorSecondary200;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $colorPrimary300;
+}

@@ -1,0 +1,17 @@
+.transcendence {
+  .table {
+    background: #2d577f;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+    width: 3vw;
+    height: 3vw;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .table--round {
+    border-radius: 100%;
+  }
+}
