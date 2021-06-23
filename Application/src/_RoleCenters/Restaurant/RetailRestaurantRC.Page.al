@@ -16,18 +16,21 @@ page 6151334 "NPR Retail Restaurant RC"
             {
                 ApplicationArea = Suite;
             }
-            part(PowerBi; "Power BI Report Spinner Part")
-            {
-                ApplicationArea = Basic, Suite;
-            }
-            part("MyReports"; "NPR My Reports")
-            {
-                ApplicationArea = Basic, Suite;
-            }
+
             part(Control21; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = R;
                 ApplicationArea = Suite;
+            }
+
+            part("MyReports"; "NPR My Reports")
+            {
+                ApplicationArea = Basic, Suite;
+            }
+
+            part(PowerBi; "Power BI Report Spinner Part")
+            {
+                ApplicationArea = Basic, Suite;
             }
             systempart(MyNotesPart; MyNotes)
             {
