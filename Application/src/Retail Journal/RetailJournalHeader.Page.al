@@ -28,6 +28,19 @@
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Description field';
                     }
+
+                    field("Customer Price Group"; Rec."Customer Price Group")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Price Group field';
+                    }
+
+                    field("Customer Disc. Group"; Rec."Customer Disc. Group")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Disc. Group field';
+                    }
+
                 }
                 group(Control6150619)
                 {
@@ -57,16 +70,8 @@
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the POS Unit No. field';
                     }
-                    field("Customer Price Group"; Rec."Customer Price Group")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Customer Price Group field';
-                    }
-                    field("Customer Disc. Group"; Rec."Customer Disc. Group")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Customer Disc. Group field';
-                    }
+
+
                 }
             }
             group(Dimensions)
