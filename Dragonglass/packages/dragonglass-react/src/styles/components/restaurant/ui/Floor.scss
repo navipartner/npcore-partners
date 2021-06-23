@@ -1,0 +1,11 @@
+.transcendence {
+  .restaurant__floor {
+    position: relative;
+    height: calc(100% - 40px);
+
+    > div {
+      position: absolute;
+      cursor: pointer;
+    }
+  }
+}

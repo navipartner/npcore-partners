@@ -1,0 +1,79 @@
+.transcendence {
+  .notifications-host {
+    position: absolute;
+    z-index: 10;
+    width: 25%;
+    bottom: 2.4em;
+    right: 0;
+  }
+
+  .notifications-panel {
+    background-color: $colorPrimary200;
+    box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.25);
+    height: 100vh;
+    position: absolute;
+    right: 0;
+    transition: 0.3s ease-in-out;
+    width: 25%;
+    z-index: 10;
+
+    &.notifications-panel--invisible {
+      transform: translate(100%, 0);
+    }
+
+    &.notifications-panel--visible {
+      transform: translate(0, 0);
+    }
+  }
+
+  .notification__entry,
+  .notification-toast {
+    background: $colorAccent100;
+    color: $colorText200;
+    margin: 10px;
+    padding: 15px 12px;
+    position: relative;
+    border-radius: $borderRadius;
+
+    .close {
+      color: $colorText200;
+      cursor: pointer;
+      font-size: 16px;
+      position: absolute;
+      right: 15px;
+      top: 10px;
+
+      &:hover {
+        color: $colorText300;
+      }
+    }
+  }
+
+  .notification__title {
+    font-weight: bold;
+  }
+
+  .notification__text {
+    padding-top: 5px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .notifications-panel__content {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .notification-toast {
+    opacity: 0;
+    margin: 0.5em 1em;
+  }
+
+  .notification-toast--show {
+    animation: fadeIn-from-up 0.3s ease-in-out forwards;
+  }
+
+  .notification-toast--hiding {
+    animation: fadeout-to-right 0.3s ease-in-out forwards;
+  }
+}

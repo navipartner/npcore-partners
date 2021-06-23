@@ -1,0 +1,36 @@
+.empty-cart {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  color: $colorText100;
+  font-size: 1.3em;
+  padding: 0 2em;
+
+  &__image {
+    position: relative;
+  }
+
+  &__caption {
+    opacity: 0.7;
+    position: relative;
+    margin-bottom: 2em;
+  }
+
+  &__call-to-action {
+    background: $colorAccent100;
+    position: relative;
+    overflow: hidden;
+    color: $colorText200;
+    width: fit-content;
+    padding: 0.75em 1.25em;
+    border-radius: $borderRadius;
+    box-shadow: $boxShadow;
+    margin: 0 auto;
+  }
+
+  &__icon {
+    margin-right: 0.25em;
+  }
+}

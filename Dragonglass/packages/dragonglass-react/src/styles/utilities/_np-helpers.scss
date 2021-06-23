@@ -1,0 +1,117 @@
+.np-fontsize-x-small {
+  font-size: 0.6em;
+}
+.np-fontsize-small {
+  font-size: 0.8em;
+}
+.np-fontsize-normal {
+  font-size: 1em;
+}
+.np-fontsize-medium {
+  font-size: 1.2em;
+}
+.np-fontsize-semilarge {
+  font-size: 1.4em;
+}
+.np-fontsize-large {
+  font-size: 1.6em;
+}
+.np-fontsize-x-large {
+  font-size: 2em;
+}
+.np-fontstyle-regular {
+  font-weight: normal;
+}
+.np-fontstyle-semibold {
+  font-weight: 600;
+}
+.np-fontstyle-bold {
+  font-weight: bold;
+}
+.np-fontstyle-uppercase {
+  text-transform: uppercase;
+}
+
+.np-text-align-none {
+  text-align: initial;
+}
+
+.np-text-align-left {
+  text-align: left;
+}
+
+.np-text-align-right {
+  text-align: right;
+}
+
+.np-text-align-center {
+  text-align: center;
+}
+
+.np-text-align-justify {
+  text-align: justify;
+}
+
+.np-underline:hover {
+  text-decoration: underline;
+}
+
+.no-padding {
+  padding: 0 !important;
+}
+
+.float-right {
+  float: right;
+}
+
+.float-left {
+  float: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.h-v-center {
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+.np-watermark {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  -ms-opacity: 0.05;
+  opacity: 0.05;
+  color: black;
+  pointer-events: none;
+  font-weight: 900;
+  display: flex;
+  align-content: flex-end;
+
+  > .content {
+    flex: 1 1 auto;
+    align-self: center;
+    text-align: center;
+    transform: rotateZ(-45deg);
+    font-size: 10em !important;
+  }
+}

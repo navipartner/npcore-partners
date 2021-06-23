@@ -1,0 +1,38 @@
+{
+  "name": "dragonglass-workflows",
+  "version": "1.0.0",
+  "description": "Dragonglass Workflows module provides Workflows 2.0 functionality to Dragonglass front end",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepare": "tsc",
+    "test": "jest --silent",
+    "jest": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://navipartner.visualstudio.com/Dragonglass/_git/dragonglass",
+    "directory": "packages/dragonglass-workflows"
+  },
+  "keywords": [
+    "Dragonglass",
+    "NaviPartner"
+  ],
+  "author": "Vjekoslav Babić",
+  "devDependencies": {
+    "@types/jest": "^26.0.12",
+    "@types/node": "^14.6.2",
+    "jest": "^26.4.2",
+    "jest-cli": "^26.4.2",
+    "ts-jest": "^26.3.0",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "@types/pako": "^1.0.1",
+    "dragonglass-core": "file:../dragonglass-core",
+    "dragonglass-nav": "file:../dragonglass-nav",
+    "dragonglass-front-end-async": "file:../dragonglass-front-end-async",
+    "dragonglass-redux": "file:../dragonglass-redux",
+    "dragonglass-transcendence": "file:../dragonglass-transcendence",
+    "pako": "^1.0.11"
+  }
+}

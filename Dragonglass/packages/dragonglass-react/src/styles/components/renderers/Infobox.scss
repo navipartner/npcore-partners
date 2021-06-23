@@ -1,0 +1,60 @@
+.mobile-view {
+  .infobox {
+    background-color: $colorSecondary100;
+    box-shadow: $boxShadow;
+    color: $colorText100;
+    padding: 1em;
+    border-radius: 0.25em;
+
+    font-size: 1.5em;
+    height: fit-content;
+    margin: auto 1em;
+
+    &__header {
+      font-weight: 600;
+      border-bottom: 1px solid $colorSecondary200;
+      padding-bottom: 0.75em;
+      margin-bottom: 0.75em;
+
+      display: flex;
+      justify-content: space-between;
+      white-space: nowrap;
+    }
+
+    &__body {
+      border-bottom: 1px solid $colorSecondary200;
+      padding-bottom: 0.75em;
+      margin-bottom: 0.75em;
+    }
+
+    &__row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25em;
+
+      div {
+        display: inline;
+      }
+
+      .aligned-content {
+        display: flex;
+
+        div {
+          padding-right: 0.25em;
+        }
+      }
+    }
+
+    &__separator {
+      width: 100%;
+      height: 0.25em;
+      margin-bottom: 0.25em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    &__spacer {
+      width: 100%;
+      height: 0.5em;
+    }
+  }
+}

@@ -1,0 +1,45 @@
+.mobile-view {
+  display: flex;
+
+  .mobile-button {
+    outline: none;
+    border: none;
+
+    color: $colorText100;
+    background-color: $colorSecondary100;
+    box-shadow: $boxShadowLight;
+
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+
+    &__icon {
+      font-size: 2.25em;
+      color: $colorText200;
+      min-width: 2em;
+      min-height: 2em;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__caption {
+      font-size: 1.25em;
+      padding: 1em;
+      text-align: left;
+      width: 100%;
+      font-family: $fontMobile;
+      font-weight: $fontWeight;
+
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

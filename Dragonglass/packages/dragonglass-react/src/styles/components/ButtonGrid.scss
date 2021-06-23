@@ -1,0 +1,42 @@
+.transcendence {
+  .buttongrid {
+    @include flex1;
+    flex-flow: column nowrap;
+    width: 100%;
+    height: 100%;
+
+    .button {
+      height: auto;
+    }
+  }
+
+  .buttongrid__row {
+    padding-bottom: 0.5em;
+    @include flex1;
+    min-height: 1%;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  @include respond-between(xxs, sm) {
+    .buttongrid--popup {
+      .buttongrid__row {
+        flex-flow: column;
+      }
+
+      .button {
+        margin-right: 0;
+        margin-bottom: 0.5em;
+        width: 100%;
+
+        &.button--disabled {
+          @include respond-between(xxs, sm) {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}

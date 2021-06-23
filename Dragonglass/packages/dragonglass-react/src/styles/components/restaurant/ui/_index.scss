@@ -1,0 +1,16 @@
+// Main Components/Restaurant/UI SCSS file
+// When adding new scss files/partials to components/restaurant/ui folder
+// make sure they are included here
+
+@import "./Bar";
+@import "./Chair";
+@import "./Door";
+@import "./Floor";
+@import "./Room";
+@import "./Table";
+@import "./TableWaiterPad";
+@import "./TableWaiterPadMenu";
+@import "./TableWaiterPads";
+@import "./Walls";
+
+@import "./statuses/RestaurantStatusList";

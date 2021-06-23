@@ -1,0 +1,30 @@
+{
+  "name": "dragonglass-core",
+  "displayName": "Dragonglass Core",
+  "version": "1.0.0",
+  "description": "Dragonglass Core is base module to provide horizontal functionality needed by other Dragonglass modules",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepare": "tsc",
+    "test": "jest --silent",
+    "jest": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://navipartner.visualstudio.com/Dragonglass/_git/dragonglass",
+    "directory": "packages/dragonglass-core"
+  },
+  "keywords": [
+    "Dragonglass",
+    "NaviPartner"
+  ],
+  "author": "Vjekoslav Babić",
+  "devDependencies": {
+    "@types/jest": "^26.0.12",
+    "@types/node": "^14.6.2",
+    "jest": "^26.4.2",
+    "jest-cli": "^26.4.2",
+    "ts-jest": "^26.3.0",
+    "typescript": "^4.0.2"
+  }
+}

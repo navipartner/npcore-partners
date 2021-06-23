@@ -1,0 +1,22 @@
+.transcendence {
+  .room {
+    width: 10vw;
+    height: 7vw;
+    background-color: #d0d4d7;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: 20px;
+      width: 0;
+      height: 0;
+      border-bottom: 3vw solid #b6bdc2;
+      border-right: 3vw solid transparent;
+    }
+  }
+}

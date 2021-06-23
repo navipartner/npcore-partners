@@ -1,0 +1,98 @@
+@import "../utilities/theme";
+
+$main-colors: (
+  "--color-primary-100": #414141,
+  "--color-primary-200": #3b3b3b,
+  "--color-primary-300": #2f2f2f,
+  "--color-primary-400": #333333,
+  "--color-primary-mobile-100": #414141,
+  "--color-primary-mobile-200": #3b3b3b,
+  "--color-secondary-100": #353535,
+  "--color-secondary-200": #292929,
+  "--color-text-100": #d4d4d4,
+  "--color-text-200": #ececec,
+  "--color-text-300": #aaaaaa,
+  "--color-text-400": #8b8b8b,
+  "--color-accent-100": #3eab55,
+  "--color-accent-200": #3eab55,
+  "--color-danger-100": #e96a2f,
+  "--color-danger-200": #d8561b,
+  "--box-shadow": (
+    rgba(0, 0, 0, 0.3) 0px 1px 2px 0px,
+    rgba(0, 0, 0, 0.15) 0px 1px 3px 1px,
+  ),
+  "--box-shadow-light": (
+    rgba(0, 0, 0, 0.15) 0px 1px 2px 0px,
+    rgba(0, 0, 0, 0.075) 0px 1px 3px 1px,
+  ),
+  "--box-shadow-top": (
+    rgba(0, 0, 0, 0.3) 0px -1px 2px 0px,
+    rgba(0, 0, 0, 0.15) 0px -1px 3px 1px,
+  ),
+);
+
+$utility-colors: (
+  "--primary": var(--color-primary-100),
+  "--primary-mobile": var(--color-primary-mobile-100),
+  "--secondary": var(--color-secondary-100),
+  "--green": #417c48,
+  "--red": #bd4448,
+  "--dark-red": #862b28,
+  "--gray": #313233,
+  "--light-gray": #c7c5c5,
+  "--purple": #5c2f69,
+  "--indigo": #503e79,
+  "--yellow": #ac9d3e,
+  "--orange": #cc8a18,
+  "--white": #d8d8d8,
+  "--dark-gray": #181818,
+  "--blue": #144a81,
+  "--dark-blue": #062f58,
+  "--light-blue": #2261a0,
+);
+
+$utility-colors-hover: (
+  "--primary-hover": var(--color-primary-200),
+  "--secondary-hover": var(--color-secondary-200),
+  "--green-hover": #346b3a,
+  "--red-hover": #a13236,
+  "--dark-red-hover": #701e1b,
+  "--gray-hover": #252627,
+  "--purple-hover": #4b2157,
+  "--indigo-hover": #413068,
+  "--yellow-hover": #9b8c31,
+  "--orange-hover": #b67910,
+  "--white-hover": #cecdcd,
+  "--light-gray-hover": #b9b1b1,
+  "--dark-gray-hover": #070707,
+  "--blue-hover": #0d3f72,
+  "--dark-blue-hover": #03203d,
+  "--light-blue-hover": #15508b,
+);
+
+$font: (
+  "--primary-font": (
+    "Segoe UI",
+    Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif,
+  ),
+  "--light-font": (
+    "Segoe UI Light" Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif,
+  ),
+  "--font-mobile": (
+    "Raleway",
+    sans-serif,
+  ),
+);
+
+:root {
+  @include spread-map($main-colors);
+  @include spread-map($utility-colors);
+  @include spread-map($utility-colors-hover);
+  @include spread-map($font);
+}

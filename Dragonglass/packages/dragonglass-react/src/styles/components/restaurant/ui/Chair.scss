@@ -1,0 +1,314 @@
+// TODO: make it nicer using scss mixin
+
+.transcendence {
+  .table__chairs {
+    span {
+      background: #acd8ec;
+      border-radius: 0.5vw 0.5vw 0 0;
+      display: block;
+      height: 0.7vw;
+      left: calc(50% - 0.7vw);
+      position: absolute;
+      top: -0.8vw;
+      transition: all 0.3s ease-in-out;
+      width: 1.4vw;
+    }
+  }
+
+  .chairs-1,
+  .chairs-2 {
+    .table__chairs {
+      span {
+        left: -1.15vw;
+        top: calc(50% - 0.35vw);
+        transform: (rotate(-90deg));
+
+        &:nth-child(2) {
+          left: auto;
+          right: -1.15vw;
+          top: calc(50% - 0.35vw);
+          transform: (rotate(90deg));
+        }
+      }
+    }
+  }
+
+  .chairs-3,
+  .chairs-4 {
+    .table__chairs {
+      span {
+        &:nth-child(2) {
+          bottom: -0.8vw;
+          left: calc(50% - 0.7vw);
+          top: auto;
+          transform: (rotate(180deg));
+        }
+
+        &:nth-child(3) {
+          left: -1.15vw;
+          top: calc(50% - 0.35vw);
+          transform: (rotate(-90deg));
+        }
+
+        &:nth-child(4) {
+          left: auto;
+          right: -1.15vw;
+          top: calc(50% - 0.35vw);
+          transform: (rotate(90deg));
+        }
+      }
+    }
+  }
+
+  .chairs-5,
+  .chairs-6,
+  .chairs-7,
+  .chairs-8,
+  .chairs-9,
+  .chairs-10,
+  .chairs-11,
+  .chairs-12,
+  .chairs-13,
+  .chairs-14,
+  .chairs-15,
+  .chairs-16 {
+    .table__chairs {
+      span {
+        left: calc(20% - 0.7vw);
+
+        &:nth-child(2) {
+          left: auto;
+          right: calc(20% - 0.7vw);
+          top: -0.8vw;
+          transform: none;
+        }
+
+        &:nth-child(3) {
+          bottom: -0.8vw;
+          top: auto;
+          transform: (rotate(180deg));
+        }
+
+        &:nth-child(4) {
+          bottom: -0.8vw;
+          left: auto;
+          right: calc(20% - 0.7vw);
+          top: auto;
+          transform: (rotate(180deg));
+        }
+
+        &:nth-child(5) {
+          left: -1.15vw;
+          top: calc(50% - 0.35vw);
+          transform: (rotate(-90deg));
+        }
+
+        &:nth-child(6) {
+          left: auto;
+          right: -1.15vw;
+          top: calc(50% - 0.35vw);
+          transform: (rotate(90deg));
+        }
+
+        &:nth-child(7) {
+          left: calc(50% - 0.7vw);
+          top: -0.8vw;
+          transform: rotate(0deg);
+        }
+
+        &:nth-child(8) {
+          bottom: -0.8vw;
+          left: auto;
+          right: calc(50% - 0.7vw);
+          top: auto;
+          transform: rotate(180deg);
+        }
+
+        &:nth-child(9) {
+          bottom: calc(25% - 0.35vw);
+          left: -1.15vw;
+          top: auto;
+          transform: (rotate(-90deg));
+        }
+
+        &:nth-child(10) {
+          bottom: calc(25% - 0.35vw);
+          left: auto;
+          right: -1.15vw;
+          top: auto;
+          transform: (rotate(90deg));
+        }
+
+        &:nth-child(11) {
+          bottom: calc(20% - 0.35vw);
+          left: -1.15vw;
+          top: auto;
+          transform: (rotate(-90deg));
+        }
+
+        &:nth-child(12) {
+          bottom: calc(20% - 0.35vw);
+          left: auto;
+          right: -1.15vw;
+          top: auto;
+          transform: (rotate(90deg));
+        }
+
+        &:nth-child(13) {
+          left: auto;
+          right: calc(20% - 0.7vw);
+        }
+
+        &:nth-child(14) {
+          bottom: -0.8vw;
+          left: auto;
+          right: calc(20% - 0.7vw);
+          top: auto;
+          transform: rotate(180deg);
+        }
+
+        &:nth-child(15) {
+          left: calc(50% - 0.7vw);
+        }
+
+        &:nth-child(16) {
+          bottom: -0.8vw;
+          left: calc(50% - 0.7vw);
+          top: auto;
+          transform: rotate(180deg);
+        }
+      }
+    }
+  }
+
+  .chairs-9,
+  .chairs-10,
+  .chairs-11,
+  .chairs-12,
+  .chairs-13,
+  .chairs-14,
+  .chairs-15,
+  .chairs-16 {
+    .table__chairs {
+      span {
+        &:nth-child(5),
+        &:nth-child(6) {
+          top: calc(25% - 0.35vw);
+        }
+      }
+    }
+  }
+
+  .chairs-9 {
+    .table__chairs {
+      span {
+        &:nth-child(6) {
+          top: calc(50% - 0.35vw);
+        }
+      }
+    }
+  }
+
+  .chairs-11,
+  .chairs-12,
+  .chairs-13,
+  .chairs-14,
+  .chairs-15,
+  .chairs-16 {
+    .table__chairs {
+      span {
+        &:nth-child(5),
+        &:nth-child(6) {
+          top: calc(20% - 0.35vw);
+        }
+
+        &:nth-child(9) {
+          bottom: calc(50% - 0.35vw);
+        }
+      }
+    }
+  }
+
+  .chairs-12,
+  .chairs-13,
+  .chairs-14,
+  .chairs-15,
+  .chairs-16 {
+    .table__chairs {
+      span {
+        &:nth-child(2) {
+          right: calc(40% - 0.7vw);
+        }
+
+        &:nth-child(7) {
+          left: calc(40% - 0.7vw);
+        }
+
+        &:nth-child(10) {
+          bottom: calc(50% - 0.35vw);
+        }
+      }
+    }
+  }
+
+  .chairs-14,
+  .chairs-15,
+  .chairs-16 {
+    .table__chairs {
+      span {
+        &:nth-child(4) {
+          right: calc(40% - 0.7vw);
+        }
+
+        &:nth-child(8) {
+          left: calc(40% - 0.7vw);
+        }
+      }
+    }
+  }
+
+  .chairs-15,
+  .chairs-16 {
+    .table__chairs {
+      span {
+        &:nth-child(1) {
+          left: calc(13% - 0.7vw);
+        }
+
+        &:nth-child(2) {
+          right: calc(32% - 0.7vw);
+        }
+
+        &:nth-child(7) {
+          left: calc(32% - 0.7vw);
+        }
+
+        &:nth-child(13) {
+          right: calc(13% - 0.7vw);
+        }
+      }
+    }
+  }
+
+  .chairs-16 {
+    .table__chairs {
+      span {
+        &:nth-child(3) {
+          left: calc(13% - 0.7vw);
+        }
+
+        &:nth-child(4) {
+          right: calc(32% - 0.7vw);
+        }
+
+        &:nth-child(8) {
+          left: calc(32% - 0.7vw);
+        }
+
+        &:nth-child(14) {
+          right: calc(13% - 0.7vw);
+        }
+      }
+    }
+  }
+}

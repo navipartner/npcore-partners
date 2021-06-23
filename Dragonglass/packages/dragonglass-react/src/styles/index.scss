@@ -1,0 +1,11 @@
+// Main SCSS file that gets loaded through Webpack.
+// Importing full content of dragonglass-react/src/styles folder
+// When adding new scss files/partials make sure they are included through an index file
+// (here or in respective subfolder)
+
+@import "./utilities/index";
+@import "./dragonglass-ui/index";
+@import "./base/reset";
+@import "./layout/Layout";
+@import "./components/index";
+@import "./layout/StatusBar";

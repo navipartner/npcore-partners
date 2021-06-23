@@ -1,0 +1,120 @@
+.transcendence {
+  .input {
+    display: block;
+    margin-bottom: 0.5em;
+    width: 100%;
+    position: relative;
+    border-radius: $borderRadius;
+
+    &--with-caption {
+      background-color: $colorPrimary100;
+      padding: 0.5em 1em 1em 1em;
+      border-radius: $borderRadius;
+    }
+
+    &__label {
+      background-color: inherit;
+      color: $colorText200;
+      margin: 0 auto 8px;
+      padding: 0;
+      width: 100%;
+      text-align: left;
+    }
+
+    &__holder {
+      width: 100%;
+      display: flex;
+      position: relative;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid $colorPrimary300;
+      border-radius: $borderRadius;
+    }
+
+    &__erase {
+      cursor: pointer;
+      padding: 5px 10px;
+      position: absolute;
+      right: 0;
+      text-align: center;
+      top: 0;
+      transition: background-color 300ms ease-out;
+      width: 40px;
+      color: $colorText100;
+
+      &:hover {
+        background: $colorPrimary300;
+      }
+
+      &:active,
+      &.active {
+        background-color: #888888;
+        border: 1px solid #888888;
+        transform: none;
+        transition: none;
+
+        > i {
+          transform: scale(0.93);
+        }
+      }
+    }
+
+    &__notification {
+      font-size: 0.7em;
+      padding-top: 5px;
+      color: $colorText100;
+    }
+
+    &__textbox {
+      border: none;
+      padding: 5px 50px 5px 10px;
+      width: 100%;
+      margin: 0;
+      outline: none;
+      color: $colorText100;
+      background-color: $colorSecondary100;
+
+      &.error {
+        border-color: $colorDanger100;
+        background-color: #ffede8;
+      }
+
+      &.filteredinputactive {
+        color: #7ba1c4;
+      }
+
+      &::selection {
+        background-color: $colorPrimary200;
+        color: $colorText200;
+      }
+    }
+  }
+
+  .text-enter {
+    position: absolute;
+    z-index: 9;
+    width: calc(100% - 2em);
+
+    &__entry {
+      animation: fadeIn-slideIn-dark 0.3s ease-in-out forwards;
+      backdrop-filter: blur(2px);
+      background: $colorSecondary100;
+      border-radius: $borderRadius;
+      border: none;
+      box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.35);
+      color: $colorText100;
+      margin-top: 8px;
+      padding: 5px 10px;
+      pointer-events: none;
+      position: absolute;
+      transition: margin-top 0.3s ease-in-out;
+      width: 100%;
+
+      &.is-closing {
+        animation: slideOut-dark 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+      }
+
+      @include generate-text-enter-margins;
+    }
+  }
+}

@@ -1,0 +1,12 @@
+.dragonglass {
+  .dialog__container--message,
+  .dialog__container--confirm,
+  .dialog__container--error {
+    .dialog__body {
+      span {
+        display: block;
+        color: map-get($colors, "light-gray");
+      }
+    }
+  }
+}
