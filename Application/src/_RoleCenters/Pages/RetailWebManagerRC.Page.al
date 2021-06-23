@@ -427,6 +427,14 @@ page 6151244 "NPR Retail Web Manager RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Import Types action';
                 }
+                action(DataLogSetup)
+                {
+                    Caption = 'Data Log Setup';
+                    Image = SetupLines;
+                    RunObject = page "NPR Data Log Setup";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Data Log Setup action';
+                }
 
             }
         }
