@@ -4,9 +4,8 @@ page 6150749 "NPR POS Ticket Rcpt. Text"
     UsageCategory = None;
     SourceTable = "NPR POS Ticket Rcpt. Text";
     Caption = 'POS Sales Ticket Receipt Text';
-    Editable = false;
     AutoSplitKey = true;
-    DelayedInsert = true;
+    LinksAllowed = false;
 
     layout
     {
@@ -29,7 +28,6 @@ page 6150749 "NPR POS Ticket Rcpt. Text"
                 field("Receipt Text"; Rec."Receipt Text")
                 {
                     Caption = 'Sales Ticket Receipt - Preview';
-                    Editable = false;
                     ApplicationArea = All;
                     ToolTip = 'Specifies Receipt Text';
                 }
