@@ -98,6 +98,11 @@
             "justification": "Only use AssertError in Test Codeunits."
         },
         {
+            "id": "AA0175",
+            "action":"Hidden",
+            "justification": "Only find or get records if you are not using values."
+        },
+        {
             "id": "AA0181",
             "action":"Hidden",
             "justification": "The FindSet() or Find() methods must be used only in connection with the Next() method."
@@ -106,6 +111,11 @@
             "id": "AA0189",
             "action":"Hidden",
             "justification": "Only use a correct values of ApplicationArea."
+        },
+        {
+            "id": "AA0194",
+            "action":"Hidden",
+            "justification": "Remember to specify either the 'OnAction' trigger or 'RunObject' property on an action."
         },
         {
             "id": "AA0198",
@@ -146,6 +156,11 @@
             "id": "AA0207",
             "action":"Error",
             "justification": "The EventSubscriber method must be local."
+        },
+        {
+            "id": "AA0210",
+            "action":"Hidden",
+            "justification": "Avoid non-indexed fields into filtering. Suboptimal index."
         },
         {
             "id": "AA0211",
