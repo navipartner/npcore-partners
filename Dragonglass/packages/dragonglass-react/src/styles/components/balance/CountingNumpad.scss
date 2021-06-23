@@ -1,0 +1,66 @@
+.counting {
+  .counting-numpad {
+    display: grid;
+    grid-gap: 0.5em;
+    justify-content: center;
+    justify-items: center;
+    grid-template-columns: repeat(3, auto);
+    font-size: 1.4em;
+    height: fit-content;
+    position: relative;
+    z-index: 1;
+
+    .button {
+      width: 3.5em;
+      height: 3.5em;
+      border-radius: $borderRadius;
+      display: flex;
+      min-width: unset;
+      margin: 0;
+      box-shadow: $boxShadow;
+      transition: all 0.3s ease-in-out;
+      align-items: center;
+
+      &--secondary {
+        background: $colorPrimary400;
+      }
+
+      &--transparent {
+        background: transparent;
+        color: $colorPrimary300;
+        box-shadow: none;
+        pointer-events: none;
+      }
+
+      &--disabled {
+        pointer-events: none;
+        background: $colorPrimary300;
+        color: $colorText300;
+        box-shadow: none;
+        border: 2px solid transparent;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: $colorText200;
+      }
+    }
+
+    &--disabled {
+      &:hover {
+        cursor: not-allowed;
+      }
+
+      .button {
+        pointer-events: none;
+        background: $colorPrimary300;
+        color: $colorText300;
+        box-shadow: none;
+
+        &--secondary {
+          border: 2px solid transparent;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+@mixin flex-center($orientation: row) {
+  display: flex;
+  flex-flow: $orientation nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin setWH100() {
+  width: 100%;
+  height: 100%;
+  //overflow: hidden;
+}
+
+%container {
+  display: flex;
+  @include setWH100();
+}
+
+@mixin rowAnimation(
+  $animation-duration: $button-animation-duration,
+  $animation-percent-delay: $button-animation-percent-delay
+) {
+  @for $i from 10 through 1 {
+    &:nth-child(#{$i}) {
+      animation-delay: calc(
+        ((#{$animation-percent-delay} / 100) * #{$i}) * #{$animation-duration}s
+      );
+
+      .c-button {
+        @include button-animation(
+          $animation-duration,
+          $animation-percent-delay,
+          #{$i}
+        );
+      }
+    }
+  }
+}
+
+@mixin button-animation(
+  $animation-duration: $button-animation-duration,
+  $animation-percent-delay: $button-animation-percent-delay,
+  $op: 1
+) {
+  @for $i from 10 through 1 {
+    &:nth-child(#{$i}) {
+      animation-delay: calc(
+        ((#{$animation-percent-delay} / 100) * (#{$i} + #{$op})) *
+          #{$animation-duration}s
+      );
+    }
+  }
+}
+
+@mixin transition($what: all, $time: 0.3s, $how: ease-in-out) {
+  transition: $what $time $how;
+}

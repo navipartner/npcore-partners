@@ -1,0 +1,102 @@
+.transcendence {
+  .dialog__container--configuration {
+    max-height: 650px;
+
+    .dialog__body {
+      min-height: 45vh;
+    }
+  }
+
+  .dialog__settings__body {
+    height: calc(100% - 20px);
+    height: -webkit-fill-available;
+  }
+
+  .dialog__settings__body [data-simplebar] {
+    height: calc(45vh - 70px);
+  }
+
+  .dialog-configuration__group {
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.is-expanded {
+      .dialog-configuration__group__content {
+        max-height: 400px;
+        background: $colorSecondary100;
+        padding: 15px;
+        border-radius: 0 0 3px 3px;
+        box-shadow: $boxShadow;
+      }
+
+      .toggle-icon {
+        //transform: rotate(0);
+        top: 10px;
+      }
+    }
+  }
+
+  .dialog__caption {
+    padding: 20px 20px 10px;
+  }
+
+  .dialog-configuration__group__caption {
+    position: relative;
+    padding: 1em;
+    background: $colorPrimary100;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+    border: none;
+    border-radius: $borderRadius;
+    color: $colorText200;
+
+    &:hover {
+      background-color: $colorPrimary200;
+    }
+
+    span {
+      &.toggle-icon {
+        color: $colorText200;
+      }
+    }
+  }
+
+  .dialog-configuration__group__content {
+    transition: all 0.3s ease-in-out;
+    max-height: 0;
+    overflow: hidden;
+    border: none;
+
+    .radio-group {
+      margin: 0;
+      padding: 0;
+    }
+
+    .input-with-binding {
+      margin: 0 0 15px;
+    }
+
+    .switch {
+      margin: 0 0 15px;
+    }
+
+    > div {
+      padding: 10px;
+
+      &:last-child {
+        border: 0;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .toggle-icon {
+    //transform: rotate(180deg);
+    position: absolute;
+    top: 12px;
+    font-size: 20px;
+    right: 15px;
+    transition: all 0.3s ease-in-out;
+  }
+}

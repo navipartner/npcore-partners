@@ -1,0 +1,89 @@
+.dragonglass {
+  .dialog-host {
+    .dialog__container--numpad {
+      min-width: auto;
+      min-height: auto;
+      max-height: initial;
+      width: 525px;
+      height: 650px;
+
+      .dialog__body {
+        flex-flow: column;
+        display: flex;
+        height: calc(100% - 120px);
+
+        .input {
+          display: block;
+          margin-bottom: 0.5em;
+          margin-top: 1em;
+          width: 100%;
+          position: relative;
+
+          .input__holder {
+            width: 100%;
+            display: flex;
+
+            input {
+              background: white;
+              font-size: 1em;
+              border-radius: 3px;
+              padding: 8px 50px 8px 8px;
+              box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.15);
+              border: 0px none;
+              flex: 1;
+              width: 100%;
+
+              &:focus {
+                box-shadow: 0px 0px 3px 2px rgba(71, 194, 255, 0.45);
+                outline: 0 none;
+              }
+            }
+
+            &.input__holder--invalid {
+              input:focus {
+                box-shadow: 0px 0px 4px 0px rgba(255, 0, 0, 0.45);
+              }
+            }
+
+            .input__erase {
+              background-color: $primary-color;
+              border-radius: 3px;
+              color: #fff;
+              padding: 7px 10px;
+              position: absolute;
+              right: 0;
+              text-align: center;
+              width: 40px;
+              border: 1px solid transparent;
+              transition: background-color 300ms ease-out;
+              cursor: pointer;
+
+              &:hover {
+                background: $primary-color-hover;
+              }
+            }
+          }
+
+          .input__notification {
+            padding-top: 5px;
+            font-size: 14px;
+          }
+        }
+
+        .button {
+          .button__caption {
+            font-size: 18px;
+          }
+
+          .button--color-gray {
+            background: #a4b4c8;
+
+            &:hover {
+              background: #76889c;
+            }
+          }
+        }
+      }
+    }
+  }
+}

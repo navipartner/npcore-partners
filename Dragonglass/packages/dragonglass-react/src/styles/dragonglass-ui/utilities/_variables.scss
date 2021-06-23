@@ -1,0 +1,121 @@
+//
+//  Font
+//  _____________________________________________
+
+$font: (
+  family: (
+    "Segoe UI",
+    Tahoma,
+    "Geneva",
+    Verdana,
+    sans-serif,
+  ),
+  color: color("grey", "darken-1"),
+  // #757575
+  size: 1.6rem,
+);
+
+//
+//  Toolbar
+//  _____________________________________________
+
+$toolbar: (
+  background: #f5f5f5,
+  box-shadow: 0 0 3px #ccc,
+  border-bottom: 1px solid #c2d8f3,
+  padding: 5px 0 0,
+  height: 50px,
+);
+
+// Logo
+$logo: (
+  padding: 5px 10px,
+  height: 30px,
+);
+
+//
+//  Layout
+//  _____________________________________________
+
+$layout: (
+  panel-padding: 0 20px 0 0,
+  panel-width: 50%,
+  views-padding: 20px,
+  views-height: calc(100% - #{map-get($toolbar, height)}),
+);
+
+//
+//  Colors
+//  _____________________________________________
+
+$primary-color: color("light-blue", "darken-3"); // #0277bd
+$primary-text: color("shades", "white"); // #ffffff
+$primary-color-hover: darken($primary-color, 5%);
+
+//
+//  Navigation
+//  _____________________________________________
+
+$navigation: (
+  indicator-height: 4px,
+  padding: 0 0 5px,
+  item-color: #bdbdbd,
+  item-active: $primary-color,
+  item-padding: 10px 20px,
+);
+
+//
+//  Navigation - Button Menu
+//  ---------------------------------------------
+
+$navigation-button-menu: (
+  border-bottom: 1px solid #c2d8f3,
+  height: 45px,
+  margin: 0 0 5px,
+  button-menu-content-height: calc(100% - 50px),
+);
+
+//
+//  Infobox
+//  _____________________________________________
+
+$infobox: (
+  height: calc(50% - 48px),
+  border-radius: 4px,
+  padding: 10px,
+  background: #f2f2f2,
+);
+
+// Infobox Customer Total Section
+$customer-total: (
+  height: 70%,
+);
+
+$customer: (
+  width: 60%,
+);
+
+$customer-details: (
+  line-height: 20px,
+  font-size: 1.5rem,
+  padding: 10px 0 0 4px,
+  height: 70%,
+);
+
+// Infobox Button Menu
+$infobox-button-menu: (
+  height: 30%,
+);
+
+//
+//  Button
+//  _____________________________________________
+
+$button: (
+  radius: 4px,
+  padding: 5px,
+);
+
+// Button Animations
+$button-animation-duration: 0.35;
+$button-animation-percent-delay: 10;

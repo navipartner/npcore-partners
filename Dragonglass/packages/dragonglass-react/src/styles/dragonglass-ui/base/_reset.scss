@@ -1,0 +1,61 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* 1rem = 10px */
+  font-size: 62.5%;
+}
+
+body {
+  border: none;
+  cursor: default;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  height: 100vh;
+  font-size: map-get($font, size);
+}
+
+.body.dragonglass {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  color: map-get($font, color);
+  height: 100vh;
+
+  body &,
+  input,
+  textarea,
+  keygen,
+  select,
+  button {
+    font-family: map-get($font, family);
+  }
+
+  table {
+    font-size: 1em;
+  }
+
+  thead,
+  th,
+  tbody,
+  tr,
+  td {
+    padding: 0;
+    margin: 0;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}

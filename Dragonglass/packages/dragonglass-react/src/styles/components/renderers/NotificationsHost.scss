@@ -1,0 +1,32 @@
+@media (min-width: 320px) and (max-width: 768px) {
+  .transcendence {
+    .notifications-host {
+      width: 100%;
+      bottom: 4em;
+      font-size: 1.4em;
+      font-weight: 500;
+
+      .notification-toast {
+        background: $colorAccent100;
+        box-shadow: $boxShadow;
+
+        .close {
+          color: $colorText200;
+        }
+
+        .notification__title {
+          font-size: 1.1em;
+          font-weight: 600;
+          border-bottom: 1px solid $colorSecondary100;
+          padding-bottom: 0.25em;
+          margin-bottom: 0.25em;
+        }
+
+        .notification__text {
+          font-size: 1em;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}

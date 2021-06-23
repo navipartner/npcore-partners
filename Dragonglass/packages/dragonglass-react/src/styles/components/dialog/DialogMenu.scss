@@ -1,0 +1,13 @@
+.transcendence {
+  .dialog-host .dialog__container {
+    &.dialog__container--menu {
+      width: 75%;
+      height: 75%;
+
+      @include respond-between(xxs, sm) {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}

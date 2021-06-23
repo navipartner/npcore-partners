@@ -1,0 +1,96 @@
+.transcendence {
+  // login
+  .view.login {
+    > .container {
+      > .container:last-child {
+        flex: 1 1 40%;
+      }
+
+      .lastsale {
+        font-size: 1.8rem;
+
+        .captionbox__datacaption {
+          padding: 1.25em 1em;
+        }
+
+        .lastline {
+          padding: 1.25em 0;
+        }
+      }
+    }
+
+    .captionbox {
+      > .captionbox__datacaption:last-child {
+        background: $colorPrimary100;
+        color: $colorText200;
+
+        @include respond-between(xxs, sm) {
+          padding: 0 10px;
+        }
+
+        .captionbox__datacaption {
+          flex: 1 1 30%;
+
+          &:first-child {
+            flex: 1 1 70%;
+          }
+        }
+      }
+    }
+
+    @include respond-between(xxs, sm) {
+      .logo {
+        max-height: 15vh;
+      }
+
+      .info {
+        max-height: 2em;
+      }
+
+      .menu {
+        max-height: 3em;
+      }
+    }
+  }
+
+  // sale & payment
+  .view.sale,
+  .view.payment {
+    @include respond-between(xxs, sm) {
+      .container.top {
+        flex: 1 1 8em !important;
+
+        .buttongrid {
+          height: auto;
+        }
+      }
+    }
+    > .container:first-child {
+      > .container:first-child {
+        max-height: 45%;
+
+        @include respond-between(xxs, sm) {
+          max-height: inherit;
+        }
+      }
+
+      > .container:last-child {
+        max-height: calc(55% - 1.25em);
+
+        @include respond-between(xxs, sm) {
+          max-height: inherit;
+        }
+      }
+    }
+
+    > .container {
+      > .container:last-child {
+        max-height: calc(50% - 6.5em);
+      }
+    }
+
+    .input--with-caption {
+      margin-bottom: 0;
+    }
+  }
+}

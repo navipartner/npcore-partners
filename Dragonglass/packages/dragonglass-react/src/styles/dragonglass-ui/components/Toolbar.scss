@@ -1,0 +1,23 @@
+.dragonglass {
+  .c-navbar {
+    align-items: center;
+    background: map-get($toolbar, background);
+    border-bottom: map-get($toolbar, border-bottom);
+    box-shadow: map-get($toolbar, box-shadow);
+    display: flex;
+    height: map-get($toolbar, height);
+    justify-content: center;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .c-logo {
+    padding: 0;
+    position: absolute;
+    left: 20px;
+
+    img {
+      height: map-get($logo, height);
+    }
+  }
+}
