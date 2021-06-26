@@ -86,6 +86,11 @@ table 6059964 "NPR MPOS QR Code"
             TableRelation = "NPR Register"."Register No.";
             ValidateTableRelation = false;
         }
+        field(22; "QR Image"; Media)
+        {
+            Caption = 'QR code';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

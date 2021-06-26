@@ -31,6 +31,11 @@ table 6059952 "NPR Display Content Lines"
             DataClassification = CustomerContent;
             SubType = Bitmap;
         }
+        field(13; Picture; Media)
+        {
+            Caption = 'Image';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

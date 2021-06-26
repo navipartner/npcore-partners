@@ -61,6 +61,11 @@ table 6014478 "NPR Retail Logo"
             Caption = 'Width';
             DataClassification = CustomerContent;
         }
+        field(10; "POS Logo"; Media)
+        {
+            Caption = 'Logo';
+            DataClassification = CustomerContent;
+        }
         field(100; "ESCPOS Height Low Byte"; Integer)
         {
             Caption = 'ESCPOS Height Low Byte';

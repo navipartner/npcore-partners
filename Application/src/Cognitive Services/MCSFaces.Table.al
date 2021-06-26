@@ -97,6 +97,11 @@ table 6059959 "NPR MCS Faces"
             OptionCaption = 'Capture Image,Capture And Identify Faces,Identify Faces';
             OptionMembers = CaptureImage,CaptureAndIdentifyFaces,IdentifyFaces;
         }
+        field(26; Image; Media)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

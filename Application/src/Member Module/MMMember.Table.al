@@ -155,6 +155,11 @@ table 6060126 "NPR MM Member"
             DataClassification = CustomerContent;
             SubType = Bitmap;
         }
+        field(33; Image; Media)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
+        }
         field(35; "E-Mail Address"; Text[80])
         {
             Caption = 'E-Mail Address';

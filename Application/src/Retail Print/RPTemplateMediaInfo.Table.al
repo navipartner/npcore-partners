@@ -29,6 +29,11 @@ table 6014566 "NPR RP Template Media Info"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+        field(13; Image; Media)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
