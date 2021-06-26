@@ -80,10 +80,10 @@
         exit('AFTER_LOGIN');
     end;
 
-    local procedure OnAfterLogin_OnRun()
+    local procedure OnAfterLogin_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
     begin
         Commit();
-        if not Codeunit.Run(Codeunit::"NPR POS View Change WF Mgt.") then;
+        if not Codeunit.Run(Codeunit::"NPR POS View Change WF Mgt.", POSSalesWorkflowStep) then;
     end;
 
     procedure InvokeOnAfterLoginWorkflow(var POSSession: Codeunit "NPR POS Session")
@@ -109,7 +109,7 @@
             exit;
 
         repeat
-            OnAfterLogin_OnRun();
+            OnAfterLogin_OnRun(POSSalesWorkflowStep);
         until POSSalesWorkflowStep.Next() = 0;
 
         POSSession.AddServerStopwatch('AFTER_LOGIN_WORKFLOWS', CurrentDateTime - StartTime);
