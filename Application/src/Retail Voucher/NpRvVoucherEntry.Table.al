@@ -62,7 +62,7 @@ table 6151014 "NPR NpRv Voucher Entry"
         }
         field(50; "Register No."; Code[10])
         {
-            Caption = 'Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit"."No.";
         }

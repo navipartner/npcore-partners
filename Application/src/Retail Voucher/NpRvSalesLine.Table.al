@@ -42,7 +42,6 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.50';
             OptionCaption = 'New Voucher,Payment,Top-up,Partner Issue Voucher';
             OptionMembers = "New Voucher",Payment,"Top-up","Partner Issue Voucher";
         }
@@ -72,7 +71,6 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.49';
         }
         field(65; Description; Text[50])
         {
@@ -88,19 +86,16 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'Send via Print';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
         }
         field(105; "Send via E-mail"; Boolean)
         {
             Caption = 'Send via E-mail';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
         }
         field(107; "Send via SMS"; Boolean)
         {
             Caption = 'Send via SMS';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
         }
         field(200; "Customer No."; Code[20])
         {
@@ -246,7 +241,6 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'Language Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             TableRelation = Language;
         }
         field(300; "Voucher Message"; Text[250])
@@ -263,14 +257,12 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             NotBlank = true;
         }
         field(405; "Document Source"; Option)
         {
             Caption = 'Document Source';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             OptionCaption = 'POS,Sales Document,Payment Line';
             OptionMembers = POS,"Sales Document","Payment Line";
         }
@@ -278,32 +270,27 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(420; "Document No."; Code[20])
         {
             Caption = 'Document No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             TableRelation = "Sales Header"."No." WHERE("Document Type" = FIELD("Document Type"));
         }
         field(430; "Document Line No."; Integer)
         {
             Caption = 'Document Line No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(440; "Posting No."; Code[20])
         {
             Caption = 'Posting No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(1000; Id; Guid)
         {
             Caption = 'Id';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(1010; "Retail ID"; Guid)
         {
@@ -314,7 +301,6 @@ table 6151015 "NPR NpRv Sales Line"
         {
             Caption = 'Parent Id';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
     }
 
