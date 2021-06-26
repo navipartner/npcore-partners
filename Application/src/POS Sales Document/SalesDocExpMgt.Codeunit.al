@@ -309,7 +309,7 @@
         if SalesHeader."Sell-to Contact" = '' then
             SalesHeader."Sell-to Contact" := SalePOS."Contact No.";
         SalesHeader."Your Reference" := SalePOS.Reference;
-        SalesHeader."External Document No." := SalePOS.Reference;
+        SalesHeader."External Document No." := SalePOS."External Document No.";
         SalesHeader.Validate("Location Code", GetLocationCode(SalePOS));
         SalesHeader.Ship := Ship;
         SalesHeader.Invoice := Invoice;
