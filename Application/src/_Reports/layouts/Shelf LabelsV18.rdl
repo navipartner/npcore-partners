@@ -1,0 +1,548 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>dfc2e3a6-41c7-4a2a-bcd0-addef131efb4</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Tablix Name="Tablix3">
+            <TablixBody>
+              <TablixColumns>
+                <TablixColumn>
+                  <Width>5.23cm</Width>
+                </TablixColumn>
+              </TablixColumns>
+              <TablixRows>
+                <TablixRow>
+                  <Height>2.53506cm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Tablix Name="Tablix8">
+                          <TablixBody>
+                            <TablixColumns>
+                              <TablixColumn>
+                                <Width>0.64413cm</Width>
+                              </TablixColumn>
+                              <TablixColumn>
+                                <Width>1.73587cm</Width>
+                              </TablixColumn>
+                              <TablixColumn>
+                                <Width>2.15cm</Width>
+                              </TablixColumn>
+                              <TablixColumn>
+                                <Width>0.7cm</Width>
+                              </TablixColumn>
+                            </TablixColumns>
+                            <TablixRows>
+                              <TablixRow>
+                                <Height>0.47988cm</Height>
+                                <TablixCells>
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="Description_TMPRetailJournalLineCol1">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Left(Fields!NPRAtrributeTextArray1.Value, 35)</Value>
+                                                <Style>
+                                                  <FontFamily>Segoe UI</FontFamily>
+                                                  <FontSize>11pt</FontSize>
+                                                  <FontWeight>Bold</FontWeight>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style />
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Description_TMPRetailJournalLineCol1</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Middle</VerticalAlign>
+                                        </Style>
+                                      </Textbox>
+                                      <ColSpan>4</ColSpan>
+                                    </CellContents>
+                                  </TablixCell>
+                                  <TablixCell />
+                                  <TablixCell />
+                                  <TablixCell />
+                                </TablixCells>
+                              </TablixRow>
+                              <TablixRow>
+                                <Height>0.4402cm</Height>
+                                <TablixCells>
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="Textbox38">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Left(Fields!Description_TMPRetailJournalLineCol1.Value, 35)</Value>
+                                                <Style>
+                                                  <FontFamily>Segoe UI</FontFamily>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style />
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Textbox38</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Top</VerticalAlign>
+                                        </Style>
+                                      </Textbox>
+                                      <ColSpan>4</ColSpan>
+                                    </CellContents>
+                                  </TablixCell>
+                                  <TablixCell />
+                                  <TablixCell />
+                                  <TablixCell />
+                                </TablixCells>
+                              </TablixRow>
+                              <TablixRow>
+                                <Height>0.3077cm</Height>
+                                <TablixCells>
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="Description_ItemVariant">
+                                        <CanGrow>true</CanGrow>
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Fields!Description_ItemVariant.Value</Value>
+                                                <Style>
+                                                  <FontFamily>Segoe UI</FontFamily>
+                                                  <FontSize>7pt</FontSize>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Left</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Description_ItemVariant</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Top</VerticalAlign>
+                                        </Style>
+                                      </Textbox>
+                                      <ColSpan>4</ColSpan>
+                                    </CellContents>
+                                  </TablixCell>
+                                  <TablixCell />
+                                  <TablixCell />
+                                  <TablixCell />
+                                </TablixCells>
+                              </TablixRow>
+                              <TablixRow>
+                                <Height>1.01728cm</Height>
+                                <TablixCells>
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="Textbox39">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Fields!BarCodeTempBlobCol1.Value</Value>
+                                                <Style>
+                                                  <FontFamily>IDAutomationC128M</FontFamily>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Center</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Textbox38</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Middle</VerticalAlign>
+                                        </Style>
+                                      </Textbox>
+                                      <ColSpan>2</ColSpan>
+                                      <rd:Selected>true</rd:Selected>
+                                    </CellContents>
+                                  </TablixCell>
+                                  <TablixCell />
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="Textbox42">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Fields!TMPUnitPriceWhole.Value</Value>
+                                                <Style>
+                                                  <FontFamily>Impact</FontFamily>
+                                                  <FontSize>22pt</FontSize>
+                                                  <FontWeight>Bold</FontWeight>
+                                                  <Format>N</Format>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Right</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Textbox42</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Top</VerticalAlign>
+                                        </Style>
+                                      </Textbox>
+                                    </CellContents>
+                                  </TablixCell>
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="Textbox3">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Fields!TMPUnitPriceDecimal.Value</Value>
+                                                <Style>
+                                                  <FontFamily>Impact</FontFamily>
+                                                  <FontSize>14pt</FontSize>
+                                                  <FontWeight>Bold</FontWeight>
+                                                  <TextDecoration>Underline</TextDecoration>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Left</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Textbox3</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Top</VerticalAlign>
+                                          <PaddingLeft>2pt</PaddingLeft>
+                                          <PaddingRight>2pt</PaddingRight>
+                                          <PaddingTop>2pt</PaddingTop>
+                                          <PaddingBottom>2pt</PaddingBottom>
+                                        </Style>
+                                      </Textbox>
+                                    </CellContents>
+                                  </TablixCell>
+                                </TablixCells>
+                              </TablixRow>
+                              <TablixRow>
+                                <Height>0.29cm</Height>
+                                <TablixCells>
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="ItemNo_TMPRetailJournalLineCol1">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Fields!ItemNo_TMPRetailJournalLineCol1.Value</Value>
+                                                <Style>
+                                                  <FontFamily>Courier New</FontFamily>
+                                                  <FontSize>7pt</FontSize>
+                                                  <FontWeight>Bold</FontWeight>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Center</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>ItemNo_TMPRetailJournalLineCol1</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Top</VerticalAlign>
+                                        </Style>
+                                      </Textbox>
+                                      <ColSpan>2</ColSpan>
+                                    </CellContents>
+                                  </TablixCell>
+                                  <TablixCell />
+                                  <TablixCell>
+                                    <CellContents>
+                                      <Textbox Name="Textbox65">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value />
+                                                <Style>
+                                                  <FontSize>20pt</FontSize>
+                                                  <FontWeight>Bold</FontWeight>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Left</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Textbox65</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>None</Style>
+                                          </Border>
+                                          <VerticalAlign>Bottom</VerticalAlign>
+                                          <PaddingLeft>2pt</PaddingLeft>
+                                          <PaddingRight>2pt</PaddingRight>
+                                          <PaddingTop>2pt</PaddingTop>
+                                          <PaddingBottom>2pt</PaddingBottom>
+                                        </Style>
+                                      </Textbox>
+                                      <ColSpan>2</ColSpan>
+                                    </CellContents>
+                                  </TablixCell>
+                                  <TablixCell />
+                                </TablixCells>
+                              </TablixRow>
+                            </TablixRows>
+                          </TablixBody>
+                          <TablixColumnHierarchy>
+                            <TablixMembers>
+                              <TablixMember />
+                              <TablixMember />
+                              <TablixMember />
+                              <TablixMember />
+                            </TablixMembers>
+                          </TablixColumnHierarchy>
+                          <TablixRowHierarchy>
+                            <TablixMembers>
+                              <TablixMember>
+                                <Group Name="Details" />
+                                <TablixMembers>
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                </TablixMembers>
+                              </TablixMember>
+                            </TablixMembers>
+                          </TablixRowHierarchy>
+                          <KeepTogether>true</KeepTogether>
+                          <DataSetName>DataSet_Result</DataSetName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Tablix>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+              </TablixRows>
+            </TablixBody>
+            <TablixColumnHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="ColumnGroup">
+                    <GroupExpressions>
+                      <GroupExpression>=(RowNumber(Nothing) - 1) Mod 1</GroupExpression>
+                    </GroupExpressions>
+                  </Group>
+                </TablixMember>
+              </TablixMembers>
+            </TablixColumnHierarchy>
+            <TablixRowHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="RowGroup">
+                    <GroupExpressions>
+                      <GroupExpression>=Ceiling((RowNumber(Nothing)) / 11)</GroupExpression>
+                    </GroupExpressions>
+                  </Group>
+                </TablixMember>
+              </TablixMembers>
+            </TablixRowHierarchy>
+            <DataSetName>DataSet_Result</DataSetName>
+            <Height>2.53506cm</Height>
+            <Width>5.23cm</Width>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+            </Style>
+          </Tablix>
+        </ReportItems>
+        <Height>2.53506cm</Height>
+        <Style />
+      </Body>
+      <Width>5.4cm</Width>
+      <Page>
+        <PageHeight>29.7cm</PageHeight>
+        <PageWidth>21cm</PageWidth>
+        <LeftMargin>1.75cm</LeftMargin>
+        <RightMargin>1cm</RightMargin>
+        <TopMargin>0.9cm</TopMargin>
+        <Columns>3</Columns>
+        <ColumnSpacing>0.01cm</ColumnSpacing>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>b655740f-3501-4423-ad3f-9d55a813750d</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="ItemNo_TMPRetailJournalLineCol1">
+          <DataField>ItemNo_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Description_TMPRetailJournalLineCol1">
+          <DataField>Description_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Description2_TMPRetailJournalLineCol1">
+          <DataField>Description2_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="VendorItemNo_TMPRetailJournalLineCol1">
+          <DataField>VendorItemNo_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="CurrentUnitPrice_TMPRetailJournalLineCol1">
+          <DataField>CurrentUnitPrice_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="CurrentUnitPrice_TMPRetailJournalLineCol1Format">
+          <DataField>CurrentUnitPrice_TMPRetailJournalLineCol1Format</DataField>
+        </Field>
+        <Field Name="Unitprice_TMPRetailJournalLineCol1">
+          <DataField>Unitprice_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Unitprice_TMPRetailJournalLineCol1Format">
+          <DataField>Unitprice_TMPRetailJournalLineCol1Format</DataField>
+        </Field>
+        <Field Name="Barcode_TMPRetailJournalLineCol1">
+          <DataField>Barcode_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="Itemgroup_TMPRetailJournalLineCol1">
+          <DataField>Itemgroup_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="BarCodeTempBlobCol1">
+          <DataField>BarCodeTempBlobCol1</DataField>
+        </Field>
+        <Field Name="Assortment_TMPRetailJournalLineCol1">
+          <DataField>Assortment_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="NewItemNo_TMPRetailJournalLineCol1">
+          <DataField>NewItemNo_TMPRetailJournalLineCol1</DataField>
+        </Field>
+        <Field Name="TMPItemGroup">
+          <DataField>TMPItemGroup</DataField>
+        </Field>
+        <Field Name="BeforeCaption">
+          <DataField>BeforeCaption</DataField>
+        </Field>
+        <Field Name="NowCaption">
+          <DataField>NowCaption</DataField>
+        </Field>
+        <Field Name="TMPUnitPriceWhole">
+          <DataField>TMPUnitPriceWhole</DataField>
+        </Field>
+        <Field Name="TMPUnitPriceDecimal">
+          <DataField>TMPUnitPriceDecimal</DataField>
+        </Field>
+        <Field Name="NPRAtrributeTextArray1">
+          <DataField>NPRAtrributeTextArray1</DataField>
+        </Field>
+        <Field Name="NPRAttributeTextArrayText1">
+          <DataField>NPRAttributeTextArrayText1</DataField>
+        </Field>
+        <Field Name="TMPBeforeUnitPrice">
+          <DataField>TMPBeforeUnitPrice</DataField>
+        </Field>
+        <Field Name="TMPBeforeUnitPriceFormat">
+          <DataField>TMPBeforeUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="Description_ItemVariant">
+          <DataField>Description_ItemVariant</DataField>
+        </Field>
+        <Field Name="LCYCode_GeneralLedgerSetup">
+          <DataField>LCYCode_GeneralLedgerSetup</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

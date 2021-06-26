@@ -1,8 +1,8 @@
-#if BC17
+#if not BC17
 report 6014495 "NPR Whse. - Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/NP Whse. - Shipment.rdlc';
+    RDLCLayout = './src/_Reports/layouts/NP Whse. - ShipmentV18.rdl';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Whse. - Shipment';
@@ -99,23 +99,18 @@ report 6014495 "NPR Whse. - Shipment"
                     column(QtyPicked_WhseShptLine; "Qty. Picked")
                     {
                     }
-                    column(Barcode; BlobBuffer."Buffer 1")
+                    column(Barcode; BarCodeEncodedText)
                     {
                     }
 
                     trigger OnAfterGetRecord()
-                    var
-                        Code128Lbl: Label 'CODE128', Locked = true;
                     begin
                         GetLocation("Location Code");
 
-                        BarcodeLib.SetShowText(true);
-                        BarcodeLib.SetAntiAliasing(false);
-                        BarcodeLib.SetBarcodeType(Code128Lbl);
-                        BarcodeLib.GenerateBarcode("Warehouse Shipment Line"."Source No.", TmpBarcode);
-                        TmpBarcode.CreateInStream(InStr);
-                        TmpBarcode.CreateOutStream(OuStr);
-                        BlobBuffer.GetFromTempBlob(TmpBarcode, 1);
+                        BarcodeSimbiology := BarcodeSimbiology::Code128;
+
+                        BarCodeText := "Warehouse Shipment Line"."Source No.";
+                        BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false));
                     end;
                 }
             }
@@ -129,14 +124,13 @@ report 6014495 "NPR Whse. - Shipment"
 
     var
         Location: Record Location;
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
-        BarcodeLib: Codeunit "NPR Barcode Image Library";
-        TmpBarcode: Codeunit "Temp Blob";
-        InStr: InStream;
+        BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
+        BarcodeSimbiology: Enum "Barcode Symbology";
+        BarCodeText: Text;
+        BarCodeEncodedText: Text;
         CurrReportPageNoCaptionLbl: Label 'Page';
         QtyPickedCaptionLbl: Label 'Qty. Picked';
         WarehouseShipmentCaptionLbl: Label 'Warehouse Shipment';
-        OuStr: OutStream;
 
     local procedure GetLocation(LocationCode: Code[10])
     begin
@@ -147,4 +141,14 @@ report 6014495 "NPR Whse. - Shipment"
                 Location.Get(LocationCode);
     end;
 }
+
+
+//  Purchased Font Name	Evaluation Font Name*	Font Height*	  N Dimension**
+//  IDAutomationC128XXS	IDAutomationSC128XXS	 .10″ or .254 CM	  10
+//  IDAutomationC128XS	IDAutomationSC128XS	     .20″ or .508 CM	  20
+//  IDAutomationC128S	IDAutomationSC128S	     .35″ or .889 CM	  35
+//  IDAutomationC128M	IDAutomationSC128M	     .50″ or 1.27 CM	  50
+//  IDAutomationC128L	IDAutomationSC128L	     .60″ or 1.46 CM	  58
+//  IDAutomationC128XL	IDAutomationSC128XL	     .75″ or 1.90 CM	  75
+//  IDAutomationC128XXL	IDAutomationSC128XXL	   1″ or 2.54 CM	  100
 #endif
