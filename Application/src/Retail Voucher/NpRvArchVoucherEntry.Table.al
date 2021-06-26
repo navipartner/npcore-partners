@@ -23,7 +23,6 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         {
             Caption = 'Entry Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.49,NPR5.50';
             OptionCaption = ',Issue Voucher,Payment,Manual Archive,Partner Issue Voucher,Partner Payment,Top-up';
             OptionMembers = ,"Issue Voucher",Payment,"Manual Archive","Partner Issue Voucher","Partner Payment","Top-up";
         }
@@ -62,7 +61,7 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         }
         field(50; "Register No."; Code[10])
         {
-            Caption = 'Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit"."No.";
         }
@@ -70,7 +69,6 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48,NPR5.55';
             OptionCaption = 'POS Entry,Invoice';
             OptionMembers = "POS Entry",Invoice;
         }
@@ -78,13 +76,11 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         {
             Caption = 'Document No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
         }
         field(60; "External Document No."; Code[50])
         {
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             Editable = false;
             NotBlank = true;
         }
@@ -100,7 +96,6 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         {
             Caption = 'Partner Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.49';
             TableRelation = "NPR NpRv Partner";
         }
         field(70; "Closed by Entry No."; Integer)
@@ -113,14 +108,12 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         {
             Caption = 'Closed by Partner Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.49';
             TableRelation = "NPR NpRv Partner";
         }
         field(80; "Partner Clearing"; Boolean)
         {
             Caption = 'Partner Clearing';
             DataClassification = CustomerContent;
-            Description = 'NPR5.49';
         }
         field(85; "Original Entry No."; Integer)
         {
