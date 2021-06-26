@@ -248,7 +248,7 @@ table 6014405 "NPR POS Sale"
             Caption = 'Contact';
             DataClassification = CustomerContent;
         }
-        field(16; Reference; Text[30])
+        field(16; Reference; Text[35])
         {
             Caption = 'Reference';
             DataClassification = CustomerContent;
@@ -535,7 +535,7 @@ table 6014405 "NPR POS Sale"
             DataClassification = CustomerContent;
             TableRelation = "Country/Region";
         }
-        field(128; "External Document No."; Code[20])
+        field(128; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
             DataClassification = CustomerContent;

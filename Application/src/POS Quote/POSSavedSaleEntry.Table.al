@@ -74,7 +74,7 @@ table 6151002 "NPR POS Saved Sale Entry"
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
         }
-        field(50; Reference; Text[30])
+        field(50; Reference; Text[35])
         {
             Caption = 'Reference';
             DataClassification = CustomerContent;

@@ -512,6 +512,7 @@
 
         PrevRec := Format(SalePOS);
 
+        SalePOS."External Document No." := SalePOS."Sales Ticket No.";
         SalePOS.Reference := SalePOS."Sales Ticket No.";
         CustomerNo := JSON.GetString('customer_no');
         SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Ord);

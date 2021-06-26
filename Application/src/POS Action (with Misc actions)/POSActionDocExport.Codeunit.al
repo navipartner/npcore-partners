@@ -10,6 +10,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         PAYMENT_OPTION_DESC: Label 'Select document payment';
         TextExtDocNoLabel: Label 'Enter External Document No.';
         TextAttentionLabel: Label 'Enter Attention';
+        TextYourRefLabel: Label 'Enter a value for the field ''Your Reference''';
         TextConfirmTitle: Label 'Confirm action';
         TextConfirmLead: Label 'Export active sale to NAV sales document?';
         TextPrepaymentTitle: Label 'Prepayment';
@@ -17,6 +18,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         TextPrepaymentAmountLead: Label 'Please specify prepayment amount to be paid after export';
         CaptionAskExtDocNo: Label 'Prompt External Doc. No.';
         CaptionAskAttention: Label 'Prompt Attention';
+        CaptionAskYourRef: Label 'Prompt Your Reference';
         CaptionConfirm: Label 'Confirm Export';
         CaptionAskOperation: Label 'Ask Doc. Operation';
         CaptionPrint: Label 'Standard Print';
@@ -40,6 +42,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionCheckCustCredit: Label 'Check Customer Credit';
         DescAskExtDocNo: Label 'Ask user to input external document number';
         DescAskAttention: Label 'Ask user to input attention';
+        DescAskYourRef: Label 'Ask user to input ''Your Reference''';
         DescConfirm: Label 'Ask user to confirm before any export is performed';
         DescAskOperation: Label 'Ask user to select posting type';
         DescPrint: Label 'Print standard NAV report after export & posting is done';
@@ -112,7 +115,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.10');
+        exit('1.11');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -128,6 +131,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             Sender.RegisterWorkflowStep('confirm', 'param.ConfirmExport && confirm(labels.confirmTitle, labels.confirmLead).no (abort);');
             Sender.RegisterWorkflowStep('extdocno', 'param.AskExtDocNo && input (labels.ExtDocNo).cancel (abort);');
             Sender.RegisterWorkflowStep('attention', 'param.AskAttention && input (labels.Attention).cancel (abort);');
+            Sender.RegisterWorkflowStep('yourref', 'param.AskYourRef && input (labels.YourRef).cancel (abort);');
 
             Sender.RegisterWorkflowStep('exportDocument', 'respond();');
 
@@ -152,6 +156,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             Sender.RegisterBooleanParameter('SetSendPdf2Nav', false);
             Sender.RegisterBooleanParameter('AskExtDocNo', false);
             Sender.RegisterBooleanParameter('AskAttention', false);
+            Sender.RegisterBooleanParameter('AskYourRef', false);
             Sender.RegisterBooleanParameter('SetTransferSalesperson', true);
             Sender.RegisterBooleanParameter('SetTransferDimensions', true);
             Sender.RegisterBooleanParameter('SetTransferPaymentMethod', true);
@@ -186,6 +191,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     begin
         Captions.AddActionCaption(ActionCode(), 'ExtDocNo', TextExtDocNoLabel);
         Captions.AddActionCaption(ActionCode(), 'Attention', TextAttentionLabel);
+        Captions.AddActionCaption(ActionCode(), 'YourRef', TextYourRefLabel);
         Captions.AddActionCaption(ActionCode(), 'confirmTitle', TextConfirmTitle);
         Captions.AddActionCaption(ActionCode(), 'confirmLead', TextConfirmLead);
         Captions.AddActionCaption(ActionCode(), 'prepaymentDialogTitle', TextPrepaymentTitle);
@@ -512,18 +518,29 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     var
         ExtDocNo: Text;
         Attention: Text;
+        YourRef: Text;
+        ModifyRec: Boolean;
     begin
         ExtDocNo := GetInput(JSON, 'extdocno');
         if (ExtDocNo <> '') then begin
-            SalePOS.Validate(Reference, CopyStr(ExtDocNo, 1, MaxStrLen(SalePOS.Reference)));
-            SalePOS.Modify(true);
+            SalePOS.Validate("External Document No.", CopyStr(ExtDocNo, 1, MaxStrLen(SalePOS."External Document No.")));
+            ModifyRec := true;
         end;
 
         Attention := GetInput(JSON, 'attention');
         if (Attention <> '') then begin
             SalePOS.Validate("Contact No.", CopyStr(Attention, 1, MaxStrLen(SalePOS."Contact No.")));
-            SalePOS.Modify(true);
+            ModifyRec := true;
         end;
+
+        YourRef := GetInput(JSON, 'yourref');
+        if (YourRef <> '') then begin
+            SalePOS.Validate(Reference, CopyStr(YourRef, 1, MaxStrLen(SalePOS.Reference)));
+            ModifyRec := true;
+        end;
+
+        if ModifyRec then
+            SalePOS.Modify(true);
     end;
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
@@ -555,6 +572,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := CaptionAskExtDocNo;
             'AskAttention':
                 Caption := CaptionAskAttention;
+            'AskYourRef':
+                Caption := CaptionAskYourRef;
             'ConfirmExport':
                 Caption := CaptionConfirm;
             'SetAsk':
@@ -619,7 +638,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := CaptionSendPayAndPost;
             'Pdf2NavPayAndPostDocument':
                 Caption := CaptionPdf2NavPayAndPost;
-            //-NPR5.53 [377510]
             'SelectCustomer':
                 Caption := CaptionSelectCustomer;
             'ShowDocumentPaymentMenu':
@@ -646,6 +664,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := DescAskExtDocNo;
             'AskAttention':
                 Caption := DescAskAttention;
+            'AskYourRef':
+                Caption := DescAskYourRef;
             'ConfirmExport':
                 Caption := DescConfirm;
             'SetAsk':
@@ -710,7 +730,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := DescSendPayAndPost;
             'Pdf2NavPayAndPostDocument':
                 Caption := DescPdf2NavPayAndPost;
-            //-NPR5.53 [377510]
             'SelectCustomer':
                 Caption := DescSelectCustomer;
             'ShowDocumentPaymentMenu':
