@@ -112,10 +112,12 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
     local procedure TrySendVoucherViaEmail(var Voucher: Record "NPR NpRv Voucher")
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
+#if BC17
         TempBlob: Codeunit "Temp Blob";
         BarcodeLibrary: Codeunit "NPR Barcode Image Library";
-        EmailManagement: Codeunit "NPR E-mail Management";
         InStr: InStream;
+#endif
+        EmailManagement: Codeunit "NPR E-mail Management";
         RecRef: RecordRef;
     begin
         if Voucher.Find() then;
@@ -123,14 +125,14 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
             if EmailTemplateHeader.Get(Voucher."E-mail Template Code") then
                 EmailTemplateHeader.SetRecFilter();
         end;
-
+#if BC17
         if not Voucher."Barcode Image".HasValue() then begin
             BarcodeLibrary.GenerateBarcode(Voucher."Reference No.", TempBlob);
             TempBlob.CreateInStream(InStr);
             Voucher."Barcode Image".ImportStream(InStr, Voucher.FieldName("Barcode Image"));
             Voucher.Modify();
         end;
-
+#endif
         RecRef.GetTable(Voucher);
         RecRef.SetRecFilter();
         if EmailTemplateHeader."Report ID" > 0 then
