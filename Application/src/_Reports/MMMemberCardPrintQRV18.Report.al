@@ -1,8 +1,8 @@
-#if BC17
+#if not BC17
 report 6060127 "NPR MM Member Card Print QR"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/MM Member Card Print QR.rdlc';
+    RDLCLayout = './src/_Reports/layouts/MM Member Card Print QR.rdl';
     Caption = 'Member Card Print';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
@@ -48,14 +48,17 @@ report 6060127 "NPR MM Member Card Print QR"
 
             trigger OnAfterGetRecord()
             var
-            
-                BarcodeLib: Codeunit "NPR Barcode Image Library";
+
+                BarcodeFontProvider: Codeunit "NPR Barcode Font Provider Mgt.";
                 MMMembershipRole: Record "NPR MM Membership Role";
+                Base64Image: Text;
+                Base64Convert: Codeunit "Base64 Convert";
+                OutStr: OutStream;
             begin
-                BarcodeLib.SetSizeX(2);
-                BarcodeLib.SetSizeY(2);
-                BarcodeLib.SetBarcodeType('QR');
-                BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.", TmpQR);
+
+                Base64Image := BarcodeFontProvider.GenerateQRCodeAZ("MM Member Card"."External Card No.", 'H', 'UTF8', true, true, 2);
+                TmpQR.CreateOutStream(OutStr);
+                Base64Convert.FromBase64(Base64Image, OutStr);
                 BlobBuffer.GetFromTempBlob(TmpQR, 1);
 
                 MemberDate := Format("MM Member Card"."Valid Until");

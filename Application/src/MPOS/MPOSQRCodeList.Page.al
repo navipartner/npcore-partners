@@ -108,6 +108,7 @@ page 6059964 "NPR MPOS QR Code List"
                 begin
                     Rec.CreateQRCode(Rec);
                 end;
+
             }
         }
     }

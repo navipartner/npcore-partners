@@ -1,3 +1,4 @@
+#if BC17
 codeunit 6014528 "NPR Barcode Image Library"
 {
     var
@@ -102,4 +103,4 @@ codeunit 6014528 "NPR Barcode Image Library"
         NoBarcodeText := not ShowTextIn;
     end;
 }
-
+#endif

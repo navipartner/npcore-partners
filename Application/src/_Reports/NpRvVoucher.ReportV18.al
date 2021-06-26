@@ -1,8 +1,8 @@
-#if BC17
-report 6151015 "NPR NpRv Voucher 3"
+#IF not BC17
+report 6151013 "NPR NpRv Voucher"
 {
-    RDLCLayout = './src/_Reports/layouts/NpRv Voucher 3.rdlc';
-    WordLayout = './src/_Reports/layouts/NpRv Voucher 3.docx';
+    RDLCLayout = './src/_Reports/layouts/NpRv Voucher.rdlc';
+    WordLayout = './src/_Reports/layouts/NpRv Voucher.docx';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'NpRv Voucher';
@@ -122,7 +122,7 @@ report 6151015 "NPR NpRv Voucher 3"
             column(VoucherMessage_NpRvVoucher; "NpRv Voucher"."Voucher Message")
             {
             }
-            column(Barcode_NpRvVoucher; TenantMedia.Content)
+            column(Barcode_NpRvVoucher; BarCodeEncodedText)
             {
             }
             column(IssueDate_NpRvVoucher; "NpRv Voucher"."Issue Date")
@@ -157,17 +157,28 @@ report 6151015 "NPR NpRv Voucher 3"
             var
                 Language: Codeunit Language;
             begin
+                BarCodeText := "NpRv Voucher"."Reference No.";
+                BarcodeSimbiology := BarcodeFontProviderMgt.SetBarcodeSimbiology(BarCodeText);
+
+                if BarcodeSimbiology = BarcodeSimbiology::Code39 then
+                    BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false))
+                else
+                    BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology);
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
                 Evaluate(IssuedDate, Format("NpRv Voucher"."Issue Date"));
-                "NPRv Voucher".GetImageContent(TenantMedia);
             end;
         }
     }
 
     var
-        TenantMedia: Record "Tenant Media";
+        BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
+        BarcodeSimbiology: Enum "Barcode Symbology";
+
+        BarCodeText: Text;
+        BarCodeEncodedText: Text;
+
         EndingDate: Text;
         IssuedDate: Text;
         StartingDate: Text;

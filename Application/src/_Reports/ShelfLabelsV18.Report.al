@@ -1,8 +1,8 @@
-#if BC17
+#if not BC17
 report 6014428 "NPR Shelf Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Shelf LabelsV18.rdl';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Shelf Labels';
@@ -55,7 +55,7 @@ report 6014428 "NPR Shelf Labels"
             column(Itemgroup_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Item group")
             {
             }
-            column(BarCodeTempBlobCol1; BlobBuffer."Buffer 1")
+            column(BarCodeTempBlobCol1; BarCodeEncodedText)
             {
             }
             column(Assortment_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1.Assortment)
@@ -94,8 +94,9 @@ report 6014428 "NPR Shelf Labels"
 
             trigger OnAfterGetRecord()
             begin
-                BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
-                BlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
+
+                BarCodeText := Barcode;
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false));
 
                 Clear(ItemVariant);
                 if Item.Get("Item No.") then begin
@@ -168,19 +169,18 @@ report 6014428 "NPR Shelf Labels"
     trigger OnPreReport()
     begin
         CurrencyChar := 8364;
-        BarcodeLib.SetBarcodeType('CODE128');
-        BarcodeLib.SetShowText(false);
-        BarcodeLib.SetAntiAliasing(false);
+        BarcodeSimbiology := BarcodeSimbiology::Code128;
         LineNo := 1;
     end;
 
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
         ItemCategory: Record "Item Category";
-        BarcodeLib: Codeunit "NPR Barcode Image Library";
-        TempBlobCol1: Codeunit "Temp Blob";
+        BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
+        BarcodeSimbiology: Enum "Barcode Symbology";
+        BarCodeText: Text;
+        BarCodeEncodedText: Text;
         CurrencyChar: Char;
         TMPBeforeUnitPrice: Decimal;
         TMPRetailLineDiscount: Decimal;

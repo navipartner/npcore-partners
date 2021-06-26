@@ -1,8 +1,8 @@
-#if BC17
+# if not BC17
 report 6014455 "NPR Item Barcode Status Sheet"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Item Barcode Status Sheet.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Item Barcode Status SheetV18.rdl';
     Caption = 'Item Barcode Status Sheet';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
@@ -63,14 +63,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol1; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol1; BlobBuffer."Buffer 1")
+            column(BarCodeTempBlobCol1; BarCodeEncodedText)
             {
             }
 
             trigger OnAfterGetRecord()
             begin
-                BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
-                BlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
+                BarCodeText := Barcode;
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology);
             end;
         }
         dataitem(TMPRetail_Journal_Line_Col2; "NPR Retail Journal Line")
@@ -95,14 +95,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol2; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol2; BlobBuffer."Buffer 2")
+            column(BarCodeTempBlobCol2; BarCodeEncodedText)
             {
             }
 
             trigger OnAfterGetRecord()
             begin
-                BarcodeLib.GenerateBarcode(Barcode, TempBlobCol2);
-                BlobBuffer.GetFromTempBlob(TempBlobCol2, 2);
+                BarCodeText := Barcode;
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology);
             end;
         }
         dataitem(TMPRetail_Journal_Line_Col3; "NPR Retail Journal Line")
@@ -127,14 +127,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol3; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol3; BlobBuffer."Buffer 3")
+            column(BarCodeTempBlobCol3; BarCodeEncodedText)
             {
             }
 
             trigger OnAfterGetRecord()
             begin
-                BarcodeLib.GenerateBarcode(Barcode, TempBlobCol3);
-                BlobBuffer.GetFromTempBlob(TempBlobCol3, 3);
+                BarCodeText := Barcode;
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology);
             end;
         }
     }
@@ -169,12 +169,11 @@ report 6014455 "NPR Item Barcode Status Sheet"
     begin
         i := 1;
         LineNo := 1;
-        BarcodeLib.SetBarcodeType('EAN13');
-        BarcodeLib.SetAntiAliasing(false);
-        BarcodeLib.SetShowText(true);
 
-        ItemFilter := StrSubstNo(Pct1Lbl, Item.TableCaption, Item.GetFilters());
-        ItemVariantFilter := StrSubstNo(Pct1Lbl, ItemVariant.TableCaption, ItemVariant.GetFilters());
+        BarcodeSimbiology := BarcodeSimbiology::"EAN-13";
+
+        ItemFilter := StrSubstNo('%1: %2', Item.TableCaption, Item.GetFilters());
+        ItemVariantFilter := StrSubstNo('%1: %2', ItemVariant.TableCaption, ItemVariant.GetFilters());
 
         if ShowInventory then
             Item.SetAutoCalcFields(Inventory);
@@ -183,16 +182,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
     var
         ShowInventory: Boolean;
         ShowVariantInfo: Integer;
-        BarcodeLib: Codeunit "NPR Barcode Image Library";
-        TempBlobCol1: Codeunit "Temp Blob";
-        TempBlobCol2: Codeunit "Temp Blob";
-        TempBlobCol3: Codeunit "Temp Blob";
+        BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
+        BarcodeSimbiology: Enum "Barcode Symbology";
+        BarCodeText: Text;
+        BarCodeEncodedText: Text;
         i: Integer;
         LineNo: Integer;
         ItemFilter: Text;
         ItemVariantFilter: Text;
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
-        Pct1Lbl: Label '%1: %2', locked = true;
 
     local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])
     begin
@@ -201,7 +198,6 @@ report 6014455 "NPR Item Barcode Status Sheet"
             1:
                 begin
                     TMPRetail_Journal_Line_Col1.Init();
-                    TMPRetail_Journal_Line_Col1."No." := 'temp';
                     TMPRetail_Journal_Line_Col1."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col1.Validate("Item No.", ItemNo);
                     if StrLen(VariantCode) > 0 then begin
@@ -216,7 +212,6 @@ report 6014455 "NPR Item Barcode Status Sheet"
             2:
                 begin
                     TMPRetail_Journal_Line_Col2.Init();
-                    TMPRetail_Journal_Line_Col2."No." := 'temp';
                     TMPRetail_Journal_Line_Col2."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col2.Validate("Item No.", ItemNo);
                     if StrLen(VariantCode) > 0 then begin
@@ -231,7 +226,6 @@ report 6014455 "NPR Item Barcode Status Sheet"
             3:
                 begin
                     TMPRetail_Journal_Line_Col3.Init();
-                    TMPRetail_Journal_Line_Col3."No." := 'temp';
                     TMPRetail_Journal_Line_Col3."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col3.Validate("Item No.", ItemNo);
                     if StrLen(VariantCode) > 0 then begin

@@ -1,3 +1,4 @@
+#if BC17
 report 6151016 "NPR NpRv Voucher 4"
 {
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 4.rdlc';
@@ -171,4 +172,4 @@ report 6151016 "NPR NpRv Voucher 4"
         IssuedDate: Text;
         StartingDate: Text;
 }
-
+#endif

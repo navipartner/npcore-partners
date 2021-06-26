@@ -1,8 +1,8 @@
-#if BC17
+#if not BC17
 report 6060123 "NPR MM Member Card Std Print"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/MM Member Card Std Print.rdl';
+    RDLCLayout = './src/_Reports/layouts/MM Member Card Std PrintV18.rdl';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
@@ -14,7 +14,7 @@ report 6060123 "NPR MM Member Card Std Print"
             column(MemberDate; MemberDate)
             {
             }
-            column(Barcode; BlobBuffer."Buffer 1")
+            column(Barcode; BarCodeEncodedText)
             {
             }
             column(ExternalMemberNo; "External Member No.")
@@ -77,17 +77,14 @@ report 6060123 "NPR MM Member Card Std Print"
                 Item: Record Item;
                 MMMembership: Record "NPR MM Membership";
                 MMMembershipSetup: Record "NPR MM Membership Setup";
-                BarcodeLib: Codeunit "NPR Barcode Image Library";
                 PointTo: Integer;
-                Code128Lbl: Label 'CODE128', Locked = true;
             begin
                 CalcFields("External Member No.");
-                BarcodeLib.SetAntiAliasing(false);
-                BarcodeLib.SetShowText(false);
-                BarcodeLib.SetBarcodeType(Code128Lbl);
-                BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.", TmpBarcode);
+                BarcodeSimbiology := BarcodeSimbiology::Code128;
 
-                BlobBuffer.GetFromTempBlob(TmpBarcode, 1);
+                BarCodeText := "MM Member Card"."External Card No.";
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false));
+
                 Clear(MemberDate);
                 Clear(MemberItem);
                 Clear(CardType);
@@ -118,9 +115,11 @@ report 6060123 "NPR MM Member Card Std Print"
     var
         CompanyInformation: Record "Company Information";
         MMMembershipEntry: Record "NPR MM Membership Entry";
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
+        BarcodeSimbiology: Enum "Barcode Symbology";
         TenantMediaMMMember: Record "Tenant Media";
-        TmpBarcode: Codeunit "Temp Blob";
+        BarCodeText: Text;
+        BarCodeEncodedText: Text;
         ExpiryDateCaption: Label 'Expiry date: ';
         MemberCardNoCaption: Label 'Member No.:';
         MemberNameCaption: Label 'Name: ';
