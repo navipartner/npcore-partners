@@ -63,14 +63,12 @@ table 6151013 "NPR NpRv Voucher"
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "No. Series";
         }
         field(45; "Arch. No. Series"; Code[20])
         {
             Caption = 'Archivation No. Series';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "No. Series";
         }
         field(50; "Arch. No."; Code[20])
@@ -96,7 +94,6 @@ table 6151013 "NPR NpRv Voucher"
         {
             Caption = 'Allow Top-up';
             DataClassification = CustomerContent;
-            Description = 'NPR5.50';
         }
         field(65; "Print Template Code"; Code[20])
         {
@@ -124,7 +121,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Sum("NPR NpRv Voucher Entry".Amount WHERE("Voucher No." = FIELD("No."),
                                                                  "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher" | "Top-up")));
             Caption = 'Initial Amount';
-            Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -140,14 +136,12 @@ table 6151013 "NPR NpRv Voucher"
         {
             Caption = 'E-mail Template Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "NPR E-mail Template Header" WHERE("Table No." = CONST(6151013));
         }
         field(95; "SMS Template Code"; Code[10])
         {
             Caption = 'SMS Template Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             TableRelation = "NPR SMS Template Header" WHERE("Table No." = CONST(6151013));
         }
         field(100; "Send Voucher Module"; Code[20])
@@ -161,19 +155,16 @@ table 6151013 "NPR NpRv Voucher"
         {
             Caption = 'Send via Print';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
         }
         field(105; "Send via E-mail"; Boolean)
         {
             Caption = 'Send via E-mail';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
         }
         field(107; "Send via SMS"; Boolean)
         {
             Caption = 'Send via SMS';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
         }
         field(110; "Validate Voucher Module"; Code[20])
         {
@@ -335,7 +326,6 @@ table 6151013 "NPR NpRv Voucher"
         {
             Caption = 'Language Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             TableRelation = Language;
         }
         field(300; "Voucher Message"; Text[250])
@@ -347,7 +337,6 @@ table 6151013 "NPR NpRv Voucher"
         {
             Caption = 'Barcode';
             DataClassification = CustomerContent;
-            Description = 'NPR5.48';
             SubType = Bitmap;
             ObsoleteState = Pending;
             ObsoleteReason = 'Use Media instead of Blob type.';
@@ -362,7 +351,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Min("NPR NpRv Voucher Entry"."Posting Date" WHERE("Voucher No." = FIELD("No."),
                                                                          "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Date';
-            Description = 'NPR5.49';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -370,8 +358,7 @@ table 6151013 "NPR NpRv Voucher"
         {
             CalcFormula = Max("NPR NpRv Voucher Entry"."Register No." WHERE("Voucher No." = FIELD("No."),
                                                                          "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
-            Caption = 'Issue Register No.';
-            Description = 'NPR5.49';
+            Caption = 'Issue POS Unit No.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -380,7 +367,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Max("NPR NpRv Voucher Entry"."Document Type" WHERE("Voucher No." = FIELD("No."),
                                                                           "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Document Type';
-            Description = 'NPR5.48,NPR5.49';
             Editable = false;
             FieldClass = FlowField;
             OptionCaption = 'POS Entry,Invoice';
@@ -391,7 +377,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Max("NPR NpRv Voucher Entry"."Document No." WHERE("Voucher No." = FIELD("No."),
                                                                          "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Document No.';
-            Description = 'NPR5.48,NPR5.49';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -400,7 +385,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Max("NPR NpRv Voucher Entry"."External Document No." WHERE("Voucher No." = FIELD("No."),
                                                                                   "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue External Document No.';
-            Description = 'NPR5.48,NPR5.49';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -409,7 +393,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Max("NPR NpRv Voucher Entry"."User ID" WHERE("Voucher No." = FIELD("No."),
                                                                     "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue User ID';
-            Description = 'NPR5.49';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -418,7 +401,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Max("NPR NpRv Voucher Entry"."Partner Code" WHERE("Voucher No." = FIELD("No."),
                                                                          "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Partner Code';
-            Description = 'NPR5.49';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -426,7 +408,6 @@ table 6151013 "NPR NpRv Voucher"
         {
             CalcFormula = Max("NPR NpRv Voucher Entry"."Partner Clearing" WHERE("Voucher No." = FIELD("No.")));
             Caption = 'Partner Clearing';
-            Description = 'NPR5.49';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -435,7 +416,6 @@ table 6151013 "NPR NpRv Voucher"
             CalcFormula = Count("NPR NpRv Sending Log" WHERE("Voucher No." = FIELD("No."),
                                                           "Error during Send" = CONST(false)));
             Caption = 'No. Send';
-            Description = 'NPR5.55';
             Editable = false;
             FieldClass = FlowField;
         }
