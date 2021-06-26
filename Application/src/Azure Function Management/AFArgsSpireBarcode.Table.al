@@ -68,6 +68,11 @@ table 6151572 "NPR AF Args: Spire Barcode"
             DataClassification = CustomerContent;
             SubType = Bitmap;
         }
+        field(19; Picture; Media)
+        {
+            Caption = 'Image';
+            DataClassification = CustomerContent;
+        }
         field(21; "Barcode Size"; Integer)
         {
             Caption = 'Barcode Size';

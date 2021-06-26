@@ -350,6 +350,11 @@ table 6151013 "NPR NpRv Voucher"
             Description = 'NPR5.48';
             SubType = Bitmap;
         }
+        field(306; "Barcode Image"; Media)
+        {
+            Caption = 'Barcode';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Issue Date"; Date)
         {
             CalcFormula = Min("NPR NpRv Voucher Entry"."Posting Date" WHERE("Voucher No." = FIELD("No."),

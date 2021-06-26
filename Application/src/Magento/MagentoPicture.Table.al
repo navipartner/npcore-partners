@@ -38,6 +38,11 @@ table 6151411 "NPR Magento Picture"
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(103; Image; Media)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
+        }
         field(110; "Entry No."; BigInteger)
         {
             AutoIncrement = true;

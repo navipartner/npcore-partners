@@ -249,6 +249,11 @@ table 6151018 "NPR NpRv Arch. Voucher"
             Description = 'NPR5.49';
             SubType = Bitmap;
         }
+        field(306; "Barcode Image"; Media)
+        {
+            Caption = 'Barcode';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Issue Date"; Date)
         {
             CalcFormula = Min("NPR NpRv Arch. Voucher Entry"."Posting Date" WHERE("Arch. Voucher No." = FIELD("No."),
