@@ -12,82 +12,153 @@
             cuegroup(Tickets)
             {
                 Caption = 'Tickets';
-                field("Issued Tickets"; Rec."Issued Tickets")
+                field("Issued Tickets"; IssuedTicketsCount)
                 {
                     ApplicationArea = All;
-                    DrillDownPageId = "NPR TM Ticket List";
                     ToolTip = 'Specifies the value of the Issued Tickets field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Issued Tickets';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR TM Ticket List");
+                    end;
                 }
-                field("Ticket Requests"; Rec."Ticket Requests")
+                field("Ticket Requests"; TicketRequestsCount)
                 {
                     ApplicationArea = All;
-                    DrillDownPageID = "NPR TM Ticket Request";
                     ToolTip = 'Specifies the value of the Ticket Requests field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Ticket Requests';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR TM Ticket Request");
+                    end;
                 }
-                field("Ticket Types"; Rec."Ticket Types")
+                field("Ticket Types"; TicketTypesCount)
                 {
                     ApplicationArea = All;
-                    DrillDownPageId = "NPR TM Ticket Type";
                     ToolTip = 'Specifies the value of the Ticket Type field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Ticket Types';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR TM Ticket Type");
+                    end;
                 }
-                field("Ticket Admission BOM"; Rec."Ticket Admission BOM")
+                field("Ticket Admission BOM"; TicketAdmissionBOMCount)
                 {
                     ApplicationArea = All;
-                    DrillDownPageID = "NPR TM Ticket BOM";
                     ToolTip = 'Specifies the value of the Ticket BOM field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Ticket BOM';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR TM Ticket BOM");
+                    end;
                 }
-                field("Ticket Schedules"; Rec."Ticket Schedules")
+                field("Ticket Schedules"; TicketSchedulesCount)
                 {
                     ApplicationArea = All;
-                    DrillDownPageID = "NPR TM Ticket Schedules";
                     ToolTip = 'Specifies the value of the Ticket Schedules field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Ticket Schedules';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR TM Ticket Schedules");
+                    end;
                 }
-                field("Ticket Admissions"; Rec."Ticket Admissions")
+                field("Ticket Admissions"; TicketAdmissionsCount)
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR TM Ticket Admissions";
                     ToolTip = 'Specifies the value of the Ticket Admissions field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Ticket Admissions';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR TM Ticket Admissions");
+                    end;
                 }
             }
             cuegroup(Members)
             {
                 Caption = 'Members';
-                field(Control6; Rec.Members)
+                field(Control6; MembersCount)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Members field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Members';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR MM Members");
+                    end;
                 }
-                field(Memberships; Rec.Memberships)
+                field(Memberships; MembershipsCount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Memberships field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Memberships';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR MM Memberships");
+                    end;
                 }
-                field(Membercards; Rec.Membercards)
+                field(Membercards; MembercardsCount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membercards field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Member Cards';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR MM Member Card List");
+                    end;
                 }
             }
 
             cuegroup(Master)
             {
                 Caption = 'Master';
-                field(Items; Rec.Items)
+                field(Items; ItemCount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Items field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Items';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"Item List");
+                    end;
                 }
-                field(Contacts; Rec.Contacts)
+
+                field(Contacts; ContactCount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contacts field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Contacts';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"Contact List");
+                    end;
+
                 }
-                field(Customers; Rec.Customers)
+                field(Customers; CustomerCount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customers field';
+                    DecimalPlaces = 0 : 0;
+                    Caption = 'Customers';
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"Customer List");
+                    end;
                 }
+
+
 
             }
         }
@@ -99,6 +170,30 @@
             Rec.Init();
             Rec.Insert();
         end;
+
+        Rec.CalcFields("Issued Tickets", "Ticket Requests", "Ticket Types", "Ticket Admission BOM", "Ticket Schedules", "Ticket Admissions");
+        IssuedTicketsCount := Rec."Issued Tickets";
+        TicketRequestsCount := Rec."Ticket Requests";
+        TicketTypesCount := Rec."Ticket Types";
+        TicketAdmissionBOMCount := Rec."Ticket Admission BOM";
+        TicketSchedulesCount := Rec."Ticket Schedules";
+        TicketAdmissionsCount := Rec."Ticket Admissions";
+        Rec.CalcFields(Members, Memberships, Membercards);
+        MembersCount := Rec.Members;
+        MembershipsCount := Rec.Memberships;
+        MembercardsCount := Rec.Membercards;
+        Rec.CalcFields(Items, Contacts, Customers);
+        ItemCount := Rec.Items;
+        ContactCount := Rec.Contacts;
+        CustomerCount := Rec.Customers;
     end;
+
+    var
+
+        IssuedTicketsCount, TicketRequestsCount, TicketTypesCount, TicketAdmissionBOMCount, TicketSchedulesCount, TicketAdmissionsCount : Decimal;
+        MembersCount, MembershipsCount, MembercardsCount : Decimal;
+        ItemCount, CustomerCount, ContactCount : Decimal;
+
+
 }
 
