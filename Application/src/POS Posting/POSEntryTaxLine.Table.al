@@ -143,7 +143,6 @@ table 6150629 "NPR POS Entry Tax Line"
         {
             CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Entry Date';
-            Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -151,7 +150,6 @@ table 6150629 "NPR POS Entry Tax Line"
         {
             CalcFormula = Lookup("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Starting Time';
-            Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -159,7 +157,13 @@ table 6150629 "NPR POS Entry Tax Line"
         {
             CalcFormula = Lookup("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Ending Time';
-            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(630; "Document No."; Code[20])
+        {
+            CalcFormula = Lookup("NPR POS Entry"."Document No." WHERE("Entry No." = FIELD("POS Entry No.")));
+            Caption = 'Document No.';
             Editable = false;
             FieldClass = FlowField;
         }
