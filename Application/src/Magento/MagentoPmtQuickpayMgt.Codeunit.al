@@ -46,18 +46,6 @@
         SendWebRequest(HttpWebRequest);
     end;
 
-    local procedure Cancel(PaymentLine: Record "NPR Magento Payment Line")
-    var
-        JsonBody: JsonObject;
-        HttpWebRequest: HttpRequestMessage;
-        RequestBodyText: Text;
-    begin
-        JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
-        JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post"(), PaymentLine, "ServiceName.Cancel"(), RequestBodyText);
-        SendWebRequest(HttpWebRequest);
-    end;
-
     local procedure Refund(PaymentLine: Record "NPR Magento Payment Line")
     var
         JsonBody: JsonObject;
@@ -158,7 +146,7 @@
     end;
 
     #endregion
-
+# pragma warning disable AA0228
     local procedure "RequestMethod.Post"(): Text
     begin
         exit('POST');
@@ -174,20 +162,17 @@
         exit('id');
     end;
 
-    local procedure "ServiceName.Cancel"(): Text
-    begin
-        exit('cancel');
-    end;
-
     local procedure "ServiceName.Capture"(): Text
     begin
         exit('capture');
     end;
 
+
     local procedure "ServiceName.Refund"(): Text
     begin
         exit('refund');
     end;
+# pragma warning disable AA0228
 
     procedure IsNaviConnectPayment(var SalesHeader: Record "Sales Header"): Boolean
     var

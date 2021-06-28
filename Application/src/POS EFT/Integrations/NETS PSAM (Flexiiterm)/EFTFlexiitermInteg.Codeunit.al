@@ -20,10 +20,6 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         exit('FLEXIITERM');
     end;
 
-    local procedure "// EFT Interface implementation"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -108,20 +104,12 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         EFTFlexiitermProtocol.SendRequest(EftTransactionRequest);
     end;
 
-    local procedure "// Protocol Response"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184516, 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
     begin
         EFTInterface.EftIntegrationResponse(EFTTransactionRequest);
-    end;
-
-    local procedure "// Aux"()
-    begin
     end;
 
     procedure GetPOSDescription(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text

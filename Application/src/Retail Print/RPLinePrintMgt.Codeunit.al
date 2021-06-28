@@ -288,10 +288,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         ClearState();
     end;
 
-    local procedure "// Locals"()
-    begin
-    end;
-
     local procedure GetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer): Text
     var
         DeviceType: Text;
@@ -700,13 +696,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
             SetFourColumnDistribution(TemplateHeader."Four Column Width 1", TemplateHeader."Four Column Width 2", TemplateHeader."Four Column Width 3", TemplateHeader."Four Column Width 4");
     end;
 
-    local procedure ResetColumnDistributions()
-    begin
-        Clear(TwoColumnDistribution);
-        Clear(ThreeColumnDistribution);
-        Clear(FourColumnDistribution);
-    end;
-
     local procedure SetDefaultDistributions()
     begin
         if TwoColumnDistribution[1] = 0 then
@@ -782,10 +771,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         Clear(SkipColumnsAboveNo);
         Clear(SkipRemainingColumns);
         //+NPR5.55 [391841]
-    end;
-
-    local procedure "// Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

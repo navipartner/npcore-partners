@@ -345,28 +345,6 @@
         NextColumNo := ColumnNo + 1;
     end;
 
-    local procedure EnterFilterInCell("Filter": Text[250]; Field_Name: Text[100])
-    begin
-        if Filter <> '' then begin
-            RowNo := RowNo + 1;
-            EnterCell(RowNo, 1, Field_Name, false, false, '', ExcelBuf."Cell Type"::Text);
-            EnterCell(RowNo, 2, Filter, false, false, '', ExcelBuf."Cell Type"::Text);
-        end;
-    end;
-
-    local procedure EnterFormula(RowNo: Integer; ColumnNo: Integer; CellValue: Text[250]; Bold: Boolean; UnderLine: Boolean; NumberFormat: Text[30])
-    begin
-        ExcelBuf.Init();
-        ExcelBuf.Validate("Row No.", RowNo);
-        ExcelBuf.Validate("Column No.", ColumnNo);
-        ExcelBuf."Cell Value as Text" := '';
-        ExcelBuf.Formula := CellValue; // is converted to formula later.
-        ExcelBuf.Bold := Bold;
-        ExcelBuf.Underline := UnderLine;
-        ExcelBuf.NumberFormat := NumberFormat;
-        ExcelBuf.Insert();
-    end;
-
     local procedure MapAllColumns(RowNo: Integer; TableNo: Integer; Bold: Boolean; UnderLine: Boolean; NumberFormat: Text[30])
     var
         RecField: Record "Field";

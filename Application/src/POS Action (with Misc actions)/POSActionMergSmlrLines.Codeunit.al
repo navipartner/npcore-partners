@@ -61,9 +61,6 @@ then begin
         Handled := true;
     end;
 
-    local procedure "--- Adiacent functions"()
-    begin
-    end;
 
     local procedure ColapseSaleLines(SalePOS: Record "NPR POS Sale")
     var

@@ -84,10 +84,6 @@ then begin
         Handled := true;
     end;
 
-    local procedure "--- Adiacent functions"()
-    begin
-    end;
-
     local procedure RunModalPage(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"; SingleLine: Boolean)
     var
         POSEntries: Page "NPR POS Entries";

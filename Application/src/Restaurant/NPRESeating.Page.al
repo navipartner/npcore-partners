@@ -115,34 +115,4 @@
         }
     }
 
-    local procedure ActionViewLinkedWaiterPad()
-    var
-        SeatingWaiterPadLinkPage: Page "NPR NPRE Seat.: WaiterPadLink";
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-    begin
-        SeatingWaiterPadLink.Reset();
-        SeatingWaiterPadLink.SetRange("Seating Code", Rec.Code);
-
-        Clear(SeatingWaiterPadLinkPage);
-        SeatingWaiterPadLinkPage.SetTableView(SeatingWaiterPadLink);
-        SeatingWaiterPadLinkPage.RunModal();
-    end;
-
-    local procedure ActionAddWaiterPad()
-    var
-        WaiterPadList: Page "NPR NPRE Waiter Pad List";
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
-    begin
-        //Get a waiter pad to add to seating
-        Clear(WaiterPadList);
-        WaiterPad.Reset();
-        WaiterPadList.SetTableView(WaiterPad);
-        WaiterPadList.LookupMode(true);
-        WaiterPadList.Editable(false);
-        if WaiterPadList.RunModal() = ACTION::LookupOK then begin
-            WaiterPadList.GetRecord(WaiterPad);
-            WaiterPadManagement.LinkSeatingToWaiterPad(WaiterPad."No.", Rec.Code);
-        end;
-    end;
 }

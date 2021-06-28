@@ -91,11 +91,5 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         exit(NcTask.Insert(true));
     end;
 
-    local procedure ScheduleTaskProcessing(NcTask: Record "NPR Nc Task")
-    var
-        NewSessionId: Integer;
-    begin
-        SESSION.StartSession(NewSessionId, CODEUNIT::"NPR NpGp POS Session Mgt.", CompanyName, NcTask);
-    end;
 }
 

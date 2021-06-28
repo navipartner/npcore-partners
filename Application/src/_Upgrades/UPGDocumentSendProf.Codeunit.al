@@ -50,7 +50,7 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
             DocSendProfile."E-Mail" := DocSendProfile."E-Mail"::"Yes (Prompt for Settings)";
             DocSendProfile."E-Mail Attachment" := DocSendProfile."E-Mail Attachment"::PDF;
             DocSendProfile.Insert(true);
-        end; 
+        end;
         EmailProfileCode := DocSendProfile.Code;
 
         if not HavePrintProfile(DocSendProfile) then begin
@@ -74,6 +74,7 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
             OIOProfileCode := DocSendProfile.Code;
     end;
 
+# pragma warning disable AA0228
     local procedure UpgradeCustomerDocumentSendingProfiles()
     var
         Customer: Record Customer;
@@ -135,6 +136,7 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
                 end;
             until Vendor.Next() = 0;
     end;
+# pragma warning restore
 
     local procedure HavePrintProfile(var DocSendProfilePar: Record "Document Sending Profile"): Boolean
     begin

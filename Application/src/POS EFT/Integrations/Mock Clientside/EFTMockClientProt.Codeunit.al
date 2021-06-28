@@ -29,10 +29,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
         exit('MOCK_CLIENT_SIDE');
     end;
 
-    local procedure "// Stargate Requests"()
-    begin
-    end;
-
     procedure SendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
         case EftTransactionRequest."Processing Type" of
@@ -233,10 +229,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         FrontEnd.InvokeDevice(Request, ActionCode(), 'EftRequest');
-    end;
-
-    local procedure "// Stargate Responses"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', false, false)]
@@ -478,10 +470,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
         EftTransactionRequest."Result Display Text" := CopyStr(State.ResultString, 1, MaxStrLen(EftTransactionRequest."Result Display Text"));
     end;
 
-    local procedure "// Aux"()
-    begin
-    end;
-
     local procedure SetConnectionInitState(var State: DotNet NPRNetState5; EFTSetup: Record "NPR EFT Setup")
     var
         ConnectionMethod: Integer;
@@ -559,10 +547,6 @@ codeunit 6184512 "NPR EFT Mock Client Prot."
             EntryNo += 1;
             Line := StringReader.ReadLine();
         end;
-    end;
-
-    local procedure "// Event Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

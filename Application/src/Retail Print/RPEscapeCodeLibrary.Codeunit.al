@@ -376,10 +376,6 @@ codeunit 6014540 "NPR RP Escape Code Library"
         ReturnPattern := String.PadStrLeft(GetBitPattern(Integer), PatternLength, '0', false);
     end;
 
-    local procedure "-- Init Functions"()
-    begin
-    end;
-
     local procedure Initialize()
     begin
         cNUL := 0;

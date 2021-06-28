@@ -402,19 +402,6 @@
         exit(Result);
     end;
 
-    local procedure CheckHandlerListForDuplicates(var ListOfText: List of [Text])
-    var
-        ChecklistList: List of [Text];
-        i: Integer;
-        Value: Text;
-    begin
-        for i := 1 to ListOfText.Count() do begin
-            ListOfText.Get(i, Value);
-            if not ChecklistList.Contains(Value) then
-                ChecklistList.Add(Value);
-        end;
-        ListOfText := ChecklistList;
-    end;
     #endregion
     #region Event Publishers
     [IntegrationEvent(false, false)]

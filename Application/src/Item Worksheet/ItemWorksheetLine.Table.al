@@ -2022,18 +2022,6 @@ table 6060042 "NPR Item Worksheet Line"
         exit('');
     end;
 
-    local procedure GetItem()
-    begin
-        if not Item.Get("Existing Item No.") then begin
-            if Item."No." <> '' then
-                Clear(Item);
-            exit;
-        end;
-
-        if "Item No." <> Item."No." then
-            Item.Get("Item No.");
-    end;
-
     procedure GetNewItemNo(): Code[20]
     var
         InventorySetup: Record "Inventory Setup";
@@ -2415,21 +2403,6 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheetVarietyValue.Value := '';
             ItemWorksheetVarietyValue.Insert();
         end;
-    end;
-
-    local procedure VariantExists(ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line"): Boolean
-    var
-        ItemWorksheetVariantLine2: Record "NPR Item Worksh. Variant Line";
-    begin
-        ItemWorksheetVariantLine2.Reset();
-        ItemWorksheetVariantLine2.SetRange("Worksheet Template Name", ItemWorksheetVariantLine."Worksheet Template Name");
-        ItemWorksheetVariantLine2.SetRange("Worksheet Name", ItemWorksheetVariantLine."Worksheet Name");
-        ItemWorksheetVariantLine2.SetRange("Worksheet Line No.", ItemWorksheetVariantLine."Worksheet Line No.");
-        ItemWorksheetVariantLine2.SetRange("Variety 1 Value", ItemWorksheetVariantLine."Variety 1 Value");
-        ItemWorksheetVariantLine2.SetRange("Variety 2 Value", ItemWorksheetVariantLine."Variety 2 Value");
-        ItemWorksheetVariantLine2.SetRange("Variety 3 Value", ItemWorksheetVariantLine."Variety 3 Value");
-        ItemWorksheetVariantLine2.SetRange("Variety 4 Value", ItemWorksheetVariantLine."Variety 4 Value");
-        exit(ItemWorksheetVariantLine2.FindFirst());
     end;
 
     procedure UpdateVarietyHeadingText()
@@ -3083,77 +3056,6 @@ table 6060042 "NPR Item Worksheet Line"
                     end;
                 end;
             end;
-        end;
-        exit(true);
-    end;
-
-    local procedure ValidateFieldText(SourceText: Text; TargetFldRef: FieldRef): Boolean
-    var
-        TmpDateFormula: DateFormula;
-        TmpBool: Boolean;
-        TmpDate: Date;
-        TmpDateTime: DateTime;
-        TmpDecimal: Decimal;
-        TmpInteger: Integer;
-        TmpTime: Time;
-    begin
-        case UpperCase(Format(TargetFldRef.Type)) of
-            'TEXT', 'CODE':
-                TargetFldRef.Validate(Format(SourceText));
-            'INTEGER':
-                if Evaluate(TmpInteger, Format(SourceText)) then begin
-                    TargetFldRef.Validate(TmpInteger);
-                end else
-                    exit(false);
-            'OPTION':
-                if Evaluate(TmpInteger, Format(SourceText)) then begin
-                    if TmpInteger <> 9 then
-                        TargetFldRef.Validate(TmpInteger);
-                end else
-                    exit(false);
-            'DECIMAL':
-                if Evaluate(TmpDecimal, Format(SourceText)) then begin
-                    TargetFldRef.Validate(TmpDecimal);
-                end else
-                    exit(false);
-            'DATE':
-                if Evaluate(TmpDate, Format(SourceText)) then begin
-                    TargetFldRef.Validate(TmpDate);
-                end else
-                    exit(false);
-            'TIME':
-                if Evaluate(TmpTime, Format(SourceText)) then begin
-                    TargetFldRef.Validate(TmpTime);
-                end else
-                    exit(false);
-            'DATETIME':
-                if Evaluate(TmpDateTime, Format(SourceText)) then begin
-                    TargetFldRef.Validate(TmpDateTime);
-                end else
-                    exit(false);
-            'BOOLEAN':
-                if Evaluate(TmpInteger, Format(SourceText)) then begin
-                    case TmpInteger of
-                        0:
-                            begin
-                                TmpBool := false;
-                                TargetFldRef.Validate(TmpBool);
-                            end;
-                        1:
-                            begin
-                                TmpBool := true;
-                                TargetFldRef.Validate(TmpBool);
-                            end;
-                    end;
-                end else begin
-                    if Evaluate(TmpBool, Format(SourceText)) then
-                        TargetFldRef.Validate(TmpBool);
-                end;
-            'DATEFORMULA':
-                if Evaluate(TmpDateFormula, Format(SourceText)) then begin
-                    TargetFldRef.Validate(TmpDateFormula);
-                end else
-                    exit(false);
         end;
         exit(true);
     end;

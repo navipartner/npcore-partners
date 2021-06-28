@@ -174,22 +174,5 @@ report 6060044 "NPR Map Excel Item Worksh."
             until ExcelBuf.Next() = 0;
     end;
 
-    local procedure FormatData(TextToFormat: Text[250]): Text[250]
-    var
-        FormatDate: Date;
-        FormatDecimal: Decimal;
-        FormatInteger: Integer;
-    begin
-        case true of
-            Evaluate(FormatInteger, TextToFormat):
-                exit(Format(FormatInteger));
-            Evaluate(FormatDecimal, TextToFormat):
-                exit(Format(FormatDecimal));
-            Evaluate(FormatDate, TextToFormat):
-                exit(Format(FormatDate));
-            else
-                exit(TextToFormat);
-        end;
-    end;
 }
 

@@ -143,19 +143,6 @@
         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
     end;
 
-
-
-
-
-
-    local procedure GetPaidSalesInvoices(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-        CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
-        CustLedgerEntry.SetRange(Open, false);
-        CustLedgerEntry.SetRange("Posting Date", CalcDate('<CM-3M>', GetDefaultWorkDate()), GetDefaultWorkDate());
-        CustLedgerEntry.SetRange("Closed at Date", CalcDate('<CM-3M>', GetDefaultWorkDate()), GetDefaultWorkDate());
-    end;
-
     procedure CalcCashAccountsBalances() CashAccountBalance: Decimal
     var
         GLAccount: Record "G/L Account";

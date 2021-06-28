@@ -65,10 +65,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         PrinterInitialized: Boolean;
         LabelHeight: Integer;
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
     local procedure DeviceCode(): Text
     begin
         exit('EPSON');
@@ -134,10 +130,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         tmpRetailList.Value := DeviceCode();
         tmpRetailList.Choice := DeviceCode();
         tmpRetailList.Insert();
-    end;
-
-    local procedure "// Shorthand function"()
-    begin
     end;
 
     procedure InitJob()
@@ -297,38 +289,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
     end;
 
-    local procedure PrintControlChar(Char: Text[1])
-    begin
-        case Char of
-            'G':
-                PrintDefaultLogo();
-            'P':
-                SelectCutModeAndCutPaper(66, 3);//papercut
-            'A':
-                GeneratePulse(0, 25, 25);
-            'B':
-                GeneratePulse(0, 50, 50);
-            'C':
-                GeneratePulse(0, 75, 75);
-            'D':
-                GeneratePulse(0, 100, 100);
-            'E':
-                GeneratePulse(0, 125, 125);
-            'a':
-                GeneratePulse(1, 25, 25);
-            'b':
-                GeneratePulse(1, 50, 50);
-            'c':
-                GeneratePulse(1, 75, 75);
-            'd':
-                GeneratePulse(1, 100, 100);
-            'e':
-                GeneratePulse(1, 125, 125);
-            'h':
-                PrintAltDefaultLogo();
-        end;
-    end;
-
     procedure SetFontStretch(Height: Integer; Width: Integer)
     var
         n: Char;
@@ -402,35 +362,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer('CAN');
     end;
 
-    local procedure "// Advanced Functions"()
-    begin
-    end;
-
-    local procedure Barcode()
-    begin
-    end;
-
-    local procedure CancelUserDefinedCharacters(n: Char)
-    begin
-        // Ref sheet 116
-        TempPattern := 'ESC ? %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure DefineUserDefindCharacters(y: Char; c1: Char; c2: Char)
-    begin
-        // Ref sheet 112
-        TempPattern := 'ESC & %1 %2 %3';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(y), ESC.C2ESC(c1), ESC.C2ESC(c2)));
-    end;
-
-    local procedure ExecuteTestPrint(pL: Char; pH: Char; n: Integer; m: Integer)
-    begin
-        // Ref sheet 135
-        TempPattern := 'GS ( A %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(pL), ESC.C2ESC(pH), n, m));
-    end;
-
     local procedure FeedLabelToPosition(pL: Char; pH: Char; fn: Char; m: Char)
     begin
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=48
@@ -467,34 +398,12 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, m, ESC.C2ESC(t1), ESC.C2ESC(t2)));
     end;
 
-    local procedure PrintAndFeedPaper(n: Char)
-    begin
-        // Ref sheet 118
-        TempPattern := 'ESC J %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure PrintAndFeedNLines(n: Char)
-    begin
-        // Ref sheet 123
-        TempPattern := 'ESC t %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
     local procedure PrintBarCodeA(m: Char; "d1..dk": Text[30])
     begin
         // Ref sheet 190 m in [0-6]
         // 0; UPC-A, 1: UPC-1, 2; EAN13, 3; JAN8, 4; CODE39
         // 5; ITF, 6; CODABAR(NW-7)
         TempPattern := 'GS k %1 %2 NUL';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(m), "d1..dk"));
-    end;
-
-    local procedure PrintBarCodeB(m: Char; "d1..dk": Text[30])
-    begin
-        // Ref sheet 191 m in [A-N]
-        //
-        TempPattern := 'GS k %1 %2';
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(m), "d1..dk"));
     end;
 
@@ -520,20 +429,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(pL), ESC.C2ESC(pH), ESC.C2ESC(m), ESC.C2ESC(fn), ESC.C2ESC(kc1), ESC.C2ESC(kc2), ESC.C2ESC(x), ESC.C2ESC(y)));
     end;
 
-    local procedure SelectBitImageMode(m: Char; nL: Char; nH: Char; "d1..dk": Text[50])
-    begin
-        // Ref sheet 115
-        TempPattern := 'ESC * %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(m), ESC.C2ESC(nL), ESC.C2ESC(nH), "d1..dk"));
-    end;
-
-    local procedure SelectCancelUserDefinedCharSet(n: Char)
-    begin
-        // Ref sheet 110
-        TempPattern := 'ESC % ' + ESC.C2ESC(n);
-        AddToBuffer(TempPattern);
-    end;
-
     local procedure SelectCharacterCodeTable(n: Char)
     begin
         // Ref sheet 125, 16 = Windows-1252, NAV danish superset.
@@ -548,13 +443,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
     end;
 
-    local procedure SelectHRICharacterFont(n: Integer)
-    begin
-        // Ref sheet 118 (n in [0,1])
-        TempPattern := 'GS f %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
     local procedure SelectCharacterSize(n: Char)
     begin
         // Ref sheet 134
@@ -566,38 +454,11 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
     end;
 
-    local procedure SelectCutModeAndCutPaper(m: Char; n: Char)
-    begin
-        // Ref sheet 184
-        TempPattern := 'GS V %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(m), ESC.C2ESC(n)));
-    end;
-
     local procedure SelectDefaultLineSpacing()
     begin
         // Ref sheet 115
         TempPattern := 'ESC 2';
         AddToBuffer(TempPattern);
-    end;
-
-    local procedure SelectInternationalCharSet(n: Char)
-    begin
-        // Ref sheet 119 (n in [0,17])
-        TempPattern := 'ESC R %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure SelectJustification(n: Integer)
-    begin
-        TempPattern := 'ESC a %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure SelectPeripheralDevice(n: Char)
-    begin
-        // Ref sheet 111
-        TempPattern := 'ESC = %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
     end;
 
     local procedure SelectPageMode()
@@ -607,46 +468,11 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer(TempPattern);
     end;
 
-    local procedure SelectPrintMode(n: Char)
-    begin
-        // Ref sheet 111
-        TempPattern := 'ESC ! %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure SelectPrintSpeed(K: Char; pL: Char; pH: Char; fn: Char; m: Char)
-    begin
-        // Ref sheet 149, pL + pH x 256 = 2
-        TempPattern := 'GS ( %1 %2 %3 %4 %5';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(K), ESC.C2ESC(pL), ESC.C2ESC(pH), ESC.C2ESC(fn), ESC.C2ESC(m)));
-    end;
-
-    local procedure SelectStandardMode()
-    begin
-        // Ref sheet 119
-        TempPattern := 'ESC S';
-        AddToBuffer(TempPattern);
-    end;
-
     local procedure SelectPrintDirectInPageMode(n: Integer)
     begin
         // Ref sheet 120  (n in[0,1,2,3])
         TempPattern := 'ESC T %1';
         AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure SetAbsolutePrintPosition(nL: Char; nH: Char)
-    begin
-        // Ref sheet 111
-        TempPattern := 'ESC $ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetAbsVerticalPrintPos(nL: Char; nH: Char)
-    begin
-        // Ref sheet 134 LSB of   0 <= nL, nH <= 255
-        TempPattern := 'GS $ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
     end;
 
     local procedure SetBarCodeHeight(n: Char)
@@ -670,27 +496,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(x), ESC.C2ESC(y)));
     end;
 
-    local procedure SetHorizontalTabPositions("n1..nk": Text[50])
-    begin
-        // Ref sheet 117
-        TempPattern := 'ESC D %1 NUL';
-        AddToBuffer(StrSubstNo(TempPattern, "n1..nk"));
-    end;
-
-    local procedure SetLeftMargin(nL: Char; nH: Char)
-    begin
-        // Ref sheet 183
-        TempPattern := 'GS L %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetLineSpacing(n: Char)
-    begin
-        // Ref sheet 116
-        TempPattern := 'ESC 3 %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
     local procedure SetPrintAreaInPageMode(xL: Char; xH: Char; yL: Char; yH: Char; dxL: Char; dxH: Char; dyL: Char; dyH: Char)
     begin
         // Ref sheet 121
@@ -698,39 +503,11 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         AddTextToBuffer(Format(xL) + Format(xH) + Format(yL) + Format(yH) + Format(dxL) + Format(dxH) + Format(dyL) + Format(dyH));
     end;
 
-    local procedure SetPrintAreaWidth(nL: Char; nH: Char)
-    begin
-        // Ref sheet 184
-        TempPattern := 'GS W %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetPrintPosToLineBeginning(n: Char)
-    begin
-        //https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=61
-        TempPattern := 'GS T %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure SetRelativePrintPosition(nL: Char; nH: Char)
-    begin
-        // Ref sheet 121
-        TempPattern := 'ESC \ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
     local procedure SetRelativeVerticalPrintPos(nL: Char; nH: Char)
     begin
         // Ref sheet 184
         TempPattern := 'GS \ %1 %2';
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetRightSideCharacterSpacing(n: Char)
-    begin
-        // Ref sheet 110
-        TempPattern := 'ESC SP %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)))
     end;
 
     local procedure Text(Type: Text; Rotation: Integer; X: Integer; Y: Integer; Height: Integer; Bold: Boolean; TextIn: Text)
@@ -795,13 +572,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
             SelectPrintDirectInPageMode(0);
     end;
 
-    local procedure TurnDoubleStrikeModeOnOff(n: Integer)
-    begin
-        // Ref sheet 118 (n in [0,1])
-        TempPattern := 'ESC G %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
     local procedure TurnExphasizedModeOnOff(n: Integer)
     begin
         // Ref sheet 117 (n in [0,1])
@@ -813,20 +583,6 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
     begin
         // Ref sheet 117
         TempPattern := 'ESC - %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure TurnUpsideDownPrintOnOff(n: Char)
-    begin
-        // Ref sheet 126 LSB of n is 1 = turn on
-        TempPattern := 'ESC { %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure Turn90ClockWiserRotModeOnOff(n: Integer)
-    begin
-        // Ref sheet 120 (n in [0,1]
-        TempPattern := 'ESC V %1';
         AddToBuffer(StrSubstNo(TempPattern, n));
     end;
 
@@ -962,18 +718,9 @@ codeunit 6014537 "NPR RP Epson Label Device Lib."
         RetailList.Insert();
     end;
 
-    local procedure "// Aux Functions"()
-    begin
-    end;
-
     local procedure AddToBuffer(Text: Text[1024])
     begin
         ESC.WriteSequenceToBuffer(Text, PrintBuffer);
-    end;
-
-    local procedure AddCharToBuffer(CharCode: Integer)
-    begin
-        PrintBuffer += Format(CharCode);
     end;
 
     local procedure AddTextToBuffer(Text: Text[1024])

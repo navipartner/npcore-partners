@@ -130,16 +130,6 @@ codeunit 6014580 "NPR Object Output Mgt."
         exit(true);
     end;
 
-    local procedure FindLocalPrinterName(PrinterName: Text): Text
-    var
-        RedirectedText: Text;
-    begin
-        RedirectedText := ' (redirected';
-        if StrPos(PrinterName, RedirectedText) > 0 then
-            exit(CopyStr(PrinterName, 1, StrPos(PrinterName, RedirectedText) - 1));
-        exit(PrinterName);
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6014547, 'OnSendPrintJob', '', false, false)]
     local procedure OnSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
     var

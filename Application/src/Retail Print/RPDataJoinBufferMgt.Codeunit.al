@@ -208,10 +208,6 @@
                     Buffer.SetRange("Unique Record No.");
     end;
 
-    local procedure "// Aux"()
-    begin
-    end;
-
     local procedure SetRootSubsetFilter(RootNo: Integer): Boolean
     var
         TempRecordNo: Integer;
@@ -255,10 +251,6 @@
     procedure SetDecimalRounding(DecimalRoundingIn: Option "2","3","4","5")
     begin
         DecimalRounding := DecimalRoundingIn;
-    end;
-
-    local procedure "// Locals"()
-    begin
     end;
 
     local procedure ProcessDataItem(ParentDataItem: Record "NPR RP Data Items"; var ParentRecRef: RecordRef): Boolean

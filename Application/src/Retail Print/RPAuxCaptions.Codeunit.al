@@ -21,19 +21,11 @@ codeunit 6014551 "NPR RP Aux: Captions"
         Caption_WarrantyProof: Label 'Proof of Warranty';
         Caption_TestEnvironment: Label 'TEST - NOT VALID SALES';
 
-    local procedure "// Locals"()
-    begin
-    end;
-
     local procedure AddFunction(var tmpRetailList: Record "NPR Retail List" temporary; Choice: Text)
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := Choice;
         tmpRetailList.Insert();
-    end;
-
-    local procedure "// Event Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionCodeunitList', '', false, false)]

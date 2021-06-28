@@ -10,10 +10,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
     local procedure ActionCode(): Text
     begin
         exit('MM_MEMBER_ARRIVAL');
@@ -121,10 +117,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         Handled := true;
     end;
 
-    local procedure "--Workers"()
-    begin
-    end;
-
     local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20])
     var
         Member: Record "NPR MM Member";
@@ -200,10 +192,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
         ExtMemberCardNo := MemberCard."External Card No.";
         exit(ExtMemberCardNo <> '');
-    end;
-
-    local procedure "--- Ean Box Event Handling"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]

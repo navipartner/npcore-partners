@@ -581,11 +581,13 @@ report 6014432 "NPR Customer Analysis"
         CustomerFilter: Text[250];
         Pct1Lbl: Label '%1%', locked = true;
 
+# pragma warning disable AA0228
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
     begin
         if Tal2 = 0 then
             exit(0);
         exit(Round(Tal1 / Tal2 * 100, 0.1));
     end;
+# pragma warning restore
 }
 

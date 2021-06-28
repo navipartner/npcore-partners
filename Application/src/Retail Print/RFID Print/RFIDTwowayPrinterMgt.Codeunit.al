@@ -72,10 +72,6 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
         RetailReportSelectionMgt.RunObjects(RecRef, ReportType);
     end;
 
-    local procedure "// Publishers"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnHandleRFIDBuffer(HandlerCodeunit: Integer; var tmpRFIDPrintBuffer: Record "NPR RFID Print Buffer" temporary)
     begin
@@ -83,10 +79,6 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
 
     [IntegrationEvent(false, false)]
     procedure OnSetRFIDHandlerCodeunit(CodeunitID: Integer)
-    begin
-    end;
-
-    local procedure "// Subscribers"()
     begin
     end;
 

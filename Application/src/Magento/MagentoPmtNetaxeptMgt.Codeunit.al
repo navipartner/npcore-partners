@@ -244,6 +244,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
 
     #endregion
 
+# pragma warning disable AA0228
     local procedure "ServiceName.Cancel"(): Text
     begin
         exit('annul');
@@ -258,4 +259,5 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
     begin
         exit('credit');
     end;
+# pragma warning restore
 }

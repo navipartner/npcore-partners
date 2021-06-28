@@ -705,28 +705,6 @@
 
     end;
 
-    local procedure CreatePOSPostingLogEntry(var POSEntry: Record "NPR POS Entry"; ErrorReason: Text): Integer
-    var
-        POSPostingLog: Record "NPR POS Posting Log";
-        LastPOSEntry: Record "NPR POS Entry";
-    begin
-
-        LastPOSEntry.Reset();
-        LastPOSEntry.FindLast();
-
-        POSPostingLog.Init();
-        POSPostingLog."Entry No." := 0;
-        POSPostingLog."User ID" := UserId;
-        POSPostingLog."Posting Timestamp" := CurrentDateTime;
-        POSPostingLog."With Error" := true;
-        POSPostingLog."Error Description" := CopyStr(ErrorReason, 1, MaxStrLen(POSPostingLog."Error Description"));
-        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
-        POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
-        POSPostingLog.Insert(true);
-        exit(POSPostingLog."Entry No.");
-
-    end;
-
     local procedure StoreCountedDenominations(UnitNo: Code[10]; WorkshiftEntryNo: Integer)
     var
         EODDenomination: Record "NPR EOD Denomination";

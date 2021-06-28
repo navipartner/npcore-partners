@@ -153,10 +153,6 @@ then begin
         JSON.SetContext('ReturnReason', ReturnReason.Code);
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
-
     local procedure PerformAdjustInventory(POSSession: Codeunit "NPR POS Session"; Quantity: Decimal; ReturnReasonCode: Code[10])
     var
         TempItemJnlLine: Record "Item Journal Line" temporary;

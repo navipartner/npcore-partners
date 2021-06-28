@@ -22,10 +22,6 @@ codeunit 6151121 "NPR MM GDPR Management"
         MISSING_APPROVAL: Label 'The GDPR setup for this membership type require that GDPR terms must be approved prior to member creation. Member %1 has not approved the GDPR terms yet.';
         HideDialog: Boolean;
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterMemberCreateEvent', '', true, true)]
     local procedure OnNewMember(var Membership: Record "NPR MM Membership"; var Member: Record "NPR MM Member")
     var
@@ -69,10 +65,6 @@ codeunit 6151121 "NPR MM GDPR Management"
                 OnMembershipGDPRAgreementChangeWorker(MembershipSetup.Code, '', AgreementNo);
             until (MembershipSetup.Next() = 0);
         end;
-    end;
-
-    local procedure "--Workers"()
-    begin
     end;
 
     procedure OnMembershipGDPRAgreementChangeWorker(MembershipCode: Code[20]; OldAgreementNo: Code[20]; NewAgreementNo: Code[20])
@@ -333,38 +325,6 @@ codeunit 6151121 "NPR MM GDPR Management"
         Membership.Modify(true); // This will cause a customer sync.
     end;
 
-    local procedure ValidateAnonymizeMembership(MembershipEntryNo: Integer; var ReasonText: Text): Boolean
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        MembershipEntry: Record "NPR MM Membership Entry";
-        ReasonLbl: Label 'Membership with entry no. %1 not found.';
-        Reason2Lbl: Label 'Membership %1 has %2 %3, which is not found in the setup table %4';
-        Reason3Lbl: Label 'Membership %1 has not expired yet.';
-    begin
-
-        if (not Membership.Get(MembershipEntryNo)) then begin
-            ReasonText := StrSubstNo(ReasonLbl, MembershipEntryNo);
-            exit(false);
-        end;
-
-        if (not MembershipSetup.Get(Membership."Membership Code")) then begin
-            ReasonText := StrSubstNo(Reason2Lbl,
-              Membership."External Membership No.", Membership.FieldCaption("Membership Code"), Membership."Membership Code", MembershipSetup.TableCaption);
-            exit(false);
-        end;
-
-        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipEntry.SetFilter(Blocked, '=%1', false);
-        MembershipEntry.SetFilter("Valid Until Date", '>=%1', Today);
-        if (not MembershipEntry.IsEmpty()) then begin
-            ReasonText := StrSubstNo(Reason3Lbl, Membership."External Membership No.");
-            exit(false);
-        end;
-
-        exit(true);
-    end;
-
     local procedure ValidateAnonymizeMemberRole(MembershipEntryNo: Integer; MemberEntryNo: Integer; AgreementCheck: Boolean; var ReasonText: Text): Boolean
     var
         MembershipRole: Record "NPR MM Membership Role";
@@ -443,10 +403,6 @@ codeunit 6151121 "NPR MM GDPR Management"
             MemberInfoCapture."GDPR Approval"::PENDING:
                 GDPRManagement.CreateAgreementPendingEntry(AgreementNo, 0, DataSubjectId);
         end;
-    end;
-
-    local procedure "---"()
-    begin
     end;
 
     local procedure CreateLogEntryMembership(GDPRAgreementNo: Code[20]; GDPRMode: Option; MembershipEntryNo: Integer)

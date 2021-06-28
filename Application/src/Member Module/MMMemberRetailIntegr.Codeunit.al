@@ -853,10 +853,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         end;
     end;
 
-    local procedure "--Helpers for remote memberships"()
-    begin
-    end;
-
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)

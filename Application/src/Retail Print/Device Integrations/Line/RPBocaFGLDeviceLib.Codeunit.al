@@ -117,11 +117,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         yCoord: Integer;
         ySpace: Integer;
 
-    local procedure "// Interface implementation"()
-    begin
-        //PrintBytesLocal(PrinterName : Text;PrintBytes : Text;TargetEncoding : Text)
-    end;
-
     local procedure DeviceCode(): Text
     begin
         exit('BOCA');
@@ -613,10 +608,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
             exit(true);
     end;
 
-    local procedure "// Aux Functions"()
-    begin
-    end;
-
     local procedure InitBuffer()
     begin
         //-NPR5.40 [284505]
@@ -760,18 +751,10 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         RetailList.Insert();
     end;
 
-    local procedure "// Unit Conversions"()
-    begin
-    end;
-
     local procedure Mm2In(mm: Decimal): Decimal
     begin
         exit(mm * 0.03937007874);
     end;
 
-    local procedure In2Mm(inches: Decimal): Decimal
-    begin
-        exit(inches / 0.03937007874);
-    end;
 }
 

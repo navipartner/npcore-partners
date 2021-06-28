@@ -81,10 +81,6 @@ then begin
         exit('1.0');
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure HandleExchangeLabelBarcode(iBarcode: Text; var POSSession: Codeunit "NPR POS Session")
     var
         ExchangeLabelManagement: Codeunit "NPR Exchange Label Mgt.";
@@ -107,10 +103,6 @@ then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.SetFirst();
         end;
-    end;
-
-    local procedure "--- Ean Box Event Handling"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]

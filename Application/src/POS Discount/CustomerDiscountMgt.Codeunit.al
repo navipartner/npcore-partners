@@ -65,10 +65,6 @@
         end;
     end;
 
-    local procedure "--- Subscription"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
     local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
@@ -140,21 +136,5 @@
     local procedure DiscCalcCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Customer Discount Mgt.");
-    end;
-
-    local procedure DiscountLineActiveNow(var SalesLineDiscount: Record "Sales Line Discount"): Boolean
-    var
-        CurrDate: Date;
-    begin
-        if SalesLineDiscount.IsTemporary then
-            exit(false);
-
-        CurrDate := Today();
-        if SalesLineDiscount."Starting Date" > CurrDate then
-            exit(false);
-        if (SalesLineDiscount."Ending Date" > 0D) and (SalesLineDiscount."Ending Date" < CurrDate) then
-            exit(false);
-
-        exit(true);
     end;
 }

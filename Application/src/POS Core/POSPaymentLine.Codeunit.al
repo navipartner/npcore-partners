@@ -36,13 +36,6 @@ codeunit 6150707 "NPR POS Payment Line"
         Initialized := true;
     end;
 
-    local procedure CheckInit(WithError: Boolean): Boolean
-    begin
-        if WithError and (not Initialized) then
-            Error('Codeunit POS Payment Line was invoked in uninitialized state. This is a programming bug, not a user error');
-        exit(Initialized);
-    end;
-
     procedure ToDataset(CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         DataMgt: Codeunit "NPR POS Data Management";

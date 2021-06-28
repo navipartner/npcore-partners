@@ -48,10 +48,6 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
         RunOptionalSelection(ReportSelectionRetail, RecRef);
     end;
 
-    local procedure "-- Settings"()
-    begin
-    end;
-
     procedure SetRegisterNo(RegisterNoIn: Code[10])
     begin
         RegisterNo := RegisterNoIn;
@@ -75,10 +71,6 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
     procedure SetMatrixPrintIterationFieldNo(FieldNo: Integer)
     begin
         MatrixPrintIterationFieldNo := FieldNo;
-    end;
-
-    local procedure "-- Aux"()
-    begin
     end;
 
     local procedure RunOptionalSelection(var ReportSelection: Record "NPR Report Selection Retail"; var RecRefIn: RecordRef)

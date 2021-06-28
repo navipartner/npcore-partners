@@ -32,10 +32,6 @@
         exit('ADYEN_CLOUD');
     end;
 
-    local procedure "// EFT Interface implementation"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin

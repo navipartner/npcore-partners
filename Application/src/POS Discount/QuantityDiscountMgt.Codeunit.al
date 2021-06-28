@@ -140,10 +140,6 @@
         exit(DiscountPriority."Discount No. Series");
     end;
 
-    local procedure "--- Subscription"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
     local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
@@ -211,45 +207,4 @@
         exit(CODEUNIT::"NPR Quantity Discount Mgt.");
     end;
 
-    local procedure DiscountActiveNow(var QuantityDiscountHeader: Record "NPR Quantity Discount Header"): Boolean
-    var
-        CurrDate: Date;
-        CurrTime: Time;
-    begin
-        if QuantityDiscountHeader.IsTemporary then
-            exit(false);
-
-        if QuantityDiscountHeader.Status <> QuantityDiscountHeader.Status::Active then
-            exit(false);
-        if QuantityDiscountHeader."Starting Date" = 0D then
-            exit(false);
-        if QuantityDiscountHeader."Closing Date" = 0D then
-            exit(false);
-
-        CurrDate := Today();
-        CurrTime := Time;
-        if QuantityDiscountHeader."Starting Date" > CurrDate then
-            exit(false);
-        if QuantityDiscountHeader."Closing Date" < CurrDate then
-            exit(false);
-        if (QuantityDiscountHeader."Starting Date" = CurrDate) and (QuantityDiscountHeader."Starting Time" > CurrTime) then
-            exit(false);
-        if (QuantityDiscountHeader."Closing Date" = CurrDate) and (QuantityDiscountHeader."Closing Time" < CurrTime) then
-            exit(false);
-
-        exit(true);
-    end;
-
-    local procedure DiscountLineActiveNow(var QuantityDiscountLine: Record "NPR Quantity Discount Line"): Boolean
-    var
-        QuantityDiscountHeader: Record "NPR Quantity Discount Header";
-    begin
-        if QuantityDiscountLine.IsTemporary then
-            exit(false);
-
-        if not QuantityDiscountHeader.Get(QuantityDiscountLine."Item No.", QuantityDiscountLine."Main no.") then
-            exit(false);
-
-        exit(DiscountActiveNow(QuantityDiscountHeader));
-    end;
 }

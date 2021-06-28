@@ -218,10 +218,6 @@ codeunit 6150710 "NPR POS Data Management"
         DataColumn.SetWidth(Width);
     end;
 
-    local procedure "--- Events ---"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnGetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     begin
@@ -279,10 +275,6 @@ codeunit 6150710 "NPR POS Data Management"
 
     [IntegrationEvent(FALSE, FALSE)]
     local procedure OnSetupDataSourcesForView(View: Codeunit "NPR POS View"; Setup: Codeunit "NPR POS Setup")
-    begin
-    end;
-
-    local procedure "--- Constants ---"()
     begin
     end;
 

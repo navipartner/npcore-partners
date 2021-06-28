@@ -44,24 +44,6 @@ codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
         Commit();
     end;
 
-    local procedure DeleteLines()
-    var
-        ItemWkshtVariantLine2: Record "NPR Item Worksh. Variant Line";
-        ItemWkshtVarietyValueLine2: Record "NPR Item Worksh. Variety Value";
-        ItemWkshLine2: Record "NPR Item Worksheet Line";
-    begin
-        ItemWkshLine2.Copy(ItemWkshLine);
-        if ItemWkshLine2.FindSet() then
-            repeat
-                ItemWkshtVariantLine2.SetRange("Worksheet Name", ItemWkshLine2."Worksheet Name");
-                ItemWkshtVariantLine2.SetRange("Worksheet Line No.", ItemWkshLine2."Line No.");
-                ItemWkshtVariantLine2.DeleteAll();
-                ItemWkshtVarietyValueLine2.SetRange("Worksheet Name", ItemWkshLine2."Worksheet Name");
-                ItemWkshtVarietyValueLine2.SetRange("Worksheet Line No.", ItemWkshLine2."Line No.");
-                ItemWkshtVarietyValueLine2.DeleteAll();
-            until ItemWkshtVarietyValueLine2.Next() = 0;
-    end;
-
     local procedure CreateWindow()
     begin
         Window.Open(

@@ -412,24 +412,6 @@ report 6060042 "NPR Import Excel Item Worksh."
         end;
     end;
 
-    local procedure FormatData(TextToFormat: Text[250]): Text[250]
-    var
-        FormatDate: Date;
-        FormatDecimal: Decimal;
-        FormatInteger: Integer;
-    begin
-        case true of
-            Evaluate(FormatInteger, TextToFormat):
-                exit(Format(FormatInteger));
-            Evaluate(FormatDecimal, TextToFormat):
-                exit(Format(FormatDecimal));
-            Evaluate(FormatDate, TextToFormat):
-                exit(Format(FormatDate));
-            else
-                exit(TextToFormat);
-        end;
-    end;
-
     local procedure ProcessColumnMapping(ParTableNo: Integer; ParFieldNoFilter: Text; ParColumnsFilter: Text): Boolean
     var
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";

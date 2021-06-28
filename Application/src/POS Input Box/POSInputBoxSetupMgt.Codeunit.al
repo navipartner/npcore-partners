@@ -14,10 +14,6 @@
     begin
     end;
 
-    local procedure "--- Init Default Setup"()
-    begin
-    end;
-
     procedure InitDefaultEanBoxSetup()
     var
         EanBoxSetup: Record "NPR Ean Box Setup";
@@ -49,10 +45,6 @@
         EanBoxSetupEvent.Validate("Event Code", EventCode);
         EanBoxSetupEvent.Enabled := true;
         EanBoxSetupEvent.Insert(true);
-    end;
-
-    local procedure "--- Init Parameters"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6060106, 'OnAfterInsertEvent', '', true, true)]
@@ -235,10 +227,6 @@
         repeat
             InitEanBoxEventParameters(EanBoxEvent);
         until EanBoxEvent.Next() = 0;
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     procedure DefaultSalesSetupCode(): Code[10]

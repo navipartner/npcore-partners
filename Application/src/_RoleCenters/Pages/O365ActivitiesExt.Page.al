@@ -120,26 +120,7 @@
 
     var
         CueAndKPIs: Codeunit "Cues And KPIs";
-        O365GettingStartedMgt: Codeunit "O365 Getting Started Mgt.";
-        WhatIsNewTourVisible: Boolean;
         ShowDataIntegrationCues: Boolean;
-
-    local procedure StartWhatIsNewTour()
-    var
-        O365UserTours: Record "User Tours";
-        TourID: Integer;
-    begin
-        TourID := O365GettingStartedMgt.GetWhatIsNewTourID();
-
-        if O365UserTours.AlreadyCompleted(TourID) then
-            exit;
-
-
-        if WhatIsNewTourVisible then begin
-            O365UserTours.MarkAsCompleted(TourID);
-            WhatIsNewTourVisible := false;
-        end;
-    end;
 
 
     procedure DrillDownSalesThisMonthLastYear()

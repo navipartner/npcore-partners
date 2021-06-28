@@ -218,20 +218,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
         end;
     end;
 
-    local procedure DaysSinceLastBalance(PosUnitNo: Code[10]): Integer
-    var
-        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-    begin
-        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', PosUnitNo);
-        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
-        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
-
-        if (not POSWorkshiftCheckpoint.FindLast()) then
-            exit(-1); // Never been balanced
-
-        exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
-    end;
-
     local procedure CreateFirstTimeCheckpoint(UnitNo: Code[10])
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";

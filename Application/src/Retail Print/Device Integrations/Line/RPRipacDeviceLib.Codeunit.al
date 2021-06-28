@@ -16,10 +16,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         MediaWidth: Option "80mm","58mm";
         Error_UnsupportedFont: Label 'Unsupported font: %1';
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
     local procedure DeviceCode(): Text
     begin
         exit('RIPAC');
@@ -283,43 +279,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         AddToBuffer('LF');
     end;
 
-    procedure FormFeed()
-    begin
-        AddToBuffer('FF');
-    end;
-
-    procedure CarriageReturn()
-    begin
-        AddToBuffer('CR');
-    end;
-
-    procedure Cancel()
-    begin
-        AddToBuffer('CAN');
-    end;
-
-    local procedure "// Advanced Functions"()
-    begin
-    end;
-
-    local procedure CancelUserDefinedCharacters(n: Char)
-    begin
-        TempPattern := 'ESC ? %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure DefineUserDefindCharacters(y: Char; c1: Char; c2: Char)
-    begin
-        TempPattern := 'ESC & %1 %2 %3';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(y), ESC.C2ESC(c1), ESC.C2ESC(c2)));
-    end;
-
-    local procedure ExecuteTestPrint(pL: Char; pH: Char; n: Integer; m: Integer)
-    begin
-        TempPattern := 'GS ( A %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(pL), ESC.C2ESC(pH), n, m));
-    end;
-
     local procedure InitializePrinter()
     begin
         TempPattern := 'ESC @';
@@ -330,18 +289,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     begin
         TempPattern := 'ESC p %1 %2 %3';
         AddToBuffer(StrSubstNo(TempPattern, m, ESC.C2ESC(t1), ESC.C2ESC(t2)));
-    end;
-
-    local procedure PrintAndFeedPaper(n: Char)
-    begin
-        TempPattern := 'ESC J %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure PrintAndFeedNLines(n: Char)
-    begin
-        TempPattern := 'ESC t %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
     end;
 
     local procedure PrintBarCodeA(m: Char; "d1..dk": Text[30])
@@ -356,28 +303,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         AddTextToBuffer(Format(m) + Format(n) + "d1..dn");
     end;
 
-    local procedure PrintGraphicsInBuffer()
-    var
-        TemporaryPattern: Text;
-        pL: Char;
-        pH: Char;
-        m: Char;
-        fn: Char;
-    begin
-        pL := 2;
-        pH := 0;
-        m := 48;
-        fn := 50;
-
-        TemporaryPattern := 'GS ( L %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TemporaryPattern, Format(pL), Format(pH), Format(m), Format(fn)));
-    end;
-
-    local procedure PrintDataInPageMode()
-    begin
-        AddToBuffer('ESC FF');
-    end;
-
     procedure PrintNVGraphicsData(n: Char; m: Char)
     begin
         TempPattern := 'FS p %1 %2';
@@ -388,19 +313,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     begin
         TempPattern := 'GS ( L %1 %2 %3 %4 %5 %6 %7 %8';
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(pL), ESC.C2ESC(pH), ESC.C2ESC(m), ESC.C2ESC(fn), ESC.C2ESC(kc1), ESC.C2ESC(kc2), ESC.C2ESC(x), ESC.C2ESC(y)));
-    end;
-
-    local procedure SelectBitImageMode(m: Char; nL: Char; nH: Char; "d1..dk": Text)
-    begin
-        TempPattern := 'ESC * %1 %2 %3';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(m), ESC.C2ESC(nL), ESC.C2ESC(nH)));
-        AddTextToBuffer("d1..dk");
-    end;
-
-    local procedure SelectCancelUserDefinedCharSet(n: Char)
-    begin
-        TempPattern := 'ESC % ' + ESC.C2ESC(n);
-        AddToBuffer(TempPattern);
     end;
 
     local procedure SelectCharacterCodeTable(n: Char)
@@ -415,12 +327,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
     end;
 
-    local procedure SelectHRICharacterFont(n: Integer)
-    begin
-        TempPattern := 'GS f %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
     local procedure SelectCharacterSize(n: Char)
     begin
         TempPattern := 'GS ! %1';
@@ -433,70 +339,10 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(m), ESC.C2ESC(n)));
     end;
 
-    local procedure SelectDefaultLineSpacing()
-    begin
-        TempPattern := 'ESC 2';
-        AddToBuffer(TempPattern);
-    end;
-
-    local procedure SelectInternationalCharSet(n: Char)
-    begin
-        TempPattern := 'ESC R %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
     local procedure SelectJustification(n: Integer)
     begin
         TempPattern := 'ESC a %1';
         AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure SelectPeripheralDevice(n: Char)
-    begin
-        TempPattern := 'ESC = %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure SelectPageMode()
-    begin
-        TempPattern := 'ESC L';
-        AddToBuffer(TempPattern);
-    end;
-
-    local procedure SelectPrintMode(n: Char)
-    begin
-        TempPattern := 'ESC ! %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure SelectPrintSpeed(K: Char; pL: Char; pH: Char; fn: Char; m: Char)
-    begin
-        TempPattern := 'GS ( %1 %2 %3 %4 %5';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(K), ESC.C2ESC(pL), ESC.C2ESC(pH), ESC.C2ESC(fn), ESC.C2ESC(m)));
-    end;
-
-    local procedure SelectStandardMode()
-    begin
-        TempPattern := 'ESC S';
-        AddToBuffer(TempPattern);
-    end;
-
-    local procedure SelectPrintDirectInPageMode(n: Integer)
-    begin
-        TempPattern := 'ESC T %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure SetAbsolutePrintPosition(nL: Char; nH: Char)
-    begin
-        TempPattern := 'ESC $ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetAbsVerticalPrintPos(nL: Char; nH: Char)
-    begin
-        TempPattern := 'GS $ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
     end;
 
     local procedure SetBarCodeHeight(n: Char)
@@ -509,69 +355,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     begin
         TempPattern := 'GS w %1';
         AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure SetHorzAndVertMotionUnits(x: Char; y: Char)
-    begin
-        TempPattern := 'GS P %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(x), ESC.C2ESC(y)));
-    end;
-
-    local procedure SetHorizontalTabPositions("n1..nk": Text[50])
-    begin
-        TempPattern := 'ESC D %1 NUL';
-        AddToBuffer(StrSubstNo(TempPattern, "n1..nk"));
-    end;
-
-    local procedure SetLeftMargin(nL: Char; nH: Char)
-    begin
-        TempPattern := 'GS L %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetLineSpacing(n: Char)
-    begin
-        TempPattern := 'ESC 3 %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure SetPrintAreaInPageMode(W: Char; xl: Char; xH: Char; yL: Char; yH: Char; dxL: Char; dxH: Char; dyL: Char; dyH: Char)
-    begin
-        TempPattern := 'ESC %1 %2 %3 %4 %5 %6 %7 %8 %9';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(W), ESC.C2ESC(xl), ESC.C2ESC(xH),
-                                                        ESC.C2ESC(yL), ESC.C2ESC(yH),
-                                                        ESC.C2ESC(dxL), ESC.C2ESC(dxH),
-                                                        ESC.C2ESC(dyL), ESC.C2ESC(dyH)));
-    end;
-
-    local procedure SetPrintAreaWidth(nL: Char; nH: Char)
-    begin
-        TempPattern := 'GS W %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetRelativePrintPosition(nL: Char; nH: Char)
-    begin
-        TempPattern := 'ESC \ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetRelativeVerticalPrintPos(nL: Char; nH: Char)
-    begin
-        TempPattern := 'GS \ %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(nL), ESC.C2ESC(nH)));
-    end;
-
-    local procedure SetRightSideCharacterSpacing(n: Char)
-    begin
-        TempPattern := 'ESC SP %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)))
-    end;
-
-    local procedure StoreGraphicsInBuffer(pL: Char; pH: Char; m: Char; fn: Char; a: Char; bx: Char; by: Char; c: Char; xL: Char; xH: Char; yL: Char; yH: Char; Image: Text)
-    begin
-        AddToBuffer('GS ( L');
-        AddTextToBuffer(Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH) + Image);
     end;
 
     local procedure TurnDoubleStrikeModeOnOff(n: Integer)
@@ -589,18 +372,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
     local procedure TurnUnderlineModeOnOff(n: Integer)
     begin
         TempPattern := 'ESC - %1';
-        AddToBuffer(StrSubstNo(TempPattern, n));
-    end;
-
-    local procedure TurnUpsideDownPrintOnOff(n: Char)
-    begin
-        TempPattern := 'ESC { %1';
-        AddToBuffer(StrSubstNo(TempPattern, ESC.C2ESC(n)));
-    end;
-
-    local procedure Turn90ClockWiserRotModeOnOff(n: Integer)
-    begin
-        TempPattern := 'ESC V %1';
         AddToBuffer(StrSubstNo(TempPattern, n));
     end;
 
@@ -637,18 +408,9 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
             exit(true);
     end;
 
-    local procedure "// Aux Functions"()
-    begin
-    end;
-
     local procedure AddToBuffer(Text: Text[1024])
     begin
         ESC.WriteSequenceToBuffer(Text, PrintBuffer);
-    end;
-
-    local procedure AddCharToBuffer(CharCode: Integer)
-    begin
-        PrintBuffer += Format(CharCode);
     end;
 
     local procedure AddTextToBuffer(Text: Text)
@@ -707,10 +469,6 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         RetailList.Choice := Choice;
         RetailList.Value := Value;
         RetailList.Insert();
-    end;
-
-    local procedure "// Code 128 Functions"()
-    begin
     end;
 
     local procedure BuildCommandC128(Value: Text): Text

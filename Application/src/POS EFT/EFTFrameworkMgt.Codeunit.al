@@ -425,10 +425,6 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         Message(TextWhole);
     end;
 
-    local procedure "// Aux"()
-    begin
-    end;
-
     local procedure InitGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Text; SalesReceiptNo: Text)
     var
         SalePOS: Record "NPR POS Sale";

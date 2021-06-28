@@ -392,23 +392,6 @@ codeunit 6060132 "NPR MM Import Members"
         exit(rDate);
     end;
 
-    local procedure validateDecimalField(fieldValue: Text; fieldValueIs: Integer; fieldCaptionName: Text) rDecimal: Decimal
-    begin
-
-        rDecimal := 0.0;
-
-        if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
-            Error(VALUE_REQUIRED, fieldCaptionName, GLineCount);
-
-        if ((fieldValue = '') and (fieldValueIs = OPTIONAL)) then
-            exit(0.0);
-
-        if not (Evaluate(rDecimal, fieldValue)) then
-            Error(INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
-
-        exit(rDecimal);
-    end;
-
     local procedure validateIntegerField(fieldValue: Text; fieldValueIs: Integer; fieldCaptionName: Text) rInteger: Integer
     begin
 
@@ -424,18 +407,6 @@ codeunit 6060132 "NPR MM Import Members"
             Error(INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
 
         exit(rInteger);
-    end;
-
-    local procedure text2Money(pCents: Text[30]) rMoney: Decimal
-    begin
-        if ('' = pCents) then exit(0);
-
-        Evaluate(rMoney, pCents);
-
-        // Lookup currency to determinate decimal places...
-        rMoney := rMoney / 100;
-
-        exit(rMoney);
     end;
 
     local procedure nextField(var VarLineOfText: Text[1024]): Text[1024]
@@ -495,51 +466,6 @@ codeunit 6060132 "NPR MM Import Members"
 
         VarText := CopyStr(InputText, NextFieldPos);
         exit(RField);
-    end;
-
-    local procedure reverseTokenizer(var varText: Text[1024]; pSeparator: Char; pQuote: Char) rField: Text[1024]
-    var
-        IsQuoted: Boolean;
-        LText: Text[1024];
-        NextFieldPos: Integer;
-        IsNextField: Boolean;
-        AByte: Text[1];
-    begin
-
-        //  backward searching tokenizer splitting string at separator.
-        //  separator is protected by quoting string
-        //  the separator is omitted from the resulting strings
-
-        IsQuoted := false;
-        NextFieldPos := StrLen(varText);
-        IsNextField := false;
-
-        LText := varText;
-
-        if (pQuote = LText[NextFieldPos]) then IsQuoted := true;
-        while ((NextFieldPos <= StrLen(LText)) and (not IsNextField)) do begin
-            if (pSeparator = LText[NextFieldPos]) then IsNextField := true;
-            if (IsQuoted and IsNextField) then IsNextField := (LText[NextFieldPos + 1] = pQuote);
-
-            AByte[1] := LText[NextFieldPos];
-            if (not IsNextField) then rField := AByte + rField;
-            NextFieldPos -= 1;
-        end;
-        if (IsQuoted) then rField := CopyStr(rField, 2, StrLen(rField) - 2);
-
-        varText := CopyStr(LText, 1, NextFieldPos);
-        exit(rField);
-    end;
-
-    local procedure MakeNote(Member: Record "NPR MM Member"; CommentText: Text)
-    var
-        RecordLink: Record "Record Link";
-        RecordLinkManagement: Codeunit "Record Link Management";
-    begin
-        RecordLink.Get(Member.AddLink('', 'Notes'));
-        RecordLink.Type := RecordLink.Type::Note;
-        RecordLinkManagement.WriteNote(RecordLink, CommentText);
-        RecordLink.Modify();
     end;
 
 }

@@ -172,10 +172,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure AquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]): Boolean
     begin
 

@@ -832,10 +832,6 @@
         exit('PEPPER');
     end;
 
-    local procedure "--*** Create Request"()
-    begin
-    end;
-
     local procedure CreateBeginWorkshiftRequest(RegisterNo: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
@@ -1024,10 +1020,6 @@
 
         EFTTransactionRequest.Started := CurrentDateTime;
         EFTTransactionRequest."User ID" := UserId;
-    end;
-
-    local procedure "--*** Supporting Functions"()
-    begin
     end;
 
     procedure SetTrxProcessingType(TransactionSubtypeCode: Code[10]; RegisterNo: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -1495,10 +1487,6 @@
             exit(false);
 
         exit(EFTResultCode."Open Terminal and Retry");
-    end;
-
-    local procedure "--***Printing"()
-    begin
     end;
 
     local procedure ReadyReceiptsForPrint(EFTTransactionRequest: Record "NPR EFT Transaction Request")

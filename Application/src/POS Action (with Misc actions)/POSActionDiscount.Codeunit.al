@@ -912,6 +912,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     #endregion
     #region Constants
 
+# pragma warning disable AA0228
     local procedure "DiscType.DiscountAmt"(): Integer
     begin
         exit(0);
@@ -926,6 +927,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     begin
         exit(2);
     end;
+# pragma warning restore
 
     #endregion
 }

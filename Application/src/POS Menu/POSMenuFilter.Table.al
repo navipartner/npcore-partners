@@ -309,22 +309,4 @@ table 6150717 "NPR POS Menu Filter"
 
         exit('');
     end;
-
-    local procedure GetStoreCode(): Code[10]
-    var
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSStore: Record "NPR POS Store";
-    begin
-
-        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
-            POSFrontEndManagement.GetSession(POSSession);
-            POSSession.GetSetup(POSSetup);
-            POSSetup.GetPOSStore(POSStore);
-            exit(POSStore.Code);
-        end;
-
-        exit('');
-    end;
 }

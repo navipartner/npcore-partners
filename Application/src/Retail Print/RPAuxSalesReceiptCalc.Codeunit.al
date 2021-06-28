@@ -7,10 +7,6 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
     begin
     end;
 
-    local procedure "// Locals"()
-    begin
-    end;
-
     local procedure AddFunction(var tmpRetailList: Record "NPR Retail List" temporary; Choice: Text)
     begin
         tmpRetailList.Number += 1;

@@ -47,10 +47,6 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
 
     end;
 
-    local procedure "--Handlers"()
-    begin
-    end;
-
     local procedure DecodeLoyaltyPointsQuery(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -82,10 +78,6 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         MemberInfoCapture.Modify();
 
         exit(true);
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     local procedure DeserializeMembershipQuery(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")

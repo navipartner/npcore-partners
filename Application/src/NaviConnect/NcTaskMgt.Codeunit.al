@@ -571,10 +571,6 @@
     begin
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
     procedure Initialize()
     begin
         if not Initialized then begin

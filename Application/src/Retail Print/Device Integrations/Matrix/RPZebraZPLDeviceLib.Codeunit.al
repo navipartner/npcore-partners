@@ -40,10 +40,6 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         Encoding: Option "Windows-1252","UTF-8";
         ERR_ENCODING: Label 'Unknown encoding: %1';
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
     local procedure DeviceCode(): Text
     begin
         exit('ZEBRA');
@@ -1134,18 +1130,9 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
             Error(err0002);
     end;
 
-    local procedure "-- Aux Functions"()
-    begin
-    end;
-
     local procedure AddToBuffer(Text: Text)
     begin
         AddTextToBuffer(Text);
-    end;
-
-    local procedure AddCharToBuffer(CharCode: Integer)
-    begin
-        PrintBuffer += Format(CharCode);
     end;
 
     local procedure AddTextToBuffer(Text: Text)

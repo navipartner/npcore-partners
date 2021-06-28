@@ -27,10 +27,6 @@
         exit('NETS_BAXI_NET');
     end;
 
-    local procedure "// EFT Interface implementation"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -393,10 +389,6 @@
         end
     end;
 
-    local procedure "// EFT Parameter Handling"()
-    begin
-    end;
-
     procedure GetPaymentTypeParameters(EFTSetup: Record "NPR EFT Setup"; var EFTNETSBAXIPaymentSetup: Record "NPR EFT NETS BAXI Paym. Setup")
     begin
         EFTSetup.TestField("Payment Type POS");
@@ -406,10 +398,6 @@
             EFTNETSBAXIPaymentSetup."Payment Type POS" := EFTSetup."Payment Type POS";
             EFTNETSBAXIPaymentSetup.Insert();
         end;
-    end;
-
-    local procedure "// Aux"()
-    begin
     end;
 
     local procedure CreateGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")

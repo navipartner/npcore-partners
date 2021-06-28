@@ -465,18 +465,6 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             POSSession.ChangeViewSale();
     end;
 
-    local procedure Method_KeyPress(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        KeyPressed: Text;
-        ReadingFromKeyPressErr: Label 'reading from KeyPress method context';
-    begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        KeyPressed := JSON.GetStringOrFail('key', ReadingFromKeyPressErr);
-
-        POSSession.ProcessKeyPress(KeyPressed);
-    end;
-
     local procedure Method_ProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";

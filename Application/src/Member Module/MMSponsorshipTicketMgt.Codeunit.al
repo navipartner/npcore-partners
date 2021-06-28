@@ -507,10 +507,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 
     end;
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterMemberCreateEvent', '', true, true)]
     local procedure OnAfterMemberCreateEvent(var Membership: Record "NPR MM Membership"; var Member: Record "NPR MM Member")
     var

@@ -284,14 +284,9 @@ page 6151061 "NPR Distrib. Matrix"
         DistributionGroupMembersGV: Record "NPR Distrib. Group Members";
         DistributionLinesGV: Record "NPR Distribution Lines";
         DistributionHeadersGV: Record "NPR Distribution Headers";
-        DistributionID: Integer;
         TotalToDistribuate: Decimal;
         LastColumnShown: Integer;
         NewLastColumnShown: Integer;
-
-    local procedure FormatStr()
-    begin
-    end;
 
     local procedure MATRIX_OnDrillDown(INT: Integer)
     var
@@ -312,38 +307,6 @@ page 6151061 "NPR Distrib. Matrix"
         //  FOR i := 1 TO DistributionGroupMembers.Count() DO
         //    MATRIX_CellData[i] := FORMAT(DistributionLines."Distribution Quantity") +'/'+ FORMAT(DistributionLines."Avaliable Quantity");
         // CurrPage.Update();
-    end;
-
-    local procedure MATRIX_OnAfterGetRecord(MATRIX_ColumnOrdinal: Integer)
-    var
-        DistributionLines: Record "NPR Distribution Lines";
-    begin
-
-
-        DistributionLines.SetRange(DistributionLines."Distribution Id", DistributionID);
-        DistributionLines.SetRange("Distribution Item", Rec."Item No.");
-        //fix int issue
-        DistributionLines.SetRange(DistributionLines."Distribution Group Member", Format(DistributionGroupMembersGV."Distribution Member Id"));
-        if DistributionLines.FindSet() then begin
-            repeat
-                MATRIX_CellData[MATRIX_ColumnOrdinal] := Format(DistributionLines."Distribution Quantity" + MATRIX_ColumnOrdinal);
-            until DistributionLines.Next() = 0;
-        end;
-
-
-
-
-        //IF ShowColumnName THEN
-        //MatrixHeader := FORMAT(MatrixDistributionLines[MATRIX_ColumnOrdinal]."Distribution Group Member");
-        //ELSE
-        //  MatrixHeader := MatrixRecords[MATRIX_ColumnOrdinal].Code;
-        //MATRIX_MatrixRecord := MatrixRecords[MATRIX_ColumnOrdinal];
-        //MATRIX_CellData[MATRIX_ColumnOrdinal] := 'TEST' + FORMAT(MATRIX_ColumnOrdinal);
-    end;
-
-    procedure SetMatrixFilter(DistID: Integer)
-    begin
-        DistributionID := DistID;
     end;
 
     procedure Load(var DistributionHeaders: Record "NPR Distribution Headers")

@@ -43,27 +43,5 @@
         exit(true);
     end;
 
-    local procedure GetTableId("Record": Variant; Silent: Boolean) TableId: Integer
-    var
-        RefRef: RecordRef;
-    begin
-        if not (Record.IsRecord or Record.IsRecordRef) then begin
-            if not Silent then begin
-                Error('Variant must me Record or RecordRef in function [NPRAttItemSearch].[GetTableId].');
-            end else begin
-                exit(0);
-            end;
-        end;
-
-        if Record.IsRecord then begin
-            RefRef.GetTable(Record);
-        end;
-
-        if Record.IsRecordRef then begin
-            RefRef := Record;
-        end;
-
-        TableId := RefRef.Number;
-    end;
 }
 

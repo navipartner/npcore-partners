@@ -283,14 +283,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure ConfigureCustomerWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
-    begin
-        Context.SetContext('capture_amount', true);
-        Context.SetContext('capture_voucher', false);
-        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
-        exit(true);
-    end;
-
     local procedure ConfigurePayoutWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
@@ -383,23 +375,6 @@ codeunit 6150725 "NPR POS Action: Payment"
     end;
 
     local procedure CapturePayoutPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
-    var
-        AmountToCapture: Decimal;
-    begin
-        AmountToCapture := 0;
-
-        if AmountToCaptureLCY = 0 then
-            exit(true);
-
-        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
-
-        POSLine."Amount Including VAT" := AmountToCaptureLCY;
-        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
-
-        exit(true);
-    end;
-
-    local procedure CaptureCustomerPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         AmountToCapture: Decimal;
     begin
@@ -579,27 +554,6 @@ codeunit 6150725 "NPR POS Action: Payment"
             exit(CreditVoucherExist(VoucherNumber, VoucherTypeCode, VoucherStatusMsg));
 
         exit(false);
-    end;
-
-    local procedure SelectCreditVoucherFromList(var VoucherNoOut: Text): Boolean
-    var
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        PageAction: Action;
-    begin
-
-        Clear(VoucherNoOut);
-
-        NpRvVoucher.Reset();
-
-        PageAction := PAGE.RunModal(0, NpRvVoucher);
-
-        if (PageAction = ACTION::LookupOK) then
-            VoucherNoOut := NpRvVoucher."Reference No.";
-
-        if (VoucherNoOut = '') then
-            exit(false);
-
-        exit((PageAction = ACTION::LookupOK));
     end;
 
     local procedure CreditVoucherExist(VoucherNo: Text; var VoucherTypeCode: Code[20]; var VoucherStatusMsg: Text): Boolean

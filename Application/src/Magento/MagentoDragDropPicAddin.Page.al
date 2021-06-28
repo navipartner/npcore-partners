@@ -322,11 +322,6 @@
         IsLogoPicture := NewIsLogoPicture;
     end;
 
-    local procedure SetPictureType(NewPictureType: Integer)
-    begin
-        PictureType := NewPictureType;
-    end;
-
     procedure SetRecordPosition(PictureType: Integer; PictureName: Text)
     begin
         if Rec.Get(PictureType, PictureName) then;

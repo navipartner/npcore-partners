@@ -64,6 +64,8 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     end;
 
     #region Enum
+
+# pragma warning disable AA0228
     local procedure "AttributeName.ElementType"(): Text
     begin
         exit('element_type');
@@ -78,5 +80,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     begin
         exit('container');
     end;
+# pragma warning restore
+
     #endregion
 }

@@ -467,10 +467,6 @@
         POSFrontEnd.InvokeWorkflow(POSAction);
     end;
 
-    local procedure "-- Serial number support functions"()
-    begin
-    end;
-
     local procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean): Boolean
     var
         ItemTrackingCode: Record "Item Tracking Code";

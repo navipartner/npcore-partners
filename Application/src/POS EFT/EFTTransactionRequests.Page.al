@@ -475,17 +475,6 @@ page 6184498 "NPR EFT Transaction Requests"
         Style: Text;
         UsesPOSEntry: Boolean;
 
-    local procedure ClosePageIfInsidePOS()
-    var
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-    begin
-        //-NPR5.46 [290734]
-        if POSSession.IsActiveSession(POSFrontEnd) then
-            CurrPage.Close();
-        //+NPR5.46 [290734]
-    end;
-
     local procedure SetStyle(): Text
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";

@@ -28,10 +28,6 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
     begin
     end;
 
-    local procedure "// Event Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionCodeunitList', '', false, false)]
     local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
     var

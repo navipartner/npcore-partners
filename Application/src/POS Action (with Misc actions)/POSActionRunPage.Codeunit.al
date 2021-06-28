@@ -116,10 +116,6 @@ then begin
         end;
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
-
     local procedure RunPage(PageId: Integer; RunModal: Boolean; TableID: Integer; TableView: Text)
     var
         RecRef: RecordRef;

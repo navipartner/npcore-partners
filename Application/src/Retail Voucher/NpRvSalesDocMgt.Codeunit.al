@@ -363,26 +363,6 @@
             until NpRvSalesLine.Next() = 0;
     end;
 
-    local procedure SendOpenVouchers(SalesInvHeader: Record "Sales Invoice Header")
-    var
-        MagentoPaymentLine: Record "NPR Magento Payment Line";
-        NpRvVoucher: Record "NPR NpRv Voucher";
-    begin
-        MagentoPaymentLine.SetRange("Document Table No.", DATABASE::"Sales Invoice Header");
-        MagentoPaymentLine.SetRange("Document No.", SalesInvHeader."No.");
-        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
-        MagentoPaymentLine.SetRange("Source Table No.", DATABASE::"NPR NpRv Voucher");
-        if MagentoPaymentLine.IsEmpty then
-            exit;
-
-        Commit();
-        MagentoPaymentLine.FindSet();
-        repeat
-            if NpRvVoucher.Get(MagentoPaymentLine."Source No.") then
-                SendVoucher(NpRvVoucher);
-        until MagentoPaymentLine.Next() = 0;
-    end;
-
     procedure IssueVoucherAction(SalesHeader: Record "Sales Header")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";

@@ -116,11 +116,5 @@ page 6184479 "NPR EFTType POSUnit Gen.Param."
         else
             exit(Rec.Value);
     end;
-
-    [TryFunction]
-    local procedure TrySelectStr(Ordinal: Integer; OptionString: Text; var OptionOut: Text)
-    begin
-        OptionOut := SelectStr(Ordinal + 1, OptionString);
-    end;
 }
 

@@ -25,10 +25,6 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         exit('VERIFONE_VIM');
     end;
 
-    local procedure "// Stargate Requests"()
-    begin
-    end;
-
     procedure SendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
         case EftTransactionRequest."Processing Type" of
@@ -420,10 +416,6 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         exit('EFT_' + IntegrationType());
     end;
 
-    local procedure "// Responses"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
     local procedure Device_Response(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
@@ -509,10 +501,6 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         EFTTransactionRequest.Modify(true);
 
         OnAfterProtocolResponse(EFTTransactionRequest);
-    end;
-
-    local procedure "// Event Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

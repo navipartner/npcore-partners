@@ -8,10 +8,6 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
     var
         NotHandled: Label 'A request to validate foreign member card number %1 was attempted for %2 %3 but no handler responded with handled. This is a setup error, disable this community for remote validation.';
 
-    local procedure "--API"()
-    begin
-    end;
-
     procedure RediscoverNewManagers()
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
@@ -93,10 +89,6 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
     begin
 
         OnShowDashboard(ForeignMembershipSetup."Community Code", ForeignMembershipSetup."Manager Code");
-    end;
-
-    local procedure "--Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

@@ -1086,15 +1086,6 @@ table 6150701 "NPR POS Menu Button"
             until (MenuButton.Next() = 0) or (not Traverse);
     end;
 
-    local procedure RemoveSubset(var FromSuperset: Record "NPR POS Menu Button" temporary; var Subset: Record "NPR POS Menu Button" temporary) Removed: Boolean
-    begin
-        if Subset.FindSet() then
-            repeat
-                FromSuperset := Subset;
-                Removed := Removed or FromSuperset.Delete();
-            until Subset.Next() = 0;
-    end;
-
     local procedure LookupBackgroundColor()
     var
         TempRetailList: Record "NPR Retail List" temporary;

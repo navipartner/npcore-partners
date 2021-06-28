@@ -477,10 +477,6 @@ codeunit 6060136 "NPR MM Member Notification"
         exit(ResponseMessage = '');
     end;
 
-    local procedure "--Notifications"()
-    begin
-    end;
-
     procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer) NotificationEntryNo: Integer
     var
         Membership: Record "NPR MM Membership";
@@ -896,10 +892,6 @@ codeunit 6060136 "NPR MM Member Notification"
             '}}';
 
         exit(template);
-    end;
-
-    local procedure "---Magento"()
-    begin
     end;
 
     local procedure RequestMagentoPasswordUrl(CustomerNo: Code[20]; ContactNo: Code[20]; EmailAddress: Text[200]; var ResponseUrl: Text[200]; var ReasonText: Text): Boolean

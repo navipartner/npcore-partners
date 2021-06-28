@@ -137,20 +137,12 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTMobilePayProtocol.SendEftDeviceRequest(EftTransactionRequest);
     end;
 
-    local procedure "// Protocol Response"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184514, 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
     begin
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
-    end;
-
-    local procedure "// EFT Parameter Handling"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6184484, 'OnValidateParameterValue', '', false, false)]
@@ -209,10 +201,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if Rec."EFT Integration Type" <> IntegrationType() then
             exit;
         Rec.TestField("POS Unit No.");
-    end;
-
-    local procedure "// API Operations"()
-    begin
     end;
 
     procedure InitializeGlobals(PaymentType: Code[10]; RegisterNo: Code[10])
@@ -477,10 +465,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         exit(InvokePaymentCancel());
     end;
 
-    local procedure "// Web Request Mgt."()
-    begin
-    end;
-
     [TryFunction]
     local procedure InvokeRegisterPoS(var PoSIdIn: Text[100])
     var
@@ -553,22 +537,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         RequestBody := RequestBody + StrSubstNo(RequestBody3Lbl, PoSID);
 
         InvokeRESTHTTPRequest(RequestBody, 'UnRegisterPoS', ResponseText);
-    end;
-
-    [TryFunction]
-    local procedure InvokeGetUniquePoSId(var PoSIdIn: Text[100])
-    var
-        RequestBody: Text[1024];
-        ResponseText: Text[1024];
-        RequestBodyLbl: Label '{"MerchantId":"%1"}', Locked = true;
-    begin
-        if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
-
-        RequestBody := StrSubstNo(RequestBodyLbl, MerchantID);
-
-        InvokeRESTHTTPRequest(RequestBody, 'GetUniquePoSId', ResponseText);
-        ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
     end;
 
     [TryFunction]
@@ -772,10 +740,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseStream := HttpWebResponse.GetResponseStream();
         ResponseStreamReader := ResponseStreamReader.StreamReader(ResponseStream);
         JSONResponseText := ResponseStreamReader.ReadToEnd();
-    end;
-
-    local procedure "// Aux"()
-    begin
     end;
 
     local procedure CalcAuthHeader(RequestUrl: Text[100]; ContentBody: Text[1024]): Text[100]

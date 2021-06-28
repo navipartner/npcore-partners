@@ -684,9 +684,7 @@
     #endregion Constants
 
     #region UI
-    local procedure GetMaxSyncDuration(): Duration
-    begin
-    end;
+
     #endregion UI
 
     #region events

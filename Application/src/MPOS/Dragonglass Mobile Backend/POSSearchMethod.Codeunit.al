@@ -26,13 +26,6 @@ codeunit 6014564 "NPR POS Search Method"
         end
     end;
 
-    local procedure NewLine(): Text;
-    var
-        LF: Char;
-    begin
-        exit(Format(LF, 0, '<CHAR>'));
-    end;
-
     local procedure IsMatch(SearchTerm: Text; TextToSearch: Text): Boolean;
     var
         Word: Text;

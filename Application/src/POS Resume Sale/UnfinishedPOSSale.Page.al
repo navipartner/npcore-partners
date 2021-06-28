@@ -94,7 +94,9 @@ page 6150746 "NPR Unfinished POS Sale"
         CancelAndNewText: Label 'Note: If you select ''No'', system will try to cancel the sale.';
         AllowToPostpone: Boolean;
 
+# pragma warning disable AA0228
     local procedure GenerateInstructions(): Text
+# pragma warning restore
     begin
         if AllowToPostpone then
             exit(LeaveAsIsAndNewText)

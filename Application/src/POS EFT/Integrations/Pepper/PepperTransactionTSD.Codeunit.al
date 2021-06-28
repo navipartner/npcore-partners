@@ -189,10 +189,6 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
         exit(-960); //Transaction not yet sent
     end;
 
-    local procedure "---Results"()
-    begin
-    end;
-
     procedure GetTrx_ResultCode() ResultCode: Integer
     begin
 
@@ -298,10 +294,6 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
     begin
 
         exit(TrxIsAbandoned);
-    end;
-
-    local procedure "--Stargate2"()
-    begin
     end;
 
     procedure SetTransactionEntryNo(EntryNo: Integer)

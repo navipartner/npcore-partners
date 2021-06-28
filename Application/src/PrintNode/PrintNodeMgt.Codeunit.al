@@ -167,16 +167,6 @@ codeunit 6151221 "NPR PrintNode Mgt."
         exit('PRINTNODE-PDF');
     end;
 
-    local procedure AddPrintNodeJobtoNaviDocs(RecordVariant: Variant; PrinterID: Text; ReportID: Integer; DelayUntil: DateTime)
-    var
-        NaviDocsManagement: Codeunit "NPR NaviDocs Management";
-        DataTypeManagement: Codeunit "Data Type Management";
-        RecRef: RecordRef;
-    begin
-        DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
-        NaviDocsManagement.AddDocumentEntryWithHandlingProfileExt(RecRef, NaviDocsHandlingProfileCode(), ReportID, '', PrinterID, DelayUntil);
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnManageDocument', '', true, true)]
     local procedure HandleNaviDocsDocument(var IsDocumentHandled: Boolean; ProfileCode: Code[20]; var NaviDocsEntry: Record "NPR NaviDocs Entry"; ReportID: Integer; var WithSuccess: Boolean; var ErrorMessage: Text)
     var

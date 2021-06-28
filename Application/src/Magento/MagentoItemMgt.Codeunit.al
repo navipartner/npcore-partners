@@ -192,10 +192,6 @@
         exit(not SalesPrice.IsEmpty());
     end;
 
-    local procedure "--- Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'NPR Seo Link', true, true)]
     local procedure ItemOnAfterValidateSeoLink(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     begin

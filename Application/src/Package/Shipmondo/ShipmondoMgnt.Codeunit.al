@@ -284,72 +284,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end;
     end;
 
-    local procedure GetShipmentLabels(ShipmentID: Code[20]; LabelFormat: Text; Silent: Boolean);
-    var
-        Jtoken: JsonToken;
-    begin
-        RequestURL := 'https://app.pakkelabels.dk/api/public/v3/shipments/' + ShipmentID + '/labels?label_format=' + LabelFormat;
-        if not ExecuteCall('GET', Jtoken, Silent) then
-            Exit;
-    end;
-
-    local procedure GetShipment(ShipmentID: Code[20]; silent: Boolean);
-    var
-        Jtoken: JsonToken;
-    begin
-        RequestURL := 'https://app.pakkelabels.dk/api/public/v3/shipments/' + ShipmentID;
-        if not ExecuteCall('GET', Jtoken, silent) then
-            Exit;
-    end;
-
-    local procedure GetShipments(_CurrentPage: Integer; Silent: Boolean);
-    var
-        QueryParams: Text;
-        Jtoken: JsonToken;
-        QueryParamsLbl: Label 'page=%1&per_page=%2', Locked = true;
-    begin
-        RequestURL := 'https://app.pakkelabels.dk/api/public/v3/shipments';
-        QueryParams := '';
-
-        if QueryParams <> '' then
-            QueryParams += '&';
-        QueryParams += STRSUBSTNO(QueryParamsLbl, _CurrentPage, 20);
-
-        if QueryParams <> '' then
-            RequestURL := RequestURL + '?' + QueryParams;
-
-        if not ExecuteCall('GET', Jtoken, silent) then
-            Exit;
-    end;
-
-    local procedure GetProducts(CountryCode: Code[10]; CarrierCode: Text; _CurrentPage: Integer; silent: Boolean);
-    var
-        QueryParams: Text;
-        Jtoken: JsonToken;
-        QueryParamsLbl: Label 'country_code=%1', Locked = true;
-        QueryParams2Lbl: Label 'carrier_code=%1', Locked = true;
-        QueryParams3Lbl: Label 'page=%1&per_page=%2', Locked = true;
-    begin
-        RequestURL := 'https://app.pakkelabels.dk/api/public/v3/products';
-        QueryParams := '';
-        if CountryCode <> '' then
-            QueryParams += STRSUBSTNO(QueryParamsLbl, CountryCode);
-        if CarrierCode <> '' then begin
-            if QueryParams <> '' then
-                QueryParams += '&';
-            QueryParams += STRSUBSTNO(QueryParams2Lbl, CarrierCode);
-        end;
-        if QueryParams <> '' then
-            QueryParams += '&';
-        QueryParams += STRSUBSTNO(QueryParams3Lbl, _CurrentPage, 20);
-
-        if QueryParams <> '' then
-            RequestURL := RequestURL + '?' + QueryParams;
-        if not ExecuteCall('GET', Jtoken, silent) then
-            Exit;
-
-    end;
-
     local procedure PrintJob(ShipmentDocument: Record "NPR Pacsoft Shipment Document") output: Text;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
@@ -869,20 +803,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             RequestString := PrintJob(Rec);
             if ExecuteCall('POST', JToken, false) then;
         end;
-    end;
-
-    local procedure TQSendPakkeLabel();
-    var
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-    begin
-        ShipmentDocument.SETFILTER(ShipmentDocument."Shipping Method Code", '<>%1', '');
-        ShipmentDocument.SETFILTER("Shipping Agent Code", '<>%1', '');
-        ShipmentDocument.SETFILTER("Shipping Agent Service Code", '<>%1', '');
-        ShipmentDocument.SETFILTER("Response Shipment ID", '');
-        if ShipmentDocument.FINDSET(true) then
-            repeat
-                CreateShipment(ShipmentDocument, true)
-            until ShipmentDocument.NEXT() = 0;
     end;
 
     [EventSubscriber(ObjectType::Table, 36, 'OnAfterModifyEvent', '', true, true)]

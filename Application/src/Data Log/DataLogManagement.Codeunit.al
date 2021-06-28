@@ -237,11 +237,6 @@
         RecRef.Close();
     end;
 
-    local procedure IsIntegrationRecord(TableID: Integer): Boolean
-    begin
-        exit(TempDataLogSetup.Get(TableID));
-    end;
-
     local procedure LoadMonTables()
     var
         DataLogSetup: Record "NPR Data Log Setup (Table)";

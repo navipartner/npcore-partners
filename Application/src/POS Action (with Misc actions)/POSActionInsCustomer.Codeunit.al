@@ -154,10 +154,6 @@ then begin
         //+NPR5.50 [353380]
     end;
 
-    local procedure "--- POS Workflow"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnAfterLogin', '', true, true)]
     local procedure SelectCustomerRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var

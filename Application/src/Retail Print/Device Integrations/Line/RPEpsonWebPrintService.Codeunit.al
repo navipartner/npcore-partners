@@ -41,25 +41,6 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
         exit(PrintJobs);
     end;
 
-    local procedure "-- Aux"()
-    begin
-    end;
-
-    local procedure GetSinglePrintJob(var WebPrintBuffer: Record "NPR Web Print Buffer"): Text
-    var
-        InStream: InStream;
-        InnerXML: Text;
-    begin
-        //Each print job is contained in a XML element : ePOSPrint
-        if WebPrintBuffer."Print Data".HasValue() then begin
-            WebPrintBuffer.CalcFields("Print Data");
-            WebPrintBuffer."Print Data".CreateInStream(InStream);
-            InStream.Read(InnerXML);
-            exit(InnerXML);
-        end;
-        exit('');
-    end;
-
     local procedure GetAllPrintJobs(var WebPrintBuffer: Record "NPR Web Print Buffer"): Text
     var
         TmpWebPrintBuffer: Record "NPR Web Print Buffer" temporary;

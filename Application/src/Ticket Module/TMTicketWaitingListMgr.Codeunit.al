@@ -174,10 +174,6 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         TicketNotifyParticipant.SendGeneralNotification(NotificationEntry);
     end;
 
-    local procedure CreateRemoveFromListNotification(): Integer
-    begin
-    end;
-
     local procedure CreateWaitingListNotifications(var TmpTicketWaitingList: Record "NPR TM Ticket Wait. List" temporary; var TmpNotificationEntryOut: Record "NPR TM Ticket Notif. Entry" temporary)
     begin
 
@@ -423,10 +419,6 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         repeat
             ProcessAdmission(Admission, Today, SendNotifications);
         until (Admission.Next() = 0);
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR TM Ticket Management", 'OnDetailedTicketEvent', '', true, true)]

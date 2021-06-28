@@ -2,7 +2,7 @@
 {
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
-        Text003: Label 'Filters - %1', Comment = '%1 = Table Name';
+
         Selection: Integer;
         Text004: Label '&Quantity,Quantity &to Receive,Quantity &Received';
 
@@ -612,103 +612,6 @@
         RetailJnlHeader."No." := RetailJnlCode;
         RetailJnlHeader."Register No." := POSUnit.GetCurrentPOSUnit();
 
-    end;
-
-    local procedure RunDynamicRequestPage(var ReturnFilters: Text; Filters: Text): Boolean
-    var
-        TableMetadata: Record "Table Metadata";
-        RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
-        FilterPageBuilder: FilterPageBuilder;
-        RecRef: RecordRef;
-        KyRef: KeyRef;
-        FldRef: FieldRef;
-        j: Integer;
-        DynamicRequestPageField: Record "Dynamic Request Page Field";
-        DynamicRequestPageField1: Record "Dynamic Request Page Field";
-    begin
-        if not TableMetadata.Get(6014407) then
-            exit(false);
-
-
-        DynamicRequestPageField.SetRange("Table ID", 6014407);
-        if not DynamicRequestPageField.FindSet() then begin
-            RecRef.Open(6014407);
-            RecRef.CurrentKeyIndex(1);
-            KyRef := RecRef.KeyIndex(1);
-            for j := 1 to KyRef.FieldCount do begin
-                if (j = 1) or (j = 6) then begin
-                    Clear(FldRef);
-                    FldRef := RecRef.FieldIndex(j);
-                    DynamicRequestPageField1.Init();
-                    DynamicRequestPageField1.Validate("Table ID", 6014407);
-                    DynamicRequestPageField1.Validate("Field ID", FldRef.Number);
-                    DynamicRequestPageField1.Insert(true);
-                    Commit();
-                end;
-            end;
-        end;
-
-        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, CopyStr('Audit Roll', 1, 20), 6014407) then
-            exit(false);
-        if Filters <> '' then
-            if not RequestPageParametersHelper.SetViewOnDynamicRequestPage(
-               FilterPageBuilder, Filters, CopyStr('Audit Roll', 1, 20), 6014407)
-            then
-                exit(false);
-
-        FilterPageBuilder.PageCaption := StrSubstNo(Text003, 'Audit Roll');
-        if not FilterPageBuilder.RunModal() then
-            exit(false);
-
-        ReturnFilters :=
-          RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr('Audit Roll', 1, 20), 6014407);
-
-        exit(true);
-    end;
-
-    local procedure SetFiltersOnTable(Filters: Text; var RecRef: RecordRef): Boolean
-    var
-        TempBlob: Codeunit "Temp Blob";
-        RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
-        OutStream: OutStream;
-    begin
-        RecRef.Open(6014407);
-
-        if Filters = '' then
-            exit(RecRef.FindSet());
-
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(OutStream);
-        OutStream.WriteText(Filters);
-
-        if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
-            exit(false);
-
-        exit(RecRef.FindSet());
-    end;
-
-    local procedure GetStoreLocationCode(): Code[10]
-    var
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSStore: Record "NPR POS Store";
-    begin
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-            exit('');
-        POSFrontEnd.GetSession(POSSession);
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSStore(POSStore);
-        exit(POSStore."Location Code");
-    end;
-
-    local procedure GetPOSUnitLocationCode(POSUnit: Record "NPR POS Unit"): Code[10]
-    var
-        POSStore: Record "NPR POS Store";
-    begin
-        if not POSStore.get(POSUnit."POS Store Code") then
-            exit;
-        exit(POSStore."Location Code");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014413, 'OnBeforePrintRetailJournal', '', true, true)]

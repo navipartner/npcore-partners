@@ -262,8 +262,5 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
         end;
     end;
 
-    local procedure NewItemHierachyLine()
-    begin
-    end;
 }
 

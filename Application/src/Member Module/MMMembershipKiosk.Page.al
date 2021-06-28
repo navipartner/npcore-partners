@@ -191,10 +191,6 @@ page 6060078 "NPR MM Membership Kiosk"
         end;
     end;
 
-    local procedure "--JsonHelpers"()
-    begin
-    end;
-
     local procedure GetJToken(JObject: JsonObject; JsonKey: Text; var JToken: JsonToken) KeyFound: Boolean
     var
         PlaceHolderLbl: Label '{%1: ""}', Locked = true;
@@ -290,10 +286,6 @@ page 6060078 "NPR MM Membership Kiosk"
 
         PutStringValue(JObject, 'ErrorMessage', ErrorMessage);
         exit(PageId::SHOWERROR);
-    end;
-
-    local procedure "--MM interactions"()
-    begin
     end;
 
     local procedure CreateMembership(JObject: JsonObject)

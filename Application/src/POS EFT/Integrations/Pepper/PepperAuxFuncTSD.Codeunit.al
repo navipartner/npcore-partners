@@ -18,10 +18,6 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
         Labels: DotNet NPRNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "NPR Pepper Term. Captions TSD";
 
-    local procedure "---Pepper_Set"()
-    begin
-    end;
-
     procedure InitializeProtocol()
     begin
 
@@ -180,10 +176,6 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
         SetUtilityOpCode(false, PepperOpCodes.CustomMenu, '');
     end;
 
-    local procedure "---Pepper_Get"()
-    begin
-    end;
-
     procedure GetResultCode() ResultCode: Integer
     begin
 
@@ -218,10 +210,6 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
             exit('');
 
         exit(AuxResult.XmlAdditionalParameters);
-    end;
-
-    local procedure "--Stargate2"()
-    begin
     end;
 
     procedure SetTransactionEntryNo(EntryNo: Integer)

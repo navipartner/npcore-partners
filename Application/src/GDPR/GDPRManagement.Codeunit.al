@@ -116,10 +116,6 @@ codeunit 6151120 "NPR GDPR Management"
         exit(true);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure VerifyAcceptEntryExist(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35]): Boolean
     var
         GDPRConsentLog: Record "NPR GDPR Consent Log";
@@ -150,10 +146,6 @@ codeunit 6151120 "NPR GDPR Management"
         if (GDPRConsentLog.FindLast()) then;
 
         exit(GDPRConsentLog."Entry Approval State");
-    end;
-
-    local procedure "--Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

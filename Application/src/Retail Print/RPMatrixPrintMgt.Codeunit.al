@@ -212,10 +212,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         PrintIterationFieldNo := FieldNo;
     end;
 
-    local procedure "// Locals"()
-    begin
-    end;
-
     local procedure GetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer): Text
     var
         DeviceType: Text;
@@ -580,10 +576,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
             exit(AttributeArray[AttributeID."Shortcut Attribute ID"]);
         end;
         //+NPR5.46 [314067]
-    end;
-
-    local procedure "// Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

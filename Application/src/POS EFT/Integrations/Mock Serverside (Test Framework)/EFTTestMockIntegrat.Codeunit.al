@@ -21,10 +21,6 @@ codeunit 6184543 "NPR EFT Test Mock Integrat."
         exit('TEST_MOCK');
     end;
 
-    local procedure "// EFT Interface implementation"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
@@ -176,10 +172,6 @@ codeunit 6184543 "NPR EFT Test Mock Integrat."
             exit;
 
         Skip := true; //There is no front end to pause
-    end;
-
-    local procedure "// Mock Behaviour"()
-    begin
     end;
 
     local procedure HandleSendEftDeviceRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request")

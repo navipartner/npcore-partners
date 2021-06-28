@@ -36,10 +36,6 @@
         exit('MOCK_CLIENT_SIDE');
     end;
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -263,20 +259,12 @@
         tmpEFTSetup.Insert();
     end;
 
-    local procedure "// Protocol Response"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184512, 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
     begin
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
-    end;
-
-    local procedure "// Generic Parameter Handlers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6184481, 'OnGetParameterNameCaption', '', false, false)]
@@ -457,10 +445,6 @@
                     if not RegEx.IsMatch(Parameter.Value, '^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\.(?!$)|$)){4}$') then
                         Parameter.FieldError(Value);
         end;
-    end;
-
-    local procedure "// Aux"()
-    begin
     end;
 
     procedure GetConnectionMethod(EFTSetup: Record "NPR EFT Setup"): Integer

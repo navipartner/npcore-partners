@@ -247,10 +247,6 @@ codeunit 6184514 "NPR EFT MobilePay Prot."
         Message(ErrorText);
     end;
 
-    local procedure "// Event Publishers"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin

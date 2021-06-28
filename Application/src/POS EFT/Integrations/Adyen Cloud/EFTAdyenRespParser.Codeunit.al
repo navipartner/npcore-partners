@@ -61,10 +61,6 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         EftTransactionEntryNo := EntryNo;
     end;
 
-    local procedure "// Parse"()
-    begin
-    end;
-
     local procedure ParsePaymentTransaction(Response: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         JObject: DotNet NPRNetJObject;
@@ -638,10 +634,6 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         if not ((JToken.ToString() = 'InProgress') or (JToken.ToString() = 'Busy')) then
             Error('Not InProgress');
         //+NPR5.53 [377533]
-    end;
-
-    local procedure "// Aux"()
-    begin
     end;
 
     local procedure GetLastReceiptLineEntryNo(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Integer

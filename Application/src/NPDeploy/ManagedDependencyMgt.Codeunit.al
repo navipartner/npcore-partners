@@ -556,11 +556,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     begin
     end;
 
-    [BusinessEvent(false)]
-    local procedure OnAfterReadDependenciesFromGroundControl()
-    begin
-    end;
-
     procedure ParseJSON(JSON: Text): JsonToken
     var
         JObject: JsonObject;

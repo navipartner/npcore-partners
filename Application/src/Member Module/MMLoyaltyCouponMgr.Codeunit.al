@@ -72,10 +72,6 @@
         exit(Coupon."No.");
     end;
 
-    local procedure "--- Coupon Interface"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
@@ -118,10 +114,6 @@
 
         Handled := true;
         Error(Text001);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

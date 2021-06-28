@@ -39,11 +39,6 @@ codeunit 6184518 "NPR EFT Adyen Cloud Prot."
         ResponseStatusCodeBuffer: Integer;
         ResponseErrorBodyBuffer: Text;
 
-    local procedure IntegrationType(): Text
-    begin
-        exit('ADYEN_CLOUD');
-    end;
-
     procedure SendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; OpenDialog: Boolean)
     begin
         // All the request types that show a front-end dialog while waiting for terminal customer interaction, are asynchronous using STARTSESSION to perform a long timeout webservice request.

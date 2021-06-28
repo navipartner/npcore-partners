@@ -594,26 +594,6 @@
         end;
     end;
 
-    local procedure GetCustomReportSelection(SourceType: Integer; BillToCustomer: Code[20]; NewUsage: Enum "Report Selection Usage") ReportID: Integer
-    var
-        CustomReportSelection: Record "Custom Report Selection";
-        EmailNaviDocsMgtWrapper: Codeunit "NPR E-mail NaviDocs Mgt.Wrap.";
-    begin
-        CustomReportSelection.SetRange("Source Type", SourceType);
-        CustomReportSelection.SetRange("Source No.", BillToCustomer);
-        CustomReportSelection.SetRange(Usage, NewUsage);
-        ReportID := 0;
-        if CustomReportSelection.FindFirst() then begin
-            ReportID := CustomReportSelection."Report ID";
-            if EmailNaviDocsMgtWrapper.HasCustomReportLayout(CustomReportSelection) or
-                (CustomReportSelection."Send To Email" <> '') then begin
-                UseCustomReportSelection := true;
-                GlobalCustomReportSelection := CustomReportSelection;
-            end;
-        end;
-        exit(ReportID);
-    end;
-
     local procedure GetCustomEmailForReportID(SourceType: Integer; BillToCustomer: Code[20]; NewUsage: Enum "Report Selection Usage"; ReportID: Integer)
     var
         CustomReportSelection: Record "Custom Report Selection";
