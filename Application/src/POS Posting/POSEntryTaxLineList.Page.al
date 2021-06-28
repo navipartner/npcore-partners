@@ -29,6 +29,11 @@ page 6150676 "NPR POS Entry Tax Line List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Time field';
                 }
+                field("Document No."; Rec."Document No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
+                }
                 field("Tax Base Amount"; Rec."Tax Base Amount")
                 {
                     ApplicationArea = All;
