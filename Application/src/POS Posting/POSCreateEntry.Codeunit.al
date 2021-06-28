@@ -1201,10 +1201,6 @@
         exit(SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Comment, SaleLinePOS."Sale Type"::"Debit Sale", SaleLinePOS."Sale Type"::"Open/Close"]);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreatePOSEntry(var SalePOS: Record "NPR POS Sale")
     begin

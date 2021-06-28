@@ -441,10 +441,6 @@
         POSSalesWorkflow.InitPOSSalesWorkflowSteps();
     end;
 
-    local procedure "--- Find"()
-    begin
-    end;
-
     local procedure FindCustomer(Element: XmlElement; var Customer: Record Customer): Boolean
     var
         NpCsWorkflow: Record "NPR NpCs Workflow";

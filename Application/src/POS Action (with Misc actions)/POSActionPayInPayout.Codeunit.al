@@ -189,10 +189,6 @@ then begin
         SaleLinePOS.Modify(true);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
 

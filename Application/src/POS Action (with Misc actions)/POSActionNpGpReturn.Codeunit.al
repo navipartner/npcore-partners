@@ -12,7 +12,6 @@
         NoGlobalSaleErr: Label 'Could not find record of sale';
         NpGpCrossCompanySetup: Record "NPR NpGp Cross Company Setup";
         NoInterCompTradeErr: Label 'Inter company exchange is not set up between "%1" and "%2"';
-        NotFoundErr: Label 'Return receipt reference number %1 not found.';
         ServicePasswordErr: Label 'Please check there is a password set up in %1';
         QuantityOverloadedErr: Label 'Quantity of items returned cannot exceed the original amount';
         ReadingErr: Label 'reading in %1';
@@ -436,47 +435,6 @@
         TempNpGpPOSSalesLine.FindSet();
     end;
 
-    local procedure VerifyReceiptForReversal(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; SalesTicketNo: Code[20])
-    var
-        POSEntry: Record "NPR POS Entry";
-        ReferenceNumber: Text;
-    begin
-        HandleReferenceNumber(Context, FrontEnd, ReferenceNumber);
-
-        POSEntry.SetRange("Document No.", SalesTicketNo);
-        if not POSEntry.FindFirst() then
-            Error(NotFoundErr, ReferenceNumber);
-    end;
-
-    local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR POS Sale"; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        Customer: Record Customer;
-        Contact: Record Contact;
-        POSEntry: Record "NPR POS Entry";
-    begin
-        POSEntry.SetRange("POS Unit No.", TempNpGpPOSSalesEntry."POS Unit No.");
-        POSEntry.SetRange("Document No.", TempNpGpPOSSalesEntry."Document No.");
-        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
-        POSEntry.SetRange("Customer No.", '<>%1', '');
-        if not POSEntry.FindFirst() then
-            exit;
-
-        if Customer.Get(POSEntry."Customer No.") then begin
-            SalePOS.Validate("Customer No.", Customer."No.");
-        end else begin
-            if not Contact.Get(POSEntry."Customer No.") then
-                exit;
-
-            SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Cash);
-            SalePOS.Validate("Customer No.", Contact."No.");
-        end;
-
-        SalePOS.Modify(true);
-        POSSale.Refresh(SalePOS);
-        POSSale.Modify(true, false);
-    end;
-
     local procedure TestQuantity(var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; SalePOS: Record "NPR POS Sale")
     var
         POSCrossReference: Record "NPR POS Cross Reference";
@@ -517,10 +475,6 @@
 
         if CopyStr(ReferenceNumber, StrLen(ReferenceNumber) - 1) = 'XX' then
             ReferenceNumber := CopyStr(ReferenceNumber, 1, StrLen(ReferenceNumber) - 2);
-    end;
-
-    local procedure "--- Ean Box Event Handling"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]

@@ -89,10 +89,6 @@ then begin
         RunPage(Item, PageId);
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
-
     local procedure RunPage(var Item: Record Item; PageId: Integer)
     begin
         if PageId = 0 then

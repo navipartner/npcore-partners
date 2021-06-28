@@ -123,13 +123,6 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         DataRow.Fields().Add(DataSourceExtensionName(), FindItemAddOn(SaleLinePOS, ItemAddOn));
     end;
 
-    [BusinessEvent(false)]
-#pragma warning disable AA0150
-    local procedure OnGetLineStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-#pragma warning restore
-    begin
-    end;
-
     procedure GenerateItemAddOnConfigJson(SalePOS: Record "NPR POS Sale"; MasterSaleLinePOS: Record "NPR POS Sale Line"; ItemAddOn: Record "NPR NpIa Item AddOn") ConfigJObject: JsonObject
     var
         AddOnSaleLinePOS: Record "NPR POS Sale Line";

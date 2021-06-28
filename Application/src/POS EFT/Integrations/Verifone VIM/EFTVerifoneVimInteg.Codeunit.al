@@ -24,10 +24,6 @@
         exit('VERIFONE_VIM');
     end;
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -323,10 +319,6 @@
         exit(UNKNOWN);
     end;
 
-    local procedure "// POS Unit specific parameters"()
-    begin
-    end;
-
     local procedure GetPOSUnitParameters(EFTSetup: Record "NPR EFT Setup"; var EFTVerifoneUnitParameter: Record "NPR EFT Verifone Unit Param.")
     begin
         if not EFTVerifoneUnitParameter.Get(EFTSetup."POS Unit No.") then begin
@@ -438,10 +430,6 @@
     begin
         GetPOSUnitParameters(EFTSetup, EFTVerifoneUnitParameter);
         exit(EFTVerifoneUnitParameter."Auto Login After Reconnect");
-    end;
-
-    local procedure "// Payment Type specific parameters"()
-    begin
     end;
 
     procedure GetPaymentTypeParameters(EFTSetup: Record "NPR EFT Setup"; var EFTVerifonePaymentParameter: Record "NPR EFT Verifone Paym. Param.")

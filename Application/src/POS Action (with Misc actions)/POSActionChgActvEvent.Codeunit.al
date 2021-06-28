@@ -5,7 +5,6 @@
         EventNoLbl: Label 'Event No.';
         DialogType: Option TextField,List;
         IsAlreadyAssigned: Label 'The Event ''%1'' has already been set up as active event for %2=''%3''.';
-        IncorrecFunctionCall: Label 'Incorrect function %1 call: must be called with a temporary record as parameter.\This indicates a programming bug, not a user error. Please contact system vendor.';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -216,26 +215,6 @@
     local procedure FilterJobs(var Job: Record Job)
     begin
         Job.SetRange("NPR Event", true);
-    end;
-
-    local procedure GetDimSetEntryFromDefDim(var DimSetEntry: Record "Dimension Set Entry"; TableID: Integer; No: Code[20])
-    var
-        DefaultDim: Record "Default Dimension";
-    begin
-        if not DimSetEntry.IsTemporary then
-            Error(IncorrecFunctionCall, 'CU6060161.GetDimSEtEntryFromDefDim');
-
-        DefaultDim.SetRange("Table ID", TableID);
-        DefaultDim.SetRange("No.", No);
-        DefaultDim.SetFilter("Dimension Code", '<>%1', '');
-        DefaultDim.SetFilter("Dimension Value Code", '<>%1', '');
-        if DefaultDim.FindSet() then
-            repeat
-                DimSetEntry.Init();
-                DimSetEntry."Dimension Code" := DefaultDim."Dimension Code";
-                DimSetEntry.Validate("Dimension Value Code", DefaultDim."Dimension Value Code");
-                DimSetEntry.Insert();
-            until DefaultDim.Next() = 0;
     end;
 }
 

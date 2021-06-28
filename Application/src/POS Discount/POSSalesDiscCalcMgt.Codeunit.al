@@ -172,10 +172,6 @@
         NpDcCouponMgt.ApplyDiscount(SalePOS);
     end;
 
-    local procedure "--- Apply Discount"()
-    begin
-    end;
-
     local procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     begin
 

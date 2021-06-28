@@ -92,10 +92,6 @@
         TicketSetup.Modify();
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure CreateNumberSeries(NoSerieCode: Code[20]; StartNumber: Code[20]; TypeDescription: Text[20]): Code[20]
     var
         NoSeries: Record "No. Series";

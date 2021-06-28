@@ -120,10 +120,6 @@
         end;
     end;
 
-    local procedure "--- Change Log"()
-    begin
-    end;
-
     local procedure EnableChangeLog()
     var
         ChangeLogSetup: Record "Change Log Setup";
@@ -188,10 +184,6 @@
 
         if PrevRec <> Format(ChangeLogSetupTable) then
             ChangeLogSetupTable.Modify();
-    end;
-
-    local procedure "--- Price Log"()
-    begin
     end;
 
     procedure UpdatePriceLog()
@@ -435,10 +427,6 @@
         exit(RetailPriceLogEntry."Change Log Entry No.");
     end;
 
-    local procedure "--- Retail Journal"()
-    begin
-    end;
-
     procedure RetailJnlImportFromPriceLog(RetailJnlHeader: Record "NPR Retail Journal Header")
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
@@ -647,10 +635,6 @@
     local procedure QueryPriceLogViewName(): Code[40]
     begin
         exit('QUERY_RETAIL_PRICE_LOG');
-    end;
-
-    local procedure "--- Triggers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6014475, 'OnAfterInsertEvent', '', true, true)]

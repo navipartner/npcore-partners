@@ -496,10 +496,6 @@ codeunit 6060115 "NPR TM Ticket WebService"
         exit(ImportEntry."Sequence No." + 1);
     end;
 
-    local procedure InitSetup(): Text
-    begin
-    end;
-
     local procedure TicketIntegrationSetup()
     var
         ImportType: Record "NPR Nc Import Type";

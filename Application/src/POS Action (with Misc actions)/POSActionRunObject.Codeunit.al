@@ -61,10 +61,6 @@ then begin
         Handled := true;
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
-
     local procedure RunObject(MenuFilterCode: Code[20]; POSSession: Codeunit "NPR POS Session")
     var
         POSMenuFilter: Record "NPR POS Menu Filter";

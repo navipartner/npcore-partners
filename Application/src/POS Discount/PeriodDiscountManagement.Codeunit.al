@@ -234,10 +234,6 @@
         exit(DiscountPriority."Discount No. Series");
     end;
 
-    local procedure "--- Discount Interface"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
     local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin

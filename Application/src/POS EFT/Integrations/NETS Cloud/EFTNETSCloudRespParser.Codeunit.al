@@ -58,10 +58,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
         EftTransactionEntryNo := EntryNo;
     end;
 
-    local procedure "// Parse"()
-    begin
-    end;
-
     local procedure ParseTransaction(Response: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         JObject: DotNet NPRNetJObject;
@@ -439,10 +435,6 @@ codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
     begin
         JValue := JObject.SelectToken(Path, WithError);
         exit(not IsNull(JValue));
-    end;
-
-    local procedure "// Aux"()
-    begin
     end;
 
     local procedure ParseReceipt(JObject: DotNet NPRNetJObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptElement: Text; var LastReceiptNo: Integer; var LastReceiptEntryNo: Integer; WriteToStream: OutStream)

@@ -144,33 +144,5 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
         exit('BUILTIN_REGISTER_BALANCING');
     end;
 
-    local procedure GetLastSaleNoText(): Text
-    begin
-        exit('LastSaleNo');
-    end;
 
-    local procedure GetLastSaleTotalText(): Text
-    begin
-        exit('LastSaleTotal');
-    end;
-
-    local procedure GetLastSalePaidText(): Text
-    begin
-        exit('LastSalePaid');
-    end;
-
-    local procedure GetLastSaleChangeText(): Text
-    begin
-        exit('LastSaleChange');
-    end;
-
-    local procedure GetLastSaleDateText(): Text
-    begin
-        exit('LastSaleDate');
-    end;
-
-    local procedure GetCompanyNameText(): Text
-    begin
-        exit('CompanyName');
-    end;
 }

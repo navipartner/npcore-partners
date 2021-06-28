@@ -88,10 +88,6 @@ codeunit 6014680 "NPR Endpoint Query WebService"
         exit(ImportEntry."Sequence No." + 1);
     end;
 
-    local procedure InitSetup(): Text
-    begin
-    end;
-
     local procedure EndpointIntegrationSetup()
     var
         ImportType: Record "NPR Nc Import Type";

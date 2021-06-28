@@ -105,17 +105,5 @@ page 6014455 "NPR Campaign Discount List"
             }
         }
     }
-
-    local procedure CodeOnActivate()
-    begin
-        Rec.SetCurrentKey(Code);
-        CurrPage.Update();
-    end;
-
-    local procedure DescriptionOnActivate()
-    begin
-        Rec.SetCurrentKey(Description);
-        CurrPage.Update();
-    end;
 }
 

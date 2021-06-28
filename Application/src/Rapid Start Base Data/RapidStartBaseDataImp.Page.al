@@ -122,17 +122,6 @@ page 6014615 "NPR RapidStart Base Data Imp."
         }
     }
 
-    local procedure TakeStep(Step: Integer)
-    begin
-        currentStep += Step;
-        SetControls();
-    end;
-
-    local procedure SetControls()
-    begin
-
-    end;
-
     var
         AdjustTableNames: Boolean;
         currentStep: Integer;

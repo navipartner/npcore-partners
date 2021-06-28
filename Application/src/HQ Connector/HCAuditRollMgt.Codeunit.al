@@ -109,10 +109,6 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
         CODEUNIT.Run(CODEUNIT::"NPR HC Post Audit Roll", HCAuditRoll);
     end;
 
-    local procedure "--- Database"()
-    begin
-    end;
-
     local procedure InsertAuditRollLine(Element: XmlElement; var HCAuditRoll: Record "NPR HC Audit Roll")
     var
         TempHCAuditRoll: Record "NPR HC Audit Roll" temporary;

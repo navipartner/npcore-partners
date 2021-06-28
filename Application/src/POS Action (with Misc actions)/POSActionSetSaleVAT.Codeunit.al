@@ -100,10 +100,6 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         //+NPR5.48 [333938]
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure CheckLimits(POSSession: Codeunit "NPR POS Session"; MinSaleAmount: Decimal; MinSaleAmountLimit: Boolean; MaxSaleAmount: Decimal; MaxSaleAmountLimit: Boolean)
     var
         POSSale: Codeunit "NPR POS Sale";

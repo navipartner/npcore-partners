@@ -484,10 +484,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         exit(true);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure CreateSalesEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TmpBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TotalEarnAmount: Decimal)
     var
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
@@ -673,10 +669,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipPointsEntry.Insert();
 
         LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
-    end;
-
-    local procedure "---"()
-    begin
     end;
 
     procedure InvoiceAllStorePoints()

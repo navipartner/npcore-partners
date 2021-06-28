@@ -314,37 +314,6 @@
         HospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
         NPHWaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
 
-    local procedure ActionViewLinkedSeating()
-    var
-        SeatingWaiterPadLinkPage: Page "NPR NPRE Seat.: WaiterPadLink";
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-    begin
-        SeatingWaiterPadLink.Reset();
-        SeatingWaiterPadLink.SetRange("Waiter Pad No.", Rec."No.");
-
-        Clear(SeatingWaiterPadLinkPage);
-        SeatingWaiterPadLinkPage.SetTableView(SeatingWaiterPadLink);
-        SeatingWaiterPadLinkPage.RunModal();
-    end;
-
-    local procedure ActionAddSeating()
-    var
-        SeatingList: Page "NPR NPRE Seating List";
-        Seating: Record "NPR NPRE Seating";
-        WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
-    begin
-        //Get a seating to add to waiter pad
-        Clear(SeatingList);
-        Seating.Reset();
-        SeatingList.SetTableView(Seating);
-        SeatingList.LookupMode(true);
-        SeatingList.Editable(false);
-        if SeatingList.RunModal() = ACTION::LookupOK then begin
-            SeatingList.GetRecord(Seating);
-            WaiterPadManagement.LinkSeatingToWaiterPad(Rec."No.", Seating.Code);
-        end;
-    end;
-
     local procedure LookupFlowStatus(StatusObjectType: Enum "NPR NPRE Status Object"; var StatusCode: Code[10]): Boolean
     var
         FlowStatus: Record "NPR NPRE Flow Status";

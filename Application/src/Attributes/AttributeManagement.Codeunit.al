@@ -702,10 +702,6 @@
         exit(false);
     end;
 
-    local procedure "--- Filter"()
-    begin
-    end;
-
     procedure GetAttributeFilterView(var NPRAttributeValueSet: Record "NPR Attribute Value Set"; "Record": Variant) FilterView: Text
     var
         NPRAttributeID: Record "NPR Attribute ID";

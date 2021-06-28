@@ -208,19 +208,6 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         ResponseMessage.Content.ReadAs(ResponseText);
     end;
 
-    local procedure IsEasyNets(PaymentLine: record "NPR Magento Payment Line"): Boolean
-    var
-        Paymentgateway: record "NPR Magento Payment Gateway";
-    begin
-        if paymentline."Payment Gateway Code" = '' then
-            exit(false);
-        if not Paymentgateway.get(PaymentLine."Payment Gateway Code") then
-            exit(false);
-
-        exit(Paymentgateway."Capture Codeunit Id" = CurrCodeunitId())
-
-    end;
-
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Magento Pmt. EasyNets Mgt");

@@ -318,21 +318,6 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         MobilePayV10Integration.GetMobilePayStores(EftSetup, TempMobilePayStores);
     end;
 
-    local procedure GetEftTypePosUnitBlobParamTextValue(var EFTTypePOSUnitBLOBParam: Record "NPR EFTType POSUnit BLOBParam." temporary): Text
-    var
-        RetVal: Text;
-        inStrm: InStream;
-    begin
-        if not EFTTypePOSUnitBLOBParam.Value.HASVALUE then
-            exit('');
-
-        EFTTypePOSUnitBLOBParam.CalcFields(Value);
-        EFTTypePOSUnitBLOBParam.Value.CreateInStream(inStrm);
-        inStrm.ReadText(RetVal);
-
-        exit(RetVal);
-    end;
-
     local procedure IsQROnlyPosUnit(PosUnitId: Text): Boolean
     begin
         // TO-DO: How do we know what is the beacon id if there is a static one (white boxes)?

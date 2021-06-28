@@ -75,10 +75,6 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         end;
     end;
 
-    local procedure "--Json Helper"()
-    begin
-    end;
-
     local procedure GetStringValue(JObject: JsonObject; JsonKey: Text) KeyValue: Text
     var
         JToken: JsonToken;
@@ -88,10 +84,6 @@ codeunit 6060126 "NPR MM Membership Kiosk"
             exit('');
 
         JToken.WriteTo(KeyValue);
-    end;
-
-    local procedure "Kiosk Pages"()
-    begin
     end;
 
     procedure WelcomePageCss() CSS: Text

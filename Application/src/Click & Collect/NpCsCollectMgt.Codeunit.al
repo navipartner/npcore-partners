@@ -452,11 +452,6 @@
         exit(CODEUNIT::"NPR NpCs Collect WS");
     end;
 
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR NpCs Collect Mgt.");
-    end;
-
     procedure GetNpSsDocumentListPageId(NpCsDocument: Record "NPR NpCs Document") PageId: Integer
     begin
         case NpCsDocument.Type of

@@ -67,10 +67,6 @@ then begin
         ShowSeating(FrontEnd, POSSession);
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
-
     local procedure ShowSeating(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
         SaleLinePOS: Record "NPR POS Sale Line";

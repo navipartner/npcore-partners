@@ -147,10 +147,6 @@
 
     end;
 
-    local procedure "--Functions"()
-    begin
-    end;
-
     local procedure ViewPoints(MemberCardNumber: Text[100])
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -288,11 +284,6 @@
 
     end;
 
-    local procedure "--Helpers"()
-    begin
-        //
-    end;
-
     local procedure SetCustomer(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[100])
     var
         POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
@@ -330,10 +321,6 @@
 
         ExtMemberCardNo := MemberCard."External Card No.";
         exit(ExtMemberCardNo <> '');
-    end;
-
-    local procedure "--DataSource Extension"()
-    begin
     end;
 
     local procedure ThisDataSource(): Text

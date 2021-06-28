@@ -1194,9 +1194,4 @@
     local procedure OnBeforeInsertArchiveEntry(var ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry"; NpRvVoucherEntry: Record "NPR NpRv Voucher Entry")
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean)
-    begin
-    end;
 }

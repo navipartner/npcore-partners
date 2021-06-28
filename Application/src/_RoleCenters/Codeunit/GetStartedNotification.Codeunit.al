@@ -5,27 +5,7 @@ codeunit 6014441 "NPR Get Started Notification"
         if not IsNotificationEnabled() then
             exit;
 
-       // SendGetStartedNotification();
-    end;
-
-    local procedure SendGetStartedNotification()
-    var
-        GettingStartedNotification: Notification;
-    begin
-        GettingStartedNotification.ID := NotificationIDLbl;
-        GettingStartedNotification.Message(GetStartedNotificationMsg);
-        GettingStartedNotification.Scope := NotificationScope::LocalScope;
-        GettingStartedNotification.AddAction(GetStartedNotificationActionTxt, Codeunit::"NPR Get Started Notification", 'GetStartedVideoAction');
-        GettingStartedNotification.AddAction(DontShowNotificationAgain, Codeunit::"NPR Get Started Notification", 'DisableNotificationAction');
-        GettingStartedNotification.Send();
-    end;
-
-    local procedure RecallGetStartedNotification()
-    var
-        GettingStartedNotification: Notification;
-    begin 
-        GettingStartedNotification.ID := NotificationIDLbl;
-        GettingStartedNotification.Recall();
+        // SendGetStartedNotification();
     end;
 
     procedure DisableNotificationAction(Notification: Notification)
@@ -67,8 +47,5 @@ codeunit 6014441 "NPR Get Started Notification"
     var
         NotificationIDLbl: Label '637ad99b-140d-4f2a-a865-e1b275c0a2a6', Locked = true;
         GetStartedMyNotificationMsg: Label 'Get Started Guide';
-        GetStartedNotificationMsg: Label 'Welcome to NP Retail, here''s a quick quide on how to setup everything!';
-        GetStartedNotificationActionTxt: Label 'Get Started!';
         GetStartedNotificationDescription: Label 'Show reminder to watch get started guide';
-        DontShowNotificationAgain: Label 'Don''t show me again';
 }

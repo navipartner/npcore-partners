@@ -58,7 +58,7 @@ codeunit 6014456 "NPR Item Category Mgt."
 
         if not Silent then
             if not ConfirmedOrGuiNotAlloved(ConfirmQst, false) then
-                    exit;
+                exit;
 
         ChildItemCategory.FindSet();
         repeat
@@ -235,7 +235,7 @@ codeunit 6014456 "NPR Item Category Mgt."
         // end;
 
         // if TempItem."NPR Variety Group" <> '' then
-            // Item.Validate(Item."NPR Variety Group", TempItem."NPR Variety Group");
+        // Item.Validate(Item."NPR Variety Group", TempItem."NPR Variety Group");
 
         // Item.Validate("Item Category Code", ItemCategory.Code);
 
@@ -253,19 +253,6 @@ codeunit 6014456 "NPR Item Category Mgt."
             exit(false);
 
         exit(VATPostingSetup.Get(TempItem."VAT Bus. Posting Gr. (Price)", TempItem."VAT Prod. Posting Group"));
-    end;
-
-    local procedure AddItemUOMIfMissing(ItemNo: Code[20]; ItemUomCode: Code[10])
-    var
-        ItemUnitOfMeasure: Record "Item Unit of Measure";
-    begin
-        if not ItemUnitofMeasure.Get(ItemNo, ItemUomCode) and (ItemUomCode <> '') then begin
-            ItemUnitOfMeasure."Item No." := ItemNo;
-            ItemUnitOfMeasure.Code := ItemUomCode;
-            ItemUnitOfMeasure."Qty. per Unit of Measure" := 1;
-            if ItemUnitOfMeasure.Insert() then
-                ;
-        end;
     end;
 
     #endregion

@@ -77,15 +77,6 @@ table 6059944 "NPR NaviDocs Entry Attachment"
     begin
     end;
 
-    local procedure IsWebClient(): Boolean
-    var
-        ActiveSession: Record "Active Session";
-    begin
-        if ActiveSession.Get(ServiceInstanceId(), SessionId()) then
-            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
-        exit(false);
-    end;
-
     local procedure FilenamePattern(): Text
     begin
         exit('NaviDocs-%1.%2');

@@ -175,10 +175,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         exit(PdfDoc);
     end;
 
-    local procedure "*** LoyaltyServerFunctions ***"()
-    begin
-    end;
-
     procedure RegisterSale(var RegisterSale: XMLport "NPR MM Register Sale")
     var
         TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
@@ -284,10 +280,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ImportEntry.Modify(true);
     end;
 
-    local procedure ReleaseReservation()
-    begin
-    end;
-
     procedure GetLoyaltyConfiguration(var GetLoyaltyConfiguration: XMLport "NPR MM Get Loyalty Config.")
     var
         TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
@@ -338,10 +330,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ImportEntry."Runtime Error" := false;
 
         ImportEntry.Modify(true);
-    end;
-
-    local procedure "*** Points to Coupons ***"()
-    begin
     end;
 
     procedure GetCouponEligibility(var LoyaltyCouponEligibility: XMLport "NPR MM Loyalty Coupon Elig.")

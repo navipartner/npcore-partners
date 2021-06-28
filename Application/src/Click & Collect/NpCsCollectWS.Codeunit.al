@@ -123,10 +123,6 @@
         collect_documents.RefreshSourceTable();
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
     [TryFunction]
     local procedure FindNpCsDocument(TempNpCsDocument: Record "NPR NpCs Document" temporary; var NpCsDocument: Record "NPR NpCs Document")
     begin

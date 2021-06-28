@@ -625,20 +625,5 @@ page 6060140 "NPR MM POS Member Card"
         ProfileManagement.ShowContactQuestionnaireCard(Contact, '', 0);
     end;
 
-    local procedure CreateMembership()
-    var
-        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MembershipSalesSetupPage: Page "NPR MM Membership Sales Setup";
-    begin
-
-        MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
-        if (MembershipSalesSetup.Count() = 1) then begin
-            MembershipSalesSetup.FindFirst();
-            MembershipSalesSetupPage.CreateMembership(MembershipSalesSetup);
-        end else begin
-            MembershipSalesSetupPage.SetTableView(MembershipSalesSetup);
-            MembershipSalesSetupPage.RunModal();
-        end;
-    end;
 }
 

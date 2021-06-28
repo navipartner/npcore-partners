@@ -14,10 +14,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         Text000: Label 'Tax Free';
         Text001: Label 'Boarding Pass';
 
-    local procedure "---POS Action functions"()
-    begin
-    end;
-
     local procedure ActionCode(): Text
     begin
         exit('BOARDINGPASS');
@@ -177,10 +173,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         POSSession.RequestRefreshData();
 
         Handled := true;
-    end;
-
-    local procedure "--Processing"()
-    begin
     end;
 
     local procedure DecodeBoardingPassString(iBoardingPassString: Text; iRequiredFromAirPortCode: Text; var oRequiredFromAirPortCodeInTrip: Boolean; var oRequiredFromAirPortFlightDate: Date; var oTravelStartDate: Date; var oTravelEndDate: Date; var oTravelDescription: Text; var oTravelSaveString: Text)

@@ -226,38 +226,6 @@ codeunit 6151130 "NPR TM Seating Mgt."
         CurrentTemplate.Modify();
     end;
 
-    local procedure ChangeParentN(CurrentEntryNumber: Integer; NewParentEntryNumber: Integer)
-    var
-        CurrentTemplate: Record "NPR TM Seating Template";
-        NewTemplate: Record "NPR TM Seating Template";
-        TmpSeatingTemplate: Record "NPR TM Seating Template" temporary;
-        ParentSeatingTemplate: Record "NPR TM Seating Template";
-        CurrentDepth: Integer;
-        NewDepth: Integer;
-        NewOrdinal: Integer;
-        NewPath: Code[250];
-        PathLbl: Label '%1/%2', Locked = true;
-    begin
-
-        CurrentTemplate.Get(CurrentEntryNumber);
-        CurrentDepth := CurrentTemplate."Indent Level" - 1; // Parent depth
-
-        NewTemplate.Get(NewParentEntryNumber);
-        NewDepth := NewTemplate."Indent Level";
-
-        ParentSeatingTemplate.SetFilter("Parent Entry No.", '=%1', NewParentEntryNumber);
-        NewOrdinal := ParentSeatingTemplate.Count() + 1;
-        NewPath := StrSubstNo(PathLbl, NewTemplate.Path, Format(CurrentTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
-
-        UpdateTemporaryPathListN(CurrentTemplate."Admission Code", CurrentTemplate.Path, NewPath, TmpSeatingTemplate, 4);
-        UpdatePersistentTemplate(TmpSeatingTemplate, (NewDepth - CurrentDepth));
-
-        CurrentTemplate.Ordinal := NewOrdinal;
-        CurrentTemplate.Path := NewPath;
-        CurrentTemplate."Parent Entry No." := NewParentEntryNumber;
-        CurrentTemplate.Modify();
-    end;
-
     procedure IndentNode(RecToIndent: Record "NPR TM Seating Template")
     var
         SeatingTemplate: Record "NPR TM Seating Template";

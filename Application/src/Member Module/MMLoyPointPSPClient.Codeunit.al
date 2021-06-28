@@ -15,10 +15,6 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         exit('MM_LOYALTY_PWP');
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -198,10 +194,6 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         //These requests are synchronous - which crashes the front end if we pause/resume.
         // but the result is checked from JS async UI
         Skip := false;
-    end;
-
-    local procedure "---"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeEndSale', '', true, true)]

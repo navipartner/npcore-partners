@@ -274,25 +274,6 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         exit(AdmissionCode);
     end;
 
-    local procedure CreateAdmissionScheduleEntry(AdmissionCode: Code[20]; StartDate: Date; StartTime: Time; EndDate: Date; EndTime: Time): Integer
-    var
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-    begin
-        AdmissionScheduleEntry."Entry No." := 0;
-        AdmissionScheduleEntry.INSERT();
-
-        AdmissionScheduleEntry."External Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
-        AdmissionScheduleEntry."Admission Code" := AdmissionCode;
-        AdmissionScheduleEntry."Schedule Code" := GenerateCode20();
-        AdmissionScheduleEntry."Admission Start Date" := StartDate;
-        AdmissionScheduleEntry."Admission Start Time" := StartTime;
-        AdmissionScheduleEntry."Admission End Date" := EndDate;
-        AdmissionScheduleEntry."Admission End Time" := EndTime;
-        AdmissionScheduleEntry.MODIFY();
-
-        exit(AdmissionScheduleEntry."Entry No.");
-    end;
-
     local procedure CreateBaseCalendar(CalendarCode: Code[10]; Desc: Text[30]): Code[10]
     var
         BaseCalendar: Record "Base Calendar";
@@ -587,11 +568,6 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
     local procedure GenerateCode20(): Code[20]
     begin
         exit(GetNextNoFromSeries('C2'));
-    end;
-
-    local procedure GetNextNo(): Code[20]
-    begin
-        exit(GetNextNoFromSeries('TM'));
     end;
 
     local procedure GetNextNoFromSeries(FromSeries: Code[2]): Code[20]

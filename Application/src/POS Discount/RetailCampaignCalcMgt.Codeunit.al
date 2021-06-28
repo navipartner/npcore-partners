@@ -7,10 +7,6 @@ codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
     begin
     end;
 
-    local procedure "--- Calc Header"()
-    begin
-    end;
-
     procedure CalcCostAmount(CampaignCode: Code[20]; LineNo: Integer) CostAmount: Decimal
     var
         RetailCampaignItemTotals: Query "NPR Retail Campgn. Item Totals";
@@ -92,10 +88,6 @@ codeunit 6014614 "NPR Retail Campaign Calc. Mgt."
         end;
 
         exit(SalesAmount);
-    end;
-
-    local procedure "---"()
-    begin
     end;
 
     procedure DrilldownItemEntries(CampaignCode: Code[20]; LineNo: Integer) Turnover: Decimal

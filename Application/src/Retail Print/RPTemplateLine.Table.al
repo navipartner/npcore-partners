@@ -469,11 +469,6 @@ table 6014445 "NPR RP Template Line"
         ModifiedRec();
     end;
 
-
-    local procedure "// Locals"()
-    begin
-    end;
-
     procedure FindParentLine()
     var
         RPTemplateLine: Record "NPR RP Template Line";
@@ -517,10 +512,6 @@ table 6014445 "NPR RP Template Line"
             Validate("Data Item Table", Integer);
             Validate("Data Item Name", TempRetailList.Choice);
         end;
-    end;
-
-    local procedure "// Event Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

@@ -11,10 +11,6 @@
         Error_TemplateAlreadyExists: Label 'Template %1 already exists. Please pick a new code.';
         Error_VersionDown: Label 'Cannot version down from %1 to %2';
 
-    local procedure "//Print"()
-    begin
-    end;
-
     procedure PrintTemplate(TemplateCode: Code[20]; "Record": Variant; MatrixIterationField: Integer)
     var
         RPTemplateHeader: Record "NPR RP Template Header";
@@ -38,10 +34,6 @@
                     MatrixPrintMgt.ProcessTemplate(TemplateCode, RecRef);
                 end;
         end;
-    end;
-
-    local procedure "// Versioning"()
-    begin
     end;
 
     procedure GetNextVersionNumber(var TemplateHeader: Record "NPR RP Template Header") NewVersion: Text
@@ -249,10 +241,6 @@
         DownloadFromStream(InStream, 'Export archived template to file', '', 'JSON File (*.json)|*.json', FileName);
     end;
 
-    local procedure "// Table Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyTemplateLine(var Rec: Record "NPR RP Template Line"; var xRec: Record "NPR RP Template Line"; RunTrigger: Boolean)
     var
@@ -313,10 +301,6 @@
                 RPTemplateLine.FindParentLine();
                 RPTemplateLine.Modify();
             until RPTemplateLine.Next() = 0;
-    end;
-
-    local procedure "// Data Upgrade"()
-    begin
     end;
 
     procedure UpgradeField(TableId: Integer; FromFieldId: Integer; ToFieldId: Integer)

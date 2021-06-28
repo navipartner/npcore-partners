@@ -733,10 +733,6 @@ codeunit 6151131 "NPR TM Seating UI"
     begin
     end;
 
-    local procedure "---"()
-    begin
-    end;
-
     local procedure GetStringValueFromJson(JObject: DotNet NPRNetJObject; "Key": Text): Text
     var
         JToken: DotNet NPRNetJToken;
@@ -806,36 +802,6 @@ codeunit 6151131 "NPR TM Seating UI"
 
         VarText := CopyStr(InputText, NextFieldPos);
         exit(RField);
-    end;
-
-    local procedure "--"()
-    begin
-    end;
-
-    local procedure CreateSeatingTest(rows: Integer; cols: Integer) SeatText: Text
-    var
-        a: Integer;
-        b: Integer;
-        ViewPort: Decimal;
-        PlaceHolderLbl: Label '<svg viewbox="0 0 %1 %1" preserveaspectratio="none">', Locked = true;
-    begin
-
-        ViewPort := cols * 50;
-        if (rows > cols) then
-            ViewPort := rows * 50;
-
-
-        // small angle approximation of cos (x) is 1-x*x/2 (radians) in the range 0..1 (0..57 degrees)
-
-        SeatText := StrSubstNo(PlaceHolderLbl, Format(ViewPort, 0, 9));
-
-        for a := 0 to rows - 1 do begin
-            for b := 0 to cols - 1 do begin
-                SeatText += CreateSeatWithPreset((b + a * cols + 1), 'free_seat', a, b, cols);
-            end;
-        end;
-
-        SeatText += '</svg>';
     end;
 
     local procedure CreateSeatingTemplate(ExtAdmScheduleEntryNo: Integer) SeatText: Text

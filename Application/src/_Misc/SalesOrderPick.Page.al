@@ -718,11 +718,6 @@ page 6014518 "NPR Sales Order Pick"
         exit(true);
     end;
 
-    local procedure ApproveCalcInvDisc()
-    begin
-        CurrPage.SalesLines.PAGE.ApproveCalcInvDisc();
-    end;
-
     local procedure SelltoCustomerNoOnAfterValidat()
     begin
         if Rec.GetFilter("Sell-to Customer No.") = xRec."Sell-to Customer No." then
@@ -752,16 +747,6 @@ page 6014518 "NPR Sales Order Pick"
     end;
 
     local procedure PricesIncludingVATOnAfterValid()
-    begin
-        CurrPage.Update();
-    end;
-
-    local procedure AccountCodeOnAfterValidate()
-    begin
-        CurrPage.SalesLines.PAGE.UpdateForm(true)
-    end;
-
-    local procedure Prepayment37OnAfterValidate()
     begin
         CurrPage.Update();
     end;

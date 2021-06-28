@@ -517,21 +517,6 @@
         exit(ReportPrinterInterface.GetLastError());
     end;
 
-    local procedure GetCustomReportLayout(var CustomReportLayout: Record "Custom Report Layout"; RecRef: RecordRef; ReportID: Integer): Boolean
-    var
-        CustomReportSelection: Record "Custom Report Selection";
-    begin
-        if RecRef.Number in [18, 36, 112, 114] then begin
-            CustomReportSelection.SetRange("Source Type", DATABASE::Customer);
-            CustomReportSelection.SetRange("Source No.", Format(RecRef.Field(4).Value));
-            CustomReportSelection.SetRange("Report ID", ReportID);
-            if CustomReportSelection.FindFirst() then
-                if CustomReportSelection."Custom Report Layout Code" <> '' then
-                    exit(CustomReportLayout.Get(CustomReportSelection."Custom Report Layout Code"));
-        end;
-        exit(false);
-    end;
-
     procedure CreateHandlingProfileLibrary()
     var
         HandlingTypePrintTxt: Label 'Print Document';

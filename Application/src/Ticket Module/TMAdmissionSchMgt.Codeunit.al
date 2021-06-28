@@ -265,10 +265,6 @@
         RefDateIsInRange := (ReferenceDate >= GenerateFromDate) and (ReferenceDate <= GenerateUntilDate);
     end;
 
-    local procedure DeterminePeriod()
-    begin
-    end;
-
     local procedure AddTimeEntry(StartFromDate: Date; Admission: Record "NPR TM Admission"; Schedule: Record "NPR TM Admis. Schedule"; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -564,22 +560,6 @@
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '>%1', ToDate);
         AdmissionScheduleEntry.ModifyALL("Reason Code", 'CTE01B');
         AdmissionScheduleEntry.ModifyALL(Cancelled, TRUE);
-    end;
-
-    local procedure GetHighestDateEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ReferenceDate: Date): Date
-    var
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-    begin
-
-        AdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
-        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-        AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', ScheduleCode);
-        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-
-        if (AdmissionScheduleEntry.FindLast()) then
-            exit(AdmissionScheduleEntry."Admission Start Date");
-
-        exit(ReferenceDate);
     end;
 
     local procedure IsIdentical(AdmissionScheduleEntry1: Record "NPR TM Admis. Schedule Entry"; AdmissionScheduleEntry2: Record "NPR TM Admis. Schedule Entry"): Boolean

@@ -3886,12 +3886,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(0);
     end;
 
-    local procedure ActivateCustomerForWeb()
-    begin
-
-        // TODO: Defer customer / contact sync until activated.
-    end;
-
     local procedure SetMemberFields(var Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         CurrentMember: Record "NPR MM Member";
@@ -4282,10 +4276,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure PrintCard()
-    begin
-    end;
-
     local procedure EncodeSHA1(Plain: Text): Text
     begin
 
@@ -4657,10 +4647,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(false);
     end;
 
-    local procedure "--Events"()
-    begin
-    end;
-
     local procedure OnMembershipChangeEvent(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
@@ -4670,10 +4656,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
             Membership."Modified At" := CurrentDateTime();
             Membership.Modify(true);
         end;
-    end;
-
-    local procedure "--ExternalSearchFunctions"()
-    begin
     end;
 
     procedure GetMembershipFromUserPassword(UserLogonId: Code[50]; Password: Text[50]) MembershipEntryNo: Integer

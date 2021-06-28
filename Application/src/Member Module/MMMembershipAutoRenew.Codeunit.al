@@ -202,20 +202,6 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    local procedure PostAutoRenewInvoiceBatch(var TmpMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary)
-    var
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
-    begin
-
-        MemberInfoCapture.SetFilter("Auto-Renew Entry No.", '=%1', TmpMembershipAutoRenew."Entry No.");
-        if (MemberInfoCapture.FindSet()) then begin
-            repeat
-                if (not PostDocument(MemberInfoCapture)) then
-                    TmpMembershipAutoRenew."Invoice Posting Fail Count" += 1;
-            until (MemberInfoCapture.Next() = 0);
-        end;
-    end;
-
     local procedure PostDocument(var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         SalesHeader: Record "Sales Header";
@@ -437,10 +423,6 @@
 
     end;
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterMembershipCreateEvent', '', true, true)]
     local procedure OnAfterMembershipCreateSubscriber(Membership: Record "NPR MM Membership")
     var
@@ -460,10 +442,6 @@
 
         if (not GuiAllowed) then
             exit;
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     local procedure SetResponseOk(var MemberInfoCapture: Record "NPR MM Member Info Capture")

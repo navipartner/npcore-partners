@@ -102,53 +102,6 @@ codeunit 6014638 "NPR POS Normal Tax Backward"
         Rec."VAT Base Amount" := Rec.Amount;
     end;
 
-    local procedure ApplyDiscounts(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
-    begin
-        Rec."Discount %" := POSSaleTax."Calculated Discount %";
-        Rec."Discount Amount" := POSSaleTax."Calculated Discount Amount";
-        Rec."Invoice Discount Amount" := POSSaleTax."Calculated Inv. Disc. Amount";
-        Rec."Allow Line Discount" := POSSaleTax."Calc. Applied Line Discount";
-        Rec."Allow Invoice Discount" := POSSaleTax."Calc. Applied Invoice Discount";
-
-        if Rec."Discount %" <> 0 then
-            Rec."Discount Amount" := Round(Rec.Amount * Rec."Discount %" / 100, Currency."Amount Rounding Precision")
-        else
-            if Rec."Discount Amount" <> 0 then begin
-                Rec."Discount Amount" := Round(Rec."Discount Amount", Currency."Amount Rounding Precision");
-                Rec."Discount %" := Round(100 - (Rec.Amount - Rec."Discount Amount") / Rec.Amount * 100, 0.0001);
-            end;
-        Rec.Amount := Rec.Amount - Rec."Discount Amount" - Rec."Invoice Discount Amount";
-        Rec."Line Amount" := Rec."Line Amount" - Rec."Discount Amount" - Rec."Invoice Discount Amount";
-        Rec."Amount Including VAT" := Rec."Amount Including VAT" - Rec."Discount Amount" - Rec."Invoice Discount Amount";
-    end;
-
-    local procedure ApplyDiscounts(var POSSaleTaxLine: Record "NPR POS Sale Tax Line")
-    begin
-        if not POSSaleTaxLine."Applied Line Discount" then begin
-            POSSaleTaxLine."Discount %" := 0;
-            POSSaleTaxLine."Discount Amount" := 0;
-        end else begin
-            POSSaleTaxLine."Amount Excl. Tax" := POSSaleTaxLine."Amount Excl. Tax" - POSSaleTaxLine."Discount Amount";
-            POSSaleTaxLine."Line Amount" := POSSaleTaxLine."Amount Excl. Tax";
-            POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxLine."Amount Excl. Tax" * (1 + POSSaleTaxLine."Tax %" / 100) - POSSaleTaxLine."Discount Amount";
-            POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Amount Incl. Tax" - POSSaleTaxLine."Amount Excl. Tax";
-            POSSaleTaxLine."Unit Price Incl. Tax" := POSSaleTaxLine."Amount Incl. Tax" / POSSaleTaxLine.Quantity;
-            POSSaleTaxLine."Unit Tax" := POSSaleTaxLine."Tax Amount" / POSSaleTaxLine.Quantity;
-        end;
-        if not POSSaleTaxLine."Applied Invoice Discount" then begin
-            POSSaleTaxLine."Invoice Disc. Amount" := 0;
-        end else begin
-            POSSaleTaxLine."Amount Excl. Tax" := POSSaleTaxLine."Amount Excl. Tax" - POSSaleTaxLine."Invoice Disc. Amount";
-            POSSaleTaxLine."Line Amount" := POSSaleTaxLine."Amount Excl. Tax";
-            POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxLine."Amount Excl. Tax" * (1 + POSSaleTaxLine."Tax %" / 100) - POSSaleTaxLine."Invoice Disc. Amount";
-            POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Amount Incl. Tax" - POSSaleTaxLine."Amount Excl. Tax";
-            POSSaleTaxLine."Unit Price Incl. Tax" := POSSaleTaxLine."Amount Incl. Tax" / POSSaleTaxLine.Quantity;
-            POSSaleTaxLine."Unit Tax" := POSSaleTaxLine."Tax Amount" / POSSaleTaxLine.Quantity;
-        end;
-        if POSSaleTaxLine."Applied Invoice Discount" or POSSaleTaxLine."Applied Invoice Discount" then
-            POSSaleTaxLine.Modify();
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateTaxLines(var POSSaleTax: record "NPR POS Sale Tax"; Rec: Record "NPR POS Sale Line")
     begin
