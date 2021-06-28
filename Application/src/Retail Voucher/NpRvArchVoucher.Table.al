@@ -237,7 +237,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
             Caption = 'Barcode';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(306; "Barcode Image"; Media)

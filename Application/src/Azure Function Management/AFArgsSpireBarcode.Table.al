@@ -65,7 +65,7 @@ table 6151572 "NPR AF Args: Spire Barcode"
             Caption = 'Image';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(19; Picture; Media)
