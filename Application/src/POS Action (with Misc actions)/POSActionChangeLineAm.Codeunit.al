@@ -65,10 +65,6 @@ then begin
         Handled := true;
     end;
 
-    local procedure "-- Ean Box Event Handling"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var

@@ -26,10 +26,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         MembershipEvents: Codeunit "NPR MM Membership Events";
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
     local procedure ActionCode(): Text
     begin
         exit('MM_MEMBERMGT');
@@ -677,10 +673,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure "--Helpers"()
-    begin
-    end;
-
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
 
@@ -750,32 +742,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberInfoCapture.DeleteAll();
     end;
 
-    local procedure ShowAlterMembershipItemSelection(Type: Option; ExternalCardNo: Text[100]; ReferenceDate: Date; NotValidMessage: Text): Code[20]
-    var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        Membership: Record "NPR MM Membership";
-        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        ItemNo: Code[20];
-        NotFoundReasonText: Text;
-    begin
-
-        if (not Membership.Get(MembershipManagement.GetMembershipFromExtCardNo(ExternalCardNo, ReferenceDate, NotFoundReasonText))) then
-            if (NotFoundReasonText <> '') then
-                Error(NotFoundReasonText)
-            else
-                Error(MEMBERSHIP_BLOCKED_NOT_FOUND, ExternalCardNo);
-
-        MembershipAlterationSetup.SetFilter("Alteration Type", '=%1', Type);
-        MembershipAlterationSetup.SetFilter("From Membership Code", '=%1', Membership."Membership Code");
-
-        ItemNo := ShowAlterMembershipLookupList(Membership."Entry No.",
-          MembershipAlterationSetup,
-          StrSubstNo(CHANGEMEMBERSHIP_LOOKUP_CAPTION, Format(MembershipAlterationSetup."Alteration Type"), Membership."External Membership No.", Membership."Membership Code"),
-          NotValidMessage);
-
-        exit(ItemNo);
-    end;
-
     local procedure SetReceiptReference(EntryNo: Integer; ReceiptNo: Code[20]; LineNo: Integer)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -786,10 +752,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             MemberInfoCapture."Line No." := LineNo;
             MemberInfoCapture.Modify();
         end;
-    end;
-
-    local procedure "--GUI"()
-    begin
     end;
 
     local procedure GetAlterMembershipItemSelection(Type: Option; ExternalCardNo: Text[100]; ReferenceDate: Date; NotValidMessage: Text): Code[20]
@@ -928,44 +890,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure "--- Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeLoadSavedSale', '', true, true)]
-    local procedure OnBeforeLoadSavedSaleSubscriber_discontinued(var Sender: Codeunit "NPR POS Sale"; OriginalSalesTicketNo: Code[20]; NewSalesTicketNo: Code[20])
-    var
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MemberInfoCapture2: Record "NPR MM Member Info Capture";
-        POSSalesInfo: Record "NPR MM POS Sales Info";
-    begin
-
-        MemberInfoCapture.SetCurrentKey("Receipt No.");
-        MemberInfoCapture.SetFilter("Receipt No.", '=%1', OriginalSalesTicketNo);
-        if (MemberInfoCapture.FindSet()) then begin
-            repeat
-                MemberInfoCapture2.Get(MemberInfoCapture."Entry No.");
-                MemberInfoCapture2."Receipt No." := NewSalesTicketNo;
-                MemberInfoCapture2.Modify();
-            until (MemberInfoCapture.Next() = 0);
-        end;
-
-        if (POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0)) then begin
-            POSSalesInfo."Receipt No." := NewSalesTicketNo;
-            if (not (POSSalesInfo.Insert())) then;
-        end;
-
-        POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::LINE);
-        POSSalesInfo.SetFilter("Receipt No.", '=%1', OriginalSalesTicketNo);
-        if (POSSalesInfo.FindSet()) then begin
-            repeat
-                POSSalesInfo."Receipt No." := NewSalesTicketNo;
-                if (not POSSalesInfo.Insert()) then;
-            until (POSSalesInfo.Next() = 0);
-        end;
-
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
     local procedure OnBeforeLoadSavedSaleSubscriber(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     var
@@ -1005,11 +929,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    local procedure "--- OnAfterInsertSaleLine Workflow"()
-    begin
-
-    end;
-
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -1032,10 +951,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
         exit(CODEUNIT::"NPR MM POS Action: MemberMgmt.");
 
-    end;
-
-    local procedure "--POS Workflow"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnAfterLogin', '', true, true)]

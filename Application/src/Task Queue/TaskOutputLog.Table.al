@@ -177,18 +177,5 @@ table 6059905 "NPR Task Output Log"
         exit(ConvertStr(ErrorString, Format(CR) + Format(LF), '\\'));
     end;
 
-    local procedure AppendFile(Filename: Text)
-    var
-        IStream: InStream;
-    begin
-        //-TQ1.29
-        if not Exists(Filename) then
-            exit;
-
-        "File Name" := Filename;
-        Rec.File.CreateInStream(IStream);
-        IStream.Read(Filename);
-        //+TQ1.29
-    end;
 }
 

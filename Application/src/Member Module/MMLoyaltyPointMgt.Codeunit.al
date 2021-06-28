@@ -658,10 +658,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
     end;
 
-    local procedure "--RulesSelection"()
-    begin
-    end;
-
     local procedure CheckItemRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; AmountIsDiscounted: Boolean; var RuleReference: Integer): Integer
     var
         LoyaltyItemPointSetup: Record "NPR MM Loy. Item Point Setup";
@@ -768,10 +764,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         // No Rule Found
         RuleReference := 0;
         exit(RuleType::NO_RULE);
-    end;
-
-    local procedure "--consume points"()
-    begin
     end;
 
     procedure IssueOneCoupon(MembershipEntryNo: Integer; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; DocumentNo: Code[20]; PostingDate: Date; SubTotal: Decimal) CouponNo: Code[20]
@@ -1399,32 +1391,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                                                  StrSubstNo(ExpireLbl, Format(Today(), 0, 9)), 'Points Expiry');
         end;
 
-    end;
-
-    local procedure CalculateExpirePointsToDateWorker(var Membership: Record "NPR MM Membership"; EarnPeriodEnd: Date; BurnPeriodEnd: Date) PointsToExpire: Integer
-    var
-        PeriodPoints: Integer;
-        TotalExpiredPoints: Integer;
-        TotalRedeemedPoints: Integer;
-    begin
-
-        Membership.SetFilter("Date Filter", '..%1', Today);
-        Membership.CalcFields("Expired Points");
-        TotalExpiredPoints := Membership."Expired Points";
-
-        Membership.SetFilter("Date Filter", '..%1', BurnPeriodEnd);
-        Membership.CalcFields("Redeemed Points (Withdrawl)", "Remaining Points");
-        TotalRedeemedPoints := Membership."Redeemed Points (Withdrawl)";
-
-        Membership.SetFilter("Date Filter", '..%1', EarnPeriodEnd);
-        Membership.CalcFields("Remaining Points");
-        PeriodPoints := Membership."Remaining Points";
-
-        PointsToExpire := PeriodPoints + TotalExpiredPoints + TotalRedeemedPoints;
-    end;
-
-    local procedure "--Membership Elegibility and Upgrade"()
-    begin
     end;
 
     procedure GetNextLoyaltyTier(MembershipEntryNo: Integer; Upgrade: Boolean; var LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members."): Boolean

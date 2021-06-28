@@ -45,10 +45,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         end;
     end;
 
-    local procedure "// Operations"()
-    begin
-    end;
-
     local procedure Reconciliation(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTSetup: Record "NPR EFT Setup";
@@ -496,10 +492,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         end;
     end;
 
-    local procedure "// API"()
-    begin
-    end;
-
     [TryFunction]
     local procedure InvokeLogin(EftTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; var Response: Text)
     var
@@ -765,10 +757,6 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         exit(Response);
     end;
 
-    local procedure "// Aux"()
-    begin
-    end;
-
     procedure GetToken(EFTSetup: Record "NPR EFT Setup"): Text
     var
         EFTNETSCloudToken: Codeunit "NPR EFT NETSCloud Token";
@@ -814,19 +802,9 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
         end;
     end;
 
-    local procedure GetDateTime(): Text
-    begin
-        exit(Format(CurrentDateTime, 0, 9));
-    end;
-
     local procedure GetAmount(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
     begin
         exit(DelChr(Format(Abs(EFTTransactionRequest."Amount Input"), 0, '<Precision,2:2><Standard Format,9>'), '=', '.'));
-    end;
-
-    local procedure GetCashbackAmount(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
-    begin
-        exit(DelChr(Format(EFTTransactionRequest."Cashback Amount", 0, '<Precision,2:2><Standard Format,9>'), '=', '.'));
     end;
 
     procedure CancelTrxIfTerminalThrewInProgressError(EFTTransactionRequest: Record "NPR EFT Transaction Request"; Response: Text)

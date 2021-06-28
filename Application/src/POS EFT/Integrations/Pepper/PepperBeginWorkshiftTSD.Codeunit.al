@@ -220,10 +220,6 @@ codeunit 6184491 "NPR Pepper Begin Workshift TSD"
     begin
     end;
 
-    local procedure "---Pepper_Get"()
-    begin
-    end;
-
     procedure GetILP_XmlLicenseString(var XmlLicenseContents: Text) HaveLicenseText: Boolean
     begin
 
@@ -259,10 +255,6 @@ codeunit 6184491 "NPR Pepper Begin Workshift TSD"
             exit('');
 
         exit(StartWorkShiftResponse.OpenReceipt());
-    end;
-
-    local procedure "--Stargate2"()
-    begin
     end;
 
     procedure SetTransactionEntryNo(EntryNo: Integer)

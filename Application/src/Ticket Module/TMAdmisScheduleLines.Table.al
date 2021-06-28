@@ -367,21 +367,5 @@ table 6060119 "NPR TM Admis. Schedule Lines"
         Admission.TestField("Capacity Limits By", Admission."Capacity Limits By"::OVERRIDE);
     end;
 
-    local procedure CheckUncancelledEntries()
-    var
-        TMAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        TextUncancelled: Label 'Please cancel all future Admission Schedule Entries for %1 %2 %3.';
-    begin
-        //-TM1.11
-        TMAdmissionScheduleEntry.Reset();
-        TMAdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
-        TMAdmissionScheduleEntry.SetRange("Admission Code", "Admission Code");
-        TMAdmissionScheduleEntry.SetRange("Schedule Code", "Schedule Code");
-        TMAdmissionScheduleEntry.SetRange(Cancelled, false);
-        TMAdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', WorkDate());
-        if not TMAdmissionScheduleEntry.IsEmpty then
-            Error(TextUncancelled, TableCaption, "Admission Code", "Schedule Code");
-        //+TM1.11
-    end;
 }
 

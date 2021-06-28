@@ -293,26 +293,6 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
     #endregion
 
     #region Advanced Functions
-    local procedure Adjust(variable: Text[30]; nnn: Integer)
-    begin
-        // Ref sheet 18
-        TempPattern := 'ADJUST %1 %2';
-        AddToBuffer(StrSubstNo(TempPattern, variable, nnn));
-    end;
-
-    local procedure AdjustDUP(nnn: Integer)
-    begin
-        // Ref sheet 20
-        TempPattern := 'ADJUST_DUP %1';
-        AddToBuffer(StrSubstNo(TempPattern, nnn));
-    end;
-
-    local procedure AreaClear(x: Integer; y: Integer; w: Integer; h: Integer)
-    begin
-        // Ref sheet 21
-        TempPattern := 'AREA_CLEAR %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, x, y, w, h));
-    end;
 
     local procedure Barcode(type: Text[30]; x: Integer; y: Integer; h: Integer; characters: Text[30])
     begin
@@ -339,49 +319,6 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, Rnnn, type, modifiers, x, y, h, characters));
     end;
 
-    local procedure BarcodeFont(type: Text[30])
-    begin
-        // Ref sheet 27
-        // Type, refer to table 3 in documentation.
-        TempPattern := 'BARCODE_FONT %1';
-        AddToBuffer(StrSubstNo(TempPattern, type));
-    end;
-
-    local procedure BarcodePDF417()
-    begin
-        // Ref sheet 30-33
-        // Type, refer to table 3 in documentation.
-        Error('Not Implemented!');
-    end;
-
-    local procedure BarcodeUPS(x: Integer; y: Integer; mode: Integer; data: Text[30])
-    begin
-        // Ref sheet 34-37
-        // mode in [0-6]
-        TempPattern := 'BARCODE UPS %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, x, y, mode, data));
-    end;
-
-    local procedure Comment(characters: Text[30])
-    begin
-        // Ref sheet 38
-        TempPattern := 'COMMENT %1';
-        AddToBuffer(StrSubstNo(TempPattern, characters));
-    end;
-
-    local procedure Double()
-    begin
-        // Ref sheet 39
-        Error('Not Implemented!');
-    end;
-
-    local procedure DrawBox(x: Integer; y: Integer; w: Integer; h: Integer; t: Integer)
-    begin
-        // Ref sheet 40
-        TempPattern := 'DRAWBOX %1 %2 %3 %4 %4';
-        AddToBuffer(StrSubstNo(TempPattern, x, y, w, h, t));
-    end;
-
     local procedure DrawLine(x: Integer; y: Integer; w: Integer)
     begin
         // Not in ref sheet
@@ -392,33 +329,12 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, x, y, x + w, y, 2));
     end;
 
-    local procedure FillBox(x: Integer; y: Integer; w: Integer; h: Integer)
-    begin
-        // Ref sheet 43
-        TempPattern := 'FILL_BOX %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, x, y, w, h));
-    end;
-
-    local procedure Halt()
-    begin
-        // Ref sheet 42
-        TempPattern := 'HALT';
-        AddToBuffer(TempPattern);
-    end;
-
     local procedure HeaderLine(mode: Text[2]; x: Integer; dottime: Integer; maxY: Integer; numlbls: Integer)
     begin
         // Ref sheet 51-54
         // mode in [!,@,!#,#,!*,!+,!A]
         TempPattern := '%1 %2 %3 %4 %5';
         AddToBuffer(StrSubstNo(TempPattern, mode, x, dottime, maxY, numlbls));
-    end;
-
-    local procedure Index()
-    begin
-        // Ref sheet 55
-        TempPattern := 'INDEX';
-        AddToBuffer(TempPattern);
     end;
 
     local procedure Justify(alignment: Text[6])
@@ -429,56 +345,6 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, alignment));
     end;
 
-    local procedure Multiple(nnn: Integer)
-    begin
-        // Ref sheet 60-6
-        // nnn in [2:9]
-        TempPattern := 'MULTIPLE %1';
-        AddToBuffer(StrSubstNo(TempPattern, nnn));
-    end;
-
-    local procedure NoIndex()
-    begin
-        // Ref sheet 55
-        TempPattern := 'NOINDEX';
-        AddToBuffer(TempPattern);
-    end;
-
-    local procedure Pitch(nnn: Integer)
-    begin
-        // Ref sheet 63-64
-        TempPattern := 'PITCH %1';
-        AddToBuffer(StrSubstNo(TempPattern, nnn));
-    end;
-
-    local procedure Quantity(numlabels: Integer)
-    begin
-        // Ref sheet 65
-        TempPattern := 'QUANTITY %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, numlabels));
-    end;
-
-    local procedure Rotate90(type: Text[5]; x: Integer; y: Integer; characters: Text[250])
-    begin
-        // Ref sheet 72-73
-        TempPattern := 'R90 %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, type, x, y, characters));
-    end;
-
-    local procedure Rotate180(type: Text[5]; x: Integer; y: Integer; characters: Text[250])
-    begin
-        // Ref sheet 72-73
-        TempPattern := 'R180 %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, type, x, y, characters));
-    end;
-
-    local procedure Rotate270(type: Text[5]; x: Integer; y: Integer; characters: Text[250])
-    begin
-        // Ref sheet 72-73
-        TempPattern := 'R270 %1 %2 %3 %4';
-        AddToBuffer(StrSubstNo(TempPattern, type, x, y, characters));
-    end;
-
     local procedure String(type: Text[10]; x: Integer; y: Integer; characters: Text[250])
     begin
         // Ref sheet 74-77
@@ -487,36 +353,12 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, type, x, y, characters));
     end;
 
-    local procedure String2(eximage: Integer; exspace: Integer; xmult: Integer; ymult: Integer; type: Text[5]; x: Integer; y: Integer; characters: Text[250])
-    begin
-        // Ref sheet 74-77
-        // Version including optional parameters
-        // type in [3X5,5X7,8X8,9X12,12X16,18X23,24X31]
-        TempPattern := 'STRING (%1,%2,%3,%4) %5 %6 %7 %8';
-        AddToBuffer(StrSubstNo(TempPattern, eximage, exspace, xmult, ymult, type, x, y, characters));
-    end;
-
     local procedure Text(fontID: Text[1]; x: Integer; y: Integer; characters: Text[250])
     begin
         // Ref sheet 78-80
         // fontID in [1:6]
         TempPattern := 'TEXT %1 %2 %3 %4';
         AddToBuffer(StrSubstNo(TempPattern, fontID, x, y, characters));
-    end;
-
-    local procedure Text2(spacing: Integer; rotation: Integer; xmult: Integer; ymult: Integer; fontID: Integer; x: Integer; y: Integer; characters: Text[250])
-    begin
-        // Ref sheet 78-80
-        // fontID in [1:6]
-        TempPattern := 'TEXT (%1,%2,%3,%4) %5 %6 %7 %8';
-        AddToBuffer(StrSubstNo(TempPattern, spacing, rotation, xmult, ymult, fontID, x, y, characters));
-    end;
-
-    local procedure UniversalClear()
-    begin
-        // Ref sheet 86
-        TempPattern := '23 23 23 23 23 CLEAR 23 23 23 23 23';
-        AddToBuffer(ESC.Get(TempPattern));
     end;
 
     local procedure UltraFont(T: Text[1]; nnn: Text[10]; x: Integer; y: Integer; char: Text[250])
@@ -552,11 +394,6 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
     local procedure AddToBuffer(Text: Text[1024])
     begin
         AddTextToBuffer(Text);
-    end;
-
-    local procedure AddCharToBuffer(CharCode: Integer)
-    begin
-        PrintBuffer += Format(CharCode);
     end;
 
     local procedure AddTextToBuffer(Text: Text[1024])

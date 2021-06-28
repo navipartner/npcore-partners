@@ -704,16 +704,6 @@
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
-    local procedure OnBeforeLoadSavedSale(OriginalSalesTicketNo: Code[20]; NewSalesTicketNo: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(TRUE, false)]
-    local procedure OnAfterLoadSavedSale(OriginalSalesTicketNo: Code[20]; NewSalesTicketNo: Code[20])
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeResumeSale(SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin

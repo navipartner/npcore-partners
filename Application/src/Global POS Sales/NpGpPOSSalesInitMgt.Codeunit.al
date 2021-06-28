@@ -132,10 +132,6 @@
         end;
     end;
 
-    local procedure "-- Sync Setup"()
-    begin
-    end;
-
     procedure InitSyncSetup() TaskProcessorCode: Text
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";

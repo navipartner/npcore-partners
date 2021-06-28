@@ -31,11 +31,6 @@
         CaptionPaymentsDetails: Label 'Payment Details:';
         CaptionRemaningAmt: Label 'Remaining Amount';
 
-    local procedure ProtocolName(): Text
-    begin
-        exit('CUSTOMER_DISPLAY');
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitializeAtLogin', '', true, true)]
     local procedure CU6150705OnAfterInitializeAtLogin(POSUnit: Record "NPR POS Unit")
     var

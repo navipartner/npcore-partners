@@ -228,6 +228,11 @@
             "justification": "The value of the Caption property of Fields must be filled in."
         },
         {
+            "id": "AA0228",
+            "action":"Error",
+            "justification": "The local method must be used, otherwise the variable is not necessary."
+        },
+        {
             "id": "AA0231",
             "action":"Error",
             "justification": "StrSubstNo or string concatenation must not be used as a parameter in the Error method."

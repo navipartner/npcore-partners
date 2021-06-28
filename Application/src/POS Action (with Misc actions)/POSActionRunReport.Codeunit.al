@@ -75,10 +75,6 @@ then begin
         Handled := true;
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
-
     local procedure RunReport(ReportId: Integer; RunRequestPage: Boolean; "Record": Variant)
     var
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";

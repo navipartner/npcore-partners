@@ -290,15 +290,5 @@ table 6150613 "NPR NP Retail Setup"
     fieldgroups
     {
     }
-
-    local procedure GetPublisherCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR POS Sales Price Calc. Mgt.");
-    end;
-
-    local procedure GetPublisherFunction(): Text
-    begin
-        exit('OnFindItemPrice');
-    end;
 }
 

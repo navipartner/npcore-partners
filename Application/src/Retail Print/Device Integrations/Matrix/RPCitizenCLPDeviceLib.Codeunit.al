@@ -36,10 +36,6 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
         err0002: Label 'Barcode does not exist.';
         PrintBuffer: Text;
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
     local procedure DeviceCode(): Text
     begin
         exit('CITIZEN');
@@ -297,19 +293,11 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
         Error('NOT IMPLEMENTED!');
     end;
 
-    local procedure "// Aux Functions"()
-    begin
-    end;
-
     local procedure AddToBuffer(Text: Text[1024])
     begin
         AddTextToBuffer(Text);
     end;
 
-    local procedure AddCharToBuffer(CharCode: Integer)
-    begin
-        PrintBuffer += Format(CharCode);
-    end;
 
     local procedure AddTextToBuffer(Text: Text[1024])
     begin

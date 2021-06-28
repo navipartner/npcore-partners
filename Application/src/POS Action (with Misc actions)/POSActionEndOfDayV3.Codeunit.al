@@ -168,10 +168,6 @@ then begin
         end;
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]): Boolean
     var
         POSUnit: Record "NPR POS Unit";

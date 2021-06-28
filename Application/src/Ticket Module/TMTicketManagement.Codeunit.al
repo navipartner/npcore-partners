@@ -1791,13 +1791,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(CloseTicketAccessEntry(ClosedByAccessEntry, DetailedTicketAccessEntry.Type::ADMITTED));
     end;
 
-    local procedure ClosePostpaidEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean
-    var
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-    begin
-        exit(CloseTicketAccessEntry(ClosedByAccessEntry, DetailedTicketAccessEntry.Type::PAYMENT));
-    end;
-
     local procedure CloseTicketAccessEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; ClosingEntryType: Option) Closed: Boolean
     var
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";

@@ -848,11 +848,6 @@
         exit(CopyStr(GeneratedNumber, 1, 10));
     end;
 
-    local procedure GenerateCode20(): Code[20]
-    begin
-        exit(GetNextNoFromSeries('C20'));
-    end;
-
     local procedure GetNextNoFromSeries(FromSeries: Code[20]): Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;

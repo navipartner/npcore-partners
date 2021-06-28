@@ -179,10 +179,6 @@ codeunit 6060128 "NPR MM Member WebService"
         exit(MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate(), true));
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure CreateMembership(var membership: XMLport "NPR MM Create Membership"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
@@ -970,10 +966,6 @@ codeunit 6060128 "NPR MM Member WebService"
 
     end;
 
-    local procedure "--RecuringPayment"()
-    begin
-    end;
-
     procedure GetAutoRenewProduct(var Membership: XMLport "NPR MM Get AutoRenew Product")
     var
         ImportEntry: Record "NPR Nc Import Entry";
@@ -1098,20 +1090,12 @@ codeunit 6060128 "NPR MM Member WebService"
 
     end;
 
-    local procedure "--Helper WS"()
-    begin
-    end;
-
     procedure ResolveMemberIdentifier(var MemberIdentifier: XMLport "NPR MM Member Identifier")
     begin
 
         MemberIdentifier.Import();
         MemberIdentifier.CreateResult();
 
-    end;
-
-    local procedure "--Locals"()
-    begin
     end;
 
     local procedure IsMembershipValid(MembershipEntryNo: Integer) IsValid: Boolean

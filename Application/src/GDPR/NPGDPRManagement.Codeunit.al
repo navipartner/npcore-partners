@@ -433,52 +433,6 @@
         GDPRLogEntry.Insert();
     end;
 
-    local procedure AnonymizeSalesArchives(VarCustNo: Code[20])
-    var
-        SalesHdrArchive: Record "Sales Header Archive";
-    begin
-        SalesHdrArchive.SetRange("Sell-to Customer No.", VarCustNo);
-        if SalesHdrArchive.IsEmpty() then
-            exit;
-        SalesHdrArchive.FindSet();
-        repeat
-            SalesHdrArchive."Sell-to Customer Name" := '------';
-            SalesHdrArchive."Sell-to Customer Name 2" := '------';
-            SalesHdrArchive."Sell-to Address" := '------ --';
-            SalesHdrArchive."Sell-to Address 2" := '------ --';
-            SalesHdrArchive."Sell-to City" := '';
-            SalesHdrArchive."Sell-to Contact" := '------';
-            SalesHdrArchive."Sell-to Post Code" := '';
-            SalesHdrArchive."Sell-to County" := '';
-            SalesHdrArchive."Sell-to Country/Region Code" := '';
-            SalesHdrArchive."Ship-to Post Code" := '';
-            SalesHdrArchive."Ship-to County" := '';
-            SalesHdrArchive."Ship-to Country/Region Code" := '';
-            SalesHdrArchive."Ship-to Name" := '------';
-            SalesHdrArchive."Ship-to Name 2" := '------';
-            SalesHdrArchive."Ship-to Address" := '------ --';
-            SalesHdrArchive."Ship-to Address 2" := '------ --';
-            SalesHdrArchive."Ship-to City" := '';
-            SalesHdrArchive."Ship-to Contact" := '------';
-            SalesHdrArchive."VAT Registration No." := '';
-            SalesHdrArchive."Bill-to Customer No." := '';
-            SalesHdrArchive."Bill-to Name" := '------';
-            SalesHdrArchive."Bill-to Name 2" := '------';
-            SalesHdrArchive."Bill-to Address" := '------ --';
-            SalesHdrArchive."Bill-to Address 2" := '------ --';
-            SalesHdrArchive."Bill-to City" := '';
-            SalesHdrArchive."Bill-to Contact" := '------';
-            SalesHdrArchive."Ship-to Code" := '';
-            SalesHdrArchive."Bill-to Post Code" := '';
-            SalesHdrArchive."Bill-to County" := '';
-            SalesHdrArchive."Bill-to Country/Region Code" := '';
-            SalesHdrArchive."Sell-to Post Code" := '';
-            SalesHdrArchive."Sell-to County" := '';
-            SalesHdrArchive."Sell-to Country/Region Code" := '';
-            SalesHdrArchive.Modify(true);
-        until SalesHdrArchive.Next() = 0;
-    end;
-
     local procedure AnonymizeSalesShipments(VarCustNo: Code[20])
     var
         SalesShipmentHdr: Record "Sales Shipment Header";

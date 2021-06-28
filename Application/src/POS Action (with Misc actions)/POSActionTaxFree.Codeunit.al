@@ -99,10 +99,6 @@ then begin
         TaxFreeConsolidation.RunModal();
     end;
 
-    local procedure "--- DataSource Extension"()
-    begin
-    end;
-
     local procedure ThisDataSource(): Text
     begin
 
@@ -160,10 +156,6 @@ then begin
             DataRow.Add('Status', Caption_Disabled);
 
         Handled := true;
-    end;
-
-    local procedure "--- Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAttemptEndSale', '', false, false)]

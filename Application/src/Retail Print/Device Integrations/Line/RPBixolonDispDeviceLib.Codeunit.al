@@ -45,10 +45,6 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
         ESC: Codeunit "NPR RP Escape Code Library";
         PrintBuffer: Text;
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
     local procedure DeviceCode(): Text
     begin
         exit('DISPLAYBIXOLON');
@@ -104,10 +100,6 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
         tmpRetailList.Insert();
     end;
 
-    local procedure "// ShortHandFunctions"()
-    begin
-    end;
-
     procedure Init()
     begin
         Clear(PrintBuffer);
@@ -125,56 +117,9 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
         AddToBuffer(TempPattern);
     end;
 
-    procedure GetPrintBytes(): Text
-    begin
-        exit(PrintBuffer);
-    end;
-
-    procedure SetPrintBytes(PrintBytes: Text)
-    begin
-        PrintBuffer := PrintBytes;
-    end;
-
-    local procedure "// Base Functions"()
-    begin
-    end;
-
-    procedure HorizontalTab()
-    begin
-        AddToBuffer('HT');
-    end;
-
-    procedure LineFeed()
-    begin
-        AddToBuffer('LF');
-    end;
-
-    procedure FormFeed()
-    begin
-        AddToBuffer('FF');
-    end;
-
-    procedure CarriageReturn()
-    begin
-        AddToBuffer('CR');
-    end;
-
-    procedure Cancel()
-    begin
-        AddToBuffer('CAN');
-    end;
-
-    local procedure "// Info Functions"()
-    begin
-    end;
-
     procedure GetPageWidth(FontFace: Text[30]) Width: Integer
     begin
         Width := 20;
-    end;
-
-    local procedure "// Aux Functions"()
-    begin
     end;
 
     local procedure AddToBuffer(Text: Text)
@@ -182,25 +127,9 @@ codeunit 6014541 "NPR RP BixolonDisp Device Lib."
         ESC.WriteSequenceToBuffer(Text, PrintBuffer);
     end;
 
-    local procedure AddCharToBuffer(CharCode: Integer)
-    begin
-        PrintBuffer := PrintBuffer + Format(CharCode);
-    end;
-
     local procedure AddTextToBuffer(Text: Text)
     begin
         PrintBuffer := PrintBuffer + Text;
-    end;
-
-    local procedure "// Test Functions"()
-    begin
-    end;
-
-    local procedure PrintToDisplay()
-    begin
-        AddTextToBuffer('12345678901234567890');
-        CarriageReturn();
-        AddTextToBuffer('01234567890123456789');
     end;
 }
 

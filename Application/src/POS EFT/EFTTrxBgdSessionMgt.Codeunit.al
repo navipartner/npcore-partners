@@ -8,10 +8,6 @@
     begin
     end;
 
-    local procedure "// Request"()
-    begin
-    end;
-
     procedure CreateRequestRecord(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.")
     begin
         EFTTransactionAsyncRequest.Init();
@@ -73,10 +69,6 @@
         EFTTransactionAsyncRequest.Get(TrxEntryNo);
         EFTTransactionAsyncRequest."Abort Requested" := true;
         EFTTransactionAsyncRequest.Modify();
-    end;
-
-    local procedure "// Response"()
-    begin
     end;
 
     procedure CreateResponseRecord(TrxEntryNo: Integer; Response: Text; ErrorMessage: Text; Error: Boolean)

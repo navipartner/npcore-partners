@@ -135,17 +135,5 @@ xmlport 6014674 "NPR Endpoint Query Web Import"
 
         ReturnValue := ParReturnValue;
     end;
-
-    local procedure FindBooleanOptionValue(InputText: Text): Integer
-    begin
-        case UpperCase(InputText) of
-            'TRUE', 'YES', '1':
-                exit(1);
-            'FALSE', 'NO', '0':
-                exit(0);
-            else
-                exit(3);
-        end;
-    end;
 }
 

@@ -55,7 +55,9 @@ page 6014456 "NPR POS Info: Request Text"
         exit(UserInputString);
     end;
 
+# pragma warning disable AA0228
     local procedure GetDataCaptionExpression(): Text
+# pragma warning restore
     var
         AddInfoRequiredLbl: Label 'We need more information';
     begin
@@ -64,7 +66,9 @@ page 6014456 "NPR POS Info: Request Text"
         exit(AddInfoRequiredLbl);
     end;
 
+# pragma warning disable AA0228
     local procedure GenerateInstructions(): Text
+# pragma warning restore
     var
         TextForLbl: Label 'Please specify additional information for %1 %2';
     begin

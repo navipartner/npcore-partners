@@ -133,10 +133,6 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         end;
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure VoidLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale")
     var
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -214,10 +210,6 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
     begin
         EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
         EFTTransactionRequest.SetRange(Reversed, false);
-    end;
-
-    local procedure "// Parameter Handling"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]

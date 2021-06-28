@@ -759,10 +759,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         until (TicketReservationRequest.Next() = 0);
     end;
 
-    local procedure "--Utils"()
-    begin
-    end;
-
     procedure Initialize()
     begin
 

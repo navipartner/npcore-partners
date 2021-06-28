@@ -59,11 +59,6 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
         exit(Format(Amount * 100));
     end;
 
-    local procedure GetErrorMessage(ErrorMgs: Text): Text
-    begin
-        Message(ErrorMgs);
-    end;
-
     procedure IsDibsPaymentLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
@@ -109,8 +104,10 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
             Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
     end;
 
+# pragma warning disable AA0228
     local procedure "RequestMethod.Post"(): Text
     begin
         exit('POST');
     end;
+# pragma warning restore
 }

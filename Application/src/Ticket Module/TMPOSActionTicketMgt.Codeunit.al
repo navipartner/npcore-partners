@@ -19,10 +19,6 @@
         REVOKE_IN_PROGRESS: Label 'Ticket %1 is being processed for revoke and can''t be added at this time.';
         TICKETMGMTLbl: Label 'TM_TICKETMGMT_%1', Locked = true;
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
     local procedure ActionCode(VersionCode: Code[10]): Text
     begin
         if (VersionCode <> '') then
@@ -284,10 +280,6 @@
         Handled := true;
     end;
 
-    local procedure "----"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', true, true)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
@@ -441,10 +433,6 @@
                     DoWorkflowFunction(FunctionId, Context, POSSession, AdmissionCode, ExternalTicketNumber, TicketReference, PosUnitNo, WithTicketPrint);
                 end;
         end;
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
@@ -639,10 +627,6 @@
                 SaleLinePOS."Unit Price" := TicketUnitPrice;
             end;
         end;
-    end;
-
-    local procedure "--Workers"()
-    begin
     end;
 
     local procedure NewTicketSales(SaleLinePOS: Record "NPR POS Sale Line"): Integer
@@ -1228,10 +1212,6 @@
         exit((OriginalUnitPrice <> NewTicketPrice) and (NewTicketPrice >= 0));
     end;
 
-    local procedure "--Helpers"()
-    begin
-    end;
-
     local procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
@@ -1392,10 +1372,6 @@
         exit(true);
     end;
 
-    local procedure "--- Ean Box Event Handling"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
@@ -1445,10 +1421,6 @@
     local procedure EventCodeExternalTicketNo(): Code[20]
     begin
         exit('TICKET_ARRIVAL');
-    end;
-
-    local procedure "--- OnAfterInsertSaleLine Workflow"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]

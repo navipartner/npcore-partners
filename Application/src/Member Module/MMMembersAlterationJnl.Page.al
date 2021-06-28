@@ -263,7 +263,6 @@
         SELECT_FILE_CAPTION: Label 'Membership Alteration Import';
         FILE_FILTER: Label 'CSV Files (*.csv)|*.csv|All Files (*.*)|*.*';
         PROCESS_INFO: Label 'Processing: (%1) %2';
-        INVALID_VALUE: Label 'The value %1 specified for %2 on line %3 is not valid.';
         INVALID_LENGTH: Label 'The length of %1 exceeds the max length of %2 for %3 on line %4.';
         VALUE_REQUIRED: Label 'A value is required for field %1 on line %2.';
         DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
@@ -474,10 +473,6 @@
         exit(true);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure ImportAlterationFromFile(SkipFirstLine: Boolean)
     var
         FileManagement: Codeunit "File Management";
@@ -665,24 +660,6 @@
         end;
 
         exit(rDate);
-
-    end;
-
-    local procedure validateIntegerField(fieldValue: Text; fieldValueIs: Integer; fieldCaptionName: Text) rInteger: Integer
-    begin
-
-        rInteger := 0;
-
-        if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
-            Error(VALUE_REQUIRED, fieldCaptionName, GLineCount);
-
-        if ((fieldValue = '') and (fieldValueIs = OPTIONAL)) then
-            exit(0);
-
-        if not (Evaluate(rInteger, fieldValue)) then
-            Error(INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
-
-        exit(rInteger);
 
     end;
 

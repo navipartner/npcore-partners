@@ -179,10 +179,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         exit(true);
     end;
 
-    local procedure "--RequestHandlers"()
-    begin
-    end;
-
     local procedure GetAuthorization(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
 
@@ -302,10 +298,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         SoapAction := 'reservePoints';
         XmlText := CreateReservePointsSoapXml(TmpTransactionAuthorization, TmpRegisterPaymentLines);
         exit(true);
-    end;
-
-    local procedure "--ResulHandlers"()
-    begin
     end;
 
     local procedure HandleReservePointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
@@ -718,10 +710,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
           LeftText,
           PadStr('', Round(Width - StrLen(LeftText) - StrLen(RightText), 1), ' '),
           RightText);
-    end;
-
-    local procedure "--Helpers"()
-    begin
     end;
 
     local procedure EarnAmountToPoints(LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; Amount: Decimal) Points: Integer

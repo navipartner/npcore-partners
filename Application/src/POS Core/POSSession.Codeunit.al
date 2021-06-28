@@ -641,17 +641,7 @@ codeunit 6150700 "NPR POS Session"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSetView(View: Codeunit "NPR POS View")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnInitializeDataSource(DataStore: Codeunit "NPR Data Store")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFrontEndId(HardwareId: Text; SessionName: Text; HostName: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 

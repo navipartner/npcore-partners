@@ -28,10 +28,6 @@
         exit('NETS_CLOUD');
     end;
 
-    local procedure "// EFT Interface implementation"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -374,10 +370,6 @@
             Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
     end;
 
-    local procedure "// EFT Parameter Handling"()
-    begin
-    end;
-
     procedure GetAPIUsername(EFTSetupIn: Record "NPR EFT Setup"): Text
     var
         EFTNETSCloudPaymentSetup: Record "NPR EFT NETS Cloud Paym. Setup";
@@ -444,10 +436,6 @@
             EFTNETSCloudPOSUnitSetup."POS Unit No." := EFTSetup."POS Unit No.";
             EFTNETSCloudPOSUnitSetup.Insert();
         end;
-    end;
-
-    local procedure "// Aux"()
-    begin
     end;
 
     local procedure CreateGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")

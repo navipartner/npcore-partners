@@ -58,10 +58,6 @@
         NpRiDataCollectionMgt.RunRequestPage(NpRiReimbursementTemplate, RecRef, RecRef2, TempField);
     end;
 
-    local procedure "--- Party Mgt."()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'SetupPartyTypeTableNoLookup', '', true, true)]
     local procedure OnSetupPartyTypeTableNoLookup(var TempTableMetadata: Record "Table Metadata" temporary)
     var

@@ -98,30 +98,6 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
         exit(LastRestultCode);
     end;
 
-    local procedure "----"()
-    begin
-    end;
-
-    local procedure GetZipFileToInstall(Data: Text; var PepperB64File: Text)
-    var
-        InStr: InStream;
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-    begin
-        FileMgtResponse := FileMgtResponse.Deserialize(Data);
-
-        PepperVersion.CalcFields("Install Zip File");
-        if (PepperVersion."Install Zip File".HasValue()) then begin
-            PepperVersion."Install Zip File".CreateInStream(InStr);
-            MemoryStream := InStr;
-            BinaryReader := BinaryReader.BinaryReader(InStr);
-            PepperB64File := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-            MemoryStream.Dispose();
-            Clear(MemoryStream);
-        end;
-    end;
-
     local procedure GetFirstChunk(var B64FileChunk: Text)
     var
         Convert: DotNet NPRNetConvert;
@@ -151,17 +127,6 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
         end else begin
             B64FileChunk := '';
         end;
-    end;
-
-    local procedure SerializeJson("Object": Variant): Text
-    var
-        JsonConvert: DotNet JsonConvert;
-    begin
-        exit(JsonConvert.SerializeObject(Object));
-    end;
-
-    local procedure "--Stargate2"()
-    begin
     end;
 
     procedure SetTransactionEntryNo(EntryNo: Integer)

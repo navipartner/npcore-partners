@@ -72,10 +72,6 @@ codeunit 6184493 "NPR Pepper End Workshift TSD"
         EndWorkShiftRequest.TimeoutMillies := TimeoutMillies;
     end;
 
-    local procedure "---Pepper_Get"()
-    begin
-    end;
-
     procedure GetResultCode() ResultCode: Integer
     begin
 
@@ -106,10 +102,6 @@ codeunit 6184493 "NPR Pepper End Workshift TSD"
             exit('');
 
         exit(EndWorkShiftResponse.EndOfDayReceipt());
-    end;
-
-    local procedure "--Stargate2"()
-    begin
     end;
 
     procedure SetTransactionEntryNo(EntryNo: Integer)

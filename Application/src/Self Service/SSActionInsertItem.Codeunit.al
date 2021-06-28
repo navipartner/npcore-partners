@@ -587,17 +587,6 @@
     #endregion
     #region Serial number support functions
 
-    local procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean): Boolean
-    var
-        ItemTrackingCode: Record "Item Tracking Code";
-    begin
-        if Item."Item Tracking Code" = '' then exit(false);
-        if not ItemTrackingCode.Get(Item."Item Tracking Code") then exit(false);
-        ItemTrackingCode.TestField("Lot Specific Tracking", false);
-        UseSpecificTracking := ItemTrackingCode."SN Specific Tracking";
-        exit(ItemTrackingCode."SN Sales Outbound Tracking");
-    end;
-
     local procedure SerialNumberCanBeUsedForItem(ItemNo: Code[20]; SerialNumber: Code[20]; var UserInformationErrorWarning: Text) CanBeUsed: Boolean
     var
         Item: Record Item;

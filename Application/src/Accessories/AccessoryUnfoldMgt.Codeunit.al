@@ -10,10 +10,6 @@
         Text002: Label '%1 must be the same as on Master Item %2: %3';
         Text003: Label 'Checking Accessories: @1@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\Posting Accessories:  @2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@';
 
-    local procedure "--- Generate Worksheet"()
-    begin
-    end;
-
     procedure GenerateWorksheet(var AccessoryUnfoldWorksheet: Record "NPR Accessory Unfold Worksheet")
     var
         ItemLedgEntry: Record "Item Ledger Entry";
@@ -159,10 +155,6 @@
         exit(CopyStr(TableMetadata.Name, 1, 20));
     end;
 
-    local procedure "--- Post Worksheet"()
-    begin
-    end;
-
     procedure PostWorksheet(var AccessoryUnfoldWorksheet: Record "NPR Accessory Unfold Worksheet"): Boolean
     var
         AccessoryUnfoldWorksheet2: Record "NPR Accessory Unfold Worksheet";
@@ -275,10 +267,6 @@
         ItemJnlPostLine.Run(TempItemJnlLine);
     end;
 
-    local procedure "--- Test"()
-    begin
-    end;
-
     procedure TestVatSetup(AccessoryItemNo: Code[20]; ItemNo: Code[20])
     var
         Item: Record Item;
@@ -293,10 +281,6 @@
         Item2.Get(ItemNo);
         if Item."VAT Prod. Posting Group" <> Item2."VAT Prod. Posting Group" then
             Error(Text002, Item.FieldCaption("VAT Prod. Posting Group"), Item."No.", Item."VAT Prod. Posting Group");
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure UseDialog(): Boolean

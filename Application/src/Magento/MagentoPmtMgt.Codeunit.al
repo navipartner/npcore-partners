@@ -34,69 +34,6 @@
     end;
 
     //[EventSubscriber(ObjectType::Codeunit, 6620, 'OnAfterCopySalesDoc', '', true, true)]
-    local procedure CopySalesDoc(FromDocType: Option Quote,"Blanket Order","Order",Invoice,"Return Order","Credit Memo","Posted Shipment","Posted Invoice","Posted Return Receipt","Posted Credit Memo"; FromDocNo: Code[20]; IncludeHeader: Boolean; var ToSalesHeader: Record "Sales Header")
-    var
-        PaymentLine: Record "NPR Magento Payment Line";
-        PaymentLine2: Record "NPR Magento Payment Line";
-        PaymentLineBal: Record "NPR Magento Payment Line";
-    begin
-        if not (ToSalesHeader."Document Type" in [ToSalesHeader."Document Type"::"Return Order", ToSalesHeader."Document Type"::"Credit Memo"]) then
-            exit;
-
-        case FromDocType of
-            FromDocType::Order:
-                begin
-                    PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
-                    PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Order);
-                    PaymentLine.SetRange("Document No.", FromDocNo);
-                end;
-            FromDocType::Invoice:
-                begin
-                    PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
-                    PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Invoice);
-                    PaymentLine.SetRange("Document No.", FromDocNo);
-                end;
-            FromDocType::"Posted Invoice":
-                begin
-                    PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Invoice Header");
-                    PaymentLine.SetRange("Document Type", 0);
-                    PaymentLine.SetRange("Document No.", FromDocNo);
-                end;
-            else
-                exit;
-        end;
-        if PaymentLine.IsEmpty then
-            exit;
-
-        PaymentLine.FindSet();
-        repeat
-            if PaymentLine2.Get(DATABASE::"Sales Header", ToSalesHeader."Document Type", ToSalesHeader."No.", PaymentLine."Line No.") then
-                PaymentLine2.Delete();
-            PaymentLine2.Init();
-            PaymentLine2 := PaymentLine;
-            PaymentLine2."Document Table No." := DATABASE::"Sales Header";
-            PaymentLine2."Document Type" := ToSalesHeader."Document Type";
-            PaymentLine2."Document No." := ToSalesHeader."No.";
-            PaymentLine2.Insert(true);
-
-            if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine."Account No." <> '') and (PaymentLine.Amount <> 0) then
-                PaymentLineBal := PaymentLine;
-        until PaymentLine.Next() = 0;
-
-        if not IncludeHeader then
-            exit;
-        if ToSalesHeader."Applies-to Doc. No." <> '' then
-            exit;
-        if ToSalesHeader."Applies-to ID" <> '' then
-            exit;
-
-        ToSalesHeader.Validate("Payment Method Code");
-        if PaymentLineBal."Account No." <> '' then begin
-            ToSalesHeader."Bal. Account Type" := PaymentLineBal."Account Type";
-            ToSalesHeader."Bal. Account No." := PaymentLineBal."Account No.";
-        end;
-        ToSalesHeader.Modify(true);
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure Cu80OnAfterPostSalesCrMemo(var SalesHeader: Record "Sales Header"; SalesCrMemoHdrNo: Code[20])

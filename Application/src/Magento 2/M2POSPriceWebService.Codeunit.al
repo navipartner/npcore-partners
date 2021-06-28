@@ -125,56 +125,6 @@
         end;
     end;
 
-    local procedure TEST_SOAP_PosPrice()
-    var
-        M2POSQuotePriceRequest: XMLport "NPR M2 POS Sv. Sale Price Req.";
-        xmltext: Text;
-        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        iStream: InStream;
-        oStream: OutStream;
-        TmpSalePOS: Record "NPR POS Sale" temporary;
-        TmpSaleLinePOS: Record "NPR POS Sale Line" temporary;
-    begin
-
-        xmltext :=
-          '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-          '<PriceQuote xmlns="urn:microsoft-dynamics-nav/xmlports/x6151145">' +
-            '<Request>' +
-              '<Customer Number="">' +
-                 '<Line LineNumber="101" ItemNumber="73034" Quantity="3"/>' +
-                 '<Line LineNumber="102" ItemNumber="73034" Quantity="7"/>' +
-                 '<Line LineNumber="103" ItemNumber="80001" VariantCode="1" Quantity="7"/>' +
-              '</Customer>' +
-            '</Request>' +
-          '</PriceQuote>';
-
-        // Request
-        TmpBLOBbuffer.Insert();
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        oStream.WriteText(xmltext);
-        TmpBLOBbuffer.Modify();
-
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        M2POSQuotePriceRequest.SetSource(iStream);
-        M2POSQuotePriceRequest.Import();
-
-        // Process
-        M2POSQuotePriceRequest.GetRequest(TmpSalePOS, TmpSaleLinePOS);
-        TryPosQuoteRequest(TmpSalePOS, TmpSaleLinePOS);
-        M2POSQuotePriceRequest.SetResponse(TmpSalePOS, TmpSaleLinePOS);
-
-        // Reponse
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        M2POSQuotePriceRequest.SetDestination(oStream);
-        M2POSQuotePriceRequest.Export();
-        TmpBLOBbuffer.Modify();
-
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        M2POSQuotePriceRequest.SetSource(iStream);
-        iStream.Read(xmltext);
-        Message(xmltext);
-    end;
-
     procedure ItemPrice(var ItemPriceRequest: XMLport "NPR M2 Item Price Request")
     var
         TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary;
@@ -542,56 +492,6 @@
 
             until (TmpQtyBracket.Next() = 0);
         end;
-    end;
-
-    local procedure TEST_SOAP_ItemPrice()
-    var
-        M2ItemPriceRequest: XMLport "NPR M2 Item Price Request";
-        xmltext: Text;
-        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        iStream: InStream;
-        oStream: OutStream;
-        TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary;
-        TmpPricePointResponse: Record "NPR M2 Price Calc. Buffer" temporary;
-        TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary;
-        ResponseMessage: Text;
-        ResponseCode: Code[10];
-    begin
-
-        xmltext :=
-          '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-          '<ItemPrice xmlns="urn:microsoft-dynamics-nav/xmlports/x6151146">' +
-            '<Request RequestId="101" ItemNumber="80001" VariantCode="1" CustomerNumber="10034"/>' +
-            '<Request RequestId="102" ItemNumber="80001" VariantCode="2"/>' +
-            '<Request RequestId="103" ItemNumber="80001" VariantCode="1" CustomerNumber="10034" Quantity="7"/>' +
-          '</ItemPrice>';
-
-        // Request
-        TmpBLOBbuffer.Insert();
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        oStream.WriteText(xmltext);
-        TmpBLOBbuffer.Modify();
-
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        M2ItemPriceRequest.SetSource(iStream);
-        M2ItemPriceRequest.Import();
-
-        // Process
-        M2ItemPriceRequest.GetSalesPriceRequest(TmpSalesPriceRequest);
-        TryItemPriceRequest(TmpSalesPriceRequest, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
-        M2ItemPriceRequest.SetSalesPriceResponse(TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
-
-        // Reponse
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        M2ItemPriceRequest.SetDestination(oStream);
-        M2ItemPriceRequest.Export();
-        TmpBLOBbuffer.Modify();
-
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        M2ItemPriceRequest.SetSource(iStream);
-        iStream.Read(xmltext);
-
-        Message(xmltext);
     end;
 
     procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "NPR M2 Item Availab. By Period")

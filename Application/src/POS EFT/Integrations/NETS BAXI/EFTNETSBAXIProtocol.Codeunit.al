@@ -14,10 +14,6 @@ codeunit 6184541 "NPR EFT NETS BAXI Protocol"
         FORCE_ABORT_DESC: Label 'Transaction was force aborted. Use lookup to check result.';
         BALANCE_ENQUIRY: Label 'Balance Enquiry';
 
-    local procedure "// Stargate Requests"()
-    begin
-    end;
-
     procedure SendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
         case EftTransactionRequest."Processing Type" of
@@ -550,10 +546,6 @@ codeunit 6184541 "NPR EFT NETS BAXI Protocol"
         EFTNETSBAXIIntegration: Codeunit "NPR EFT NETS BAXI Integration";
     begin
         exit('EFT_' + EFTNETSBAXIIntegration.IntegrationType());
-    end;
-
-    local procedure "// Responses"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]

@@ -69,10 +69,6 @@
         gPrefix := pPrefix;
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure CreateCommunity(CommunityCode: Code[20]; Prefix: Code[10]; Description: Text[50]): Code[20]
     var
         MemberCommunity: Record "NPR MM Member Community";
@@ -336,10 +332,6 @@
         CurrencyExchangeRate.Modify();
 
         exit(CurrencyCode);
-    end;
-
-    local procedure "---"()
-    begin
     end;
 
     local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20]): Code[20]

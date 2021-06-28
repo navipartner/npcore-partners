@@ -170,10 +170,6 @@
         exit(tmpImpactedItemDiscGroups.Get(TempSaleLinePOS."Item Disc. Group"));
     end;
 
-    local procedure "--- Calc Discount"()
-    begin
-    end;
-
     procedure CalcLineDiscAmount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; BatchQty: Decimal; TotalQty: Decimal; TotalVATAmount: Decimal; TotalAmount: Decimal; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; InvQtyDict: Dictionary of [Guid, Decimal]) LineDiscAmount: Decimal
     var
         TotalAmountAfterDisc: Decimal;
@@ -484,10 +480,6 @@
         MixDiscountLevel.DeleteAll();
         MixDiscountLevel.SetRange(Quantity);
         exit(MixDiscountLevel.FindLast());
-    end;
-
-    local procedure "--- Apply"()
-    begin
     end;
 
     local procedure AdjustBatchQty(var BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var InvQtyDict: Dictionary of [Guid, Decimal])
@@ -1065,10 +1057,6 @@
              TempMixedDiscount."Discount Type"::"Multiple Discount Levels"]);
     end;
 
-    local procedure "--- Mix Match"()
-    begin
-    end;
-
     procedure FindMatchingMixedDiscounts(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     begin
         MatchMixedDiscounts(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS);
@@ -1231,20 +1219,6 @@
         exit(false)
     end;
 
-    local procedure DiscountLineActive(SalePOS: Record "NPR POS Sale"; MixedDiscountLine: Record "NPR Mixed Discount Line"): Boolean
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-    begin
-        if not MixedDiscount.Get(MixedDiscountLine.Code) then
-            exit(false);
-
-        exit(DiscountActive(SalePOS, MixedDiscount));
-    end;
-
-    local procedure "--- Best Mix Match"()
-    begin
-    end;
-
     local procedure CalcTotalAppliedMixDisc(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) DiscAmount: Decimal
     var
         TempMixedDiscountCopy: Record "NPR Mixed Discount" temporary;
@@ -1378,10 +1352,6 @@
             DiscountPriority.CreateNoSeries(NoSeriesCodeTok, NoSeriesDescriptionTok, false);
 
         exit(DiscountPriority."Discount No. Series");
-    end;
-
-    local procedure "--- Discount Interface"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]

@@ -10,10 +10,6 @@ codeunit 6184479 "NPR EFT Interface"
     begin
     end;
 
-    local procedure "// Discovery"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
@@ -24,10 +20,6 @@ codeunit 6184479 "NPR EFT Interface"
     begin
     end;
 
-    local procedure "// Configuration"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     begin
@@ -35,10 +27,6 @@ codeunit 6184479 "NPR EFT Interface"
 
     [IntegrationEvent(false, false)]
     procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
-    begin
-    end;
-
-    local procedure "// Requests"()
     begin
     end;
 
@@ -97,10 +85,6 @@ codeunit 6184479 "NPR EFT Interface"
     begin
     end;
 
-    local procedure "// Aux"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
@@ -138,10 +122,6 @@ codeunit 6184479 "NPR EFT Interface"
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeLookupPrompt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
-    begin
-    end;
-
-    local procedure "// Response"()
     begin
     end;
 

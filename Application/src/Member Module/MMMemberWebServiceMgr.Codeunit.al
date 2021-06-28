@@ -966,10 +966,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     end;
 
-    local procedure "--Database"()
-    begin
-    end;
-
     local procedure InsertCreateMembership(CreateMembershipRequest: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
 

@@ -227,10 +227,6 @@ table 6014678 "NPR Endpoint Query"
         Modify(true);
     end;
 
-    local procedure CreateFilterLinesFromFilterText()
-    begin
-    end;
-
     procedure CreateFilterTextFromFilterLines()
     var
         EndpointQueryFilter: Record "NPR Endpoint Query Filter";
