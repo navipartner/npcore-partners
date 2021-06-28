@@ -61,30 +61,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeAFArgsSpireBarcode()
     var
         MigrationRec: Record "NPR AF Args: Spire Barcode";
+        MigrationRec2: Record "NPR AF Args: Spire Barcode";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Image);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Image.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR AF Args: Spire Barcode", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR AF Args: Spire Barcode", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Image.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec.Picture.ImportStream(InStr, MigrationRec.FieldName(Picture)));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Image.HasValue() then begin
+                        MigrationRec2.CalcFields(Image);
+                        MigrationRec2.Image.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2.Picture.ImportStream(InStr, MigrationRec2.FieldName(Picture)));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -95,30 +99,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeMCSFaces()
     var
         MigrationRec: Record "NPR MCS Faces";
+        MigrationRec2: Record "NPR MCS Faces";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Picture);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Picture.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR MCS Faces", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR MCS Faces", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Picture.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec.Image.ImportStream(InStr, MigrationRec.FieldName(Image)));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Picture.HasValue() then begin
+                        MigrationRec2.CalcFields(Picture);
+                        MigrationRec2.Picture.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2.Image.ImportStream(InStr, MigrationRec2.FieldName(Image)));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -129,30 +137,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeMagentoPicture()
     var
         MigrationRec: Record "NPR Magento Picture";
+        MigrationRec2: Record "NPR Magento Picture";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Picture);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Picture.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR Magento Picture", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR Magento Picture", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Picture.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec.Image.ImportStream(InStr, MigrationRec.FieldName(Image)));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Picture.HasValue() then begin
+                        MigrationRec2.CalcFields(Picture);
+                        MigrationRec2.Picture.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2.Image.ImportStream(InStr, MigrationRec2.FieldName(Image)));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -163,30 +175,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeMMMember()
     var
         MigrationRec: Record "NPR MM Member";
+        MigrationRec2: Record "NPR MM Member";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Picture);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Picture.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR MM Member", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR MM Member", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Picture.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec.Image.ImportStream(InStr, MigrationRec.FieldName(Image)));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Picture.HasValue() then begin
+                        MigrationRec2.CalcFields(Picture);
+                        MigrationRec2.Picture.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2.Image.ImportStream(InStr, MigrationRec2.FieldName(Image)));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -197,30 +213,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeMPOSQRCode()
     var
         MigrationRec: Record "NPR MPOS QR Code";
+        MigrationRec2: Record "NPR MPOS QR Code";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields("QR code");
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec."QR code".HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR MPOS QR Code", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR MPOS QR Code", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec."QR code".CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec."QR Image".ImportStream(InStr, MigrationRec.FieldName("QR Image")));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2."QR code".HasValue() then begin
+                        MigrationRec2.CalcFields("QR code");
+                        MigrationRec2."QR code".CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2."QR Image".ImportStream(InStr, MigrationRec2.FieldName("QR Image")));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -231,30 +251,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeDisplayContentLines()
     var
         MigrationRec: Record "NPR Display Content Lines";
+        MigrationRec2: Record "NPR Display Content Lines";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Image);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Image.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR Display Content Lines", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR Display Content Lines", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Image.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec.Picture.ImportStream(InStr, MigrationRec.FieldName(Picture)));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Image.HasValue() then begin
+                        MigrationRec2.CalcFields(Image);
+                        MigrationRec2.Image.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2.Picture.ImportStream(InStr, MigrationRec2.FieldName(Picture)));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -265,30 +289,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeRetailLogo()
     var
         MigrationRec: Record "NPR Retail Logo";
+        MigrationRec2: Record "NPR Retail Logo";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Logo);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Logo.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR Retail Logo", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR Retail Logo", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Logo.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec."POS Logo".ImportStream(InStr, MigrationRec.FieldName("POS Logo")));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Logo.HasValue() then begin
+                        MigrationRec2.CalcFields(Logo);
+                        MigrationRec2.Logo.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2."POS Logo".ImportStream(InStr, MigrationRec2.FieldName("POS Logo")));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -299,30 +327,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeRPTemplateMediaInfo()
     var
         MigrationRec: Record "NPR RP Template Media Info";
+        MigrationRec2: Record "NPR RP Template Media Info";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Picture);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Picture.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR RP Template Media Info", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR RP Template Media Info", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Picture.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec.Image.ImportStream(InStr, MigrationRec.FieldName(Image)));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Picture.HasValue() then begin
+                        MigrationRec2.CalcFields(Picture);
+                        MigrationRec2.Picture.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2.Image.ImportStream(InStr, MigrationRec2.FieldName(Image)));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -333,30 +365,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeNpRvArchVoucher()
     var
         MigrationRec: Record "NPR NpRv Arch. Voucher";
+        MigrationRec2: Record "NPR NpRv Arch. Voucher";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Barcode);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Barcode.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR NpRv Arch. Voucher", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR NpRv Arch. Voucher", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Barcode.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec."Barcode Image".ImportStream(InStr, MigrationRec.FieldName("Barcode Image")));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Barcode.HasValue() then begin
+                        MigrationRec2.CalcFields(Barcode);
+                        MigrationRec2.Barcode.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2."Barcode Image".ImportStream(InStr, MigrationRec2.FieldName("Barcode Image")));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;
@@ -367,30 +403,34 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     procedure UpgradeNpRvVoucher()
     var
         MigrationRec: Record "NPR NpRv Voucher";
+        MigrationRec2: Record "NPR NpRv Voucher";
         BlobToMediaMigration: Record "NPR Blob To Media Migration";
         DataLogMgt: Codeunit "NPR Data Log Management";
         InStr: InStream;
         WithError: Boolean;
+        ProblemErr: Label 'Problem upgrading media for: %1', Locked = true;
     begin
         if MigrationRec.IsEmpty() then
             exit;
 
-        MigrationRec.SetAutoCalcFields(Barcode);
-        if MigrationRec.FindSet(true) then
+        MigrationRec.SetLoadFields(SystemId, SystemModifiedAt);
+        if MigrationRec.FindSet() then
             repeat
-                if MigrationRec.Barcode.HasValue() then begin
-                    if not BlobToMediaMigration.Get(Database::"NPR NpRv Voucher", MigrationRec.SystemId) then
-                        Clear(BlobToMediaMigration);
+                if not BlobToMediaMigration.Get(Database::"NPR NpRv Voucher", MigrationRec.SystemId) then
+                    Clear(BlobToMediaMigration);
 
-                    if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
-                        MigrationRec.Barcode.CreateInStream(InStr);
-                        WithError := IsNullGuid(MigrationRec."Barcode Image".ImportStream(InStr, MigrationRec.FieldName("Barcode Image")));
+                if BlobToMediaMigration.SystemModifiedAt < MigrationRec.SystemModifiedAt then begin
+                    MigrationRec2.GetBySystemId(MigrationRec.SystemId);
+                    if MigrationRec2.Barcode.HasValue() then begin
+                        MigrationRec2.CalcFields(Barcode);
+                        MigrationRec2.Barcode.CreateInStream(InStr);
+                        WithError := IsNullGuid(MigrationRec2."Barcode Image".ImportStream(InStr, MigrationRec2.FieldName("Barcode Image")));
                         if not WithError then begin
                             DataLogMgt.DisableDataLog(true);
-                            MigrationRec.Modify();
+                            MigrationRec2.Modify();
                             DataLogMgt.DisableDataLog(false);
                         end else
-                            LogError(StrSubstNo('Problem upgrading media for: %1', MigrationRec.RecordId()));
+                            LogError(StrSubstNo(ProblemErr, MigrationRec2.RecordId()));
 
                         Clear(InStr);
                     end;

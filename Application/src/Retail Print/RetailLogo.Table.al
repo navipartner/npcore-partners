@@ -39,7 +39,7 @@ table 6014478 "NPR Retail Logo"
             Caption = 'Logo';
             SubType = Bitmap;
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(7; ESCPOSLogo; BLOB)

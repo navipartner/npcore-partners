@@ -24,7 +24,7 @@ table 6151411 "NPR Magento Picture"
             Caption = 'Picture';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(101; "Size (kb)"; Decimal)

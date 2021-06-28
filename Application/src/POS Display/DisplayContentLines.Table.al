@@ -28,7 +28,7 @@ table 6059952 "NPR Display Content Lines"
             Caption = 'Image';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(13; Picture; Media)

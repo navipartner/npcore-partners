@@ -18,7 +18,7 @@ table 6014566 "NPR RP Template Media Info"
             Caption = 'Picture';
             SubType = Bitmap;
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(11; URL; Text[250])
