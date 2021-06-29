@@ -49,7 +49,6 @@ table 6014624 "NPR Web Client Dependency"
     var
         WebDependency: Record "NPR Web Client Dependency";
         InStr: InStream;
-
     begin
         if not WebDependency.Get(DependencyType, DependencyCode) then
             exit;
@@ -59,7 +58,7 @@ table 6014624 "NPR Web Client Dependency"
 
         WebDependency.CalcFields(BLOB);
         WebDependency.BLOB.CreateInStream(InStr, TextEncoding::UTF8);
-        InStr.ReadText(Result);
+        InStr.Read(Result, WebDependency.BLOB.Length);
     end;
 
     procedure GetJavaScript(DependencyCode: Code[10]): Text
