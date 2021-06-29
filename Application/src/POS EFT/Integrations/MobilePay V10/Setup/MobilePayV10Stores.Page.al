@@ -1,4 +1,4 @@
-page 6014435 "NPR MobilePayV10 Stores"
+page 6014619 "NPR MobilePayV10 Stores"
 {
     PageType = List;
     SourceTable = "NPR MobilePayV10 Store";

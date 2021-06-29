@@ -1,4 +1,4 @@
-page 6014437 "NPR MobilePayV10 Payment Setup"
+page 6014655 "NPR MobilePayV10 Payment Setup"
 {
     PageType = Card;
     ApplicationArea = All;
