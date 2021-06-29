@@ -435,10 +435,10 @@ tableextension 6014427 "NPR Item" extends Item
     }
     keys
     {
-        key(Key1; "NPR Group sale", "NPR Item Group")
+        key("NPR Key1"; "NPR Group sale", "NPR Item Group")
         {
         }
-        key(Key2; "NPR Primary Key Length")
+        key("NPR Key2"; "NPR Primary Key Length")
         {
         }
     }
