@@ -337,14 +337,14 @@ codeunit 6184499 "NPR EFT Framework Mgt."
                 FieldError("Processing Type");
         end;
 
-        POSSession.GetSession(POSSession, true);
-        POSSession.GetFrontEnd(POSFrontEnd, true);
-        POSSession.RequestRefreshData();
-
+        if POSSession.GetSession(POSSession, false) then begin
+            POSSession.GetFrontEnd(POSFrontEnd, true);
+            POSSession.RequestRefreshData();
         //-NPR5.54 [364340]
-        ResumeFrontEndAfterEFTRequest(EftTransactionRequest, POSFrontEnd);
+            ResumeFrontEndAfterEFTRequest(EftTransactionRequest, POSFrontEnd);
         //+NPR5.54 [364340]
         //+NPR5.51 [355433]
+        end;
     end;
 
     procedure LookupTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -491,9 +491,6 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     begin
         EFTSetup.TestField("EFT Integration Type");
         EFTSetup.TestField("Payment Type POS");
-        //-NPR5.54 [364340]
-        SalePOS.Get(POSUnitNo, SalesReceiptNo);
-        //+NPR5.54 [364340]
 
         EFTTransactionRequest."Integration Type" := EFTSetup."EFT Integration Type";
         EFTTransactionRequest."POS Payment Type Code" := EFTSetup."Payment Type POS"; //This one might be switched later depending on transaction context, ie. card type.
@@ -503,9 +500,10 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         EFTTransactionRequest."User ID" := UserId;
         EFTTransactionRequest.Started := CurrentDateTime;
         EFTTransactionRequest.Token := CreateGuid();
-        //-NPR5.54 [364340]
-        EFTTransactionRequest."Sales ID" := SalePOS."Retail ID";
-        //+NPR5.54 [364340]
+        if (POSUnitNo <> '') and (SalesReceiptNo <> '') then begin
+            SalePOS.Get(POSUnitNo, SalesReceiptNo);
+            EFTTransactionRequest."Sales ID" := SalePOS."Retail ID";
+        end;
     end;
 
     local procedure EndGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
