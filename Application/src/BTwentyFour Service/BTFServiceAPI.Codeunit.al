@@ -12,6 +12,7 @@ codeunit 6014641 "NPR BTF Service API"
         ServiceEndPointsNotFoundLbl: Label '%1 not found for %2: %3 or endpoints exist but they are not enabled. Try to navigate to service endpoints through the setup by running an action "Show Setup Page"', Comment = '%1=ServiceEndPoint.TableCaption();%2=ServiceSetup.TableCaption();%3=ServiceSetup.Code';
         ImportTypeParameterLbl: Label 'import_type', locked = true;
         BearerTokenLbl: Label 'bearer %1', locked = true;
+        ClassIdTok: Label 'classid=%1', Locked = true;
 
     procedure VerifyServiceURL(var ServiceURL: Text)
     var
@@ -395,5 +396,42 @@ codeunit 6014641 "NPR BTF Service API"
     procedure GetBearerTokenLbl(): Text
     begin
         exit(BearerTokenLbl);
+    end;
+
+    procedure GetServiceUrlWithEndpoint(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint";
+        UrlParameters: Text): Text
+    begin
+        exit(GetServiceUrlWithEndpoint(ServiceSetup, ServiceEndPoint, -1, UrlParameters));
+    end;
+
+    procedure GetServiceUrlWithEndpoint(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint";
+        ClassId: Integer): Text
+    begin
+        exit(GetServiceUrlWithEndpoint(ServiceSetup, ServiceEndPoint, ClassId, ''));
+    end;
+
+    procedure GetServiceUrlWithEndpoint(ServiceSetup: Record "NPR BTF Service Setup"; ServiceEndPoint: Record "NPR BTF Service EndPoint";
+        ClassId: Integer; UrlParameters: Text) ServiceUrl: Text
+    var
+        UrlQuery: Text;
+        QueryDelimiter: Text;
+    begin
+        QueryDelimiter := '';
+        ServiceUrl := ServiceSetup."Service URL" + ServiceEndPoint.Path;
+
+        if (ClassId >= 0) then begin
+            UrlQuery := StrSubstNo(ClassIdTok, ClassId);
+            QueryDelimiter := '&';
+        end;
+
+        If (UrlParameters <> '') then begin
+            UrlQuery := UrlQuery + QueryDelimiter + UrlParameters;
+        end;
+
+        if (UrlQuery <> '') then begin
+            ServiceUrl := ServiceUrl + '?' + UrlQuery;
+        end;
+
+        exit(ServiceUrl);
     end;
 }

@@ -221,7 +221,7 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
             if (MobilePayPaymentSetup."Merchant VAT Number" <> '') then begin
                 if STRPOS(MobilePayPaymentSetup."Merchant VAT Number", CompanyInfo."Country/Region Code") = 0 then begin
                     MobilePayPaymentSetup."Merchant VAT Number" :=
-                        StrSubstNo('%1%2', CompanyInfo."Country/Region Code", MobilePayPaymentSetup."Merchant VAT Number");
+                        StrSubstNo(MerchantVatNoEvalFormulaTok, CompanyInfo."Country/Region Code", MobilePayPaymentSetup."Merchant VAT Number");
                 end;
             end;
 
@@ -432,4 +432,5 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
         UNSUPPORTED_COUNTRY_Err: Label 'MobilePay isn''t supported in %1 (country).';
         CANT_AUTH_Err: Label 'Can''t authenticate!';
         TempOldEFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param." temporary;
+        MerchantVatNoEvalFormulaTok: Label '%1%2', Locked = true;
 }
