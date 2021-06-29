@@ -1,4 +1,4 @@
-codeunit 6014505 "NPR MobilePayV10 Get Refund"
+codeunit 6014607 "NPR MobilePayV10 Get Refund"
 {
     // GET /v10/refunds/{refundid}
     TableNo = "NPR EFT Transaction Request";

@@ -1,4 +1,4 @@
-codeunit 6014524 "NPR MobilePayV10 GetPOSList"
+codeunit 6014600 "NPR MobilePayV10 GetPOSList"
 {
     // GET  /v10/pointofsales
     TableNo = "NPR EFT Setup";
