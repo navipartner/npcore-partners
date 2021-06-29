@@ -485,7 +485,7 @@
         SalesHeader."External Document No." := NpXmlDomMgt.GetXmlText(XmlElement, 'external_document_no', MaxStrLen(SalesHeader."External Document No."), false);
         if SalesHeader."External Document No." = '' then
             SalesHeader."External Document No." := SalesHeader."NPR External Order No.";
-        SalesHeader."Your Reference" := NpXmlDomMgt.GetXmlText(XmlElement, 'your_reference', MaxStrLen(SalesHeader."Your Reference"), false);
+        SalesHeader."Your Reference" := NpXmlDomMgt.GetXmlText(XmlElement, 'customer_reference_no', MaxStrLen(SalesHeader."Your Reference"), false);
         SalesHeader.Insert(true);
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
         SalesHeader."Sell-to Customer Name" := NpXmlDomMgt.GetElementText(XmlElement2, 'name', MaxStrLen(SalesHeader."Sell-to Customer Name"), true);
