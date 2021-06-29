@@ -326,7 +326,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
 
         if AccessToken <> '' then begin
             HttpWebRequest.GetHeaders(Headers);
-            Headers.Add('Authorization', StrSubstNo('Bearer %1', AccessToken));
+            Headers.Add('Authorization', StrSubstNo(BearerToken, AccessToken));
         end;
 
         Client.Send(HttpWebRequest, HttpWebResponse);
@@ -346,4 +346,5 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         TransactionID: Text;
         LastContext: Text;
         LastRevision: Text;
+        BearerToken: Label 'Bearer %1', Locked = true;
 }

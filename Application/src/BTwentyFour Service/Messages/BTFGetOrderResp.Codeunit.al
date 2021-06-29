@@ -84,7 +84,7 @@ codeunit 6014650 "NPR BTF GetOrderResp" implements "NPR BTF IEndPoint", "NPR Nc 
 
         ClearLastError();
         RequestMessage.Method := Format(ServiceEndPoint."Service Method Name");
-        URI := StrSubstNo(ServiceSetup."Service URL" + ServiceEndPoint.Path + '?classid=%1', "NPR BTF Messages Class"::orderresponse.AsInteger());
+        URI := ServiceApi.GetServiceUrlWithEndpoint(ServiceSetup, ServiceEndPoint, "NPR BTF Messages Class"::orderresponse.AsInteger());
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
         Headers.Add('User-Agent', 'Dynamics 365');
