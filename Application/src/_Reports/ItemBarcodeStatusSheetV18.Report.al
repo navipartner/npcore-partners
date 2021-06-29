@@ -172,8 +172,8 @@ report 6014455 "NPR Item Barcode Status Sheet"
 
         BarcodeSimbiology := BarcodeSimbiology::"EAN-13";
 
-        ItemFilter := StrSubstNo('%1: %2', Item.TableCaption, Item.GetFilters());
-        ItemVariantFilter := StrSubstNo('%1: %2', ItemVariant.TableCaption, ItemVariant.GetFilters());
+        ItemFilter := StrSubstNo(KeyPairFilterToken, Item.TableCaption, Item.GetFilters());
+        ItemVariantFilter := StrSubstNo(KeyPairFilterToken, ItemVariant.TableCaption, ItemVariant.GetFilters());
 
         if ShowInventory then
             Item.SetAutoCalcFields(Inventory);
@@ -190,6 +190,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
         LineNo: Integer;
         ItemFilter: Text;
         ItemVariantFilter: Text;
+        KeyPairFilterToken: Label '%1: %2', Locked = true;
 
     local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])
     begin

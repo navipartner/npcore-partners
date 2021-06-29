@@ -86,7 +86,7 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
 
         ClearLastError();
         RequestMessage.Method := Format(ServiceEndPoint."Service Method Name");
-        URI := StrSubstNo(ServiceSetup."Service URL" + ServiceEndPoint.Path + '?classid=%1', "NPR BTF Messages Class"::pricat.AsInteger());
+        URI := ServiceApi.GetServiceUrlWithEndpoint(ServiceSetup, ServiceEndPoint, "NPR BTF Messages Class"::pricat.AsInteger());
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
         Headers.Add('User-Agent', 'Dynamics 365');
