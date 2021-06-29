@@ -1,0 +1,104 @@
+codeunit 6014514 "NPR MobilePayV10 Find Payment"
+{
+    // GET /v10/payments
+    TableNo = "NPR EFT Transaction Request";
+
+    var
+        _request: text;
+        _response: text;
+        _responseHttpCode: Integer;
+        _filter: Text;
+        MobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary;
+        MobilePayV10PaymentBuffInitiated: Boolean;
+        PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err: Label 'Payment detail buffer has not been initiated! This is a programming bug.';
+
+    trigger OnRun()
+    begin
+        clear(_request);
+        clear(_response);
+        clear(_responseHttpCode);
+        SendRequest(Rec);
+    end;
+
+    internal procedure SetFilter(filter: Text)
+    begin
+        _filter := filter;
+    end;
+
+    internal procedure SetPaymentDetailBuffer(var MobilePayV10PaymentBuffer: Record "NPR MobilePayV10 Payment" temporary)
+    begin
+        MobilePayV10PaymentBuff.Copy(MobilePayV10PaymentBuffer, true);
+        MobilePayV10PaymentBuffInitiated := true;
+    end;
+
+    internal procedure GetRequestResponse(): text
+    begin
+        exit(StrSubstNo('==Request==\%1\\==Response==\(%2)\%3', _request, _responseHttpCode, _response));
+    end;
+
+    local procedure SendRequest(var eftTrxRequest: Record "NPR EFT Transaction Request")
+    var
+        reqMessage: HttpRequestMessage;
+        httpClient: HttpClient;
+        respMessage: HttpResponseMessage;
+        mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
+        jsonResponse: JsonObject;
+        jsonRequest: JsonObject;
+        mobilePayUnitSetup: Record "NPR MobilePayV10 Unit Setup";
+        posUnit: Record "NPR POS Unit";
+        beaconTypes: JsonArray;
+        eftSetup: Record "NPR EFT Setup";
+        requestUrl: Text;
+        httpRequestHelper: Codeunit "NPR HttpRequest Helper";
+    begin
+        eftSetup.FindSetup(eftTrxRequest."Register No.", eftTrxRequest."Original POS Payment Type Code");
+        mobilePayUnitSetup.Get(eftSetup."POS Unit No.");
+        mobilePayUnitSetup.TestField("MobilePay POS ID");
+
+        mobilePayProtocol.SetGenericHeaders(eftSetup, reqMessage, httpRequestHelper);
+
+        reqMessage.Method := 'GET';
+        requestUrl := mobilePayProtocol.GetURL(eftSetup) + '/pos/v10/payments';
+        if (_filter <> '') then begin
+            requestUrl += StrSubstNo('?%1', _filter);
+        end;
+        reqMessage.SetRequestUri(requestUrl);
+
+        mobilePayProtocol.SendAndPreHandleTheRequest(httpClient, reqMessage, respMessage, httpRequestHelper);
+
+        _responseHttpCode := respMessage.HttpStatusCode;
+        respMessage.Content.ReadAs(_response);
+
+        ParseResponse(reqMessage, respMessage, eftTrxRequest);
+    end;
+
+    local procedure ParseResponse(var reqMessage: HttpRequestMessage; var respMessage: HttpResponseMessage; var eftTrxRequest: Record "NPR EFT Transaction Request")
+    var
+        jsonToken: JsonToken;
+        jsonResponse: JsonObject;
+        jsonArray: JsonArray;
+        mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
+    begin
+        mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
+
+        jsonResponse.SelectToken('paymentIds', jsonToken);
+        jsonArray := jsonToken.AsArray();
+
+        if (not MobilePayV10PaymentBuffInitiated) then begin
+            Error(PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err);
+        end;
+
+        ParseMultiPaymentsAndInsertToBuffer(jsonArray, MobilePayV10PaymentBuff);
+    end;
+
+    local procedure ParseMultiPaymentsAndInsertToBuffer(var PaymentsJsonArray: JsonArray; var MobilePayV10PaymentBuffer: Record "NPR MobilePayV10 Payment" temporary)
+    var
+        jsonToken: JsonToken;
+    begin
+        foreach jsonToken in PaymentsJsonArray do begin
+            MobilePayV10PaymentBuffer.Init();
+            Evaluate(MobilePayV10PaymentBuffer.PaymentId, jsonToken.AsValue().AsText());
+            MobilePayV10PaymentBuffer.Insert();
+        end;
+    end;
+}

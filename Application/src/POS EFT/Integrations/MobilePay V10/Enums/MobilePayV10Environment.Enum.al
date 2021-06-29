@@ -1,0 +1,12 @@
+enum 6014467 "NPR MobilePayV10 Environment"
+{
+    Extensible = false;
+    value(0; Production)
+    {
+        Caption = 'Production';
+    }
+    value(1; Sandbox)
+    {
+        Caption = 'Sandbox';
+    }
+}
