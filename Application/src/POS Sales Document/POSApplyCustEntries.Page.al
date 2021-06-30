@@ -17,21 +17,21 @@ page 6014493 "NPR POS Apply Cust. Entries"
             group(General)
             {
                 Caption = 'General';
-                field("ApplyingCustLedgEntry.""Posting Date"""; TempApplyingCustLedgEntry."Posting Date")
+                field(ApplyingPostingDate; TempApplyingCustLedgEntry."Posting Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Posting Date';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("ApplyingCustLedgEntry.""Document Type"""; TempApplyingCustLedgEntry."Document Type")
+                field(ApplyingDocumentType; TempApplyingCustLedgEntry."Document Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Document Type';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("ApplyingCustLedgEntry.""Document No."""; TempApplyingCustLedgEntry."Document No.")
+                field(ApplyingDocumentNo; TempApplyingCustLedgEntry."Document No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Document No.';
@@ -52,21 +52,21 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("ApplyingCustLedgEntry.""Currency Code"""; TempApplyingCustLedgEntry."Currency Code")
+                field(ApplyingCurrencyCode; TempApplyingCustLedgEntry."Currency Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Currency Code';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("ApplyingCustLedgEntry.Amount"; TempApplyingCustLedgEntry.Amount)
+                field(ApplyingAmount2; TempApplyingCustLedgEntry.Amount)
                 {
                     ApplicationArea = All;
                     Caption = 'Amount';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("ApplyingCustLedgEntry.""Remaining Amount"""; TempApplyingCustLedgEntry."Remaining Amount")
+                field(ApplyingRemainingAmount; TempApplyingCustLedgEntry."Remaining Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Remaining Amount';
@@ -140,7 +140,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
-                field("CalcApplnRemainingAmount(""Remaining Amount"")"; CalcApplnRemainingAmount(Rec."Remaining Amount"))
+                field("Appln. Remaining Amount"; CalcApplnRemainingAmount(Rec."Remaining Amount"))
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = ApplnCurrencyCode;
@@ -155,8 +155,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
                     trigger OnValidate()
                     begin
-                        CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", Rec);
-
+                        Codeunit.Run(Codeunit::"Cust. Entry-Edit", Rec);
                         if (xRec."Amount to Apply" = 0) or (Rec."Amount to Apply" = 0) and
                            (ApplnType = ApplnType::"Applies-to ID")
                         then
@@ -165,7 +164,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         AmounttoApplyOnAfterValidate();
                     end;
                 }
-                field("CalcApplnAmounttoApply(""Amount to Apply"")"; CalcApplnAmounttoApply(Rec."Amount to Apply"))
+                field("CalcApplnAmounttoApply(Amount to Apply)"; CalcApplnAmounttoApply(Rec."Amount to Apply"))
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = ApplnCurrencyCode;
@@ -210,7 +209,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         RecalcApplnAmount();
                     end;
                 }
-                field("CalcApplnRemainingAmount(""Remaining Pmt. Disc. Possible"")"; CalcApplnRemainingAmount(Rec."Remaining Pmt. Disc. Possible"))
+                field("CalcApplnRemainingAmount(Remaining Pmt. Disc. Possible)"; CalcApplnRemainingAmount(Rec."Remaining Pmt. Disc. Possible"))
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = ApplnCurrencyCode;

@@ -53,6 +53,11 @@
             "justification": "Lowering permissions should only be used in tests."
         },
         {
+            "id": "AA0100",
+            "action":"Error",
+            "justification": "Do not have identifiers with quotes in the name."
+        },        
+        {
             "id": "AA0101",
             "action":"Error",
             "justification": "Use camel case property values in pages of type API."

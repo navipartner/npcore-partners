@@ -28,7 +28,7 @@ page 6060051 "NPR Item Worksheet FactBox"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Description field.';
             }
-            field(ItemDescription; TempRecTempItem.Description)
+            field(ItemDescription; TempItem.Description)
             {
                 ApplicationArea = All;
                 CaptionClass = ExItemDescription;
@@ -41,7 +41,7 @@ page 6060051 "NPR Item Worksheet FactBox"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Unit Price field.';
             }
-            field("RecTempItem.""Unit Price"""; TempRecTempItem."Unit Price")
+            field("Unit Price"; TempItem."Unit Price")
             {
                 ApplicationArea = All;
                 BlankZero = true;
@@ -56,7 +56,7 @@ page 6060051 "NPR Item Worksheet FactBox"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Direct Unit Cost field.';
             }
-            field("Last unit cost"; TempRecTempItem."Last Direct Cost")
+            field("Last unit cost"; TempItem."Last Direct Cost")
             {
                 ApplicationArea = All;
                 BlankZero = true;
@@ -104,7 +104,7 @@ page 6060051 "NPR Item Worksheet FactBox"
         RecExItem.Init();
         if Rec."Existing Item No." <> '' then
             if RecExItem.Get(Rec."Existing Item No.") then
-                TempRecTempItem := RecExItem;
+                TempItem := RecExItem;
         RecExItem.CalcFields(Inventory);
         BuildCaptions();
     end;
@@ -112,13 +112,13 @@ page 6060051 "NPR Item Worksheet FactBox"
     trigger OnAfterGetRecord()
     begin
         Clear(RecExItem);
-        Clear(TempRecTempItem);
+        Clear(TempItem);
         BuildCaptions();
     end;
 
     var
         RecExItem: Record Item;
-        TempRecTempItem: Record Item temporary;
+        TempItem: Record Item temporary;
         ExItemDescription: Text;
         ExItemUnitCost: Text;
         ExItemUnitPrice: Text;
@@ -140,18 +140,18 @@ page 6060051 "NPR Item Worksheet FactBox"
         ExNoOfChanges := '';
         ExNoOfWarnings := '';
         if (Rec."Existing Item No." <> '') then begin
-            if Rec.Description <> TempRecTempItem.Description then
+            if Rec.Description <> TempItem.Description then
                 ExItemDescription := DescriptionLbl
             else
-                TempRecTempItem.Description := '';
-            if Rec."Sales Price" <> TempRecTempItem."Unit Price" then
+                TempItem.Description := '';
+            if Rec."Sales Price" <> TempItem."Unit Price" then
                 ExItemUnitPrice := UnitPriceLbl
             else
-                TempRecTempItem."Unit Price" := 0;
-            if Rec."Direct Unit Cost" <> TempRecTempItem."Last Direct Cost" then
+                TempItem."Unit Price" := 0;
+            if Rec."Direct Unit Cost" <> TempItem."Last Direct Cost" then
                 ExItemUnitCost := UnitCostLbl
             else
-                TempRecTempItem."Last Direct Cost" := 0;
+                TempItem."Last Direct Cost" := 0;
             Rec.CalcFields("No. of Changes", "No. of Warnings");
             if Rec."No. of Changes" <> 0 then begin
                 ExNoOfChanges := Rec.FieldCaption("No. of Changes");

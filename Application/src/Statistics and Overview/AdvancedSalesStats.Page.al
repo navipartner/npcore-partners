@@ -157,7 +157,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Start field';
                 }
-                field("-""Sale (QTY)"""; -"Sale (QTY)")
+                field("-Sale (QTY)"; -"Sale (QTY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (QTY)';
@@ -175,7 +175,7 @@ page 6014585 "NPR Advanced Sales Stats"
                         AuxItemLedgerEntries.RunModal();
                     end;
                 }
-                field("-""LastYear Sale (QTY)"""; -"LastYear Sale (QTY)")
+                field("-LastYear Sale (QTY)"; -"LastYear Sale (QTY)")
                 {
                     ApplicationArea = All;
                     Caption = '-> Last Year';

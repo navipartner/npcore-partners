@@ -61,7 +61,7 @@
 
         addafter("Inventory Posting Group")
         {
-            field("NPR NPR_ItemAvlByLocation"; ItemAvlByLocation)
+            field("NPR ItemAvlByLocation"; ItemAvlByLocation)
             {
                 Caption = 'Inv availability by location';
                 ApplicationArea = All;

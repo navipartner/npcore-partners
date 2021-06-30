@@ -93,7 +93,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Passes API field';
                 }
-                field("""PUT Passes Template"".HASVALUE()"; Rec."PUT Passes Template".HasValue())
+                field("PUT Passes Template"; Rec."PUT Passes Template".HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Have Template';

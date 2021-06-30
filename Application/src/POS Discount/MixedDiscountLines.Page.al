@@ -108,7 +108,7 @@ page 6014451 "NPR Mixed Discount Lines"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("CalcMinQty()"; CalcMinQty())
+                field(MinQty; CalcMinQty())
                 {
                     ApplicationArea = All;
                     Caption = 'Min. Qty.';

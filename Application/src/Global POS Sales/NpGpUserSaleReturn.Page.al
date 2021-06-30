@@ -16,35 +16,35 @@ page 6151174 "NPR NpGp User Sale Return"
             group(Control6014408)
             {
                 ShowCaption = false;
-                field("TempNpGpPOSSalesEntry.""Original Company"""; TempNpGpPOSSalesEntry."Original Company")
+                field("Original Company Name"; TempNpGpPOSSalesEntry."Original Company")
                 {
                     ApplicationArea = All;
                     Caption = 'Original Company Name';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Original Company Name field';
                 }
-                field("TempNpGpPOSSalesEntry.""POS Store Code"""; TempNpGpPOSSalesEntry."POS Store Code")
+                field("POS Store Code"; TempNpGpPOSSalesEntry."POS Store Code")
                 {
                     ApplicationArea = All;
                     Caption = 'POS Store Code';
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("TempNpGpPOSSalesEntry.""POS Unit No."""; TempNpGpPOSSalesEntry."POS Unit No.")
+                field("POS Unit No."; TempNpGpPOSSalesEntry."POS Unit No.")
                 {
                     ApplicationArea = All;
                     Caption = 'POS Unit No.';
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("TempNpGpPOSSalesEntry.""Document No."""; TempNpGpPOSSalesEntry."Document No.")
+                field("Document No."; TempNpGpPOSSalesEntry."Document No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Document No.';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("TempNpGpPOSSalesEntry.""Posting Date"""; TempNpGpPOSSalesEntry."Posting Date")
+                field("Posting Date"; TempNpGpPOSSalesEntry."Posting Date")
                 {
                     ApplicationArea = All;
                     Caption = ' Posting Date';

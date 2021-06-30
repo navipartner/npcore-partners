@@ -20,7 +20,7 @@ page 6151432 "NPR Magento Attr. Labels"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value field';
                 }
-                field("FORMAT(""Text Field"".HASVALUE)"; Format(Rec."Text Field".HasValue))
+                field("Text Field"; Format(Rec."Text Field".HasValue))
                 {
                     ApplicationArea = All;
                     AssistEdit = true;

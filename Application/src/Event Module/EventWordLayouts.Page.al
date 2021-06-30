@@ -32,7 +32,7 @@ page 6060157 "NPR Event Word Layouts"
                     ApplicationArea = All;
                     ToolTip = 'Specifies a description of basic layout.';
                 }
-                field("Layout.HASVALUE"; Rec.Layout.HasValue)
+                field(HasLayout; Rec.Layout.HasValue)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies if current layout is loaded either by inheriting from basic layout or by manually importing it.';

@@ -18,7 +18,7 @@ page 6151219 "NPR NpCs Coll. Store Inv.Lines"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("GetNo()"; GetNo())
+                field("No."; GetNo())
                 {
                     ApplicationArea = All;
                     Caption = 'No.';

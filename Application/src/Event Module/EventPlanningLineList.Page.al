@@ -58,7 +58,7 @@ page 6060161 "NPR Event Planning Line List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("""Calendar Item ID"" <> ''"; Rec."NPR Calendar Item ID" <> '')
+                field("Meeting Req. Exists"; Rec."NPR Calendar Item ID" <> '')
                 {
                     ApplicationArea = All;
                     Caption = 'Meeting Req. Exists';

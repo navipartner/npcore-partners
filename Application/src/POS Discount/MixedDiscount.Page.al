@@ -102,7 +102,7 @@
 
                                 ShowCaption = false;
                                 Visible = (Rec."Mix Type" = 1) OR (Rec.Lot);
-                                field("CalcMinQty()"; Rec.CalcMinQty())
+                                field(ItemQtyPerLot; Rec.CalcMinQty())
                                 {
                                     ApplicationArea = All;
                                     Caption = 'Item Qty. per Lot';
