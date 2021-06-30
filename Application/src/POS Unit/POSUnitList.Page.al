@@ -34,11 +34,6 @@ page 6150616 "NPR POS Unit List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("POS Display Profile"; Rec."POS Display Profile")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Display Profile field';
-                }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
