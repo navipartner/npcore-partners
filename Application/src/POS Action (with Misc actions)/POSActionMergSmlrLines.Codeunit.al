@@ -1,13 +1,5 @@
 codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
 {
-    // NPR5.51/ALST/20190701 CASE 360269 new object
-    // NPR5.52/ALST/20191017 CASE 360269 items with diferent unit prices will not be colapsed
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescriptionCaption: Label 'This action is used to merge similar item lines of the sale to a single one';
         NoLinesErr: Label 'No adequate sale lines are available in the current sale';
@@ -19,7 +11,7 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.1');
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -52,20 +44,21 @@ then begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        ColapseSaleLines(SalePOS);
+        ColapseSaleLines(POSSession, SalePOS);
 
-        POSSale.RefreshCurrent();
-        POSSession.ChangeViewSale();
+        POSSale.SetModified();
         POSSession.RequestRefreshData();
 
         Handled := true;
     end;
 
+    #region Adiacent functions
 
-    local procedure ColapseSaleLines(SalePOS: Record "NPR POS Sale")
+    local procedure ColapseSaleLines(var POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
         SaleLinePOS.SetCurrentKey("No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -77,30 +70,35 @@ then begin
         if not SaleLinePOS.FindSet() then
             Error(NoLinesErr);
 
+        POSSession.GetSaleLine(POSSaleLine);
+
         repeat
+
             SaleLinePOS.SetRange("No.", SaleLinePOS."No.");
-            //-NPR5.52 [360269]
+            SaleLinePOS.SetRange("Variant Code", SaleLinePOS."Variant Code");
             SaleLinePOS.SetRange("Unit Price", SaleLinePOS."Unit Price");
-            //+NPR5.52 [360269]
 
             if SaleLinePOS.Count() > 1 then begin
+
                 TempSaleLinePOS := SaleLinePOS;
                 TempSaleLinePOS.Insert();
 
-                SaleLinePOS.Delete(true);
+                POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+                POSSaleLine.DeleteLine();
 
                 while SaleLinePOS.Next() > 0 do begin
                     TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
-                    SaleLinePOS.Delete(true);
+                    POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+                    POSSaleLine.DeleteLine();
                 end;
 
                 TempSaleLinePOS.Modify();
             end;
 
+
             SaleLinePOS.SetRange("No.");
-            //-NPR5.52 [360269]
+            SaleLinePOS.SetRange("Variant Code");
             SaleLinePOS.SetRange("Unit Price");
-        //+NPR5.52 [360269]
         until SaleLinePOS.Next() = 0;
 
         if not TempSaleLinePOS.FindSet() then
@@ -108,11 +106,13 @@ then begin
 
         repeat
             SaleLinePOS := TempSaleLinePOS;
-            SaleLinePOS.Insert();
+            POSSaleLine.InsertLine(SaleLinePOS);
 
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
             SaleLinePOS.Modify();
+            POSSaleLine.RefreshCurrent();
         until TempSaleLinePOS.Next() = 0;
     end;
+    #endregion
 }
 
