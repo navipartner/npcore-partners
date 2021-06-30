@@ -149,7 +149,7 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
 
     procedure LookupValue()
     var
-        tmpRetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
         Parts: DotNet NPRNetArray;
         "Part": DotNet NPRNetString;
         OptionStringCaption: Text;
@@ -172,16 +172,16 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
             SplitString(OptionString, Parts);
 
         foreach Part in Parts do begin
-            tmpRetailList.Number += 1;
-            tmpRetailList.Choice := Part;
-            tmpRetailList.Insert();
+            TempRetailList.Number += 1;
+            TempRetailList.Choice := Part;
+            TempRetailList.Insert();
         end;
 
-        if tmpRetailList.IsEmpty then
+        if TempRetailList.IsEmpty then
             exit;
 
-        if PAGE.RunModal(0, tmpRetailList) = ACTION::LookupOK then
-            Validate(Value, tmpRetailList.Choice);
+        if PAGE.RunModal(0, TempRetailList) = ACTION::LookupOK then
+            Validate(Value, TempRetailList.Choice);
     end;
 
     procedure ValidateValue()
@@ -261,6 +261,7 @@ table 6184484 "NPR EFTType POSUnit Gen.Param."
 
         OnValidateParameterValue(Rec);
     end;
+
     procedure GetOptionInt(Value: Text; OptionStringIn: Text) Result: Integer
     var
         TypeHelper: Codeunit "Type Helper";

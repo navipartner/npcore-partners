@@ -280,7 +280,7 @@
 
     procedure SetupCommonBatch(TaskBatch: Record "NPR Task Batch")
     var
-        TMPConfigSel: Record "Config. Selection" temporary;
+        TempConfigSel: Record "Config. Selection" temporary;
         Comp: Record Company;
         TaskBatch2: Record "NPR Task Batch";
         TaskTemplate2: Record "NPR Task Template";
@@ -298,22 +298,22 @@
         if Comp.FindSet() then
             repeat
                 if Comp.Name <> CompanyName then begin
-                    TMPConfigSel.Init();
-                    TMPConfigSel.Name := Comp.Name;
-                    TMPConfigSel.Insert();
+                    TempConfigSel.Init();
+                    TempConfigSel.Name := Comp.Name;
+                    TempConfigSel.Insert();
                 end;
             until Comp.Next() = 0;
 
-        if not (PAGE.RunModal(PAGE::"Config. Selection", TMPConfigSel) = ACTION::LookupOK) then
+        if not (PAGE.RunModal(PAGE::"Config. Selection", TempConfigSel) = ACTION::LookupOK) then
             exit;
 
-        TMPConfigSel.SetRange(Selected, true);
-        if TMPConfigSel.FindSet() then
+        TempConfigSel.SetRange(Selected, true);
+        if TempConfigSel.FindSet() then
             repeat
-                NASGroup2.ChangeCompany(TMPConfigSel.Name);
-                TaskTemplate2.ChangeCompany(TMPConfigSel.Name);
-                TaskBatch2.ChangeCompany(TMPConfigSel.Name);
-                TaskLine2.ChangeCompany(TMPConfigSel.Name);
+                NASGroup2.ChangeCompany(TempConfigSel.Name);
+                TaskTemplate2.ChangeCompany(TempConfigSel.Name);
+                TaskBatch2.ChangeCompany(TempConfigSel.Name);
+                TaskLine2.ChangeCompany(TempConfigSel.Name);
 
                 case NASGroup2.Count() of
                     0:
@@ -363,7 +363,7 @@
                             TaskLine2.Modify();
                         end;
                     until TaskLine.Next() = 0;
-            until TMPConfigSel.Next() = 0;
+            until TempConfigSel.Next() = 0;
     end;
 }
 

@@ -21,7 +21,7 @@
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupInventoryPerLocation(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
-        TMPInvBuffer: Record "Inventory Buffer" temporary;
+        TempInvBuffer: Record "Inventory Buffer" temporary;
         Location: Record Location;
         Item: Record Item;
     begin
@@ -34,29 +34,29 @@
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
-                TMPInvBuffer.Init();
-                TMPInvBuffer."Item No." := TMPVrtBuffer."Item No.";
-                TMPInvBuffer."Variant Code" := TMPVrtBuffer."Variant Code";
-                TMPInvBuffer."Location Code" := Location.Code;
-                TMPInvBuffer.Quantity := Item."Net Change";
-                TMPInvBuffer.Insert();
+                TempInvBuffer.Init();
+                TempInvBuffer."Item No." := TMPVrtBuffer."Item No.";
+                TempInvBuffer."Variant Code" := TMPVrtBuffer."Variant Code";
+                TempInvBuffer."Location Code" := Location.Code;
+                TempInvBuffer.Quantity := Item."Net Change";
+                TempInvBuffer.Insert();
             until Location.Next() = 0;
         Item.SetFilter("Location Filter", '');
         Item.CalcFields("Net Change");
         if Item."Net Change" <> 0 then begin
-            TMPInvBuffer.Init();
-            TMPInvBuffer."Item No." := TMPVrtBuffer."Item No.";
-            TMPInvBuffer."Variant Code" := TMPVrtBuffer."Variant Code";
-            TMPInvBuffer."Location Code" := BlankLocation;
-            TMPInvBuffer.Quantity := Item."Net Change";
-            TMPInvBuffer.Insert();
+            TempInvBuffer.Init();
+            TempInvBuffer."Item No." := TMPVrtBuffer."Item No.";
+            TempInvBuffer."Variant Code" := TMPVrtBuffer."Variant Code";
+            TempInvBuffer."Location Code" := BlankLocation;
+            TempInvBuffer.Quantity := Item."Net Change";
+            TempInvBuffer.Insert();
         end;
 
         if UseReturnValue(CalledFrom, VrtFieldSetup) then begin
-            if PAGE.RunModal(6059976, TMPInvBuffer) = ACTION::LookupOK then
-                FieldValue := TMPInvBuffer."Location Code";
+            if PAGE.RunModal(6059976, TempInvBuffer) = ACTION::LookupOK then
+                FieldValue := TempInvBuffer."Location Code";
         end else
-            PAGE.RunModal(6059976, TMPInvBuffer);
+            PAGE.RunModal(6059976, TempInvBuffer);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]

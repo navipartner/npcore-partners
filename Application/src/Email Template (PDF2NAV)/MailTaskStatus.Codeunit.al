@@ -43,7 +43,7 @@ codeunit 6059905 "NPR Mail Task Status"
         Text007: Label 'Task "%1" will be executed now';
         Text008: Label 'Task "%1" is running again with status %2';
 
-        EmailItem: Record "Email Item" temporary;
+        TempEmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
         MailManagement: Codeunit "Mail Management";
 
@@ -289,7 +289,7 @@ codeunit 6059905 "NPR Mail Task Status"
             else
                 SendAsMailType := SendAsMailType::JMail;
         end;
-        EmailSenderHandler.CreateEmailItem(EmailItem, ToName, '', Recipients, '', '', true);
+        EmailSenderHandler.CreateEmailItem(TempEmailItem, ToName, '', Recipients, '', '', true);
     end;
 
     procedure CreateMessage(SendAsMailType: Option Auto,JMail,SMTPMail; SenderName: Text[100]; SenderAddress: Text; Recipients: Text[1024]; Subject: Text[200]; Body: Text[1024])
@@ -305,7 +305,7 @@ codeunit 6059905 "NPR Mail Task Status"
         end;
 
         InitMailAdrSeparators(Separators);
-        EmailSenderHandler.CreateEmailItem(EmailItem, SenderName, SenderAddress, Recipients.Split(Separators), Subject, Body, true);
+        EmailSenderHandler.CreateEmailItem(TempEmailItem, SenderName, SenderAddress, Recipients.Split(Separators), Subject, Body, true);
     end;
 
 
@@ -351,7 +351,7 @@ codeunit 6059905 "NPR Mail Task Status"
     begin
         InitMailAdrSeparators(Separators);
         Recipients := NewRecipient.Split(Separators);
-        EmailSenderHandler.AddRecipients(EmailItem, Recipients);
+        EmailSenderHandler.AddRecipients(TempEmailItem, Recipients);
     end;
 
     procedure AddRecipientCC(NewRecipientCC: Text[80])
@@ -361,7 +361,7 @@ codeunit 6059905 "NPR Mail Task Status"
     begin
         InitMailAdrSeparators(Separators);
         CCRecipients := NewRecipientCC.Split(Separators);
-        EmailSenderHandler.AddRecipientCC(EmailItem, CCRecipients);
+        EmailSenderHandler.AddRecipientCC(TempEmailItem, CCRecipients);
     end;
 
     procedure AddRecipientBCC(NewRecipientBCC: Text[80])
@@ -371,22 +371,22 @@ codeunit 6059905 "NPR Mail Task Status"
     begin
         InitMailAdrSeparators(Separators);
         BCCRecipients := NewRecipientBCC.Split(Separators);
-        EmailSenderHandler.AddRecipientBCC(EmailItem, BCCRecipients);
+        EmailSenderHandler.AddRecipientBCC(TempEmailItem, BCCRecipients);
     end;
 
     procedure AppendHTML(TextLine: Text[260]): Boolean
     begin
-        EmailSenderHandler.AppendBodyLine(EmailItem, TextLine + '<br/>');
+        EmailSenderHandler.AppendBodyLine(TempEmailItem, TextLine + '<br/>');
     end;
 
     procedure AddAttachmentFromStream(InStrAttachment: InStream; NewAttachment: Text[1024])
     begin
-        EmailSenderHandler.AddAttachmentFromStream(EmailItem, InStrAttachment, NewAttachment);
+        EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, InStrAttachment, NewAttachment);
     end;
 
     procedure Send() MailSent: Boolean
     begin
-        EmailSenderHandler.Send(EmailItem);
+        EmailSenderHandler.Send(TempEmailItem);
         exit(true);
     end;
 

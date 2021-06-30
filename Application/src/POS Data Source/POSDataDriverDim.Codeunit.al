@@ -74,7 +74,7 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         DimensionManagement: Codeunit DimensionManagement;
-        DimSetEntryTmp: Record "Dimension Set Entry" temporary;
+        TempDimSetEntry: Record "Dimension Set Entry" temporary;
         SalePOS: Record "NPR POS Sale";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
@@ -90,16 +90,16 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
 
         GeneralLedgerSetup.Get();
 
-        DimensionManagement.GetDimensionSet(DimSetEntryTmp, SalePOS."Dimension Set ID");
+        DimensionManagement.GetDimensionSet(TempDimSetEntry, SalePOS."Dimension Set ID");
 
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 1 Code", '1');
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 2 Code", '2');
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 3 Code", '3');
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 4 Code", '4');
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 5 Code", '5');
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 6 Code", '6');
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 7 Code", '7');
-        AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 8 Code", '8');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 1 Code", '1');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 2 Code", '2');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 3 Code", '3');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 4 Code", '4');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 5 Code", '5');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 6 Code", '6');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 7 Code", '7');
+        AddDimesionValue(DataRow, TempDimSetEntry, GeneralLedgerSetup."Shortcut Dimension 8 Code", '8');
     end;
 
     local procedure AddDimesionValue(var DataRow: Codeunit "NPR Data Row"; var DimSetEntryTmp: Record "Dimension Set Entry" temporary; DimensionCode: Code[20]; ShortcutNumber: Code[10])

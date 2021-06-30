@@ -264,7 +264,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationResponse2: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         TicketAttemptCreate: Codeunit "NPR Ticket Attempt Create";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -295,18 +295,18 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         for NTicket := 1 to TicketNodeList.Count() do begin
             TicketNodeList.Get(NTicket, TicketNode);
-            InsertTemporaryTicketReservation(TicketNode.AsXmlElement(), Token, TmpTicketReservationRequest);
+            InsertTemporaryTicketReservation(TicketNode.AsXmlElement(), Token, TempTicketReservationRequest);
         end;
 
-        TmpTicketReservationRequest.Reset();
-        if (TmpTicketReservationRequest.IsEmpty()) then
+        TempTicketReservationRequest.Reset();
+        if (TempTicketReservationRequest.IsEmpty()) then
             Error('Houston, we have a problem! 6060116.CreateTicketRequest() said ok, but token %1 was not found.', Token);
 
         // pre-check member guest
-        MemberTicketManager.PreValidateMemberGuestTicketRequest(TmpTicketReservationRequest, true);
+        MemberTicketManager.PreValidateMemberGuestTicketRequest(TempTicketReservationRequest, true);
 
         Commit();
-        if (TicketAttemptCreate.AttemptValidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
+        if (TicketAttemptCreate.AttemptValidateRequestForTicketReuse(TempTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             // duplicate the previous response so SOAP Service gets a valid response
             TicketReservationResponse.SetFilter("Session Token ID", '=%1', ReusedToken);
             if (TicketReservationResponse.FindSet()) then begin
@@ -323,13 +323,13 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         end;
 
         // Make new tickets
-        TmpTicketReservationRequest.Reset();
-        TmpTicketReservationRequest.FindSet();
+        TempTicketReservationRequest.Reset();
+        TempTicketReservationRequest.FindSet();
         repeat
-            TicketReservationRequest.TransferFields(TmpTicketReservationRequest, false);
+            TicketReservationRequest.TransferFields(TempTicketReservationRequest, false);
             TicketReservationRequest."Entry No." := 0;
             TicketReservationRequest.Insert();
-        until (TmpTicketReservationRequest.Next() = 0);
+        until (TempTicketReservationRequest.Next() = 0);
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);

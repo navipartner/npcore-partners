@@ -61,20 +61,20 @@
     end;
 
     var
-        OptionValueBuffer: Record "NPR Text Editor Dialog Option" temporary;
+        TempOptionValueBuffer: Record "NPR Text Editor Dialog Option" temporary;
         EditorContent: Text;
         OKClicked: Boolean;
         CanClose: Boolean;
 
     local procedure SendOptionsToTextEditor()
     begin
-        OptionValueBuffer.Reset();
-        OptionValueBuffer.SetAutoCalcFields("Option Value");
-        if OptionValueBuffer.FindSet() then begin
+        TempOptionValueBuffer.Reset();
+        TempOptionValueBuffer.SetAutoCalcFields("Option Value");
+        if TempOptionValueBuffer.FindSet() then begin
             repeat
-                OptionValueBuffer.TestField("Option Key");
-                SetOption(OptionValueBuffer."Option Key", OptionValueBuffer.GetOptionValue());
-            until OptionValueBuffer.Next() = 0;
+                TempOptionValueBuffer.TestField("Option Key");
+                SetOption(TempOptionValueBuffer."Option Key", TempOptionValueBuffer.GetOptionValue());
+            until TempOptionValueBuffer.Next() = 0;
         end;
     end;
 
@@ -108,7 +108,7 @@
         TextEditorDialog: Page "NPR Text Editor Dialog";
     begin
         TextEditorDialog.SetContent(Content);
-        TextEditorDialog.SetOptionValueBuffer(OptionValueBuffer);
+        TextEditorDialog.SetOptionValueBuffer(TempOptionValueBuffer);
         if TextEditorDialog.RunModal() = ACTION::OK then;
         if TextEditorDialog.GetOKClicked() then begin
             Content := TextEditorDialog.GetContent();
@@ -118,20 +118,20 @@
 
     procedure InitTextEditorOptionKeyAndValueBuffer()
     begin
-        OptionValueBuffer.Reset();
-        OptionValueBuffer.DeleteAll();
+        TempOptionValueBuffer.Reset();
+        TempOptionValueBuffer.DeleteAll();
     end;
 
     procedure AddTextEditorOptionKeyAndValue(OptionKey: Text; OptionValue: Variant)
     begin
-        OptionValueBuffer.Init();
-        OptionValueBuffer."Option Key" := OptionKey;
-        OptionValueBuffer.SetOptionValue(OptionValue);
-        OptionValueBuffer.Insert();
+        TempOptionValueBuffer.Init();
+        TempOptionValueBuffer."Option Key" := OptionKey;
+        TempOptionValueBuffer.SetOptionValue(OptionValue);
+        TempOptionValueBuffer.Insert();
     end;
 
     procedure SetOptionValueBuffer(var OptionValueBufferInput: Record "NPR Text Editor Dialog Option" temporary)
     begin
-        OptionValueBuffer.Copy(OptionValueBufferInput, true);
+        TempOptionValueBuffer.Copy(OptionValueBufferInput, true);
     end;
 }

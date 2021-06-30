@@ -81,7 +81,7 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
 
     var
         AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
-        AssignedFlowStatusTmp: Record "NPR NPRE Assigned Flow Status" temporary;
+        TempAssignedFlowStatus: Record "NPR NPRE Assigned Flow Status" temporary;
         FlowStatus: Record "NPR NPRE Flow Status";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         SourceRecID: RecordID;
@@ -136,23 +136,23 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
     begin
         if not InitAssignedPrintCategory() then
             exit('');
-        exit(WaiterPadMgt.AssignedFlowStatusesAsFilterString(AssignedPrintCategory.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow, AssignedFlowStatusTmp));
+        exit(WaiterPadMgt.AssignedFlowStatusesAsFilterString(AssignedPrintCategory.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow, TempAssignedFlowStatus));
     end;
 
     local procedure ShowServingSteps()
     begin
         if not InitAssignedPrintCategory() then
             exit;
-        WaiterPadMgt.SelectFlowStatuses(AssignedPrintCategory.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow, AssignedFlowStatusTmp);
+        WaiterPadMgt.SelectFlowStatuses(AssignedPrintCategory.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow, TempAssignedFlowStatus);
     end;
 
     procedure SetAssignedFlowStatusRecordset(var AssignedFlowStatusIn: Record "NPR NPRE Assigned Flow Status")
     begin
-        AssignedFlowStatusTmp.Copy(AssignedFlowStatusIn, true);
+        TempAssignedFlowStatus.Copy(AssignedFlowStatusIn, true);
     end;
 
     procedure GetAssignedFlowStatusRecordset(var AssignedFlowStatusOut: Record "NPR NPRE Assigned Flow Status")
     begin
-        AssignedFlowStatusOut.Copy(AssignedFlowStatusTmp, true);
+        AssignedFlowStatusOut.Copy(TempAssignedFlowStatus, true);
     end;
 }

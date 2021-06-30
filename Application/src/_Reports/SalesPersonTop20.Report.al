@@ -19,8 +19,8 @@ report 6014406 "NPR Sales Person Top 20"
                     if "Salesperson/Purchaser"."NPR Sales (LCY)" = 0 then
                         CurrReport.Skip();
 
-                SalesPersonTemp.Init();
-                SalesPersonTemp."Vendor No." := "Salesperson/Purchaser".Code;
+                TempSalesPerson.Init();
+                TempSalesPerson."Vendor No." := "Salesperson/Purchaser".Code;
 
                 if Sorting = Sorting::Largest then
                     Multipl := -1
@@ -37,25 +37,25 @@ report 6014406 "NPR Sales Person Top 20"
                 case ShowType of
                     ShowType::Turnover:
                         begin
-                            SalesPersonTemp."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
-                            SalesPersonTemp."Amount 2 (LCY)" := Multipl * "NPR Discount Amount";
+                            TempSalesPerson."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
+                            TempSalesPerson."Amount 2 (LCY)" := Multipl * "NPR Discount Amount";
                         end;
                     ShowType::Discount:
                         begin
-                            SalesPersonTemp."Amount (LCY)" := Multipl * "NPR Discount Amount";
-                            SalesPersonTemp."Amount 2 (LCY)" := Multipl * "NPR Sales (LCY)";
+                            TempSalesPerson."Amount (LCY)" := Multipl * "NPR Discount Amount";
+                            TempSalesPerson."Amount 2 (LCY)" := Multipl * "NPR Sales (LCY)";
                         end;
                     ShowType::"Contribution Margin":
-                        SalesPersonTemp."Amount (LCY)" := Multipl * Db;
+                        TempSalesPerson."Amount (LCY)" := Multipl * Db;
                 end;
 
-                SalesPersonTemp.Insert();
+                TempSalesPerson.Insert();
 
                 if (I = 0) or (I < ShowQty) then
                     I := I + 1
                 else begin
-                    SalesPersonTemp.FindLast();
-                    SalesPersonTemp.Delete();
+                    TempSalesPerson.FindLast();
+                    TempSalesPerson.Delete();
                 end;
 
                 SalesTotal += "NPR Sales (LCY)";
@@ -74,7 +74,7 @@ report 6014406 "NPR Sales Person Top 20"
 
             trigger OnPreDataItem()
             begin
-                SalesPersonTemp.DeleteAll();
+                TempSalesPerson.DeleteAll();
                 I := 0;
                 SalespersonFilter := "Salesperson/Purchaser".GetFilter("Date Filter");
             end;
@@ -160,13 +160,13 @@ report 6014406 "NPR Sales Person Top 20"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not SalesPersonTemp.FindFirst() then
+                    if not TempSalesPerson.FindFirst() then
                         CurrReport.Break();
                 end else
-                    if SalesPersonTemp.Next() = 0 then
+                    if TempSalesPerson.Next() = 0 then
                         CurrReport.Break();
 
-                if "Salesperson/Purchaser".Get(SalesPersonTemp."Vendor No.") then
+                if "Salesperson/Purchaser".Get(TempSalesPerson."Vendor No.") then
                     "Salesperson/Purchaser".CalcFields("NPR Sales (LCY)", "NPR Discount Amount", "NPR COGS (LCY)");
 
                 Db := "Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)";
@@ -239,7 +239,7 @@ report 6014406 "NPR Sales Person Top 20"
     end;
 
     var
-        SalesPersonTemp: Record "Vendor Amount" temporary;
+        TempSalesPerson: Record "Vendor Amount" temporary;
         OnlySales: Boolean;
         Db: Decimal;
         Dg: Decimal;

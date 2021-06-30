@@ -10,7 +10,7 @@
     var
         RaptorSetup: Record "NPR Raptor Setup";
         IncorrectFunctionCallErr: Label 'Function call on a non-temporary variable. This is a critical programming error. Please contact system vendor.';
-        SalespersonTmp: Record "Salesperson/Purchaser" temporary;
+        TempSalesperson: Record "Salesperson/Purchaser" temporary;
 
     local procedure Process()
     var
@@ -54,23 +54,23 @@
 
     local procedure SendItemLedgerEntry(ItemLedger: Record "Item Ledger Entry"; SessionGUID: Guid)
     var
-        Parameters: Record "Name/Value Buffer" temporary;
+        TempParameters: Record "Name/Value Buffer" temporary;
         RaptorMgt: Codeunit "NPR Raptor Management";
     begin
-        GenerateParameters(Parameters, ItemLedger, SessionGUID);
-        OnBeforeILESendRaptorTrackingRequest(Parameters, ItemLedger, false);
-        RaptorMgt.SendRaptorTrackingRequest(Parameters);
+        GenerateParameters(TempParameters, ItemLedger, SessionGUID);
+        OnBeforeILESendRaptorTrackingRequest(TempParameters, ItemLedger, false);
+        RaptorMgt.SendRaptorTrackingRequest(TempParameters);
     end;
 
     procedure Test_ShowItemLedgerRaptorParameters(ItemLedger: Record "Item Ledger Entry")
     var
-        Parameters: Record "Name/Value Buffer" temporary;
+        TempParameters: Record "Name/Value Buffer" temporary;
         DummySessionGUID: Guid;
     begin
         //-NPR5.55 [400925]
-        GenerateParameters(Parameters, ItemLedger, DummySessionGUID);
-        OnBeforeILESendRaptorTrackingRequest(Parameters, ItemLedger, true);
-        PAGE.RunModal(PAGE::"Name/Value Lookup", Parameters);
+        GenerateParameters(TempParameters, ItemLedger, DummySessionGUID);
+        OnBeforeILESendRaptorTrackingRequest(TempParameters, ItemLedger, true);
+        PAGE.RunModal(PAGE::"Name/Value Lookup", TempParameters);
         //+NPR5.55 [400925]
     end;
 
@@ -95,13 +95,13 @@
 
         Eligible := not RaptorSetup."Exclude Webshop Sales" or (RaptorSetup."Webshop Salesperson Filter" = '');
         if not Eligible then begin
-            SalespersonTmp.Reset();
-            if SalespersonTmp.IsEmpty then
-                CreateTmpSalespersonList(SalespersonTmp);
-            SalespersonTmp.SetFilter(Code, RaptorSetup."Webshop Salesperson Filter");
+            TempSalesperson.Reset();
+            if TempSalesperson.IsEmpty then
+                CreateTmpSalespersonList(TempSalesperson);
+            TempSalesperson.SetFilter(Code, RaptorSetup."Webshop Salesperson Filter");
             AuxItemLedgerEntry.Get(ItemLedger."Entry No.");
-            SalespersonTmp.Code := AuxItemLedgerEntry."Salespers./Purch. Code";
-            Eligible := not SalespersonTmp.Find();
+            TempSalesperson.Code := AuxItemLedgerEntry."Salespers./Purch. Code";
+            Eligible := not TempSalesperson.Find();
         end;
 
         exit(Eligible);

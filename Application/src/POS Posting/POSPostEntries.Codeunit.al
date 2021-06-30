@@ -50,7 +50,7 @@
         TempPOSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary;
         TempPOSPaymentLinetoPost: Record "NPR POS Entry Payment Line" temporary;
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
-        POSEntryTemp: Record "NPR POS Entry" temporary;
+        TempPOSEntry: Record "NPR POS Entry" temporary;
     begin
 
         if ((not PostItemEntriesVar) and (not PostPOSEntriesVar)) or POSEntry.IsEmpty then
@@ -96,17 +96,17 @@
             CreateGenJournalLinesFromSalesTax(POSEntry, TempGenJournalLine);
 
             if StopOnErrorVar then begin
-                CheckandPostGenJournal(TempGenJournalLine, POSEntry, POSEntryTemp);
+                CheckandPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry);
                 UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-                MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
+                MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
             end else begin
                 Commit();
-                if not CheckandPostGenJournal(TempGenJournalLine, POSEntry, POSEntryTemp) then begin
+                if not CheckandPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry) then begin
                     UpdatePOSPostingLogEntry(POSPostingLogEntryNo, true);
-                    MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
+                    MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
                 end else begin
                     UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-                    MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
+                    MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
                 end;
 
             end;

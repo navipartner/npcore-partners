@@ -121,12 +121,12 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
 
     procedure LookupAuditHandler(var POSAuditProfile: Record "NPR POS Audit Profile")
     var
-        tmpRetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
-        OnLookupAuditHandler(tmpRetailList);
-        if PAGE.RunModal(0, tmpRetailList) <> ACTION::LookupOK then
+        OnLookupAuditHandler(TempRetailList);
+        if PAGE.RunModal(0, TempRetailList) <> ACTION::LookupOK then
             exit;
-        POSAuditProfile."Audit Handler" := tmpRetailList.Choice;
+        POSAuditProfile."Audit Handler" := TempRetailList.Choice;
     end;
 
     procedure LogPartnerModification(POSUnitNo: Text; Description: Text[250])

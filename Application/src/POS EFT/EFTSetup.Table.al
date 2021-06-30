@@ -27,10 +27,10 @@ table 6184485 "NPR EFT Setup"
             trigger OnValidate()
             var
                 EFTInterface: Codeunit "NPR EFT Interface";
-                tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
+                TempEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
             begin
-                EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
-                tmpEFTIntegrationType.Get("EFT Integration Type");
+                EFTInterface.OnDiscoverIntegrations(TempEFTIntegrationType);
+                TempEFTIntegrationType.Get("EFT Integration Type");
             end;
         }
         field(3; "POS Unit No."; Code[10])
@@ -73,11 +73,11 @@ table 6184485 "NPR EFT Setup"
     local procedure LookupIntegrationType()
     var
         EFTInterface: Codeunit "NPR EFT Interface";
-        tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
+        TempEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
     begin
-        EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
-        if PAGE.RunModal(0, tmpEFTIntegrationType) = ACTION::LookupOK then
-            "EFT Integration Type" := tmpEFTIntegrationType.Code;
+        EFTInterface.OnDiscoverIntegrations(TempEFTIntegrationType);
+        if PAGE.RunModal(0, TempEFTIntegrationType) = ACTION::LookupOK then
+            "EFT Integration Type" := TempEFTIntegrationType.Code;
     end;
 
     procedure ShowEftPOSUnitParameters()

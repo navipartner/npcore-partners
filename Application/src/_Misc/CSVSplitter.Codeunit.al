@@ -10,7 +10,7 @@ codeunit 6060073 "NPR CSV Splitter"
     end;
 
     var
-        ExcelBuffer: Record "Excel Buffer" temporary;
+        TempExcelBuffer: Record "Excel Buffer" temporary;
         FileMgt: Codeunit "File Management";
         ExportToServer: Boolean;
         WindowIsOpen: Boolean;
@@ -113,14 +113,14 @@ codeunit 6060073 "NPR CSV Splitter"
         NoRowsReadErr: Label 'No rows could be read.';
     begin
         if SheetName = '' then
-            SheetName := ExcelBuffer.SelectSheetsName(InputFileName);
-        ExcelBuffer.LockTable();
-        ExcelBuffer.OpenBook(InputFileName, SheetName);
-        ExcelBuffer.ReadSheet();
-        if not ExcelBuffer.FindLast() then
+            SheetName := TempExcelBuffer.SelectSheetsName(InputFileName);
+        TempExcelBuffer.LockTable();
+        TempExcelBuffer.OpenBook(InputFileName, SheetName);
+        TempExcelBuffer.ReadSheet();
+        if not TempExcelBuffer.FindLast() then
             Error(NoRowsReadErr);
-        NumberOfLines := ExcelBuffer."Row No.";
-        ExcelBuffer.CloseBook();
+        NumberOfLines := TempExcelBuffer."Row No.";
+        TempExcelBuffer.CloseBook();
     end;
 
     local procedure FillArray()
@@ -156,18 +156,18 @@ codeunit 6060073 "NPR CSV Splitter"
             FieldEnumerator += 1;
             FieldValue := NextField(CSVLine);
             if FieldValue <> '' then begin
-                ExcelBuffer.Init();
-                ExcelBuffer.Validate("Row No.", LineEnumarator);
-                ExcelBuffer.Validate("Column No.", FieldEnumerator);
-                ExcelBuffer.Validate("Cell Value as Text", FieldValue);
-                ExcelBuffer.Insert();
+                TempExcelBuffer.Init();
+                TempExcelBuffer.Validate("Row No.", LineEnumarator);
+                TempExcelBuffer.Validate("Column No.", FieldEnumerator);
+                TempExcelBuffer.Validate("Cell Value as Text", FieldValue);
+                TempExcelBuffer.Insert();
             end;
         until (CSVLine = '') or (FieldEnumerator = 99);
-        ExcelBuffer.Init();
-        ExcelBuffer.Validate("Row No.", LineEnumarator);
-        ExcelBuffer.Validate("Column No.", FieldEnumerator + 1);
-        ExcelBuffer.Validate("Cell Value as Text", GetEndofLineText());
-        ExcelBuffer.Insert();
+        TempExcelBuffer.Init();
+        TempExcelBuffer.Validate("Row No.", LineEnumarator);
+        TempExcelBuffer.Validate("Column No.", FieldEnumerator + 1);
+        TempExcelBuffer.Validate("Cell Value as Text", GetEndofLineText());
+        TempExcelBuffer.Insert();
         exit(FieldEnumerator);
     end;
 
@@ -254,42 +254,42 @@ codeunit 6060073 "NPR CSV Splitter"
     var
         FieldValue: Text;
     begin
-        if ExcelBuffer.Get(LineEnumerator, SplitOnColumn) then
-            FieldValue := ExcelBuffer."Cell Value as Text"
+        if TempExcelBuffer.Get(LineEnumerator, SplitOnColumn) then
+            FieldValue := TempExcelBuffer."Cell Value as Text"
         else
             FieldValue := '';
-        ExcelBuffer.Reset();
-        ExcelBuffer.SetRange("Row No.", LineEnumerator);
-        if ExcelBuffer.FindLast() then begin
-            if MaxNoOfColumns < ExcelBuffer."Column No." then
-                MaxNoOfColumns := ExcelBuffer."Column No.";
+        TempExcelBuffer.Reset();
+        TempExcelBuffer.SetRange("Row No.", LineEnumerator);
+        if TempExcelBuffer.FindLast() then begin
+            if MaxNoOfColumns < TempExcelBuffer."Column No." then
+                MaxNoOfColumns := TempExcelBuffer."Column No.";
         end;
         case SplitMethod of
             0:
                 begin
-                    ExcelBuffer.Init();
-                    ExcelBuffer.Validate("Row No.", LineEnumerator);
-                    ExcelBuffer.Validate("Column No.", 999);
-                    ExcelBuffer.Validate("Cell Value as Text", Format(1));
-                    ExcelBuffer.Insert(true);
+                    TempExcelBuffer.Init();
+                    TempExcelBuffer.Validate("Row No.", LineEnumerator);
+                    TempExcelBuffer.Validate("Column No.", 999);
+                    TempExcelBuffer.Validate("Cell Value as Text", Format(1));
+                    TempExcelBuffer.Insert(true);
                 end;
             SplitMethod::GroupByColumn:
                 begin
-                    ExcelBuffer.Init();
-                    ExcelBuffer.Validate("Row No.", LineEnumerator);
-                    ExcelBuffer.Validate("Column No.", 999);
-                    ExcelBuffer.Validate("Cell Value as Text", FieldValue);
-                    ExcelBuffer.Insert(true);
+                    TempExcelBuffer.Init();
+                    TempExcelBuffer.Validate("Row No.", LineEnumerator);
+                    TempExcelBuffer.Validate("Column No.", 999);
+                    TempExcelBuffer.Validate("Cell Value as Text", FieldValue);
+                    TempExcelBuffer.Insert(true);
                 end;
             SplitMethod::SplitOnValueFirstField:
                 begin
                     if SplitOnValue = FieldValue then
                         NumberOfFiles += 1;
-                    ExcelBuffer.Init();
-                    ExcelBuffer.Validate("Row No.", LineEnumerator);
-                    ExcelBuffer.Validate("Column No.", 999);
-                    ExcelBuffer.Validate("Cell Value as Text", Format(NumberOfFiles));
-                    ExcelBuffer.Insert(true);
+                    TempExcelBuffer.Init();
+                    TempExcelBuffer.Validate("Row No.", LineEnumerator);
+                    TempExcelBuffer.Validate("Column No.", 999);
+                    TempExcelBuffer.Validate("Cell Value as Text", Format(NumberOfFiles));
+                    TempExcelBuffer.Insert(true);
                 end;
         end;
     end;
@@ -312,17 +312,17 @@ codeunit 6060073 "NPR CSV Splitter"
         repeat
             I := I + 1;
             UpdateWindow(StrSubstNo(BuildingFileLbl, I));
-            ExcelBuffer.Reset();
-            ExcelBuffer.SetRange("Column No.", 999);
-            ExcelBuffer.SetFilter(ExcelBuffer.Comment, '=%1', '');
+            TempExcelBuffer.Reset();
+            TempExcelBuffer.SetRange("Column No.", 999);
+            TempExcelBuffer.SetFilter(TempExcelBuffer.Comment, '=%1', '');
             if HeaderRows > 0 then
-                ExcelBuffer.SetRange("Row No.", HeaderRows + 1, 9999999);
-            if ExcelBuffer.FindFirst() then begin
+                TempExcelBuffer.SetRange("Row No.", HeaderRows + 1, 9999999);
+            if TempExcelBuffer.FindFirst() then begin
                 CreateOutputfile(I, OutputFile);
                 if not ExportToServer then
                     OutputFile.CreateInStream(LocalInstr);
-                ExcelBuffer.SetRange("Cell Value as Text", ExcelBuffer."Cell Value as Text");
-                ExcelBuffer.SetRange(ExcelBuffer.Comment);
+                TempExcelBuffer.SetRange("Cell Value as Text", TempExcelBuffer."Cell Value as Text");
+                TempExcelBuffer.SetRange(TempExcelBuffer.Comment);
                 if HeaderRows > 0 then begin
                     J := 0;
                     repeat
@@ -330,14 +330,14 @@ codeunit 6060073 "NPR CSV Splitter"
                         OutputFile.Write(BuildLine(J));
                     until J = HeaderRows;
                 end;
-                if ExcelBuffer.FindSet() then
+                if TempExcelBuffer.FindSet() then
                     repeat
-                        if ExcelBuffer.Comment = '' then begin
-                            ExcelBuffer.Validate(Comment, StrSubstNo(FileLbl, Format(I)));
-                            ExcelBuffer.Modify();
-                            OutputFile.Write(BuildLine(ExcelBuffer."Row No."));
+                        if TempExcelBuffer.Comment = '' then begin
+                            TempExcelBuffer.Validate(Comment, StrSubstNo(FileLbl, Format(I)));
+                            TempExcelBuffer.Modify();
+                            OutputFile.Write(BuildLine(TempExcelBuffer."Row No."));
                         end;
-                    until ExcelBuffer.Next() = 0;
+                    until TempExcelBuffer.Next() = 0;
                 if not ExportToServer then begin
                     DownloadFromStream(LocalInstr, 'Export', '', 'All Files (*.*)|*.*', FileName);
                 end;
@@ -397,8 +397,8 @@ codeunit 6060073 "NPR CSV Splitter"
         repeat
             ColumnNo += 1;
             UpdateWindow(StrSubstNo(BuiltLineAndColumnLbl, LineNo, ColumnNo));
-            if ExcelBuffer.Get(LineNo, ColumnNo) then
-                FieldValue := ExcelBuffer."Cell Value as Text"
+            if TempExcelBuffer.Get(LineNo, ColumnNo) then
+                FieldValue := TempExcelBuffer."Cell Value as Text"
             else
                 FieldValue := '';
             if FieldValue <> GetEndofLineText() then begin

@@ -6,17 +6,17 @@
     var
         TaxFreeRequest: Record "NPR Tax Free Request";
         GlobalBlueHandler: Codeunit "NPR Tax Free GB I2";
-        tmpTaxFreeUnit: Record "NPR Tax Free POS Unit" temporary;
+        TempTaxFreeUnit: Record "NPR Tax Free POS Unit" temporary;
     begin
-        if not FindUniqueCountryTaxFreeUnits(tmpTaxFreeUnit) then
+        if not FindUniqueCountryTaxFreeUnits(TempTaxFreeUnit) then
             Error(Error_MissingParams);
 
-        tmpTaxFreeUnit.FindSet();
+        TempTaxFreeUnit.FindSet();
         repeat
             TaxFreeRequest.Init();
             TaxFreeRequest."Request Type" := 'GET_BLOCKED_COUNTRIES';
-            TaxFreeRequest."POS Unit No." := tmpTaxFreeUnit."POS Unit No.";
-            TaxFreeRequest.Mode := tmpTaxFreeUnit.Mode;
+            TaxFreeRequest."POS Unit No." := TempTaxFreeUnit."POS Unit No.";
+            TaxFreeRequest.Mode := TempTaxFreeUnit.Mode;
             TaxFreeRequest."Timeout (ms)" := 300 * 1000;
             TaxFreeRequest."Time Start" := Time;
             TaxFreeRequest."Date Start" := Today();
@@ -25,7 +25,7 @@
             GlobalBlueHandler.DownloadBlockedCountries(TaxFreeRequest);
             Clear(TaxFreeRequest);
             Clear(GlobalBlueHandler);
-        until tmpTaxFreeUnit.Next() = 0;
+        until TempTaxFreeUnit.Next() = 0;
     end;
 
     var
@@ -35,7 +35,7 @@
     var
         GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
-        tmpInteger: Record "Integer" temporary;
+        TempInteger: Record "Integer" temporary;
     begin
         TaxFreeUnit.SetRange("Handler ID Enum", TaxFreeUnit."Handler ID Enum"::GLOBALBLUE_I2);
         TaxFreeUnit.FindSet();
@@ -45,10 +45,10 @@
             GlobalBlueParameters.SetFilter("Shop Country Code", '<>%1', 0);
             GlobalBlueParameters.SetRange("Tax Free Unit", TaxFreeUnit."POS Unit No.");
             if GlobalBlueParameters.FindFirst() then
-                if not tmpInteger.Get(GlobalBlueParameters."Shop Country Code") then begin
-                    tmpInteger.Init();
-                    tmpInteger.Number := GlobalBlueParameters."Shop Country Code";
-                    tmpInteger.Insert();
+                if not TempInteger.Get(GlobalBlueParameters."Shop Country Code") then begin
+                    TempInteger.Init();
+                    TempInteger.Number := GlobalBlueParameters."Shop Country Code";
+                    TempInteger.Insert();
                     tmpTaxFreeUnit.Init();
                     tmpTaxFreeUnit.TransferFields(TaxFreeUnit);
                     tmpTaxFreeUnit.Insert();

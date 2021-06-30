@@ -328,20 +328,20 @@ table 6014446 "NPR RP Template Header"
     var
         LinePrinterInterface: Codeunit "NPR RP Line Printer Interf.";
         MatrixPrinterInterface: Codeunit "NPR RP Matrix Printer Interf.";
-        TmpRetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
         case "Printer Type" of
             "Printer Type"::Line:
-                LinePrinterInterface.GetDeviceList(TmpRetailList);
+                LinePrinterInterface.GetDeviceList(TempRetailList);
             "Printer Type"::Matrix:
-                MatrixPrinterInterface.GetDeviceList(TmpRetailList);
+                MatrixPrinterInterface.GetDeviceList(TempRetailList);
         end;
 
-        if TmpRetailList.IsEmpty then
+        if TempRetailList.IsEmpty then
             exit;
 
-        if PAGE.RunModal(PAGE::"NPR Retail List", TmpRetailList) = ACTION::LookupOK then
-            Validate("Printer Device", TmpRetailList.Choice);
+        if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then
+            Validate("Printer Device", TempRetailList.Choice);
     end;
 }
 

@@ -267,8 +267,8 @@
 
     local procedure DeleteDuplicates(TaskProcessor: Record "NPR Nc Task Processor"; var TempTask: Record "NPR Nc Task" temporary)
     var
-        NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
-        UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
+        TempNewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
+        TempUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
         Checked: Boolean;
         DeleteTempTask: Boolean;
         UniqueTask: Boolean;
@@ -294,15 +294,15 @@
                 end;
                 Checked := false;
                 UniqueTask := false;
-                IsUniqueTask(TaskProcessor, TempTask, UniqueTaskBuffer, UniqueTask, Checked);
+                IsUniqueTask(TaskProcessor, TempTask, TempUniqueTaskBuffer, UniqueTask, Checked);
                 if not Checked then begin
-                    NewUniqueTaskBuffer.Init();
-                    NewUniqueTaskBuffer."Table No." := TempTask."Table No.";
-                    NewUniqueTaskBuffer."Task Processor Code" := TempTask."Task Processor Code";
-                    NewUniqueTaskBuffer."Record Position" := TempTask."Record Position";
-                    NewUniqueTaskBuffer."Codeunit ID" := 0;
-                    NewUniqueTaskBuffer."Processing Code" := Format(TempTask.Type);
-                    UniqueTask := ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer);
+                    TempNewUniqueTaskBuffer.Init();
+                    TempNewUniqueTaskBuffer."Table No." := TempTask."Table No.";
+                    TempNewUniqueTaskBuffer."Task Processor Code" := TempTask."Task Processor Code";
+                    TempNewUniqueTaskBuffer."Record Position" := TempTask."Record Position";
+                    TempNewUniqueTaskBuffer."Codeunit ID" := 0;
+                    TempNewUniqueTaskBuffer."Processing Code" := Format(TempTask.Type);
+                    UniqueTask := ReqisterUniqueTask(TempNewUniqueTaskBuffer, TempUniqueTaskBuffer);
                 end;
                 DeleteTempTask := not UniqueTask;
                 if DeleteTempTask then begin

@@ -108,30 +108,30 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
 
     procedure ConfigureFromMenuButton(MenuButton: Record "NPR POS Menu Button"; POSSession: Codeunit "NPR POS Session"; var Instance: Codeunit "NPR Workflow Action");
     var
-        POSAction: Record "NPR POS Action" temporary;
+        TempPOSAction: Record "NPR POS Action" temporary;
         InStr: InStream;
         Calculated: Boolean;
         Workflow: Codeunit "NPR Workflow";
     begin
         Instance.GetWorkflow(Workflow);
 
-        if POSSession.RetrieveSessionAction(MenuButton."Action Code", POSAction) then begin
-            if POSAction.Workflow.HasValue() then begin
-                POSAction.Workflow.CreateInStream(InStr);
+        if POSSession.RetrieveSessionAction(MenuButton."Action Code", TempPOSAction) then begin
+            if TempPOSAction.Workflow.HasValue() then begin
+                TempPOSAction.Workflow.CreateInStream(InStr);
                 Workflow.DeserializeFromJsonStream(InStr);
-                if POSAction."Bound to DataSource" then
+                if TempPOSAction."Bound to DataSource" then
                     Instance.Content().Add('DataBinding', true);
-                if POSAction."Custom JavaScript Logic".HasValue() then begin
-                    Instance.Content().Add('CustomJavaScript', POSAction.GetCustomJavaScriptLogic());
+                if TempPOSAction."Custom JavaScript Logic".HasValue() then begin
+                    Instance.Content().Add('CustomJavaScript', TempPOSAction.GetCustomJavaScriptLogic());
                 end;
-                if POSAction.Description <> '' then
-                    Instance.Content().Add('Description', POSAction.Description);
+                if TempPOSAction.Description <> '' then
+                    Instance.Content().Add('Description', TempPOSAction.Description);
                 Calculated := true;
             end;
         end;
 
         if not Calculated then begin
-            Workflow.SetName(POSAction.Code);
+            Workflow.SetName(TempPOSAction.Code);
         end;
     end;
 }

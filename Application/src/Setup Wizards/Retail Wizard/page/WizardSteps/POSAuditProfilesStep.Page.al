@@ -20,7 +20,7 @@ page 6014654 "NPR POS Audit Profiles Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSAuditProfile(ExistingAuditProfiles, Rec.Code);
+                        CheckIfNoAvailableInPOSAuditProfile(TempExistingAuditProfiles, Rec.Code);
                     end;
                 }
                 field("Sale Fiscal No. Series"; Rec."Sale Fiscal No. Series")
@@ -133,12 +133,12 @@ page 6014654 "NPR POS Audit Profiles Step"
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
-                        POSAuditProfile: Record "NPR POS Audit Profile" temporary;
+                        TempPOSAuditProfile: Record "NPR POS Audit Profile" temporary;
                         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
                     begin
-                        POSAuditProfile.TransferFields(Rec);
-                        POSAuditLogMgt.LookupAuditHandler(POSAuditProfile);
-                        Rec.TransferFields(POSAuditProfile);
+                        TempPOSAuditProfile.TransferFields(Rec);
+                        POSAuditLogMgt.LookupAuditHandler(TempPOSAuditProfile);
+                        Rec.TransferFields(TempPOSAuditProfile);
                     end;
                 }
                 field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")
@@ -171,7 +171,7 @@ page 6014654 "NPR POS Audit Profiles Step"
     end;
 
     var
-        ExistingAuditProfiles: Record "NPR POS Audit Profile" temporary;
+        TempExistingAuditProfiles: Record "NPR POS Audit Profile" temporary;
 
     procedure GetRec(var TempPOSAuditProfile: Record "NPR POS Audit Profile")
     begin
@@ -220,8 +220,8 @@ page 6014654 "NPR POS Audit Profiles Step"
     begin
         if POSAuditProfile.FindSet() then
             repeat
-                ExistingAuditProfiles := POSAuditProfile;
-                ExistingAuditProfiles.Insert();
+                TempExistingAuditProfiles := POSAuditProfile;
+                TempExistingAuditProfiles.Insert();
             until POSAuditProfile.Next() = 0;
     end;
 

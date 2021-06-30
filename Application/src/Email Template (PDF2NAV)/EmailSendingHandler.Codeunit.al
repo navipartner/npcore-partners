@@ -48,7 +48,7 @@ codeunit 6014553 "NPR Email Sending Handler"
     procedure AddAttachmentFromStream(var EmailItem: Record "Email Item"; InStr: InStream; FileName: Text[1024])
     var
 #if BC17
-        Attachment: Record Attachment temporary;
+        TempAttachment: Record Attachment temporary;
         TempBLOB: Codeunit "Temp Blob";
         Outstr: OutStream;
 #endif
@@ -56,8 +56,8 @@ codeunit 6014553 "NPR Email Sending Handler"
 #if BC17
         TempBLOB.CreateOutStream(Outstr);
         CopyStream(Outstr, InStr);
-        Attachment.SetAttachmentFileFromBlob(TempBLOB);
-        Attachment."Attachment File".Export(FileName);
+        TempAttachment.SetAttachmentFileFromBlob(TempBLOB);
+        TempAttachment."Attachment File".Export(FileName);
         case true of
             EmailItem."Attachment File Path" = '':
                 begin

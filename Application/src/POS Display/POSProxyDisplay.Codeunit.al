@@ -495,7 +495,7 @@
         TotalTAXTxt: Text;
         GrandTotalIncTax: Decimal;
         GrandTotalIncTaxTxt: Text;
-        DisplayCustomContent: Record "NPR Display Custom Content" temporary;
+        TempDisplayCustomContent: Record "NPR Display Custom Content" temporary;
         GLSetup: Record "General Ledger Setup";
         PaymentAmountTxt: Text;
         PaymentAmountLCYTxt: Text;
@@ -508,10 +508,10 @@
         DisplaySetup.Get(Rec."Register No.");
         if not DisplaySetup."Hide receipt" then begin
             if DisplaySetup."Custom Display Codeunit" <> 0 then begin
-                DisplayCustomContent.RecId := Rec.RecordId;
-                DisplayCustomContent.Action := Action;
-                DisplayCustomContent.NewQuantity := NewQuantity;
-                CODEUNIT.Run(DisplaySetup."Custom Display Codeunit", DisplayCustomContent);
+                TempDisplayCustomContent.RecId := Rec.RecordId;
+                TempDisplayCustomContent.Action := Action;
+                TempDisplayCustomContent.NewQuantity := NewQuantity;
+                CODEUNIT.Run(DisplaySetup."Custom Display Codeunit", TempDisplayCustomContent);
             end else begin
                 SaleLinePOS.Reset();
                 SaleLinePOS.SetRange("Register No.", Rec."Register No.");

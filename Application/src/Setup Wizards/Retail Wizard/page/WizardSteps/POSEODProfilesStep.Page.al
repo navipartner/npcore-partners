@@ -20,7 +20,7 @@ page 6014656 "NPR POS EOD Profiles Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSEndOfDayProfile(ExistingEndOfDayProfiles, Rec.Code);
+                        CheckIfNoAvailableInPOSEndOfDayProfile(TempExistingEndOfDayProfiles, Rec.Code);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -157,7 +157,7 @@ page 6014656 "NPR POS EOD Profiles Step"
     end;
 
     var
-        ExistingEndOfDayProfiles: Record "NPR POS End of Day Profile" temporary;
+        TempExistingEndOfDayProfiles: Record "NPR POS End of Day Profile" temporary;
         TempAllPOSUnit: Record "NPR POS Unit" temporary;
 
     procedure SetGlobals(var TempPOSUnit: Record "NPR POS Unit" temporary)
@@ -223,8 +223,8 @@ page 6014656 "NPR POS EOD Profiles Step"
     begin
         if POSEndOfDayProfile.FindSet() then
             repeat
-                ExistingEndOfDayProfiles := POSEndOfDayProfile;
-                ExistingEndOfDayProfiles.Insert();
+                TempExistingEndOfDayProfiles := POSEndOfDayProfile;
+                TempExistingEndOfDayProfiles.Insert();
             until POSEndOfDayProfile.Next() = 0;
     end;
 

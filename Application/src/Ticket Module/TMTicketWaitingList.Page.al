@@ -124,17 +124,17 @@ page 6151138 "NPR TM Ticket Waiting List"
 
                 trigger OnAction()
                 var
-                    TmpTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
+                    TempTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
                     TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
                     TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
                     TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
                 begin
 
-                    TicketWaitingListMgr.CreateWaitingListNotification(Rec, TmpTicketNotificationEntry);
+                    TicketWaitingListMgr.CreateWaitingListNotification(Rec, TempTicketNotificationEntry);
                     Commit();
 
-                    TmpTicketNotificationEntry.FindFirst();
-                    TicketNotificationEntry.SetFilter("Entry No.", '=%1', TmpTicketNotificationEntry."Entry No.");
+                    TempTicketNotificationEntry.FindFirst();
+                    TicketNotificationEntry.SetFilter("Entry No.", '=%1', TempTicketNotificationEntry."Entry No.");
                     TicketNotifyParticipant.SendGeneralNotification(TicketNotificationEntry);
                 end;
             }

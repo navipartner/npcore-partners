@@ -197,9 +197,9 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
     local procedure TransformToRegisterReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
     var
-        TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
-        TmpRegisterSalesLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempRegisterSalesLines: Record "NPR MM Reg. Sales Buffer" temporary;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         SaleLinePOS: Record "NPR POS Sale Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -210,7 +210,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         if (not GetStoreSetup(EFTTransactionRequest."Register No.", ResponseText, LoyaltyStoreSetup)) then
             exit(false);
 
-        GetAuthorization(EFTTransactionRequest, LoyaltyStoreSetup, TmpTransactionAuthorization);
+        GetAuthorization(EFTTransactionRequest, LoyaltyStoreSetup, TempTransactionAuthorization);
         GeneralLedgerSetup.Get();
 
         // Sales items are points rewarding
@@ -219,26 +219,26 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
         if (SaleLinePOS.FindSet()) then
             repeat
-                TmpRegisterSalesLines."Entry No." := TmpRegisterSalesLines.Count() + 1;
+                TempRegisterSalesLines."Entry No." := TempRegisterSalesLines.Count() + 1;
                 case (SaleLinePOS."Amount Including VAT" >= 0) of
                     true:
-                        TmpRegisterSalesLines.Type := TmpRegisterSalesLines.Type::SALES;
+                        TempRegisterSalesLines.Type := TempRegisterSalesLines.Type::SALES;
                     false:
-                        TmpRegisterSalesLines.Type := TmpRegisterSalesLines.Type::RETURN;
+                        TempRegisterSalesLines.Type := TempRegisterSalesLines.Type::RETURN;
                 end;
-                TmpRegisterSalesLines."Item No." := SaleLinePOS."No.";
-                TmpRegisterSalesLines."Variant Code" := SaleLinePOS."Variant Code";
-                TmpRegisterSalesLines.Description := SaleLinePOS.Description;
-                TmpRegisterSalesLines.Quantity := SaleLinePOS.Quantity;
-                TmpRegisterSalesLines."Total Amount" := SaleLinePOS."Amount Including VAT";
+                TempRegisterSalesLines."Item No." := SaleLinePOS."No.";
+                TempRegisterSalesLines."Variant Code" := SaleLinePOS."Variant Code";
+                TempRegisterSalesLines.Description := SaleLinePOS.Description;
+                TempRegisterSalesLines.Quantity := SaleLinePOS.Quantity;
+                TempRegisterSalesLines."Total Amount" := SaleLinePOS."Amount Including VAT";
 
                 if (SaleLinePOS."Currency Code" = '') then
                     SaleLinePOS."Currency Code" := GeneralLedgerSetup."LCY Code";
-                TmpRegisterSalesLines."Currency Code" := SaleLinePOS."Currency Code";
+                TempRegisterSalesLines."Currency Code" := SaleLinePOS."Currency Code";
 
-                TmpRegisterSalesLines."Total Points" := EarnAmountToPoints(LoyaltyStoreSetup, TmpRegisterSalesLines."Total Amount");
+                TempRegisterSalesLines."Total Points" := EarnAmountToPoints(LoyaltyStoreSetup, TempRegisterSalesLines."Total Amount");
 
-                TmpRegisterSalesLines.Insert();
+                TempRegisterSalesLines.Insert();
             until (SaleLinePOS.Next() = 0);
 
         EFTTransactionRequest2.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
@@ -246,57 +246,57 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest2.SetFilter("Processing Type", '=%1|%2', EFTTransactionRequest2."Processing Type"::PAYMENT, EFTTransactionRequest2."Processing Type"::REFUND);
         if (EFTTransactionRequest2.FindSet()) then begin
             repeat
-                TmpRegisterPaymentLines.Init();
-                TmpRegisterPaymentLines."Entry No." := TmpRegisterPaymentLines.Count() + 1;
+                TempRegisterPaymentLines.Init();
+                TempRegisterPaymentLines."Entry No." := TempRegisterPaymentLines.Count() + 1;
                 case (EFTTransactionRequest2."Processing Type") of
                     EFTTransactionRequest2."Processing Type"::PAYMENT:
-                        TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::PAYMENT;
+                        TempRegisterPaymentLines.Type := TempRegisterPaymentLines.Type::PAYMENT;
                     EFTTransactionRequest2."Processing Type"::REFUND:
-                        TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::REFUND;
+                        TempRegisterPaymentLines.Type := TempRegisterPaymentLines.Type::REFUND;
                 end;
-                TmpRegisterPaymentLines.Description := EFTTransactionRequest2."POS Description";
-                TmpRegisterPaymentLines."Authorization Code" := EFTTransactionRequest2."Authorisation Number";
-                TmpRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
-                TmpRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
-                TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
-                TmpRegisterPaymentLines.Insert();
+                TempRegisterPaymentLines.Description := EFTTransactionRequest2."POS Description";
+                TempRegisterPaymentLines."Authorization Code" := EFTTransactionRequest2."Authorisation Number";
+                TempRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
+                TempRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
+                TempRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
+                TempRegisterPaymentLines.Insert();
             until (EFTTransactionRequest2.Next() = 0);
         end;
 
         SoapAction := 'RegisterReceipt';
-        XmlText := CreateRegisterSaleSoapXml(TmpTransactionAuthorization, TmpRegisterSalesLines, TmpRegisterPaymentLines);
+        XmlText := CreateRegisterSaleSoapXml(TempTransactionAuthorization, TempRegisterSalesLines, TempRegisterPaymentLines);
         exit(true);
     end;
 
     local procedure TransformToReservePoints(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
     var
-        TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
     begin
 
         if (not GetStoreSetup(EFTTransactionRequest."Register No.", ResponseText, LoyaltyStoreSetup)) then
             exit(false);
 
-        GetAuthorization(EFTTransactionRequest, LoyaltyStoreSetup, TmpTransactionAuthorization);
+        GetAuthorization(EFTTransactionRequest, LoyaltyStoreSetup, TempTransactionAuthorization);
 
-        TmpRegisterPaymentLines."Entry No." := 1;
+        TempRegisterPaymentLines."Entry No." := 1;
         case EFTTransactionRequest."Processing Type" of
             EFTTransactionRequest."Processing Type"::PAYMENT:
-                TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::PAYMENT;
+                TempRegisterPaymentLines.Type := TempRegisterPaymentLines.Type::PAYMENT;
             EFTTransactionRequest."Processing Type"::REFUND:
-                TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::REFUND;
+                TempRegisterPaymentLines.Type := TempRegisterPaymentLines.Type::REFUND;
             else
-                TmpRegisterPaymentLines.Type := TmpRegisterPaymentLines.Type::NA;
+                TempRegisterPaymentLines.Type := TempRegisterPaymentLines.Type::NA;
         end;
-        TmpRegisterPaymentLines."Currency Code" := EFTTransactionRequest."Currency Code";
-        TmpRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest."Amount Input");
-        TmpRegisterPaymentLines."Total Points" := EFTTransactionRequest."Amount Input";
-        TmpRegisterPaymentLines.Description := CopyStr(EFTTransactionRequest."POS Description", 1, MaxStrLen(TmpRegisterPaymentLines.Description));
-        TmpRegisterPaymentLines.Insert();
+        TempRegisterPaymentLines."Currency Code" := EFTTransactionRequest."Currency Code";
+        TempRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest."Amount Input");
+        TempRegisterPaymentLines."Total Points" := EFTTransactionRequest."Amount Input";
+        TempRegisterPaymentLines.Description := CopyStr(EFTTransactionRequest."POS Description", 1, MaxStrLen(TempRegisterPaymentLines.Description));
+        TempRegisterPaymentLines.Insert();
 
         SoapAction := 'reservePoints';
-        XmlText := CreateReservePointsSoapXml(TmpTransactionAuthorization, TmpRegisterPaymentLines);
+        XmlText := CreateReservePointsSoapXml(TempTransactionAuthorization, TempRegisterPaymentLines);
         exit(true);
     end;
 

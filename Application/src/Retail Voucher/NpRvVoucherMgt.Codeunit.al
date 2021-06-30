@@ -972,7 +972,7 @@
 
     procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line")
     var
-        NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
+        TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";
         Voucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -980,18 +980,18 @@
 
     begin
         VoucherType.Get(VoucherTypeCode);
-        PrepareVoucherBuffer(NpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
-        ValidateVoucher(NpRvVoucherBuffer);
+        PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
+        ValidateVoucher(TempNpRvVoucherBuffer);
 
         POSLine."No." := VoucherType."Payment Type";
         POSLine."Register No." := SalePOS."Register No.";
-        POSLine.Description := NpRvVoucherBuffer.Description;
+        POSLine.Description := TempNpRvVoucherBuffer.Description;
         POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        POSLine."Amount Including VAT" := NpRvVoucherBuffer.Amount;
+        POSLine."Amount Including VAT" := TempNpRvVoucherBuffer.Amount;
         POSPaymentLine.InsertPaymentLine(POSLine, 0);
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
-        PaymentLine."Discount Code" := NpRvVoucherBuffer."No.";
-        if FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", Voucher) then begin
+        PaymentLine."Discount Code" := TempNpRvVoucherBuffer."No.";
+        if FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then begin
             if GLAcc.get(Voucher."Account No.") then begin
                 POSLine."VAT Prod. Posting Group" := GLAcc."VAT Prod. Posting Group";
                 UpdateTaxSetup(POSLine, SalePOS);
@@ -1001,7 +1001,7 @@
         end;
 
         POSSession.RequestRefreshData();
-        InsertNpRvSalesLine(NpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
+        InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
 
         ApplyPayment(FrontEnd, POSSession, NpRvSalesLine);
     end;

@@ -63,14 +63,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol1; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol1; BlobBuffer."Buffer 1")
+            column(BarCodeTempBlobCol1; TempBlobBuffer."Buffer 1")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
-                BlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
+                TempBlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
             end;
         }
         dataitem(TMPRetail_Journal_Line_Col2; "NPR Retail Journal Line")
@@ -95,14 +95,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol2; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol2; BlobBuffer."Buffer 2")
+            column(BarCodeTempBlobCol2; TempBlobBuffer."Buffer 2")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol2);
-                BlobBuffer.GetFromTempBlob(TempBlobCol2, 2);
+                TempBlobBuffer.GetFromTempBlob(TempBlobCol2, 2);
             end;
         }
         dataitem(TMPRetail_Journal_Line_Col3; "NPR Retail Journal Line")
@@ -127,14 +127,14 @@ report 6014455 "NPR Item Barcode Status Sheet"
             column(ShowVariantInfo_TMPRetailJournalLineCol3; ShowVariantInfo)
             {
             }
-            column(BarCodeTempBlobCol3; BlobBuffer."Buffer 3")
+            column(BarCodeTempBlobCol3; TempBlobBuffer."Buffer 3")
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol3);
-                BlobBuffer.GetFromTempBlob(TempBlobCol3, 3);
+                TempBlobBuffer.GetFromTempBlob(TempBlobCol3, 3);
             end;
         }
     }
@@ -191,7 +191,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
         LineNo: Integer;
         ItemFilter: Text;
         ItemVariantFilter: Text;
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        TempBlobBuffer: Record "NPR BLOB buffer" temporary;
         Pct1Lbl: Label '%1: %2', locked = true;
 
     local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])

@@ -1,9 +1,9 @@
 ﻿codeunit 6014558 "NPR RP Data Join Buffer Mgt."
 {
     var
-        Buffer: Record "NPR RP Data Join Buffer" temporary;
-        RecIDBuffer: Record "NPR RP DataJoin Rec.ID Buffer" temporary;
-        FieldMap: Record "NPR RP Data Join Field Map" temporary;
+        TempBuffer: Record "NPR RP Data Join Buffer" temporary;
+        TempRecIDBuffer: Record "NPR RP DataJoin Rec.ID Buffer" temporary;
+        TempFieldMap: Record "NPR RP Data Join Field Map" temporary;
         CurrentDataItemName: Text;
         Error_InvalidTable: Label 'Invalid table was passed to template %1. It was expecting a table with ID %2';
         DecimalRounding: Option "2","3","4","5";
@@ -51,21 +51,21 @@
 
     procedure IsEmpty(): Boolean
     begin
-        exit(Buffer.IsEmpty());
+        exit(TempBuffer.IsEmpty());
     end;
 
     procedure DeleteSet()
     begin
-        Buffer.DeleteAll();
+        TempBuffer.DeleteAll();
     end;
 
     procedure FindBufferSet(DataItemName: Text; var CurrentRecNo: Integer) Result: Boolean
     begin
-        Buffer.SetRange("Data Item Name", DataItemName);
-        Result := Buffer.FindFirst();
+        TempBuffer.SetRange("Data Item Name", DataItemName);
+        Result := TempBuffer.FindFirst();
         if Result then
-            CurrentRecNo := Buffer."Unique Record No.";
-        Buffer.SetRange("Data Item Name");
+            CurrentRecNo := TempBuffer."Unique Record No.";
+        TempBuffer.SetRange("Data Item Name");
 
         CurrentDataItemName := DataItemName;
     end;
@@ -75,30 +75,30 @@
         if CurrentRecNo = UpperBound then
             exit(NewUpperBound);
 
-        Buffer.SetRange("Join Level", Buffer."Join Level");
+        TempBuffer.SetRange("Join Level", TempBuffer."Join Level");
 
         if UpperBound = 0 then
-            Buffer.SetFilter("Unique Record No.", '>%1', CurrentRecNo)
+            TempBuffer.SetFilter("Unique Record No.", '>%1', CurrentRecNo)
         else
-            Buffer.SetRange("Unique Record No.", CurrentRecNo + 1, UpperBound);
+            TempBuffer.SetRange("Unique Record No.", CurrentRecNo + 1, UpperBound);
 
-        if Buffer.FindFirst() then
-            NewUpperBound := Buffer."Unique Record No." - 1
+        if TempBuffer.FindFirst() then
+            NewUpperBound := TempBuffer."Unique Record No." - 1
         else
             NewUpperBound := 0;
 
-        Buffer.SetRange("Join Level");
-        Buffer.SetRange("Unique Record No.");
+        TempBuffer.SetRange("Join Level");
+        TempBuffer.SetRange("Unique Record No.");
     end;
 
     procedure GetField(FieldNo: Integer; DataItemName: Text) Value: Text
     begin
-        Buffer.SetRange("Data Item Name", DataItemName);
-        Buffer.SetRange("Field No.", FieldNo);
-        if Buffer.FindFirst() then
-            Value := Buffer.Value;
-        Buffer.SetRange("Data Item Name");
-        Buffer.SetRange("Field No.");
+        TempBuffer.SetRange("Data Item Name", DataItemName);
+        TempBuffer.SetRange("Field No.", FieldNo);
+        if TempBuffer.FindFirst() then
+            Value := TempBuffer.Value;
+        TempBuffer.SetRange("Data Item Name");
+        TempBuffer.SetRange("Field No.");
         exit(Value);
     end;
 
@@ -107,7 +107,7 @@
         ExistingFilter: Text;
     begin
         if RootNo > 1 then begin
-            ExistingFilter := Buffer.GetView();
+            ExistingFilter := TempBuffer.GetView();
             if not (SetRootSubsetFilter(RootNo)) then
                 exit('');
         end;
@@ -115,20 +115,20 @@
         Value := GetField(FieldNo, DataItemName);
 
         if RootNo > 1 then
-            Buffer.SetView(ExistingFilter);
+            TempBuffer.SetView(ExistingFilter);
     end;
 
     procedure GetFieldFromRecordIterationNo(FieldNo: Integer; IterationNo: Integer; DataItemName: Text) Value: Text
     var
         ExistingFilter: Text;
     begin
-        ExistingFilter := Buffer.GetView();
+        ExistingFilter := TempBuffer.GetView();
 
         if not (SetIterationSubsetFilter(IterationNo, DataItemName)) then
             exit('');
         Value := GetField(FieldNo, DataItemName);
 
-        Buffer.SetView(ExistingFilter);
+        TempBuffer.SetView(ExistingFilter);
     end;
 
     procedure GetRecID(DataItemName: Text; var RecIDOut: RecordID) Result: Boolean
@@ -136,13 +136,13 @@
         if (DataItemName = '') then
             exit(false);
 
-        Buffer.SetRange("Data Item Name", DataItemName);
-        Result := Buffer.FindFirst();
+        TempBuffer.SetRange("Data Item Name", DataItemName);
+        Result := TempBuffer.FindFirst();
         if Result then begin
-            RecIDBuffer.Get(Buffer."Unique Record No.");
-            RecIDOut := RecIDBuffer."Buffer Record ID";
+            TempRecIDBuffer.Get(TempBuffer."Unique Record No.");
+            RecIDOut := TempRecIDBuffer."Buffer Record ID";
         end;
-        Buffer.SetRange("Data Item Name");
+        TempBuffer.SetRange("Data Item Name");
     end;
 
     procedure GetRecIDFromRecordRootNo(RootNo: Integer; DataItemName: Text; var RecIDOut: RecordID) Result: Boolean
@@ -150,31 +150,31 @@
         ExistingFilter: Text;
     begin
         if RootNo > 1 then begin
-            ExistingFilter := Buffer.GetView();
+            ExistingFilter := TempBuffer.GetView();
             SetRootSubsetFilter(RootNo);
         end;
 
         Result := GetRecID(DataItemName, RecIDOut);
 
         if RootNo > 1 then
-            Buffer.SetView(ExistingFilter);
+            TempBuffer.SetView(ExistingFilter);
     end;
 
     procedure GetRecIDFromRecordIterationNo(IterationNo: Integer; DataItemName: Text; var RecIDOut: RecordID) Result: Boolean
     var
         ExistingFilter: Text;
     begin
-        ExistingFilter := Buffer.GetView();
+        ExistingFilter := TempBuffer.GetView();
 
         SetIterationSubsetFilter(IterationNo, DataItemName);
         Result := GetRecID(DataItemName, RecIDOut);
 
-        Buffer.SetView(ExistingFilter);
+        TempBuffer.SetView(ExistingFilter);
     end;
 
     procedure GetBuffer(var BufferOut: Record "NPR RP Data Join Buffer" temporary)
     begin
-        BufferOut.Copy(Buffer, true);
+        BufferOut.Copy(TempBuffer, true);
     end;
 
     procedure NextRecord(DataItemName: Text; var CurrentRecNo: Integer; UpperBound: Integer) Result: Boolean
@@ -182,30 +182,30 @@
         if CurrentRecNo = UpperBound then
             exit(false);
 
-        Buffer.SetRange("Data Item Name", DataItemName);
+        TempBuffer.SetRange("Data Item Name", DataItemName);
         if UpperBound = 0 then
-            Buffer.SetFilter("Unique Record No.", '>%1', CurrentRecNo)
+            TempBuffer.SetFilter("Unique Record No.", '>%1', CurrentRecNo)
         else
-            Buffer.SetRange("Unique Record No.", CurrentRecNo + 1, UpperBound);
-        Result := Buffer.FindFirst();
+            TempBuffer.SetRange("Unique Record No.", CurrentRecNo + 1, UpperBound);
+        Result := TempBuffer.FindFirst();
         if Result then
-            CurrentRecNo := Buffer."Unique Record No.";
-        Buffer.SetRange("Data Item Name");
-        Buffer.SetRange("Unique Record No.");
+            CurrentRecNo := TempBuffer."Unique Record No.";
+        TempBuffer.SetRange("Data Item Name");
+        TempBuffer.SetRange("Unique Record No.");
     end;
 
     procedure SetBounds(LowerBound: Integer; UpperBound: Integer)
     begin
         if (UpperBound = LowerBound) and (UpperBound > 0) then
-            Buffer.SetRange("Unique Record No.", LowerBound)
+            TempBuffer.SetRange("Unique Record No.", LowerBound)
         else
             if (UpperBound = 0) and (LowerBound > 0) then
-                Buffer.SetFilter("Unique Record No.", '>=%1', LowerBound)
+                TempBuffer.SetFilter("Unique Record No.", '>=%1', LowerBound)
             else
                 if (UpperBound > 0) then
-                    Buffer.SetRange("Unique Record No.", LowerBound, UpperBound)
+                    TempBuffer.SetRange("Unique Record No.", LowerBound, UpperBound)
                 else
-                    Buffer.SetRange("Unique Record No.");
+                    TempBuffer.SetRange("Unique Record No.");
     end;
 
     local procedure SetRootSubsetFilter(RootNo: Integer): Boolean
@@ -229,23 +229,23 @@
         TempRecordNo: Integer;
         i: Integer;
     begin
-        Buffer.Reset();
+        TempBuffer.Reset();
         if not (FindBufferSet(DataItemName, TempRecordNo)) then
             exit(false);
         if IterationNo > 1 then
             for i := 1 to IterationNo - 1 do
                 if not NextRecord(DataItemName, TempRecordNo, 0) then
                     exit(false);
-        Buffer.SetRange("Unique Record No.", TempRecordNo);
+        TempBuffer.SetRange("Unique Record No.", TempRecordNo);
 
         exit(true);
     end;
 
     procedure AddFieldToMap(DataItemName: Text; FieldNo: Integer)
     begin
-        FieldMap."Data Item Name" := DataItemName;
-        FieldMap."Data Item Field No." := FieldNo;
-        if FieldMap.Insert() then;
+        TempFieldMap."Data Item Name" := DataItemName;
+        TempFieldMap."Data Item Field No." := FieldNo;
+        if TempFieldMap.Insert() then;
     end;
 
     procedure SetDecimalRounding(DecimalRoundingIn: Option "2","3","4","5")
@@ -262,7 +262,7 @@
         IntegerBuffer: Integer;
         FieldRef: FieldRef;
         DataProcessed: Boolean;
-        tmpDistinctValueList: Record "NPR Retail List" temporary;
+        TempDistinctValueList: Record "NPR Retail List" temporary;
         FieldValue: Integer;
         Itt: Integer;
         StopIterating: Boolean;
@@ -321,7 +321,7 @@
         end;
 
         repeat
-            if TestConstraint(ParentDataItem, ParentRecRef) and TestDistinct(ParentDataItem, ParentRecRef, tmpDistinctValueList) then begin
+            if TestConstraint(ParentDataItem, ParentRecRef) and TestDistinct(ParentDataItem, ParentRecRef, TempDistinctValueList) then begin
                 DataProcessed := true;
                 FillRecord(ParentRecRef, ParentDataItem);
 
@@ -358,41 +358,41 @@
     var
         FieldRef: FieldRef;
     begin
-        FieldMap.SetRange("Data Item Name", ParentDataItem.Name);
-        if FieldMap.FindSet() then begin
-            Buffer."Unique Record No." += 1;
+        TempFieldMap.SetRange("Data Item Name", ParentDataItem.Name);
+        if TempFieldMap.FindSet() then begin
+            TempBuffer."Unique Record No." += 1;
             repeat
-                Buffer."Field No." := FieldMap."Data Item Field No.";
-                Buffer."Join Level" := ParentDataItem.Level;
-                Buffer."Data Item Name" := ParentDataItem.Name;
-                if FieldMap."Data Item Field No." > 0 then begin
-                    FieldRef := RecRef.Field(FieldMap."Data Item Field No.");
+                TempBuffer."Field No." := TempFieldMap."Data Item Field No.";
+                TempBuffer."Join Level" := ParentDataItem.Level;
+                TempBuffer."Data Item Name" := ParentDataItem.Name;
+                if TempFieldMap."Data Item Field No." > 0 then begin
+                    FieldRef := RecRef.Field(TempFieldMap."Data Item Field No.");
                     if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
                         FieldRef.CalcField();
 
                     if UpperCase(Format(FieldRef.Type)) = 'DECIMAL' then
                         case DecimalRounding of
                             DecimalRounding::"2":
-                                Buffer.Value := Format(FieldRef.Value, 0, '<Precision,2:2><Standard Format,2>');
+                                TempBuffer.Value := Format(FieldRef.Value, 0, '<Precision,2:2><Standard Format,2>');
                             DecimalRounding::"3":
-                                Buffer.Value := Format(FieldRef.Value, 0, '<Precision,3:3><Standard Format,2>');
+                                TempBuffer.Value := Format(FieldRef.Value, 0, '<Precision,3:3><Standard Format,2>');
                             DecimalRounding::"4":
-                                Buffer.Value := Format(FieldRef.Value, 0, '<Precision,4:4><Standard Format,2>');
+                                TempBuffer.Value := Format(FieldRef.Value, 0, '<Precision,4:4><Standard Format,2>');
                             DecimalRounding::"5":
-                                Buffer.Value := Format(FieldRef.Value, 0, '<Precision,5:5><Standard Format,2>');
+                                TempBuffer.Value := Format(FieldRef.Value, 0, '<Precision,5:5><Standard Format,2>');
                         end
                     else
-                        Buffer.Value := Format(FieldRef.Value);
+                        TempBuffer.Value := Format(FieldRef.Value);
                 end else
-                    Clear(Buffer.Value);
-                Buffer.Insert();
-            until FieldMap.Next() = 0;
+                    Clear(TempBuffer.Value);
+                TempBuffer.Insert();
+            until TempFieldMap.Next() = 0;
 
-            RecIDBuffer."Unique Record No." := Buffer."Unique Record No.";
-            RecIDBuffer."Buffer Record ID" := RecRef.RecordId;
-            RecIDBuffer.Insert();
+            TempRecIDBuffer."Unique Record No." := TempBuffer."Unique Record No.";
+            TempRecIDBuffer."Buffer Record ID" := RecRef.RecordId;
+            TempRecIDBuffer.Insert();
         end;
-        FieldMap.Reset();
+        TempFieldMap.Reset();
     end;
 
     local procedure SetupTableJoin(ParentRecord: Record "NPR RP Data Items"; ChildRecord: Record "NPR RP Data Items"; var ParentRecRef: RecordRef; var ChildRecRef: RecordRef)

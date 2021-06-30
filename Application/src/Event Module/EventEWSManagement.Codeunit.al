@@ -468,29 +468,29 @@
 
     procedure ShowExchIntSummary(Job: Record Job)
     var
-        EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer" temporary;
+        TempEventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer" temporary;
     begin
-        PrepareExchIntSummary(Job, EventExchIntSumBuffer);
-        PAGE.Run(PAGE::"NPR Event Exch. Int. Mail Sum.", EventExchIntSumBuffer);
+        PrepareExchIntSummary(Job, TempEventExchIntSumBuffer);
+        PAGE.Run(PAGE::"NPR Event Exch. Int. Mail Sum.", TempEventExchIntSumBuffer);
     end;
 
     procedure ExchIntSummaryApplyStyleExpr(var EventExchIntSummaryBuffer: Record "NPR Event Exc.Int.Summ. Buffer" temporary; var ColorStyle: Text): Boolean
     var
-        EventExchIntSummaryBuffer2: Record "NPR Event Exc.Int.Summ. Buffer" temporary;
+        TempEventExchIntSummaryBuffer2: Record "NPR Event Exc.Int.Summ. Buffer" temporary;
         Apply: Boolean;
         ColorStyle2: Text;
     begin
         ColorStyle := 'Standard';
-        EventExchIntSummaryBuffer2.Copy(EventExchIntSummaryBuffer, true);
+        TempEventExchIntSummaryBuffer2.Copy(EventExchIntSummaryBuffer, true);
         case EventExchIntSummaryBuffer.Indentation of
             0:
                 begin
                     ColorStyle := 'Strong';
-                    EventExchIntSummaryBuffer2.SetRange("Parent Entry No.", EventExchIntSummaryBuffer."Entry No.");
-                    if EventExchIntSummaryBuffer2.FindSet() then
+                    TempEventExchIntSummaryBuffer2.SetRange("Parent Entry No.", EventExchIntSummaryBuffer."Entry No.");
+                    if TempEventExchIntSummaryBuffer2.FindSet() then
                         repeat
-                            Apply := Apply or ExchIntSummaryApplyStyleExpr(EventExchIntSummaryBuffer2, ColorStyle2);
-                        until (EventExchIntSummaryBuffer2.Next() = 0) or Apply;
+                            Apply := Apply or ExchIntSummaryApplyStyleExpr(TempEventExchIntSummaryBuffer2, ColorStyle2);
+                        until (TempEventExchIntSummaryBuffer2.Next() = 0) or Apply;
                     if Apply then
                         ColorStyle := 'Unfavorable';
                     exit(Apply);
@@ -498,8 +498,8 @@
             1:
                 if EventExchIntSummaryBuffer."E-mail Account" = '' then begin
                     ColorStyle := 'Attention';
-                    EventExchIntSummaryBuffer2.Reset();
-                    if (EventExchIntSummaryBuffer2.Next() <> 0) and (EventExchIntSummaryBuffer2.Indentation = 2) then begin
+                    TempEventExchIntSummaryBuffer2.Reset();
+                    if (TempEventExchIntSummaryBuffer2.Next() <> 0) and (TempEventExchIntSummaryBuffer2.Indentation = 2) then begin
                         ColorStyle := 'Standard';
                         exit(false);
                     end;

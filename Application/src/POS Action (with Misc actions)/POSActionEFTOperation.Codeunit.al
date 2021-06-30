@@ -215,9 +215,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
     local procedure OnParameterLookup(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
-        tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
+        TempEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
         EFTInterface: Codeunit "NPR EFT Interface";
-        tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary;
+        TempEFTAuxOperation: Record "NPR EFT Aux Operation" temporary;
         POSParameterValue2: Record "NPR POS Parameter Value";
         EFTSetup: Record "NPR EFT Setup";
         PaymentTypeFilter: Text;
@@ -232,9 +232,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         case POSParameterValue.Name of
             'EftType':
                 begin
-                    EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
-                    if PAGE.RunModal(0, tmpEFTIntegrationType) = ACTION::LookupOK then
-                        POSParameterValue.Value := tmpEFTIntegrationType.Code;
+                    EFTInterface.OnDiscoverIntegrations(TempEFTIntegrationType);
+                    if PAGE.RunModal(0, TempEFTIntegrationType) = ACTION::LookupOK then
+                        POSParameterValue.Value := TempEFTIntegrationType.Code;
                 end;
             'PaymentType':
                 begin
@@ -268,10 +268,10 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                     if POSParameterValue2.Value = '' then
                         exit;
 
-                    EFTInterface.OnDiscoverAuxiliaryOperations(tmpEFTAuxOperation);
-                    tmpEFTAuxOperation.SetRange("Integration Type", POSParameterValue2.Value);
-                    if PAGE.RunModal(0, tmpEFTAuxOperation) = ACTION::LookupOK then
-                        POSParameterValue.Value := Format(tmpEFTAuxOperation."Auxiliary ID");
+                    EFTInterface.OnDiscoverAuxiliaryOperations(TempEFTAuxOperation);
+                    TempEFTAuxOperation.SetRange("Integration Type", POSParameterValue2.Value);
+                    if PAGE.RunModal(0, TempEFTAuxOperation) = ACTION::LookupOK then
+                        POSParameterValue.Value := Format(TempEFTAuxOperation."Auxiliary ID");
                 end;
         end;
     end;
@@ -279,8 +279,8 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
     local procedure OnParameterValidate(var POSParameterValue: Record "NPR POS Parameter Value")
     var
-        tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
-        tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary;
+        TempEFTIntegrationType: Record "NPR EFT Integration Type" temporary;
+        TempEFTAuxOperation: Record "NPR EFT Aux Operation" temporary;
         EFTInterface: Codeunit "NPR EFT Interface";
         POSParameterValue2: Record "NPR POS Parameter Value";
         AuxId: Integer;
@@ -294,9 +294,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                 begin
                     if POSParameterValue.Value = '' then
                         exit;
-                    EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
-                    tmpEFTIntegrationType.SetRange(Code, POSParameterValue.Value);
-                    tmpEFTIntegrationType.FindFirst();
+                    EFTInterface.OnDiscoverIntegrations(TempEFTIntegrationType);
+                    TempEFTIntegrationType.SetRange(Code, POSParameterValue.Value);
+                    TempEFTIntegrationType.FindFirst();
                 end;
             'PaymentType':
                 begin
@@ -325,11 +325,11 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                     if POSParameterValue2.Value = '' then
                         exit;
 
-                    EFTInterface.OnDiscoverAuxiliaryOperations(tmpEFTAuxOperation);
-                    tmpEFTAuxOperation.SetRange("Integration Type", POSParameterValue2.Value);
+                    EFTInterface.OnDiscoverAuxiliaryOperations(TempEFTAuxOperation);
+                    TempEFTAuxOperation.SetRange("Integration Type", POSParameterValue2.Value);
                     Evaluate(AuxId, POSParameterValue.Value);
-                    tmpEFTAuxOperation.SetRange("Auxiliary ID", AuxId);
-                    tmpEFTAuxOperation.FindFirst();
+                    TempEFTAuxOperation.SetRange("Auxiliary ID", AuxId);
+                    TempEFTAuxOperation.FindFirst();
                 end;
         end;
     end;

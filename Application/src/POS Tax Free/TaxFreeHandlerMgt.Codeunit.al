@@ -41,29 +41,29 @@
 
     procedure SetGenericHandlerParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit")
     var
-        tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
+        TempHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
         Handled: Boolean;
         TaxFreeHandlerParameters: Page "NPR Tax Free Gen. Handl. Param";
     begin
         Constructor(TaxFreeUnit."Handler ID Enum");
-        TaxFreeHandlerInterface.OnLookupHandlerParameter(TaxFreeUnit, Handled, tmpHandlerParameter);
+        TaxFreeHandlerInterface.OnLookupHandlerParameter(TaxFreeUnit, Handled, TempHandlerParameter);
         if not Handled then
             Error(Error_MissingHandler, TaxFreeUnit."Handler ID Enum");
 
-        if tmpHandlerParameter.IsEmpty then
+        if TempHandlerParameter.IsEmpty then
             exit;
 
         if TaxFreeUnit."Handler Parameters".HasValue() then
-            tmpHandlerParameter.DeserializeParameterBLOB(TaxFreeUnit);
+            TempHandlerParameter.DeserializeParameterBLOB(TaxFreeUnit);
 
         TaxFreeHandlerParameters.Editable(true);
-        TaxFreeHandlerParameters.SetRec(tmpHandlerParameter);
+        TaxFreeHandlerParameters.SetRec(TempHandlerParameter);
         if TaxFreeHandlerParameters.RunModal() <> ACTION::OK then
             exit;
 
-        TaxFreeHandlerParameters.GetRec(tmpHandlerParameter);
+        TaxFreeHandlerParameters.GetRec(TempHandlerParameter);
 
-        tmpHandlerParameter.SerializeParameterBLOB(TaxFreeUnit);
+        TempHandlerParameter.SerializeParameterBLOB(TaxFreeUnit);
         TaxFreeUnit.Modify();
     end;
 
@@ -117,7 +117,7 @@
         TaxFreeRequest: Record "NPR Tax Free Request";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         "Action": Integer;
-        tmpTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
+        TempTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
         SkipRecordHandling: Boolean;
         ActionLbl: Label '%1,%2,%3', Locked = true;
     begin
@@ -151,11 +151,11 @@
         HandleEventResponse(Handled, TaxFreeUnit, TaxFreeRequest, false);
 
         if TaxFreeRequest.Success and (not SkipRecordHandling) then begin
-            tmpTaxFreeVoucherSaleLink.Init();
-            tmpTaxFreeVoucherSaleLink."Sales Ticket No." := ReceiptNo;
-            tmpTaxFreeVoucherSaleLink.Insert();
+            TempTaxFreeVoucherSaleLink.Init();
+            TempTaxFreeVoucherSaleLink."Sales Ticket No." := ReceiptNo;
+            TempTaxFreeVoucherSaleLink.Insert();
 
-            CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
+            CreateAndPrintVoucher(TaxFreeRequest, TempTaxFreeVoucherSaleLink);
         end;
     end;
 
@@ -192,7 +192,7 @@
         Handled: Boolean;
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
         TaxFreeRequest: Record "NPR Tax Free Request";
-        tmpTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
+        TempTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
         TaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link";
     begin
         TaxFreeUnit.Get(TaxFreeVoucher."POS Unit No.");
@@ -200,9 +200,9 @@
         TaxFreeVoucherSaleLink.SetRange("Voucher Entry No.", TaxFreeVoucher."Entry No.");
         TaxFreeVoucherSaleLink.FindSet();
         repeat
-            tmpTaxFreeVoucherSaleLink.Init();
-            tmpTaxFreeVoucherSaleLink.TransferFields(TaxFreeVoucherSaleLink);
-            tmpTaxFreeVoucherSaleLink.Insert();
+            TempTaxFreeVoucherSaleLink.Init();
+            TempTaxFreeVoucherSaleLink.TransferFields(TaxFreeVoucherSaleLink);
+            TempTaxFreeVoucherSaleLink.Insert();
         until TaxFreeVoucherSaleLink.Next() = 0;
 
         CreateRequest('VOUCHER_REISSUE', TaxFreeUnit, TaxFreeRequest);
@@ -223,7 +223,7 @@
 
         if (TaxFreeRequest.Success and Handled) then begin
             VoidVoucher(TaxFreeVoucher, true); //Void old
-            CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink); //Create & print new
+            CreateAndPrintVoucher(TaxFreeRequest, TempTaxFreeVoucherSaleLink); //Create & print new
         end;
     end;
 
@@ -307,7 +307,7 @@
     var
         Handled: Boolean;
         TaxFreeRequest: Record "NPR Tax Free Request";
-        tmpTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
+        TempTaxFreeVoucherSaleLink: Record "NPR Tax Free Voucher Sale Link" temporary;
     begin
         CreateRequest('VOUCHER_CONSOLIDATE', TaxFreeUnit, TaxFreeRequest);
 
@@ -326,14 +326,14 @@
         if TaxFreeRequest.Success then begin
             tmpTaxFreeConsolidation.FindSet();
             repeat
-                tmpTaxFreeVoucherSaleLink.Init();
-                tmpTaxFreeVoucherSaleLink."Sales Ticket No." := tmpTaxFreeConsolidation."Sales Ticket No.";
-                tmpTaxFreeVoucherSaleLink."Sales Header No." := tmpTaxFreeConsolidation."Sales Header No.";
-                tmpTaxFreeVoucherSaleLink."Sales Header Type" := tmpTaxFreeConsolidation."Sales Header Type";
-                tmpTaxFreeVoucherSaleLink.Insert();
+                TempTaxFreeVoucherSaleLink.Init();
+                TempTaxFreeVoucherSaleLink."Sales Ticket No." := tmpTaxFreeConsolidation."Sales Ticket No.";
+                TempTaxFreeVoucherSaleLink."Sales Header No." := tmpTaxFreeConsolidation."Sales Header No.";
+                TempTaxFreeVoucherSaleLink."Sales Header Type" := tmpTaxFreeConsolidation."Sales Header Type";
+                TempTaxFreeVoucherSaleLink.Insert();
             until tmpTaxFreeConsolidation.Next() = 0;
 
-            CreateAndPrintVoucher(TaxFreeRequest, tmpTaxFreeVoucherSaleLink);
+            CreateAndPrintVoucher(TaxFreeRequest, TempTaxFreeVoucherSaleLink);
         end;
     end;
 

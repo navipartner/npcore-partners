@@ -3,7 +3,7 @@ codeunit 6014420 "NPR Endpoint Send SMS" implements "NPR Send SMS"
     procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
     var
         NcEndpoint: Record "NPR Nc Endpoint";
-        NcTaskOutput: Record "NPR Nc Task Output" temporary;
+        TempNcTaskOutput: Record "NPR Nc Task Output" temporary;
         SMSSetup: Record "NPR SMS Setup";
         NcEndpointMgt: Codeunit "NPR Nc Endpoint Mgt.";
         BSlash: Label '\', Locked = true;
@@ -27,11 +27,11 @@ codeunit 6014420 "NPR Endpoint Send SMS" implements "NPR Send SMS"
         end;
         if FileName = '' then
             FileName := SMSSetup."Local SMTP Pickup Library" + BSlash + PhoneNo + '.txt';
-        NcTaskOutput.Data.CreateOutStream(OStream, TEXTENCODING::Windows);
+        TempNcTaskOutput.Data.CreateOutStream(OStream, TEXTENCODING::Windows);
         OStream.WriteText(FileContent);
-        NcTaskOutput.Insert(false);
-        NcTaskOutput.Name := FileName;
-        if not NcEndpointMgt.RunEndpoint(NcTaskOutput, NcEndpoint, Response) then
+        TempNcTaskOutput.Insert(false);
+        TempNcTaskOutput.Name := FileName;
+        if not NcEndpointMgt.RunEndpoint(TempNcTaskOutput, NcEndpoint, Response) then
             Error(SendFailedErr, NcEndpoint.Code);
     end;
 

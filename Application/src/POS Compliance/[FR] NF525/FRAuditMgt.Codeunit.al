@@ -656,7 +656,7 @@
     var
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSTaxAmountLine2: Record "NPR POS Entry Tax Line";
-        tmpPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
+        TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
     begin
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if OnlyIncludeItems then begin
@@ -667,11 +667,11 @@
             repeat
                 //Select distinct tax % total
 
-                tmpPOSTaxAmountLine.SetRange("Tax %", POSTaxAmountLine."Tax %");
-                if tmpPOSTaxAmountLine.IsEmpty then begin
-                    tmpPOSTaxAmountLine."POS Entry No." += 1;
-                    tmpPOSTaxAmountLine."Tax %" := POSTaxAmountLine."Tax %";
-                    tmpPOSTaxAmountLine.Insert();
+                TempPOSTaxAmountLine.SetRange("Tax %", POSTaxAmountLine."Tax %");
+                if TempPOSTaxAmountLine.IsEmpty then begin
+                    TempPOSTaxAmountLine."POS Entry No." += 1;
+                    TempPOSTaxAmountLine."Tax %" := POSTaxAmountLine."Tax %";
+                    TempPOSTaxAmountLine.Insert();
 
                     POSTaxAmountLine2.SetRange("POS Entry No.", POSEntry."Entry No.");
                     POSTaxAmountLine2.SetRange("Tax %", POSTaxAmountLine."Tax %");
@@ -755,7 +755,7 @@
     var
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
         POSWorkshiftTaxCheckpoint2: Record "NPR POS Worksh. Tax Checkp.";
-        tmpPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
+        TempPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
     begin
         //Implied only include item amounts as per audit requirements.
 
@@ -765,11 +765,11 @@
             repeat
                 //Select distinct tax % total
 
-                tmpPOSWorkshiftTaxCheckpoint.SetRange("Tax %", POSWorkshiftTaxCheckpoint."Tax %");
-                if tmpPOSWorkshiftTaxCheckpoint.IsEmpty then begin
-                    tmpPOSWorkshiftTaxCheckpoint."Entry No." += 1;
-                    tmpPOSWorkshiftTaxCheckpoint."Tax %" := POSWorkshiftTaxCheckpoint."Tax %";
-                    tmpPOSWorkshiftTaxCheckpoint.Insert();
+                TempPOSWorkshiftTaxCheckpoint.SetRange("Tax %", POSWorkshiftTaxCheckpoint."Tax %");
+                if TempPOSWorkshiftTaxCheckpoint.IsEmpty then begin
+                    TempPOSWorkshiftTaxCheckpoint."Entry No." += 1;
+                    TempPOSWorkshiftTaxCheckpoint."Tax %" := POSWorkshiftTaxCheckpoint."Tax %";
+                    TempPOSWorkshiftTaxCheckpoint.Insert();
 
                     POSWorkshiftTaxCheckpoint2.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
                     POSWorkshiftTaxCheckpoint2.SetRange("Tax %", POSWorkshiftTaxCheckpoint."Tax %");

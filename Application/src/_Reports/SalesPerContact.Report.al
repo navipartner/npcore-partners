@@ -17,7 +17,7 @@ report 6014597 "NPR Sales Per Contact"
 
                 Clear(SumOfTurnover);
                 Clear(SumOfTurnoverLY);
-                TurnoverTmp.Init();
+                TempTurnover.Init();
                 Contact1.Get("No.");
 
                 if Contact.GetFilter("Date Filter") <> '' then begin
@@ -38,19 +38,19 @@ report 6014597 "NPR Sales Per Contact"
 
                 if (SumOfTurnover = 0) and (SumOfTurnoverLY = 0) then
                     CurrReport.Skip();
-                TurnoverTmp."Decimal 1" := Multiple * SumOfTurnover;
-                TurnoverTmp."Decimal 2" := SumOfTurnover;
-                TurnoverTmp."Decimal 3" := SumOfTurnoverLY;
+                TempTurnover."Decimal 1" := Multiple * SumOfTurnover;
+                TempTurnover."Decimal 2" := SumOfTurnover;
+                TempTurnover."Decimal 3" := SumOfTurnoverLY;
 
                 if SumOfTurnoverLY <> 0 then
-                    TurnoverTmp."Decimal 4" := SumOfTurnover / SumOfTurnoverLY * 100
+                    TempTurnover."Decimal 4" := SumOfTurnover / SumOfTurnoverLY * 100
                 else
-                    TurnoverTmp."Decimal 4" := 0;
-                TurnoverTmp."Short Code 1" := "No.";
-                TurnoverTmp.Template := "No.";
-                TurnoverTmp.Description := Name;
-                TurnoverTmp."Description 2" := Address;
-                TurnoverTmp.Insert();
+                    TempTurnover."Decimal 4" := 0;
+                TempTurnover."Short Code 1" := "No.";
+                TempTurnover.Template := "No.";
+                TempTurnover.Description := Name;
+                TempTurnover."Description 2" := Address;
+                TempTurnover.Insert();
             end;
 
             trigger OnPreDataItem()
@@ -72,13 +72,13 @@ report 6014597 "NPR Sales Per Contact"
             column(Number_Integer; Integer.Number)
             {
             }
-            column(Decimal2_TurnoverTmp; TurnoverTmp."Decimal 2")
+            column(Decimal2_TurnoverTmp; TempTurnover."Decimal 2")
             {
             }
-            column(Decimal4_TurnoverTmp; TurnoverTmp."Decimal 4")
+            column(Decimal4_TurnoverTmp; TempTurnover."Decimal 4")
             {
             }
-            column(Decimal3_TurnoverTmp; TurnoverTmp."Decimal 3")
+            column(Decimal3_TurnoverTmp; TempTurnover."Decimal 3")
             {
             }
             column(COMPANYNAME; CompanyName)
@@ -109,10 +109,10 @@ report 6014597 "NPR Sales Per Contact"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not TurnoverTmp.Find('-') then
+                    if not TempTurnover.Find('-') then
                         CurrReport.Break();
                 end else
-                    if (TurnoverTmp.Next() = 0) then
+                    if (TempTurnover.Next() = 0) then
                         CurrReport.Break();
 
                 if Number > ShowQuantity then
@@ -120,12 +120,12 @@ report 6014597 "NPR Sales Per Contact"
 
 
 
-                Contact.Get(TurnoverTmp."Short Code 1");
+                Contact.Get(TempTurnover."Short Code 1");
             end;
 
             trigger OnPreDataItem()
             begin
-                TurnoverTmp.SetCurrentKey("Decimal 1", "Short Code 1");
+                TempTurnover.SetCurrentKey("Decimal 1", "Short Code 1");
             end;
         }
     }
@@ -197,7 +197,7 @@ report 6014597 "NPR Sales Per Contact"
     var
         CompanyInformation: Record "Company Information";
         Contact1: Record Contact;
-        TurnoverTmp: Record "NPR TEMP Buffer" temporary;
+        TempTurnover: Record "NPR TEMP Buffer" temporary;
         MaxDate: Date;
         MaxDateLY: Date;
         MinDate: Date;

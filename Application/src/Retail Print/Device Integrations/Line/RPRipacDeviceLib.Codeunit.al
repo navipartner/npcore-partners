@@ -424,22 +424,22 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
 
     procedure SelectFont(var Value: Text): Boolean
     var
-        RetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
-        ConstructFontSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"NPR Retail List", RetailList) = ACTION::LookupOK then begin
-            Value := RetailList.Choice;
+        ConstructFontSelectionList(TempRetailList);
+        if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then begin
+            Value := TempRetailList.Choice;
             exit(true);
         end;
     end;
 
     procedure SelectCommand(var Value: Text): Boolean
     var
-        RetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
-        ConstructCommandSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"NPR Retail List", RetailList) = ACTION::LookupOK then begin
-            Value := RetailList.Choice;
+        ConstructCommandSelectionList(TempRetailList);
+        if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then begin
+            Value := TempRetailList.Choice;
             exit(true);
         end;
     end;

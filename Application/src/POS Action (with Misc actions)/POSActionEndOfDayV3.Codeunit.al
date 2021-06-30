@@ -303,19 +303,19 @@ then begin
     local procedure EftDiscovery(POSSession: Codeunit "NPR POS Session")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
-        tmpEFTSetup: Record "NPR EFT Setup" temporary;
+        TempEFTSetup: Record "NPR EFT Setup" temporary;
         EFTSetup: Record "NPR EFT Setup";
     begin
-        EFTInterface.OnQueueCloseBeforeRegisterBalance(POSSession, tmpEFTSetup);
-        if not tmpEFTSetup.FindSet() then begin
+        EFTInterface.OnQueueCloseBeforeRegisterBalance(POSSession, TempEFTSetup);
+        if not TempEFTSetup.FindSet() then begin
             NextWorkflowStep := NextWorkflowStep::JUMP_BALANCE_REGISTER;
             exit;
         end;
 
         repeat
-            EFTSetup.Get(tmpEFTSetup.RecordId);
+            EFTSetup.Get(TempEFTSetup.RecordId);
             EFTSetup.Mark(true);
-        until tmpEFTSetup.Next() = 0;
+        until TempEFTSetup.Next() = 0;
         EFTSetup.MarkedOnly(true);
         EFTSetup.FindSet();
 

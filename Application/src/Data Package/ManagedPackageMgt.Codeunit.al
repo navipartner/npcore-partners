@@ -10,7 +10,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
     // SetLoadMethod()
 
     var
-        GlobalTableListTmp: Record AllObj temporary;
+        TempGlobalTableList: Record AllObj temporary;
         Caption_LoadMethod: Label 'Select one of the following package load methods:';
         Caption_DeleteWarning: Label 'WARNING: This will delete ALL existing data in tables:\%1.\\Are you sure you want to continue?';
         Caption_ModifyWarning: Label 'WARNING: This could change existing data in tables:\%1.\\Are you sure you want to continue?';
@@ -34,9 +34,9 @@ codeunit 6014628 "NPR Managed Package Mgt."
     begin
         AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Table, ID);
 
-        GlobalTableListTmp."Object Type" := GlobalTableListTmp."Object Type"::Table;
-        GlobalTableListTmp."Object ID" := ID;
-        GlobalTableListTmp.Insert();
+        TempGlobalTableList."Object Type" := TempGlobalTableList."Object Type"::Table;
+        TempGlobalTableList."Object ID" := ID;
+        TempGlobalTableList.Insert();
 
         GlobalTableString += '\' + StrSubstNo(PlaceHolder2Lbl, AllObjWithCaption."Object ID", AllObjWithCaption."Object Caption");
     end;
@@ -181,16 +181,16 @@ codeunit 6014628 "NPR Managed Package Mgt."
             end;
         end;
 
-        if (LoadMethod = LoadMethod::DeleteFirst) and GlobalTableListTmp.FindSet() then
+        if (LoadMethod = LoadMethod::DeleteFirst) and TempGlobalTableList.FindSet() then
             repeat
-                RecRef.Open(GlobalTableListTmp."Object ID");
+                RecRef.Open(TempGlobalTableList."Object ID");
 
                 if not RecRef.WritePermission then
                     Error(Error_MissingPermission, RecRef.Number);
 
                 RecRef.DeleteAll();
                 RecRef.Close();
-            until GlobalTableListTmp.Next() = 0;
+            until TempGlobalTableList.Next() = 0;
 
         if not LoadRecords(JToken, LoadMethod) then
             Error(Error_PackageLoad);
@@ -231,7 +231,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
             UpdateDialog(1, TableNo);
             UpdateProgressDialog(2, Itt, Total);
 
-            if not GlobalTableListTmp.Get(GlobalTableListTmp."Object Type"::Table, TableNo) then //Only accept data for expected tables.
+            if not TempGlobalTableList.Get(TempGlobalTableList."Object Type"::Table, TableNo) then //Only accept data for expected tables.
                 exit(false);
 
             RecRef.Open(TableNo);

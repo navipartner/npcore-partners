@@ -47,15 +47,15 @@
 
     trigger OnOpenPage()
     var
-        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
+        TempRetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
     begin
         if Rec.IsTemporary then
-            RetailInventoryBuffer.Copy(Rec, true)
+            TempRetailInventoryBuffer.Copy(Rec, true)
         else
-            RetailInventoryBuffer.Copy(Rec);
-        RetailInventoryBuffer.Reset();
-        RetailInventoryBuffer.SetRange("Processing Error", true);
-        ProcessingErrorExists := RetailInventoryBuffer.FindFirst();
+            TempRetailInventoryBuffer.Copy(Rec);
+        TempRetailInventoryBuffer.Reset();
+        TempRetailInventoryBuffer.SetRange("Processing Error", true);
+        ProcessingErrorExists := TempRetailInventoryBuffer.FindFirst();
     end;
 
     var

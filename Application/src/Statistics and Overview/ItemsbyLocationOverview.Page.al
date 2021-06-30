@@ -222,7 +222,7 @@
     end;
 
     var
-        MatrixRecordTmp: Record Location temporary;
+        TempMatrixRecord: Record Location temporary;
         MatrixRecords: array[32] of Record Location;
         MatrixSubPage: Page "NPR Items by Loc.Overv. Matrix";
         MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn;
@@ -247,21 +247,21 @@
         CurrentMatrixRecordOrdinal: Integer;
     begin
         if SetWanted = SetWanted::Initial then begin
-            MatrixRecordTmp.DeleteAll();
+            TempMatrixRecord.DeleteAll();
             MatrixRecord.Reset();
             if LocationFilter <> '' then
                 MatrixRecord.SetFilter(Code, LocationFilter);
             MatrixRecord.SetRange("Use As In-Transit", ShowInTransit);
             if MatrixRecord.FindSet() then
                 repeat
-                    MatrixRecordTmp := MatrixRecord;
-                    MatrixRecordTmp.Insert();
+                    TempMatrixRecord := MatrixRecord;
+                    TempMatrixRecord.Insert();
                 until MatrixRecord.Next() = 0;
             if (LocationFilter = '') and not ShowInTransit then begin
-                MatrixRecordTmp.Init();
-                MatrixRecordTmp.Code := MatrixSubPage.EmptyCodeValue();
-                MatrixRecordTmp.Name := MatrixSubPage.EmptyCodeValue();
-                MatrixRecordTmp.Insert();
+                TempMatrixRecord.Init();
+                TempMatrixRecord.Code := MatrixSubPage.EmptyCodeValue();
+                TempMatrixRecord.Name := MatrixSubPage.EmptyCodeValue();
+                TempMatrixRecord.Insert();
             end;
         end;
 
@@ -269,8 +269,8 @@
         Clear(MatrixRecords);
         CurrentMatrixRecordOrdinal := 1;
 
-        RecRef.GetTable(MatrixRecordTmp);
-        RecRef.SetTable(MatrixRecordTmp);
+        RecRef.GetTable(TempMatrixRecord);
+        RecRef.SetTable(TempMatrixRecord);
 
         if ShowColumnName then
             CaptionFieldNo := MatrixRecord.FieldNo(Name)
@@ -282,19 +282,19 @@
           MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrSetLength);
 
         if MATRIX_CurrSetLength > 0 then begin
-            MatrixRecordTmp.SetPosition(MATRIX_PKFirstRecInCurrSet);
-            MatrixRecordTmp.Find();
+            TempMatrixRecord.SetPosition(MATRIX_PKFirstRecInCurrSet);
+            TempMatrixRecord.Find();
             repeat
-                MatrixRecords[CurrentMatrixRecordOrdinal].Copy(MatrixRecordTmp);
+                MatrixRecords[CurrentMatrixRecordOrdinal].Copy(TempMatrixRecord);
                 CurrentMatrixRecordOrdinal := CurrentMatrixRecordOrdinal + 1;
-            until (CurrentMatrixRecordOrdinal > MATRIX_CurrSetLength) or (MatrixRecordTmp.Next() <> 1);
+            until (CurrentMatrixRecordOrdinal > MATRIX_CurrSetLength) or (TempMatrixRecord.Next() <> 1);
         end;
     end;
 
     local procedure UpdateMatrixSubPage()
     begin
         CurrPage.MATRIX.PAGE.SetFilters(ItemFilter, VariantFilter, VarietyValueFilter, ShowItems);
-        CurrPage.MATRIX.PAGE.Load(MATRIX_CaptionSet, MatrixRecords, MatrixRecordTmp);
+        CurrPage.MATRIX.PAGE.Load(MATRIX_CaptionSet, MatrixRecords, TempMatrixRecord);
         CurrPage.Update(false);
     end;
 

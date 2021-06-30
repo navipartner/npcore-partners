@@ -40,7 +40,7 @@ page 6014417 "NPR Print Tags"
 
     trigger OnAfterGetRecord()
     begin
-        Pick := SelectedPrintTagsTmp.Get(Rec."Print Tag");
+        Pick := TempSelectedPrintTags.Get(Rec."Print Tag");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -55,7 +55,7 @@ page 6014417 "NPR Print Tags"
     end;
 
     var
-        SelectedPrintTagsTmp: Record "NPR Print Tags" temporary;
+        TempSelectedPrintTags: Record "NPR Print Tags" temporary;
         Pick: Boolean;
         TagText: Text[100];
 
@@ -64,11 +64,11 @@ page 6014417 "NPR Print Tags"
         TagString: Text;
         Tagged: Boolean;
     begin
-        if SelectedPrintTagsTmp.FindSet() then
+        if TempSelectedPrintTags.FindSet() then
             repeat
-                TagString += SelectedPrintTagsTmp."Print Tag" + ',';
+                TagString += TempSelectedPrintTags."Print Tag" + ',';
                 Tagged := true;
-            until SelectedPrintTagsTmp.Next() = 0;
+            until TempSelectedPrintTags.Next() = 0;
 
         if Tagged then
             TagString := DelStr(TagString, StrLen(TagString));
@@ -104,12 +104,12 @@ page 6014417 "NPR Print Tags"
     begin
         if (StrLen(PrintTag) > 100) or (PrintTag = '') then exit;
 
-        if SelectedPrintTagsTmp.Get(PrintTag) then
-            SelectedPrintTagsTmp.Delete()
+        if TempSelectedPrintTags.Get(PrintTag) then
+            TempSelectedPrintTags.Delete()
         else begin
-            SelectedPrintTagsTmp.Init();
-            SelectedPrintTagsTmp."Print Tag" := PrintTag;
-            SelectedPrintTagsTmp.Insert();
+            TempSelectedPrintTags.Init();
+            TempSelectedPrintTags."Print Tag" := PrintTag;
+            TempSelectedPrintTags.Insert();
         end;
     end;
 }

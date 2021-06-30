@@ -89,16 +89,16 @@ report 6014663 "NPR Retail Calc. Inv."
                 begin
                     if not "Item Ledger Entry".IsEmpty then
                         CurrReport.Skip();   // Skip if item has any record in Item Ledger Entry.
-                    Clear(QuantityOnHandBuffer);
-                    QuantityOnHandBuffer."Item No." := "Item No.";
-                    QuantityOnHandBuffer."Location Code" := "Location Code";
-                    QuantityOnHandBuffer."Variant Code" := "Variant Code";
+                    Clear(TempQuantityOnHandBuffer);
+                    TempQuantityOnHandBuffer."Item No." := "Item No.";
+                    TempQuantityOnHandBuffer."Location Code" := "Location Code";
+                    TempQuantityOnHandBuffer."Variant Code" := "Variant Code";
 
                     GetLocation("Location Code");
                     if Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
-                        QuantityOnHandBuffer."Bin Code" := "Bin Code";
-                    if not QuantityOnHandBuffer.Find() then
-                        QuantityOnHandBuffer.Insert();   // Insert a zero quantity line.
+                        TempQuantityOnHandBuffer."Bin Code" := "Bin Code";
+                    if not TempQuantityOnHandBuffer.Find() then
+                        TempQuantityOnHandBuffer.Insert();   // Insert a zero quantity line.
                 end;
             }
             dataitem(ItemWithNoTransaction; "Integer")
@@ -154,8 +154,8 @@ report 6014663 "NPR Retail Calc. Inv."
                 if not SkipDim then
                     SelectedDim.GetSelectedDim(UserId, 3, REPORT::"NPR Retail Calc. Inv.", '', TempSelectedDim);
 
-                QuantityOnHandBuffer.Reset();
-                QuantityOnHandBuffer.DeleteAll();
+                TempQuantityOnHandBuffer.Reset();
+                TempQuantityOnHandBuffer.DeleteAll();
             end;
         }
     }
@@ -254,7 +254,7 @@ report 6014663 "NPR Retail Calc. Inv."
         DimSelectionBuf: Record "Dimension Selection Buffer";
         DimSetEntry: Record "Dimension Set Entry";
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
-        QuantityOnHandBuffer: Record "Inventory Buffer" temporary;
+        TempQuantityOnHandBuffer: Record "Inventory Buffer" temporary;
         ItemJnlBatch: Record "Item Journal Batch";
         ItemJnlLine: Record "Item Journal Line";
         Location: Record Location;
@@ -471,10 +471,10 @@ report 6014663 "NPR Retail Calc. Inv."
 
     local procedure InsertQuantityOnHandBuffer(ItemNo: Code[20]; LocationCode: Code[10])
     begin
-        QuantityOnHandBuffer.Init();
-        QuantityOnHandBuffer."Item No." := ItemNo;
-        QuantityOnHandBuffer."Location Code" := LocationCode;
-        QuantityOnHandBuffer.Insert(true);
+        TempQuantityOnHandBuffer.Init();
+        TempQuantityOnHandBuffer."Item No." := ItemNo;
+        TempQuantityOnHandBuffer."Location Code" := LocationCode;
+        TempQuantityOnHandBuffer.Insert(true);
     end;
 
     procedure InitializeRequest(NewPostingDate: Date; DocNo: Code[20]; ItemsNotOnInvt: Boolean)
@@ -510,15 +510,15 @@ report 6014663 "NPR Retail Calc. Inv."
         WhseQuantity: Decimal;
     begin
         AdjustPosQty := false;
-        ItemTrackingMgt.GetWhseItemTrkgSetup(QuantityOnHandBuffer."Item No.", WhseItemTrackingSetup);
+        ItemTrackingMgt.GetWhseItemTrkgSetup(TempQuantityOnHandBuffer."Item No.", WhseItemTrackingSetup);
         ItemTrackingSplit := WhseItemTrackingSetup."Serial No. Required" or WhseItemTrackingSetup."Lot No. Required";
         WarehouseEntry.SetCurrentKey(
           "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
           "Lot No.", "Serial No.", "Entry Type");
 
-        WarehouseEntry.SetRange("Item No.", QuantityOnHandBuffer."Item No.");
-        WarehouseEntry.SetRange("Location Code", QuantityOnHandBuffer."Location Code");
-        WarehouseEntry.SetRange("Variant Code", QuantityOnHandBuffer."Variant Code");
+        WarehouseEntry.SetRange("Item No.", TempQuantityOnHandBuffer."Item No.");
+        WarehouseEntry.SetRange("Location Code", TempQuantityOnHandBuffer."Location Code");
+        WarehouseEntry.SetRange("Variant Code", TempQuantityOnHandBuffer."Variant Code");
         WarehouseEntry.CalcSums("Qty. (Base)");
         WhseQuantity := WarehouseEntry."Qty. (Base)";
         WarehouseEntry.SetRange("Bin Code", AdjmtBin);
@@ -647,23 +647,23 @@ report 6014663 "NPR Retail Calc. Inv."
                 DimEntryNo := DimBufMgt.InsertDimensions(TempDimBufIn);
         end;
         if RetrieveBuffer(BinCode, DimEntryNo) then begin
-            QuantityOnHandBuffer.Quantity := QuantityOnHandBuffer.Quantity + NewQuantity;
-            QuantityOnHandBuffer.Modify();
+            TempQuantityOnHandBuffer.Quantity := TempQuantityOnHandBuffer.Quantity + NewQuantity;
+            TempQuantityOnHandBuffer.Modify();
         end else begin
-            QuantityOnHandBuffer.Quantity := NewQuantity;
-            QuantityOnHandBuffer.Insert();
+            TempQuantityOnHandBuffer.Quantity := NewQuantity;
+            TempQuantityOnHandBuffer.Insert();
         end;
     end;
 
     local procedure RetrieveBuffer(BinCode: Code[20]; DimEntryNo: Integer): Boolean
     begin
-        QuantityOnHandBuffer.Reset();
-        QuantityOnHandBuffer."Item No." := "Item Ledger Entry"."Item No.";
-        QuantityOnHandBuffer."Variant Code" := "Item Ledger Entry"."Variant Code";
-        QuantityOnHandBuffer."Location Code" := "Item Ledger Entry"."Location Code";
-        QuantityOnHandBuffer."Dimension Entry No." := DimEntryNo;
-        QuantityOnHandBuffer."Bin Code" := BinCode;
-        exit(QuantityOnHandBuffer.Find());
+        TempQuantityOnHandBuffer.Reset();
+        TempQuantityOnHandBuffer."Item No." := "Item Ledger Entry"."Item No.";
+        TempQuantityOnHandBuffer."Variant Code" := "Item Ledger Entry"."Variant Code";
+        TempQuantityOnHandBuffer."Location Code" := "Item Ledger Entry"."Location Code";
+        TempQuantityOnHandBuffer."Dimension Entry No." := DimEntryNo;
+        TempQuantityOnHandBuffer."Bin Code" := BinCode;
+        exit(TempQuantityOnHandBuffer.Find());
     end;
 
     local procedure HasNewQuantity(NewQuantity: Decimal): Boolean
@@ -673,12 +673,12 @@ report 6014663 "NPR Retail Calc. Inv."
 
     local procedure ItemBinLocationIsCalculated(BinCode: Code[20]): Boolean
     begin
-        QuantityOnHandBuffer.Reset();
-        QuantityOnHandBuffer.SetRange("Item No.", "Item Ledger Entry"."Item No.");
-        QuantityOnHandBuffer.SetRange("Variant Code", "Item Ledger Entry"."Variant Code");
-        QuantityOnHandBuffer.SetRange("Location Code", "Item Ledger Entry"."Location Code");
-        QuantityOnHandBuffer.SetRange("Bin Code", BinCode);
-        exit(QuantityOnHandBuffer.Find('-'));
+        TempQuantityOnHandBuffer.Reset();
+        TempQuantityOnHandBuffer.SetRange("Item No.", "Item Ledger Entry"."Item No.");
+        TempQuantityOnHandBuffer.SetRange("Variant Code", "Item Ledger Entry"."Variant Code");
+        TempQuantityOnHandBuffer.SetRange("Location Code", "Item Ledger Entry"."Location Code");
+        TempQuantityOnHandBuffer.SetRange("Bin Code", BinCode);
+        exit(TempQuantityOnHandBuffer.Find('-'));
     end;
 
     procedure SetSkipDim(NewSkipDim: Boolean)
@@ -690,8 +690,8 @@ report 6014663 "NPR Retail Calc. Inv."
     var
         LocalLocation: Record Location;
     begin
-        QuantityOnHandBuffer.SetRange("Item No.", ItemNo);
-        if QuantityOnHandBuffer.IsEmpty() then begin
+        TempQuantityOnHandBuffer.SetRange("Item No.", ItemNo);
+        if TempQuantityOnHandBuffer.IsEmpty() then begin
             Item.CopyFilter("Location Filter", LocalLocation.Code);
             LocalLocation.SetRange("Use As In-Transit", false);
             if (Item.GetFilter("Location Filter") <> '') and LocalLocation.FindSet() then
@@ -705,39 +705,39 @@ report 6014663 "NPR Retail Calc. Inv."
 
     local procedure CalcPhysInvQtyAndInsertItemJnlLine()
     begin
-        QuantityOnHandBuffer.Reset();
-        if QuantityOnHandBuffer.FindSet() then begin
+        TempQuantityOnHandBuffer.Reset();
+        if TempQuantityOnHandBuffer.FindSet() then begin
             repeat
                 PosQty := 0;
                 NegQty := 0;
 
-                GetLocation(QuantityOnHandBuffer."Location Code");
+                GetLocation(TempQuantityOnHandBuffer."Location Code");
                 if Location."Directed Put-away and Pick" then
                     CalcWhseQty(Location."Adjustment Bin Code", PosQty, NegQty);
 
-                if (NegQty - QuantityOnHandBuffer.Quantity <> QuantityOnHandBuffer.Quantity - PosQty) or ItemTrackingSplit then begin
-                    if PosQty = QuantityOnHandBuffer.Quantity then
+                if (NegQty - TempQuantityOnHandBuffer.Quantity <> TempQuantityOnHandBuffer.Quantity - PosQty) or ItemTrackingSplit then begin
+                    if PosQty = TempQuantityOnHandBuffer.Quantity then
                         PosQty := 0;
                     if (PosQty <> 0) or AdjustPosQty then
                         InsertItemJnlLine(
-                          QuantityOnHandBuffer."Item No.", QuantityOnHandBuffer."Variant Code", QuantityOnHandBuffer."Dimension Entry No.",
-                          QuantityOnHandBuffer."Bin Code", QuantityOnHandBuffer.Quantity, PosQty);
+                          TempQuantityOnHandBuffer."Item No.", TempQuantityOnHandBuffer."Variant Code", TempQuantityOnHandBuffer."Dimension Entry No.",
+                          TempQuantityOnHandBuffer."Bin Code", TempQuantityOnHandBuffer.Quantity, PosQty);
 
-                    if NegQty = QuantityOnHandBuffer.Quantity then
+                    if NegQty = TempQuantityOnHandBuffer.Quantity then
                         NegQty := 0;
                     if NegQty <> 0 then begin
                         if ((PosQty <> 0) or AdjustPosQty) and not ItemTrackingSplit then begin
-                            NegQty := NegQty - QuantityOnHandBuffer.Quantity;
-                            QuantityOnHandBuffer.Quantity := 0;
+                            NegQty := NegQty - TempQuantityOnHandBuffer.Quantity;
+                            TempQuantityOnHandBuffer.Quantity := 0;
                             ZeroQty := true;
                         end;
-                        if NegQty = -QuantityOnHandBuffer.Quantity then begin
+                        if NegQty = -TempQuantityOnHandBuffer.Quantity then begin
                             NegQty := 0;
                             AdjustPosQty := true;
                         end;
                         InsertItemJnlLine(
-                          QuantityOnHandBuffer."Item No.", QuantityOnHandBuffer."Variant Code", QuantityOnHandBuffer."Dimension Entry No.",
-                          QuantityOnHandBuffer."Bin Code", QuantityOnHandBuffer.Quantity, NegQty);
+                          TempQuantityOnHandBuffer."Item No.", TempQuantityOnHandBuffer."Variant Code", TempQuantityOnHandBuffer."Dimension Entry No.",
+                          TempQuantityOnHandBuffer."Bin Code", TempQuantityOnHandBuffer.Quantity, NegQty);
 
                         ZeroQty := ZeroQtySave;
                     end;
@@ -748,10 +748,10 @@ report 6014663 "NPR Retail Calc. Inv."
 
                 if (PosQty = 0) and (NegQty = 0) and not AdjustPosQty then
                     InsertItemJnlLine(
-                      QuantityOnHandBuffer."Item No.", QuantityOnHandBuffer."Variant Code", QuantityOnHandBuffer."Dimension Entry No.",
-                      QuantityOnHandBuffer."Bin Code", QuantityOnHandBuffer.Quantity, QuantityOnHandBuffer.Quantity);
-            until QuantityOnHandBuffer.Next() = 0;
-            QuantityOnHandBuffer.DeleteAll();
+                      TempQuantityOnHandBuffer."Item No.", TempQuantityOnHandBuffer."Variant Code", TempQuantityOnHandBuffer."Dimension Entry No.",
+                      TempQuantityOnHandBuffer."Bin Code", TempQuantityOnHandBuffer.Quantity, TempQuantityOnHandBuffer.Quantity);
+            until TempQuantityOnHandBuffer.Next() = 0;
+            TempQuantityOnHandBuffer.DeleteAll();
         end;
     end;
 
@@ -768,7 +768,7 @@ report 6014663 "NPR Retail Calc. Inv."
     var
         DefaultDimension: Record "Default Dimension";
     begin
-        DefaultDimension.SetRange("No.", QuantityOnHandBuffer."Item No.");
+        DefaultDimension.SetRange("No.", TempQuantityOnHandBuffer."Item No.");
         DefaultDimension.SetRange("Table ID", DATABASE::Item);
         if DefaultDimension.FindSet() then
             repeat

@@ -43,7 +43,7 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
 
     local procedure GetAllPrintJobs(var WebPrintBuffer: Record "NPR Web Print Buffer"): Text
     var
-        TmpWebPrintBuffer: Record "NPR Web Print Buffer" temporary;
+        TempWebPrintBuffer: Record "NPR Web Print Buffer" temporary;
         InnerXML: Text;
         InStream: InStream;
         OutStream: OutStream;
@@ -66,36 +66,36 @@ codeunit 6014538 "NPR RP Epson Web Print Service"
                 DevIDStrStart := StrPos(InnerXML, '<devid>') + 7;
                 DevID := CopyStr(InnerXML, DevIDStrStart, StrPos(InnerXML, '</devid>') - DevIDStrStart);
 
-                TmpWebPrintBuffer.SetRange("Printer ID", DevID);
-                if TmpWebPrintBuffer.FindFirst() and TmpWebPrintBuffer."Print Data".HasValue() then begin
+                TempWebPrintBuffer.SetRange("Printer ID", DevID);
+                if TempWebPrintBuffer.FindFirst() and TempWebPrintBuffer."Print Data".HasValue() then begin
                     NewCommand := CopyStr(InnerXML, StrPos(InnerXML, '<command>') + 9);
 
-                    TmpWebPrintBuffer.CalcFields("Print Data");
-                    TmpWebPrintBuffer."Print Data".CreateInStream(InStream);
+                    TempWebPrintBuffer.CalcFields("Print Data");
+                    TempWebPrintBuffer."Print Data".CreateInStream(InStream);
                     InStream.Read(ExistingCommand);
 
-                    TmpWebPrintBuffer."Print Data".CreateOutStream(OutStream);
+                    TempWebPrintBuffer."Print Data".CreateOutStream(OutStream);
                     OutStream.Write(CopyStr(ExistingCommand, 1, StrPos(ExistingCommand, '</command>') - 1) + NewCommand);
-                    TmpWebPrintBuffer.Modify();
+                    TempWebPrintBuffer.Modify();
                 end else begin
-                    TmpWebPrintBuffer.Init();
-                    TmpWebPrintBuffer."Printer ID" := DevID;
-                    TmpWebPrintBuffer."Print Data".CreateOutStream(OutStream);
+                    TempWebPrintBuffer.Init();
+                    TempWebPrintBuffer."Printer ID" := DevID;
+                    TempWebPrintBuffer."Print Data".CreateOutStream(OutStream);
                     OutStream.Write(InnerXML);
-                    TmpWebPrintBuffer.Insert();
+                    TempWebPrintBuffer.Insert();
                 end;
             end;
         until WebPrintBuffer.Next() = 0;
 
-        if TmpWebPrintBuffer.FindSet() then
+        if TempWebPrintBuffer.FindSet() then
             repeat
-                if TmpWebPrintBuffer."Print Data".HasValue() then begin
-                    TmpWebPrintBuffer.CalcFields("Print Data");
-                    TmpWebPrintBuffer."Print Data".CreateInStream(InStream);
+                if TempWebPrintBuffer."Print Data".HasValue() then begin
+                    TempWebPrintBuffer.CalcFields("Print Data");
+                    TempWebPrintBuffer."Print Data".CreateInStream(InStream);
                     InStream.Read(InnerXML);
                     TotalInnerXML += InnerXML;
                 end;
-            until TmpWebPrintBuffer.Next() = 0;
+            until TempWebPrintBuffer.Next() = 0;
 
         exit(TotalInnerXML)
     end;

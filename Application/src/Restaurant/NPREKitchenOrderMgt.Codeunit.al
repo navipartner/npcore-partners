@@ -36,17 +36,17 @@
         KitchenRequestParam: Record "NPR NPRE Kitchen Request";
         KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link";
         KitchenStation: Record "NPR NPRE Kitchen Station";
-        KitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
+        TempKitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
     begin
-        if not FindApplicableWPLineKitchenStations(KitchenStationBuffer, WaiterPadLine, FlowStatusCode, PrintCategoryCode) then
+        if not FindApplicableWPLineKitchenStations(TempKitchenStationBuffer, WaiterPadLine, FlowStatusCode, PrintCategoryCode) then
             exit(false);
 
         KitchenRequestParam.InitFromWaiterPadLine(WaiterPadLine);
-        KitchenRequestParam."Restaurant Code" := KitchenStationBuffer."Restaurant Code";
+        KitchenRequestParam."Restaurant Code" := TempKitchenStationBuffer."Restaurant Code";
         KitchenRequestParam."Serving Step" := FlowStatusCode;
         KitchenRequestParam."Created Date-Time" := SentDateTime;
         InitKitchenReqSourceFromWaiterPadLine(
-          KitchenReqSourceParam, WaiterPadLine, KitchenStationBuffer."Restaurant Code", KitchenRequestParam."Serving Step", KitchenRequestParam."Created Date-Time");
+          KitchenReqSourceParam, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", KitchenRequestParam."Serving Step", KitchenRequestParam."Created Date-Time");
 
         FindKitchenRequests(KitchenRequest, KitchenReqSourceParam);
         HandleQtyChange(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam);
@@ -62,11 +62,11 @@
                     KitchenRequest2.Modify();
                 end;
 
-                KitchenStationBuffer.FindSet();
+                TempKitchenStationBuffer.FindSet();
                 repeat
-                    KitchenStation.Get(KitchenStationBuffer."Production Restaurant Code", KitchenStationBuffer."Kitchen Station");
+                    KitchenStation.Get(TempKitchenStationBuffer."Production Restaurant Code", TempKitchenStationBuffer."Kitchen Station");
                     CreateKitchenStationRequest(KitchenRequest2, KitchenStation);
-                until KitchenStationBuffer.Next() = 0;
+                until TempKitchenStationBuffer.Next() = 0;
 
                 UpdateOrderStatus(KitchenRequest2."Order ID");
             until KitchenRequest.Next() = 0;

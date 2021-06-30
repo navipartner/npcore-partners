@@ -277,7 +277,7 @@
     local procedure OnActionSelectToStoreCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         FromNpCsStore: Record "NPR NpCs Store";
-        NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
+        TempNpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
         SalePOS: Record "NPR POS Sale";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempNpCsStore: Record "NPR NpCs Store" temporary;
@@ -305,37 +305,37 @@
 
             TempSaleLinePOS.FindSet();
             repeat
-                NpCsStoreInventoryBuffer.Init();
-                NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
-                NpCsStoreInventoryBuffer.Sku := TempSaleLinePOS.Reference;
-                NpCsStoreInventoryBuffer.Description := CopyStr(TempSaleLinePOS.Description, 1, MaxStrLen(NpCsStoreInventoryBuffer.Description));
-                NpCsStoreInventoryBuffer."Description 2" := TempSaleLinePOS."Description 2";
-                NpCsStoreInventoryBuffer.Quantity := TempSaleLinePOS.Quantity;
-                NpCsStoreInventoryBuffer.Insert();
+                TempNpCsStoreInventoryBuffer.Init();
+                TempNpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
+                TempNpCsStoreInventoryBuffer.Sku := TempSaleLinePOS.Reference;
+                TempNpCsStoreInventoryBuffer.Description := CopyStr(TempSaleLinePOS.Description, 1, MaxStrLen(TempNpCsStoreInventoryBuffer.Description));
+                TempNpCsStoreInventoryBuffer."Description 2" := TempSaleLinePOS."Description 2";
+                TempNpCsStoreInventoryBuffer.Quantity := TempSaleLinePOS.Quantity;
+                TempNpCsStoreInventoryBuffer.Insert();
             until TempSaleLinePOS.Next() = 0;
         until ToNpCsStore.Next() = 0;
 
-        NpCsStoreMgt.SetBufferInventory(NpCsStoreInventoryBuffer);
+        NpCsStoreMgt.SetBufferInventory(TempNpCsStoreInventoryBuffer);
         TempNpCsStore.FindSet();
         repeat
             PrevRec := Format(TempNpCsStore);
 
-            Clear(NpCsStoreInventoryBuffer);
-            NpCsStoreInventoryBuffer.SetRange("Store Code", TempNpCsStore.Code);
-            NpCsStoreInventoryBuffer.SetRange("In Stock", false);
-            TempNpCsStore."In Stock" := NpCsStoreInventoryBuffer.IsEmpty();
-            NpCsStoreInventoryBuffer.SetRange("In Stock");
-            if NpCsStoreInventoryBuffer.FindSet() then
+            Clear(TempNpCsStoreInventoryBuffer);
+            TempNpCsStoreInventoryBuffer.SetRange("Store Code", TempNpCsStore.Code);
+            TempNpCsStoreInventoryBuffer.SetRange("In Stock", false);
+            TempNpCsStore."In Stock" := TempNpCsStoreInventoryBuffer.IsEmpty();
+            TempNpCsStoreInventoryBuffer.SetRange("In Stock");
+            if TempNpCsStoreInventoryBuffer.FindSet() then
                 repeat
-                    if NpCsStoreInventoryBuffer.Quantity > 0 then begin
-                        TempNpCsStore."Requested Qty." += NpCsStoreInventoryBuffer.Quantity;
-                        if NpCsStoreInventoryBuffer.Inventory < 0 then
-                            NpCsStoreInventoryBuffer.Inventory := 0;
-                        if NpCsStoreInventoryBuffer.Inventory > NpCsStoreInventoryBuffer.Quantity then
-                            NpCsStoreInventoryBuffer.Inventory := NpCsStoreInventoryBuffer.Quantity;
-                        TempNpCsStore."Fullfilled Qty." += NpCsStoreInventoryBuffer.Inventory;
+                    if TempNpCsStoreInventoryBuffer.Quantity > 0 then begin
+                        TempNpCsStore."Requested Qty." += TempNpCsStoreInventoryBuffer.Quantity;
+                        if TempNpCsStoreInventoryBuffer.Inventory < 0 then
+                            TempNpCsStoreInventoryBuffer.Inventory := 0;
+                        if TempNpCsStoreInventoryBuffer.Inventory > TempNpCsStoreInventoryBuffer.Quantity then
+                            TempNpCsStoreInventoryBuffer.Inventory := TempNpCsStoreInventoryBuffer.Quantity;
+                        TempNpCsStore."Fullfilled Qty." += TempNpCsStoreInventoryBuffer.Inventory;
                     end;
-                until NpCsStoreInventoryBuffer.Next() = 0;
+                until TempNpCsStoreInventoryBuffer.Next() = 0;
 
             if PrevRec <> Format(TempNpCsStore) then
                 TempNpCsStore.Modify();
@@ -343,8 +343,8 @@
 
         Clear(NpCsStoresbyDistance);
         Clear(TempNpCsStore);
-        Clear(NpCsStoreInventoryBuffer);
-        NpCsStoresbyDistance.SetSourceTables(TempNpCsStore, NpCsStoreInventoryBuffer);
+        Clear(TempNpCsStoreInventoryBuffer);
+        NpCsStoresbyDistance.SetSourceTables(TempNpCsStore, TempNpCsStoreInventoryBuffer);
         NpCsStoresbyDistance.SetShowInventory(true);
         NpCsStoresbyDistance.SetFromStoreCode(FromStoreCode);
         NpCsStoresbyDistance.LookupMode(true);

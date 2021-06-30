@@ -1181,20 +1181,20 @@
 
     local procedure CaptureCustomerInfo(): Text
     var
-        tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
+        TempCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
     begin
-        tmpCustomerInfoCapture.Init();
-        tmpCustomerInfoCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-        tmpCustomerInfoCapture.Insert();
+        TempCustomerInfoCapture.Init();
+        TempCustomerInfoCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
+        TempCustomerInfoCapture.Insert();
 
         if Confirm(Caption_UseID) then begin
-            if not ScanCustomerID(tmpCustomerInfoCapture) then
+            if not ScanCustomerID(TempCustomerInfoCapture) then
                 exit(CaptureCustomerInfo()); //Aborted - Restart capture flow
         end;
 
-        if not IsAllRequiredCustomerInfoCaptured(tmpCustomerInfoCapture) then begin
-            tmpCustomerInfoCapture."Is Identity Checked" := false;
-            if not ManualCustomerInfoEntry(tmpCustomerInfoCapture) then begin
+        if not IsAllRequiredCustomerInfoCaptured(TempCustomerInfoCapture) then begin
+            TempCustomerInfoCapture."Is Identity Checked" := false;
+            if not ManualCustomerInfoEntry(TempCustomerInfoCapture) then begin
                 if Confirm(Caption_CancelOperation) then
                     Error(Error_UserCancel)
                 else
@@ -1202,7 +1202,7 @@
             end;
         end;
 
-        exit(GetCustomerInfoXML(tmpCustomerInfoCapture));
+        exit(GetCustomerInfoXML(TempCustomerInfoCapture));
     end;
 
     local procedure ScanCustomerID(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary): Boolean
@@ -1237,27 +1237,27 @@
     local procedure GetMobileNoIdentifier(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary): Boolean
     var
         TravellerInfoCapture: Page "NPR Tax Free GB I2 Info Capt.";
-        tmpMobilePhoneNoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
-        tmpMobilePhoneRequiredParam: Record "NPR Tax Free GB I2 Param." temporary;
+        TempMobilePhoneNoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
+        TempMobilePhoneRequiredParam: Record "NPR Tax Free GB I2 Param." temporary;
     begin
-        tmpMobilePhoneRequiredParam.Init();
-        tmpMobilePhoneRequiredParam."(Dialog) Mobile No." := tmpMobilePhoneRequiredParam."(Dialog) Mobile No."::Required;
-        tmpMobilePhoneRequiredParam.Insert();
-        tmpMobilePhoneNoCapture.Init();
-        tmpMobilePhoneNoCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-        tmpMobilePhoneNoCapture.Insert();
+        TempMobilePhoneRequiredParam.Init();
+        TempMobilePhoneRequiredParam."(Dialog) Mobile No." := TempMobilePhoneRequiredParam."(Dialog) Mobile No."::Required;
+        TempMobilePhoneRequiredParam.Insert();
+        TempMobilePhoneNoCapture.Init();
+        TempMobilePhoneNoCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
+        TempMobilePhoneNoCapture.Insert();
 
-        TravellerInfoCapture.SetModes(tmpMobilePhoneRequiredParam);
-        TravellerInfoCapture.SetRec(tmpMobilePhoneNoCapture);
+        TravellerInfoCapture.SetModes(TempMobilePhoneRequiredParam);
+        TravellerInfoCapture.SetRec(TempMobilePhoneNoCapture);
         TravellerInfoCapture.LookupMode(true);
         if TravellerInfoCapture.RunModal() <> ACTION::LookupOK then
             exit(false); //Restart capture flow
 
-        TravellerInfoCapture.GetRec(tmpMobilePhoneNoCapture);
-        tmpCustomerInfoCapture."Mobile No." := tmpMobilePhoneNoCapture."Mobile No.";
-        tmpCustomerInfoCapture."Mobile No. Country" := tmpMobilePhoneNoCapture."Mobile No. Country";
-        tmpCustomerInfoCapture."Mobile No. Prefix" := tmpMobilePhoneNoCapture."Mobile No. Prefix";
-        tmpCustomerInfoCapture."Mobile No. Prefix Formatted" := tmpMobilePhoneNoCapture."Mobile No. Prefix Formatted";
+        TravellerInfoCapture.GetRec(TempMobilePhoneNoCapture);
+        tmpCustomerInfoCapture."Mobile No." := TempMobilePhoneNoCapture."Mobile No.";
+        tmpCustomerInfoCapture."Mobile No. Country" := TempMobilePhoneNoCapture."Mobile No. Country";
+        tmpCustomerInfoCapture."Mobile No. Prefix" := TempMobilePhoneNoCapture."Mobile No. Prefix";
+        tmpCustomerInfoCapture."Mobile No. Prefix Formatted" := TempMobilePhoneNoCapture."Mobile No. Prefix Formatted";
 
         //Identifer = [00][Country Prefix][Mobile No.]
         tmpCustomerInfoCapture."Global Blue Identifier" := '00';
@@ -1276,27 +1276,27 @@
     local procedure GetPassportIdentifier(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary): Boolean
     var
         TravellerInfoCapture: Page "NPR Tax Free GB I2 Info Capt.";
-        tmpPassportCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
-        tmpPassportRequiredParam: Record "NPR Tax Free GB I2 Param." temporary;
+        TempPassportCapture: Record "NPR TaxFree GB I2 Info Capt." temporary;
+        TempPassportRequiredParam: Record "NPR Tax Free GB I2 Param." temporary;
     begin
-        tmpPassportRequiredParam.Init();
-        tmpPassportRequiredParam."(Dialog) Passport Number" := tmpPassportRequiredParam."(Dialog) Passport Number"::Required;
-        tmpPassportRequiredParam."(Dialog) Passport Country Code" := tmpPassportRequiredParam."(Dialog) Passport Country Code"::Required;
-        tmpPassportRequiredParam.Insert();
-        tmpPassportCapture.Init();
-        tmpPassportCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-        tmpPassportCapture.Insert();
+        TempPassportRequiredParam.Init();
+        TempPassportRequiredParam."(Dialog) Passport Number" := TempPassportRequiredParam."(Dialog) Passport Number"::Required;
+        TempPassportRequiredParam."(Dialog) Passport Country Code" := TempPassportRequiredParam."(Dialog) Passport Country Code"::Required;
+        TempPassportRequiredParam.Insert();
+        TempPassportCapture.Init();
+        TempPassportCapture."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
+        TempPassportCapture.Insert();
 
-        TravellerInfoCapture.SetModes(tmpPassportRequiredParam);
-        TravellerInfoCapture.SetRec(tmpPassportCapture);
+        TravellerInfoCapture.SetModes(TempPassportRequiredParam);
+        TravellerInfoCapture.SetRec(TempPassportCapture);
         TravellerInfoCapture.LookupMode(true);
         if TravellerInfoCapture.RunModal() <> ACTION::LookupOK then
             exit(false); //Restart capture flow
 
-        TravellerInfoCapture.GetRec(tmpPassportCapture);
-        tmpCustomerInfoCapture."Passport Country" := tmpPassportCapture."Passport Country";
-        tmpCustomerInfoCapture."Passport Country Code" := tmpPassportCapture."Passport Country Code";
-        tmpCustomerInfoCapture."Passport Number" := tmpPassportCapture."Passport Number";
+        TravellerInfoCapture.GetRec(TempPassportCapture);
+        tmpCustomerInfoCapture."Passport Country" := TempPassportCapture."Passport Country";
+        tmpCustomerInfoCapture."Passport Country Code" := TempPassportCapture."Passport Country Code";
+        tmpCustomerInfoCapture."Passport Number" := TempPassportCapture."Passport Number";
 
         //Identifier = [Passport Country Code]+[UPPERCASE(Passport Number)]
         tmpCustomerInfoCapture."Global Blue Identifier" := Format(tmpCustomerInfoCapture."Passport Country Code") + '+' + UpperCase(tmpCustomerInfoCapture."Passport Number");
@@ -1429,7 +1429,7 @@
 
     local procedure IsConsolidationEligibleSeperate(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
-        tmpSharedEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
+        TempSharedEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
         Eligible: Boolean;
         First: Boolean;
         FilterString: Text;
@@ -1444,11 +1444,11 @@
                 tmpEligibleServices.FindSet();
                 repeat
                     if First then begin
-                        tmpSharedEligibleServices.Init();
-                        tmpSharedEligibleServices.TransferFields(tmpEligibleServices);
-                        tmpSharedEligibleServices.Insert();
+                        TempSharedEligibleServices.Init();
+                        TempSharedEligibleServices.TransferFields(tmpEligibleServices);
+                        TempSharedEligibleServices.Insert();
                     end else begin
-                        if not tmpSharedEligibleServices.Get(tmpEligibleServices."Tax Free Unit", tmpEligibleServices."Service ID") then begin
+                        if not TempSharedEligibleServices.Get(tmpEligibleServices."Tax Free Unit", tmpEligibleServices."Service ID") then begin
                             if FilterString <> '' then
                                 FilterString += '&';
                             FilterString += '<>' + Format(tmpEligibleServices."Service ID");
@@ -1458,9 +1458,9 @@
 
                 if FilterString <> '' then begin
                     //Delete every non-shared service
-                    tmpSharedEligibleServices.SetFilter("Service ID", FilterString);
-                    tmpSharedEligibleServices.DeleteAll();
-                    tmpSharedEligibleServices.SetRange("Service ID");
+                    TempSharedEligibleServices.SetFilter("Service ID", FilterString);
+                    TempSharedEligibleServices.DeleteAll();
+                    TempSharedEligibleServices.SetRange("Service ID");
                 end;
             end;
 
@@ -1468,11 +1468,11 @@
             tmpEligibleServices.DeleteAll();
             Clear(tmpEligibleServices);
             Clear(FilterString);
-            Eligible := Eligible and (not tmpSharedEligibleServices.IsEmpty());
+            Eligible := Eligible and (not TempSharedEligibleServices.IsEmpty());
         until (tmpTaxFreeConsolidation.Next() = 0) or (not Eligible);
 
         if Eligible then
-            tmpEligibleServices.Copy(tmpSharedEligibleServices, true);
+            tmpEligibleServices.Copy(TempSharedEligibleServices, true);
 
         exit(Eligible);
     end;
@@ -1855,21 +1855,21 @@
     procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var SkipRecordHandling: Boolean)
 #pragma warning restore
     var
-        tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
-        tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
+        TempEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
+        TempTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
     begin
         InitializeHandler(TaxFreeRequest);
 
-        if not IsStoredSaleEligible(SalesReceiptNo, tmpEligibleServices) then
+        if not IsStoredSaleEligible(SalesReceiptNo, TempEligibleServices) then
             Error(Error_Ineligible);
-        if tmpEligibleServices.IsEmpty then
+        if TempEligibleServices.IsEmpty then
             Error(Error_Ineligible);
 
-        tmpTaxFreeConsolidation.Init();
-        tmpTaxFreeConsolidation."Sales Ticket No." := SalesReceiptNo;
-        tmpTaxFreeConsolidation.Insert();
+        TempTaxFreeConsolidation.Init();
+        TempTaxFreeConsolidation."Sales Ticket No." := SalesReceiptNo;
+        TempTaxFreeConsolidation.Insert();
 
-        IssueVoucher(TaxFreeRequest, tmpTaxFreeConsolidation, tmpEligibleServices);
+        IssueVoucher(TaxFreeRequest, TempTaxFreeConsolidation, TempEligibleServices);
     end;
 
     procedure OnVoucherVoid(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
@@ -1901,16 +1901,16 @@
 
     procedure OnVoucherConsolidate(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
     var
-        tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
+        TempEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
         InitializeHandler(TaxFreeRequest);
 
-        if not IsConsolidationEligible(tmpTaxFreeConsolidation, tmpEligibleServices) then
+        if not IsConsolidationEligible(tmpTaxFreeConsolidation, TempEligibleServices) then
             Error(Error_ConsolidationEligible);
-        if tmpEligibleServices.IsEmpty then
+        if TempEligibleServices.IsEmpty then
             Error(Error_ConsolidationEligible);
 
-        IssueVoucher(TaxFreeRequest, tmpTaxFreeConsolidation, tmpEligibleServices);
+        IssueVoucher(TaxFreeRequest, tmpTaxFreeConsolidation, TempEligibleServices);
     end;
 
     procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean)
@@ -1921,18 +1921,18 @@
 
     procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     var
-        tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
+        TempEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
         InitializeHandler(TaxFreeRequest);
-        Eligible := IsActiveSaleEligible(SalesTicketNo, tmpEligibleServices);
+        Eligible := IsActiveSaleEligible(SalesTicketNo, TempEligibleServices);
     end;
 
     procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     var
-        tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
+        TempEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
         InitializeHandler(TaxFreeRequest);
-        Eligible := IsStoredSaleEligible(SalesTicketNo, tmpEligibleServices);
+        Eligible := IsStoredSaleEligible(SalesTicketNo, TempEligibleServices);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Tax Free POS Unit", 'OnAfterDeleteEvent', '', false, false)]

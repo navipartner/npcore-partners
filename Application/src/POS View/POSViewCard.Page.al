@@ -78,7 +78,7 @@ page 6150711 "NPR POS View Card"
     procedure RetrieveAutoCompleteOptions(OptionsType: Text);
     var
         Menu: record "NPR POS Menu";
-        DataSourceTemp: Record "NPR POS Data Source Discovery" temporary;
+        TempDataSource: Record "NPR POS Data Source Discovery" temporary;
         Options: JsonArray;
         OptionsText: Text;
     begin
@@ -93,11 +93,11 @@ page 6150711 "NPR POS View Card"
 
             'dataSource':
                 begin
-                    DataSourceTemp.DiscoverDataSources();
-                    if DataSourceTemp.FindSet() then
+                    TempDataSource.DiscoverDataSources();
+                    if TempDataSource.FindSet() then
                         repeat
-                            Options.Add(DataSourceTemp.Name);
-                        until DataSourceTemp.Next() = 0;
+                            Options.Add(TempDataSource.Name);
+                        until TempDataSource.Next() = 0;
                 end;
         end;
 

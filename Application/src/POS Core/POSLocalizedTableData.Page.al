@@ -141,7 +141,7 @@ page 6150724 "NPR POS Localized Table Data"
 
     var
         Language: Record "Windows Language";
-        FieldTmp: Record "Field" temporary;
+        TempField: Record "Field" temporary;
         RecRef: RecordRef;
         Text001: Label 'You must provide the field list to localize, when preparing data for localization.\\Record ID: [%1]';
         Text002: Label 'must be ''Text'' when localizing captions for';
@@ -163,15 +163,15 @@ page 6150724 "NPR POS Localized Table Data"
 
         Old := Rec;
 
-        FieldTmp.FindSet();
+        TempField.FindSet();
         repeat
             Rec.Init();
             Rec."Record ID" := RecRef.RecordId;
             Rec."Language Code" := LanguageDialog.GetLanguageCode();
-            Rec."Field No." := FieldTmp."No.";
+            Rec."Field No." := TempField."No.";
             Rec."From Original Table" := false;
             Rec.Insert();
-        until FieldTmp.Next() = 0;
+        until TempField.Next() = 0;
 
         Rec := Old;
         CurrPage.Update(false);
@@ -222,8 +222,8 @@ page 6150724 "NPR POS Localized Table Data"
             Rec."From Original Table" := true;
             Rec.Insert();
 
-            FieldTmp := Field;
-            FieldTmp.Insert();
+            TempField := Field;
+            TempField.Insert();
 
             LocalizedCaption.SetRange("Record ID", RecRef.RecordId);
             LocalizedCaption.SetRange("Field No.", Field."No.");
@@ -240,12 +240,12 @@ page 6150724 "NPR POS Localized Table Data"
         Caption: Record "NPR POS Localized Caption";
         Old: Record "NPR POS Localized Caption";
     begin
-        FieldTmp.FindSet();
+        TempField.FindSet();
         repeat
             Caption.SetRange("Record ID", RecRef.RecordId);
-            Caption.SetRange("Field No.", FieldTmp."No.");
+            Caption.SetRange("Field No.", TempField."No.");
             Caption.DeleteAll();
-        until FieldTmp.Next() = 0;
+        until TempField.Next() = 0;
 
         Old := Rec;
         Rec.SetRange("From Original Table", false);

@@ -97,7 +97,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     SingleInstance = true;
 
     var
-        Buffer: Record "NPR RP Print Buffer" temporary;
+        TempBuffer: Record "NPR RP Print Buffer" temporary;
         LinePrinter: Codeunit "NPR RP Line Printer Interf.";
         CurrentLineNo: Integer;
         CurrentFont: Text[30];
@@ -266,7 +266,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
 
     procedure ClearBuffer()
     begin
-        Buffer.DeleteAll();
+        TempBuffer.DeleteAll();
     end;
 
     procedure ProcessCodeunit(CodeunitID: Integer; "Table": Variant)
@@ -353,14 +353,14 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         LinePrinter.Construct(DeviceType);
         LinePrinter.OnInitJob(DeviceSettings);
 
-        if Buffer.FindSet() then
+        if TempBuffer.FindSet() then
             repeat
-                if CurrentLine <> Buffer."Line No." then
+                if CurrentLine <> TempBuffer."Line No." then
                     LinePrinter.OnLineFeed();
                 PadBuffer();
-                LinePrinter.OnPrintData(Buffer);
-                CurrentLine := Buffer."Line No.";
-            until Buffer.Next() = 0;
+                LinePrinter.OnPrintData(TempBuffer);
+                CurrentLine := TempBuffer."Line No.";
+            until TempBuffer.Next() = 0;
 
         LinePrinter.OnEndJob();
         OnSendPrintJob(TemplateCode, CodeunitId, ReportId, LinePrinter, 1);
@@ -568,9 +568,9 @@ codeunit 6014549 "NPR RP Line Print Mgt."
             if TemplateLine."Skip If Empty" then begin
                 Clear(LineBuffer);
                 if (TemplateLine."Template Column No." > LastColumnNo) and (not TemplateLine."Prefix Next Line") then begin
-                    Buffer.SetRange("Line No.", CurrentLineNo);
-                    Buffer.DeleteAll();
-                    Buffer.SetRange("Line No.");
+                    TempBuffer.SetRange("Line No.", CurrentLineNo);
+                    TempBuffer.DeleteAll();
+                    TempBuffer.SetRange("Line No.");
                 end;
                 SkipColumnsAboveNo := TemplateLine."Template Column No.";
                 SkipRemainingColumns := true;
@@ -625,23 +625,23 @@ codeunit 6014549 "NPR RP Line Print Mgt."
         FieldWidth: Decimal;
         PageWidth: Integer;
     begin
-        if (UpperCase(Buffer.Font) in ['CONTROL', 'LOGO', 'COMMAND']) or (Buffer.Width <> 0) then
+        if (UpperCase(TempBuffer.Font) in ['CONTROL', 'LOGO', 'COMMAND']) or (TempBuffer.Width <> 0) then
             exit;
 
-        LinePrinter.OnGetPageWidth(Buffer.Font, PageWidth);
+        LinePrinter.OnGetPageWidth(TempBuffer.Font, PageWidth);
 
-        case GetColumnCount(Buffer) of
+        case GetColumnCount(TempBuffer) of
             1:
                 FieldWidth := PageWidth;
             2:
-                case Buffer."Column No." of
+                case TempBuffer."Column No." of
                     1:
                         FieldWidth := PageWidth * TwoColumnDistribution[1];
                     2:
                         FieldWidth := PageWidth * TwoColumnDistribution[2];
                 end;
             3:
-                case Buffer."Column No." of
+                case TempBuffer."Column No." of
                     1:
                         FieldWidth := PageWidth * ThreeColumnDistribution[1];
                     2:
@@ -650,7 +650,7 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                         FieldWidth := PageWidth * ThreeColumnDistribution[3];
                 end;
             4:
-                case Buffer."Column No." of
+                case TempBuffer."Column No." of
                     1:
                         FieldWidth := PageWidth * FourColumnDistribution[1];
                     2:
@@ -664,23 +664,23 @@ codeunit 6014549 "NPR RP Line Print Mgt."
                 exit;
         end;
 
-        if Buffer."Pad Char" = '' then
-            Buffer."Pad Char" := ' ';
+        if TempBuffer."Pad Char" = '' then
+            TempBuffer."Pad Char" := ' ';
 
         FieldWidth := Round(FieldWidth, 1.0, '<');
 
-        if FieldWidth < StrLen(Buffer.Text) then
-            Buffer.Text := CopyStr(Buffer.Text, 1, FieldWidth)
+        if FieldWidth < StrLen(TempBuffer.Text) then
+            TempBuffer.Text := CopyStr(TempBuffer.Text, 1, FieldWidth)
         else
-            case Buffer.Align of
-                Buffer.Align::Left:
-                    Buffer.Text := PadStr(Buffer.Text, FieldWidth, Buffer."Pad Char");
+            case TempBuffer.Align of
+                TempBuffer.Align::Left:
+                    TempBuffer.Text := PadStr(TempBuffer.Text, FieldWidth, TempBuffer."Pad Char");
 
-                Buffer.Align::Center:
+                TempBuffer.Align::Center:
                     ; //Do nothing, pass align to printer interface instead
 
-                Buffer.Align::Right:
-                    Buffer.Text := PadStr('', FieldWidth - StrLen(Buffer.Text), Buffer."Pad Char") + Buffer.Text;
+                TempBuffer.Align::Right:
+                    TempBuffer.Text := PadStr('', FieldWidth - StrLen(TempBuffer.Text), TempBuffer."Pad Char") + TempBuffer.Text;
             end;
     end;
 
@@ -727,21 +727,21 @@ codeunit 6014549 "NPR RP Line Print Mgt."
             NewLine();
         end;
 
-        Buffer."Line No." := CurrentLineNo;
-        Buffer."Column No." := Column;
-        Buffer.Text := Text;
+        TempBuffer."Line No." := CurrentLineNo;
+        TempBuffer."Column No." := Column;
+        TempBuffer.Text := Text;
         if Font = '' then
-            Buffer.Font := CurrentFont
+            TempBuffer.Font := CurrentFont
         else
-            Buffer.Font := Font;
-        Buffer.Width := Width;
-        Buffer."Pad Char" := PadChar;
-        Buffer.Bold := CurrentBold;
-        Buffer.Underline := CurrentUnderLine;
-        Buffer.DoubleStrike := CurrentDoubleStrike;
-        Buffer.Align := Align;
-        if not Buffer.Insert() then
-            Buffer.Modify();
+            TempBuffer.Font := Font;
+        TempBuffer.Width := Width;
+        TempBuffer."Pad Char" := PadChar;
+        TempBuffer.Bold := CurrentBold;
+        TempBuffer.Underline := CurrentUnderLine;
+        TempBuffer.DoubleStrike := CurrentDoubleStrike;
+        TempBuffer.Align := Align;
+        if not TempBuffer.Insert() then
+            TempBuffer.Modify();
 
         LastColumnNo := Column;
 
@@ -751,8 +751,8 @@ codeunit 6014549 "NPR RP Line Print Mgt."
     local procedure ClearState()
     begin
         //Can be deleted when this CU is no longer single instance.
-        Buffer.DeleteAll();
-        Clear(Buffer);
+        TempBuffer.DeleteAll();
+        Clear(TempBuffer);
         Clear(LinePrinter);
         Clear(CurrentLineNo);
         Clear(CurrentFont);

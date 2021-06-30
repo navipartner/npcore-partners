@@ -183,7 +183,7 @@
         SenderAddress: Text;
         Subject: Text;
         Separators: List of [Text];
-        EmailItem: Record "Email Item" temporary;
+        TempEmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         Separators.Add(';');
@@ -196,7 +196,7 @@
         SenderAddress := GetErrorMailSenderAddress();
         Subject := GetErrorMailSubject(NcImportEntry);
         Body := GetErrorMailBody(NcImportEntry);
-        EmailSenderHandler.CreateEmailItem(EmailItem,
+        EmailSenderHandler.CreateEmailItem(TempEmailItem,
                   '',
                   SenderAddress,
                   NcImportType."E-mail address on Error".Split(Separators),
@@ -207,9 +207,9 @@
         if NcImportEntry."Document Source".HasValue() then begin
             NcImportEntry.CalcFields("Document Source");
             NcImportEntry."Document Source".CreateInStream(InStream);
-            EmailSenderHandler.AddAttachmentFromStream(EmailItem, InStream, NcImportEntry."Document Name");
+            EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, InStream, NcImportEntry."Document Name");
         end;
-        EmailSenderHandler.Send(EmailItem);
+        EmailSenderHandler.Send(TempEmailItem);
     end;
 
     procedure SendTestErrorMail(NcImportType: Record "NPR Nc Import Type")

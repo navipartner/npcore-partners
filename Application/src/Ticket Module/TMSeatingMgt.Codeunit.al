@@ -183,22 +183,22 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
     procedure SwapSubNodes(AdmissionCode: Code[20]; PathA: Text; PathB: Text)
     var
-        TmpSeatingTemplateA: Record "NPR TM Seating Template" temporary;
-        TmpSeatingTemplateB: Record "NPR TM Seating Template" temporary;
+        TempSeatingTemplateA: Record "NPR TM Seating Template" temporary;
+        TempSeatingTemplateB: Record "NPR TM Seating Template" temporary;
     begin
 
-        UpdateTemporaryPathList(AdmissionCode, PathA, PathB, TmpSeatingTemplateA);
-        UpdateTemporaryPathList(AdmissionCode, PathB, PathA, TmpSeatingTemplateB);
+        UpdateTemporaryPathList(AdmissionCode, PathA, PathB, TempSeatingTemplateA);
+        UpdateTemporaryPathList(AdmissionCode, PathB, PathA, TempSeatingTemplateB);
 
-        UpdatePersistentTemplate(TmpSeatingTemplateA, 0);
-        UpdatePersistentTemplate(TmpSeatingTemplateB, 0);
+        UpdatePersistentTemplate(TempSeatingTemplateA, 0);
+        UpdatePersistentTemplate(TempSeatingTemplateB, 0);
     end;
 
     local procedure ChangeParent(CurrentEntryNumber: Integer; NewParentEntryNumber: Integer)
     var
         CurrentTemplate: Record "NPR TM Seating Template";
         NewTemplate: Record "NPR TM Seating Template";
-        TmpSeatingTemplate: Record "NPR TM Seating Template" temporary;
+        TempSeatingTemplate: Record "NPR TM Seating Template" temporary;
         ParentSeatingTemplate: Record "NPR TM Seating Template";
         CurrentDepth: Integer;
         NewDepth: Integer;
@@ -217,8 +217,8 @@ codeunit 6151130 "NPR TM Seating Mgt."
         NewOrdinal := ParentSeatingTemplate.Count() + 1;
         NewPath := StrSubstNo(PathLbl, NewTemplate.Path, Format(CurrentTemplate.Ordinal, 0, '<Integer,4><Filler Character,0>'));
 
-        UpdateTemporaryPathList(CurrentTemplate."Admission Code", CurrentTemplate.Path, NewPath, TmpSeatingTemplate);
-        UpdatePersistentTemplate(TmpSeatingTemplate, (NewDepth - CurrentDepth));
+        UpdateTemporaryPathList(CurrentTemplate."Admission Code", CurrentTemplate.Path, NewPath, TempSeatingTemplate);
+        UpdatePersistentTemplate(TempSeatingTemplate, (NewDepth - CurrentDepth));
 
         CurrentTemplate.Ordinal := NewOrdinal;
         CurrentTemplate.Path := NewPath;
@@ -229,7 +229,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
     procedure IndentNode(RecToIndent: Record "NPR TM Seating Template")
     var
         SeatingTemplate: Record "NPR TM Seating Template";
-        TmpSeatingTemplate: Record "NPR TM Seating Template" temporary;
+        TempSeatingTemplate: Record "NPR TM Seating Template" temporary;
     begin
 
         SeatingTemplate.SetCurrentKey("Admission Code", Path);
@@ -239,8 +239,8 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
             SeatingTemplate.Get(AddChild(SeatingTemplate."Entry No."));
 
-            UpdateTemporaryPathList(RecToIndent."Admission Code", RecToIndent.Path, SeatingTemplate.Path, TmpSeatingTemplate);
-            UpdatePersistentTemplate(TmpSeatingTemplate, 1);
+            UpdateTemporaryPathList(RecToIndent."Admission Code", RecToIndent.Path, SeatingTemplate.Path, TempSeatingTemplate);
+            UpdatePersistentTemplate(TempSeatingTemplate, 1);
 
             SeatingTemplate.Description := RecToIndent.Description;
             SeatingTemplate."Description 2" := RecToIndent."Description 2";
@@ -252,7 +252,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
     var
         SeatingTemplate: Record "NPR TM Seating Template";
         SeatingTemplate2: Record "NPR TM Seating Template";
-        TmpSeatingTemplate: Record "NPR TM Seating Template" temporary;
+        TempSeatingTemplate: Record "NPR TM Seating Template" temporary;
         NewNode: Record "NPR TM Seating Template";
         I: Integer;
         Distance: Integer;
@@ -274,8 +274,8 @@ codeunit 6151130 "NPR TM Seating Mgt."
             NewNode.Get(NewNode."Entry No.");
         end;
 
-        UpdateTemporaryPathList(RecToUnIndent."Admission Code", RecToUnIndent.Path, NewNode.Path, TmpSeatingTemplate);
-        UpdatePersistentTemplate(TmpSeatingTemplate, -1);
+        UpdateTemporaryPathList(RecToUnIndent."Admission Code", RecToUnIndent.Path, NewNode.Path, TempSeatingTemplate);
+        UpdatePersistentTemplate(TempSeatingTemplate, -1);
 
         RecToUnIndent.Get(RecToUnIndent."Entry No.");
         RecToUnIndent.Delete();

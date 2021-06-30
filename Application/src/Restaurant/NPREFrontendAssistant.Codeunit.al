@@ -3,7 +3,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnConfigureReusableWorkflows', '', true, true)]
     local procedure OnConfigureReusableWorkflows(var Sender: Codeunit "NPR POS UI Management"; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup");
     var
-        POSAction: Record "NPR POS Action" temporary;
+        TempPOSAction: Record "NPR POS Action" temporary;
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
         ConfigureReusableWorkflowLbl: Label '%1, %2', Locked = true;
     begin
@@ -11,51 +11,51 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
             exit;
 
         if RestaurantSetup."New Waiter Pad Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."New Waiter Pad Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."New Waiter Pad Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("New Waiter Pad Action")), RestaurantSetup.FieldNo("New Waiter Pad Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("New Waiter Pad Action")), RestaurantSetup.FieldNo("New Waiter Pad Action"));
         end;
 
         if RestaurantSetup."Select Waiter Pad Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."Select Waiter Pad Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."Select Waiter Pad Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Waiter Pad Action")), RestaurantSetup.FieldNo("Select Waiter Pad Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Waiter Pad Action")), RestaurantSetup.FieldNo("Select Waiter Pad Action"));
         end;
 
         if RestaurantSetup."Select Table Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."Select Table Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."Select Table Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Table Action")), RestaurantSetup.FieldNo("Select Table Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Table Action")), RestaurantSetup.FieldNo("Select Table Action"));
         end;
 
         if RestaurantSetup."Select Restaurant Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."Select Restaurant Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."Select Restaurant Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Restaurant Action")), RestaurantSetup.FieldNo("Select Restaurant Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Restaurant Action")), RestaurantSetup.FieldNo("Select Restaurant Action"));
         end;
 
         if RestaurantSetup."Save Layout Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."Save Layout Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."Save Layout Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Save Layout Action")), RestaurantSetup.FieldNo("Save Layout Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Save Layout Action")), RestaurantSetup.FieldNo("Save Layout Action"));
         end;
 
         if RestaurantSetup."Set Waiter Pad Status Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."Set Waiter Pad Status Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."Set Waiter Pad Status Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Set Waiter Pad Status Action")), RestaurantSetup.FieldNo("Set Waiter Pad Status Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Set Waiter Pad Status Action")), RestaurantSetup.FieldNo("Set Waiter Pad Status Action"));
         end;
 
         if RestaurantSetup."Set Table Status Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."Set Table Status Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."Set Table Status Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Set Table Status Action")), RestaurantSetup.FieldNo("Set Table Status Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Set Table Status Action")), RestaurantSetup.FieldNo("Set Table Status Action"));
         end;
 
         if RestaurantSetup."Set Number of Guests Action" <> '' then begin
-            POSSession.RetrieveSessionAction(RestaurantSetup."Set Number of Guests Action", POSAction);
+            POSSession.RetrieveSessionAction(RestaurantSetup."Set Number of Guests Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
-                POSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Set Number of Guests Action")), RestaurantSetup.FieldNo("Set Number of Guests Action"));
+                TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Set Number of Guests Action")), RestaurantSetup.FieldNo("Set Number of Guests Action"));
         end;
     end;
 

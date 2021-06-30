@@ -325,7 +325,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     procedure InsertPOSAddOnLines(ItemAddOn: Record "NPR NpIa Item AddOn"; SelectedAddOnLines: JsonToken; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; CompulsoryAddOn: Boolean): Boolean
     var
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
-        ItemAddOnLineTmp: Record "NPR NpIa Item AddOn Line" temporary;
+        TempItemAddOnLine: Record "NPR NpIa Item AddOn Line" temporary;
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -338,15 +338,15 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
             if SelectedAddOnLines.AsValue().IsNull then
                 exit(InsertMandatoryPOSAddOnLines(ItemAddOn, POSSession, AppliesToLineNo, false, CompulsoryAddOn));
 
-        ItemAddOnLineTmp.Reset();
-        ItemAddOnLineTmp.DeleteAll();
+        TempItemAddOnLine.Reset();
+        TempItemAddOnLine.DeleteAll();
 
         SelectedAddonLineKeys := SelectedAddOnLines.AsObject().Keys;
         foreach AddonLineKey in SelectedAddonLineKeys do begin
             SelectedAddOnLines.AsObject().Get(AddonLineKey, JToken);
             if ParsePOSAddOnLine(ItemAddOn, JToken, AddonLineKey, ItemAddOnLine) then begin
-                ItemAddOnLineTmp := ItemAddOnLine;
-                ItemAddOnLineTmp.Insert();
+                TempItemAddOnLine := ItemAddOnLine;
+                TempItemAddOnLine.Insert();
             end;
         end;
 
@@ -354,27 +354,27 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         ItemAddOnLine.SetRange(Mandatory, true);
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
         if not ItemAddOnLine.IsEmpty then
-            CopyItemAddOnLinesToTemp(ItemAddOnLine, ItemAddOnLineTmp, false);
+            CopyItemAddOnLinesToTemp(ItemAddOnLine, TempItemAddOnLine, false);
 
-        if ItemAddOnLineTmp.IsEmpty then
+        if TempItemAddOnLine.IsEmpty then
             exit(false);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        if not AskForVariants(SalePOS, AppliesToLineNo, ItemAddOnLineTmp) then begin
+        if not AskForVariants(SalePOS, AppliesToLineNo, TempItemAddOnLine) then begin
             if CompulsoryAddOn then
                 RemoveBaseLine(POSSession, AppliesToLineNo);
             exit(false);
         end;
 
         POSSession.GetSaleLine(POSSaleLine);
-        ItemAddOnLineTmp.FindSet();
+        TempItemAddOnLine.FindSet();
         repeat
-            if InsertPOSAddOnLine(ItemAddOnLineTmp, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS) then
-                if SelectedAddOnLines.AsObject().Get(CommentLineID(ItemAddOnLineTmp."Line No."), JToken) then
+            if InsertPOSAddOnLine(TempItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS) then
+                if SelectedAddOnLines.AsObject().Get(CommentLineID(TempItemAddOnLine."Line No."), JToken) then
                     InsertPOSAddOnLineComment(JToken, ItemAddOn, SaleLinePOS);
-        until ItemAddOnLineTmp.Next() = 0;
+        until TempItemAddOnLine.Next() = 0;
 
         exit(true);
     end;
@@ -387,7 +387,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     local procedure InsertMandatoryPOSAddOnLines(ItemAddOn: Record "NPR NpIa Item AddOn"; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; NotRequiringComments: Boolean; CompulsoryAddOn: Boolean): Boolean
     var
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
-        ItemAddOnLineTmp: Record "NPR NpIa Item AddOn Line" temporary;
+        TempItemAddOnLine: Record "NPR NpIa Item AddOn Line" temporary;
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -400,21 +400,21 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
         if ItemAddOnLine.IsEmpty() then
             exit(false);
-        CopyItemAddOnLinesToTemp(ItemAddOnLine, ItemAddOnLineTmp, true);
+        CopyItemAddOnLinesToTemp(ItemAddOnLine, TempItemAddOnLine, true);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        if not AskForVariants(SalePOS, AppliesToLineNo, ItemAddOnLineTmp) then begin
+        if not AskForVariants(SalePOS, AppliesToLineNo, TempItemAddOnLine) then begin
             if CompulsoryAddOn then
                 RemoveBaseLine(POSSession, AppliesToLineNo);
             exit(false);
         end;
 
         POSSession.GetSaleLine(POSSaleLine);
-        if ItemAddOnLineTmp.FindSet() then begin
+        if TempItemAddOnLine.FindSet() then begin
             repeat
-                InsertPOSAddOnLine(ItemAddOnLineTmp, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS);
-            until ItemAddOnLineTmp.Next() = 0;
+                InsertPOSAddOnLine(TempItemAddOnLine, SalePOS, POSSaleLine, AppliesToLineNo, SaleLinePOS);
+            until TempItemAddOnLine.Next() = 0;
 
             if SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo) then
                 POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
@@ -868,7 +868,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
     local procedure AskForVariants(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line")
     var
         AddOnSaleLinePOS: Record "NPR POS Sale Line";
-        ItemVariantRequestBuffer: Record "NPR NpIa Item AddOn Line" temporary;
+        TempItemVariantRequestBuffer: Record "NPR NpIa Item AddOn Line" temporary;
     begin
         if ItemAddOnLine.FindSet() then
             repeat
@@ -877,30 +877,30 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
                    (ItemAddOnLine.Quantity > 0) and
                    ItemVariantIsRequired(ItemAddOnLine."Item No.")
                 then begin
-                    ItemVariantRequestBuffer := ItemAddOnLine;
+                    TempItemVariantRequestBuffer := ItemAddOnLine;
                     if FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, AddOnSaleLinePOS) then
                         if AddOnSaleLinePOS."Variant Code" <> '' then
-                            ItemVariantRequestBuffer."Variant Code" := AddOnSaleLinePOS."Variant Code";
-                    ItemVariantRequestBuffer.Insert();
+                            TempItemVariantRequestBuffer."Variant Code" := AddOnSaleLinePOS."Variant Code";
+                    TempItemVariantRequestBuffer.Insert();
                 end;
             until ItemAddOnLine.Next() = 0;
 
-        if ItemVariantRequestBuffer.IsEmpty() then
+        if TempItemVariantRequestBuffer.IsEmpty() then
             exit;
 
-        if Page.RunModal(Page::"NPR NpIa ItemAddOn Sel. Vars.", ItemVariantRequestBuffer) <> Action::LookupOK then
+        if Page.RunModal(Page::"NPR NpIa ItemAddOn Sel. Vars.", TempItemVariantRequestBuffer) <> Action::LookupOK then
             Error('');
 
-        if ItemVariantRequestBuffer.FindSet() then
+        if TempItemVariantRequestBuffer.FindSet() then
             repeat
-                ItemVariantRequestBuffer.TestField("Variant Code");
-                ItemAddOnLine.Get(ItemVariantRequestBuffer."AddOn No.", ItemVariantRequestBuffer."Line No.");
-                if ItemAddOnLine."Variant Code" <> ItemVariantRequestBuffer."Variant Code" then begin
-                    ItemAddOnLine."Variant Code" := ItemVariantRequestBuffer."Variant Code";
-                    ItemAddOnLine.Description := ItemVariantRequestBuffer."Description 2";
+                TempItemVariantRequestBuffer.TestField("Variant Code");
+                ItemAddOnLine.Get(TempItemVariantRequestBuffer."AddOn No.", TempItemVariantRequestBuffer."Line No.");
+                if ItemAddOnLine."Variant Code" <> TempItemVariantRequestBuffer."Variant Code" then begin
+                    ItemAddOnLine."Variant Code" := TempItemVariantRequestBuffer."Variant Code";
+                    ItemAddOnLine.Description := TempItemVariantRequestBuffer."Description 2";
                     ItemAddOnLine.Modify();
                 end;
-            until ItemVariantRequestBuffer.Next() = 0;
+            until TempItemVariantRequestBuffer.Next() = 0;
     end;
 
     local procedure ItemVariantIsRequired(ItemNo: Code[20]): Boolean

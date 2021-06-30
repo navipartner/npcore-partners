@@ -16,7 +16,7 @@ report 6060127 "NPR MM Member Card Print QR"
             column(MemberType; MemberType)
             {
             }
-            column(QRBlob; BlobBuffer."Buffer 1")
+            column(QRBlob; TempBlobBuffer."Buffer 1")
             {
             }
             column(RegisterPicture; TenantMedia.Content)
@@ -59,7 +59,7 @@ report 6060127 "NPR MM Member Card Print QR"
                 Base64Image := BarcodeFontProvider.GenerateQRCodeAZ("MM Member Card"."External Card No.", 'H', 'UTF8', true, true, 2);
                 TmpQR.CreateOutStream(OutStr);
                 Base64Convert.FromBase64(Base64Image, OutStr);
-                BlobBuffer.GetFromTempBlob(TmpQR, 1);
+                TempBlobBuffer.GetFromTempBlob(TmpQR, 1);
 
                 MemberDate := Format("MM Member Card"."Valid Until");
 
@@ -91,6 +91,6 @@ report 6060127 "NPR MM Member Card Print QR"
         MemberDate: Text;
         POSUnit: Record "NPR POS Unit";
         TenantMedia, TenantMediaMMMember : Record "Tenant Media";
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        TempBlobBuffer: Record "NPR BLOB buffer" temporary;
 }
 #endif

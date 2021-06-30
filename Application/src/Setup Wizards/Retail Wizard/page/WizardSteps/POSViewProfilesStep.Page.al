@@ -19,7 +19,7 @@ page 6014655 "NPR POS View Profiles Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSViewProfile(ExistingViewProfiles, Rec.Code);
+                        CheckIfNoAvailableInPOSViewProfile(TempExistingViewProfiles, Rec.Code);
                     end;
                 }
                 field("Client Decimal Separator"; Rec."Client Decimal Separator")
@@ -74,7 +74,7 @@ page 6014655 "NPR POS View Profiles Step"
     end;
 
     var
-        ExistingViewProfiles: Record "NPR POS View Profile" temporary;
+        TempExistingViewProfiles: Record "NPR POS View Profile" temporary;
 
     procedure GetRec(var TempPOSViewProfile: Record "NPR POS View Profile")
     begin
@@ -123,8 +123,8 @@ page 6014655 "NPR POS View Profiles Step"
     begin
         if POSViewProfile.FindSet() then
             repeat
-                ExistingViewProfiles := POSViewProfile;
-                ExistingViewProfiles.Insert();
+                TempExistingViewProfiles := POSViewProfile;
+                TempExistingViewProfiles.Insert();
             until POSViewProfile.Next() = 0;
     end;
 

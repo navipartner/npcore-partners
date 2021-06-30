@@ -20,7 +20,7 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
                     rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
                     AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
                     packageList: List of [Text];
-                    tmpRetailList: Record "NPR Retail List" temporary;
+                    TempRetailList: Record "NPR Retail List" temporary;
                     RetailListPage: Page "NPR Retail List";
                     package: Text;
                     BaseUri: Text;
@@ -33,26 +33,26 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
                         + '&sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageList);
 
                     foreach package in packageList do begin
-                        tmpRetailList.Number += 1;
-                        tmpRetailList.Value := package;
-                        tmpRetailList.Choice := package;
-                        tmpRetailList.Insert();
+                        TempRetailList.Number += 1;
+                        TempRetailList.Value := package;
+                        TempRetailList.Choice := package;
+                        TempRetailList.Insert();
                     end;
 
                     RetailListPage.LookupMode(true);
-                    RetailListPage.SetRec(tmpRetailList);
+                    RetailListPage.SetRec(TempRetailList);
                     if RetailListPage.RunModal() <> Action::LookupOK then
                         exit(false);
 
                     SelectedValues := '';
-                    RetailListPage.GetSelectionFilter(tmpRetailList);
-                    tmpRetailList.MarkedOnly(true);
-                    if tmpRetailList.FindSet() then
+                    RetailListPage.GetSelectionFilter(TempRetailList);
+                    TempRetailList.MarkedOnly(true);
+                    if TempRetailList.FindSet() then
                         repeat
                             if StrLen(SelectedValues) > 0 then
                                 SelectedValues += ',';
-                            SelectedValues += tmpRetailList.Value;
-                        until tmpRetailList.Next() = 0;
+                            SelectedValues += TempRetailList.Value;
+                        until TempRetailList.Next() = 0;
 
                     exit(true);
                 end;

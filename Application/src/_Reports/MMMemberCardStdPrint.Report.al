@@ -14,7 +14,7 @@ report 6060123 "NPR MM Member Card Std Print"
             column(MemberDate; MemberDate)
             {
             }
-            column(Barcode; BlobBuffer."Buffer 1")
+            column(Barcode; TempBlobBuffer."Buffer 1")
             {
             }
             column(ExternalMemberNo; "External Member No.")
@@ -87,7 +87,7 @@ report 6060123 "NPR MM Member Card Std Print"
                 BarcodeLib.SetBarcodeType(Code128Lbl);
                 BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.", TmpBarcode);
 
-                BlobBuffer.GetFromTempBlob(TmpBarcode, 1);
+                TempBlobBuffer.GetFromTempBlob(TmpBarcode, 1);
                 Clear(MemberDate);
                 Clear(MemberItem);
                 Clear(CardType);
@@ -118,7 +118,7 @@ report 6060123 "NPR MM Member Card Std Print"
     var
         CompanyInformation: Record "Company Information";
         MMMembershipEntry: Record "NPR MM Membership Entry";
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        TempBlobBuffer: Record "NPR BLOB buffer" temporary;
         TenantMediaMMMember: Record "Tenant Media";
         TmpBarcode: Codeunit "Temp Blob";
         ExpiryDateCaption: Label 'Expiry date: ';

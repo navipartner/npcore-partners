@@ -20,7 +20,7 @@ page 6014657 "NPR POS Sales Wfl. Sets Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSSalesWorkflowSet(ExistingPOSSalesWorkflowSet, Rec.Code);
+                        CheckIfNoAvailableInPOSSalesWorkflowSet(TempExistingPOSSalesWorkflowSet, Rec.Code);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -38,7 +38,7 @@ page 6014657 "NPR POS Sales Wfl. Sets Step"
     end;
 
     var
-        ExistingPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set" temporary;
+        TempExistingPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set" temporary;
 
     procedure GetRec(var TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set")
     begin
@@ -87,8 +87,8 @@ page 6014657 "NPR POS Sales Wfl. Sets Step"
     begin
         if POSSalesWorkflowSet.FindSet() then
             repeat
-                ExistingPOSSalesWorkflowSet := POSSalesWorkflowSet;
-                ExistingPOSSalesWorkflowSet.Insert();
+                TempExistingPOSSalesWorkflowSet := POSSalesWorkflowSet;
+                TempExistingPOSSalesWorkflowSet.Insert();
             until POSSalesWorkflowSet.Next() = 0;
     end;
 

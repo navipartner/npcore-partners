@@ -8,7 +8,7 @@
     end;
 
     var
-        tRevisionsrulle: Record "NPR HC Audit Roll Posting" temporary;
+        TempRevisionsrulle: Record "NPR HC Audit Roll Posting" temporary;
         HCRetailSetup: Record "NPR HC Retail Setup";
         HCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
         ProgressVis: Boolean;
@@ -25,24 +25,24 @@
     var
         TempPost: Record "NPR HC Audit Roll Posting" temporary;
     begin
-        if tRevisionsrulle.Count() > 0 then begin
+        if TempRevisionsrulle.Count() > 0 then begin
             HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(true));
 
-            tRevisionsrulle.ModifyAll("Internal Posting No.", 0);
+            TempRevisionsrulle.ModifyAll("Internal Posting No.", 0);
 
-            if tRevisionsrulle.Find('-') then
+            if TempRevisionsrulle.Find('-') then
                 repeat
                     HCPostTempAuditRoll.ClearStatusWindow();
-                    tRevisionsrulle.SetRange("Sale Date", tRevisionsrulle."Sale Date");
+                    TempRevisionsrulle.SetRange("Sale Date", TempRevisionsrulle."Sale Date");
                     TempPost.Reset();
-                    TempPost.TransferFromTemp(TempPost, tRevisionsrulle);
+                    TempPost.TransferFromTemp(TempPost, TempRevisionsrulle);
                     HCPostTempAuditRoll.RunPost(TempPost);
-                    tRevisionsrulle.Find('+');
-                    tRevisionsrulle.SetRange("Sale Date");
+                    TempRevisionsrulle.Find('+');
+                    TempRevisionsrulle.SetRange("Sale Date");
                     TempPost.Reset();
                     HCPostTempAuditRoll.RunUpdateChanges(TempPost);
                     TempPost.DeleteAll();
-                until tRevisionsrulle.Next() = 0;
+                until TempRevisionsrulle.Next() = 0;
             exit(true);
         end else
             exit(false);
@@ -52,23 +52,23 @@
     var
         TempPost: Record "NPR HC Audit Roll Posting" temporary;
     begin
-        if tRevisionsrulle.Count() > 0 then begin
-            tRevisionsrulle.ModifyAll("Internal Posting No.", 0);
+        if TempRevisionsrulle.Count() > 0 then begin
+            TempRevisionsrulle.ModifyAll("Internal Posting No.", 0);
 
-            if tRevisionsrulle.Find('-') then
+            if TempRevisionsrulle.Find('-') then
                 repeat
                     HCPostTempAuditRoll.ClearStatusWindow();
-                    tRevisionsrulle.SetRange("Sale Date", tRevisionsrulle."Sale Date");
+                    TempRevisionsrulle.SetRange("Sale Date", TempRevisionsrulle."Sale Date");
                     TempPost.Reset();
-                    TempPost.TransferFromTemp(TempPost, tRevisionsrulle);
+                    TempPost.TransferFromTemp(TempPost, TempRevisionsrulle);
                     HCPostTempAuditRoll.RunPostItemLedger(TempPost);
-                    tRevisionsrulle.Find('+');
-                    tRevisionsrulle.SetRange("Sale Date");
+                    TempRevisionsrulle.Find('+');
+                    TempRevisionsrulle.SetRange("Sale Date");
                     TempPost.Reset();
                     HCPostTempAuditRoll.RunUpdateChanges(TempPost);
                     TempPost.DeleteAll();
 
-                until tRevisionsrulle.Next() = 0;
+                until TempRevisionsrulle.Next() = 0;
             exit(true);
         end else
             exit(false);
@@ -77,13 +77,13 @@
     procedure RunCode(var Rec: Record "NPR HC Audit Roll")
     var
         Kasse: Record "NPR HC Register";
-        Dummy: Record "NPR HC Audit Roll" temporary;
+        TempDummy: Record "NPR HC Audit Roll" temporary;
     begin
         HCRetailSetup.Get();
         ProcessToSalesDocuments(Rec);
 
-        Dummy.Copy(Rec);
-        Clear(tRevisionsrulle);
+        TempDummy.Copy(Rec);
+        Clear(TempRevisionsrulle);
 
         HCRetailSetup.Validate("Posting Source Code", HCRetailSetup."Posting Source Code");
 
@@ -101,36 +101,36 @@
 
                         Rec.SetRange("Register No.", Kasse."Register No.");
 
-                        HCPostTempAuditRoll.RunTransfer(tRevisionsrulle, Rec);
-                        HCPostTempAuditRoll.RemoveSuspendedPayouts(tRevisionsrulle);
+                        HCPostTempAuditRoll.RunTransfer(TempRevisionsrulle, Rec);
+                        HCPostTempAuditRoll.RemoveSuspendedPayouts(TempRevisionsrulle);
 
-                        tRevisionsrulle.Reset();
+                        TempRevisionsrulle.Reset();
 
-                        HCPostTempAuditRoll.RunTest(tRevisionsrulle);
+                        HCPostTempAuditRoll.RunTest(TempRevisionsrulle);
 
                         PostPerRegisterTmp(Kasse);
-                        tRevisionsrulle.DeleteAll();
+                        TempRevisionsrulle.DeleteAll();
                     until Kasse.Next() = 0;
             end else begin
                 HCPostTempAuditRoll.SetProgressVis(ProgressVis);
 
-                HCPostTempAuditRoll.RunTransfer(tRevisionsrulle, Rec);
-                HCPostTempAuditRoll.RemoveSuspendedPayouts(tRevisionsrulle);
+                HCPostTempAuditRoll.RunTransfer(TempRevisionsrulle, Rec);
+                HCPostTempAuditRoll.RemoveSuspendedPayouts(TempRevisionsrulle);
 
-                tRevisionsrulle.Reset();
+                TempRevisionsrulle.Reset();
 
-                HCPostTempAuditRoll.RunTest(tRevisionsrulle);
+                HCPostTempAuditRoll.RunTest(TempRevisionsrulle);
 
                 PostPerRegisterTmp(Kasse);
-                tRevisionsrulle.DeleteAll();
+                TempRevisionsrulle.DeleteAll();
 
             end;
         end;
 
         /* ITEM ENTRY POSTING */
-        Clear(tRevisionsrulle);
-        tRevisionsrulle.DeleteAll();
-        Rec.CopyFilters(Dummy);
+        Clear(TempRevisionsrulle);
+        TempRevisionsrulle.DeleteAll();
+        Rec.CopyFilters(TempDummy);
         Kasse.Reset();
         Kasse.SetFilter("Register No.", Rec.GetFilter("Register No."));
         pRevisionsrulle.DeleteAll();
@@ -146,23 +146,23 @@
                     repeat
                         HCPostTempAuditRoll.SetProgressVis(ProgressVis);
                         Rec.SetRange("Register No.", Kasse."Register No.");
-                        HCPostTempAuditRoll.RunTransferItemLedger(tRevisionsrulle, Rec);
-                        HCPostTempAuditRoll.RunTest(tRevisionsrulle);
-                        tRevisionsrulle.Reset();
+                        HCPostTempAuditRoll.RunTransferItemLedger(TempRevisionsrulle, Rec);
+                        HCPostTempAuditRoll.RunTest(TempRevisionsrulle);
+                        TempRevisionsrulle.Reset();
                         PostPerRegisterTmpItemLedger(Kasse);
-                        tRevisionsrulle.DeleteAll();
+                        TempRevisionsrulle.DeleteAll();
                     until Kasse.Next() = 0;
             end else begin
                 HCPostTempAuditRoll.SetProgressVis(ProgressVis);
-                HCPostTempAuditRoll.RunTransferItemLedger(tRevisionsrulle, Rec);
-                HCPostTempAuditRoll.RunTest(tRevisionsrulle);
-                tRevisionsrulle.Reset();
+                HCPostTempAuditRoll.RunTransferItemLedger(TempRevisionsrulle, Rec);
+                HCPostTempAuditRoll.RunTest(TempRevisionsrulle);
+                TempRevisionsrulle.Reset();
                 PostPerRegisterTmpItemLedger(Kasse);
-                tRevisionsrulle.DeleteAll();
+                TempRevisionsrulle.DeleteAll();
             end;
         end;
 
-        Rec.Copy(Dummy);
+        Rec.Copy(TempDummy);
 
         if ProgressVis then
             HCPostTempAuditRoll.CloseStatusWindow('');

@@ -57,7 +57,7 @@ codeunit 6151153 "NPR M2 Service Lib."
         NonWorkingDescription: Text;
         CalendarCode: Code[10];
         SearchLength: Integer;
-        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
+        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
     begin
 
         CalendarCode := GetCalendarCode(SourceType, SourceNo, '');
@@ -68,18 +68,18 @@ codeunit 6151153 "NPR M2 Service Lib."
             exit(ReferenceDate);
 
         repeat
-            CustomizedCalendarChangeTemp."Source Type" := SourceType;
-            CustomizedCalendarChangeTemp."Source Code" := SourceNo;
-            CustomizedCalendarChangeTemp."Base Calendar Code" := CalendarCode;
-            CustomizedCalendarChangeTemp."Date" := ReferenceDate;
-            CustomizedCalendarChangeTemp.Description := NonWorkingDescription;
-            CustomizedCalendarChangeTemp.Insert();
+            TempCustomizedCalendarChange."Source Type" := SourceType;
+            TempCustomizedCalendarChange."Source Code" := SourceNo;
+            TempCustomizedCalendarChange."Base Calendar Code" := CalendarCode;
+            TempCustomizedCalendarChange."Date" := ReferenceDate;
+            TempCustomizedCalendarChange.Description := NonWorkingDescription;
+            TempCustomizedCalendarChange.Insert();
 
-            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
-            if (CustomizedCalendarChangeTemp.Nonworking) then
+            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
+            if (TempCustomizedCalendarChange.Nonworking) then
                 ReferenceDate += 1;
             SearchLength += 1;
-        until (not CustomizedCalendarChangeTemp.Nonworking) or (SearchLength > 100);
+        until (not TempCustomizedCalendarChange.Nonworking) or (SearchLength > 100);
 
         exit(ReferenceDate);
     end;

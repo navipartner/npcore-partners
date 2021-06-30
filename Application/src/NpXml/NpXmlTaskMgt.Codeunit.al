@@ -5,7 +5,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
     trigger OnRun()
     var
         TaskProcessor: Record "NPR Nc Task Processor";
-        UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
+        TempUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         RecRef: RecordRef;
         RecRef2: RecordRef;
@@ -22,14 +22,14 @@ codeunit 6151550 "NPR NpXml Task Mgt."
             Rec.Type::Insert:
                 begin
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
-                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, false, false, UniqueTaskBuffer);
+                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, false, false, TempUniqueTaskBuffer);
                         ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;
             Rec.Type::Modify:
                 begin
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
-                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, false, true, false, UniqueTaskBuffer);
+                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, false, true, false, TempUniqueTaskBuffer);
                         ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;
@@ -39,7 +39,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
                     if NcTaskMgt.RecExists(RecRef2, Rec."Company Name") then
                         RecRef2.Find();
 
-                    NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
+                    NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, TempUniqueTaskBuffer);
                     ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                 end;
             Rec.Type::Rename:
@@ -48,10 +48,10 @@ codeunit 6151550 "NPR NpXml Task Mgt."
                     if NcTaskMgt.RecExists(RecRef2, Rec."Company Name") then
                         RecRef2.Find();
 
-                    NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
+                    NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, TempUniqueTaskBuffer);
                     ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
-                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, true, false, UniqueTaskBuffer);
+                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, true, false, TempUniqueTaskBuffer);
                         ProcessComplete := NpXmlTriggerMgt.GetProcessComplete() and ProcessComplete;
                     end;
                 end;

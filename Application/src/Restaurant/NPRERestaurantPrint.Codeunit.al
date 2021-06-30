@@ -51,82 +51,82 @@
 
     procedure PrintWaiterPadLinesToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
     var
-        FlowStatusTmp: Record "NPR NPRE Flow Status" temporary;
+        TempFlowStatus: Record "NPR NPRE Flow Status" temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
-        PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
+        TempWPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
+        TempPrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         PrintDateTime: DateTime;
         KDSUpdated: Boolean;
     begin
-        InitTempFlowStatusList(FlowStatusTmp, FlowStatusTmp."Status Object"::WaiterPadLineMealFlow);
+        InitTempFlowStatusList(TempFlowStatus, TempFlowStatus."Status Object"::WaiterPadLineMealFlow);
         if FlowStatusCode <> '' then
-            FlowStatusTmp.SetRange(Code, FlowStatusCode);
+            TempFlowStatus.SetRange(Code, FlowStatusCode);
 
-        if not BufferWPadLinesForSending(WaiterPad, WaiterPadLineIn, PrintType, FlowStatusTmp, ForceResend, WPadLineBuffer) then begin
+        if not BufferWPadLinesForSending(WaiterPad, WaiterPadLineIn, PrintType, TempFlowStatus, ForceResend, TempWPadLineBuffer) then begin
             if ShowNothingToSendErr then
                 Error(NothingToSendLbl);
             exit(false);
         end;
 
-        PrintTemplateBuffer.DeleteAll();
+        TempPrintTemplateBuffer.DeleteAll();
         PrintDateTime := CurrentDateTime;
 
-        FlowStatusTmp.SetCurrentKey("Status Object", "Flow Order");  //ensure serving steps are processed in correct order
-        if FlowStatusTmp.FindSet() then
+        TempFlowStatus.SetCurrentKey("Status Object", "Flow Order");  //ensure serving steps are processed in correct order
+        if TempFlowStatus.FindSet() then
             repeat
-                WPadLineBuffer.SetRange("Serving Step", FlowStatusTmp.Code);
-                if WPadLineBuffer.FindFirst() then
+                TempWPadLineBuffer.SetRange("Serving Step", TempFlowStatus.Code);
+                if TempWPadLineBuffer.FindFirst() then
                     repeat
-                        WPadLineBuffer.SetRange("Output Type", WPadLineBuffer."Output Type");
+                        TempWPadLineBuffer.SetRange("Output Type", TempWPadLineBuffer."Output Type");
                         repeat
                             WaiterPadLine.Reset();
-                            WPadLineBuffer.SetRange("Print Category Code", WPadLineBuffer."Print Category Code");
-                            WPadLineBuffer.FindSet();
+                            TempWPadLineBuffer.SetRange("Print Category Code", TempWPadLineBuffer."Print Category Code");
+                            TempWPadLineBuffer.FindSet();
                             repeat
-                                if WaiterPadLine.Get(WPadLineBuffer."Waiter Pad No.", WPadLineBuffer."Waiter Pad Line No.") then
+                                if WaiterPadLine.Get(TempWPadLineBuffer."Waiter Pad No.", TempWPadLineBuffer."Waiter Pad Line No.") then
                                     WaiterPadLine.Mark := true;
-                            until WPadLineBuffer.Next() = 0;
+                            until TempWPadLineBuffer.Next() = 0;
 
                             WaiterPadLine.MarkedOnly(true);
                             if not WaiterPadLine.IsEmpty then
-                                case WPadLineBuffer."Output Type" of
-                                    WPadLineBuffer."Output Type"::Print:
+                                case TempWPadLineBuffer."Output Type" of
+                                    TempWPadLineBuffer."Output Type"::Print:
                                         if FindPrintTemplates(
-                                            WaiterPad, WaiterPadLine, PrintType, WPadLineBuffer."Print Category Code", WPadLineBuffer."Serving Step", PrintTemplateBuffer)
+                                            WaiterPad, WaiterPadLine, PrintType, TempWPadLineBuffer."Print Category Code", TempWPadLineBuffer."Serving Step", TempPrintTemplateBuffer)
                                         then begin
                                             WaiterPadLine.FindSet();
                                             repeat
                                                 LogWaiterPadLinePrint(
-                                                  WaiterPadLine, PrintType, WPadLineBuffer."Serving Step", WPadLineBuffer."Print Category Code", PrintDateTime, 0);
+                                                  WaiterPadLine, PrintType, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintDateTime, 0);
                                             until WaiterPadLine.Next() = 0;
                                         end;
-                                    WPadLineBuffer."Output Type"::KDS:
+                                    TempWPadLineBuffer."Output Type"::KDS:
                                         KDSUpdated :=
                                           KitchenOrderMgt.SendWPLinesToKitchen(
-                                            WaiterPadLine, WPadLineBuffer."Serving Step", WPadLineBuffer."Print Category Code", PrintType, PrintDateTime) or KDSUpdated;
+                                            WaiterPadLine, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintType, PrintDateTime) or KDSUpdated;
                                 end;
 
-                            WPadLineBuffer.DeleteAll();
-                            WPadLineBuffer.SetRange("Print Category Code");
-                        until not WPadLineBuffer.FindFirst();  //Print category loop
-                        WPadLineBuffer.SetRange("Output Type");
-                    until not WPadLineBuffer.FindFirst();  //Output type loop
-            until FlowStatusTmp.Next() = 0;
+                            TempWPadLineBuffer.DeleteAll();
+                            TempWPadLineBuffer.SetRange("Print Category Code");
+                        until not TempWPadLineBuffer.FindFirst();  //Print category loop
+                        TempWPadLineBuffer.SetRange("Output Type");
+                    until not TempWPadLineBuffer.FindFirst();  //Output type loop
+            until TempFlowStatus.Next() = 0;
 
-        if PrintTemplateBuffer.IsEmpty and not KDSUpdated then begin
+        if TempPrintTemplateBuffer.IsEmpty and not KDSUpdated then begin
             if ShowNothingToSendErr then
                 Error(NothingToSendLbl);
             exit(false);
         end;
 
-        SendToPrint(PrintTemplateBuffer);
+        SendToPrint(TempPrintTemplateBuffer);
         exit(true);
     end;
 
     local procedure BufferWPadLinesForSending(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; ForceResend: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf."): Boolean
     var
-        PrintCategoryTmp: Record "NPR NPRE Print/Prod. Cat." temporary;
+        TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
         SeatingLocation: Record "NPR NPRE Seating Location";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         OutputType: Integer;
@@ -153,7 +153,7 @@
         WPadLineBuffer.Reset();
         WPadLineBuffer.DeleteAll();
 
-        InitTempPrintCategoryList(PrintCategoryTmp);
+        InitTempPrintCategoryList(TempPrintCategory);
 
         for OutputType := WaiterPadLine."Output Type Filter"::Print to WaiterPadLine."Output Type Filter"::KDS do begin
             OutputTypeIsActive :=
@@ -161,7 +161,7 @@
               ((OutputType = WaiterPadLine."Output Type Filter"::KDS) and SetupProxy.KDSActivated());
             if OutputTypeIsActive then
                 BufferEligibleForSendingWPadLines(
-                  WaiterPadLine, OutputType, PrintType, FlowStatus, PrintCategoryTmp, ForceResend, AskResendConfirmation, WPadLineBuffer);
+                  WaiterPadLine, OutputType, PrintType, FlowStatus, TempPrintCategory, ForceResend, AskResendConfirmation, WPadLineBuffer);
         end;
 
         exit(not WPadLineBuffer.IsEmpty());
@@ -250,11 +250,11 @@
 
     local procedure FindAndPrintTemplates(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; PrintCategoryCode: Code[20]; ServingStep: Code[10]): Boolean
     var
-        PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
+        TempPrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
     begin
-        PrintTemplateBuffer.DeleteAll();
-        if FindPrintTemplates(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep, PrintTemplateBuffer) then begin
-            SendToPrint(PrintTemplateBuffer);
+        TempPrintTemplateBuffer.DeleteAll();
+        if FindPrintTemplates(WaiterPad, WaiterPadLine, PrintType, PrintCategoryCode, ServingStep, TempPrintTemplateBuffer) then begin
+            SendToPrint(TempPrintTemplateBuffer);
             exit(true);
         end;
         exit(false);
@@ -264,7 +264,7 @@
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
-        SeatingLocationTemp: Record "NPR NPRE Seating Location" temporary;
+        TempSeatingLocation: Record "NPR NPRE Seating Location" temporary;
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         FindForBlankLocation: Boolean;
     begin
@@ -276,24 +276,24 @@
                         SeatingLocation.Code := Seating."Seating Location";
                         if not SeatingLocation.Find() then
                             SeatingLocation.Init();
-                        SeatingLocationTemp := SeatingLocation;
-                        SeatingLocationTemp.Insert();
+                        TempSeatingLocation := SeatingLocation;
+                        TempSeatingLocation.Insert();
                     end;
             until SeatingWaiterPadLink.Next() = 0;
 
         TemplateFound := false;
-        FindForBlankLocation := not SeatingLocationTemp.FindSet();
+        FindForBlankLocation := not TempSeatingLocation.FindSet();
         if not FindForBlankLocation then
             repeat
-                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, SeatingLocationTemp, PrintType, PrintCategoryCode, ServingStep) then
+                if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
                     TemplateFound := true
                 else
                     FindForBlankLocation := true;
-            until SeatingLocationTemp.Next() = 0;
+            until TempSeatingLocation.Next() = 0;
 
         if FindForBlankLocation then begin
-            Clear(SeatingLocationTemp);
-            if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, SeatingLocationTemp, PrintType, PrintCategoryCode, ServingStep) then
+            Clear(TempSeatingLocation);
+            if AddPrintTemplatesToBuffer(PrintTemplateBuffer, WaiterPadLine, TempSeatingLocation, PrintType, PrintCategoryCode, ServingStep) then
                 TemplateFound := true;
         end;
     end;

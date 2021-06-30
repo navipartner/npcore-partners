@@ -10,13 +10,13 @@
     end;
 
     var
-        Dummy: Record "NPR HC Audit Roll Posting" temporary;
-        FinKldLinie: Record "Gen. Journal Line" temporary;
+        TempDummy: Record "NPR HC Audit Roll Posting" temporary;
+        TempFinKldLinie: Record "Gen. Journal Line" temporary;
         GeneralPostingSetup: Record "General Posting Setup";
         BetalingsValg: Record "NPR HC Payment Type POS";
-        VarekldLinie: Record "Item Journal Line" temporary;
-        Debitorpost: Record "Cust. Ledger Entry" temporary;
-        RevisionUdbetaling: Record "NPR HC Audit Roll Posting" temporary;
+        TempVarekldLinie: Record "Item Journal Line" temporary;
+        TempDebitorpost: Record "Cust. Ledger Entry" temporary;
+        TempRevisionUdbetaling: Record "NPR HC Audit Roll Posting" temporary;
         HCRetailSetup: Record "NPR HC Retail Setup";
         Debitorpost1: Record "Cust. Ledger Entry";
         Vare: Record Item;
@@ -87,7 +87,7 @@
 
     procedure PostRegisterTransactions(var TempPost: Record "NPR HC Audit Roll Posting" temporary)
     var
-        CurrentPost: Record "NPR HC Audit Roll Posting" temporary;
+        TempCurrentPost: Record "NPR HC Audit Roll Posting" temporary;
         BankAccount: Record "Bank Account";
     begin
         GeneralLedgerSetup.Get();
@@ -107,18 +107,18 @@
                 TempPost.SetFilter("Posting Date", '%1..', CalcDate('+1<D>', TempPost."Sale Date"));
                 TempPost.CalcSums("Amount Including VAT");
                 if TempPost."Amount Including VAT" <> 0 then begin
-                    CurrentPost := TempPost;
+                    TempCurrentPost := TempPost;
                     TempPost.FindFirst();
                     repeat
                         TempPost.SetRange("Posting Date", TempPost."Posting Date");
                         TempPost.FindLast();
                         TempPost.CalcSums("Amount Including VAT");
                         PostDayClearing(TempPost, BetalingsValg, TempPost."Amount Including VAT");
-                        TempPost.SetFilter("Posting Date", '>%1', CurrentPost."Sale Date");
+                        TempPost.SetFilter("Posting Date", '>%1', TempCurrentPost."Sale Date");
                     until TempPost.Next() = 0;
                 end;
                 TempPost.SetRange("Posting Date");
-                TempPost := CurrentPost;
+                TempPost := TempCurrentPost;
             end;
         end;
 
@@ -213,78 +213,78 @@
         ItemGL: Record Item;
     begin
         Kasse.Get(CashRegisterNo);
-        Clear(FinKldLinie);
+        Clear(TempFinKldLinie);
         if Finkllbr = 0 then
             Finkllbr := GetLastGenJournalLine();
         Finkllbr += 10000;
-        FinKldLinie."Line No." := Finkllbr;
+        TempFinKldLinie."Line No." := Finkllbr;
 
-        FinKldLinie."Document No." := GetDocumentNo(TempPost);
-        FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
-        FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
-        FinKldLinie."Posting Date" := PostingDate;
-        FinKldLinie."Document Date" := PostingDate;
+        TempFinKldLinie."Document No." := GetDocumentNo(TempPost);
+        TempFinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
+        TempFinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
+        TempFinKldLinie."Posting Date" := PostingDate;
+        TempFinKldLinie."Document Date" := PostingDate;
         case AccType of
             AccountType::"G/L":
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"G/L Account";
             AccountType::Customer:
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::Customer;
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::Customer;
             AccountType::Vendor:
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::Vendor;
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::Vendor;
             AccountType::Bank:
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"Bank Account";
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"Bank Account";
             AccountType::"Fixed Asset":
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"Fixed Asset";
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"Fixed Asset";
         end;
 
-        FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
-        FinKldLinie."Bal. Account No." := '';
-        FinKldLinie.Validate("Account No.", AccNo);
+        TempFinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+        TempFinKldLinie."Bal. Account No." := '';
+        TempFinKldLinie.Validate("Account No.", AccNo);
 
         if TempPost.Type = TempPost.Type::Item then
-            FinKldLinie.Validate("Gen. Posting Type", FinKldLinie."Gen. Posting Type"::Sale);
+            TempFinKldLinie.Validate("Gen. Posting Type", TempFinKldLinie."Gen. Posting Type"::Sale);
 
         if TempPost.Type = TempPost.Type::Item then begin
             if ItemGL.Get(TempPost."No.") then begin
-                FinKldLinie.Validate("Gen. Prod. Posting Group", ItemGL."Gen. Prod. Posting Group");
-                FinKldLinie.Validate("VAT Prod. Posting Group", ItemGL."VAT Prod. Posting Group");
+                TempFinKldLinie.Validate("Gen. Prod. Posting Group", ItemGL."Gen. Prod. Posting Group");
+                TempFinKldLinie.Validate("VAT Prod. Posting Group", ItemGL."VAT Prod. Posting Group");
             end;
 
         end;
 
-        FinKldLinie.Validate(Amount, Amount2);
+        TempFinKldLinie.Validate(Amount, Amount2);
 
         case AccType of
             AccountType::"G/L":
                 begin
-                    if RevisionUdbetaling."Sale Type" = RevisionUdbetaling."Sale Type"::"Out payment" then begin
-                        FinKldLinie.Description := CopyStr(RevisionUdbetaling.Description, 1, 50);
-                        Clear(RevisionUdbetaling);
+                    if TempRevisionUdbetaling."Sale Type" = TempRevisionUdbetaling."Sale Type"::"Out payment" then begin
+                        TempFinKldLinie.Description := CopyStr(TempRevisionUdbetaling.Description, 1, 50);
+                        Clear(TempRevisionUdbetaling);
                     end else
-                        FinKldLinie.Description := StrSubstNo(Bogf1, PostingDate, CashRegisterNo);
+                        TempFinKldLinie.Description := StrSubstNo(Bogf1, PostingDate, CashRegisterNo);
                 end;
             AccountType::Customer:
-                FinKldLinie.Description := StrSubstNo(Bogf2, PostingDate, CashRegisterNo);
+                TempFinKldLinie.Description := StrSubstNo(Bogf2, PostingDate, CashRegisterNo);
             AccountType::Bank:
-                FinKldLinie.Description := StrSubstNo(Bogf1, PostingDate, CashRegisterNo);
+                TempFinKldLinie.Description := StrSubstNo(Bogf1, PostingDate, CashRegisterNo);
         end;
 
         if ForceDesc <> '' then
-            FinKldLinie.Description := ForceDesc;
+            TempFinKldLinie.Description := ForceDesc;
 
         Kasse.Get(CashRegisterNo);
 
-        FinKldLinie."Document Date" := PostingDate;
-        FinKldLinie."System-Created Entry" := true;
+        TempFinKldLinie."Document Date" := PostingDate;
+        TempFinKldLinie."System-Created Entry" := true;
         HCRetailSetup.Get();
 
-        FinKldLinie."Shortcut Dimension 1 Code" := TempPost."Shortcut Dimension 1 Code";
-        FinKldLinie."Shortcut Dimension 2 Code" := TempPost."Shortcut Dimension 2 Code";
-        FinKldLinie."Dimension Set ID" := TempPost."Dimension Set ID";
+        TempFinKldLinie."Shortcut Dimension 1 Code" := TempPost."Shortcut Dimension 1 Code";
+        TempFinKldLinie."Shortcut Dimension 2 Code" := TempPost."Shortcut Dimension 2 Code";
+        TempFinKldLinie."Dimension Set ID" := TempPost."Dimension Set ID";
 
-        FinKldLinie.Insert();
+        TempFinKldLinie.Insert();
         if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-            GenJournalLine := FinKldLinie;
+            GenJournalLine := TempFinKldLinie;
             GenJournalLine.Insert(true);
         end;
     end;
@@ -295,38 +295,38 @@
     begin
         HCRetailSetup.Get();
         Clear(Counter);
-        if FinKldLinie.Find('-') then begin
-            Total := FinKldLinie.Count();
+        if TempFinKldLinie.Find('-') then begin
+            Total := TempFinKldLinie.Count();
             repeat
                 Counter += 1;
                 if HCRetailSetup."Gen. Journal Batch" = '' then
-                    GenJnlPostLine.RunWithCheck(FinKldLinie);
+                    GenJnlPostLine.RunWithCheck(TempFinKldLinie);
                 UpdateStatusWindow(10, '', Round(Counter / Total) * 10000);
-            until FinKldLinie.Next() = 0;
+            until TempFinKldLinie.Next() = 0;
         end;
 
         Clear(Counter);
 
-        if VarekldLinie.Find('-') then begin
-            Total := VarekldLinie.Count();
+        if TempVarekldLinie.Find('-') then begin
+            Total := TempVarekldLinie.Count();
             repeat
                 Counter += 1;
                 if HCRetailSetup."Item Journal Batch" = '' then
-                    ItemJnlPostLine.RunWithCheck(VarekldLinie);
+                    ItemJnlPostLine.RunWithCheck(TempVarekldLinie);
                 UpdateStatusWindow(11, '', Round(Counter / Total) * 10000);
-            until VarekldLinie.Next() = 0;
+            until TempVarekldLinie.Next() = 0;
         end else
             UpdateStatusWindow(11, '', 10000);
 
         Debitorpost1.LockTable();
-        if Debitorpost.Find('-') then begin
+        if TempDebitorpost.Find('-') then begin
             if Debitorpost1.Find('+') then;
             DebPostLbrNr := Debitorpost1."Entry No.";
             repeat
-                Debitorpost1 := Debitorpost;
-                Debitorpost1."Entry No." := Debitorpost."Entry No." + DebPostLbrNr;
+                Debitorpost1 := TempDebitorpost;
+                Debitorpost1."Entry No." := TempDebitorpost."Entry No." + DebPostLbrNr;
                 HCRetailSetup.Get();
-            until Debitorpost.Next() = 0;
+            until TempDebitorpost.Next() = 0;
         end;
     end;
 
@@ -335,14 +335,14 @@
         HCRetailSetup.Get();
         Clear(Counter);
 
-        if VarekldLinie.Find('-') then begin
-            Total := VarekldLinie.Count();
+        if TempVarekldLinie.Find('-') then begin
+            Total := TempVarekldLinie.Count();
             repeat
                 Counter += 1;
                 if HCRetailSetup."Item Journal Batch" = '' then
-                    ItemJnlPostLine.RunWithCheck(VarekldLinie);
+                    ItemJnlPostLine.RunWithCheck(TempVarekldLinie);
                 UpdateStatusWindow(11, '', Round(Counter / Total) * 10000);
-            until VarekldLinie.Next() = 0;
+            until TempVarekldLinie.Next() = 0;
         end else
             UpdateStatusWindow(11, '', 10000);
     end;
@@ -401,54 +401,54 @@
                     if Finkllbr = 0 then
                         Finkllbr := GetLastGenJournalLine();
                     Finkllbr += 10000;
-                    FinKldLinie.Init();
-                    FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
-                    FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
+                    TempFinKldLinie.Init();
+                    TempFinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
+                    TempFinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
 
-                    FinKldLinie."Line No." := Finkllbr;
+                    TempFinKldLinie."Line No." := Finkllbr;
 
-                    FinKldLinie."Document No." := GetDocumentNo(Rec);
+                    TempFinKldLinie."Document No." := GetDocumentNo(Rec);
 
-                    FinKldLinie."Posting Date" := Rec."Sale Date";
-                    FinKldLinie."Document Date" := Rec."Sale Date";
-                    FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+                    TempFinKldLinie."Posting Date" := Rec."Sale Date";
+                    TempFinKldLinie."Document Date" := Rec."Sale Date";
+                    TempFinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
 
                     if Difference > 0 then
-                        FinKldLinie.Validate("Account No.", Kasse."Difference Account");
+                        TempFinKldLinie.Validate("Account No.", Kasse."Difference Account");
                     if Difference < 0 then
-                        FinKldLinie.Validate("Account No.", Kasse."Difference Account - Neg.");
+                        TempFinKldLinie.Validate("Account No.", Kasse."Difference Account - Neg.");
 
                     if (HCPaymentTypePOS."Fixed Rate" <= 0) and
                        (HCPaymentTypePOS."Processing Type" <> HCPaymentTypePOS."Processing Type"::Cash) then
                         Error(ErrNotSet, HCPaymentTypePOS."No.");
 
                     if HCPaymentTypePOS."Processing Type" <> HCPaymentTypePOS."Processing Type"::Cash then
-                        FinKldLinie.Validate(Amount, Difference * HCPaymentTypePOS."Fixed Rate" / 100)
+                        TempFinKldLinie.Validate(Amount, Difference * HCPaymentTypePOS."Fixed Rate" / 100)
                     else
-                        FinKldLinie.Validate(Amount, Difference * HCPaymentTypePOS."Fixed Rate" / 100);
+                        TempFinKldLinie.Validate(Amount, Difference * HCPaymentTypePOS."Fixed Rate" / 100);
 
                     if HCPaymentTypePOS."Account Type" = HCPaymentTypePOS."Account Type"::"G/L Account" then begin
-                        FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
-                        FinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(HCPaymentTypePOS, Rec."Register No."));
+                        TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"G/L Account";
+                        TempFinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(HCPaymentTypePOS, Rec."Register No."));
                     end;
                     if HCPaymentTypePOS."Account Type" = HCPaymentTypePOS."Account Type"::Bank then begin
-                        FinKldLinie."Account Type" := FinKldLinie."Account Type"::"Bank Account";
-                        FinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(HCPaymentTypePOS, Rec."Register No."));
+                        TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"Bank Account";
+                        TempFinKldLinie.Validate("Bal. Account No.", GetPaymentPostingSetup(HCPaymentTypePOS, Rec."Register No."));
                     end;
 
-                    FinKldLinie.Description := StrSubstNo(DiffTekst, Rec."Register No.", Difference, HCPaymentTypePOS.Description);
+                    TempFinKldLinie.Description := StrSubstNo(DiffTekst, Rec."Register No.", Difference, HCPaymentTypePOS.Description);
 
-                    FinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-                    FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-                    FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
+                    TempFinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
+                    TempFinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
+                    TempFinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
                     HCRetailSetup.Get();
 
-                    FinKldLinie."System-Created Entry" := true;
+                    TempFinKldLinie."System-Created Entry" := true;
 
-                    FinKldLinie.Insert();
+                    TempFinKldLinie.Insert();
                     if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-                        GenJournalLine := FinKldLinie;
+                        GenJournalLine := TempFinKldLinie;
                         GenJournalLine.Insert(true);
                     end;
                 end;
@@ -468,54 +468,54 @@
         CreateRetPurchOrder(RevRulle);
 
         Kasse.Get(RevRulle."Register No.");
-        VarekldLinie.Init();
+        TempVarekldLinie.Init();
         if Varekllbr = 0 then
             Varekllbr := GetLastItemJournalLine();
         Varekllbr += 10000;
-        VarekldLinie."Journal Template Name" := HCRetailSetup."Item Journal Template";
-        VarekldLinie."Journal Batch Name" := HCRetailSetup."Item Journal Batch";
-        VarekldLinie."Line No." := Varekllbr;
+        TempVarekldLinie."Journal Template Name" := HCRetailSetup."Item Journal Template";
+        TempVarekldLinie."Journal Batch Name" := HCRetailSetup."Item Journal Batch";
+        TempVarekldLinie."Line No." := Varekllbr;
 
         if HCRetailSetup."Appendix no. eq Sales Ticket" then
-            VarekldLinie."Document No." := RevRulle."Sales Ticket No."
+            TempVarekldLinie."Document No." := RevRulle."Sales Ticket No."
         else
-            VarekldLinie."Document No." := GetDocumentNo(RevRulle);
+            TempVarekldLinie."Document No." := GetDocumentNo(RevRulle);
 
-        VarekldLinie."Entry Type" := VarekldLinie."Entry Type"::Sale;
-        VarekldLinie."Source No." := RevRulle."Customer No.";
-        VarekldLinie."Source Type" := VarekldLinie."Source Type"::Customer;
+        TempVarekldLinie."Entry Type" := TempVarekldLinie."Entry Type"::Sale;
+        TempVarekldLinie."Source No." := RevRulle."Customer No.";
+        TempVarekldLinie."Source Type" := TempVarekldLinie."Source Type"::Customer;
 
-        VarekldLinie."Posting Date" := Bogfdate;
-        VarekldLinie."Document Date" := Bogfdate;
-        VarekldLinie."Discount Amount" := RevRulle."Line Discount Amount";
-        if (VarekldLinie."Discount Amount" <> 0) and Item.Get(RevRulle."No.") then begin
+        TempVarekldLinie."Posting Date" := Bogfdate;
+        TempVarekldLinie."Document Date" := Bogfdate;
+        TempVarekldLinie."Discount Amount" := RevRulle."Line Discount Amount";
+        if (TempVarekldLinie."Discount Amount" <> 0) and Item.Get(RevRulle."No.") then begin
             if Item."Price Includes VAT" then
-                VarekldLinie."Discount Amount" := VarekldLinie."Discount Amount" / ((100 + RevRulle."VAT %") / 100);
+                TempVarekldLinie."Discount Amount" := TempVarekldLinie."Discount Amount" / ((100 + RevRulle."VAT %") / 100);
         end;
-        VarekldLinie."Reason Code" := RevRulle."Reason Code";
-        VarekldLinie."Bin Code" := RevRulle."Bin Code";
+        TempVarekldLinie."Reason Code" := RevRulle."Reason Code";
+        TempVarekldLinie."Bin Code" := RevRulle."Bin Code";
 
         if Vare.Type <> Vare.Type::Service then
-            VarekldLinie.Validate("Item No.", RevRulle."No.")
+            TempVarekldLinie.Validate("Item No.", RevRulle."No.")
         else begin
-            VarekldLinie."Item No." := RevRulle."No.";
-            VarekldLinie."Gen. Bus. Posting Group" := RevRulle."Gen. Bus. Posting Group";
-            VarekldLinie."Gen. Prod. Posting Group" := RevRulle."Gen. Prod. Posting Group";
+            TempVarekldLinie."Item No." := RevRulle."No.";
+            TempVarekldLinie."Gen. Bus. Posting Group" := RevRulle."Gen. Bus. Posting Group";
+            TempVarekldLinie."Gen. Prod. Posting Group" := RevRulle."Gen. Prod. Posting Group";
         end;
-        VarekldLinie.Validate(Quantity, RevRulle.Quantity);
+        TempVarekldLinie.Validate(Quantity, RevRulle.Quantity);
         if not ItemUnitofMeasure.Get(RevRulle."No.", RevRulle.Unit) then begin
             Item.Get(RevRulle."No.");
-            VarekldLinie.Validate("Unit of Measure Code", Item."Base Unit of Measure");
+            TempVarekldLinie.Validate("Unit of Measure Code", Item."Base Unit of Measure");
         end else
-            VarekldLinie.Validate("Unit of Measure Code", RevRulle.Unit);
-        VarekldLinie.Validate(Amount, RevRulle.Amount);
-        VarekldLinie."Gen. Bus. Posting Group" := RevRulle."Gen. Bus. Posting Group";
-        VarekldLinie.Description := RevRulle.Description;
-        VarekldLinie."Salespers./Purch. Code" := RevRulle."Salesperson Code";
+            TempVarekldLinie.Validate("Unit of Measure Code", RevRulle.Unit);
+        TempVarekldLinie.Validate(Amount, RevRulle.Amount);
+        TempVarekldLinie."Gen. Bus. Posting Group" := RevRulle."Gen. Bus. Posting Group";
+        TempVarekldLinie.Description := RevRulle.Description;
+        TempVarekldLinie."Salespers./Purch. Code" := RevRulle."Salesperson Code";
         if RevRulle.Lokationskode = '' then
-            VarekldLinie."Location Code" := Kasse."Location Code" else
-            VarekldLinie."Location Code" := RevRulle.Lokationskode;
-        VarekldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+            TempVarekldLinie."Location Code" := Kasse."Location Code" else
+            TempVarekldLinie."Location Code" := RevRulle.Lokationskode;
+        TempVarekldLinie."Source Code" := HCRetailSetup."Posting Source Code";
         if RevRulle."Serial No." <> '' then begin
             Sporing.SetCurrentKey("Entry No.", Positive);
             Sporing.SetRange(Positive, false);
@@ -540,14 +540,14 @@
             end else begin
                 if RevRulle.Quantity <= 0 then begin
                     Sporing."Creation Date" := Today();
-                    VarekldLinie.Validate(Amount, -VarekldLinie.Amount);
+                    TempVarekldLinie.Validate(Amount, -TempVarekldLinie.Amount);
                 end;
             end;
             Sporing."Source Type" := 83;
             Sporing."Source Subtype" := 1;
-            Sporing."Source ID" := VarekldLinie."Journal Template Name";
-            Sporing."Source Batch Name" := VarekldLinie."Journal Batch Name";
-            Sporing."Source Ref. No." := VarekldLinie."Line No.";
+            Sporing."Source ID" := TempVarekldLinie."Journal Template Name";
+            Sporing."Source Batch Name" := TempVarekldLinie."Journal Batch Name";
+            Sporing."Source Ref. No." := TempVarekldLinie."Line No.";
             Sporing."Expected Receipt Date" := Today();
             Sporing."Serial No." := RevRulle."Serial No.";
             Sporing."Created By" := RevRulle."Salesperson Code";
@@ -557,25 +557,25 @@
             Sporing."Qty. to Invoice (Base)" := -RevRulle.Quantity;
             Sporing.Insert();
         end;
-        VarekldLinie."Variant Code" := CopyStr(RevRulle."Variant Code", 1, 10);
+        TempVarekldLinie."Variant Code" := CopyStr(RevRulle."Variant Code", 1, 10);
 
         if RevRulle."Unit Cost" <> 0 then
-            VarekldLinie.Validate("Unit Cost", RevRulle."Unit Cost");
+            TempVarekldLinie.Validate("Unit Cost", RevRulle."Unit Cost");
 
-        VarekldLinie.Validate("Return Reason Code", RevRulle."Return Reason Code");
-        VarekldLinie."Shortcut Dimension 1 Code" := RevRulle."Shortcut Dimension 1 Code";
-        VarekldLinie."Shortcut Dimension 2 Code" := RevRulle."Shortcut Dimension 2 Code";
-        VarekldLinie."Dimension Set ID" := RevRulle."Dimension Set ID";
+        TempVarekldLinie.Validate("Return Reason Code", RevRulle."Return Reason Code");
+        TempVarekldLinie."Shortcut Dimension 1 Code" := RevRulle."Shortcut Dimension 1 Code";
+        TempVarekldLinie."Shortcut Dimension 2 Code" := RevRulle."Shortcut Dimension 2 Code";
+        TempVarekldLinie."Dimension Set ID" := RevRulle."Dimension Set ID";
 
-        VarekldLinie.Insert();
+        TempVarekldLinie.Insert();
         if HCRetailSetup."Item Journal Batch" <> '' then begin
-            ItemJournalLine := VarekldLinie;
+            ItemJournalLine := TempVarekldLinie;
             ItemJournalLine.Insert(true);
         end;
 
         if Straks then begin
             if HCRetailSetup."Item Journal Batch" = '' then
-                ItemJnlPostLine.RunWithCheck(VarekldLinie);
+                ItemJnlPostLine.RunWithCheck(TempVarekldLinie);
         end;
 
     end;
@@ -597,33 +597,33 @@
         txtSalesBlanketOrder: Label 'blanket order';
         txtSalesReturnOrder: Label 'return order';
     begin
-        Clear(FinKldLinie);
+        Clear(TempFinKldLinie);
 
         HCRetailSetup.Get();
         if Finkllbr = 0 then
             Finkllbr := GetLastGenJournalLine();
         Finkllbr += 10000;
-        FinKldLinie."Line No." := Finkllbr;
-        FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
-        FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
-        FinKldLinie."Document No." := GetDocumentNo(RevRulle);
+        TempFinKldLinie."Line No." := Finkllbr;
+        TempFinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
+        TempFinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
+        TempFinKldLinie."Document No." := GetDocumentNo(RevRulle);
 
-        FinKldLinie."Posting Date" := BogfDate;
-        FinKldLinie."Document Date" := BogfDate;
-        FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
-        FinKldLinie."Bal. Account No." := '';
+        TempFinKldLinie."Posting Date" := BogfDate;
+        TempFinKldLinie."Document Date" := BogfDate;
+        TempFinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+        TempFinKldLinie."Bal. Account No." := '';
         if RevRulle."Sale Type" = RevRulle."Sale Type"::Deposit then begin
-            FinKldLinie.Validate("Document Type", FinKldLinie."Document Type"::Payment);
-            FinKldLinie."Account Type" := FinKldLinie."Account Type"::Customer;
-            FinKldLinie.Validate("Account No.", RevRulle."No.");
-            FinKldLinie.Validate(Amount, -RevRulle."Amount Including VAT");
-            FinKldLinie."Allow Application" := true;
+            TempFinKldLinie.Validate("Document Type", TempFinKldLinie."Document Type"::Payment);
+            TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::Customer;
+            TempFinKldLinie.Validate("Account No.", RevRulle."No.");
+            TempFinKldLinie.Validate(Amount, -RevRulle."Amount Including VAT");
+            TempFinKldLinie."Allow Application" := true;
             /*************************************************************************
             * Bruges kun i forbindelse med udl�sninger fa gl.Butik3 / Butik2000     *
             * l�sninger. Konverterer debetsalg til finansposteringer p� debitor     *
             *************************************************************************/
             if RevRulle."N3 Debit Sale Conversion" then
-                FinKldLinie.Description := StrSubstNo(Bogf1, BogfDate, RevRulle."Register No.")
+                TempFinKldLinie.Description := StrSubstNo(Bogf1, BogfDate, RevRulle."Register No.")
             else begin
                 if RevRulle."Sales Document No." <> '' then begin
                     case RevRulle."Sales Document Type" of
@@ -640,45 +640,45 @@
                         SalesHeader."Document Type"::"Return Order":
                             SalesDocTypeText := txtSalesReturnOrder;
                     end;
-                    FinKldLinie.Description := StrSubstNo(txtIndbetalingSales, SalesDocTypeText, RevRulle."Sales Document No.");
+                    TempFinKldLinie.Description := StrSubstNo(txtIndbetalingSales, SalesDocTypeText, RevRulle."Sales Document No.");
                 end else
-                    FinKldLinie.Description := txtIndbetaling;
+                    TempFinKldLinie.Description := txtIndbetaling;
             end;
         end;
 
 
         if (RevRulle.Type = RevRulle.Type::Payment) then begin
             BetalingsValg.Get(RevRulle."No.");
-            FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
-            FinKldLinie.Validate("Account No.", GetPaymentPostingSetup(BetalingsValg, RevRulle."Register No."));
-            FinKldLinie.Validate(Amount, RevRulle."Amount Including VAT");
-            FinKldLinie.Description := StrSubstNo(txtKasse, RevRulle.Description, RevRulle."Register No.");
+            TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"G/L Account";
+            TempFinKldLinie.Validate("Account No.", GetPaymentPostingSetup(BetalingsValg, RevRulle."Register No."));
+            TempFinKldLinie.Validate(Amount, RevRulle."Amount Including VAT");
+            TempFinKldLinie.Description := StrSubstNo(txtKasse, RevRulle.Description, RevRulle."Register No.");
         end;
 
         if (RevRulle.Type = RevRulle.Type::"G/L") then begin
-            FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
-            FinKldLinie.Validate("Account No.", RevRulle."No.");
-            FinKldLinie.Validate(Amount, RevRulle."Amount Including VAT");
-            FinKldLinie.Description := StrSubstNo(txtKasse, RevRulle.Description, RevRulle."Register No.")
+            TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"G/L Account";
+            TempFinKldLinie.Validate("Account No.", RevRulle."No.");
+            TempFinKldLinie.Validate(Amount, RevRulle."Amount Including VAT");
+            TempFinKldLinie.Description := StrSubstNo(txtKasse, RevRulle.Description, RevRulle."Register No.")
         end;
 
         HCRegister.Get(RevRulle."Register No.");
 
-        FinKldLinie."Document Date" := BogfDate;
-        FinKldLinie."Applies-to Doc. Type" := RevRulle."Buffer Document Type";
-        FinKldLinie.Validate("Applies-to Doc. No.", RevRulle."Buffer Invoice No.");
-        FinKldLinie."Shortcut Dimension 1 Code" := RevRulle."Shortcut Dimension 1 Code";
-        FinKldLinie."Shortcut Dimension 2 Code" := RevRulle."Shortcut Dimension 2 Code";
-        FinKldLinie."Dimension Set ID" := RevRulle."Dimension Set ID";
+        TempFinKldLinie."Document Date" := BogfDate;
+        TempFinKldLinie."Applies-to Doc. Type" := RevRulle."Buffer Document Type";
+        TempFinKldLinie.Validate("Applies-to Doc. No.", RevRulle."Buffer Invoice No.");
+        TempFinKldLinie."Shortcut Dimension 1 Code" := RevRulle."Shortcut Dimension 1 Code";
+        TempFinKldLinie."Shortcut Dimension 2 Code" := RevRulle."Shortcut Dimension 2 Code";
+        TempFinKldLinie."Dimension Set ID" := RevRulle."Dimension Set ID";
 
         HCRetailSetup.Get();
 
-        FinKldLinie."System-Created Entry" := true;
+        TempFinKldLinie."System-Created Entry" := true;
 
-        FinKldLinie.Insert();
+        TempFinKldLinie.Insert();
 
         if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-            GenJournalLine := FinKldLinie;
+            GenJournalLine := TempFinKldLinie;
             GenJournalLine.Insert(true);
         end;
 
@@ -725,38 +725,38 @@
             if Finkllbr = 0 then
                 Finkllbr := GetLastGenJournalLine();
             Finkllbr += 10000;
-            FinKldLinie.Init();
-            FinKldLinie."Line No." := Finkllbr;
-            FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
-            FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
-            FinKldLinie."Document No." := GetDocumentNo(Rec);
+            TempFinKldLinie.Init();
+            TempFinKldLinie."Line No." := Finkllbr;
+            TempFinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
+            TempFinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
+            TempFinKldLinie."Document No." := GetDocumentNo(Rec);
 
-            FinKldLinie."Posting Date" := Rec."Sale Date";
-            FinKldLinie."Document Date" := Rec."Sale Date";
-            FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+            TempFinKldLinie."Posting Date" := Rec."Sale Date";
+            TempFinKldLinie."Document Date" := Rec."Sale Date";
+            TempFinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
 
             if Rec.Difference > 0 then
-                FinKldLinie.Validate("Account No.", Kasse."Difference Account");
+                TempFinKldLinie.Validate("Account No.", Kasse."Difference Account");
 
             if Rec.Difference < 0 then
-                FinKldLinie.Validate("Account No.", Kasse."Difference Account - Neg.");
+                TempFinKldLinie.Validate("Account No.", Kasse."Difference Account - Neg.");
 
-            FinKldLinie.Validate(Amount, Rec.Difference);
-            FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
+            TempFinKldLinie.Validate(Amount, Rec.Difference);
+            TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"G/L Account";
 
-            FinKldLinie.Validate("Bal. Account No.", Kasse.Account);
-            FinKldLinie.Description := StrSubstNo("Bogf. Tekst 1", Rec."Register No.");
-            FinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-            FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-            FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
+            TempFinKldLinie.Validate("Bal. Account No.", Kasse.Account);
+            TempFinKldLinie.Description := StrSubstNo("Bogf. Tekst 1", Rec."Register No.");
+            TempFinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
+            TempFinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
+            TempFinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
             HCRetailSetup.Get();
 
-            FinKldLinie."System-Created Entry" := true;
+            TempFinKldLinie."System-Created Entry" := true;
 
-            FinKldLinie.Insert();
+            TempFinKldLinie.Insert();
             if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-                GenJournalLine := FinKldLinie;
+                GenJournalLine := TempFinKldLinie;
                 GenJournalLine.Insert(true);
             end;
 
@@ -772,40 +772,40 @@
             if Finkllbr = 0 then
                 Finkllbr := GetLastGenJournalLine();
             Finkllbr += 10000;
-            FinKldLinie.Init();
-            FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
-            FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
-            FinKldLinie."Line No." := Finkllbr;
+            TempFinKldLinie.Init();
+            TempFinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
+            TempFinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
+            TempFinKldLinie."Line No." := Finkllbr;
 
-            FinKldLinie."Document No." := GetDocumentNo(Rec);
+            TempFinKldLinie."Document No." := GetDocumentNo(Rec);
 
-            FinKldLinie."Posting Date" := Rec."Sale Date";
-            FinKldLinie."Document Date" := Rec."Sale Date";
+            TempFinKldLinie."Posting Date" := Rec."Sale Date";
+            TempFinKldLinie."Document Date" := Rec."Sale Date";
             if Kasse."Balanced Type" = Kasse."Balanced Type"::Finans then
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account"
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"G/L Account"
             else
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"Bank Account";
-            FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"Bank Account";
+            TempFinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
 
-            FinKldLinie.Validate("Account No.", Kasse."Balance Account");
-            FinKldLinie.Validate(Amount, Rec."Transferred to Balance Account");
+            TempFinKldLinie.Validate("Account No.", Kasse."Balance Account");
+            TempFinKldLinie.Validate(Amount, Rec."Transferred to Balance Account");
 
-            FinKldLinie.Validate("Bal. Account No.", Kasse.Account);
+            TempFinKldLinie.Validate("Bal. Account No.", Kasse.Account);
 
-            FinKldLinie.Description := StrSubstNo("Bogf. Tekst 2", Rec."Register No.");
+            TempFinKldLinie.Description := StrSubstNo("Bogf. Tekst 2", Rec."Register No.");
 
-            FinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-            FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-            FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
+            TempFinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
+            TempFinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
+            TempFinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
             HCRetailSetup.Get();
 
-            FinKldLinie."System-Created Entry" := true;
+            TempFinKldLinie."System-Created Entry" := true;
 
-            FinKldLinie.Insert();
+            TempFinKldLinie.Insert();
 
             if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-                GenJournalLine := FinKldLinie;
+                GenJournalLine := TempFinKldLinie;
                 GenJournalLine.Insert(true);
             end;
 
@@ -820,38 +820,38 @@
             if Finkllbr = 0 then
                 Finkllbr := GetLastGenJournalLine();
             Finkllbr += 10000;
-            FinKldLinie.Init();
-            FinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
-            FinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
-            FinKldLinie."Line No." := Finkllbr;
+            TempFinKldLinie.Init();
+            TempFinKldLinie."Journal Template Name" := HCRetailSetup."Gen. Journal Template";
+            TempFinKldLinie."Journal Batch Name" := HCRetailSetup."Gen. Journal Batch";
+            TempFinKldLinie."Line No." := Finkllbr;
 
-            FinKldLinie."Document No." := GetDocumentNo(Rec);
+            TempFinKldLinie."Document No." := GetDocumentNo(Rec);
 
-            FinKldLinie."Posting Date" := Rec."Sale Date";
-            FinKldLinie."Document Date" := Rec."Sale Date";
+            TempFinKldLinie."Posting Date" := Rec."Sale Date";
+            TempFinKldLinie."Document Date" := Rec."Sale Date";
             if Kasse."Balanced Type" = Kasse."Balanced Type"::Finans then
-                FinKldLinie."Account Type" := FinKldLinie."Account Type"::"G/L Account";
+                TempFinKldLinie."Account Type" := TempFinKldLinie."Account Type"::"G/L Account";
 
-            FinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
+            TempFinKldLinie."Source Code" := HCRetailSetup."Posting Source Code";
             Kasse.TestField("Register Change Account");
-            FinKldLinie.Validate("Account No.", Kasse."Register Change Account");
-            FinKldLinie.Validate(Amount, Rec."Change Register");
+            TempFinKldLinie.Validate("Account No.", Kasse."Register Change Account");
+            TempFinKldLinie.Validate(Amount, Rec."Change Register");
 
-            FinKldLinie.Validate("Bal. Account No.", Kasse.Account);
-            FinKldLinie.Description := StrSubstNo("Bogf. Tekst 3", Rec."Register No.");
+            TempFinKldLinie.Validate("Bal. Account No.", Kasse.Account);
+            TempFinKldLinie.Description := StrSubstNo("Bogf. Tekst 3", Rec."Register No.");
 
-            FinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
-            FinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
-            FinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
+            TempFinKldLinie."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
+            TempFinKldLinie."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
+            TempFinKldLinie."Dimension Set ID" := Rec."Dimension Set ID";
 
             HCRetailSetup.Get();
 
-            FinKldLinie."System-Created Entry" := true;
+            TempFinKldLinie."System-Created Entry" := true;
 
-            FinKldLinie.Insert();
+            TempFinKldLinie.Insert();
 
             if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-                GenJournalLine := FinKldLinie;
+                GenJournalLine := TempFinKldLinie;
                 GenJournalLine.Insert(true);
             end;
 
@@ -971,9 +971,9 @@
 
             HCRetailSetup.Get();
 
-            FinKldLinie.DeleteAll();
-            VarekldLinie.DeleteAll();
-            Debitorpost.DeleteAll();
+            TempFinKldLinie.DeleteAll();
+            TempVarekldLinie.DeleteAll();
+            TempDebitorpost.DeleteAll();
 
             HCRetailSetup.TestField("Posting Source Code");
             BogfDate := Rec."Sale Date";
@@ -1002,9 +1002,9 @@
               ######################################### */
 
             Clear(Rec.Quantity);
-            Clear(Dummy);
+            Clear(TempDummy);
             Rec.Reset();
-            if Debitorpost.Find('+')
+            if TempDebitorpost.Find('+')
               then
                 ;
             Rec.SetCurrentKey("Sale Type", Type, "Customer Type", "Customer No.");
@@ -1014,12 +1014,12 @@
             Rec.SetFilter("Customer No.", '<> %1', blank);
             Total := Rec.Count();
             PrintKey('Ekspeditionsart, Type, Debitortype, Kundenummer', Rec.GetFilters, 2);
-            Dummy.CopyFilters(Rec);
+            TempDummy.CopyFilters(Rec);
             if Rec.FindSet() then begin
                 repeat
                     Counter += Rec.Count();
                     Rec.SetCurrentKey("Sale Type", Type, "Customer Type", "Customer No.");
-                    Rec.CopyFilters(Dummy);
+                    Rec.CopyFilters(TempDummy);
                     Rec.FindLast();
                     UpdateStatusWindow(8, '', Round(Counter / Total) * 10000);
                 until Rec.Next() = 0;
@@ -1050,7 +1050,7 @@
               Post (item) sales on g/l accounts
               ################################################ */
 
-            Clear(Dummy);
+            Clear(TempDummy);
             Clear(Counter);
             Rec.Reset();
             Rec.SetCurrentKey("Sale Type", Type,
@@ -1062,7 +1062,7 @@
             Total := Rec.Count();
             PrintKey('Kassenummer,Ekspeditionsdato,Ekspeditionsart,Type,Bogf�rt...', Rec.GetFilters, 5);
             PrintKey('"Virksomheds-bogf�ringsgruppe","Produkt-bogf�ringsgruppe"', Rec.GetFilters, 5);
-            Dummy.CopyFilters(Rec);
+            TempDummy.CopyFilters(Rec);
             if Rec.FindFirst() then begin
                 repeat
                     Rec.SetRange("Gen. Bus. Posting Group", Rec."Gen. Bus. Posting Group");
@@ -1079,7 +1079,7 @@
                                     "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID",
                                     "VAT Bus. Posting Group", "VAT Prod. Posting Group");
                     Rec.FindLast();
-                    Rec.CopyFilters(Dummy);
+                    Rec.CopyFilters(TempDummy);
                     UpdateStatusWindow(4, '', Round(Counter / Total) * 10000);
                 until Rec.Next() = 0;
             end;
@@ -1090,14 +1090,14 @@
               ############################################## */
 
             Clear(Counter);
-            Clear(Dummy);
+            Clear(TempDummy);
             Rec.Reset();
             Rec.SetCurrentKey("Sale Type", Type, "No.", "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID");
             Rec.SetRange("Sale Type", Rec."Sale Type"::Payment);
             Rec.SetRange(Type, Rec.Type::Payment);
             Total := Rec.Count();
             PrintKey('Ekspeditionsart, Type, Nummer', Rec.GetFilters, 6);
-            Dummy.CopyFilters(Rec);
+            TempDummy.CopyFilters(Rec);
             if Rec.FindSet() then begin
                 repeat
                     BetValgRec.Get(Rec."No.");
@@ -1111,7 +1111,7 @@
                                 Counter += Rec.Count();
                                 Rec.SetCurrentKey("Sale Type", Type, "No.", "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID");
                                 Rec.FindLast();
-                                Rec.CopyFilters(Dummy);
+                                Rec.CopyFilters(TempDummy);
                                 UpdateStatusWindow(5, '', Round(Counter / Total) * 10000);
                             end;
                         BetValgRec.Posting::"Single Entry":
@@ -1157,7 +1157,7 @@
             PrintKey('Ekspeditionsart,Type', Rec.GetFilters, 8);
             if Rec.FindSet() then
                 repeat
-                    RevisionUdbetaling := Rec;
+                    TempRevisionUdbetaling := Rec;
                     Counter += 1;
                     if Rec."No." = Kasse.Rounding then begin
                         ChangeSum += Rec."Amount Including VAT";
@@ -1181,8 +1181,8 @@
             Rec.ModifyAll("Posted Doc. No.", GetDocumentNo(Rec));
             Rec.SetRange("Posted Doc. No.");
             Rec.ModifyAll(Posted, true);
-            FinKldLinie.DeleteAll(true);
-            VarekldLinie.DeleteAll(true);
+            TempFinKldLinie.DeleteAll(true);
+            TempVarekldLinie.DeleteAll(true);
 
         end;   /*** DoNotbogf�r ***/
 
@@ -1213,9 +1213,9 @@
 
             HCRetailSetup.Get();
 
-            FinKldLinie.DeleteAll();
-            VarekldLinie.DeleteAll();
-            Debitorpost.DeleteAll();
+            TempFinKldLinie.DeleteAll();
+            TempVarekldLinie.DeleteAll();
+            TempDebitorpost.DeleteAll();
 
             HCRetailSetup.TestField("Posting Source Code");
             BogfDate := Rec."Sale Date";
@@ -1441,7 +1441,7 @@
     var
         nCount: Integer;
         nTotal: Integer;
-        Linie: Record "NPR HC Audit Roll Posting" temporary;
+        TempLinie: Record "NPR HC Audit Roll Posting" temporary;
     begin
         Rulle.SetCurrentKey("Sale Type", Type, "No.");
         Rulle.SetRange("Sale Type", Rulle."Sale Type"::"Out payment");
@@ -1451,7 +1451,7 @@
         nTotal := Rulle.Count();
         nCount := 0;
 
-        Linie.CopyFilters(Rulle);
+        TempLinie.CopyFilters(Rulle);
         if Rulle.Find('-') then
             repeat
                 if ProgressVis then begin
@@ -1463,7 +1463,7 @@
                 Rulle.SetRange("Sales Ticket No.", Rulle."Sales Ticket No.");
                 Rulle.DeleteAll();
                 Rulle.SetCurrentKey("Sale Type", Type, "No.");
-                Rulle.CopyFilters(Linie);
+                Rulle.CopyFilters(TempLinie);
             until Rulle.Next() = 0;
 
         Rulle.SetRange("Sale Type", Rulle."Sale Type"::Deposit);
@@ -1471,7 +1471,7 @@
         nTotal := Rulle.Count();
         nCount := 0;
 
-        Linie.CopyFilters(Rulle);
+        TempLinie.CopyFilters(Rulle);
         if Rulle.Find('-') then
             repeat
                 if ProgressVis then begin
@@ -1483,7 +1483,7 @@
                 Rulle.SetRange("Sales Ticket No.", Rulle."Sales Ticket No.");
                 Rulle.DeleteAll();
                 Rulle.SetCurrentKey("Sale Type", Type, "No.");
-                Rulle.CopyFilters(Linie);
+                Rulle.CopyFilters(TempLinie);
             until Rulle.Next() = 0;
         if ProgressVis then
             Window.Update(101, 10000);
@@ -1677,21 +1677,21 @@
             SalesHeader."Document Type"::Order,
             SalesHeader."Document Type"::Invoice:
                 begin
-                    FinKldLinie."Applies-to Doc. Type" := FinKldLinie."Applies-to Doc. Type"::Invoice;
+                    TempFinKldLinie."Applies-to Doc. Type" := TempFinKldLinie."Applies-to Doc. Type"::Invoice;
                 end;
             SalesHeader."Document Type"::"Credit Memo",
             SalesHeader."Document Type"::"Return Order":
                 begin
-                    FinKldLinie."Applies-to Doc. Type" := FinKldLinie."Applies-to Doc. Type"::"Credit Memo";
+                    TempFinKldLinie."Applies-to Doc. Type" := TempFinKldLinie."Applies-to Doc. Type"::"Credit Memo";
                 end;
         end;
         if HCRetailSetup."Gen. Journal Batch" <> '' then begin
-            GenJournalLine."Applies-to Doc. Type" := FinKldLinie."Applies-to Doc. Type";
+            GenJournalLine."Applies-to Doc. Type" := TempFinKldLinie."Applies-to Doc. Type";
             GenJournalLine.Validate("Applies-to Doc. No.", SalesHeader."Last Posting No.");
             GenJournalLine.Insert();
         end else begin
-            FinKldLinie.Validate("Applies-to Doc. No.", SalesHeader."Last Posting No.");
-            FinKldLinie.Modify();
+            TempFinKldLinie.Validate("Applies-to Doc. No.", SalesHeader."Last Posting No.");
+            TempFinKldLinie.Modify();
         end;
     end;
 }

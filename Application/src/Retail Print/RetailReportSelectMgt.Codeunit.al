@@ -121,16 +121,16 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         RecRef: RecordRef;
         RecordView: Text;
-        TaskLine: Record "NPR Task Line" temporary;
+        TempTaskLine: Record "NPR Task Line" temporary;
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
         if ReportSelection.FindSet() then
             repeat
                 if Format(ReportSelection."Record Filter") <> '' then begin
-                    TaskLine.Init();
-                    TaskLine."Table 1 No." := ReportSelection."Filter Object ID";
-                    TaskLine."Table 1 Filter" := ReportSelection."Record Filter";
-                    RecordView := TaskLine.GetTableView(ReportSelection."Filter Object ID", RecordView);
+                    TempTaskLine.Init();
+                    TempTaskLine."Table 1 No." := ReportSelection."Filter Object ID";
+                    TempTaskLine."Table 1 Filter" := ReportSelection."Record Filter";
+                    RecordView := TempTaskLine.GetTableView(ReportSelection."Filter Object ID", RecordView);
                 end else
                     RecordView := '';
 

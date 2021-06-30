@@ -31,7 +31,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
     var
         TempPattern: Text[50];
         ESC: Codeunit "NPR RP Escape Code Library";
-        HashTable: Record "NPR TEMP Buffer" temporary;
+        TempHashTable: Record "NPR TEMP Buffer" temporary;
         err0001: Label 'Unsupported Font';
         err0002: Label 'Barcode does not exist.';
         PrintBuffer: Text;
@@ -111,7 +111,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
         //PrintBuffer := '';
         //+NPR5.51 [360975]
 
-        if HashTable.IsEmpty then
+        if TempHashTable.IsEmpty then
             ConstructHashTable();
 
         STX := ESC."02"();
@@ -322,11 +322,11 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
 
     procedure SelectFont(var Value: Text): Boolean
     var
-        RetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
-        ConstructFontSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"NPR Retail List", RetailList) = ACTION::LookupOK then begin
-            Value := RetailList.Choice;
+        ConstructFontSelectionList(TempRetailList);
+        if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then begin
+            Value := TempRetailList.Choice;
             exit(true);
         end;
     end;
@@ -408,16 +408,16 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
 
     procedure AddLineHashTable(Name: Code[50]; Value: Code[50])
     begin
-        HashTable.Template := Name;
-        HashTable."Code 1" := Value;
-        HashTable.Insert();
+        TempHashTable.Template := Name;
+        TempHashTable."Code 1" := Value;
+        TempHashTable.Insert();
     end;
 
     procedure GetLineHashTable(Name: Code[50]) Value: Code[50]
     begin
-        HashTable.SetRange(HashTable.Template, Name);
-        if HashTable.FindFirst() then
-            exit(HashTable."Code 1")
+        TempHashTable.SetRange(TempHashTable.Template, Name);
+        if TempHashTable.FindFirst() then
+            exit(TempHashTable."Code 1")
         else
             Error(err0002);
     end;

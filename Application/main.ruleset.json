@@ -38,6 +38,11 @@
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
         },
         {
+            "id": "AA0073",
+            "action":"Error",
+            "justification": "Only temporary variable names must be prefixed with Temp."
+        },
+        {
             "id": "AA0074",
             "action":"Hidden",
             "justification": "TextConst and Label variable names should have an approved suffix."

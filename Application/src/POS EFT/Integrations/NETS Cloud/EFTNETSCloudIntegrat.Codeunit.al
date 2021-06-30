@@ -516,22 +516,22 @@
         JObject: DotNet NPRNetJObject;
         JToken: DotNet NPRNetJToken;
         JArray: DotNet NPRNetJArray;
-        TmpRetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
         JSON := EFTNETSCloudProtocol.TerminalList(EFTSetup);
         JObject := JObject.Parse(JSON);
         JArray := JObject.Item('terminals');
 
         foreach JToken in JArray do begin
-            TmpRetailList.Number += 1;
-            TmpRetailList.Choice := JToken.Item('terminalId').ToString();
-            TmpRetailList.Insert();
+            TempRetailList.Number += 1;
+            TempRetailList.Choice := JToken.Item('terminalId').ToString();
+            TempRetailList.Insert();
         end;
 
-        if (PAGE.RunModal(0, TmpRetailList) <> ACTION::LookupOK) then
+        if (PAGE.RunModal(0, TempRetailList) <> ACTION::LookupOK) then
             exit(false);
 
-        TerminalIDOut := TmpRetailList.Choice;
+        TerminalIDOut := TempRetailList.Choice;
         exit(true);
     end;
 

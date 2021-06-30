@@ -584,27 +584,27 @@
 
     procedure ConfigureSecureMethods()
     var
-        SecureMethodTmp: Record "NPR POS Secure Method" temporary;
+        TempSecureMethod: Record "NPR POS Secure Method" temporary;
         Request: Codeunit "NPR Front-End: CfgSecureMeth.";
         Method: JsonObject;
     begin
         MakeSureFrameworkIsAvailable(true);
 
-        SecureMethodTmp.RunDiscovery();
-        if SecureMethodTmp.FindSet() then
+        TempSecureMethod.RunDiscovery();
+        if TempSecureMethod.FindSet() then
             repeat
                 Clear(Method);
-                Method.Add('description', SecureMethodTmp.Description);
-                Method.Add('typeText', Format(SecureMethodTmp.Type));
-                Method.Add('type', SecureMethodTmp.Type);
-                if SecureMethodTmp.Type = SecureMethodTmp.Type::Custom then
-                    Method.Add('handler', SecureMethodTmp.GetCustomMethodCode());
-                Request.AddMethod(SecureMethodTmp.Code, Method);
-            until SecureMethodTmp.Next() = 0;
+                Method.Add('description', TempSecureMethod.Description);
+                Method.Add('typeText', Format(TempSecureMethod.Type));
+                Method.Add('type', TempSecureMethod.Type);
+                if TempSecureMethod.Type = TempSecureMethod.Type::Custom then
+                    Method.Add('handler', TempSecureMethod.GetCustomMethodCode());
+                Request.AddMethod(TempSecureMethod.Code, Method);
+            until TempSecureMethod.Next() = 0;
         InvokeFrontEndAsync(Request);
 
-        SecureMethodTmp.SetRange(Type, SecureMethodTmp.Type::"Password Client");
-        if not SecureMethodTmp.IsEmpty then
+        TempSecureMethod.SetRange(Type, TempSecureMethod.Type::"Password Client");
+        if not TempSecureMethod.IsEmpty then
             OnRequestSecureMethodsClientPasswordsRegistration();
     end;
 

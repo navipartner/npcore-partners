@@ -7,7 +7,7 @@ codeunit 6014629 "NPR Managed Package Builder"
 
     var
         GlobalJArray: JsonArray;
-        GlobalTableListTmp: Record AllObjWithCaption temporary;
+        TempGlobalTableList: Record AllObjWithCaption temporary;
         Error_Parameter: Label 'Invalid parameter. Pass either Record or RecordRef';
         Error_NoData: Label 'No data has been added to the manifest';
         DialogValues: array[2] of Integer;
@@ -37,9 +37,9 @@ codeunit 6014629 "NPR Managed Package Builder"
         Total := RecRef.Count();
         GlobalRecCount += Total;
 
-        GlobalTableListTmp."Object Type" := GlobalTableListTmp."Object Type"::Table;
-        GlobalTableListTmp."Object ID" := RecRef.Number;
-        if GlobalTableListTmp.Insert() then;
+        TempGlobalTableList."Object Type" := TempGlobalTableList."Object Type"::Table;
+        TempGlobalTableList."Object ID" := RecRef.Number;
+        if TempGlobalTableList.Insert() then;
 
 
         repeat
@@ -96,16 +96,16 @@ codeunit 6014629 "NPR Managed Package Builder"
         ManagedDependencyMgt.AddToJObject(JObject, 'Description', Description);
         ManagedDependencyMgt.AddToJObject(JObject, 'Primary Package Table', PrimaryPackageTable);
 
-        GlobalTableListTmp.FindSet();
+        TempGlobalTableList.FindSet();
         repeat
-            JArray.Add(GlobalTableListTmp."Object ID");
-        until GlobalTableListTmp.Next() = 0;
+            JArray.Add(TempGlobalTableList."Object ID");
+        until TempGlobalTableList.Next() = 0;
 
         JObject.Add('Packaged Tables', JArray);
         JObject.Add('Data', GlobalJArray);
 
         Clear(GlobalJArray);
-        Clear(GlobalTableListTmp);
+        Clear(TempGlobalTableList);
         Clear(GlobalRecCount);
         Clear(DialogValues);
 

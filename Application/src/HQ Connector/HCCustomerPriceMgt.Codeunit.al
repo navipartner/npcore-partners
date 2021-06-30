@@ -4,7 +4,7 @@ codeunit 6150908 "NPR HC Customer Price Mgt."
     procedure TryProcessRequest(var TmpSalesHeader: Record "Sales Header"; var TmpSalesLine: Record "Sales Line")
     var
         SalesHeader: Record "Sales Header";
-        TmpSalesLinePriceCalc: Record "Sales Line" temporary;
+        TempSalesLinePriceCalc: Record "Sales Line" temporary;
     begin
         TmpSalesHeader.TestField("Sell-to Customer No.");
 
@@ -19,22 +19,22 @@ codeunit 6150908 "NPR HC Customer Price Mgt."
 
         TmpSalesLine.FindSet();
         repeat
-            TmpSalesLinePriceCalc."Document Type" := SalesHeader."Document Type";
-            TmpSalesLinePriceCalc."Document No." := SalesHeader."No.";
-            TmpSalesLinePriceCalc."Line No." := TmpSalesLine."Line No.";
-            TmpSalesLinePriceCalc.Insert(true);
+            TempSalesLinePriceCalc."Document Type" := SalesHeader."Document Type";
+            TempSalesLinePriceCalc."Document No." := SalesHeader."No.";
+            TempSalesLinePriceCalc."Line No." := TmpSalesLine."Line No.";
+            TempSalesLinePriceCalc.Insert(true);
 
-            TmpSalesLinePriceCalc.Validate(Type, TmpSalesLine.Type);
-            TmpSalesLinePriceCalc.Validate("No.", TmpSalesLine."No.");
-            TmpSalesLinePriceCalc.Validate("Variant Code", TmpSalesLine."Variant Code");
-            TmpSalesLinePriceCalc.Validate(Quantity, TmpSalesLine.Quantity);
+            TempSalesLinePriceCalc.Validate(Type, TmpSalesLine.Type);
+            TempSalesLinePriceCalc.Validate("No.", TmpSalesLine."No.");
+            TempSalesLinePriceCalc.Validate("Variant Code", TmpSalesLine."Variant Code");
+            TempSalesLinePriceCalc.Validate(Quantity, TmpSalesLine.Quantity);
 
             if (TmpSalesLine."Unit of Measure Code" <> '') then
-                TmpSalesLinePriceCalc.Validate("Unit of Measure Code", TmpSalesLine."Unit of Measure Code");
-            TmpSalesLinePriceCalc.Modify(true);
+                TempSalesLinePriceCalc.Validate("Unit of Measure Code", TmpSalesLine."Unit of Measure Code");
+            TempSalesLinePriceCalc.Modify(true);
 
             // writeback of result
-            TmpSalesLine.TransferFields(TmpSalesLinePriceCalc, false);
+            TmpSalesLine.TransferFields(TempSalesLinePriceCalc, false);
             TmpSalesLine.Modify();
         until (TmpSalesLine.Next() = 0);
     end;

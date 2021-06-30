@@ -22,7 +22,7 @@ page 6014522 "NPR Stores WP"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInMagStore(ExistingMagStores, Rec.Code);
+                        CheckIfNoAvailableInMagStore(TempExistingMagStores, Rec.Code);
                     end;
                 }
                 field("Website Code"; Rec."Website Code")
@@ -84,7 +84,7 @@ page 6014522 "NPR Stores WP"
     end;
 
     var
-        ExistingMagStores: Record "NPR Magento Store" temporary;
+        TempExistingMagStores: Record "NPR Magento Store" temporary;
         TempAllMagentoWebsite: Record "NPR Magento Website" temporary;
 
     procedure SetGlobals(var TempMagentoWebsite: Record "NPR Magento Website")
@@ -121,8 +121,8 @@ page 6014522 "NPR Stores WP"
     begin
         if MagentoStore.FindSet() then
             repeat
-                ExistingMagStores := MagentoStore;
-                ExistingMagStores.Insert();
+                TempExistingMagStores := MagentoStore;
+                TempExistingMagStores.Insert();
             until MagentoStore.Next() = 0;
     end;
 

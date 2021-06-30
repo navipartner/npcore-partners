@@ -144,17 +144,17 @@
                     if SalesLCY <> 0 then
                         SalesPct := (SalesLCYGP / SalesLCY * 100);
                     if sortSalesPerson then begin
-                        ItemAmount.Init();
-                        ItemAmount.Amount := -SalesLCYGP;
-                        ItemAmount."Amount 2" := CogsLCYGP;
-                        ItemAmount."Item No." := "Code";
-                        ItemAmount.Insert();
+                        TempItemAmount.Init();
+                        TempItemAmount.Amount := -SalesLCYGP;
+                        TempItemAmount."Amount 2" := CogsLCYGP;
+                        TempItemAmount."Item No." := "Code";
+                        TempItemAmount.Insert();
 
                         if (i = 0) or (i < ShowQty) then
                             i := i + 1
                         else begin
-                            ItemAmount.Find('+');
-                            ItemAmount.Delete();
+                            TempItemAmount.Find('+');
+                            TempItemAmount.Delete();
                         end;
                     end;
                 end;
@@ -195,20 +195,20 @@
                         CurrReport.Break();
 
                     if Number = 1 then begin
-                        if not ItemAmount.Find('-') then
+                        if not TempItemAmount.Find('-') then
                             CurrReport.Break();
                     end else
-                        if ItemAmount.Next() = 0 then
+                        if TempItemAmount.Next() = 0 then
                             CurrReport.Break();
 
-                    "Item Category".Get(ItemAmount."Item No.");
+                    "Item Category".Get(TempItemAmount."Item No.");
                     SalesLCYGPINT := 0;
                     CogsLCYGPINT := 0;
 
                     AuxValueEntry.Reset();
                     AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
                     AuxValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                    AuxValueEntry.SetRange("Item Category Code", ItemAmount."Item No.");
+                    AuxValueEntry.SetRange("Item Category Code", TempItemAmount."Item No.");
                     AuxValueEntry.SetFilter("Posting Date", SPDateFilter);
                     AuxValueEntry.SetFilter("Global Dimension 1 Code", SPGlobalDim1Filter);
                     AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
@@ -242,7 +242,7 @@
                 SalesLCY := AuxValueEntry."Sales Amount (Actual)";
                 CogsLCY := -AuxValueEntry."Cost Amount (Actual)";
 
-                ItemAmount.DeleteAll();
+                TempItemAmount.DeleteAll();
 
                 Clear(i);
                 Clear(ProfitPctSalesperson);
@@ -348,7 +348,7 @@
 
     var
         CompanyInformation: Record "Company Information";
-        ItemAmount: Record "Item Amount" temporary;
+        TempItemAmount: Record "Item Amount" temporary;
         AuxValueEntry: Record "NPR Aux. Value Entry";
         ShowMainTotal: Boolean;
         [InDataSet]

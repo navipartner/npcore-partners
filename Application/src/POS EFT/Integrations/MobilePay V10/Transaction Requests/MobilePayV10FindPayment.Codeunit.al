@@ -8,7 +8,7 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
         _response: text;
         _responseHttpCode: Integer;
         _filter: Text;
-        MobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary;
+        TempMobilePayV10PaymentBuff: Record "NPR MobilePayV10 Payment" temporary;
         MobilePayV10PaymentBuffInitiated: Boolean;
         PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err: Label 'Payment detail buffer has not been initiated! This is a programming bug.';
 
@@ -27,7 +27,7 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
 
     internal procedure SetPaymentDetailBuffer(var MobilePayV10PaymentBuffer: Record "NPR MobilePayV10 Payment" temporary)
     begin
-        MobilePayV10PaymentBuff.Copy(MobilePayV10PaymentBuffer, true);
+        TempMobilePayV10PaymentBuff.Copy(MobilePayV10PaymentBuffer, true);
         MobilePayV10PaymentBuffInitiated := true;
     end;
 
@@ -87,7 +87,7 @@ codeunit 6014514 "NPR MobilePayV10 Find Payment"
             Error(PAYMENT_DETAIL_BUFFER_NOT_INITIALIZED_Err);
         end;
 
-        ParseMultiPaymentsAndInsertToBuffer(jsonArray, MobilePayV10PaymentBuff);
+        ParseMultiPaymentsAndInsertToBuffer(jsonArray, TempMobilePayV10PaymentBuff);
     end;
 
     local procedure ParseMultiPaymentsAndInsertToBuffer(var PaymentsJsonArray: JsonArray; var MobilePayV10PaymentBuffer: Record "NPR MobilePayV10 Payment" temporary)

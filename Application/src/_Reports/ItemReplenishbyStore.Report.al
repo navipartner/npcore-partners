@@ -58,7 +58,7 @@ report 6014475 "NPR Item Replenish. by Store"
             column(ItemFilter; ItemFilter)
             {
             }
-            column(Temp_ItemNo; ItemLedgEntryTemp."Item No.")
+            column(Temp_ItemNo; TempItemLedgEntry."Item No.")
             {
             }
             column(ItemNoCaption; ItemNoCaptionLbl)
@@ -70,7 +70,7 @@ report 6014475 "NPR Item Replenish. by Store"
             column(ItemDescCaption; ItemDescCaptionLbl)
             {
             }
-            column(Temp_VariantCode; ItemLedgEntryTemp."Variant Code")
+            column(Temp_VariantCode; TempItemLedgEntry."Variant Code")
             {
             }
             column(VariantCodeCaption; VariantCodeCaptionLbl)
@@ -82,13 +82,13 @@ report 6014475 "NPR Item Replenish. by Store"
             column(VariantDescCaption; VariantDescCaptionLbl)
             {
             }
-            column(Temp_LocationCode; ItemLedgEntryTemp."Location Code")
+            column(Temp_LocationCode; TempItemLedgEntry."Location Code")
             {
             }
             column(LocationCodeCaption; LocationCodeCaptionLbl)
             {
             }
-            column(Temp_Inventory; ItemLedgEntryTemp.Quantity)
+            column(Temp_Inventory; TempItemLedgEntry.Quantity)
             {
             }
             column(InvCaption; InvCaptionLbl)
@@ -97,7 +97,7 @@ report 6014475 "NPR Item Replenish. by Store"
             column(FirstColCaption; FirstColCaptionLbl)
             {
             }
-            column(Temp_QtyOnPurchOrders; ItemLedgEntryTemp."Remaining Quantity")
+            column(Temp_QtyOnPurchOrders; TempItemLedgEntry."Remaining Quantity")
             {
             }
             column(QtyOnPurchOrderCaption; QtyOnPurchOrderCaptionLbl)
@@ -106,7 +106,7 @@ report 6014475 "NPR Item Replenish. by Store"
             column(SecondColCaption; SecondColCaptionLbl)
             {
             }
-            column(Temp_QtyOnSaleOrders; ItemLedgEntryTemp."Invoiced Quantity")
+            column(Temp_QtyOnSaleOrders; TempItemLedgEntry."Invoiced Quantity")
             {
             }
             column(QtyOnSalesOrderCaption; QtyOnSalesOrderCaptionLbl)
@@ -124,16 +124,16 @@ report 6014475 "NPR Item Replenish. by Store"
             column(FourthColCaption; FourthColCaptionLbl)
             {
             }
-            column(Temp_ReorderPoint; ItemLedgEntryTemp."Qty. per Unit of Measure")
+            column(Temp_ReorderPoint; TempItemLedgEntry."Qty. per Unit of Measure")
             {
             }
-            column(Temp_ReorderPointText; ItemLedgEntryTemp."Document No.")
+            column(Temp_ReorderPointText; TempItemLedgEntry."Document No.")
             {
             }
             column(ReorderPointCaption; ReorderPointCaptionLbl)
             {
             }
-            column(Temp_ReorderQty; ItemLedgEntryTemp."Shipped Qty. Not Returned")
+            column(Temp_ReorderQty; TempItemLedgEntry."Shipped Qty. Not Returned")
             {
             }
             column(ReorderQtyCaption; ReorderQtyCaptionLbl)
@@ -145,7 +145,7 @@ report 6014475 "NPR Item Replenish. by Store"
             column(Temp_MaxInv; DecValue1)
             {
             }
-            column(Temp_MaxInvText; ItemLedgEntryTemp.Description)
+            column(Temp_MaxInvText; TempItemLedgEntry.Description)
             {
             }
             column(MaxiInvCaption; MaxiInvCaptionLbl)
@@ -160,7 +160,7 @@ report 6014475 "NPR Item Replenish. by Store"
             column(SixthColCaption; SixthColCaptionLbl)
             {
             }
-            column(Temp_DiffCalcReason; ItemLedgEntryTemp.Area)
+            column(Temp_DiffCalcReason; TempItemLedgEntry.Area)
             {
             }
             column(Temp_OrderQty; OrderQty)
@@ -185,28 +185,28 @@ report 6014475 "NPR Item Replenish. by Store"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then
-                    ItemLedgEntryTemp.FindFirst()
+                    TempItemLedgEntry.FindFirst()
                 else
-                    ItemLedgEntryTemp.Next();
+                    TempItemLedgEntry.Next();
 
-                Item.Get(ItemLedgEntryTemp."Item No.");
-                if not ItemVariant.Get(ItemLedgEntryTemp."Item No.", ItemLedgEntryTemp."Variant Code") then
+                Item.Get(TempItemLedgEntry."Item No.");
+                if not ItemVariant.Get(TempItemLedgEntry."Item No.", TempItemLedgEntry."Variant Code") then
                     Clear(ItemVariant);
 
-                if ItemLedgEntryTemp."Global Dimension 1 Code" = '' then
+                if TempItemLedgEntry."Global Dimension 1 Code" = '' then
                     DecValue1 := 0
                 else
-                    Evaluate(DecValue1, ItemLedgEntryTemp."Global Dimension 1 Code");
+                    Evaluate(DecValue1, TempItemLedgEntry."Global Dimension 1 Code");
 
-                if ItemLedgEntryTemp."Global Dimension 2 Code" = '' then
+                if TempItemLedgEntry."Global Dimension 2 Code" = '' then
                     DecValue2 := 0
                 else
-                    Evaluate(DecValue2, ItemLedgEntryTemp."Global Dimension 2 Code");
+                    Evaluate(DecValue2, TempItemLedgEntry."Global Dimension 2 Code");
 
-                if ItemLedgEntryTemp."External Document No." = '' then
+                if TempItemLedgEntry."External Document No." = '' then
                     DecValue3 := 0
                 else
-                    Evaluate(DecValue3, ItemLedgEntryTemp."External Document No.");
+                    Evaluate(DecValue3, TempItemLedgEntry."External Document No.");
 
                 if ShowItems = ShowItems::"Without Replenish. Setup" then
                     OrderQty := 0
@@ -218,10 +218,10 @@ report 6014475 "NPR Item Replenish. by Store"
                     ReqLine."Line No." := LineNo + 10000;
                     ReqLine."Planning Line Origin" := ReqLine."Planning Line Origin"::"Order Planning";
                     ReqLine.Type := ReqLine.Type::Item;
-                    ReqLine."No." := ItemLedgEntryTemp."Item No.";
-                    ReqLine."Location Code" := ItemLedgEntryTemp."Location Code";
+                    ReqLine."No." := TempItemLedgEntry."Item No.";
+                    ReqLine."Location Code" := TempItemLedgEntry."Location Code";
                     ReqLine.Validate("No.");
-                    ReqLine.Validate("Variant Code", ItemLedgEntryTemp."Variant Code");
+                    ReqLine.Validate("Variant Code", TempItemLedgEntry."Variant Code");
                     //  ReqLine."Demand Type" := ItemReplenishText;
                     ReqLine.Level := 1;
                     ReqLine."Action Message" := ReqLine."Action Message"::New;
@@ -237,11 +237,11 @@ report 6014475 "NPR Item Replenish. by Store"
 
             trigger OnPreDataItem()
             begin
-                ItemLedgEntryTemp.Reset();
-                if ItemLedgEntryTemp.Count() = 0 then
+                TempItemLedgEntry.Reset();
+                if TempItemLedgEntry.Count() = 0 then
                     CurrReport.Break()
                 else
-                    SetRange(Number, 1, ItemLedgEntryTemp.Count());
+                    SetRange(Number, 1, TempItemLedgEntry.Count());
             end;
         }
     }
@@ -304,7 +304,7 @@ report 6014475 "NPR Item Replenish. by Store"
     end;
 
     var
-        ItemLedgEntryTemp: Record "Item Ledger Entry" temporary;
+        TempItemLedgEntry: Record "Item Ledger Entry" temporary;
         ItemVariant: Record "Item Variant";
         Location: Record Location;
         StoreGroup: Record "NPR Store Group";
@@ -349,29 +349,29 @@ report 6014475 "NPR Item Replenish. by Store"
 
     local procedure InsertIntoTemp(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; QtyOnHandHere: Decimal; QtyPurchOrdHere: Decimal; QtySalesOrdHere: Decimal)
     begin
-        ItemLedgEntryTemp.Reset();
-        ItemLedgEntryTemp.SetRange("Item No.", ItemNo);
-        ItemLedgEntryTemp.SetRange("Variant Code", VariantCode);
-        ItemLedgEntryTemp.SetRange("Location Code", LocationCode);
-        if not ItemLedgEntryTemp.FindFirst() then begin
+        TempItemLedgEntry.Reset();
+        TempItemLedgEntry.SetRange("Item No.", ItemNo);
+        TempItemLedgEntry.SetRange("Variant Code", VariantCode);
+        TempItemLedgEntry.SetRange("Location Code", LocationCode);
+        if not TempItemLedgEntry.FindFirst() then begin
             EntryNo += 1;
-            ItemLedgEntryTemp.Init();
-            ItemLedgEntryTemp."Entry No." := EntryNo;
-            ItemLedgEntryTemp."Item No." := ItemNo;
-            ItemLedgEntryTemp."Variant Code" := VariantCode;
-            ItemLedgEntryTemp."Location Code" := LocationCode;
-            ItemLedgEntryTemp.Quantity := QtyOnHandHere; // Inventory (1)
-            ItemLedgEntryTemp."Remaining Quantity" := QtyPurchOrdHere; // Qty. on Purch. Orders (2)
-            ItemLedgEntryTemp."Invoiced Quantity" := QtySalesOrdHere;  // Qty. on Sales Orders (3)
-            ItemLedgEntryTemp."Global Dimension 2 Code" := Format(QtyOnHandHere + QtyPurchOrdHere - QtySalesOrdHere); //Projected Inventory (4)=(1+2-3)
-            ItemLedgEntryTemp.Insert();
+            TempItemLedgEntry.Init();
+            TempItemLedgEntry."Entry No." := EntryNo;
+            TempItemLedgEntry."Item No." := ItemNo;
+            TempItemLedgEntry."Variant Code" := VariantCode;
+            TempItemLedgEntry."Location Code" := LocationCode;
+            TempItemLedgEntry.Quantity := QtyOnHandHere; // Inventory (1)
+            TempItemLedgEntry."Remaining Quantity" := QtyPurchOrdHere; // Qty. on Purch. Orders (2)
+            TempItemLedgEntry."Invoiced Quantity" := QtySalesOrdHere;  // Qty. on Sales Orders (3)
+            TempItemLedgEntry."Global Dimension 2 Code" := Format(QtyOnHandHere + QtyPurchOrdHere - QtySalesOrdHere); //Projected Inventory (4)=(1+2-3)
+            TempItemLedgEntry.Insert();
         end else begin
-            ItemLedgEntryTemp.Quantity := QtyOnHandHere;
-            ItemLedgEntryTemp."Remaining Quantity" := QtyPurchOrdHere;
-            ItemLedgEntryTemp."Invoiced Quantity" := QtySalesOrdHere;
-            ItemLedgEntryTemp."Global Dimension 2 Code" := Format(QtyOnHandHere + QtyPurchOrdHere - QtySalesOrdHere);
+            TempItemLedgEntry.Quantity := QtyOnHandHere;
+            TempItemLedgEntry."Remaining Quantity" := QtyPurchOrdHere;
+            TempItemLedgEntry."Invoiced Quantity" := QtySalesOrdHere;
+            TempItemLedgEntry."Global Dimension 2 Code" := Format(QtyOnHandHere + QtyPurchOrdHere - QtySalesOrdHere);
             MakeTotals();
-            ItemLedgEntryTemp.Modify();
+            TempItemLedgEntry.Modify();
         end;
     end;
 
@@ -401,29 +401,29 @@ report 6014475 "NPR Item Replenish. by Store"
     var
         ItemReplenishByStore: Record "NPR Item Repl. by Store";
     begin
-        ItemLedgEntryTemp.Reset();
-        ItemLedgEntryTemp.SetRange("Item No.", ItemNoHere);
-        ItemLedgEntryTemp.SetRange("Variant Code", VariantCodeHere);
-        ItemLedgEntryTemp.SetRange("Location Code", LocationCodeHere);
+        TempItemLedgEntry.Reset();
+        TempItemLedgEntry.SetRange("Item No.", ItemNoHere);
+        TempItemLedgEntry.SetRange("Variant Code", VariantCodeHere);
+        TempItemLedgEntry.SetRange("Location Code", LocationCodeHere);
         if ItemReplenishByStore.Get(StoreGroupHere, ItemNoHere, VariantCodeHere) then begin
             if ShowItems = ShowItems::"Without Replenish. Setup" then
-                if ItemLedgEntryTemp.FindFirst() then begin
-                    ItemLedgEntryTemp.Delete();
+                if TempItemLedgEntry.FindFirst() then begin
+                    TempItemLedgEntry.Delete();
                     exit;
                 end;
-            if not ItemLedgEntryTemp.FindFirst() then
+            if not TempItemLedgEntry.FindFirst() then
                 InsertIntoTemp(ItemReplenishByStore."Item No.", ItemReplenishByStore."Variant Code", LocationCodeHere, 0, 0, 0);
-            ItemLedgEntryTemp."Qty. per Unit of Measure" := ItemReplenishByStore."Reorder Point";
-            ItemLedgEntryTemp."Document No." := ItemReplenishByStore."Reorder Point Text";
-            ItemLedgEntryTemp."Shipped Qty. Not Returned" := ItemReplenishByStore."Reorder Quantity"; // Reorder Quantity (5)
-            ItemLedgEntryTemp."Global Dimension 1 Code" := Format(ItemReplenishByStore."Maximum Inventory");
-            ItemLedgEntryTemp.Description := ItemReplenishByStore."Maximum Inventory Text";
+            TempItemLedgEntry."Qty. per Unit of Measure" := ItemReplenishByStore."Reorder Point";
+            TempItemLedgEntry."Document No." := ItemReplenishByStore."Reorder Point Text";
+            TempItemLedgEntry."Shipped Qty. Not Returned" := ItemReplenishByStore."Reorder Quantity"; // Reorder Quantity (5)
+            TempItemLedgEntry."Global Dimension 1 Code" := Format(ItemReplenishByStore."Maximum Inventory");
+            TempItemLedgEntry.Description := ItemReplenishByStore."Maximum Inventory Text";
             MakeTotals();
-            ItemLedgEntryTemp.Modify();
+            TempItemLedgEntry.Modify();
         end else
             if ShowItems = ShowItems::"With Replenish. Setup" then
-                if ItemLedgEntryTemp.FindFirst() then
-                    ItemLedgEntryTemp.Delete();
+                if TempItemLedgEntry.FindFirst() then
+                    TempItemLedgEntry.Delete();
     end;
 
     local procedure MakeTotals()
@@ -431,26 +431,26 @@ report 6014475 "NPR Item Replenish. by Store"
         DecValueHere: Decimal;
         DecValueHere2: Decimal;
     begin
-        if ItemLedgEntryTemp."Global Dimension 1 Code" = '' then
+        if TempItemLedgEntry."Global Dimension 1 Code" = '' then
             DecValueHere := 0
         else
-            Evaluate(DecValueHere, ItemLedgEntryTemp."Global Dimension 1 Code");
+            Evaluate(DecValueHere, TempItemLedgEntry."Global Dimension 1 Code");
 
-        if ItemLedgEntryTemp."Global Dimension 2 Code" = '' then
+        if TempItemLedgEntry."Global Dimension 2 Code" = '' then
             DecValueHere2 := 0
         else
-            Evaluate(DecValueHere2, ItemLedgEntryTemp."Global Dimension 2 Code");
+            Evaluate(DecValueHere2, TempItemLedgEntry."Global Dimension 2 Code");
 
-        ItemLedgEntryTemp."External Document No." := Format(DecValueHere2 + ItemLedgEntryTemp."Shipped Qty. Not Returned");
-        if ItemLedgEntryTemp."Document No." <> '' then //if reorder point has been set check if it's greater then projected inventory, else leave new projected inventory from previous code block
-            if DecValueHere2 > ItemLedgEntryTemp."Qty. per Unit of Measure" then begin
-                ItemLedgEntryTemp."External Document No." := ItemLedgEntryTemp."Global Dimension 2 Code"; // New Projected Inventory (6)=(4+5)
-                ItemLedgEntryTemp.Area := '*';
+        TempItemLedgEntry."External Document No." := Format(DecValueHere2 + TempItemLedgEntry."Shipped Qty. Not Returned");
+        if TempItemLedgEntry."Document No." <> '' then //if reorder point has been set check if it's greater then projected inventory, else leave new projected inventory from previous code block
+            if DecValueHere2 > TempItemLedgEntry."Qty. per Unit of Measure" then begin
+                TempItemLedgEntry."External Document No." := TempItemLedgEntry."Global Dimension 2 Code"; // New Projected Inventory (6)=(4+5)
+                TempItemLedgEntry.Area := '*';
             end else
-                if ItemLedgEntryTemp.Description <> '' then //if max. inventory has been set then check if new inventory will be greater, else leave new projected inventory from previous code block
-                    if (DecValueHere2 + ItemLedgEntryTemp."Shipped Qty. Not Returned") > DecValueHere then begin
-                        ItemLedgEntryTemp."External Document No." := Format(DecValueHere);
-                        ItemLedgEntryTemp.Area := '**';
+                if TempItemLedgEntry.Description <> '' then //if max. inventory has been set then check if new inventory will be greater, else leave new projected inventory from previous code block
+                    if (DecValueHere2 + TempItemLedgEntry."Shipped Qty. Not Returned") > DecValueHere then begin
+                        TempItemLedgEntry."External Document No." := Format(DecValueHere);
+                        TempItemLedgEntry.Area := '**';
                     end;
     end;
 }

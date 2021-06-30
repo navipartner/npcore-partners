@@ -12,7 +12,7 @@ codeunit 6014569 "NPR RegEx"
 #if BC17
         Match: Codeunit DotNet_Match;
 #else
-        Match: Record Matches temporary;
+        TempMatch: Record Matches temporary;
 #endif
     begin
         Clear(RegEx);
@@ -24,10 +24,10 @@ codeunit 6014569 "NPR RegEx"
             exit(true);
         end;
 #else
-        Regex.Match(Input, Pattern, 1, Match);
-        Match.SetRange(Success, true);
-        if Match.FindFirst() then begin
-            Output := Match.ReadValue();
+        Regex.Match(Input, Pattern, 1, TempMatch);
+        TempMatch.SetRange(Success, true);
+        if TempMatch.FindFirst() then begin
+            Output := TempMatch.ReadValue();
             exit(true);
         end;
 #endif
@@ -41,8 +41,8 @@ codeunit 6014569 "NPR RegEx"
         GroupCollection: Codeunit DotNet_GroupCollection;
         DotNetGroup: Codeunit DotNet_Group;
 #else
-        Matches: Record Matches temporary;
-        Groups: Record Groups temporary;
+        TempMatches: Record Matches temporary;
+        TempGroups: Record Groups temporary;
 #endif
         Pattern: Text;
         ReplaceString: Text;
@@ -70,23 +70,23 @@ codeunit 6014569 "NPR RegEx"
             Regex.Match(Input, Match);
         end;
 #else
-        Regex.Match(Input, Pattern, 1, Matches);
-        if Matches.FindSet() then
+        Regex.Match(Input, Pattern, 1, TempMatches);
+        if TempMatches.FindSet() then
             repeat
-                if Matches.Success then begin
-                    Groups.Reset();
-                    Groups.DeleteAll();
-                    Regex.Groups(Matches, Groups);
-                    Groups.SetRange(Groups.Name, 'RandomQty');
-                    if Groups.FindFirst() then begin
-                        if Evaluate(RandomQty, Groups.ReadValue()) then begin
+                if TempMatches.Success then begin
+                    TempGroups.Reset();
+                    TempGroups.DeleteAll();
+                    Regex.Groups(TempMatches, TempGroups);
+                    TempGroups.SetRange(TempGroups.Name, 'RandomQty');
+                    if TempGroups.FindFirst() then begin
+                        if Evaluate(RandomQty, TempGroups.ReadValue()) then begin
                             for i := 1 to RandomQty do
                                 ReplaceString += Format(GenerateRandomChar());
                             Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
                         end;
                     end;
                 end;
-            until Matches.Next() = 0;
+            until TempMatches.Next() = 0;
 #endif
         Output := Input;
     end;
@@ -145,8 +145,8 @@ codeunit 6014569 "NPR RegEx"
         GroupCollection: Codeunit DotNet_GroupCollection;
         DotNetGroup: Codeunit DotNet_Group;
 #else
-        Matches: Record Matches temporary;
-        Groups: Record Groups temporary;
+        TempMatches: Record Matches temporary;
+        TempGroups: Record Groups temporary;
 #endif
         Pattern: Text;
         ReplaceString: Text;
@@ -173,23 +173,23 @@ codeunit 6014569 "NPR RegEx"
             Regex.Match(Input, Match);
         end;
 #else
-        Regex.Match(Input, Pattern, 1, Matches);
-        if Matches.FindSet() then
+        Regex.Match(Input, Pattern, 1, TempMatches);
+        if TempMatches.FindSet() then
             repeat
-                if Matches.Success then begin
-                    Groups.Reset();
-                    Groups.DeleteAll();
-                    Regex.Groups(Matches, Groups);
-                    Groups.SetRange(Groups.Name, 'RandomQty');
-                    if Groups.FindFirst() then begin
-                        if Evaluate(RandomQty, Groups.ReadValue()) then begin
+                if TempMatches.Success then begin
+                    TempGroups.Reset();
+                    TempGroups.DeleteAll();
+                    Regex.Groups(TempMatches, TempGroups);
+                    TempGroups.SetRange(TempGroups.Name, 'RandomQty');
+                    if TempGroups.FindFirst() then begin
+                        if Evaluate(RandomQty, TempGroups.ReadValue()) then begin
                             for i := 1 to RandomQty do
                                 ReplaceString += Format(GenerateRandomChar());
                             Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
                         end;
                     end;
                 end;
-            until Matches.Next() = 0;
+            until TempMatches.Next() = 0;
 #endif
         Output := Input;
     end;
@@ -230,7 +230,7 @@ codeunit 6014569 "NPR RegEx"
 #if BC17
         Match: Codeunit DotNet_Match;
 #else
-        Match: Record Matches temporary;
+        TempMatch: Record Matches temporary;
 #endif
         i: Integer;
         OffSet: Integer;
@@ -267,35 +267,35 @@ codeunit 6014569 "NPR RegEx"
             Match.NextMatch(Match);
         end;
 #else
-        Regex.Match(CodeString, '(\*\|)(.*?)(\|\*)', 1, Match);
+        Regex.Match(CodeString, '(\*\|)(.*?)(\|\*)', 1, TempMatch);
         i := 0;
-        if Match.FindSet() then
+        if TempMatch.FindSet() then
             repeat
-                if Match.Success then begin
+                if TempMatch.Success then begin
                     TempVariable.Init();
                     TempVariable."Line No." := i;
-                    TempVariable."Variable Name" := Match.ReadValue();
+                    TempVariable."Variable Name" := TempMatch.ReadValue();
                     TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
                     TempVariable."Variable Type" := TempVariable."Variable Type"::Mailchimp;
                     TempVariable.Insert();
                     i += 1;
                     OffSet := i + 1;
                 end;
-            until Match.Next() = 0;
+            until TempMatch.Next() = 0;
 
-        RegEx.Match(CodeString, '({{)(.*?)(}})', Match);
+        RegEx.Match(CodeString, '({{)(.*?)(}})', TempMatch);
         i := 0;
-        if Match.FindSet() then
+        if TempMatch.FindSet() then
             repeat
-                if Match.Success then begin
+                if TempMatch.Success then begin
                     TempVariable.Init();
                     TempVariable."Line No." := i + OffSet;
-                    TempVariable."Variable Name" := Match.ReadValue();
+                    TempVariable."Variable Name" := TempMatch.ReadValue();
                     TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
                     TempVariable."Variable Type" := TempVariable."Variable Type"::Handlebars;
                     TempVariable.Insert();
                 end;
-            until Match.Next() = 0;
+            until TempMatch.Next() = 0;
 #endif
     end;
 
@@ -304,7 +304,7 @@ codeunit 6014569 "NPR RegEx"
 #if BC17
         Match: Codeunit DotNet_Match;
 #else
-        Match: Record Matches temporary;
+        TempMatch: Record Matches temporary;
 #endif
     begin
         Clear(RegEx);
@@ -332,27 +332,27 @@ codeunit 6014569 "NPR RegEx"
             end;
         until not Match.Success();
 #else
-        RegEx.Match(TextLine, '{\d+}', Match);
-        if Match.FindSet() then
+        RegEx.Match(TextLine, '{\d+}', TempMatch);
+        if TempMatch.FindSet() then
             repeat
-                if Match.Success then begin
-                    ResultText += CopyStr(TextLine, 1, Match.Index);
-                    ResultText += ConvertToValue(Match.ReadValue(), RecRef);
-                    TextLine := CopyStr(TextLine, Match.Index + Match.Length + 1);
+                if TempMatch.Success then begin
+                    ResultText += CopyStr(TextLine, 1, TempMatch.Index);
+                    ResultText += ConvertToValue(TempMatch.ReadValue(), RecRef);
+                    TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
                 end;
-            until Match.Next() = 0;
+            until TempMatch.Next() = 0;
 
         ResultText += TextLine;
         TextLine := ResultText;
         ResultText := '';
-        RegEx.Match(TextLine, StrSubstNo(AFReportLinkTag, '.*?'), Match);
-        if Match.FindSet() then
+        RegEx.Match(TextLine, StrSubstNo(AFReportLinkTag, '.*?'), TempMatch);
+        if TempMatch.FindSet() then
             repeat
-                if Match.Success then begin
-                    ResultText += CopyStr(TextLine, 1, Match.Index);
-                    TextLine := CopyStr(TextLine, Match.Index + Match.Length + 1);
+                if TempMatch.Success then begin
+                    ResultText += CopyStr(TextLine, 1, TempMatch.Index);
+                    TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
                 end;
-            until Match.Next() = 0;
+            until TempMatch.Next() = 0;
 #endif
         ResultText += TextLine;
     end;
@@ -390,10 +390,10 @@ codeunit 6014569 "NPR RegEx"
         Group1: Codeunit DotNet_Group;
         Group2: Codeunit DotNet_Group;
 #else
-        Match: Record Matches temporary;
-        Groups: Record Groups temporary;
-        Group1: Record Groups temporary;
-        Group2: Record Groups temporary;
+        TempMatch: Record Matches temporary;
+        TempGroups: Record Groups temporary;
+        TempGroup1: Record Groups temporary;
+        TempGroup2: Record Groups temporary;
 #endif
         Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
@@ -420,29 +420,29 @@ codeunit 6014569 "NPR RegEx"
             TempMagentoPicture.Insert();
         end;
 #else
-        RegEx.Match(DataUri, 'data\:image/(.*?);base64,(.*)', Match);
-        if Match.FindSet() then
+        RegEx.Match(DataUri, 'data\:image/(.*?);base64,(.*)', TempMatch);
+        if TempMatch.FindSet() then
             repeat
-                if Match.Success then begin
-                    Groups.Reset();
-                    Groups.DeleteAll();
-                    RegEx.Groups(Match, Groups);
-                    Groups.FindSet();
-                    Group1 := Groups;
-                    Groups.Next();
-                    Group2 := Groups;
+                if TempMatch.Success then begin
+                    TempGroups.Reset();
+                    TempGroups.DeleteAll();
+                    RegEx.Groups(TempMatch, TempGroups);
+                    TempGroups.FindSet();
+                    TempGroup1 := TempGroups;
+                    TempGroups.Next();
+                    TempGroup2 := TempGroups;
                     TempMagentoPicture.Init();
                     TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
                     TempMagentoPicture.Name := PictureName;
                     TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
-                    TempMagentoPicture."Mime Type" := Group1.ReadValue();
+                    TempMagentoPicture."Mime Type" := TempGroup1.ReadValue();
                     TempBlob.CreateOutStream(OutStr);
-                    Convert.FromBase64(Group2.ReadValue(), OutStr);
+                    Convert.FromBase64(TempGroup2.ReadValue(), OutStr);
                     TempBlob.CreateInStream(InStr);
                     TempMagentoPicture.Image.ImportStream(InStr, TempMagentoPicture.FieldName(Image));
                     TempMagentoPicture.Insert();
                 end;
-            until Match.Next() = 0;
+            until TempMatch.Next() = 0;
 #endif
     end;
 }

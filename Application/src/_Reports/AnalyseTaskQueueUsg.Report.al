@@ -11,19 +11,19 @@ report 6059900 "NPR Analyse Task Queue Usg."
         {
             DataItemTableView = SORTING("Entry No.");
             RequestFilterFields = "Starting Time", "Ending Time", "User ID";
-            column(StartingTime; TMPDateTimeGroup."Starting Time")
+            column(StartingTime; TempDateTimeGroup."Starting Time")
             {
             }
-            column(EndingTime; TMPDateTimeGroup."Ending Time")
+            column(EndingTime; TempDateTimeGroup."Ending Time")
             {
             }
-            column(ObjectNoChangeCoompanies; TMPDateTimeGroup."Object No.")
+            column(ObjectNoChangeCoompanies; TempDateTimeGroup."Object No.")
             {
             }
-            column(TaskDuration; FormatDuration(TMPDateTimeGroup."Task Duration"))
+            column(TaskDuration; FormatDuration(TempDateTimeGroup."Task Duration"))
             {
             }
-            column(Utilization; CalcUtilization(TMPDateTimeGroup))
+            column(Utilization; CalcUtilization(TempDateTimeGroup))
             {
             }
 
@@ -43,8 +43,8 @@ report 6059900 "NPR Analyse Task Queue Usg."
                 LastDateTime := CreateDateTime(DMY2Date(31, 12, 9999), 0T);
 
                 Dia.Update(1, Name);
-                TMPDateTimeGroup.Reset();
-                if TMPDateTimeGroup.IsEmpty() then
+                TempDateTimeGroup.Reset();
+                if TempDateTimeGroup.IsEmpty() then
                     CurrReport.Break();
 
                 TaskLog.Reset();
@@ -56,69 +56,69 @@ report 6059900 "NPR Analyse Task Queue Usg."
                 //the endtime must be after 10:00 (endtime can be after 11:00, but newer before 10:00)
                 //and the starttime must be before 11:00 (Starttime can be before 10, but newer after 11)
                 //
-                TMPDateTimeGroup.FindFirst();
-                TaskLog.SetFilter("Ending Time", '>%1', TMPDateTimeGroup."Starting Time");
-                TMPDateTimeGroup.FindLast();
-                TaskLog.SetFilter("Starting Time", '<%1', TMPDateTimeGroup."Ending Time");
+                TempDateTimeGroup.FindFirst();
+                TaskLog.SetFilter("Ending Time", '>%1', TempDateTimeGroup."Starting Time");
+                TempDateTimeGroup.FindLast();
+                TaskLog.SetFilter("Starting Time", '<%1', TempDateTimeGroup."Ending Time");
 
                 if TaskLog.FindSet() then
                     repeat
                         Dia.Update(2, TaskLog."Entry No.");
-                        TMPDateTimeGroup.SetRange("Starting Time", 0DT, TaskLog."Ending Time");
-                        TMPDateTimeGroup.SetRange("Ending Time", TaskLog."Starting Time", LastDateTime);
-                        if TMPDateTimeGroup.FindSet() then
+                        TempDateTimeGroup.SetRange("Starting Time", 0DT, TaskLog."Ending Time");
+                        TempDateTimeGroup.SetRange("Ending Time", TaskLog."Starting Time", LastDateTime);
+                        if TempDateTimeGroup.FindSet() then
                             repeat
                                 case true of
                                     //start and end time within current group
-                                    (TaskLog."Starting Time" > TMPDateTimeGroup."Starting Time") and
-                                    (TaskLog."Ending Time" < TMPDateTimeGroup."Ending Time"):
+                                    (TaskLog."Starting Time" > TempDateTimeGroup."Starting Time") and
+                                    (TaskLog."Ending Time" < TempDateTimeGroup."Ending Time"):
                                         begin
-                                            InsertTmpTQ(TMPDateTimeGroup."Entry No.", TaskLog."Starting Time", TaskLog."Ending Time", TaskLog);
-                                            TMPDateTimeGroup."Task Duration" += TaskLog."Ending Time" - TaskLog."Starting Time";
+                                            InsertTmpTQ(TempDateTimeGroup."Entry No.", TaskLog."Starting Time", TaskLog."Ending Time", TaskLog);
+                                            TempDateTimeGroup."Task Duration" += TaskLog."Ending Time" - TaskLog."Starting Time";
                                         end;
                                     //start time within current group, endtime after
-                                    (TaskLog."Starting Time" > TMPDateTimeGroup."Starting Time") and
-                                    (TaskLog."Ending Time" > TMPDateTimeGroup."Ending Time"):
+                                    (TaskLog."Starting Time" > TempDateTimeGroup."Starting Time") and
+                                    (TaskLog."Ending Time" > TempDateTimeGroup."Ending Time"):
                                         begin
-                                            InsertTmpTQ(TMPDateTimeGroup."Entry No.", TaskLog."Starting Time", TMPDateTimeGroup."Ending Time", TaskLog);
-                                            TMPDateTimeGroup."Task Duration" += TMPDateTimeGroup."Ending Time" - TaskLog."Starting Time";
+                                            InsertTmpTQ(TempDateTimeGroup."Entry No.", TaskLog."Starting Time", TempDateTimeGroup."Ending Time", TaskLog);
+                                            TempDateTimeGroup."Task Duration" += TempDateTimeGroup."Ending Time" - TaskLog."Starting Time";
                                         end;
                                     //start time before current group, end time within current group
-                                    (TaskLog."Starting Time" < TMPDateTimeGroup."Starting Time") and
-                                    (TaskLog."Ending Time" < TMPDateTimeGroup."Ending Time"):
+                                    (TaskLog."Starting Time" < TempDateTimeGroup."Starting Time") and
+                                    (TaskLog."Ending Time" < TempDateTimeGroup."Ending Time"):
                                         begin
-                                            InsertTmpTQ(TMPDateTimeGroup."Entry No.", TMPDateTimeGroup."Starting Time", TaskLog."Ending Time", TaskLog);
-                                            TMPDateTimeGroup."Task Duration" += TaskLog."Ending Time" - TMPDateTimeGroup."Starting Time";
+                                            InsertTmpTQ(TempDateTimeGroup."Entry No.", TempDateTimeGroup."Starting Time", TaskLog."Ending Time", TaskLog);
+                                            TempDateTimeGroup."Task Duration" += TaskLog."Ending Time" - TempDateTimeGroup."Starting Time";
                                         end;
                                     //start and end time before and after current group
                                     else begin
-                                            InsertTmpTQ(TMPDateTimeGroup."Entry No.", TMPDateTimeGroup."Starting Time", TMPDateTimeGroup."Ending Time", TaskLog);
-                                            TMPDateTimeGroup."Task Duration" += TMPDateTimeGroup."Ending Time" - TMPDateTimeGroup."Starting Time";
+                                            InsertTmpTQ(TempDateTimeGroup."Entry No.", TempDateTimeGroup."Starting Time", TempDateTimeGroup."Ending Time", TaskLog);
+                                            TempDateTimeGroup."Task Duration" += TempDateTimeGroup."Ending Time" - TempDateTimeGroup."Starting Time";
                                         end;
 
                                 end;
-                                TMPDateTimeGroup.Modify();
-                            until TMPDateTimeGroup.Next() = 0;
+                                TempDateTimeGroup.Modify();
+                            until TempDateTimeGroup.Next() = 0;
                     until TaskLog.Next() = 0;
 
                 //no of changecompanies
                 TaskLog.SetRange("Entry Type", TaskLog."Entry Type"::ChangeComp);
-                TMPDateTimeGroup.Reset();
-                TMPDateTimeGroup.FindLast();
-                LastDateTime := TMPDateTimeGroup."Ending Time";
+                TempDateTimeGroup.Reset();
+                TempDateTimeGroup.FindLast();
+                LastDateTime := TempDateTimeGroup."Ending Time";
 
-                TMPDateTimeGroup.FindFirst();
-                TaskLog.SetRange("Starting Time", TMPDateTimeGroup."Starting Time", LastDateTime);
+                TempDateTimeGroup.FindFirst();
+                TaskLog.SetRange("Starting Time", TempDateTimeGroup."Starting Time", LastDateTime);
                 TaskLog.SetRange("Ending Time");
 
                 if TaskLog.FindSet() then
                     repeat
-                        TMPDateTimeGroup.SetRange("Starting Time", 0DT, TaskLog."Starting Time");
-                        TMPDateTimeGroup.SetRange("Ending Time", TaskLog."Starting Time", LastDateTime);
-                        if TMPDateTimeGroup.FindFirst() then begin
-                            TMPDateTimeGroup."Task Duration" += 3000;//approx time for comp switch
-                            TMPDateTimeGroup."Object No." += 1;
-                            TMPDateTimeGroup.Modify();
+                        TempDateTimeGroup.SetRange("Starting Time", 0DT, TaskLog."Starting Time");
+                        TempDateTimeGroup.SetRange("Ending Time", TaskLog."Starting Time", LastDateTime);
+                        if TempDateTimeGroup.FindFirst() then begin
+                            TempDateTimeGroup."Task Duration" += 3000;//approx time for comp switch
+                            TempDateTimeGroup."Object No." += 1;
+                            TempDateTimeGroup.Modify();
                         end;
                     until TaskLog.Next() = 0;
             end;
@@ -139,19 +139,19 @@ report 6059900 "NPR Analyse Task Queue Usg."
             column(Number_Header; Header.Number)
             {
             }
-            column(StartingTime_Header; TMPDateTimeGroup."Starting Time")
+            column(StartingTime_Header; TempDateTimeGroup."Starting Time")
             {
             }
-            column(EndingTime_Header; TMPDateTimeGroup."Ending Time")
+            column(EndingTime_Header; TempDateTimeGroup."Ending Time")
             {
             }
-            column(ObjectNoChangeCoompanies_Header; TMPDateTimeGroup."Object No.")
+            column(ObjectNoChangeCoompanies_Header; TempDateTimeGroup."Object No.")
             {
             }
-            column(TaskDuration_Header; FormatDuration(TMPDateTimeGroup."Task Duration"))
+            column(TaskDuration_Header; FormatDuration(TempDateTimeGroup."Task Duration"))
             {
             }
-            column(Utilization_Header; CalcUtilization(TMPDateTimeGroup))
+            column(Utilization_Header; CalcUtilization(TempDateTimeGroup))
             {
             }
             column(ShowHeader1; ShowHeader1)
@@ -166,28 +166,28 @@ report 6059900 "NPR Analyse Task Queue Usg."
                 column(Number_Lines; Lines.Number)
                 {
                 }
-                column(Company_Lines; TMPTaskQueue.Company)
+                column(Company_Lines; TempTaskQueue.Company)
                 {
                 }
-                column(Duration_Lines; FormatDuration(TMPTaskQueue."Estimated Duration"))
+                column(Duration_Lines; FormatDuration(TempTaskQueue."Estimated Duration"))
                 {
                 }
-                column(AssignedToUser_Lines; TMPTaskQueue."Assigned To User")
+                column(AssignedToUser_Lines; TempTaskQueue."Assigned To User")
                 {
                 }
-                column(StartTime_Lines; Format(TMPTaskQueue."Started Time", 0, 3))
+                column(StartTime_Lines; Format(TempTaskQueue."Started Time", 0, 3))
                 {
                 }
-                column(EndTime_Lines; Format(TMPTaskQueue."Assigned Time", 0, 3))
+                column(EndTime_Lines; Format(TempTaskQueue."Assigned Time", 0, 3))
                 {
                 }
-                column(ObjectTime_Lines; TMPTaskQueue."Object Type")
+                column(ObjectTime_Lines; TempTaskQueue."Object Type")
                 {
                 }
-                column(ObjectNo_Lines; TMPTaskQueue."Object No.")
+                column(ObjectNo_Lines; TempTaskQueue."Object No.")
                 {
                 }
-                column(LastExecutionStatus_Lines; TMPTaskQueue."Last Execution Status")
+                column(LastExecutionStatus_Lines; TempTaskQueue."Last Execution Status")
                 {
                     OptionCaption = ' ,Started,Error,Succes,Message';
                 }
@@ -195,9 +195,9 @@ report 6059900 "NPR Analyse Task Queue Usg."
                 trigger OnAfterGetRecord()
                 begin
                     if Number = 1 then
-                        TMPTaskQueue.FindFirst()
+                        TempTaskQueue.FindFirst()
                     else
-                        TMPTaskQueue.Next();
+                        TempTaskQueue.Next();
                 end;
 
                 trigger OnPreDataItem()
@@ -205,34 +205,34 @@ report 6059900 "NPR Analyse Task Queue Usg."
                     case true of
                         ShowLines = ShowLines::UtilizationPct:
                             begin
-                                if WarningLevel > CalcUtilization(TMPDateTimeGroup) then
+                                if WarningLevel > CalcUtilization(TempDateTimeGroup) then
                                     CurrReport.Break();
                             end;
                         ShowLines = ShowLines::None:
                             CurrReport.Break();
                     end;
-                    TMPTaskQueue.Reset();
-                    TMPTaskQueue.SetCurrentKey("Next Run time");
-                    TMPTaskQueue.SetRange("Task Template", Format(TMPDateTimeGroup."Entry No."));
-                    SetRange(Number, 1, TMPTaskQueue.Count());
+                    TempTaskQueue.Reset();
+                    TempTaskQueue.SetCurrentKey("Next Run time");
+                    TempTaskQueue.SetRange("Task Template", Format(TempDateTimeGroup."Entry No."));
+                    SetRange(Number, 1, TempTaskQueue.Count());
                 end;
             }
 
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then
-                    TMPDateTimeGroup.FindFirst()
+                    TempDateTimeGroup.FindFirst()
                 else
-                    TMPDateTimeGroup.Next();
+                    TempDateTimeGroup.Next();
 
-                ShowHeader1 := (WarningLevel > CalcUtilization(TMPDateTimeGroup));
-                ShowLinesHeader := (WarningLevel <= CalcUtilization(TMPDateTimeGroup));
+                ShowHeader1 := (WarningLevel > CalcUtilization(TempDateTimeGroup));
+                ShowLinesHeader := (WarningLevel <= CalcUtilization(TempDateTimeGroup));
             end;
 
             trigger OnPreDataItem()
             begin
-                TMPDateTimeGroup.Reset();
-                SetRange(Number, 1, TMPDateTimeGroup.Count());
+                TempDateTimeGroup.Reset();
+                SetRange(Number, 1, TempDateTimeGroup.Count());
             end;
         }
     }
@@ -288,8 +288,8 @@ report 6059900 "NPR Analyse Task Queue Usg."
 
     var
         TaskLog: Record "NPR Task Log (Task)";
-        TMPDateTimeGroup: Record "NPR Task Log (Task)" temporary;
-        TMPTaskQueue: Record "NPR Task Queue" temporary;
+        TempDateTimeGroup: Record "NPR Task Log (Task)" temporary;
+        TempTaskQueue: Record "NPR Task Queue" temporary;
         ShowHeader1: Boolean;
         ShowLinesHeader: Boolean;
         LastDateTime: DateTime;
@@ -319,28 +319,28 @@ report 6059900 "NPR Analyse Task Queue Usg."
 
         while PeriodStartTime < EndDateTime do begin
             Counter += 1;
-            TMPDateTimeGroup."Entry No." := Counter;
-            TMPDateTimeGroup."Starting Time" := PeriodStartTime;
-            TMPDateTimeGroup."Ending Time" := PeriodStartTime + Dur - 1;
-            TMPDateTimeGroup.Insert();
+            TempDateTimeGroup."Entry No." := Counter;
+            TempDateTimeGroup."Starting Time" := PeriodStartTime;
+            TempDateTimeGroup."Ending Time" := PeriodStartTime + Dur - 1;
+            TempDateTimeGroup.Insert();
             PeriodStartTime += Dur;
         end;
     end;
 
     procedure InsertTmpTQ(Group: Integer; StartTime: DateTime; EndTime: DateTime; TaskLog: Record "NPR Task Log (Task)")
     begin
-        TMPTaskQueue.Company := Company.Name;
-        TMPTaskQueue."Task Template" := Format(Group);
-        TMPTaskQueue."Task Line No." := TaskLog."Entry No.";
-        TMPTaskQueue."Next Run time" := StartTime;
-        TMPTaskQueue."Estimated Duration" := EndTime - StartTime;
-        TMPTaskQueue."Started Time" := StartTime;
-        TMPTaskQueue."Assigned Time" := EndTime;
-        TMPTaskQueue."Assigned To User" := TaskLog."User ID";
-        TMPTaskQueue."Object Type" := TaskLog."Object Type";
-        TMPTaskQueue."Object No." := TaskLog."Object No.";
-        TMPTaskQueue."Last Execution Status" := TaskLog.Status;
-        TMPTaskQueue.Insert();
+        TempTaskQueue.Company := Company.Name;
+        TempTaskQueue."Task Template" := Format(Group);
+        TempTaskQueue."Task Line No." := TaskLog."Entry No.";
+        TempTaskQueue."Next Run time" := StartTime;
+        TempTaskQueue."Estimated Duration" := EndTime - StartTime;
+        TempTaskQueue."Started Time" := StartTime;
+        TempTaskQueue."Assigned Time" := EndTime;
+        TempTaskQueue."Assigned To User" := TaskLog."User ID";
+        TempTaskQueue."Object Type" := TaskLog."Object Type";
+        TempTaskQueue."Object No." := TaskLog."Object No.";
+        TempTaskQueue."Last Execution Status" := TaskLog.Status;
+        TempTaskQueue.Insert();
     end;
 
     procedure FormatDuration(DurIn: Duration): Text[30]

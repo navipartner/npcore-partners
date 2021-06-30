@@ -81,11 +81,11 @@ report 6014529 "NPR Vendor/Salesperson"
                         CurrReport.Skip();
 
                     if TotalSale <> 0 then begin
-                        Varegruppetemp.Init();
-                        Varegruppetemp."Item No." := "Salesperson/Purchaser".Code;
-                        Varegruppetemp.Amount := TotalSale;
-                        Varegruppetemp."Amount 2" := TotalCOGS;
-                        if Varegruppetemp.Insert() then;
+                        TempVaregruppe.Init();
+                        TempVaregruppe."Item No." := "Salesperson/Purchaser".Code;
+                        TempVaregruppe.Amount := TotalSale;
+                        TempVaregruppe."Amount 2" := TotalCOGS;
+                        if TempVaregruppe.Insert() then;
 
                     end else
                         CurrReport.Skip();
@@ -93,7 +93,7 @@ report 6014529 "NPR Vendor/Salesperson"
 
                 trigger OnPreDataItem()
                 begin
-                    Varegruppetemp.DeleteAll();
+                    TempVaregruppe.DeleteAll();
 
                     currentRec := 1;
                     totalRec := (Count() * 2);
@@ -102,16 +102,16 @@ report 6014529 "NPR Vendor/Salesperson"
             dataitem("Integer"; "Integer")
             {
                 DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
-                column(Item_No_Varegruppetemp; Varegruppetemp."Item No.")
+                column(Item_No_Varegruppetemp; TempVaregruppe."Item No.")
                 {
                 }
                 column(Name_SalesPerson; SalesPerson.Name)
                 {
                 }
-                column(Amount_Varegruppetemp; Varegruppetemp.Amount)
+                column(Amount_Varegruppetemp; TempVaregruppe.Amount)
                 {
                 }
-                column(Amount2_Varegruppetemp; Varegruppetemp."Amount 2")
+                column(Amount2_Varegruppetemp; TempVaregruppe."Amount 2")
                 {
                 }
                 column(db; db)
@@ -154,27 +154,27 @@ report 6014529 "NPR Vendor/Salesperson"
                     db := 0;
 
                     if Number = 1 then begin
-                        if not Varegruppetemp.Find('-') then
+                        if not TempVaregruppe.Find('-') then
                             CurrReport.Break();
                     end else
-                        if Varegruppetemp.Next() = 0 then
+                        if TempVaregruppe.Next() = 0 then
                             CurrReport.Break();
 
-                    if (Varegruppetemp.Amount <> 0) then begin
-                        dg := ((Varegruppetemp.Amount - Varegruppetemp."Amount 2") / Varegruppetemp.Amount) * 100;
-                        db := Varegruppetemp.Amount - Varegruppetemp."Amount 2";
+                    if (TempVaregruppe.Amount <> 0) then begin
+                        dg := ((TempVaregruppe.Amount - TempVaregruppe."Amount 2") / TempVaregruppe.Amount) * 100;
+                        db := TempVaregruppe.Amount - TempVaregruppe."Amount 2";
                     end;
 
-                    if SalesPerson.Get(Varegruppetemp."Item No.") then;
+                    if SalesPerson.Get(TempVaregruppe."Item No.") then;
 
-                    totalTurnover += Varegruppetemp.Amount;
-                    forbrugtotal += Varegruppetemp."Amount 2";
+                    totalTurnover += TempVaregruppe.Amount;
+                    forbrugtotal += TempVaregruppe."Amount 2";
                     dbtotal += db;
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    Varegruppetemp.Ascending(false);
+                    TempVaregruppe.Ascending(false);
 
                     totalTurnover := 0;
                     forbrugtotal := 0;
@@ -220,7 +220,7 @@ report 6014529 "NPR Vendor/Salesperson"
     var
         firmaoplysninger: Record "Company Information";
         Item: Record Item;
-        Varegruppetemp: Record "Item Amount" temporary;
+        TempVaregruppe: Record "Item Amount" temporary;
         SalesPerson: Record "Salesperson/Purchaser";
         db: Decimal;
         dbalt: Decimal;

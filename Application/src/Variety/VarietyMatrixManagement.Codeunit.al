@@ -1,7 +1,7 @@
 ﻿codeunit 6059971 "NPR Variety Matrix Management"
 {
     var
-        TMPVRTBuffer: Record "NPR Variety Buffer" temporary;
+        TempVRTBuffer: Record "NPR Variety Buffer" temporary;
         MRecref: RecordRef;
         Item: Record Item;
         Text002: Label 'You can''t update %1 from this form';
@@ -16,7 +16,7 @@
 
     procedure LoadMatrixData(ItemNo: Code[20]; HideInactive: Boolean)
     begin
-        TMPVRTBuffer.LoadCombinations(TMPVRTBuffer, ItemNo, MRecref.Number = DATABASE::"Item Variant", MRecref.RecordId, HideInactive);
+        TempVRTBuffer.LoadCombinations(TempVRTBuffer, ItemNo, MRecref.Number = DATABASE::"Item Variant", MRecref.RecordId, HideInactive);
         if MRecref.Number <> DATABASE::"Item Variant" then
             SetRecordDefault(MRecref);
     end;
@@ -28,27 +28,27 @@
         ItemVariant: Record "Item Variant";
         TextValue2: Text;
     begin
-        TMPVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
-        if TMPVRTBuffer."Variant Code" = '' then
+        TempVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
+        if TempVRTBuffer."Variant Code" = '' then
             exit('-');
 
-        if ItemVariant.Get(TMPVRTBuffer."Item No.", TMPVRTBuffer."Variant Code") and ItemVariant."NPR Blocked" and ((VRTFieldSetup."Table No." <> DATABASE::"Item Variant") or (VRTFieldSetup."Field No." <> ItemVariant.FieldNo("NPR Blocked"))) then
+        if ItemVariant.Get(TempVRTBuffer."Item No.", TempVRTBuffer."Variant Code") and ItemVariant."NPR Blocked" and ((VRTFieldSetup."Table No." <> DATABASE::"Item Variant") or (VRTFieldSetup."Field No." <> ItemVariant.FieldNo("NPR Blocked"))) then
             exit('-');
 
         case VRTFieldSetup.Type of
             VRTFieldSetup.Type::Field:
                 begin
                     case true of
-                        (Format(TMPVRTBuffer."Record ID (TMP)") <> ''):
+                        (Format(TempVRTBuffer."Record ID (TMP)") <> ''):
                             begin
-                                RecRef.Get(TMPVRTBuffer."Record ID (TMP)");
+                                RecRef.Get(TempVRTBuffer."Record ID (TMP)");
                                 FRef := RecRef.Field(VRTFieldSetup."Field No.");
                                 TextValue := Format(FRef.Value);
                             end;
                         VRTFieldSetup."Table No." in [7002, 7012]:
                             begin
-                                if (Format(TMPVRTBuffer."Master Record ID") <> '') then begin
-                                    RecRef.Get(TMPVRTBuffer."Master Record ID");
+                                if (Format(TempVRTBuffer."Master Record ID") <> '') then begin
+                                    RecRef.Get(TempVRTBuffer."Master Record ID");
                                     FRef := RecRef.Field(VRTFieldSetup."Field No.");
                                     TextValue := '(' + Format(FRef.Value) + ')';
                                 end;
@@ -61,7 +61,7 @@
                 end;
             VRTFieldSetup.Type::Subscriber:
                 begin
-                    GetVarietyMatrixFieldValue(TMPVRTBuffer, VRTFieldSetup, TextValue, VRTFieldSetup."Variety Matrix Subscriber 1", ItemFilters, 0);
+                    GetVarietyMatrixFieldValue(TempVRTBuffer, VRTFieldSetup, TextValue, VRTFieldSetup."Variety Matrix Subscriber 1", ItemFilters, 0);
                 end;
         end;
 
@@ -75,7 +75,7 @@
             VRTFieldSetup."Secondary Type"::Field:
                 begin
                     if VRTFieldSetup."Table No." = VRTFieldSetup."Secondary Table No." then begin
-                        if Format(TMPVRTBuffer."Record ID (TMP)") <> '' then begin
+                        if Format(TempVRTBuffer."Record ID (TMP)") <> '' then begin
                             FRef := RecRef.Field(VRTFieldSetup."Secondary Field No.");
                             TextValue += ' (' + Format(FRef.Value) + ')';
                         end;
@@ -88,7 +88,7 @@
                 end;
             VRTFieldSetup."Secondary Type"::Subscriber:
                 begin
-                    GetVarietyMatrixFieldValue(TMPVRTBuffer, VRTFieldSetup, TextValue2, VRTFieldSetup."Variety Matrix Subscriber 2", ItemFilters, 1);
+                    GetVarietyMatrixFieldValue(TempVRTBuffer, VRTFieldSetup, TextValue2, VRTFieldSetup."Variety Matrix Subscriber 2", ItemFilters, 1);
                     TextValue += ' (' + TextValue2 + ')';
                 end;
         end;
@@ -105,21 +105,21 @@
         Bool: Boolean;
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
-        TMPVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
-        GetItem(TMPVRTBuffer."Item No.");
+        TempVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
+        GetItem(TempVRTBuffer."Item No.");
 
         case VRTFieldSetup.Type of
             VRTFieldSetup.Type::Field:
                 begin
-                    if Format(TMPVRTBuffer."Record ID (TMP)") = '' then begin
+                    if Format(TempVRTBuffer."Record ID (TMP)") = '' then begin
                         //the line is not created. create a line for it, and insert it in the buffer
-                        VRTCloneData.SetupNewLine(MRecref, Item, TMPVRTBuffer, NewValue);
+                        VRTCloneData.SetupNewLine(MRecref, Item, TempVRTBuffer, NewValue);
                         //if this is creation of a new variant, we need to exit
                         if (VRTFieldSetup."Table No." = 5401) and (VRTFieldSetup."Field No." = 1) then
                             exit;
                     end;
 
-                    RecRef.Get(TMPVRTBuffer."Record ID (TMP)");
+                    RecRef.Get(TempVRTBuffer."Record ID (TMP)");
                     FRef := RecRef.Field(VRTFieldSetup."Field No.");
 
                     case UpperCase(Format(FRef.Type)) of
@@ -214,10 +214,10 @@
                 FRef2 := RecRef2.Field(ItemVariantField);
                 if (Format(FRef2.Value) <> '') then begin
                     ItemVariant.Get(FRef.Value, FRef2.Value);
-                    TMPVRTBuffer.Get(ItemVariant."NPR Variety 1 Value", ItemVariant."NPR Variety 2 Value",
+                    TempVRTBuffer.Get(ItemVariant."NPR Variety 1 Value", ItemVariant."NPR Variety 2 Value",
                                      ItemVariant."NPR Variety 3 Value", ItemVariant."NPR Variety 4 Value");
-                    TMPVRTBuffer."Record ID (TMP)" := RecRef2.RecordId;
-                    TMPVRTBuffer.Modify();
+                    TempVRTBuffer."Record ID (TMP)" := RecRef2.RecordId;
+                    TempVRTBuffer.Modify();
                 end;
             until RecRef2.Next() = 0;
     end;
@@ -229,10 +229,10 @@
         case VRTFieldSetup."Field No." of
             1: //Inventory
                 begin
-                    if Item."No." <> TMPVRTBuffer."Item No." then
-                        Item.Get(TMPVRTBuffer."Item No.");
+                    if Item."No." <> TempVRTBuffer."Item No." then
+                        Item.Get(TempVRTBuffer."Item No.");
 
-                    Item.SetRange("Variant Filter", TMPVRTBuffer."Variant Code");
+                    Item.SetRange("Variant Filter", TempVRTBuffer."Variant Code");
                     if VRTFieldSetup."Use Location Filter" then begin
                         if LocationFilter <> '' then
                             Item.SetFilter("Location Filter", LocationFilter)
@@ -244,12 +244,12 @@
                 end;
             2: //Variant Created
                 begin
-                    exit(Format(TMPVRTBuffer."Variant Code" <> ''));
+                    exit(Format(TempVRTBuffer."Variant Code" <> ''));
                 end;
             3: //Barcode (ItemRef)
                 begin
-                    ItemRef.SetRange("Item No.", TMPVRTBuffer."Item No.");
-                    ItemRef.SetRange("Variant Code", TMPVRTBuffer."Variant Code");
+                    ItemRef.SetRange("Item No.", TempVRTBuffer."Item No.");
+                    ItemRef.SetRange("Variant Code", TempVRTBuffer."Variant Code");
                     if ItemRef.FindFirst() then
                         exit(ItemRef."Reference No.");
                 end;
@@ -281,15 +281,15 @@
                 end;
             2: //Variant Create
                 begin
-                    if (TMPVRTBuffer."Variant Code" <> '') and (VRTFieldSetup."Table No." = 5401) then begin
+                    if (TempVRTBuffer."Variant Code" <> '') and (VRTFieldSetup."Table No." = 5401) then begin
                         //delete Variant
-                        ItemVariant.Get(TMPVRTBuffer."Item No.", TMPVRTBuffer."Variant Code");
+                        ItemVariant.Get(TempVRTBuffer."Item No.", TempVRTBuffer."Variant Code");
                         ItemVariant.Delete(true);
-                        TMPVRTBuffer."Variant Code" := '';
-                        TMPVRTBuffer.Modify();
+                        TempVRTBuffer."Variant Code" := '';
+                        TempVRTBuffer.Modify();
                     end else begin
-                        VRTCloneData.SetupVariant(Item, TMPVRTBuffer, NewValue);
-                        TMPVRTBuffer.Modify();
+                        VRTCloneData.SetupVariant(Item, TempVRTBuffer, NewValue);
+                        TempVRTBuffer.Modify();
                     end;
                 end;
             3: //Barcode (ItemRef)
@@ -299,10 +299,10 @@
                     if ItemRef.FindFirst() then
                         Error(Text003, ItemRef."Item No.");
 
-                    Item.Get(TMPVRTBuffer."Item No.");
+                    Item.Get(TempVRTBuffer."Item No.");
                     ItemRef.Init();
-                    ItemRef."Item No." := TMPVRTBuffer."Item No.";
-                    ItemRef."Variant Code" := TMPVRTBuffer."Variant Code";
+                    ItemRef."Item No." := TempVRTBuffer."Item No.";
+                    ItemRef."Variant Code" := TempVRTBuffer."Variant Code";
                     ItemRef."Unit of Measure" := '';
                     ItemRef."Reference No." := NewValue;
                     ItemRef.Description := Item.Description;
@@ -316,17 +316,17 @@
         RecRef: RecordRef;
         FRef: FieldRef;
     begin
-        TMPVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
-        if TMPVRTBuffer."Variant Code" = '' then
+        TempVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
+        if TempVRTBuffer."Variant Code" = '' then
             exit(false);
 
         case VRTFieldSetup.Type of
             VRTFieldSetup.Type::Field:
                 begin
                     case true of
-                        (Format(TMPVRTBuffer."Record ID (TMP)") <> ''):
+                        (Format(TempVRTBuffer."Record ID (TMP)") <> ''):
                             begin
-                                RecRef.Get(TMPVRTBuffer."Record ID (TMP)");
+                                RecRef.Get(TempVRTBuffer."Record ID (TMP)");
                                 FRef := RecRef.Field(VRTFieldSetup."Field No.");
                                 exit(FRef.Value);
                             end;
@@ -337,7 +337,7 @@
                     case VRTFieldSetup."Field No." of
                         2: //Creation of Item Variants
                             begin
-                                exit(RecRef.Get(TMPVRTBuffer."Record ID (TMP)"));
+                                exit(RecRef.Get(TempVRTBuffer."Record ID (TMP)"));
                             end;
                     end;
                 end;
@@ -347,11 +347,11 @@
 
     procedure OnDrillDown(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
     begin
-        TMPVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
+        TempVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
         if VrtFieldSetup."OnDrillDown Subscriber" <> '' then
-            OnDrillDownVarietyMatrix(TMPVRTBuffer, VrtFieldSetup, FieldValue, 0, ItemFilters)
+            OnDrillDownVarietyMatrix(TempVRTBuffer, VrtFieldSetup, FieldValue, 0, ItemFilters)
         else
-            OnDrillDownEvent(TMPVRTBuffer, VrtFieldSetup, FieldValue);
+            OnDrillDownEvent(TempVRTBuffer, VrtFieldSetup, FieldValue);
     end;
 
     [IntegrationEvent(false, false)]
@@ -547,17 +547,17 @@
         ItemVariant: Record "Item Variant";
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
-        if TMPVRTBuffer.FindSet() then
+        if TempVRTBuffer.FindSet() then
             repeat
                 if (VRTFieldSetup.Type = VRTFieldSetup.Type::Internal) and (VRTFieldSetup."Field No." = 2) then begin
                     //create Variant
-                    if not VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
-                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                    if not VRTCloneData.GetFromVariety(ItemVariant, TempVRTBuffer."Item No.", TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value") then
+                        SetValue(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
                 end else begin
-                    if VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
-                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                    if VRTCloneData.GetFromVariety(ItemVariant, TempVRTBuffer."Item No.", TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value") then
+                        SetValue(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
                 end;
-            until TMPVRTBuffer.Next() = 0;
+            until TempVRTBuffer.Next() = 0;
     end;
 
     procedure TickCurrentRow(VRTFieldSetup: Record "NPR Variety Field Setup"; CurrVRTBuffer: Record "NPR Variety Buffer")
@@ -566,30 +566,30 @@
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
         if (CurrVRTBuffer."Variety 1 Value" <> '') then
-            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 1 Value", CurrVRTBuffer."Variety 1 Value");
+            TempVRTBuffer.SetRange(TempVRTBuffer."Variety 1 Value", CurrVRTBuffer."Variety 1 Value");
         if (CurrVRTBuffer."Variety 2 Value" <> '') then
-            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 2 Value", CurrVRTBuffer."Variety 2 Value");
+            TempVRTBuffer.SetRange(TempVRTBuffer."Variety 2 Value", CurrVRTBuffer."Variety 2 Value");
         if (CurrVRTBuffer."Variety 3 Value" <> '') then
-            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 3 Value", CurrVRTBuffer."Variety 3 Value");
+            TempVRTBuffer.SetRange(TempVRTBuffer."Variety 3 Value", CurrVRTBuffer."Variety 3 Value");
         if (CurrVRTBuffer."Variety 4 Value" <> '') then
-            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 4 Value", CurrVRTBuffer."Variety 4 Value");
+            TempVRTBuffer.SetRange(TempVRTBuffer."Variety 4 Value", CurrVRTBuffer."Variety 4 Value");
 
-        if TMPVRTBuffer.FindSet() then
+        if TempVRTBuffer.FindSet() then
             repeat
                 if (VRTFieldSetup.Type = VRTFieldSetup.Type::Internal) and (VRTFieldSetup."Field No." = 2) then begin
                     //create Variant
-                    if not VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
-                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                    if not VRTCloneData.GetFromVariety(ItemVariant, TempVRTBuffer."Item No.", TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value") then
+                        SetValue(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
                 end else begin
-                    if VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
-                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                    if VRTCloneData.GetFromVariety(ItemVariant, TempVRTBuffer."Item No.", TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value") then
+                        SetValue(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value", TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
                 end;
-            until TMPVRTBuffer.Next() = 0;
+            until TempVRTBuffer.Next() = 0;
 
-        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 1 Value");
-        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 2 Value");
-        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 3 Value");
-        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 4 Value");
+        TempVRTBuffer.SetRange(TempVRTBuffer."Variety 1 Value");
+        TempVRTBuffer.SetRange(TempVRTBuffer."Variety 2 Value");
+        TempVRTBuffer.SetRange(TempVRTBuffer."Variety 3 Value");
+        TempVRTBuffer.SetRange(TempVRTBuffer."Variety 4 Value");
 
     end;
 
@@ -602,8 +602,8 @@
 
     procedure OnLookup(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
     begin
-        TMPVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
-        OnDrillDownVarietyMatrix(TMPVRTBuffer, VrtFieldSetup, FieldValue, 1, ItemFilters);
+        TempVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
+        OnDrillDownVarietyMatrix(TempVRTBuffer, VrtFieldSetup, FieldValue, 1, ItemFilters);
     end;
 
     [IntegrationEvent(false, false)]

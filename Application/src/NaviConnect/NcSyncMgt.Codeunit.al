@@ -13,26 +13,26 @@
 
     procedure DownloadFtpType(ImportType: Record "NPR Nc Import Type"): Boolean
     var
-        ImportEntryTmp: Record "NPR Nc Import Entry" temporary;
+        TempImportEntry: Record "NPR Nc Import Entry" temporary;
         Filename: Text;
         ListOfDirectory: List of [Text];
     begin
         case true of
             ImportType."Ftp Filename" <> '':
-                if TryImportNewEntry(ImportEntryTmp, ImportType, ImportType."Ftp Filename") then
-                    SaveNewEntry(ImportEntryTmp);
+                if TryImportNewEntry(TempImportEntry, ImportType, ImportType."Ftp Filename") then
+                    SaveNewEntry(TempImportEntry);
 
             ImportType.Sftp:
                 if DownloadSftpFilenames(ImportType, ListOfDirectory) then begin
                     foreach Filename in ListOfDirectory do
-                        if TryImportNewEntrySftp(ImportEntryTmp, ImportType, Filename) then
-                            SaveNewEntry(ImportEntryTmp);
+                        if TryImportNewEntrySftp(TempImportEntry, ImportType, Filename) then
+                            SaveNewEntry(TempImportEntry);
                 end;
 
             DownloadFtpListDirectoryDetails(ImportType, ListOfDirectory):
                 foreach FileName in ListOfDirectory do begin
-                    if TryImportNewEntry(ImportEntryTmp, ImportType, Filename) then
-                        SaveNewEntry(ImportEntryTmp);
+                    if TryImportNewEntry(TempImportEntry, ImportType, Filename) then
+                        SaveNewEntry(TempImportEntry);
                 end;
             else
                 exit(false);

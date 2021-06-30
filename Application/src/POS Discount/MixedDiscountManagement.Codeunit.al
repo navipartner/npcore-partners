@@ -1,7 +1,7 @@
 ﻿codeunit 6014416 "NPR Mixed Discount Management"
 {
     var
-        CustDiscGroupTmp: Record "Customer Discount Group" temporary;
+        TempCustDiscGroup: Record "Customer Discount Group" temporary;
         GLSetup: Record "General Ledger Setup";
 
     procedure ApplyMixDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; TriggerRec: Record "NPR POS Sale Line"; RecalculateAllLines: Boolean): Boolean
@@ -42,9 +42,9 @@
     local procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
-        tmpImpactedItems: Record "Item Variant" temporary;
-        tmpImpactedItemGroups: Record "Item Discount Group" temporary;
-        tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary;
+        TempImpactedItems: Record "Item Variant" temporary;
+        TempImpactedItemGroups: Record "Item Discount Group" temporary;
+        TempImpactedItemDiscGroups: Record "Item Discount Group" temporary;
     begin
         // This function narrows the scope based on static parameters (=those assumed to not change inside an ongoing POS sale ie. "Item Group" for an item line)
         // For parameters like time and customer no., these are kept in scope here to allow them to go from enabled -> disabled (because they'll trigger "Discount Modified" := TRUE here),
@@ -57,21 +57,21 @@
 
         if RecalculateAllLines then begin
             repeat
-                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", TempSaleLinePOS."Item Disc. Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code", tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
+                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", TempSaleLinePOS."Item Disc. Group", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
+                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
             until TempSaleLinePOS.Next() = 0;
         end else begin
             if not Rec."Allow Line Discount" then
                 exit;
-            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, Rec."No.", Rec."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", Rec."Item Disc. Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, Rec."No.", Rec."Variant Code", tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
+            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", Rec."Item Disc. Group", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
+            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Category Code", '', tmpImpactedMixHeaders, TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups);
         end;
 
         TempSaleLinePOS.FindSet();
         repeat
-            if HasImpact(tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, TempSaleLinePOS) then begin
+            if HasImpact(TempImpactedItems, TempImpactedItemGroups, TempImpactedItemDiscGroups, TempSaleLinePOS) then begin
                 TempSaleLinePOS."Discount Calculated" := true;
                 TempSaleLinePOS.Modify();
                 TempSaleLinePOS.Mark(true);
@@ -664,8 +664,8 @@
 
     local procedure ApplylMultiLevelMixDiscountOnLines(var SaleLinePOSApply: Record "NPR POS Sale Line"; MixedDiscount: Record "NPR Mixed Discount"; var MixedDiscountLine: Record "NPR Mixed Discount Line"; var LastLineNo: Integer; var InvQtyDict: Dictionary of [Guid, Decimal]): Decimal
     var
-        MixedDiscountLevelTmp: Record "NPR Mixed Discount Level" temporary;
-        PriorityBufferTmp: Record "NPR Mixed Disc. Prio. Buffer" temporary;
+        TempMixedDiscountLevel: Record "NPR Mixed Discount Level" temporary;
+        TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary;
         SaleLinePOSApply2: Record "NPR POS Sale Line";
         CurrentQtyToApply: Decimal;
         LineDiscountAmt: Decimal;
@@ -682,18 +682,18 @@
         SaleLinePOSApply.CalcSums("MR Anvendt antal");
         TotalQtyToApply := SaleLinePOSApply."MR Anvendt antal";
 
-        GetMixDiscountLevels(MixedDiscount, TotalQtyToApply, MixedDiscountLevelTmp);
-        if MixedDiscountLevelTmp.IsEmpty then
+        GetMixDiscountLevels(MixedDiscount, TotalQtyToApply, TempMixedDiscountLevel);
+        if TempMixedDiscountLevel.IsEmpty then
             exit(0);
 
-        TransferSaleLinePOS2PriorityBuffer(SaleLinePOSApply, MixedDiscount, MixedDiscountLine, PriorityBufferTmp);
-        if PriorityBufferTmp.IsEmpty then
+        TransferSaleLinePOS2PriorityBuffer(SaleLinePOSApply, MixedDiscount, MixedDiscountLine, TempPriorityBuffer);
+        if TempPriorityBuffer.IsEmpty then
             exit(0);
 
         while not NothingLeftToApply do begin
             if CurrentQtyToApply = 0 then begin
-                if FindApplicableMixDiscountLevel(MixedDiscountLevelTmp, TotalQtyToApply) then begin
-                    CurrentQtyToApply := MixedDiscountLevelTmp.Quantity;
+                if FindApplicableMixDiscountLevel(TempMixedDiscountLevel, TotalQtyToApply) then begin
+                    CurrentQtyToApply := TempMixedDiscountLevel.Quantity;
                     TotalQtyToApply := TotalQtyToApply - CurrentQtyToApply;
                     RemainderAmt := 0;
                 end else
@@ -701,12 +701,12 @@
             end;
 
             if CurrentQtyToApply > 0 then begin
-                PriorityBufferTmp.FindSet();
+                TempPriorityBuffer.FindSet();
                 repeat
                     SaleLinePOSApply.SetRange(Type, SaleLinePOSApply.Type::Item);
-                    SaleLinePOSApply.SetRange("No.", PriorityBufferTmp."Item No.");
-                    SaleLinePOSApply.SetRange("Variant Code", PriorityBufferTmp."Variant Code");
-                    SaleLinePOSApply.SetRange("Unit Price", PriorityBufferTmp."Unit Price");
+                    SaleLinePOSApply.SetRange("No.", TempPriorityBuffer."Item No.");
+                    SaleLinePOSApply.SetRange("Variant Code", TempPriorityBuffer."Variant Code");
+                    SaleLinePOSApply.SetRange("Unit Price", TempPriorityBuffer."Unit Price");
                     SaleLinePOSApply.SetRange("Discount Type", SaleLinePOSApply."Discount Type"::Mix);
                     SaleLinePOSApply.SetRange("Discount Code", MixedDiscount.Code);
                     SaleLinePOSApply.SetFilter(Quantity, '>%1', 0);
@@ -729,7 +729,7 @@
                                 SaleLinePOSApply."Discount Code" := MixedDiscount.Code;
                                 SaleLinePOSApply."Custom Disc Blocked" := MixedDiscount."Block Custom Discount";
                                 LineDiscountAmt :=
-                                  CalcLineMultiLevelDiscAmount(MixedDiscount, MixedDiscountLevelTmp, SaleLinePOSApply, SaleLinePOSApply."MR Anvendt antal", RemainderAmt);
+                                  CalcLineMultiLevelDiscAmount(MixedDiscount, TempMixedDiscountLevel, SaleLinePOSApply, SaleLinePOSApply."MR Anvendt antal", RemainderAmt);
                                 SaleLinePOSApply."Discount Amount" := Round(LineDiscountAmt, 0.01);
                                 SaleLinePOSApply.Modify();
 
@@ -761,9 +761,9 @@
                             end;
 
                             if CurrentQtyToApply = 0 then
-                                MixedDiscountLevelTmp.Delete();
+                                TempMixedDiscountLevel.Delete();
                         until (SaleLinePOSApply.Next() = 0) or (CurrentQtyToApply = 0);
-                until (PriorityBufferTmp.Next() = 0) or (CurrentQtyToApply = 0);
+                until (TempPriorityBuffer.Next() = 0) or (CurrentQtyToApply = 0);
             end;
 
             if not NothingLeftToApply then
@@ -1192,9 +1192,9 @@
 
                     if MixedDiscount."Customer Disc. Group Filter" <> '' then begin
                         GenerateTmpCustDiscGroupList();
-                        CustDiscGroupTmp.SetFilter(Code, MixedDiscount."Customer Disc. Group Filter");
-                        CustDiscGroupTmp.Code := SalePOS."Customer Disc. Group";
-                        if not CustDiscGroupTmp.Find() then
+                        TempCustDiscGroup.SetFilter(Code, MixedDiscount."Customer Disc. Group Filter");
+                        TempCustDiscGroup.Code := SalePOS."Customer Disc. Group";
+                        if not TempCustDiscGroup.Find() then
                             exit(false);
                     end;
 
@@ -1563,19 +1563,19 @@
     var
         CustDiscGroup: Record "Customer Discount Group";
     begin
-        CustDiscGroupTmp.Reset();
-        if not CustDiscGroupTmp.IsEmpty then
+        TempCustDiscGroup.Reset();
+        if not TempCustDiscGroup.IsEmpty then
             exit;
 
         if CustDiscGroup.FindSet() then
             repeat
-                CustDiscGroupTmp := CustDiscGroup;
-                CustDiscGroupTmp.Insert();
+                TempCustDiscGroup := CustDiscGroup;
+                TempCustDiscGroup.Insert();
             until CustDiscGroup.Next() = 0;
 
-        CustDiscGroupTmp.Init();
-        CustDiscGroupTmp.Code := '';
-        if not CustDiscGroupTmp.Find() then
-            CustDiscGroupTmp.Insert();
+        TempCustDiscGroup.Init();
+        TempCustDiscGroup.Code := '';
+        if not TempCustDiscGroup.Find() then
+            TempCustDiscGroup.Insert();
     end;
 }

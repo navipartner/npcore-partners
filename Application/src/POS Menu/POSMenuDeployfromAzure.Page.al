@@ -20,7 +20,7 @@ page 6150709 "NPR POS Menu Deploy from Azure"
                     rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
                     AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
                     packageList: List of [Text];
-                    tmpRetailList: Record "NPR Retail List" temporary;
+                    TempRetailList: Record "NPR Retail List" temporary;
                     package: Text;
                     BaseUri: Text;
                     Secret: Text;
@@ -32,16 +32,16 @@ page 6150709 "NPR POS Menu Deploy from Azure"
                         + '&sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageList);
 
                     foreach package in packageList do begin
-                        tmpRetailList.Number += 1;
-                        tmpRetailList.Value := package;
-                        tmpRetailList.Choice := package;
-                        tmpRetailList.Insert();
+                        TempRetailList.Number += 1;
+                        TempRetailList.Value := package;
+                        TempRetailList.Choice := package;
+                        TempRetailList.Insert();
                     end;
 
-                    if Page.Runmodal(Page::"NPR Retail List", tmpRetailList) <> Action::LookupOK then
+                    if Page.Runmodal(Page::"NPR Retail List", TempRetailList) <> Action::LookupOK then
                         exit(false);
 
-                    value := tmpRetailList.Value;
+                    value := TempRetailList.Value;
                     exit(true);
                 end;
             }

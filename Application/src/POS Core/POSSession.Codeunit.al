@@ -20,7 +20,7 @@ codeunit 6150700 "NPR POS Session"
 
     var
         POSUnit: Record "NPR POS Unit";
-        SessionActions: Record "NPR POS Action" temporary;
+        TempSessionActions: Record "NPR POS Action" temporary;
         FrontEnd: Codeunit "NPR POS Front End Management";
         FrontEndKeeper: Codeunit "NPR POS Front End Keeper";
         Sale: Codeunit "NPR POS Sale";
@@ -128,7 +128,7 @@ codeunit 6150700 "NPR POS Session"
         DebugWithTimestamp('InitializeSecureMethods');
         FrontEnd.ConfigureSecureMethods();
         DebugWithTimestamp('ConfigureActionSequences');
-        FrontEnd.ConfigureActionSequences(SessionActions);
+        FrontEnd.ConfigureActionSequences(TempSessionActions);
         DebugWithTimestamp('InitializeTheme');
         UI.InitializeTheme(POSUnit);
         DebugWithTimestamp('InitializeAdminTemplates');
@@ -212,7 +212,7 @@ codeunit 6150700 "NPR POS Session"
             OnFinalize(FrontEnd);
             UnbindSubscription(FrontEndKeeper);
             ClearAll();
-            SessionActions.DeleteAll();
+            TempSessionActions.DeleteAll();
             Finalized := true;
         end;
     end;
@@ -384,32 +384,32 @@ codeunit 6150700 "NPR POS Session"
 
     procedure DiscoverSessionAction(var ActionIn: Record "NPR POS Action" temporary)
     begin
-        SessionActions := ActionIn;
-        if not SessionActions.Insert() then begin
+        TempSessionActions := ActionIn;
+        if not TempSessionActions.Insert() then begin
             ActionIn.CalcFields(Workflow);
-            SessionActions.Workflow := ActionIn.Workflow;
+            TempSessionActions.Workflow := ActionIn.Workflow;
             ActionIn.CalcFields("Custom JavaScript Logic");
-            SessionActions."Custom JavaScript Logic" := ActionIn."Custom JavaScript Logic";
-            SessionActions.Modify();
+            TempSessionActions."Custom JavaScript Logic" := ActionIn."Custom JavaScript Logic";
+            TempSessionActions.Modify();
         end;
     end;
 
     procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "NPR POS Action"): Boolean
     begin
-        if not SessionActions.Get(ActionCode) then
+        if not TempSessionActions.Get(ActionCode) then
             exit(false);
 
-        ActionOut := SessionActions;
-        SessionActions.CalcFields(Workflow);
-        ActionOut.Workflow := SessionActions.Workflow;
-        SessionActions.CalcFields("Custom JavaScript Logic");
-        ActionOut."Custom JavaScript Logic" := SessionActions."Custom JavaScript Logic";
+        ActionOut := TempSessionActions;
+        TempSessionActions.CalcFields(Workflow);
+        ActionOut.Workflow := TempSessionActions.Workflow;
+        TempSessionActions.CalcFields("Custom JavaScript Logic");
+        ActionOut."Custom JavaScript Logic" := TempSessionActions."Custom JavaScript Logic";
         exit(true);
     end;
 
     procedure IsSessionAction("Code": Code[20]): Boolean
     begin
-        exit(SessionActions.Get(Code));
+        exit(TempSessionActions.Get(Code));
     end;
 
     //#endregion

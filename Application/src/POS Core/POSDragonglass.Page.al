@@ -1,7 +1,5 @@
 page 6150750 "NPR POS (Dragonglass)"
 {
-    // NPR5.53/VB  /20191218 CASE 331640 Page created as an exact copy of page 6150700, except that it used the Dragonglass control add-in, instead of Transcendence
-
     Caption = 'POS';
     PageType = List;
     UsageCategory = Administration;
@@ -50,11 +48,11 @@ page 6150750 "NPR POS (Dragonglass)"
 
     trigger OnOpenPage()
     var
-        "Action": Record "NPR POS Action" temporary;
+        TempAction: Record "NPR POS Action" temporary;
     begin
         POSSession.DebugWithTimestamp('Action discovery starts');
-        Action.SetSession(POSSession);
-        Action.DiscoverActions();
+        TempAction.SetSession(POSSession);
+        TempAction.DiscoverActions();
         POSSession.DebugWithTimestamp('Action discovery ends');
     end;
 

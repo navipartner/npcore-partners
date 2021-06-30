@@ -100,7 +100,7 @@ page 6060120 "NPR TM Ticket Admissions"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Base Calendar Code field';
                 }
-                field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeAdmissionTemp))
+                field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChangeAdmission))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Admission Customized Calendar';
@@ -111,7 +111,7 @@ page 6060120 "NPR TM Ticket Admissions"
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeAdmissionTemp);
+                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChangeAdmission);
                     end;
                 }
                 field("Ticket Base Calendar Code"; Rec."Ticket Base Calendar Code")
@@ -119,7 +119,7 @@ page 6060120 "NPR TM Ticket Admissions"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Base Calendar Code field';
                 }
-                field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTicketTemp))
+                field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChangeTicket))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Ticket Customized Calendar';
@@ -130,7 +130,7 @@ page 6060120 "NPR TM Ticket Admissions"
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTicketTemp);
+                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChangeTicket);
                     end;
                 }
                 field("eTicket Type Code"; Rec."eTicket Type Code")
@@ -267,22 +267,22 @@ page 6060120 "NPR TM Ticket Admissions"
 
     trigger OnAfterGetCurrRecord()
     begin
-        Clear(CustomizedCalendarChangeAdmissionTemp);
-        CustomizedCalendarChangeAdmissionTemp."Source Type" := CustomizedCalendarChangeAdmissionTemp."Source Type"::Location;
-        CustomizedCalendarChangeAdmissionTemp."Source Code" := Rec."Admission Code";
-        CustomizedCalendarChangeAdmissionTemp."Base Calendar Code" := Rec."Admission Base Calendar Code";
-        if (not CustomizedCalendarChangeAdmissionTemp.Insert()) then;
+        Clear(TempCustomizedCalendarChangeAdmission);
+        TempCustomizedCalendarChangeAdmission."Source Type" := TempCustomizedCalendarChangeAdmission."Source Type"::Location;
+        TempCustomizedCalendarChangeAdmission."Source Code" := Rec."Admission Code";
+        TempCustomizedCalendarChangeAdmission."Base Calendar Code" := Rec."Admission Base Calendar Code";
+        if (not TempCustomizedCalendarChangeAdmission.Insert()) then;
 
-        Clear(CustomizedCalendarChangeTicketTemp);
-        CustomizedCalendarChangeTicketTemp."Source Type" := CustomizedCalendarChangeTicketTemp."Source Type"::Service;
-        CustomizedCalendarChangeTicketTemp."Source Code" := Rec."Admission Code";
-        CustomizedCalendarChangeTicketTemp."Base Calendar Code" := Rec."Ticket Base Calendar Code";
-        if (not CustomizedCalendarChangeTicketTemp.Insert()) then;
+        Clear(TempCustomizedCalendarChangeTicket);
+        TempCustomizedCalendarChangeTicket."Source Type" := TempCustomizedCalendarChangeTicket."Source Type"::Service;
+        TempCustomizedCalendarChangeTicket."Source Code" := Rec."Admission Code";
+        TempCustomizedCalendarChangeTicket."Base Calendar Code" := Rec."Ticket Base Calendar Code";
+        if (not TempCustomizedCalendarChangeTicket.Insert()) then;
     end;
 
     var
-        CustomizedCalendarChangeAdmissionTemp: Record "Customized Calendar Change" temporary;
-        CustomizedCalendarChangeTicketTemp: Record "Customized Calendar Change" temporary;
+        TempCustomizedCalendarChangeAdmission: Record "Customized Calendar Change" temporary;
+        TempCustomizedCalendarChangeTicket: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 }
 

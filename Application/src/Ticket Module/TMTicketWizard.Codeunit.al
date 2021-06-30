@@ -37,7 +37,7 @@
         AdmissionTemplate: Code[10];
         ScheduleStartDate: Date;
         ScheduleUntilDate: Date;
-        TmpSchedules: Record "NPR TM Admis. Schedule" temporary;
+        TempSchedules: Record "NPR TM Admis. Schedule" temporary;
         BomTemplate: Code[10];
     begin
 
@@ -51,12 +51,12 @@
         TicketWizardPage.GetTicketTypeInformation(TypeCode, TypeDescription, TypeTemplate);
         TicketWizardPage.GetItemInformation(ItemNo, ItemDescription, ItemCategory, UnitPrice, BomTemplate);
         TicketWizardPage.GetAdmissionInformation(AdmissionCode, AdmissionDescription, AdmissionTemplate);
-        TicketWizardPage.GetScheduleInformation(ScheduleStartDate, ScheduleUntilDate, TmpSchedules);
+        TicketWizardPage.GetScheduleInformation(ScheduleStartDate, ScheduleUntilDate, TempSchedules);
 
         CreateTicketType(TypeCode, TypeDescription, TypeTemplate);
         CreateItem(ItemNo, ItemDescription, ItemCategory, UnitPrice, TypeCode);
         CreateAdmission(AdmissionCode, AdmissionDescription, AdmissionTemplate);
-        CreateSchedules(AdmissionCode, ScheduleStartDate, ScheduleUntilDate, TmpSchedules);
+        CreateSchedules(AdmissionCode, ScheduleStartDate, ScheduleUntilDate, TempSchedules);
         CreateTicketBom(ItemNo, AdmissionCode, BomTemplate);
 
         AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, Today);
@@ -240,32 +240,32 @@
         ConfigTemplateHeader: Record "Config. Template Header";
         RecRef: RecordRef;
         ConfigTemplateMgt: Codeunit "Config. Template Management";
-        TmpTicketBom: Record "NPR TM Ticket Admission BOM" temporary;
+        TempTicketBom: Record "NPR TM Ticket Admission BOM" temporary;
     begin
 
         TicketSetup.Get();
         TicketBOM.Init();
 
         // For some reason, template attempts to fill value of for part of key that is blank.
-        TmpTicketBom."Item No." := ItemNo;
-        TmpTicketBom."Variant Code" := 'X'; // Dummy value to fool template management updaterecord function
-        TmpTicketBom."Admission Code" := AdmissionCode;
-        TmpTicketBom.Insert(true);
+        TempTicketBom."Item No." := ItemNo;
+        TempTicketBom."Variant Code" := 'X'; // Dummy value to fool template management updaterecord function
+        TempTicketBom."Admission Code" := AdmissionCode;
+        TempTicketBom.Insert(true);
 
         if (TicketBomTemplate <> '') then begin
             ConfigTemplateHeader.Get(TicketBomTemplate);
-            RecRef.GetTable(TmpTicketBom);
+            RecRef.GetTable(TempTicketBom);
             ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
-            RecRef.SetTable(TmpTicketBom);
+            RecRef.SetTable(TempTicketBom);
         end;
-        TmpTicketBom.Modify();
+        TempTicketBom.Modify();
 
         // Create persistant record
         TicketBOM.Init();
         TicketBOM.Validate("Item No.", ItemNo);
         TicketBOM.Validate("Admission Code", AdmissionCode);
         TicketBOM.Insert();
-        TicketBOM.TransferFields(TmpTicketBom, false);
+        TicketBOM.TransferFields(TempTicketBom, false);
         TicketBOM.Validate("Item No.", ItemNo);
         TicketBOM.Validate("Admission Code", AdmissionCode);
         TicketBOM.Default := true;

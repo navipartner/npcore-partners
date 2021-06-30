@@ -4,7 +4,7 @@
         GLAcc: Record "G/L Account";
         Item: Record Item;
         Res: Record Resource;
-        TmpExtTextLine: Record "Extended Text Line" temporary;
+        TempExtTextLine: Record "Extended Text Line" temporary;
         NextLineNo: Integer;
         LineSpacing: Integer;
         MakeUpdateRequired: Boolean;
@@ -126,10 +126,10 @@
         ExtTextLine.SetRange("Language Code", ExtTextHeader."Language Code");
         ExtTextLine.SetRange("Text No.", ExtTextHeader."Text No.");
         if ExtTextLine.Find('-') then begin
-            TmpExtTextLine.DeleteAll();
+            TempExtTextLine.DeleteAll();
             repeat
-                TmpExtTextLine := ExtTextLine;
-                TmpExtTextLine.Insert();
+                TempExtTextLine := ExtTextLine;
+                TempExtTextLine.Insert();
             until ExtTextLine.Next() = 0;
             exit(true);
         end;
@@ -146,7 +146,7 @@
         if ToJobPlanningLine.Find('>') then begin
             LineSpacing :=
               (ToJobPlanningLine."Line No." - JobPlanningLine."Line No.") div
-              (1 + TmpExtTextLine.Count());
+              (1 + TempExtTextLine.Count());
             if LineSpacing = 0 then
                 Error(Text000);
         end else
@@ -154,8 +154,8 @@
 
         NextLineNo := JobPlanningLine."Line No." + LineSpacing;
 
-        TmpExtTextLine.Reset();
-        if TmpExtTextLine.Find('-') then begin
+        TempExtTextLine.Reset();
+        if TempExtTextLine.Find('-') then begin
             repeat
                 ToJobPlanningLine.Init();
                 ToJobPlanningLine."Job No." := JobPlanningLine."Job No.";
@@ -163,15 +163,15 @@
                 ToJobPlanningLine."Line No." := NextLineNo;
                 NextLineNo := NextLineNo + LineSpacing;
                 ToJobPlanningLine.Type := ToJobPlanningLine.Type::Text;
-                ToJobPlanningLine.Description := TmpExtTextLine.Text;
+                ToJobPlanningLine.Description := TempExtTextLine.Text;
                 ToJobPlanningLine."NPR Att. to Line No." := JobPlanningLine."Line No.";
                 ToJobPlanningLine."Line Type" := JobPlanningLine."Line Type";
                 ToJobPlanningLine."Planning Date" := JobPlanningLine."Planning Date";
                 ToJobPlanningLine.Insert();
-            until TmpExtTextLine.Next() = 0;
+            until TempExtTextLine.Next() = 0;
             MakeUpdateRequired := true;
         end;
-        TmpExtTextLine.DeleteAll();
+        TempExtTextLine.DeleteAll();
     end;
 
     local procedure IsDeleteAttachedLines(LineNo: Integer; No: Code[20]; AttachedToLineNo: Integer): Boolean

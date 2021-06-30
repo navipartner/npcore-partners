@@ -1287,44 +1287,44 @@
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
-        DocumentEntry: Record "Document Entry" temporary;
+        TempDocumentEntry: Record "Document Entry" temporary;
     begin
 
         if (TableID = DATABASE::"NPR POS Entry") then begin
 
-            OnNavigateFindRecords(DocumentEntry, DocNoFilter, PostingDateFilter);
+            OnNavigateFindRecords(TempDocumentEntry, DocNoFilter, PostingDateFilter);
 
 #if BC17 
-            if (DocumentEntry."Document Type" = 0) then begin
+            if (TempDocumentEntry."Document Type" = 0) then begin
 #else
-            if (DocumentEntry."Document Type".AsInteger() = 0) then begin
+            if (TempDocumentEntry."Document Type".AsInteger() = 0) then begin
 #endif
                 if not (POSEntry.SetCurrentKey(POSEntry."Document No.")) then;
-                POSEntry.SetFilter("Document No.", DocumentEntry."Document No.");
+                POSEntry.SetFilter("Document No.", TempDocumentEntry."Document No.");
             end;
 
 #if BC17 
-            if (DocumentEntry."Document Type" = 1) then begin
+            if (TempDocumentEntry."Document Type" = 1) then begin
 #else
-            if (DocumentEntry."Document Type".AsInteger() = 2) then begin
+            if (TempDocumentEntry."Document Type".AsInteger() = 1) then begin
 #endif
                 if not (POSEntry.SetCurrentKey(POSEntry."Fiscal No.")) then;
-                POSEntry.SetFilter("Fiscal No.", DocumentEntry."Document No.");
+                POSEntry.SetFilter("Fiscal No.", TempDocumentEntry."Document No.");
             end;
 
 #if BC17 
-            if (DocumentEntry."Document Type" = 2) then begin
+            if (TempDocumentEntry."Document Type" = 2) then begin
 #else
-            if (DocumentEntry."Document Type".AsInteger() = 2) then begin
+            if (TempDocumentEntry."Document Type".AsInteger() = 2) then begin
 #endif
-                POSPeriodRegister.SetFilter("Document No.", DocumentEntry."Document No.");
+                POSPeriodRegister.SetFilter("Document No.", TempDocumentEntry."Document No.");
                 if (POSPeriodRegister.FindFirst()) then begin
                     POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegister."No.");
                     POSEntry.SetFilter("System Entry", '=%1', false);
                 end;
             end;
 
-            if (DocumentEntry."No. of Records" = 1) then
+            if (TempDocumentEntry."No. of Records" = 1) then
                 PAGE.Run(PAGE::"NPR POS Entry List", POSEntry)
             else
                 PAGE.Run(0, POSEntry);

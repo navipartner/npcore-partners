@@ -30,7 +30,7 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
                 trigger OnDrillDown()
                 begin
                     if Rec."Document Type" = Rec."Document Type"::Order then
-                        PostedPrepmtDocumentBuffer.ShowPostedDocumentList(Rec.RecordId);
+                        TempPostedPrepmtDocumentBuffer.ShowPostedDocumentList(Rec.RecordId);
                 end;
             }
             field("NPR RemainingAmtInclVAT"; RemainingAmtInclVAT)
@@ -46,7 +46,7 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
     }
 
     var
-        PostedPrepmtDocumentBuffer: Record "NPR Posted Doc. Buffer" temporary;
+        TempPostedPrepmtDocumentBuffer: Record "NPR Posted Doc. Buffer" temporary;
         PrepmtAmtInclVAT: Decimal;
         RemainingAmtInclVAT: Decimal;
 
@@ -54,8 +54,8 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
     trigger OnAfterGetRecord()
     begin
         if Rec."Document Type" = Rec."Document Type"::Order then begin
-            PostedPrepmtDocumentBuffer.Generate(Rec.RecordId, true);
-            PrepmtAmtInclVAT := PostedPrepmtDocumentBuffer.TotalAmtInclVAT(Rec.RecordId);
+            TempPostedPrepmtDocumentBuffer.Generate(Rec.RecordId, true);
+            PrepmtAmtInclVAT := TempPostedPrepmtDocumentBuffer.TotalAmtInclVAT(Rec.RecordId);
         end else
             PrepmtAmtInclVAT := 0;
         RemainingAmtInclVAT := Rec."Amount Including VAT" - PrepmtAmtInclVAT;
@@ -66,7 +66,7 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
     begin
         Rec.CopySellToCustomerFilter();
 
-        PostedPrepmtDocumentBuffer.Reset();
-        PostedPrepmtDocumentBuffer.DeleteAll();
+        TempPostedPrepmtDocumentBuffer.Reset();
+        TempPostedPrepmtDocumentBuffer.DeleteAll();
     end;
 }

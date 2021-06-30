@@ -221,7 +221,7 @@
     var
         Dim: Record Dimension;
         DimVal: Record "Dimension Value";
-        DimSetEntryTmp: Record "Dimension Set Entry" temporary;
+        TempDimSetEntry: Record "Dimension Set Entry" temporary;
         DimMgt: Codeunit DimensionManagement;
         OldDimSetID: Integer;
     begin
@@ -231,19 +231,19 @@
         if (not DimVal.Get(Dim.Code, DimValue)) then
             Error(SetDimension02, DimValue, DimCode);
 
-        DimMgt.GetDimensionSet(DimSetEntryTmp, Rec."Dimension Set ID");
+        DimMgt.GetDimensionSet(TempDimSetEntry, Rec."Dimension Set ID");
 
-        DimSetEntryTmp.SetRange("Dimension Code", Dim.Code);
-        if (DimSetEntryTmp.FindFirst()) then;
-        DimSetEntryTmp."Dimension Code" := Dim.Code;
-        DimSetEntryTmp."Dimension Value Code" := DimVal.Code;
-        DimSetEntryTmp."Dimension Value ID" := DimVal."Dimension Value ID";
+        TempDimSetEntry.SetRange("Dimension Code", Dim.Code);
+        if (TempDimSetEntry.FindFirst()) then;
+        TempDimSetEntry."Dimension Code" := Dim.Code;
+        TempDimSetEntry."Dimension Value Code" := DimVal.Code;
+        TempDimSetEntry."Dimension Value ID" := DimVal."Dimension Value ID";
 
-        if (not DimSetEntryTmp.Insert()) then
-            DimSetEntryTmp.Modify();
+        if (not TempDimSetEntry.Insert()) then
+            TempDimSetEntry.Modify();
 
         OldDimSetID := Rec."Dimension Set ID";
-        Rec."Dimension Set ID" := DimSetEntryTmp.GetDimensionSetID(DimSetEntryTmp);
+        Rec."Dimension Set ID" := TempDimSetEntry.GetDimensionSetID(TempDimSetEntry);
         DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
         Rec.Modify();
 

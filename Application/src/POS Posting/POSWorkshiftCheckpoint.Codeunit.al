@@ -1175,7 +1175,7 @@
         PeriodWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSEntry: Record "NPR POS Entry";
         TmpTaxEntryNo: Integer;
-        TmpPeriodWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
+        TempPeriodWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
         PeriodWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -1251,7 +1251,7 @@
             PeriodWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += ZReportWorkshiftCheckpoint."Direct Negative Turnover (LCY)";
             PeriodWorkshiftCheckpoint."Direct Turnover (LCY)" += ZReportWorkshiftCheckpoint."Direct Turnover (LCY)";
 
-            AggregateTaxCheckpoint(TmpPeriodWorkshiftTaxCheckpoint, PeriodWorkshiftCheckpoint."Entry No.", ZReportWorkshiftCheckpoint."Entry No.", TmpTaxEntryNo);
+            AggregateTaxCheckpoint(TempPeriodWorkshiftTaxCheckpoint, PeriodWorkshiftCheckpoint."Entry No.", ZReportWorkshiftCheckpoint."Entry No.", TmpTaxEntryNo);
         until (ZReportWorkshiftCheckpoint.Next() = 0);
 
         PeriodWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" := ZReportWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)";
@@ -1264,13 +1264,13 @@
         PeriodWorkshiftCheckpoint.Open := false;
         PeriodWorkshiftCheckpoint.Modify();
 
-        TmpPeriodWorkshiftTaxCheckpoint.Reset();
-        if (TmpPeriodWorkshiftTaxCheckpoint.FindSet()) then begin
+        TempPeriodWorkshiftTaxCheckpoint.Reset();
+        if (TempPeriodWorkshiftTaxCheckpoint.FindSet()) then begin
             repeat
-                PeriodWorkshiftTaxCheckpoint.TransferFields(TmpPeriodWorkshiftTaxCheckpoint, false);
+                PeriodWorkshiftTaxCheckpoint.TransferFields(TempPeriodWorkshiftTaxCheckpoint, false);
                 PeriodWorkshiftTaxCheckpoint."Entry No." := 0;
                 PeriodWorkshiftTaxCheckpoint.Insert();
-            until (TmpPeriodWorkshiftTaxCheckpoint.Next() = 0);
+            until (TempPeriodWorkshiftTaxCheckpoint.Next() = 0);
         end;
 
         if POSEntry.Get(PeriodWorkshiftCheckpoint."POS Entry No.") then;
@@ -1328,7 +1328,7 @@
 
     local procedure AggregateVat_PE(WorkshiftCheckpointEntryNo: Integer; PosUnitNo: Code[10]; FromPosEntryNo: Integer)
     var
-        TmpPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
+        TempPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
         POSEntry: Record "NPR POS Entry";
@@ -1348,53 +1348,53 @@
             if (POSTaxAmountLine.FindSet()) then begin
                 repeat
 
-                    TmpPOSWorkshiftTaxCheckpoint.Reset();
-                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
-                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Area Code", '=%1', POSTaxAmountLine."Tax Area Code");
-                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Calculation Type", '=%1', POSTaxAmountLine."Tax Calculation Type");
+                    TempPOSWorkshiftTaxCheckpoint.Reset();
+                    TempPOSWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
+                    TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Area Code", '=%1', POSTaxAmountLine."Tax Area Code");
+                    TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Calculation Type", '=%1', POSTaxAmountLine."Tax Calculation Type");
 
-                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
-                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Jurisdiction Code", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
-                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Group Code", '=%1', POSTaxAmountLine."Tax Group Code");
+                    TempPOSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
+                    TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Jurisdiction Code", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
+                    TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Group Code", '=%1', POSTaxAmountLine."Tax Group Code");
 
-                    if (not TmpPOSWorkshiftTaxCheckpoint.FindFirst()) then begin
+                    if (not TempPOSWorkshiftTaxCheckpoint.FindFirst()) then begin
                         TempEntryNo += 1;
-                        TmpPOSWorkshiftTaxCheckpoint."Entry No." := TempEntryNo;
+                        TempPOSWorkshiftTaxCheckpoint."Entry No." := TempEntryNo;
 
-                        TmpPOSWorkshiftTaxCheckpoint.Init();
-                        TmpPOSWorkshiftTaxCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
+                        TempPOSWorkshiftTaxCheckpoint.Init();
+                        TempPOSWorkshiftTaxCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
 
-                        TmpPOSWorkshiftTaxCheckpoint."Tax Calculation Type" := POSTaxAmountLine."Tax Calculation Type";
+                        TempPOSWorkshiftTaxCheckpoint."Tax Calculation Type" := POSTaxAmountLine."Tax Calculation Type";
 
-                        TmpPOSWorkshiftTaxCheckpoint."VAT Identifier" := POSTaxAmountLine."VAT Identifier";
-                        TmpPOSWorkshiftTaxCheckpoint."Tax Jurisdiction Code" := POSTaxAmountLine."Tax Jurisdiction Code";
-                        TmpPOSWorkshiftTaxCheckpoint."Tax Group Code" := POSTaxAmountLine."Tax Group Code";
+                        TempPOSWorkshiftTaxCheckpoint."VAT Identifier" := POSTaxAmountLine."VAT Identifier";
+                        TempPOSWorkshiftTaxCheckpoint."Tax Jurisdiction Code" := POSTaxAmountLine."Tax Jurisdiction Code";
+                        TempPOSWorkshiftTaxCheckpoint."Tax Group Code" := POSTaxAmountLine."Tax Group Code";
 
-                        TmpPOSWorkshiftTaxCheckpoint."Tax Area Code" := POSTaxAmountLine."Tax Area Code";
-                        TmpPOSWorkshiftTaxCheckpoint."Tax %" := POSTaxAmountLine."Tax %";
-                        TmpPOSWorkshiftTaxCheckpoint.Insert();
+                        TempPOSWorkshiftTaxCheckpoint."Tax Area Code" := POSTaxAmountLine."Tax Area Code";
+                        TempPOSWorkshiftTaxCheckpoint."Tax %" := POSTaxAmountLine."Tax %";
+                        TempPOSWorkshiftTaxCheckpoint.Insert();
                     end;
 
-                    TmpPOSWorkshiftTaxCheckpoint."Tax Base Amount" += POSTaxAmountLine."Tax Base Amount";
-                    TmpPOSWorkshiftTaxCheckpoint."Tax Amount" += POSTaxAmountLine."Tax Amount";
-                    TmpPOSWorkshiftTaxCheckpoint."Line Amount" += POSTaxAmountLine."Line Amount";
-                    TmpPOSWorkshiftTaxCheckpoint."Amount Including Tax" += POSTaxAmountLine."Amount Including Tax";
-                    TmpPOSWorkshiftTaxCheckpoint.Modify();
+                    TempPOSWorkshiftTaxCheckpoint."Tax Base Amount" += POSTaxAmountLine."Tax Base Amount";
+                    TempPOSWorkshiftTaxCheckpoint."Tax Amount" += POSTaxAmountLine."Tax Amount";
+                    TempPOSWorkshiftTaxCheckpoint."Line Amount" += POSTaxAmountLine."Line Amount";
+                    TempPOSWorkshiftTaxCheckpoint."Amount Including Tax" += POSTaxAmountLine."Amount Including Tax";
+                    TempPOSWorkshiftTaxCheckpoint.Modify();
 
                 until (POSTaxAmountLine.Next() = 0);
             end;
         until (POSEntry.Next() = 0);
 
-        TmpPOSWorkshiftTaxCheckpoint.Reset();
-        if (TmpPOSWorkshiftTaxCheckpoint.IsEmpty()) then
+        TempPOSWorkshiftTaxCheckpoint.Reset();
+        if (TempPOSWorkshiftTaxCheckpoint.IsEmpty()) then
             exit;
 
-        TmpPOSWorkshiftTaxCheckpoint.FindSet();
+        TempPOSWorkshiftTaxCheckpoint.FindSet();
         repeat
-            POSWorkshiftTaxCheckpoint.TransferFields(TmpPOSWorkshiftTaxCheckpoint, false);
+            POSWorkshiftTaxCheckpoint.TransferFields(TempPOSWorkshiftTaxCheckpoint, false);
             POSWorkshiftTaxCheckpoint."Entry No." := 0;
             POSWorkshiftTaxCheckpoint.Insert();
-        until (TmpPOSWorkshiftTaxCheckpoint.Next() = 0);
+        until (TempPOSWorkshiftTaxCheckpoint.Next() = 0);
     end;
 
     [IntegrationEvent(false, false)]

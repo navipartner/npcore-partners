@@ -55,7 +55,7 @@ report 6014428 "NPR Shelf Labels"
             column(Itemgroup_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Item group")
             {
             }
-            column(BarCodeTempBlobCol1; BlobBuffer."Buffer 1")
+            column(BarCodeTempBlobCol1; TempBlobBuffer."Buffer 1")
             {
             }
             column(Assortment_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1.Assortment)
@@ -95,7 +95,7 @@ report 6014428 "NPR Shelf Labels"
             trigger OnAfterGetRecord()
             begin
                 BarcodeLib.GenerateBarcode(Barcode, TempBlobCol1);
-                BlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
+                TempBlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
 
                 Clear(ItemVariant);
                 if Item.Get("Item No.") then begin
@@ -177,7 +177,7 @@ report 6014428 "NPR Shelf Labels"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        TempBlobBuffer: Record "NPR BLOB buffer" temporary;
         ItemCategory: Record "Item Category";
         BarcodeLib: Codeunit "NPR Barcode Image Library";
         TempBlobCol1: Codeunit "Temp Blob";

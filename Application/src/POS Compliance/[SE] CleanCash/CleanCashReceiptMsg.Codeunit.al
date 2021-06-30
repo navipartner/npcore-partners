@@ -13,7 +13,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
     procedure CreateRequest(PosEntry: Record "NPR POS Entry"; RequestType: Enum "NPR CleanCash Request Type"; var EntryNo: Integer): Boolean
 #pragma warning restore
     var
-        TmpVat: Record "NPR CleanCash Trans. VAT" temporary;
+        TempVat: Record "NPR CleanCash Trans. VAT" temporary;
         Amount: Decimal;
         IsSales: Boolean;
     begin
@@ -21,8 +21,8 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         // CleanCash needs individual receipts for sales and retur sales
         IsSales := (RequestType = RequestType::RegisterSalesReceipt);
 
-        GetReceiptVat(PosEntry, IsSales, Amount, TmpVat);
-        EntryNo := StoreCleanCashReceipt(PosEntry, Amount, TmpVat);
+        GetReceiptVat(PosEntry, IsSales, Amount, TempVat);
+        EntryNo := StoreCleanCashReceipt(PosEntry, Amount, TempVat);
 
         exit(EntryNo <> 0);
     end;

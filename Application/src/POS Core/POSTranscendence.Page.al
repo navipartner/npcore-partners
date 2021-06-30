@@ -52,11 +52,11 @@ page 6150700 "NPR POS (Transcendence)"
 
     trigger OnOpenPage()
     var
-        "Action": Record "NPR POS Action" temporary;
+        TempAction: Record "NPR POS Action" temporary;
     begin
         POSSession.DebugWithTimestamp('Action discovery starts');
-        Action.SetSession(POSSession);
-        Action.DiscoverActions();
+        TempAction.SetSession(POSSession);
+        TempAction.DiscoverActions();
         POSSession.DebugWithTimestamp('Action discovery ends');
     end;
 

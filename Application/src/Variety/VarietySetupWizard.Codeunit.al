@@ -15,23 +15,23 @@
     end;
 
     var
-        TMPBusinessChoiceSelectionBuffer: Record "Dimension Selection Buffer" temporary;
-        TMPProductChoiceSelectionBuffer: Record "Dimension Selection Buffer" temporary;
+        TempBusinessChoiceSelectionBuffer: Record "Dimension Selection Buffer" temporary;
+        TempProductChoiceSelectionBuffer: Record "Dimension Selection Buffer" temporary;
 
     local procedure Step1_ChooseBusinessType(): Boolean
     begin
         InsertBusinessChoices('SHOES', 'Shoe shops');
         InsertBusinessChoices('CLOTHES', 'Clothes shops');
         InsertBusinessChoices('JEWELERY', 'Jewelery shops');
-        exit(PAGE.RunModal(PAGE::"Dimension Selection-Multiple", TMPBusinessChoiceSelectionBuffer) = ACTION::LookupOK);
+        exit(PAGE.RunModal(PAGE::"Dimension Selection-Multiple", TempBusinessChoiceSelectionBuffer) = ACTION::LookupOK);
     end;
 
     local procedure Step2_ChooseProducts(): Boolean
     begin
-        TMPBusinessChoiceSelectionBuffer.SetRange(Selected, true);
-        if TMPBusinessChoiceSelectionBuffer.FindSet() then
+        TempBusinessChoiceSelectionBuffer.SetRange(Selected, true);
+        if TempBusinessChoiceSelectionBuffer.FindSet() then
             repeat
-                if TMPBusinessChoiceSelectionBuffer.Code = 'SHOES' then begin
+                if TempBusinessChoiceSelectionBuffer.Code = 'SHOES' then begin
                     InsertProductChoices('FR_MEN', 'Shoes for men French Sizes');
                     InsertProductChoices('US_MEN', 'Shoes for men american Sizes');
                     InsertProductChoices('UK_MEN', 'Shoes for men UK Sizes');
@@ -41,25 +41,25 @@
                     InsertProductChoices('UK_WOMEN', 'Shoes for women UK Sizes');
                     InsertProductChoices('IT_WOMEN', 'Shoes for women IT Sizes');
                 end;
-                if TMPBusinessChoiceSelectionBuffer.Code = 'CLOTHES' then begin
+                if TempBusinessChoiceSelectionBuffer.Code = 'CLOTHES' then begin
                     InsertProductChoices('SHIRT', 'Color/size (xs...xxl)');
                     InsertProductChoices('PANTS2', 'Color/Size');
                     InsertProductChoices('PANTS3', 'Color/Waist/Lenght');
                     InsertProductChoices('T-SHIRT', 'Color/Size');
                 end;
-                if TMPBusinessChoiceSelectionBuffer.Code = 'JEWELERY' then begin
+                if TempBusinessChoiceSelectionBuffer.Code = 'JEWELERY' then begin
                     InsertProductChoices('RINGS', 'Ring Sizes');
                 end;
-            until TMPBusinessChoiceSelectionBuffer.Next() = 0;
-        exit(PAGE.RunModal(PAGE::"Dimension Selection-Multiple", TMPProductChoiceSelectionBuffer) = ACTION::LookupOK);
+            until TempBusinessChoiceSelectionBuffer.Next() = 0;
+        exit(PAGE.RunModal(PAGE::"Dimension Selection-Multiple", TempProductChoiceSelectionBuffer) = ACTION::LookupOK);
     end;
 
     local procedure Step3_SelectWhichToCreate()
     begin
-        TMPProductChoiceSelectionBuffer.SetRange(Selected, true);
-        if TMPProductChoiceSelectionBuffer.FindSet() then
+        TempProductChoiceSelectionBuffer.SetRange(Selected, true);
+        if TempProductChoiceSelectionBuffer.FindSet() then
             repeat
-                case TMPProductChoiceSelectionBuffer.Code of
+                case TempProductChoiceSelectionBuffer.Code of
                     //Shoes
                     'FR_MEN':
                         InsertShoe_FRMen();
@@ -92,24 +92,24 @@
                     'RINGS':
                         InsertRings();
                 end;
-            until TMPProductChoiceSelectionBuffer.Next() = 0;
+            until TempProductChoiceSelectionBuffer.Next() = 0;
         //EXIT(PAGE.RUNMODAL(PAGE::"Dimension Selection-Multiple", TMPProductChoiceSelectionBuffer) = ACTION::LookupOK);
     end;
 
     local procedure InsertBusinessChoices(BusinessCode: Code[10]; BusinessDescription: Text)
     begin
-        TMPBusinessChoiceSelectionBuffer.Init();
-        TMPBusinessChoiceSelectionBuffer.Code := BusinessCode;
-        TMPBusinessChoiceSelectionBuffer.Description := BusinessDescription;
-        TMPBusinessChoiceSelectionBuffer.Insert();
+        TempBusinessChoiceSelectionBuffer.Init();
+        TempBusinessChoiceSelectionBuffer.Code := BusinessCode;
+        TempBusinessChoiceSelectionBuffer.Description := BusinessDescription;
+        TempBusinessChoiceSelectionBuffer.Insert();
     end;
 
     local procedure InsertProductChoices(ProductCode: Code[10]; ProductDescription: Text)
     begin
-        TMPProductChoiceSelectionBuffer.Init();
-        TMPProductChoiceSelectionBuffer.Code := ProductCode;
-        TMPProductChoiceSelectionBuffer.Description := ProductDescription;
-        TMPProductChoiceSelectionBuffer.Insert();
+        TempProductChoiceSelectionBuffer.Init();
+        TempProductChoiceSelectionBuffer.Code := ProductCode;
+        TempProductChoiceSelectionBuffer.Description := ProductDescription;
+        TempProductChoiceSelectionBuffer.Insert();
     end;
 
     local procedure InsertVarietyGroups(GroupCode: Code[20]; GroupDescription: Text; V1Type: Code[10]; V1Table: Code[20]; V1CreateCopy: Boolean; V2Type: Code[10]; V2Table: Code[20]; V2CreateCopy: Boolean; V3Type: Code[10]; V3Table: Code[20]; V3CreateCopy: Boolean)

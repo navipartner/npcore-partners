@@ -22,7 +22,7 @@ page 6060068 "NPR TM Ticket Rapid Packages"
                 ToolTip = 'Specifies the value of the package field';
                 trigger OnLookup(var SelectedValues: Text): Boolean
                 var
-                    tmpRetailList: Record "NPR Retail List" temporary;
+                    TempRetailList: Record "NPR Retail List" temporary;
                     rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
                     AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
                     packageList: List of [Text];
@@ -38,24 +38,24 @@ page 6060068 "NPR TM Ticket Rapid Packages"
                     rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/ticketing/?restype=container&comp=list'
                         + '&sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageList);
                     foreach package in packageList do begin
-                        tmpRetailList.Number += 1;
-                        tmpRetailList.Value := package;
-                        tmpRetailList.Choice := package;
-                        tmpRetailList.Insert();
+                        TempRetailList.Number += 1;
+                        TempRetailList.Value := package;
+                        TempRetailList.Choice := package;
+                        TempRetailList.Insert();
                     end;
 
                     RetailListPage.LookupMode(true);
-                    RetailListPage.SetRec(tmpRetailList);
+                    RetailListPage.SetRec(TempRetailList);
                     if RetailListPage.RunModal() <> Action::LookupOK then
                         exit(false);
 
                     SelectedValues := '';
                     PackageNamesFromFileNames := '';
-                    RetailListPage.GetSelectionFilter(tmpRetailList);
-                    tmpRetailList.MarkedOnly(true);
-                    if tmpRetailList.FindSet() then
+                    RetailListPage.GetSelectionFilter(TempRetailList);
+                    TempRetailList.MarkedOnly(true);
+                    if TempRetailList.FindSet() then
                         repeat
-                            PackageNameFromFileName := tmpRetailList.Value.Replace('.rapidstart', '');
+                            PackageNameFromFileName := TempRetailList.Value.Replace('.rapidstart', '');
                             if PackageNameFromFileName.Contains('_ver') then
                                 PackageNameFromFileName := PackageNameFromFileName.Substring(1, PackageNameFromFileName.IndexOf('_ver') - 1);
 
@@ -65,8 +65,8 @@ page 6060068 "NPR TM Ticket Rapid Packages"
 
                             if StrLen(SelectedValues) > 0 then
                                 SelectedValues += ',';
-                            SelectedValues += tmpRetailList.Value;
-                        until tmpRetailList.Next() = 0;
+                            SelectedValues += TempRetailList.Value;
+                        until TempRetailList.Next() = 0;
 
                     CurrPage.Update(false);
                     exit(true);

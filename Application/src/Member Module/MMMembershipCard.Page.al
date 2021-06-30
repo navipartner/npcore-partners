@@ -867,20 +867,20 @@
     var
         LoyaltyPointMgt: Codeunit "NPR MM Loyalty Point Mgt.";
         LoyaltyCouponMgr: Codeunit "NPR MM Loyalty Coupon Mgr";
-        TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
+        TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
     begin
 
-        if (LoyaltyPointMgt.GetCouponToRedeemPOS(Membership."Entry No.", TmpLoyaltyPointsSetup, 999999)) then begin
+        if (LoyaltyPointMgt.GetCouponToRedeemPOS(Membership."Entry No.", TempLoyaltyPointsSetup, 999999)) then begin
             repeat
                 Membership.CalcFields("Remaining Points");
 
-                if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
-                    if (TmpLoyaltyPointsSetup."Points Threshold" <= Membership."Remaining Points") then
+                if (TempLoyaltyPointsSetup."Value Assignment" = TempLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
+                    if (TempLoyaltyPointsSetup."Points Threshold" <= Membership."Remaining Points") then
 
                         //LoyaltyCouponMgr.IssueOneCouponAndPrint (TmpLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", TmpLoyaltyPointsSetup."Points Threshold",0);
-                        LoyaltyCouponMgr.IssueOneCouponAndPrint(TmpLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", Membership."External Membership No.", Today, TmpLoyaltyPointsSetup."Points Threshold", 0);
+                        LoyaltyCouponMgr.IssueOneCouponAndPrint(TempLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", Membership."External Membership No.", Today, TempLoyaltyPointsSetup."Points Threshold", 0);
 
-            until (TmpLoyaltyPointsSetup.Next() = 0);
+            until (TempLoyaltyPointsSetup.Next() = 0);
         end;
     end;
 
@@ -913,7 +913,7 @@
     var
         MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        TmpMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary;
+        TempMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         RenewStartDate: Date;
         RenewUntilDate: Date;
@@ -923,15 +923,15 @@
         SalesInvoicePage: Page "Sales Invoice";
     begin
 
-        TmpMembershipAutoRenew.Init();
-        MembershipManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, TmpMembershipAutoRenew."Valid Until Date");
-        EntryNo := MembershipAutoRenew.AutoRenewOneMembership(0, MembershipEntryNo, TmpMembershipAutoRenew, RenewStartDate, RenewUntilDate, RenewUnitPrice, false);
+        TempMembershipAutoRenew.Init();
+        MembershipManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, TempMembershipAutoRenew."Valid Until Date");
+        EntryNo := MembershipAutoRenew.AutoRenewOneMembership(0, MembershipEntryNo, TempMembershipAutoRenew, RenewStartDate, RenewUntilDate, RenewUnitPrice, false);
         MemberInfoCapture.Get(EntryNo);
         if (MemberInfoCapture."Response Status" <> MemberInfoCapture."Response Status"::COMPLETED) then
             Error(MemberInfoCapture."Response Message");
 
         Commit();
-        SalesHeader.Get(SalesHeader."Document Type"::Invoice, TmpMembershipAutoRenew."Last Invoice No.");
+        SalesHeader.Get(SalesHeader."Document Type"::Invoice, TempMembershipAutoRenew."Last Invoice No.");
         SalesInvoicePage.SetRecord(SalesHeader);
         SalesInvoicePage.RunModal();
     end;

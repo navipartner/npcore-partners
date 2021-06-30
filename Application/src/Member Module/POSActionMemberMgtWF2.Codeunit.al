@@ -546,7 +546,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     local procedure CreateAlterMembershipOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup") Options: Text
     var
-        TmpMembershipEntry: Record "NPR MM Membership Entry" temporary;
+        TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         OptionsArray: JsonArray;
     begin
@@ -554,15 +554,15 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         if (not MembershipAlterationSetup.FindFirst()) then
             exit('[]');
 
-        if (not MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TmpMembershipEntry)) then
+        if (not MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TempMembershipEntry)) then
             exit('[]');
 
-        TmpMembershipEntry.Reset();
-        TmpMembershipEntry.FindSet();
+        TempMembershipEntry.Reset();
+        TempMembershipEntry.FindSet();
 
         repeat
-            OptionsArray.Add(GetMembershipEntryLookupDataToJson(TmpMembershipEntry));
-        until (TmpMembershipEntry.next() = 0);
+            OptionsArray.Add(GetMembershipEntryLookupDataToJson(TempMembershipEntry));
+        until (TempMembershipEntry.next() = 0);
 
         OptionsArray.WriteTo(Options);
     end;

@@ -64,10 +64,10 @@ codeunit 6014539 "NPR UPG Pos Menus"
         POSAction: Record "NPR POS Action";
         POSMenuButton: Record "NPR POS Menu Button";
         ParamValue: Record "NPR POS Parameter Value";
-        ParamValueTmp: Record "NPR POS Parameter Value" temporary;
+        TempParamValue: Record "NPR POS Parameter Value" temporary;
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        if not ParamValueTmp.IsTemporary then
+        if not TempParamValue.IsTemporary then
             exit;
         if not POSAction.Get('SPLIT_BILL') then
             exit;
@@ -75,34 +75,34 @@ codeunit 6014539 "NPR UPG Pos Menus"
         POSMenuButton.SetRange("Action Code", POSAction.Code);
         if POSMenuButton.FindSet() then
             repeat
-                ParamValueTmp.DeleteAll();
+                TempParamValue.DeleteAll();
                 ParamValue.SetRange("Table No.", Database::"NPR POS Menu Button");
                 ParamValue.SetRange(Code, POSMenuButton."Menu Code");
                 ParamValue.SetRange("Record ID", POSMenuButton.RecordId);
                 ParamValue.SetRange(ID, POSMenuButton.ID);
                 if ParamValue.FindSet() then
                     repeat
-                        ParamValueTmp := ParamValue;
-                        ParamValueTmp.Insert();
+                        TempParamValue := ParamValue;
+                        TempParamValue.Insert();
                     until ParamValue.Next() = 0;
 
                 ParamMgt.ClearParametersForRecord(POSMenuButton.RecordId, 0);
                 ParamMgt.CopyFromActionToMenuButton(POSMenuButton."Action Code", POSMenuButton);
 
-                if ParamValueTmp.FindSet() then
+                if TempParamValue.FindSet() then
                     repeat
-                        ParamValue := ParamValueTmp;
-                        case ParamValueTmp.Name of
+                        ParamValue := TempParamValue;
+                        case TempParamValue.Name of
                             'InputType':
                                 ParamValue.Name := 'SeatingSelectionMethod';
                             'FixedSeatingCode':
                                 ParamValue.Name := 'SeatingCode';
                         end;
                         if ParamValue.Find() then begin
-                            ParamValue.Value := ParamValueTmp.Value;
+                            ParamValue.Value := TempParamValue.Value;
                             ParamValue.Modify();
                         end;
-                    until ParamValueTmp.Next() = 0;
+                    until TempParamValue.Next() = 0;
             until POSMenuButton.Next() = 0;
     end;
 

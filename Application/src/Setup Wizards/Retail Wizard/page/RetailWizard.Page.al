@@ -743,25 +743,25 @@ page 6014651 "NPR Retail Wizard"
         MediaResourcesDone: Record "Media Resources";
         MediaResourcesStandard: Record "Media Resources";
         SalespersonBuffer: Record "NPR Salesperson Buffer";
-        POSStore: Record "NPR POS Store" temporary;
+        TempPOSStore: Record "NPR POS Store" temporary;
         TempAllPOSStore: Record "NPR POS Store" temporary;
-        POSAuditProfile: Record "NPR POS Audit Profile" temporary;
+        TempPOSAuditProfile: Record "NPR POS Audit Profile" temporary;
         TempAllPOSAuditProfile: Record "NPR POS Audit Profile" temporary;
-        POSViewProfile: Record "NPR POS View Profile" temporary;
+        TempPOSViewProfile: Record "NPR POS View Profile" temporary;
         TempAllPOSViewProfile: Record "NPR POS View Profile" temporary;
-        POSEndOfDayProfile: Record "NPR POS End of Day Profile" temporary;
+        TempPOSEndOfDayProfile: Record "NPR POS End of Day Profile" temporary;
         TempAllPOSEndOfDayProfile: Record "NPR POS End of Day Profile" temporary;
-        POSPostingProfile: Record "NPR POS Posting Profile" temporary;
+        TempPOSPostingProfile: Record "NPR POS Posting Profile" temporary;
         TempAllPOSPostingProfile: Record "NPR POS Posting Profile" temporary;
-        EanBoxSetup: Record "NPR Ean Box Setup" temporary;
+        TempEanBoxSetup: Record "NPR Ean Box Setup" temporary;
         TempAllEanBoxSetup: Record "NPR Ean Box Setup" temporary;
-        POSSalesWorkflowSet: Record "NPR POS Sales Workflow Set" temporary;
+        TempPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set" temporary;
         TempAllPOSSalesWorkflowSet: Record "NPR POS Sales Workflow Set" temporary;
-        GlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup" temporary;
+        TempGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup" temporary;
         TempAllGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup" temporary;
-        POSUnitToCreate: Record "NPR POS Unit" temporary;
+        TempPOSUnitToCreate: Record "NPR POS Unit" temporary;
         TempAllPOSUnit: Record "NPR POS Unit" temporary;
-        POSPaymentBinToCreate: Record "NPR POS Payment Bin" temporary;
+        TempPOSPaymentBinToCreate: Record "NPR POS Payment Bin" temporary;
         TempAllPOSPaymentBin: Record "NPR POS Payment Bin" temporary;
         TempAllPOSPaymentMethod: Record "NPR POS Payment Method" temporary;
         TempAllSalesperson: Record "NPR Salesperson Buffer" temporary;
@@ -873,22 +873,22 @@ page 6014651 "NPR Retail Wizard"
     begin
         POSUnitStepVisible := true;
 
-        CurrPage.POSStoreListPG.Page.GetRec(POSStore);
+        CurrPage.POSStoreListPG.Page.GetRec(TempPOSStore);
         CurrPage.POSStoreListPG.Page.CopyRealAndTemp(TempAllPOSStore);
 
-        CurrPage.POSAuditProfiles.Page.GetRec(POSAuditProfile);
+        CurrPage.POSAuditProfiles.Page.GetRec(TempPOSAuditProfile);
         CurrPage.POSAuditProfiles.Page.CopyRealAndTemp(TempAllPOSAuditProfile);
-        CurrPage.POSViewProfiles.Page.GetRec(POSViewProfile);
+        CurrPage.POSViewProfiles.Page.GetRec(TempPOSViewProfile);
         CurrPage.POSViewProfiles.Page.CopyRealAndTemp(TempAllPOSViewProfile);
-        CurrPage.POSEndOfDayProfiles.Page.GetRec(POSEndOfDayProfile);
+        CurrPage.POSEndOfDayProfiles.Page.GetRec(TempPOSEndOfDayProfile);
         CurrPage.POSEndOfDayProfiles.Page.CopyRealAndTemp(TempAllPOSEndOfDayProfile);
-        CurrPage.POSPostingProfiles.Page.GetRec(POSPostingProfile);
+        CurrPage.POSPostingProfiles.Page.GetRec(TempPOSPostingProfile);
         CurrPage.POSPostingProfiles.Page.CopyRealAndTemp(TempAllPOSPostingProfile);
-        CurrPage.EANBoxSetups.Page.GetRec(EanBoxSetup);
+        CurrPage.EANBoxSetups.Page.GetRec(TempEanBoxSetup);
         CurrPage.EANBoxSetups.Page.CopyRealAndTemp(TempAllEanBoxSetup);
-        CurrPage.POSSalesWorkflowSets.Page.GetRec(POSSalesWorkflowSet);
+        CurrPage.POSSalesWorkflowSets.Page.GetRec(TempPOSSalesWorkflowSet);
         CurrPage.POSSalesWorkflowSets.Page.CopyRealAndTemp(TempAllPOSSalesWorkflowSet);
-        CurrPage.GlobalPOSSalesSetups.Page.GetRec(GlobalPOSSalesSetup);
+        CurrPage.GlobalPOSSalesSetups.Page.GetRec(TempGlobalPOSSalesSetup);
         CurrPage.GlobalPOSSalesSetups.Page.CopyRealAndTemp(TempAllGlobalPOSSalesSetup);
 
         CurrPage.POSUnitListPG.Page.SetGlobals(TempAllPOSStore,
@@ -905,7 +905,7 @@ page 6014651 "NPR Retail Wizard"
     begin
         POSPaymentBinStepVisible := true;
 
-        CurrPage.POSUnitListPG.Page.GetRec(POSUnitToCreate);
+        CurrPage.POSUnitListPG.Page.GetRec(TempPOSUnitToCreate);
         CurrPage.POSUnitListPG.Page.CopyRealAndTemp(TempAllPOSUnit);
         CurrPage.POSPaymentBinListPG.Page.SetGlobals(TempAllPOSUnit);
     end;
@@ -914,7 +914,7 @@ page 6014651 "NPR Retail Wizard"
     begin
         POSPaymentMethodStepVisible := true;
 
-        CurrPage.POSPaymentBinListPG.Page.GetRec(POSPaymentBinToCreate);
+        CurrPage.POSPaymentBinListPG.Page.GetRec(TempPOSPaymentBinToCreate);
     end;
 
     local procedure ShowPOSPostingSetupStep()
@@ -1034,8 +1034,8 @@ page 6014651 "NPR Retail Wizard"
         CurrPage.POSSalesWorkflowSets.Page.CreatePOSSalesWorkflowSetData();
         CurrPage.GlobalPOSSalesSetups.Page.CreateNpGlobalPOSSalesSetupData();
 
-        CurrPage.POSUnitListPG.Page.CreatePOSUnitData(POSUnitToCreate);
-        CurrPage.POSPaymentBinListPG.Page.CreatePOSPaymentBinData(POSPaymentBinToCreate);
+        CurrPage.POSUnitListPG.Page.CreatePOSUnitData(TempPOSUnitToCreate);
+        CurrPage.POSPaymentBinListPG.Page.CreatePOSPaymentBinData(TempPOSPaymentBinToCreate);
         CurrPage.POSPaymentMethodsPG.Page.CreatePOSPaymentMethodData();
         CurrPage.POSPostingSetupPG.Page.CreatePOSPostingSetupData();
         CurrPage.SalespersonListPG.Page.CreateSalespersonData();

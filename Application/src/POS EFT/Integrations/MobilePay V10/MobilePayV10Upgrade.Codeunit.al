@@ -352,17 +352,17 @@ codeunit 6014565 "NPR MobilePayV10 Upgrade"
     var
         mobilePayToken: Codeunit "NPR MobilePayV10 Token";
         mobilePayAuthRequest: Codeunit "NPR MobilePayV10 Auth";
-        eftTrxRequestTemp: Record "NPR EFT Transaction Request" temporary;
+        TempEftTrxRequest: Record "NPR EFT Transaction Request" temporary;
         token: Text;
     begin
         if mobilePayToken.TryGetToken(token) then
             exit(token);
 
-        eftTrxRequestTemp.Init();
-        eftTrxRequestTemp."Original POS Payment Type Code" := EftSetup."Payment Type POS";
-        eftTrxRequestTemp.Insert();
+        TempEftTrxRequest.Init();
+        TempEftTrxRequest."Original POS Payment Type Code" := EftSetup."Payment Type POS";
+        TempEftTrxRequest.Insert();
         mobilePayAuthRequest.SetGlobalEFTSetup(EftSetup);
-        mobilePayAuthRequest.Run(eftTrxRequestTemp);
+        mobilePayAuthRequest.Run(TempEftTrxRequest);
 
         IF mobilePayToken.TryGetToken(token) THEN
             EXIT(token);

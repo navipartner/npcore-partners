@@ -93,24 +93,24 @@ report 6014441 "NPR POS Item Sales with Dim."
         dataitem(AppliedFilterLoop; "Integer")
         {
             DataItemTableView = SORTING(Number);
-            column(FilterFieldName; AppliedFilterBuffer.Name)
+            column(FilterFieldName; TempAppliedFilterBuffer.Name)
             {
             }
-            column(FilterValue; AppliedFilterBuffer.Value)
+            column(FilterValue; TempAppliedFilterBuffer.Value)
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then
-                    AppliedFilterBuffer.FindSet()
+                    TempAppliedFilterBuffer.FindSet()
                 else
-                    AppliedFilterBuffer.Next();
+                    TempAppliedFilterBuffer.Next();
             end;
 
             trigger OnPreDataItem()
             begin
-                SetRange(Number, 1, AppliedFilterBuffer.Count());
+                SetRange(Number, 1, TempAppliedFilterBuffer.Count());
             end;
         }
         dataitem(POSSalesLineCons; "NPR POS Entry Sales Line")
@@ -269,7 +269,7 @@ report 6014441 "NPR POS Item Sales with Dim."
         DimSelectionBuf: Record "Dimension Selection Buffer";
         TempDimSetEntryBuffer: Record "Dimension Set Entry" temporary;
         DimValue: Record "Dimension Value";
-        AppliedFilterBuffer: Record "Name/Value Buffer" temporary;
+        TempAppliedFilterBuffer: Record "Name/Value Buffer" temporary;
         SelectedDim: Record "Selected Dimension";
         TempSelectedDim: Record "Selected Dimension" temporary;
         DimBufMgt: Codeunit "Dimension Buffer Management";
@@ -343,7 +343,7 @@ report 6014441 "NPR POS Item Sales with Dim."
         RecRef: RecordRef;
         FilterNo: Integer;
     begin
-        AppliedFilterBuffer.DeleteAll();
+        TempAppliedFilterBuffer.DeleteAll();
         FilterNo := 100;
         RecRef.GetTable("POS Entry");
         CheckAndAddRecFiltersToBuffer(RecRef, FilterNo);
@@ -386,11 +386,11 @@ report 6014441 "NPR POS Item Sales with Dim."
     begin
         if AppliedFilter = '' then
             exit;
-        AppliedFilterBuffer.Init();
-        AppliedFilterBuffer.ID := FilterNo;
-        AppliedFilterBuffer.Name := CopyStr(FieldName, 1, MaxStrLen(AppliedFilterBuffer.Name));
-        AppliedFilterBuffer.Value := CopyStr(AppliedFilter, 1, MaxStrLen(AppliedFilterBuffer.Value));
-        AppliedFilterBuffer.Insert();
+        TempAppliedFilterBuffer.Init();
+        TempAppliedFilterBuffer.ID := FilterNo;
+        TempAppliedFilterBuffer.Name := CopyStr(FieldName, 1, MaxStrLen(TempAppliedFilterBuffer.Name));
+        TempAppliedFilterBuffer.Value := CopyStr(AppliedFilter, 1, MaxStrLen(TempAppliedFilterBuffer.Value));
+        TempAppliedFilterBuffer.Insert();
         FilterNo += 1;
     end;
 

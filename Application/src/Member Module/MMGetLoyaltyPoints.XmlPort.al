@@ -274,7 +274,7 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
         LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members.";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
         MemberCommunity: Record "NPR MM Member Community";
-        TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
+        TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
         GeneralLedgerSetup: Record "General Ledger Setup";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         ReasonText: Text;
@@ -343,12 +343,12 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
         pointsearnedvalue := '0';
         pointsremainingvalue := '0';
 
-        if (LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TmpLoyaltyPointsSetup, 1000000000, ReasonText)) then begin
-            TmpLoyaltyPointsSetup.Reset();
-            TmpLoyaltyPointsSetup.SetCurrentKey(Code, "Amount LCY");
-            TmpLoyaltyPointsSetup.FindLast();
-            pointsearnedvalue := Format(Round(Earned * TmpLoyaltyPointsSetup."Point Rate", 1), 0, 9);
-            pointsremainingvalue := Format(Round(Redeemable * TmpLoyaltyPointsSetup."Point Rate", 1), 0, 9);
+        if (LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TempLoyaltyPointsSetup, 1000000000, ReasonText)) then begin
+            TempLoyaltyPointsSetup.Reset();
+            TempLoyaltyPointsSetup.SetCurrentKey(Code, "Amount LCY");
+            TempLoyaltyPointsSetup.FindLast();
+            pointsearnedvalue := Format(Round(Earned * TempLoyaltyPointsSetup."Point Rate", 1), 0, 9);
+            pointsremainingvalue := Format(Round(Redeemable * TempLoyaltyPointsSetup."Point Rate", 1), 0, 9);
 
             GeneralLedgerSetup.Get();
             pointsearnedcurrencycode := GeneralLedgerSetup."LCY Code";

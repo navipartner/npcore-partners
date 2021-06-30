@@ -200,13 +200,13 @@ table 6150701 "NPR POS Menu Button"
 
             trigger OnValidate()
             var
-                SecureMethodTmp: Record "NPR POS Secure Method" temporary;
+                TempSecureMethod: Record "NPR POS Secure Method" temporary;
             begin
                 if ("Secure Method Code" = '') then
                     exit;
 
-                SecureMethodTmp.RunDiscovery();
-                SecureMethodTmp.Get("Secure Method Code");
+                TempSecureMethod.RunDiscovery();
+                TempSecureMethod.Get("Secure Method Code");
             end;
         }
         field(34; "Show Plus/Minus Buttons"; Boolean)
@@ -816,32 +816,32 @@ table 6150701 "NPR POS Menu Button"
 
     local procedure SwitchNodes(Source: Record "NPR POS Menu Button"; Target: Record "NPR POS Menu Button")
     var
-        SourceHierarchy: Record "NPR POS Menu Button" temporary;
-        TargetHierarchy: Record "NPR POS Menu Button" temporary;
+        TempSourceHierarchy: Record "NPR POS Menu Button" temporary;
+        TempTargetHierarchy: Record "NPR POS Menu Button" temporary;
     begin
-        Source.CopyHierarchy(SourceHierarchy, true);
-        Target.CopyHierarchy(TargetHierarchy, true);
+        Source.CopyHierarchy(TempSourceHierarchy, true);
+        Target.CopyHierarchy(TempTargetHierarchy, true);
 
-        SourceHierarchy.FindFirst();
-        TargetHierarchy.FindFirst();
+        TempSourceHierarchy.FindFirst();
+        TempTargetHierarchy.FindFirst();
 
         case true of
             // Case 1: same parent
             Source."Parent ID" = Target."Parent ID":
                 begin
                     if Source.Ordinal < Target.Ordinal then
-                        SwitchNodesSameParent(TargetHierarchy, SourceHierarchy, Source.Ordinal)
+                        SwitchNodesSameParent(TempTargetHierarchy, TempSourceHierarchy, Source.Ordinal)
                     else
-                        SwitchNodesSameParent(SourceHierarchy, TargetHierarchy, Target.Ordinal);
+                        SwitchNodesSameParent(TempSourceHierarchy, TempTargetHierarchy, Target.Ordinal);
                 end;
 
             // Case 2: Cross-hierarchy move, moving up
             Source.Ordinal > Target.Ordinal:
-                MoveSubtreeAboveNode(SourceHierarchy, Target);
+                MoveSubtreeAboveNode(TempSourceHierarchy, Target);
 
             // Case 3: Cross-hierarchy move, moving down:
             else
-                MoveSubtreeBelowNode(SourceHierarchy, Target);
+                MoveSubtreeBelowNode(TempSourceHierarchy, Target);
         end;
     end;
 
@@ -1109,18 +1109,18 @@ table 6150701 "NPR POS Menu Button"
 
     procedure LocalizeData()
     var
-        FieldTmp: Record "Field" temporary;
+        TempField: Record "Field" temporary;
         LocalizedCaptions: Page "NPR POS Localized Table Data";
     begin
-        FieldTmp.TableNo := DATABASE::"NPR POS Menu Button";
+        TempField.TableNo := DATABASE::"NPR POS Menu Button";
 
-        FieldTmp."No." := FieldNo(Caption);
-        FieldTmp.Insert();
+        TempField."No." := FieldNo(Caption);
+        TempField.Insert();
 
-        FieldTmp."No." := FieldNo(Tooltip);
-        FieldTmp.Insert();
+        TempField."No." := FieldNo(Tooltip);
+        TempField.Insert();
 
-        LocalizedCaptions.PrepareLocalizationForRecord(RecordId, FieldTmp);
+        LocalizedCaptions.PrepareLocalizationForRecord(RecordId, TempField);
         LocalizedCaptions.RunModal();
     end;
 

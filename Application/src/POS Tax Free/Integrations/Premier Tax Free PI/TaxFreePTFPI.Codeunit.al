@@ -28,7 +28,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
     [TryFunction]
     local procedure InitializeHandler(TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary;
+        TempHandlerParameters: Record "NPR Tax Free Handler Param." temporary;
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
         Variant: Variant;
     begin
@@ -37,19 +37,19 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         if not TaxFreeUnit."Handler Parameters".HasValue() then
             Error(Error_MissingParameters, TaxFreeUnit."Handler ID Enum", TaxFreeUnit."POS Unit No.");
 
-        AddParameters(tmpHandlerParameters);
-        tmpHandlerParameters.DeserializeParameterBLOB(TaxFreeUnit);
+        AddParameters(TempHandlerParameters);
+        TempHandlerParameters.DeserializeParameterBLOB(TaxFreeUnit);
 
-        if tmpHandlerParameters.TryGetParameterValue('Merchant ID', Variant) then
+        if TempHandlerParameters.TryGetParameterValue('Merchant ID', Variant) then
             MerchantID := Variant;
 
-        if tmpHandlerParameters.TryGetParameterValue('VAT Number', Variant) then
+        if TempHandlerParameters.TryGetParameterValue('VAT Number', Variant) then
             VATNumber := Variant;
 
-        if tmpHandlerParameters.TryGetParameterValue('Country Code', Variant) then
+        if TempHandlerParameters.TryGetParameterValue('Country Code', Variant) then
             CountryCode := Variant;
 
-        if tmpHandlerParameters.TryGetParameterValue('Minimum Amount Limit', Variant) then
+        if TempHandlerParameters.TryGetParameterValue('Minimum Amount Limit', Variant) then
             MinimumAmountLimit := Variant;
 
         POSUnitNo := TaxFreeUnit."POS Unit No.";

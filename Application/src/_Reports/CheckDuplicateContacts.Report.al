@@ -40,19 +40,19 @@
                 dataitem("Integer"; "Integer")
                 {
                     DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
-                    column(Temp_Contact_No; TMPCont."No.")
+                    column(Temp_Contact_No; TempCont."No.")
                     {
                         IncludeCaption = true;
                     }
-                    column(Temp_Contact_Name; TMPCont.Name)
+                    column(Temp_Contact_Name; TempCont.Name)
                     {
                         IncludeCaption = true;
                     }
-                    column(Temp_Contact_Address; TMPCont.Address)
+                    column(Temp_Contact_Address; TempCont.Address)
                     {
                         IncludeCaption = true;
                     }
-                    column(Temp_Contact_Phone_No; TMPCont."Phone No.")
+                    column(Temp_Contact_Phone_No; TempCont."Phone No.")
                     {
                         IncludeCaption = true;
                     }
@@ -60,17 +60,17 @@
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then begin
-                            if not TMPCont.FindFirst() then
+                            if not TempCont.FindFirst() then
                                 CurrReport.Break()
                         end else
-                            if TMPCont.Next() = 0 then
+                            if TempCont.Next() = 0 then
                                 CurrReport.Break();
                     end;
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    TMPCont.DeleteAll();
+                    TempCont.DeleteAll();
                     Cont2.Reset();
                     Cont2.SetFilter("No.", '<>%1', "No.");
 
@@ -83,9 +83,9 @@
 
                     if Cont2.FindSet() then
                         repeat
-                            TMPCont.Init();
-                            TMPCont.TransferFields(Cont2);
-                            TMPCont.Insert();
+                            TempCont.Init();
+                            TempCont.TransferFields(Cont2);
+                            TempCont.Insert();
                         until Cont2.Next() = 0
                     else
                         CurrReport.Skip();
@@ -163,7 +163,7 @@
     var
         Company: Record "Company Information";
         Cont2: Record Contact;
-        TMPCont: Record Contact temporary;
+        TempCont: Record Contact temporary;
         CheckAddr: Boolean;
         CheckName: Boolean;
         CheckPhone: Boolean;

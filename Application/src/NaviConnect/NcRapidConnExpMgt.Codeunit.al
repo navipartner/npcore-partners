@@ -270,7 +270,7 @@
     [EventSubscriber(ObjectType::Codeunit, 6151501, 'IsUniqueTask', '', true, true)]
     local procedure IsUniqueTask(TaskProcessor: Record "NPR Nc Task Processor"; var TempTask: Record "NPR Nc Task" temporary; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary; var IsUnique: Boolean; var Checked: Boolean)
     var
-        NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
+        TempUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
         TempExportTrigger: Record "NPR Nc RapidConnect Trig.Table" temporary;
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         PrevRecRef: RecordRef;
@@ -292,13 +292,13 @@
 
         TempExportTrigger.FindSet();
         repeat
-            NewUniqueTaskBuffer.Init();
-            NewUniqueTaskBuffer."Table No." := RecRef.Number;
-            NewUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
-            NewUniqueTaskBuffer."Record Position" := RecRef.GetPosition(false);
-            NewUniqueTaskBuffer."Codeunit ID" := CurrCodeunitId();
-            NewUniqueTaskBuffer."Processing Code" := TempExportTrigger."Setup Code";
-            if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
+            TempUniqueTaskBuffer.Init();
+            TempUniqueTaskBuffer."Table No." := RecRef.Number;
+            TempUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
+            TempUniqueTaskBuffer."Record Position" := RecRef.GetPosition(false);
+            TempUniqueTaskBuffer."Codeunit ID" := CurrCodeunitId();
+            TempUniqueTaskBuffer."Processing Code" := TempExportTrigger."Setup Code";
+            if NcTaskMgt.ReqisterUniqueTask(TempUniqueTaskBuffer, UniqueTaskBuffer) then
                 IsUnique := true;
         until TempExportTrigger.Next() = 0;
     end;

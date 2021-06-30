@@ -5,7 +5,7 @@
     end;
 
     var
-        CustDiscGroupTmp: Record "Customer Discount Group" temporary;
+        TempCustDiscGroup: Record "Customer Discount Group" temporary;
 
     procedure ApplyPeriodDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     begin
@@ -161,9 +161,9 @@
             exit(true);
 
         GenerateTmpCustDiscGroupList();
-        CustDiscGroupTmp.SetFilter(Code, PeriodDiscount."Customer Disc. Group Filter");
-        CustDiscGroupTmp.Code := SalePOS."Customer Disc. Group";
-        exit(CustDiscGroupTmp.Find());
+        TempCustDiscGroup.SetFilter(Code, PeriodDiscount."Customer Disc. Group Filter");
+        TempCustDiscGroup.Code := SalePOS."Customer Disc. Group";
+        exit(TempCustDiscGroup.Find());
     end;
 
     local procedure IsValidDay(PeriodDiscount: Record "NPR Period Discount"; CheckDate: Date): Boolean
@@ -308,19 +308,19 @@
     var
         CustDiscGroup: Record "Customer Discount Group";
     begin
-        CustDiscGroupTmp.Reset();
-        if not CustDiscGroupTmp.IsEmpty then
+        TempCustDiscGroup.Reset();
+        if not TempCustDiscGroup.IsEmpty then
             exit;
 
         if CustDiscGroup.FindSet() then
             repeat
-                CustDiscGroupTmp := CustDiscGroup;
-                CustDiscGroupTmp.Insert();
+                TempCustDiscGroup := CustDiscGroup;
+                TempCustDiscGroup.Insert();
             until CustDiscGroup.Next() = 0;
 
-        CustDiscGroupTmp.Init();
-        CustDiscGroupTmp.Code := '';
-        if not CustDiscGroupTmp.Find() then
-            CustDiscGroupTmp.Insert();
+        TempCustDiscGroup.Init();
+        TempCustDiscGroup.Code := '';
+        if not TempCustDiscGroup.Find() then
+            TempCustDiscGroup.Insert();
     end;
 }

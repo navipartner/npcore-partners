@@ -102,9 +102,9 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
                             trigger OnBeforePassVariable()
                             begin
                                 Dim2Description := '';
-                                TmpFactDimension2.SetFilter("Fact Code", '=%1', TmpTicketStatisticsResponse."Admission Code");
-                                if (TmpFactDimension2.FindFirst()) then
-                                    Dim2Description := TmpFactDimension2.Description;
+                                TempFactDimension2.SetFilter("Fact Code", '=%1', TmpTicketStatisticsResponse."Admission Code");
+                                if (TempFactDimension2.FindFirst()) then
+                                    Dim2Description := TempFactDimension2.Description;
                             end;
                         }
                         fieldattribute(AdmissionCount; TmpTicketStatisticsResponse."Admission Count")
@@ -144,7 +144,7 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
         RequestUntilDate: Date;
         RequestFromDate: Date;
         StartTime: Time;
-        TmpFactDimension2: Record "NPR TM Ticket Access Fact" temporary;
+        TempFactDimension2: Record "NPR TM Ticket Access Fact" temporary;
 
     procedure GetRequest(var FromDate: Date; var UntilDate: Date; var Dim1: Text; var Dim2: Text)
     begin
@@ -179,8 +179,8 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
             exit;
 
         repeat
-            TmpFactDimension2.TransferFields(TmpFactCols, true);
-            TmpFactDimension2.Insert();
+            TempFactDimension2.TransferFields(TmpFactCols, true);
+            TempFactDimension2.Insert();
         until (TmpFactCols.Next() = 0);
 
         // Transfer data
@@ -204,7 +204,7 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
 
     procedure SetErrorResponse(ReasonText: Text)
     var
-        ExecutionTimeLbl: Label '%1 (ms)',Locked = true;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
     begin
         ResponseStatus := 'ERROR';
         ResponseMessage := ReasonText;
