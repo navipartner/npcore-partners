@@ -80,13 +80,13 @@ page 6014645 "NPR Tax Free Requests"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Success field';
                 }
-                field("Request.HASVALUE"; Rec.Request.HasValue)
+                field("Request Stored"; Rec.Request.HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Request Stored';
                     ToolTip = 'Specifies the value of the Request Stored field';
                 }
-                field("Response.HASVALUE"; Rec.Response.HasValue)
+                field("Response Stored"; Rec.Response.HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Response Stored';

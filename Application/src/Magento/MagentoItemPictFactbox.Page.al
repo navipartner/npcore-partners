@@ -14,7 +14,7 @@
                 ShowCaption = false;
                 Visible = HasPicture;
             }
-            field("TempMagentoPicture.Picture"; TempMagentoPicture.Image)
+            field("Magento Picture"; TempMagentoPicture.Image)
             {
                 ApplicationArea = All;
                 ShowCaption = false;

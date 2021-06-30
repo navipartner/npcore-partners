@@ -18,19 +18,19 @@ page 6059988 "NPR Sale Stats Activities"
                 begin
                 end;
             }
-            field("Date.GETFILTER(""Period Start"")"; Date.GetFilter("Period Start"))
+            field("Period Start Filter"; Date.GetFilter("Period Start"))
             {
                 ApplicationArea = All;
                 ShowCaption = false;
-                ToolTip = 'Specifies the value of the Date.GetFilter(Period Start) field';
+                ToolTip = 'Specifies the value of the Period Start filter';
             }
-            field("SELECTSTR(FigureToDisplay+1,Text0001)"; SelectStr(FigureToDisplay + 1, Text0001))
+            field("Figure to display"; SelectStr(FigureToDisplay + 1, Text0001))
             {
                 ApplicationArea = All;
                 ShowCaption = false;
-                ToolTip = 'Specifies the value of the SelectStr(FigureToDisplay + 1, Text0001) field';
+                ToolTip = 'Specifies Figure to display';
             }
-            field("Date.""Period Type"""; Date."Period Type")
+            field("Period Type"; Date."Period Type")
             {
                 ApplicationArea = All;
                 ShowCaption = false;

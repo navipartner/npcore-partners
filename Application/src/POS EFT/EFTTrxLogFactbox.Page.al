@@ -24,7 +24,7 @@ page 6184473 "NPR EFT Trx Log Factbox"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logged At field';
                 }
-                field("Log.HASVALUE"; Rec.Log.HasValue)
+                field("Has Log File"; Rec.Log.HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Has Log File';

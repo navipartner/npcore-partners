@@ -144,7 +144,7 @@ page 6014574 "NPR Pacsoft Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pakkelable Test Mode field';
                 }
-                group("Choose either ""Order No. to Reference"" or ""Order No. or Ext Doc No to ref""")
+                group("Choose either Order No. to Reference or Order No. or Ext Doc No to ref")
                 {
                     Caption = 'Choose either "Order No. to Reference" or "Order No. or Ext Doc No to ref"';
                     field("Order No. to Ref"; Rec."Order No. to Reference")

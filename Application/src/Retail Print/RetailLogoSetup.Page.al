@@ -61,7 +61,7 @@ page 6014566 "NPR Retail Logo Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End Date field';
                 }
-                field("OneBitLogo.HASVALUE"; Rec.OneBitLogo.HasValue())
+                field("Boca Compatible"; Rec.OneBitLogo.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Boca Compatible';

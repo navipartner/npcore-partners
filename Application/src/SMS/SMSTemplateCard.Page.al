@@ -74,7 +74,7 @@ page 6059941 "NPR SMS Template Card"
                         ToolTip = 'Specifies the value of the Recipient Group field';
                     }
                 }
-                field("""Table Filters"".HASVALUE"; Rec."Table Filters".HasValue)
+                field("Filters on Table"; Rec."Table Filters".HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Filters on Table';

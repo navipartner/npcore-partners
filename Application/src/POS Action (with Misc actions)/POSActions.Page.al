@@ -39,7 +39,7 @@ page 6150703 "NPR POS Actions"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Workflow.HASVALUE()"; Rec.Workflow.HasValue())
+                field("Workflow Defined"; Rec.Workflow.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Workflow Defined';

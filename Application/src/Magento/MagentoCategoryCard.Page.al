@@ -35,7 +35,7 @@ page 6151414 "NPR Magento Category Card"
                             CurrPage.Update(true);
                         end;
                     }
-                    field("FORMAT(Description.HASVALUE)"; Format(Rec.Description.HasValue))
+                    field("Description"; Format(Rec.Description.HasValue))
                     {
                         ApplicationArea = All;
                         AssistEdit = true;
@@ -55,7 +55,7 @@ page 6151414 "NPR Magento Category Card"
                             end;
                         end;
                     }
-                    field("FORMAT(""Short Description"".HASVALUE)"; Format(Rec."Short Description".HasValue))
+                    field("Short Description"; Format(Rec."Short Description".HasValue))
                     {
                         ApplicationArea = All;
                         Caption = 'Short Description';

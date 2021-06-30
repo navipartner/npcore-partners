@@ -76,7 +76,7 @@
             cuegroup("My User Tasks")
             {
                 Caption = 'My User Tasks';
-                field("UserTaskManagement.GetMyPendingUserTasksCount"; UserTaskManagement.GetMyPendingUserTasksCount())
+                field("Pending User Tasks"; UserTaskManagement.GetMyPendingUserTasksCount())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Pending User Tasks';

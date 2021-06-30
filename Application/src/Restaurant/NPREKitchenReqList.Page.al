@@ -90,7 +90,7 @@ page 6150691 "NPR NPRE Kitchen Req. List"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
-                field("SeatingCode()"; Rec.SeatingCode())
+                field(SeatingCode; Rec.SeatingCode())
                 {
                     ApplicationArea = All;
                     Caption = 'Seating Code';

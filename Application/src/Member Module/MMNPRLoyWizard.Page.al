@@ -18,7 +18,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                     Editable = IsEditable;
                     ToolTip = 'Specifies the value of the Community Code field';
                 }
-                field("FS_Prefix"; FS_Prefix)
+                field(SystemPrefix; FS_Prefix)
                 {
                     ApplicationArea = All;
                     Caption = 'System Prefix';

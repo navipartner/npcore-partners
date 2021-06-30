@@ -69,7 +69,7 @@
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Destination No. field';
                 }
-                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationEntityName(Rec."Destination Type", Rec."Destination No."))
+                field(DestinationEntityName; WMSMgt.GetDestinationEntityName(Rec."Destination Type", Rec."Destination No."))
                 {
                     ApplicationArea = All;
                     CaptionClass = Format(WMSMgt.GetCaption(Rec."Destination Type".AsInteger(), Rec."Source Document".AsInteger(), 1));

@@ -31,7 +31,7 @@ page 6059898 "NPR Data Log Records"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Name field';
                 }
-                field("FORMAT(""Record ID"")"; Format(Rec."Record ID"))
+                field("RecordId"; Format(Rec."Record ID"))
                 {
                     ApplicationArea = All;
                     Caption = 'Record ID';

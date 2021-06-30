@@ -56,7 +56,7 @@
             {
                 Caption = 'My User Tasks';
                 Visible = false;
-                field("UserTaskManagement.GetMyPendingUserTasksCount"; UserTaskManagement.GetMyPendingUserTasksCount())
+                field("Pending User Tasks"; UserTaskManagement.GetMyPendingUserTasksCount())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Pending User Tasks';

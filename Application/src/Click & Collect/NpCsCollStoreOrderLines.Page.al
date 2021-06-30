@@ -18,7 +18,7 @@ page 6151207 "NPR NpCs Coll. StoreOrderLines"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("GetNo()"; GetNo())
+                field("No."; GetNo())
                 {
                     ApplicationArea = All;
                     Caption = 'No.';

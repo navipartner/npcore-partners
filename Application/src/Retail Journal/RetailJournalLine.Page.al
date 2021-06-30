@@ -106,7 +106,7 @@
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Item.""Unit Price"""; Item."Unit Price")
+                field(ItemUnitPrice; Item."Unit Price")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit price(Item Card)';
@@ -119,7 +119,7 @@
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Direct Cost field';
                 }
-                field("Item.""Unit Cost"""; Item."Unit Cost")
+                field("Unit Cost"; Item."Unit Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit cost';

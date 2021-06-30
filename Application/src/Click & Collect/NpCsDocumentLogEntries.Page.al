@@ -62,7 +62,7 @@ page 6151201 "NPR NpCs Document Log Entries"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Error Entry field';
                 }
-                field("GetErrorMessage()"; Rec.GetErrorMessage())
+                field(ErrorMessage; Rec.GetErrorMessage())
                 {
                     ApplicationArea = All;
                     Caption = 'Error Message';

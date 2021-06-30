@@ -37,14 +37,14 @@ page 6014622 "NPR POS Web Fonts"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prefix field';
                 }
-                field("FORMAT(WoffHasValue)"; Format(WoffHasValue))
+                field("Woff Exists"; Format(WoffHasValue))
                 {
                     ApplicationArea = All;
                     Caption = 'Woff Exists';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Woff Exists field';
                 }
-                field("FORMAT(CssHasValue)"; Format(CssHasValue))
+                field("Css Exists"; Format(CssHasValue))
                 {
                     ApplicationArea = All;
                     Caption = 'Css Exists';

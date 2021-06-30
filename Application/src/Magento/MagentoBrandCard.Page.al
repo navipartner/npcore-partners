@@ -31,7 +31,7 @@ page 6151419 "NPR Magento Brand Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field("FORMAT(Description.HASVALUE)"; Format(Rec.Description.HasValue))
+                field("Description"; Format(Rec.Description.HasValue))
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
@@ -51,7 +51,7 @@ page 6151419 "NPR Magento Brand Card"
                         end;
                     end;
                 }
-                field("FORMAT(""Short Description"".HASVALUE)"; Format(Rec."Short Description".HasValue))
+                field("Short Description"; Format(Rec."Short Description".HasValue))
                 {
                     ApplicationArea = All;
                     Caption = 'Short Description';

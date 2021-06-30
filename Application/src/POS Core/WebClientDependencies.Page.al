@@ -27,7 +27,7 @@ page 6014659 "NPR Web Client Dependencies"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("BLOB.HASVALUE"; Rec.BLOB.HasValue())
+                field("BLOB Imported"; Rec.BLOB.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'BLOB Imported';

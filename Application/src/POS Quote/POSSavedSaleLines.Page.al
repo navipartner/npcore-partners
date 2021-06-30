@@ -17,19 +17,19 @@ page 6151005 "NPR POS Saved Sale Lines"
                 group(Control6014418)
                 {
                     ShowCaption = false;
-                    field(POSEntrySalesTicketNo; POSQuoteEntry."Sales Ticket No.")
+                    field("Sales Ticket No"; POSQuoteEntry."Sales Ticket No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Sales Ticket No.';
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
                     }
-                    field(POSEntryRegisterNo; POSQuoteEntry."Register No.")
+                    field("Register No"; POSQuoteEntry."Register No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Register No.';
                         ToolTip = 'Specifies the value of the Register No. field';
                     }
-                    field("POSEntrySalesperson Code"; POSQuoteEntry."Salesperson Code")
+                    field("Salesperson Code"; POSQuoteEntry."Salesperson Code")
                     {
                         ApplicationArea = All;
                         Caption = 'Salesperson Code';
@@ -39,19 +39,19 @@ page 6151005 "NPR POS Saved Sale Lines"
                 group(Control6014423)
                 {
                     ShowCaption = false;
-                    field("POSEntryCreated at"; POSQuoteEntry."Created at")
+                    field("Created at"; POSQuoteEntry."Created at")
                     {
                         ApplicationArea = All;
                         Caption = '"Created at"';
                         ToolTip = 'Specifies the value of the "Created at" field';
                     }
-                    field(POSEntryAmount; POSQuoteEntry.Amount)
+                    field(Amount; POSQuoteEntry.Amount)
                     {
                         ApplicationArea = All;
                         Caption = 'Amount';
                         ToolTip = 'Specifies the value of the Amount field';
                     }
-                    field(POSEntryAmountIncludingVAT; POSQuoteEntry."Amount Including VAT")
+                    field("Amount Including VAT"; POSQuoteEntry."Amount Including VAT")
                     {
                         ApplicationArea = All;
                         Caption = 'Amount Including VAT';
@@ -61,37 +61,37 @@ page 6151005 "NPR POS Saved Sale Lines"
                 group(Control6014419)
                 {
                     ShowCaption = false;
-                    field("POSQuoteEntry.""Customer Type"""; POSQuoteEntry."Customer Type")
+                    field("Customer Type"; POSQuoteEntry."Customer Type")
                     {
                         ApplicationArea = All;
                         Caption = 'Customer Type';
                         ToolTip = 'Specifies the value of the Customer Type field';
                     }
-                    field("POSQuoteEntry.""Customer No."""; POSQuoteEntry."Customer No.")
+                    field("Customer No."; POSQuoteEntry."Customer No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Customer No.';
                         ToolTip = 'Specifies the value of the Customer No. field';
                     }
-                    field("POSQuoteEntry.""Customer Price Group"""; POSQuoteEntry."Customer Price Group")
+                    field("Customer Price Group"; POSQuoteEntry."Customer Price Group")
                     {
                         ApplicationArea = All;
                         Caption = 'Customer Price Group';
                         ToolTip = 'Specifies the value of the Customer Price Group field';
                     }
-                    field("POSQuoteEntry.""Customer Disc. Group"""; POSQuoteEntry."Customer Disc. Group")
+                    field("Customer Discount Group"; POSQuoteEntry."Customer Disc. Group")
                     {
                         ApplicationArea = All;
                         Caption = 'Customer Disc. Group';
                         ToolTip = 'Specifies the value of the Customer Disc. Group field';
                     }
-                    field("POSQuoteEntry.Attention"; POSQuoteEntry.Attention)
+                    field(Attention; POSQuoteEntry.Attention)
                     {
                         ApplicationArea = All;
                         Caption = 'Attention';
                         ToolTip = 'Specifies the value of the Attention field';
                     }
-                    field("POSQuoteEntry.Reference"; POSQuoteEntry.Reference)
+                    field(Reference; POSQuoteEntry.Reference)
                     {
                         ApplicationArea = All;
                         Caption = 'Reference';
@@ -116,7 +116,7 @@ page 6151005 "NPR POS Saved Sale Lines"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Amount Including VAT"; Rec."Amount Including VAT")
+                field("Amount Incl. VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
@@ -151,7 +151,7 @@ page 6151005 "NPR POS Saved Sale Lines"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
                 }
-                field(Amount; Rec.Amount)
+                field("Amount value"; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
@@ -186,7 +186,7 @@ page 6151005 "NPR POS Saved Sale Lines"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Discount Authorised by field';
                 }
-                field("Customer Price Group"; Rec."Customer Price Group")
+                field("Customer Price Group value"; Rec."Customer Price Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Price Group field';
