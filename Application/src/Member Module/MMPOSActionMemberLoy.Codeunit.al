@@ -180,7 +180,7 @@
         LoyaltyPointMgr: Codeunit "NPR MM Loyalty Point Mgt.";
         SalePOS: Record "NPR POS Sale";
         Membership: Record "NPR MM Membership";
-        TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
+        TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
         MembershipEntryNo: Integer;
         CouponNo: Code[20];
         Coupon: Record "NPR NpDc Coupon";
@@ -212,10 +212,10 @@
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         //IF (LoyaltyPointMgr.GetCouponToRedeem (MembershipEntryNo, TmpLoyaltyPointsSetup)) THEN BEGIN
-        if (LoyaltyPointMgr.GetCouponToRedeemPOS(MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal)) then begin
+        if (LoyaltyPointMgr.GetCouponToRedeemPOS(MembershipEntryNo, TempLoyaltyPointsSetup, SubTotal)) then begin
 
-            TmpLoyaltyPointsSetup.Reset();
-            TmpLoyaltyPointsSetup.FindSet();
+            TempLoyaltyPointsSetup.Reset();
+            TempLoyaltyPointsSetup.FindSet();
             repeat
 
                 //    IF (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) THEN
@@ -240,14 +240,14 @@
                 //    
 
                 //CouponNo := LoyaltyPointMgr.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal);
-                CouponNo := LoyaltyPointMgr.IssueOneCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, SalePOS."Sales Ticket No.", SalePOS.Date, SubTotal);
+                CouponNo := LoyaltyPointMgr.IssueOneCoupon(MembershipEntryNo, TempLoyaltyPointsSetup, SalePOS."Sales Ticket No.", SalePOS.Date, SubTotal);
 
                 Coupon.Get(CouponNo);
 
                 //POSActionTextEnter.ScanBarcode (Context, POSSession, FrontEnd, Coupon."Reference No.");
                 EanBoxEventHandler.InvokeEanBox(Coupon."Reference No.", Context, POSSession, FrontEnd);
 
-            until (TmpLoyaltyPointsSetup.Next() = 0);
+            until (TempLoyaltyPointsSetup.Next() = 0);
         end;
     end;
 

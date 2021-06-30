@@ -22,7 +22,7 @@ page 6014616 "NPR Display Groups WP"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInMagDisplayGroup(ExistingMagDisplayGroups, Rec.Code);
+                        CheckIfNoAvailableInMagDisplayGroup(TempExistingMagDisplayGroups, Rec.Code);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -40,7 +40,7 @@ page 6014616 "NPR Display Groups WP"
     end;
 
     var
-        ExistingMagDisplayGroups: Record "NPR Magento Display Group" temporary;
+        TempExistingMagDisplayGroups: Record "NPR Magento Display Group" temporary;
 
     procedure CopyRealAndTemp(var TempMagentoDisplayGroup: Record "NPR Magento Display Group")
     var
@@ -84,8 +84,8 @@ page 6014616 "NPR Display Groups WP"
     begin
         if MagentoDisplayGroup.FindSet() then
             repeat
-                ExistingMagDisplayGroups := MagentoDisplayGroup;
-                ExistingMagDisplayGroups.Insert();
+                TempExistingMagDisplayGroups := MagentoDisplayGroup;
+                TempExistingMagDisplayGroups.Insert();
             until MagentoDisplayGroup.Next() = 0;
     end;
 

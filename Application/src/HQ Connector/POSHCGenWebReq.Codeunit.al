@@ -10,22 +10,22 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         RequestXmlDocText: Text;
         ResponseXmlElement: XmlElement;
         ResponseText: Text;
-        TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
+        TempHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
         ResponseXmlText: Text;
     begin
 
         HCEndpointSetup.Get(EndpointCode);
-        CreateGenericRequestRecord(RequestCode, Parameters, TmpHCGenericWebRequest);
-        BuildGenericRequest(TmpHCGenericWebRequest, SoapAction, RequestXmlDocText);
+        CreateGenericRequestRecord(RequestCode, Parameters, TempHCGenericWebRequest);
+        BuildGenericRequest(TempHCGenericWebRequest, SoapAction, RequestXmlDocText);
         if (not WebServiceApi(HCEndpointSetup, SoapAction, RequestXmlDocText, ResponseXmlElement, ResponseXmlText)) then
             Error('Error from WebService:\\%1', ResponseXmlElement.InnerXml());
 
-        if (not ApplyGenericResponse(TmpHCGenericWebRequest, ResponseXmlElement, ResponseText, ResponseXmlText)) then
+        if (not ApplyGenericResponse(TempHCGenericWebRequest, ResponseXmlElement, ResponseText, ResponseXmlText)) then
             Error(ResponseText);
-        ResponseArray[1] := TmpHCGenericWebRequest."Response 1";
-        ResponseArray[2] := TmpHCGenericWebRequest."Response 2";
-        ResponseArray[3] := TmpHCGenericWebRequest."Response 3";
-        ResponseArray[4] := TmpHCGenericWebRequest."Response 4";
+        ResponseArray[1] := TempHCGenericWebRequest."Response 1";
+        ResponseArray[2] := TempHCGenericWebRequest."Response 2";
+        ResponseArray[3] := TempHCGenericWebRequest."Response 3";
+        ResponseArray[4] := TempHCGenericWebRequest."Response 4";
     end;
 
     local procedure CreateGenericRequestRecord(RequestCode: Code[20]; Parameters: array[6] of Text; var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)

@@ -34,30 +34,30 @@
 
     procedure ReadFile(VendorNo: Code[20]; var TempBlob: Codeunit "Temp Blob"; IsOnClient: Boolean; SkipUnmappedVendors: Boolean)
     var
-        CSVBuffer: Record "CSV Buffer" temporary;
+        TempCSVBuffer: Record "CSV Buffer" temporary;
         InStr: InStream;
         DiaWindow: Dialog;
         FieldSep: Char;
     begin
         FieldSep := ';';
         TempBlob.CreateInStream(InStr);
-        CSVBuffer.LoadDataFromStream(InStr, FieldSep);
-        if CSVBuffer.IsEmpty() then
+        TempCSVBuffer.LoadDataFromStream(InStr, FieldSep);
+        if TempCSVBuffer.IsEmpty() then
             Error(FileDoesNotExistErr);
 
         if GuiAllowed then
             DiaWindow.Open(ReadingRow);
-        CSVBuffer.Findset();
+        TempCSVBuffer.Findset();
         repeat
             RowNo := RowNo + 1;
-            CSVBuffer.SetRange("Line No.", RowNo);
+            TempCSVBuffer.SetRange("Line No.", RowNo);
 
-            ProcessLine(VendorNo, CSVBuffer, SkipUnmappedVendors);
+            ProcessLine(VendorNo, TempCSVBuffer, SkipUnmappedVendors);
 
-            if CSVBuffer.FindLast() then;
-            CSVBuffer.SetRange("Line No.");
+            if TempCSVBuffer.FindLast() then;
+            TempCSVBuffer.SetRange("Line No.");
 
-        until CSVBuffer.Next() = 0;
+        until TempCSVBuffer.Next() = 0;
         if GuiAllowed then
             DiaWindow.Close();
 
@@ -96,18 +96,18 @@
         NonstockItemMaterial: Record "NPR Nonstock Item Material";
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateLine: Record "Config. Template Line";
-        CSVBuffer: Record "CSV Buffer" temporary;
+        TempCSVBuffer: Record "CSV Buffer" temporary;
         TempDec: Decimal;
         NPRAttribute: Record "NPR Attribute";
         CatalogNonstockManagement: Codeunit "NPR Catalog Nonstock Mgt.";
     begin
-        CSVBuffer.Copy(CSVBuffer2, true);
+        TempCSVBuffer.Copy(CSVBuffer2, true);
 
         NonstockItem.Init();
         NonstockItem."Entry No." := '';
         NonstockItem.Validate("Vendor No.", VendorNo);
 
-        ItemCategory.Code := CSVBuffer.GetValue(CSVBuffer."Line No.", 38);
+        ItemCategory.Code := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 38);
         if not ItemCategory.Find() then begin
             ItemCategory.Init();
             ItemCategory.Insert();
@@ -143,16 +143,16 @@
 #else
         NonstockItem.Validate("Item Templ. Code", ItemCategory.Code);
 #endif
-        Manufacturer.Code := CSVBuffer.GetValue(CSVBuffer."Line No.", 3);
+        Manufacturer.Code := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 3);
         if not Manufacturer.Find() then begin
             Manufacturer.Init();
             Manufacturer.Insert();
         end;
 
         NonstockItem.Validate("Manufacturer Code", Manufacturer.Code);
-        NonstockItem.Description := CopyStr(CSVBuffer.GetValue(CSVBuffer."Line No.", 10), 1, MaxStrLen(NonstockItem.Description));
+        NonstockItem.Description := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 10), 1, MaxStrLen(NonstockItem.Description));
 
-        UnitofMeasure.Code := CSVBuffer.GetValue(CSVBuffer."Line No.", 11);
+        UnitofMeasure.Code := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 11);
         if not UnitofMeasure.Find() then begin
             UnitofMeasure.Init();
             UnitofMeasure.Validate(Code);
@@ -160,14 +160,14 @@
         end;
 
         NonstockItem.Validate("Unit of Measure", UnitofMeasure.Code);
-        NonstockItem.Validate("Vendor Item No.", CSVBuffer.GetValue(CSVBuffer."Line No.", 4));
-        if Evaluate(TempDec, CSVBuffer.GetValue(CSVBuffer."Line No.", 20)) then
+        NonstockItem.Validate("Vendor Item No.", TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 4));
+        if Evaluate(TempDec, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 20)) then
             if TempDec <> 0 then
                 NonstockItem.Validate("Published Cost", TempDec / 10);
-        if Evaluate(TempDec, CSVBuffer.GetValue(CSVBuffer."Line No.", 18)) then
+        if Evaluate(TempDec, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 18)) then
             NonstockItem.Validate("Net Weight", TempDec);
-        NonstockItem.Validate("Bar Code", CSVBuffer.GetValue(CSVBuffer."Line No.", 5));
-        if Evaluate(TempDec, CSVBuffer.GetValue(CSVBuffer."Line No.", 25)) then
+        NonstockItem.Validate("Bar Code", TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 5));
+        if Evaluate(TempDec, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 25)) then
             if TempDec <> 0 then
                 NonstockItem.Validate("Unit Price", TempDec / 10);
 
@@ -176,27 +176,27 @@
         NPRAttribute.SetFilter("Import File Column No.", '>0');
         if NPRAttribute.FindSet() then
             repeat
-                CatalogNonstockManagement.UpdateItemAttribute(1, NonstockItem."Entry No.", NPRAttribute.Code, CSVBuffer.GetValue(CSVBuffer."Line No.", NPRAttribute."Import File Column No."));
+                CatalogNonstockManagement.UpdateItemAttribute(1, NonstockItem."Entry No.", NPRAttribute.Code, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", NPRAttribute."Import File Column No."));
             until NPRAttribute.Next() = 0;
         NonstockItemMaterial."Nonstock Item Entry No." := NonstockItem."Entry No.";
-        NonstockItemMaterial."Item Material" := CSVBuffer.GetValue(CSVBuffer."Line No.", 44);
-        NonstockItemMaterial."Item Material Density" := CSVBuffer.GetValue(CSVBuffer."Line No.", 45);
+        NonstockItemMaterial."Item Material" := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 44);
+        NonstockItemMaterial."Item Material Density" := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 45);
         NonstockItemMaterial.Insert();
     end;
 
     local procedure UpdateItem(var CSVBuffer2: Record "CSV Buffer"; var Item: Record Item)
     var
         NPRAttribute: Record "NPR Attribute";
-        CSVBuffer: Record "CSV Buffer" temporary;
+        TempCSVBuffer: Record "CSV Buffer" temporary;
         CatalogNonstockManagement: Codeunit "NPR Catalog Nonstock Mgt.";
     begin
-        CSVBuffer.Copy(CSVBuffer2, true);
+        TempCSVBuffer.Copy(CSVBuffer2, true);
 
         NPRAttribute.Reset();
         NPRAttribute.SetFilter("Import File Column No.", '>0');
         if NPRAttribute.FindSet() then
             repeat
-                CatalogNonstockManagement.UpdateItemAttribute(0, Item."No.", NPRAttribute.Code, CSVBuffer.GetValue(CSVBuffer."Line No.", NPRAttribute."Import File Column No."));
+                CatalogNonstockManagement.UpdateItemAttribute(0, Item."No.", NPRAttribute.Code, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", NPRAttribute."Import File Column No."));
             until NPRAttribute.Next() = 0;
 
         Item.Modify();
@@ -205,18 +205,18 @@
     local procedure IdentifyItem(VendorNo: Code[20]; var CSVBuffer2: Record "CSV Buffer"; var Item: Record Item): Boolean
     var
         ItemReference: Record "Item Reference";
-        CSVBuffer: Record "CSV Buffer" temporary;
+        TempCSVBuffer: Record "CSV Buffer" temporary;
     begin
-        CSVBuffer.Copy(CSVBuffer2, true);
+        TempCSVBuffer.Copy(CSVBuffer2, true);
 
         if VendorNo <> '' then
             Item.SetRange("Vendor No.", VendorNo);
-        Item.SetFilter("Vendor Item No.", '=%1', CSVBuffer.GetValue(CSVBuffer."Line No.", 4));
+        Item.SetFilter("Vendor Item No.", '=%1', TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 4));
         if Item.FindFirst() then
             exit(true);
         ItemReference.Reset();
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-        ItemReference.SetRange("Reference No.", CSVBuffer.GetValue(CSVBuffer."Line No.", 5));
+        ItemReference.SetRange("Reference No.", TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 5));
         if ItemReference.FindFirst() then begin
             Item.Get(ItemReference."Item No.");
             exit(true);
@@ -227,27 +227,27 @@
     local procedure FindVendor(var CSVBuffer2: Record "CSV Buffer"; SkipUnmappedVendors: Boolean): Code[20]
     var
         CatalogSupplier: Record "NPR Catalog Supplier";
-        CSVBuffer: Record "CSV Buffer" temporary;
+        TempCSVBuffer: Record "CSV Buffer" temporary;
     begin
-        CSVBuffer.COpy(CSVBuffer2, true);
+        TempCSVBuffer.COpy(CSVBuffer2, true);
 
         if SkipUnmappedVendors then begin
-            if not CatalogSupplier.Get(UpperCase(CSVBuffer.GetValue(CSVBuffer."Line No.", 3))) then
+            if not CatalogSupplier.Get(UpperCase(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 3))) then
                 exit('');
         end else
-            CatalogSupplier.Get(UpperCase(CSVBuffer.GetValue(CSVBuffer."Line No.", 3)));
+            CatalogSupplier.Get(UpperCase(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 3)));
         exit(CatalogSupplier."Vendor No.");
     end;
 
     local procedure IdentifyNonStockItem(VendorNo: Code[20]; var CSVBuffer2: Record "CSV Buffer"; var NonstockItem: Record "Nonstock Item"): Boolean
     var
-        CSVBuffer: Record "CSV Buffer" temporary;
+        TempCSVBuffer: Record "CSV Buffer" temporary;
     begin
-        CSVBuffer.Copy(CSVBuffer2, true);
+        TempCSVBuffer.Copy(CSVBuffer2, true);
 
         if VendorNo <> '' then
             NonstockItem.SetRange("Vendor No.", VendorNo);
-        NonstockItem.SetFilter("Vendor Item No.", '=%1', CSVBuffer.GetValue(CSVBuffer."Line No.", 4));
+        NonstockItem.SetFilter("Vendor Item No.", '=%1', TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 4));
         if NonstockItem.FindFirst() then
             exit(true);
     end;
@@ -261,11 +261,11 @@
 
     local procedure CheckMandatoryField(var CSVBuffer2: Record "CSV Buffer"; FieldNumber: Integer)
     var
-        CSVBuffer: Record "CSV Buffer" temporary;
+        TempCSVBuffer: Record "CSV Buffer" temporary;
     begin
-        CSVBuffer.Copy(CSVBuffer2, true);
+        TempCSVBuffer.Copy(CSVBuffer2, true);
 
-        if CSVBuffer.GetValue(CsvBuffer."Line No.", FieldNumber) = '' then
+        if TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", FieldNumber) = '' then
             Error(FieldMissing, FieldNumber, RowNo);
     end;
 

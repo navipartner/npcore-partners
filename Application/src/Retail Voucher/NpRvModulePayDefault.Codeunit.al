@@ -263,13 +263,13 @@
 
     local procedure GetTotalAmtInclVat(SalesHeader: Record "Sales Header"): Decimal
     var
-        SalesLineTemp: Record "Sales Line" temporary;
-        VATAmountLineTemp: Record "VAT Amount Line" temporary;
+        TempSalesLine: Record "Sales Line" temporary;
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
         SalesPost: Codeunit "Sales-Post";
     begin
-        SalesPost.GetSalesLines(SalesHeader, SalesLineTemp, 0);
-        SalesLineTemp.CalcVATAmountLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
-        SalesLineTemp.UpdateVATOnLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
-        exit(VATAmountLineTemp.GetTotalAmountInclVAT());
+        SalesPost.GetSalesLines(SalesHeader, TempSalesLine, 0);
+        TempSalesLine.CalcVATAmountLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
+        TempSalesLine.UpdateVATOnLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
+        exit(TempVATAmountLine.GetTotalAmountInclVAT());
     end;
 }

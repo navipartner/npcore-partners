@@ -522,11 +522,11 @@ page 6059785 "NPR TM Ticket List"
     local procedure DisplayTicketRequest(RequestEntryNo: Integer);
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
     begin
 
         TicketReservationRequest.GET(RequestEntryNo);
-        AddRequestToTmp(TicketReservationRequest."Session Token ID", TmpTicketReservationRequest);
+        AddRequestToTmp(TicketReservationRequest."Session Token ID", TempTicketReservationRequest);
 
         TicketReservationRequest.CALCFIELDS("Is Superseeded");
         repeat
@@ -534,13 +534,13 @@ page 6059785 "NPR TM Ticket List"
                 TicketReservationRequest.RESET();
                 TicketReservationRequest.SETFILTER("Superseeds Entry No.", '=%1', TicketReservationRequest."Entry No.");
                 TicketReservationRequest.FINDFIRST();
-                AddRequestToTmp(TicketReservationRequest."Session Token ID", TmpTicketReservationRequest);
+                AddRequestToTmp(TicketReservationRequest."Session Token ID", TempTicketReservationRequest);
 
                 TicketReservationRequest.CALCFIELDS("Is Superseeded");
             end;
         until (NOT TicketReservationRequest."Is Superseeded");
 
-        PAGE.RUN(PAGE::"NPR TM Ticket Request", TmpTicketReservationRequest);
+        PAGE.RUN(PAGE::"NPR TM Ticket Request", TempTicketReservationRequest);
     end;
 
     local procedure AddRequestToTmp(Token: Text[100]; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary);

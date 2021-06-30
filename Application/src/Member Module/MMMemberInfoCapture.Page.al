@@ -26,7 +26,7 @@ page 6060134 "NPR MM Member Info Capture"
                     var
                         MemberInfoCapture: Record "NPR MM Member Info Capture";
                         Membership: Record "NPR MM Membership";
-                        TmpMembership: Record "NPR MM Membership" temporary;
+                        TempMembership: Record "NPR MM Membership" temporary;
                     begin
                         if (Rec."Receipt No." <> '') then begin
                             MemberInfoCapture.SetFilter("Receipt No.", '=%1', Rec."Receipt No.");
@@ -34,14 +34,14 @@ page 6060134 "NPR MM Member Info Capture"
                             if (MemberInfoCapture.FindSet()) then begin
                                 repeat
                                     if (Membership.Get(MemberInfoCapture."Membership Entry No.")) then begin
-                                        TmpMembership.TransferFields(Membership, true);
-                                        TmpMembership.Insert();
+                                        TempMembership.TransferFields(Membership, true);
+                                        TempMembership.Insert();
                                     end;
                                 until (MemberInfoCapture.Next() = 0);
                             end;
 
-                            if (PAGE.RunModal(6060127, TmpMembership) = ACTION::LookupOK) then begin
-                                SetExternalMembershipNo(TmpMembership."External Membership No.");
+                            if (PAGE.RunModal(6060127, TempMembership) = ACTION::LookupOK) then begin
+                                SetExternalMembershipNo(TempMembership."External Membership No.");
                                 CurrPage.Update(true);
                             end;
                         end;
@@ -83,7 +83,7 @@ page 6060134 "NPR MM Member Info Capture"
                     var
                         MemberInfoCapture: Record "NPR MM Member Info Capture";
                         Member: Record "NPR MM Member";
-                        TmpMember: Record "NPR MM Member" temporary;
+                        TempMember: Record "NPR MM Member" temporary;
                     begin
 
                         if (Rec."Receipt No." <> '') then begin
@@ -92,19 +92,19 @@ page 6060134 "NPR MM Member Info Capture"
                             if (MemberInfoCapture.FindSet()) then begin
                                 repeat
                                     if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
-                                        TmpMember.TransferFields(Member, true);
-                                        TmpMember.Insert();
+                                        TempMember.TransferFields(Member, true);
+                                        TempMember.Insert();
                                     end;
                                 until (MemberInfoCapture.Next() = 0);
                             end;
 
-                            if (PAGE.RunModal(6060126, TmpMember) = ACTION::LookupOK) then begin
-                                Rec."First Name" := TmpMember."First Name";
-                                Rec."Last Name" := TmpMember."Last Name";
-                                Rec."E-Mail Address" := TmpMember."E-Mail Address";
-                                Rec."Phone No." := TmpMember."Phone No.";
+                            if (PAGE.RunModal(6060126, TempMember) = ACTION::LookupOK) then begin
+                                Rec."First Name" := TempMember."First Name";
+                                Rec."Last Name" := TempMember."Last Name";
+                                Rec."E-Mail Address" := TempMember."E-Mail Address";
+                                Rec."Phone No." := TempMember."Phone No.";
 
-                                SetExternalMemberNo(TmpMember."External Member No.");
+                                SetExternalMemberNo(TempMember."External Member No.");
 
                                 CurrPage.Update(true);
                             end;
@@ -389,7 +389,7 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnDrillDown()
                     var
-                        TmpMember: Record "NPR MM Member" temporary;
+                        TempMember: Record "NPR MM Member" temporary;
                         MemberInfoCapture: Record "NPR MM Member Info Capture";
                         Member: Record "NPR MM Member";
                     begin
@@ -400,15 +400,15 @@ page 6060134 "NPR MM Member Info Capture"
                             if (MemberInfoCapture.FindSet()) then begin
                                 repeat
                                     if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
-                                        TmpMember.TransferFields(Member, true);
-                                        TmpMember.Insert();
+                                        TempMember.TransferFields(Member, true);
+                                        TempMember.Insert();
                                     end;
                                 until (MemberInfoCapture.Next() = 0);
                             end;
 
-                            if (PAGE.RunModal(6060126, TmpMember) = ACTION::LookupOK) then begin
-                                Rec."Guardian External Member No." := TmpMember."External Member No.";
-                                Rec."E-Mail Address" := TmpMember."E-Mail Address";
+                            if (PAGE.RunModal(6060126, TempMember) = ACTION::LookupOK) then begin
+                                Rec."Guardian External Member No." := TempMember."External Member No.";
+                                Rec."E-Mail Address" := TempMember."E-Mail Address";
                                 CurrPage.Update(true);
                             end;
                         end else begin

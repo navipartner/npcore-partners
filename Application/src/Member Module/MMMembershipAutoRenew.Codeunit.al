@@ -16,7 +16,7 @@
     var
         MembershipAutoRenew: Record "NPR MM Membership Auto Renew";
         Membership: Record "NPR MM Membership";
-        TmpMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary;
+        TempMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberMaxCount: Integer;
         MemberIndex: Integer;
@@ -60,15 +60,15 @@
             MembershipAutoRenew.Modify();
             Commit();
 
-            TmpMembershipAutoRenew.TransferFields(MembershipAutoRenew, true);
-            TmpMembershipAutoRenew.Insert();
+            TempMembershipAutoRenew.TransferFields(MembershipAutoRenew, true);
+            TempMembershipAutoRenew.Insert();
 
             repeat
 
-                AutoRenewOneMembership(0, Membership."Entry No.", TmpMembershipAutoRenew, StartDate, UntilDate, SuggestedRenewPrice, false);
+                AutoRenewOneMembership(0, Membership."Entry No.", TempMembershipAutoRenew, StartDate, UntilDate, SuggestedRenewPrice, false);
                 if (MemberIndex mod 10 = 0) then begin
-                    MembershipAutoRenew.Get(TmpMembershipAutoRenew."Entry No.");
-                    MembershipAutoRenew.TransferFields(TmpMembershipAutoRenew, false);
+                    MembershipAutoRenew.Get(TempMembershipAutoRenew."Entry No.");
+                    MembershipAutoRenew.TransferFields(TempMembershipAutoRenew, false);
                     MembershipAutoRenew.Modify();
                     Commit();
                     if (GuiAllowed) then begin
@@ -85,27 +85,27 @@
                 MemberIndex += 1;
             until (Membership.Next() = 0);
 
-            MembershipAutoRenew.Get(TmpMembershipAutoRenew."Entry No.");
-            MembershipAutoRenew.TransferFields(TmpMembershipAutoRenew, false);
+            MembershipAutoRenew.Get(TempMembershipAutoRenew."Entry No.");
+            MembershipAutoRenew.TransferFields(TempMembershipAutoRenew, false);
             MembershipAutoRenew.Modify();
             Commit();
 
-            if (TmpMembershipAutoRenew."Post Invoice") then begin
-                MemberInfoCapture.SetFilter("Auto-Renew Entry No.", '=%1', TmpMembershipAutoRenew."Entry No.");
+            if (TempMembershipAutoRenew."Post Invoice") then begin
+                MemberInfoCapture.SetFilter("Auto-Renew Entry No.", '=%1', TempMembershipAutoRenew."Entry No.");
                 if (MemberInfoCapture.FindSet()) then begin
 
-                    TmpMembershipAutoRenew."First Invoice No." := '';
+                    TempMembershipAutoRenew."First Invoice No." := '';
 
                     repeat
                         if (not PostDocument(MemberInfoCapture)) then begin
-                            TmpMembershipAutoRenew."Invoice Posting Fail Count" += 1;
+                            TempMembershipAutoRenew."Invoice Posting Fail Count" += 1;
                         end else begin
                             MemberInfoCapture.Modify();
                         end;
 
-                        TmpMembershipAutoRenew."Last Invoice No." := MemberInfoCapture."Document No.";
-                        if (TmpMembershipAutoRenew."First Invoice No." = '') then
-                            TmpMembershipAutoRenew."First Invoice No." := MemberInfoCapture."Document No.";
+                        TempMembershipAutoRenew."Last Invoice No." := MemberInfoCapture."Document No.";
+                        if (TempMembershipAutoRenew."First Invoice No." = '') then
+                            TempMembershipAutoRenew."First Invoice No." := MemberInfoCapture."Document No.";
 
                         if (GuiAllowed) then
                             if (MemberIndex mod 10 = 0) then
@@ -115,23 +115,23 @@
                 end;
             end;
 
-            TmpMembershipAutoRenew."Completed At" := CurrentDateTime();
-            MembershipAutoRenew.Get(TmpMembershipAutoRenew."Entry No.");
-            MembershipAutoRenew.TransferFields(TmpMembershipAutoRenew, false);
+            TempMembershipAutoRenew."Completed At" := CurrentDateTime();
+            MembershipAutoRenew.Get(TempMembershipAutoRenew."Entry No.");
+            MembershipAutoRenew.TransferFields(TempMembershipAutoRenew, false);
             MembershipAutoRenew.Modify();
             Commit();
 
             MemberInfoCapture.Reset();
-            MemberInfoCapture.SetFilter("Auto-Renew Entry No.", '=%1', TmpMembershipAutoRenew."Entry No.");
-            case TmpMembershipAutoRenew."Keep Auto-Renew Entries" of
-                TmpMembershipAutoRenew."Keep Auto-Renew Entries"::ALL:
+            MemberInfoCapture.SetFilter("Auto-Renew Entry No.", '=%1', TempMembershipAutoRenew."Entry No.");
+            case TempMembershipAutoRenew."Keep Auto-Renew Entries" of
+                TempMembershipAutoRenew."Keep Auto-Renew Entries"::ALL:
                     ;// No delete, keep all entries
-                TmpMembershipAutoRenew."Keep Auto-Renew Entries"::FAILED:
+                TempMembershipAutoRenew."Keep Auto-Renew Entries"::FAILED:
                     begin
                         MemberInfoCapture.SetFilter("Response Status", '<>%1', MemberInfoCapture."Response Status"::FAILED);
                         MemberInfoCapture.DeleteAll();
                     end;
-                TmpMembershipAutoRenew."Keep Auto-Renew Entries"::NO:
+                TempMembershipAutoRenew."Keep Auto-Renew Entries"::NO:
                     MemberInfoCapture.DeleteAll();
             end;
 
@@ -333,7 +333,7 @@
 
     local procedure CreateAndPostJournal(var MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date; Membership: Record "NPR MM Membership"): Boolean
     var
-        TmpGenJournalLine: Record "Gen. Journal Line" temporary;
+        TempGenJournalLine: Record "Gen. Journal Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         NoSeriesManagement: Codeunit NoSeriesManagement;
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -351,37 +351,37 @@
         RecurringPaymentSetup.TestField("Gen. Journal Batch Name");
         RecurringPaymentSetup.TestField("Revenue Account");
 
-        TmpGenJournalLine.Validate("Journal Template Name", RecurringPaymentSetup."Gen. Journal Template Name");
-        TmpGenJournalLine.Validate("Journal Batch Name", RecurringPaymentSetup."Gen. Journal Batch Name");
+        TempGenJournalLine.Validate("Journal Template Name", RecurringPaymentSetup."Gen. Journal Template Name");
+        TempGenJournalLine.Validate("Journal Batch Name", RecurringPaymentSetup."Gen. Journal Batch Name");
 
-        TmpGenJournalLine."Line No." := 10000;
-        TmpGenJournalLine.Insert(true);
+        TempGenJournalLine."Line No." := 10000;
+        TempGenJournalLine.Insert(true);
 
-        TmpGenJournalLine.Validate("Posting Date", Today);
-        TmpGenJournalLine.Validate("Document Date", Today);
+        TempGenJournalLine.Validate("Posting Date", Today);
+        TempGenJournalLine.Validate("Document Date", Today);
 
-        TmpGenJournalLine.Validate("Document Type", TmpGenJournalLine."Document Type"::Invoice);
+        TempGenJournalLine.Validate("Document Type", TempGenJournalLine."Document Type"::Invoice);
         if (RecurringPaymentSetup."Document No. Series" <> '') then
-            TmpGenJournalLine."Posting No. Series" := RecurringPaymentSetup."Document No. Series";
-        TmpGenJournalLine."Document No." := NoSeriesManagement.GetNextNo(TmpGenJournalLine."Posting No. Series", TmpGenJournalLine."Posting Date", true);
+            TempGenJournalLine."Posting No. Series" := RecurringPaymentSetup."Document No. Series";
+        TempGenJournalLine."Document No." := NoSeriesManagement.GetNextNo(TempGenJournalLine."Posting No. Series", TempGenJournalLine."Posting Date", true);
 
-        TmpGenJournalLine."Account Type" := TmpGenJournalLine."Account Type"::Customer;
-        TmpGenJournalLine.Validate("Account No.", Membership."Customer No.");
+        TempGenJournalLine."Account Type" := TempGenJournalLine."Account Type"::Customer;
+        TempGenJournalLine.Validate("Account No.", Membership."Customer No.");
 
-        TmpGenJournalLine."Bal. Account Type" := TmpGenJournalLine."Bal. Account Type"::"G/L Account";
-        TmpGenJournalLine.Validate("Bal. Account No.", RecurringPaymentSetup."Revenue Account");
+        TempGenJournalLine."Bal. Account Type" := TempGenJournalLine."Bal. Account Type"::"G/L Account";
+        TempGenJournalLine.Validate("Bal. Account No.", RecurringPaymentSetup."Revenue Account");
 
         if (RecurringPaymentSetup."Payment Terms Code" <> '') then
-            TmpGenJournalLine.Validate("Payment Terms Code", RecurringPaymentSetup."Payment Terms Code");
+            TempGenJournalLine.Validate("Payment Terms Code", RecurringPaymentSetup."Payment Terms Code");
 
-        TmpGenJournalLine.Validate(Amount, MemberInfoCapture."Unit Price");
-        TmpGenJournalLine.Validate(Description, StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", ValidFromDate, ValidUntilDate));
+        TempGenJournalLine.Validate(Amount, MemberInfoCapture."Unit Price");
+        TempGenJournalLine.Validate(Description, StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", ValidFromDate, ValidUntilDate));
 
-        TmpGenJournalLine."External Document No." := MemberInfoCapture."Document No.";
+        TempGenJournalLine."External Document No." := MemberInfoCapture."Document No.";
 
-        TmpGenJournalLine.Modify(true);
+        TempGenJournalLine.Modify(true);
 
-        GenJnlPostLine.Run(TmpGenJournalLine);
+        GenJnlPostLine.Run(TempGenJournalLine);
 
         exit(true);
     end;

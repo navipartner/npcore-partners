@@ -22,7 +22,7 @@
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         DateRecord: Record Date;
-        TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
+        TempAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
         ScheduleStartDate: Date;
         ScheduleEndDate: Date;
         GenerateFromDate: Date;
@@ -68,19 +68,19 @@
                 repeat
                     AdmissionScheduleLines.FindSet();
                     repeat
-                        GenerateScheduleEntry(AdmissionScheduleLines, DateRecord."Period Start", TmpAdmissionScheduleEntry);
+                        GenerateScheduleEntry(AdmissionScheduleLines, DateRecord."Period Start", TempAdmissionScheduleEntry);
 
                     until (AdmissionScheduleLines.Next() = 0);
 
-                    if (not TmpAdmissionScheduleEntry.IsEmpty) then begin
-                        AreEqual := CompareScheduleEntries(AdmissionCode, DateRecord."Period Start", TmpAdmissionScheduleEntry);
+                    if (not TempAdmissionScheduleEntry.IsEmpty) then begin
+                        AreEqual := CompareScheduleEntries(AdmissionCode, DateRecord."Period Start", TempAdmissionScheduleEntry);
                         if (not AreEqual) then
-                            StoreScheduleEntries(TmpAdmissionScheduleEntry);
+                            StoreScheduleEntries(TempAdmissionScheduleEntry);
                     end;
 
-                    TmpAdmissionScheduleEntry.Reset();
-                    if (TmpAdmissionScheduleEntry.IsTemporary) then
-                        TmpAdmissionScheduleEntry.DeleteAll();
+                    TempAdmissionScheduleEntry.Reset();
+                    if (TempAdmissionScheduleEntry.IsTemporary) then
+                        TempAdmissionScheduleEntry.DeleteAll();
 
                 until (DateRecord.Next() = 0);
             end;
@@ -269,7 +269,7 @@
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         CalendarManagement: Codeunit "Calendar Management";
-        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
+        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
         EndDateTime: DateTime;
         EntryNo: Integer;
         CalendarDesc: Text;
@@ -343,47 +343,47 @@
         TmpAdmissionScheduleEntry."Visibility On Web" := AdmissionScheduleLines."Visibility On Web";
 
         if ((Admission."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
-            CustomizedCalendarChangeTemp.Init();
-            CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-            CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
-            CustomizedCalendarChangeTemp."Date" := StartFromDate;
-            CustomizedCalendarChangeTemp.Description := CalendarDesc;
-            CustomizedCalendarChangeTemp."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
-            CustomizedCalendarChangeTemp.Insert();
+            TempCustomizedCalendarChange.Init();
+            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
+            TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
+            TempCustomizedCalendarChange."Date" := StartFromDate;
+            TempCustomizedCalendarChange.Description := CalendarDesc;
+            TempCustomizedCalendarChange."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
+            TempCustomizedCalendarChange.Insert();
 
-            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
-            if (CustomizedCalendarChangeTemp.Nonworking) then
+            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
+            if (TempCustomizedCalendarChange.Nonworking) then
                 TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
         end;
 
         if ((Schedule."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
-            CustomizedCalendarChangeTemp.DeleteAll();
-            CustomizedCalendarChangeTemp.Init();
-            CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-            CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
-            CustomizedCalendarChangeTemp."Date" := StartFromDate;
-            CustomizedCalendarChangeTemp.Description := CalendarDesc;
-            CustomizedCalendarChangeTemp."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
-            CustomizedCalendarChangeTemp.Insert();
+            TempCustomizedCalendarChange.DeleteAll();
+            TempCustomizedCalendarChange.Init();
+            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
+            TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
+            TempCustomizedCalendarChange."Date" := StartFromDate;
+            TempCustomizedCalendarChange.Description := CalendarDesc;
+            TempCustomizedCalendarChange."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
+            TempCustomizedCalendarChange.Insert();
 
-            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
-            if (CustomizedCalendarChangeTemp.Nonworking) then
+            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
+            if (TempCustomizedCalendarChange.Nonworking) then
                 TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
         end;
 
         if ((AdmissionScheduleLines."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
-            CustomizedCalendarChangeTemp.DeleteAll();
-            CustomizedCalendarChangeTemp.Init();
-            CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-            CustomizedCalendarChangeTemp."Base Calendar Code" := Admission."Admission Base Calendar Code";
-            CustomizedCalendarChangeTemp."Date" := StartFromDate;
-            CustomizedCalendarChangeTemp.Description := CalendarDesc;
-            CustomizedCalendarChangeTemp."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
-            CustomizedCalendarChangeTemp."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
-            CustomizedCalendarChangeTemp.Insert();
+            TempCustomizedCalendarChange.DeleteAll();
+            TempCustomizedCalendarChange.Init();
+            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
+            TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
+            TempCustomizedCalendarChange."Date" := StartFromDate;
+            TempCustomizedCalendarChange.Description := CalendarDesc;
+            TempCustomizedCalendarChange."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
+            TempCustomizedCalendarChange."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
+            TempCustomizedCalendarChange.Insert();
 
-            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
-            if (CustomizedCalendarChangeTemp.Nonworking) then
+            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
+            if (TempCustomizedCalendarChange.Nonworking) then
                 TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
         end;
 
@@ -583,8 +583,8 @@
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketParticipantWks: Record "NPR TM Ticket Particpt. Wks.";
-        TmpTicketParticipantWks: Record "NPR TM Ticket Particpt. Wks." temporary;
-        TmpTicketParticipantWks2: Record "NPR TM Ticket Particpt. Wks." temporary;
+        TempTicketParticipantWks: Record "NPR TM Ticket Particpt. Wks." temporary;
+        TempTicketParticipantWks2: Record "NPR TM Ticket Particpt. Wks." temporary;
         Admission: Record "NPR TM Admission";
         PendingCount: Integer;
         EntryCount: Integer;
@@ -638,73 +638,73 @@
             if (not TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
                 Clear(TicketReservationRequest);
 
-            TmpTicketParticipantWks.Init();
+            TempTicketParticipantWks.Init();
             EntryCount += 1;
-            TmpTicketParticipantWks."Entry No." := EntryCount;
-            TmpTicketParticipantWks."Applies To Schedule Entry No." := ScheduleEntryNo;
-            TmpTicketParticipantWks."Notification Send Status" := TmpTicketParticipantWks."Notification Send Status"::PENDING;
+            TempTicketParticipantWks."Entry No." := EntryCount;
+            TempTicketParticipantWks."Applies To Schedule Entry No." := ScheduleEntryNo;
+            TempTicketParticipantWks."Notification Send Status" := TempTicketParticipantWks."Notification Send Status"::PENDING;
 
-            TmpTicketParticipantWks."Ticket No." := DetTicketAccessEntry."Ticket No.";
-            TmpTicketParticipantWks."Admission Code" := TicketAccessEntry."Admission Code";
-            TmpTicketParticipantWks."Admission Description" := Admission.Description;
+            TempTicketParticipantWks."Ticket No." := DetTicketAccessEntry."Ticket No.";
+            TempTicketParticipantWks."Admission Code" := TicketAccessEntry."Admission Code";
+            TempTicketParticipantWks."Admission Description" := Admission.Description;
 
-            TmpTicketParticipantWks."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
+            TempTicketParticipantWks."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
 
             /// the source is the last schedule entry and its not canceled - reminder
             // Default is reminder
-            TmpTicketParticipantWks."Notification Type" := TmpTicketParticipantWks."Notification Type"::REMINDER;
+            TempTicketParticipantWks."Notification Type" := TempTicketParticipantWks."Notification Type"::REMINDER;
 
             // multiple entires, first is canceled, last is not - reschedule
             if (not RescheduleToScheduleEntry.Cancelled) and (OriginalScheduleEntry.Cancelled) then
-                TmpTicketParticipantWks."Notification Type" := TmpTicketParticipantWks."Notification Type"::RESCHEDULE;
+                TempTicketParticipantWks."Notification Type" := TempTicketParticipantWks."Notification Type"::RESCHEDULE;
 
             // the source is the last schedule entry and its canceled - cancellation
             if (RescheduleToScheduleEntry.Cancelled) and (ScheduleEntryNo = RescheduleToScheduleEntry."Entry No.") then
-                TmpTicketParticipantWks."Notification Type" := TmpTicketParticipantWks."Notification Type"::CANCELATION;
+                TempTicketParticipantWks."Notification Type" := TempTicketParticipantWks."Notification Type"::CANCELATION;
 
-            TmpTicketParticipantWks."Original Schedule Entry No." := OriginalScheduleEntry."Entry No.";
-            TmpTicketParticipantWks."Original Start Date" := OriginalScheduleEntry."Admission Start Date";
-            TmpTicketParticipantWks."Original Start Time" := OriginalScheduleEntry."Admission Start Time";
-            TmpTicketParticipantWks."Original End Date" := OriginalScheduleEntry."Admission End Date";
-            TmpTicketParticipantWks."Original End Time" := OriginalScheduleEntry."Admission End Time";
+            TempTicketParticipantWks."Original Schedule Entry No." := OriginalScheduleEntry."Entry No.";
+            TempTicketParticipantWks."Original Start Date" := OriginalScheduleEntry."Admission Start Date";
+            TempTicketParticipantWks."Original Start Time" := OriginalScheduleEntry."Admission Start Time";
+            TempTicketParticipantWks."Original End Date" := OriginalScheduleEntry."Admission End Date";
+            TempTicketParticipantWks."Original End Time" := OriginalScheduleEntry."Admission End Time";
 
-            TmpTicketParticipantWks."New Schedule Entry No." := RescheduleToScheduleEntry."Entry No.";
-            TmpTicketParticipantWks."New Start Date" := RescheduleToScheduleEntry."Admission Start Date";
-            TmpTicketParticipantWks."New Start Time" := RescheduleToScheduleEntry."Admission Start Time";
-            TmpTicketParticipantWks."New End Date" := RescheduleToScheduleEntry."Admission End Date";
-            TmpTicketParticipantWks."New End Time" := RescheduleToScheduleEntry."Admission End Time";
+            TempTicketParticipantWks."New Schedule Entry No." := RescheduleToScheduleEntry."Entry No.";
+            TempTicketParticipantWks."New Start Date" := RescheduleToScheduleEntry."Admission Start Date";
+            TempTicketParticipantWks."New Start Time" := RescheduleToScheduleEntry."Admission Start Time";
+            TempTicketParticipantWks."New End Date" := RescheduleToScheduleEntry."Admission End Date";
+            TempTicketParticipantWks."New End Time" := RescheduleToScheduleEntry."Admission End Time";
 
-            TmpTicketParticipantWks."Notification Method" := TicketReservationRequest."Notification Method";
-            TmpTicketParticipantWks."Notification Address" := TicketReservationRequest."Notification Address";
+            TempTicketParticipantWks."Notification Method" := TicketReservationRequest."Notification Method";
+            TempTicketParticipantWks."Notification Address" := TicketReservationRequest."Notification Address";
 
-            TmpTicketParticipantWks."Notifcation Created At" := CurrentDateTime();
+            TempTicketParticipantWks."Notifcation Created At" := CurrentDateTime();
 
             if (TicketAccessEntry.Status = TicketAccessEntry.Status::ACCESS) then
-                TmpTicketParticipantWks.Insert();
+                TempTicketParticipantWks.Insert();
 
         until (DetTicketAccessEntry.Next() = 0);
 
         /// Mark duplicate notification address as duplicate
-        TmpTicketParticipantWks.Reset();
-        TmpTicketParticipantWks.FindSet();
+        TempTicketParticipantWks.Reset();
+        TempTicketParticipantWks.FindSet();
         repeat
-            TmpTicketParticipantWks2.SetFilter("Notification Address", '=%1', TmpTicketParticipantWks."Notification Address");
-            DuplicateNotificationAddress := TmpTicketParticipantWks2.FindFirst();
+            TempTicketParticipantWks2.SetFilter("Notification Address", '=%1', TempTicketParticipantWks."Notification Address");
+            DuplicateNotificationAddress := TempTicketParticipantWks2.FindFirst();
 
-            TmpTicketParticipantWks2.TransferFields(TmpTicketParticipantWks, true);
+            TempTicketParticipantWks2.TransferFields(TempTicketParticipantWks, true);
             if (DuplicateNotificationAddress) then
-                TmpTicketParticipantWks2."Notification Send Status" := TmpTicketParticipantWks2."Notification Send Status"::DUPLICATE;
+                TempTicketParticipantWks2."Notification Send Status" := TempTicketParticipantWks2."Notification Send Status"::DUPLICATE;
 
-            TmpTicketParticipantWks2.Insert();
-        until (TmpTicketParticipantWks.Next() = 0);
+            TempTicketParticipantWks2.Insert();
+        until (TempTicketParticipantWks.Next() = 0);
 
-        TmpTicketParticipantWks2.Reset();
-        TmpTicketParticipantWks2.FindSet();
+        TempTicketParticipantWks2.Reset();
+        TempTicketParticipantWks2.FindSet();
         repeat
-            TicketParticipantWks.TransferFields(TmpTicketParticipantWks2);
+            TicketParticipantWks.TransferFields(TempTicketParticipantWks2);
             TicketParticipantWks."Entry No." := 0;
             TicketParticipantWks.Insert();
-        until (TmpTicketParticipantWks2.Next() = 0);
+        until (TempTicketParticipantWks2.Next() = 0);
     end;
 }
 

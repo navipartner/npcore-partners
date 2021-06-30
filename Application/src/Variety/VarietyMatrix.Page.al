@@ -1076,29 +1076,29 @@ page 6059974 "NPR Variety Matrix"
 
     local procedure MATRIX_OnDrillDown(MATRIX_ColumnOrdinal: Integer)
     var
-        VRTBuffer: Record "NPR Variety Buffer" temporary;
+        TempVRTBuffer: Record "NPR Variety Buffer" temporary;
         FieldValue: Text[1024];
     begin
         //-NPR5.47 [324997]
         //MatrixRecord := MatrixRecords[MATRIX_ColumnOrdinal];
         //+NPR5.47 [324997]
 
-        VRTBuffer := Rec;
+        TempVRTBuffer := Rec;
         case ShowAsCrossVRT of
             ShowAsCrossVRT::Variety1:
-                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety2:
-                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety3:
-                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety4:
-                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
 
         //-NPR5.36 [288696]
         //VRTMatrixMgt.OnDrillDown(VRTBuffer, CurrVRTField);
         FieldValue := MATRIX_CellData[MATRIX_ColumnOrdinal];
-        VRTMatrixMgt.OnDrillDown(VRTBuffer, CurrVRTField, FieldValue, ItemFilters); //-NPR5.47 [327541] Added itemFilters
+        VRTMatrixMgt.OnDrillDown(TempVRTBuffer, CurrVRTField, FieldValue, ItemFilters); //-NPR5.47 [327541] Added itemFilters
         if FieldValue = MATRIX_CellData[MATRIX_ColumnOrdinal] then
             exit;
         MATRIX_CellData[MATRIX_ColumnOrdinal] := FieldValue;
@@ -1108,25 +1108,25 @@ page 6059974 "NPR Variety Matrix"
 
     local procedure MATRIX_OnLookup(MATRIX_ColumnOrdinal: Integer)
     var
-        VRTBuffer: Record "NPR Variety Buffer" temporary;
+        TempVRTBuffer: Record "NPR Variety Buffer" temporary;
         FieldValue: Text[1024];
     begin
         //-NPR5.47 [324997]
-        VRTBuffer := Rec;
+        TempVRTBuffer := Rec;
         case ShowAsCrossVRT of
             ShowAsCrossVRT::Variety1:
-                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety2:
-                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety3:
-                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety4:
-                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
 
         FieldValue := MATRIX_CellData[MATRIX_ColumnOrdinal];
 
-        VRTMatrixMgt.OnLookup(VRTBuffer, CurrVRTField, FieldValue, ItemFilters);
+        VRTMatrixMgt.OnLookup(TempVRTBuffer, CurrVRTField, FieldValue, ItemFilters);
 
         if FieldValue = MATRIX_CellData[MATRIX_ColumnOrdinal] then
             exit;
@@ -1137,26 +1137,26 @@ page 6059974 "NPR Variety Matrix"
 
     local procedure MATRIX_OnAfterGetRecord(MATRIX_ColumnOrdinal: Integer)
     var
-        VRTBuffer: Record "NPR Variety Buffer" temporary;
+        TempVRTBuffer: Record "NPR Variety Buffer" temporary;
     begin
         //-NPR5.47 [324997]
         //MatrixRecord := MatrixRecords[MATRIX_ColumnOrdinal];
         //+NPR5.47 [324997]
 
-        VRTBuffer := Rec;
+        TempVRTBuffer := Rec;
         case ShowAsCrossVRT of
             ShowAsCrossVRT::Variety1:
-                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety2:
-                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety3:
-                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety4:
-                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
 
-        MATRIX_CellData[MATRIX_ColumnOrdinal] := VRTMatrixMgt.GetValue(VRTBuffer."Variety 1 Value", VRTBuffer."Variety 2 Value",
-                                                 VRTBuffer."Variety 3 Value", VRTBuffer."Variety 4 Value",
+        MATRIX_CellData[MATRIX_ColumnOrdinal] := VRTMatrixMgt.GetValue(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value",
+                                                 TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value",
                                                  //-NPR5.47 [327541]
                                                  //CurrVRTField, LocationFilter, GD1, GD2);
                                                  CurrVRTField, ItemFilters);

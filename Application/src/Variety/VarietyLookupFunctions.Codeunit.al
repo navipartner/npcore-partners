@@ -15,7 +15,7 @@
 
     procedure ItemPerLocation(VRTFieldSetup: Record "NPR Variety Field Setup")
     var
-        TMPInvBuffer: Record "Inventory Buffer" temporary;
+        TempInvBuffer: Record "Inventory Buffer" temporary;
         Location: Record Location;
         Item: Record Item;
     begin
@@ -25,14 +25,14 @@
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
-                TMPInvBuffer.Init();
-                TMPInvBuffer."Item No." := VRTFieldSetup."Item No. (TMPParm)";
-                TMPInvBuffer."Variant Code" := VRTFieldSetup."Variant Code (TMPParm)";
-                TMPInvBuffer."Location Code" := Location.Code;
-                TMPInvBuffer.Quantity := Item."Net Change";
-                TMPInvBuffer.Insert();
+                TempInvBuffer.Init();
+                TempInvBuffer."Item No." := VRTFieldSetup."Item No. (TMPParm)";
+                TempInvBuffer."Variant Code" := VRTFieldSetup."Variant Code (TMPParm)";
+                TempInvBuffer."Location Code" := Location.Code;
+                TempInvBuffer.Quantity := Item."Net Change";
+                TempInvBuffer.Insert();
             until Location.Next() = 0;
-        PAGE.RunModal(6059976, TMPInvBuffer);
+        PAGE.RunModal(6059976, TempInvBuffer);
     end;
 
     procedure LookupTable()
@@ -80,7 +80,7 @@
 
     local procedure DrillDownItemsPerLocation(ItemNo: Code[20]; VariantCode: Code[10])
     var
-        TMPInvBuffer: Record "Inventory Buffer" temporary;
+        TempInvBuffer: Record "Inventory Buffer" temporary;
         Location: Record Location;
         Item: Record Item;
     begin
@@ -90,24 +90,24 @@
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
-                TMPInvBuffer.Init();
-                TMPInvBuffer."Item No." := ItemNo;
-                TMPInvBuffer."Variant Code" := VariantCode;
-                TMPInvBuffer."Location Code" := Location.Code;
-                TMPInvBuffer.Quantity := Item."Net Change";
-                TMPInvBuffer.Insert();
+                TempInvBuffer.Init();
+                TempInvBuffer."Item No." := ItemNo;
+                TempInvBuffer."Variant Code" := VariantCode;
+                TempInvBuffer."Location Code" := Location.Code;
+                TempInvBuffer.Quantity := Item."Net Change";
+                TempInvBuffer.Insert();
             until Location.Next() = 0;
         Item.SetFilter("Location Filter", '');
         Item.CalcFields("Net Change");
         if Item."Net Change" <> 0 then begin
-            TMPInvBuffer.Init();
-            TMPInvBuffer."Item No." := ItemNo;
-            TMPInvBuffer."Variant Code" := VariantCode;
-            TMPInvBuffer."Location Code" := BlankLocation;
-            TMPInvBuffer.Quantity := Item."Net Change";
-            TMPInvBuffer.Insert();
+            TempInvBuffer.Init();
+            TempInvBuffer."Item No." := ItemNo;
+            TempInvBuffer."Variant Code" := VariantCode;
+            TempInvBuffer."Location Code" := BlankLocation;
+            TempInvBuffer.Quantity := Item."Net Change";
+            TempInvBuffer.Insert();
         end;
-        PAGE.RunModal(6059976, TMPInvBuffer);
+        PAGE.RunModal(6059976, TempInvBuffer);
     end;
 }
 

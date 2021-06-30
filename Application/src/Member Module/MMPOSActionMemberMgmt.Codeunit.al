@@ -199,7 +199,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MembershipAppemptCreate: Codeunit "NPR Membership Attempt Create";
         ReasonText: Text;
@@ -218,12 +218,12 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 if (MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then
                     Error(QTY_CANT_CHANGE);
 
-                TmpMemberInfoCapture.TransferFields(MemberInfoCapture, true);
-                TmpMemberInfoCapture.Quantity := NewQuantity;
-                TmpMemberInfoCapture.Insert();
+                TempMemberInfoCapture.TransferFields(MemberInfoCapture, true);
+                TempMemberInfoCapture.Quantity := NewQuantity;
+                TempMemberInfoCapture.Insert();
 
                 MembershipAppemptCreate.SetAttemptCreateMembershipForcedRollback();
-                if (not MembershipAppemptCreate.run(TmpMemberInfoCapture)) then
+                if (not MembershipAppemptCreate.run(TempMemberInfoCapture)) then
                     if (not MembershipAppemptCreate.WasSuccessful(ReasonText)) then
                         error(ReasonText);
 
@@ -471,7 +471,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
-        TmpMembershipEntries: Record "NPR MM Membership Entry" temporary;
+        TempMembershipEntries: Record "NPR MM Membership Entry" temporary;
         MembershipEntryNo: Integer;
         ReasonNotFound: Text;
         MembershipEntries: Page "NPR MM Membership Entries View";
@@ -491,11 +491,11 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MembershipEntry.Ascending(false);
         if (MembershipEntry.FindSet()) then begin
             repeat
-                TmpMembershipEntries.TransferFields(MembershipEntry, true);
-                TmpMembershipEntries.Insert();
+                TempMembershipEntries.TransferFields(MembershipEntry, true);
+                TempMembershipEntries.Insert();
             until (MembershipEntry.Next() = 0);
 
-            MembershipEntries.LoadEntries(ExternalMemberCardNo, TmpMembershipEntries);
+            MembershipEntries.LoadEntries(ExternalMemberCardNo, TempMembershipEntries);
             MembershipEntries.RunModal();
 
         end;
@@ -784,17 +784,17 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     local procedure ShowAlterMembershipLookupList(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; LookupCaption: Text; NotFoundMessage: Text) ItemNo: Code[20]
     var
-        TmpMembershipEntry: Record "NPR MM Membership Entry" temporary;
+        TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin
 
         if (not MembershipAlterationSetup.FindFirst()) then
             Error(NotFoundMessage);
 
-        if (not MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TmpMembershipEntry)) then
+        if (not MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TempMembershipEntry)) then
             Error(NotFoundMessage);
 
-        ItemNo := DoLookupMembershipEntry(LookupCaption, TmpMembershipEntry);
+        ItemNo := DoLookupMembershipEntry(LookupCaption, TempMembershipEntry);
 
         exit(ItemNo);
     end;
@@ -803,7 +803,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     var
         SelectAlteration: page "NPR MM Select Alteration";
         PageAction: Action;
-        TmpMembershipEntryResponse: Record "NPR MM Membership Entry" temporary;
+        TempMembershipEntryResponse: Record "NPR MM Membership Entry" temporary;
     begin
         ItemNo := '';
 
@@ -811,8 +811,8 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         SelectAlteration.LookupMode(true);
         PageAction := SelectAlteration.RunModal();
         if (PageAction = Action::LookupOK) then begin
-            SelectAlteration.GetRecord(TmpMembershipEntryResponse);
-            ItemNo := TmpMembershipEntryResponse."Item No.";
+            SelectAlteration.GetRecord(TempMembershipEntryResponse);
+            ItemNo := TempMembershipEntryResponse."Item No.";
         end;
 
         exit(ItemNo);

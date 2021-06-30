@@ -458,7 +458,7 @@
 
     local procedure SelectTemplate(RecordVariant: Variant; var Template: Record "NPR SMS Template Header"): Boolean
     var
-        PossibleTemplate: Record "NPR SMS Template Header" temporary;
+        TempPossibleTemplate: Record "NPR SMS Template Header" temporary;
         TempBlob: Codeunit "Temp Blob";
         RecRef: RecordRef;
         IsHandled: Boolean;
@@ -479,23 +479,23 @@
                     Clear(TempBlob);
                     TempBlob.FromRecord(Template, Template.FieldNo("Table Filters"));
                     if EvaluateConditionOnTable(RecordVariant, RecRef.Number, TempBlob) then begin
-                        PossibleTemplate := Template;
-                        PossibleTemplate.Insert();
+                        TempPossibleTemplate := Template;
+                        TempPossibleTemplate.Insert();
                     end;
                 end else begin
-                    PossibleTemplate := Template;
-                    PossibleTemplate.Insert();
+                    TempPossibleTemplate := Template;
+                    TempPossibleTemplate.Insert();
                 end;
             until Template.Next() = 0;
 
-        TemplateFound := PossibleTemplate.FindFirst();
+        TemplateFound := TempPossibleTemplate.FindFirst();
 
         if TemplateFound then
-            if GuiAllowed and (PossibleTemplate.Count() > 1) then
-                TemplateFound := PAGE.RunModal(6059940, PossibleTemplate) = ACTION::LookupOK;
+            if GuiAllowed and (TempPossibleTemplate.Count() > 1) then
+                TemplateFound := PAGE.RunModal(6059940, TempPossibleTemplate) = ACTION::LookupOK;
 
         if TemplateFound then
-            Template.Get(PossibleTemplate.Code)
+            Template.Get(TempPossibleTemplate.Code)
         else begin
             Template.Init();
             Template.Code := '';

@@ -99,9 +99,9 @@ xmlport 6151198 "NPR NpCs Store Inv."
 
                                     trigger OnBeforePassVariable()
                                     begin
-                                        Clear(NpCsStoreInventoryBuffer);
-                                        if NpCsStoreInventoryBuffer.Get(TempNpCsStore2.Code, TempItem2.Description) then;
-                                        ItemInventory := Format(NpCsStoreInventoryBuffer.Inventory, 0, 9);
+                                        Clear(TempNpCsStoreInventoryBuffer);
+                                        if TempNpCsStoreInventoryBuffer.Get(TempNpCsStore2.Code, TempItem2.Description) then;
+                                        ItemInventory := Format(TempNpCsStoreInventoryBuffer.Inventory, 0, 9);
                                     end;
                                 }
 
@@ -118,7 +118,7 @@ xmlport 6151198 "NPR NpCs Store Inv."
                 var
                     NpCsStoreMgt: Codeunit "NPR NpCs Store Mgt.";
                 begin
-                    NpCsStoreMgt.SetBufferInventory(NpCsStoreInventoryBuffer);
+                    NpCsStoreMgt.SetBufferInventory(TempNpCsStoreInventoryBuffer);
                     TempNpCsStore2.Copy(TempNpCsStore, true);
                 end;
 
@@ -131,18 +131,18 @@ xmlport 6151198 "NPR NpCs Store Inv."
     }
 
     var
-        NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
+        TempNpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
         ItemNo: Code[20];
 
     local procedure Store2InventoryBuffer()
     begin
         TempItem.FindSet();
         repeat
-            if not NpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Description 2") then begin
-                NpCsStoreInventoryBuffer.Init();
-                NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
-                NpCsStoreInventoryBuffer.Sku := tempitem."Description 2";
-                NpCsStoreInventoryBuffer.Insert();
+            if not TempNpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Description 2") then begin
+                TempNpCsStoreInventoryBuffer.Init();
+                TempNpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
+                TempNpCsStoreInventoryBuffer.Sku := tempitem."Description 2";
+                TempNpCsStoreInventoryBuffer.Insert();
             end;
         until TempItem.Next() = 0;
     end;

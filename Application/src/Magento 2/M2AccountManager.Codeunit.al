@@ -4,24 +4,24 @@
     begin
         case SelectedAccountFunction of
             AccountFunctions::AUTHENTICATE:
-                AuthenticatePasswordWorker(TmpGlobalOneTimePassword, TmpGlobalContact, true);
+                AuthenticatePasswordWorker(TempGlobalOneTimePassword, TempGlobalContact, true);
             AccountFunctions::CHANGE_PASSWORD:
-                ChangePasswordWorker(TmpGlobalOneTimePassword, TmpGlobalContact);
+                ChangePasswordWorker(TempGlobalOneTimePassword, TempGlobalContact);
             AccountFunctions::CREATE_ACCOUNT:
-                CreateAccountWorker(TmpGlobalContact, TmpGlobalCustomer1, TmpGlobalAccount);
+                CreateAccountWorker(TempGlobalContact, TempGlobalCustomer1, TempGlobalAccount);
             AccountFunctions::UPDATE_ACCOUNT:
-                UpdateAccountWorker(TmpGlobalContact, TmpGlobalCustomer1, TmpGlobalAccount);
+                UpdateAccountWorker(TempGlobalContact, TempGlobalCustomer1, TempGlobalAccount);
             AccountFunctions::ADD_ACCOUNT:
-                AddAccountWorker(TmpGlobalContact, TmpGlobalAccount);
+                AddAccountWorker(TempGlobalContact, TempGlobalAccount);
             AccountFunctions::DELETE_ACCOUNT:
-                DeleteAccountWorker(TmpGlobalContact);
+                DeleteAccountWorker(TempGlobalContact);
 
             AccountFunctions::CREATE_SHIPTO:
-                CreateShiptoAddressWorker(TmpGlobalAccount, TmpGlobsalShiptoAddressRequest, TmpGlobalShiptoAddressResponse);
+                CreateShiptoAddressWorker(TempGlobalAccount, TempGlobsalShiptoAddressRequest, TempGlobalShiptoAddressResponse);
             AccountFunctions::UPDATE_SHIPTO:
-                UpdateShiptoAddressWorker(TmpGlobalAccount, TmpGlobsalShiptoAddressRequest, TmpGlobalShiptoAddressResponse);
+                UpdateShiptoAddressWorker(TempGlobalAccount, TempGlobsalShiptoAddressRequest, TempGlobalShiptoAddressResponse);
             AccountFunctions::DELETE_SHIPTO:
-                DeleteShiptoAddressWorker(TmpGlobalAccount, TmpGlobsalShiptoAddressRequest);
+                DeleteShiptoAddressWorker(TempGlobalAccount, TempGlobsalShiptoAddressRequest);
         end;
     end;
 
@@ -31,12 +31,12 @@
         AccountFunctions: Option AUTHENTICATE,CHANGE_PASSWORD,CREATE_ACCOUNT,DELETE_ACCOUNT,ADD_ACCOUNT,UPDATE_ACCOUNT,CREATE_SHIPTO,UPDATE_SHIPTO,DELETE_SHIPTO;
         SelectedAccountFunction: Option;
         AccountManager: Codeunit "NPR M2 Account Manager";
-        TmpGlobalContact: Record Contact temporary;
-        TmpGlobalAccount: Record Contact temporary;
-        TmpGlobalCustomer1: Record Customer temporary;
-        TmpGlobalOneTimePassword: Record "NPR M2 One Time Password" temporary;
-        TmpGlobsalShiptoAddressRequest: Record "Ship-to Address" temporary;
-        TmpGlobalShiptoAddressResponse: Record "Ship-to Address" temporary;
+        TempGlobalContact: Record Contact temporary;
+        TempGlobalAccount: Record Contact temporary;
+        TempGlobalCustomer1: Record Customer temporary;
+        TempGlobalOneTimePassword: Record "NPR M2 One Time Password" temporary;
+        TempGlobsalShiptoAddressRequest: Record "Ship-to Address" temporary;
+        TempGlobalShiptoAddressResponse: Record "Ship-to Address" temporary;
         CONFIRM_GLOBAL_RESET_PASSWORD: Label 'Are you sure that you want to send an email to %1 Magento contacts?';
         IdLbl: Label ',{"id":"%1","storecode":"%2"}', Locked = true;
         AccountLbl: Label '{"account": {"email":"%1", "accounts":[%2]}}', Locked = true;
@@ -201,7 +201,7 @@
         Customer: Record Customer;
         Contact: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
-        tmpMagentoContactBuffer: Record "NPR M2 Contact Buffer" temporary;
+        TempMagentoContactBuffer: Record "NPR M2 Contact Buffer" temporary;
     begin
         // Filter requirements
         Contact.SetFilter("NPR Magento Contact", '%1', true);
@@ -214,23 +214,23 @@
                 if ContactBusinessRelation.FindFirst() then begin
                     Customer.SetFilter("No.", '%1', ContactBusinessRelation."No.");
                     if Customer.FindFirst() then begin
-                        tmpMagentoContactBuffer."Entry No." += 1;
-                        tmpMagentoContactBuffer."Customer No." := Customer."No.";
-                        tmpMagentoContactBuffer."Customer Name" := Customer.Name;
-                        tmpMagentoContactBuffer."Contact No." := Contact."No.";
-                        tmpMagentoContactBuffer."Contact Name" := Contact.Name;
-                        tmpMagentoContactBuffer."Contact Email" := Contact."E-Mail";
-                        tmpMagentoContactBuffer."Magento Contact" := Contact."NPR Magento Contact";
-                        tmpMagentoContactBuffer."Magento Store Code" := Customer."NPR Magento Store Code";
-                        tmpMagentoContactBuffer.Insert();
+                        TempMagentoContactBuffer."Entry No." += 1;
+                        TempMagentoContactBuffer."Customer No." := Customer."No.";
+                        TempMagentoContactBuffer."Customer Name" := Customer.Name;
+                        TempMagentoContactBuffer."Contact No." := Contact."No.";
+                        TempMagentoContactBuffer."Contact Name" := Contact.Name;
+                        TempMagentoContactBuffer."Contact Email" := Contact."E-Mail";
+                        TempMagentoContactBuffer."Magento Contact" := Contact."NPR Magento Contact";
+                        TempMagentoContactBuffer."Magento Store Code" := Customer."NPR Magento Store Code";
+                        TempMagentoContactBuffer.Insert();
                     end;
                 end;
             until Contact.Next() = 0;
 
         // Design choice, in case that we need to run reset password again
-        tmpMagentoContactBuffer.SetFilter("Password Reset", '%1', false);
+        TempMagentoContactBuffer.SetFilter("Password Reset", '%1', false);
 
-        Page.Run(Page::"NPR M2 Contact List", tmpMagentoContactBuffer);
+        Page.Run(Page::"NPR M2 Contact List", TempMagentoContactBuffer);
     end;
 
     procedure ResetPasswordAllMagentoContacts(var MagentoContactBuffer: Record "NPR M2 Contact Buffer")
@@ -254,8 +254,8 @@
         TmpContact.Reset();
         if (TmpContact.FindSet()) then begin
             repeat
-                TmpGlobalContact.TransferFields(TmpContact, true);
-                TmpGlobalContact.Insert();
+                TempGlobalContact.TransferFields(TmpContact, true);
+                TempGlobalContact.Insert();
             until (TmpContact.Next() = 0);
         end;
     end;
@@ -265,12 +265,12 @@
         if (TmpContact.IsTemporary()) then
             TmpContact.DeleteAll();
 
-        TmpGlobalContact.Reset();
-        if (TmpGlobalContact.FindSet()) then begin
+        TempGlobalContact.Reset();
+        if (TempGlobalContact.FindSet()) then begin
             repeat
-                TmpContact.TransferFields(TmpGlobalContact, true);
+                TmpContact.TransferFields(TempGlobalContact, true);
                 TmpContact.Insert();
-            until (TmpGlobalContact.Next() = 0);
+            until (TempGlobalContact.Next() = 0);
         end;
     end;
 
@@ -279,8 +279,8 @@
         TmpContact.Reset();
         if (TmpContact.FindSet()) then begin
             repeat
-                TmpGlobalAccount.TransferFields(TmpContact, true);
-                TmpGlobalAccount.Insert();
+                TempGlobalAccount.TransferFields(TmpContact, true);
+                TempGlobalAccount.Insert();
             until (TmpContact.Next() = 0);
         end;
     end;
@@ -290,12 +290,12 @@
         if (TmpContact.IsTemporary()) then
             TmpContact.DeleteAll();
 
-        TmpGlobalAccount.Reset();
-        if (TmpGlobalAccount.FindSet()) then begin
+        TempGlobalAccount.Reset();
+        if (TempGlobalAccount.FindSet()) then begin
             repeat
-                TmpContact.TransferFields(TmpGlobalAccount, true);
+                TmpContact.TransferFields(TempGlobalAccount, true);
                 TmpContact.Insert();
-            until (TmpGlobalAccount.Next() = 0);
+            until (TempGlobalAccount.Next() = 0);
         end;
     end;
 
@@ -304,8 +304,8 @@
         TmpCustomer.Reset();
         if (TmpCustomer.FindSet()) then begin
             repeat
-                TmpGlobalCustomer1.TransferFields(TmpCustomer, true);
-                TmpGlobalCustomer1.Insert();
+                TempGlobalCustomer1.TransferFields(TmpCustomer, true);
+                TempGlobalCustomer1.Insert();
             until (TmpCustomer.Next() = 0);
         end;
     end;
@@ -315,12 +315,12 @@
         if (TmpCustomer.IsTemporary) then
             TmpCustomer.DeleteAll();
 
-        TmpGlobalCustomer1.Reset();
-        if (TmpGlobalCustomer1.FindSet()) then begin
+        TempGlobalCustomer1.Reset();
+        if (TempGlobalCustomer1.FindSet()) then begin
             repeat
-                TmpCustomer.TransferFields(TmpGlobalCustomer1, true);
+                TmpCustomer.TransferFields(TempGlobalCustomer1, true);
                 TmpCustomer.Insert();
-            until (TmpGlobalCustomer1.Next() = 0);
+            until (TempGlobalCustomer1.Next() = 0);
         end;
     end;
 
@@ -329,8 +329,8 @@
         TmpShiptoAddress.Reset();
         if (TmpShiptoAddress.FindSet()) then begin
             repeat
-                TmpGlobsalShiptoAddressRequest.TransferFields(TmpShiptoAddress, true);
-                TmpGlobsalShiptoAddressRequest.Insert();
+                TempGlobsalShiptoAddressRequest.TransferFields(TmpShiptoAddress, true);
+                TempGlobsalShiptoAddressRequest.Insert();
             until (TmpShiptoAddress.Next() = 0);
         end;
     end;
@@ -339,11 +339,11 @@
     begin
         if (TmpShiptoAddress.IsTemporary()) then
             TmpShiptoAddress.DeleteAll();
-        if (TmpGlobalShiptoAddressResponse.FindSet()) then begin
+        if (TempGlobalShiptoAddressResponse.FindSet()) then begin
             repeat
-                TmpShiptoAddress.TransferFields(TmpGlobalShiptoAddressResponse, true);
+                TmpShiptoAddress.TransferFields(TempGlobalShiptoAddressResponse, true);
                 TmpShiptoAddress.Insert();
-            until (TmpGlobalShiptoAddressResponse.Next() = 0);
+            until (TempGlobalShiptoAddressResponse.Next() = 0);
         end;
     end;
 
@@ -352,9 +352,9 @@
         TmpOneTimePassword.Reset();
         if (TmpOneTimePassword.FindSet()) then begin
             repeat
-                TmpGlobalOneTimePassword.TransferFields(TmpOneTimePassword, true);
-                TmpGlobalOneTimePassword.Insert();
-            until (TmpGlobalOneTimePassword.Next() = 0);
+                TempGlobalOneTimePassword.TransferFields(TmpOneTimePassword, true);
+                TempGlobalOneTimePassword.Insert();
+            until (TempGlobalOneTimePassword.Next() = 0);
         end;
     end;
 
@@ -429,11 +429,11 @@
 
     local procedure TryCreateAccount(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccount: Record Contact temporary) bOk: Boolean
     var
-        TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
+        TempOneTimePassword: Record "NPR M2 One Time Password" temporary;
     begin
         Clear(AccountManager);
         AccountManager.SetFunction(AccountFunctions::CREATE_ACCOUNT);
-        AccountManager.TransferSetOTP(TmpOneTimePassword);
+        AccountManager.TransferSetOTP(TempOneTimePassword);
         AccountManager.TransferSetContact(TmpContact);
         AccountManager.TransferSetCustomer1(TmpCustomer);
         AccountManager.TransferSetAccount(TmpAccount);
@@ -480,16 +480,16 @@
     local procedure TryDeleteAccount(ContactNo: Code[20]) bOk: Boolean
     var
         Account: Record Contact;
-        TmpContact: Record Contact temporary;
+        TempContact: Record Contact temporary;
     begin
 
         Account.Get(ContactNo);
-        TmpContact.TransferFields(Account, true);
-        TmpContact.Insert();
+        TempContact.TransferFields(Account, true);
+        TempContact.Insert();
 
         Clear(AccountManager);
         AccountManager.SetFunction(AccountFunctions::DELETE_ACCOUNT);
-        AccountManager.TransferSetContact(TmpContact);
+        AccountManager.TransferSetContact(TempContact);
 
         bOk := AccountManager.Run();
 
@@ -907,8 +907,8 @@
 
     local procedure AddAccountWorker(var TmpAccount: Record Contact temporary; var TmpAccountResponse: Record Contact temporary)
     var
-        TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
-        tmpCorporateAccount: Record Contact temporary;
+        TempOneTimePassword: Record "NPR M2 One Time Password" temporary;
+        TempCorporateAccount: Record Contact temporary;
         Contact: Record Contact;
         ReasonText: Text;
     begin
@@ -919,27 +919,27 @@
         if (TmpAccount."NPR Magento Password (Md5)" = '') then
             Error('Password must not be blank.');
 
-        TmpOneTimePassword."Password (Hash)" := TmpAccount."NPR Magento Password (Md5)";
-        TmpOneTimePassword."E-Mail" := LowerCase(TmpAccount."E-Mail");
-        TmpOneTimePassword.Insert();
+        TempOneTimePassword."Password (Hash)" := TmpAccount."NPR Magento Password (Md5)";
+        TempOneTimePassword."E-Mail" := LowerCase(TmpAccount."E-Mail");
+        TempOneTimePassword.Insert();
 
-        if (not AuthenticatePassword(TmpOneTimePassword, tmpCorporateAccount, ReasonText)) then
+        if (not AuthenticatePassword(TempOneTimePassword, TempCorporateAccount, ReasonText)) then
             Error('Invalid account, password combination.');
 
-        tmpCorporateAccount.SetFilter("Company No.", '=%1', TmpAccount."Company No.");
-        if (not tmpCorporateAccount.FindFirst()) then
+        TempCorporateAccount.SetFilter("Company No.", '=%1', TmpAccount."Company No.");
+        if (not TempCorporateAccount.FindFirst()) then
             Error('Invalid corporate id %1 for account, password combination.', TmpAccount."Company No.");
 
 
 
         Contact."No." := '';
         Contact.Type := Contact.Type::Person;
-        Contact."Company No." := tmpCorporateAccount."No.";
+        Contact."Company No." := TempCorporateAccount."No.";
 
-        if (not AddMembershipMember(TmpAccount, Contact, tmpCorporateAccount."No.")) then
+        if (not AddMembershipMember(TmpAccount, Contact, TempCorporateAccount."No.")) then
             Contact.Insert(true);
 
-        Contact.InheritCompanyToPersonData(tmpCorporateAccount);
+        Contact.InheritCompanyToPersonData(TempCorporateAccount);
 
         Contact.Validate(Name, TmpAccount."Company Name");
         Contact.Validate("Name 2", TmpAccount."Name 2");

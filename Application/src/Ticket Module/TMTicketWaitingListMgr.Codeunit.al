@@ -270,7 +270,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         Admission: Record "NPR TM Admission";
         WaitingListSetup: Record "NPR TM Waiting List Setup";
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
-        TmpTicketWaitingList: Record "NPR TM Ticket Wait. List" temporary;
+        TempTicketWaitingList: Record "NPR TM Ticket Wait. List" temporary;
         TicketManagement: Codeunit "NPR TM Ticket Management";
         ReferenceDateTime: DateTime;
         RemainingQty: Integer;
@@ -323,19 +323,19 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
                     CandidateForNotification := CandidateForNotification and ((ReferenceTime + WaitingListSetup."End Notify Before (Minutes)" * 60 * 1000) < AdmissionScheduleEntry."Admission Start Time");
 
                 if (CandidateForNotification) then begin
-                    TmpTicketWaitingList.TransferFields(TicketWaitingList, true);
-                    TmpTicketWaitingList."Temp Count" := TicketWaitingList."Notification Count";
-                    TmpTicketWaitingList."Temp Notified At" := TicketWaitingList."Notified At";
+                    TempTicketWaitingList.TransferFields(TicketWaitingList, true);
+                    TempTicketWaitingList."Temp Count" := TicketWaitingList."Notification Count";
+                    TempTicketWaitingList."Temp Notified At" := TicketWaitingList."Notified At";
                     if (TicketWaitingList."Notified At" = 0DT) then
-                        TmpTicketWaitingList."Temp Notified At" := TicketWaitingList."Created At" + (WaitingListSetup."Notification Delay (Minutes)" * 60 * 1000);
-                    TmpTicketWaitingList.Insert();
+                        TempTicketWaitingList."Temp Notified At" := TicketWaitingList."Created At" + (WaitingListSetup."Notification Delay (Minutes)" * 60 * 1000);
+                    TempTicketWaitingList.Insert();
                 end;
 
             end;
         until (TicketWaitingList.Next() = 0);
 
-        TmpTicketWaitingList.Reset();
-        if (TmpTicketWaitingList.IsEmpty()) then
+        TempTicketWaitingList.Reset();
+        if (TempTicketWaitingList.IsEmpty()) then
             exit;
 
         if (WaitingListSetup."Simultaneous Notification Cnt." = 0) then
@@ -345,19 +345,19 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
             exit;
 
         // Sort entries on ascending notification datetime, and reorder them using the order of selection
-        TmpTicketWaitingList.SetCurrentKey("Temp Notified At");
-        TmpTicketWaitingList.FindSet();
+        TempTicketWaitingList.SetCurrentKey("Temp Notified At");
+        TempTicketWaitingList.FindSet();
         repeat
             SelectCounter += 1;
-            TmpTicketWaitingListSelected.TransferFields(TmpTicketWaitingList, true);
+            TmpTicketWaitingListSelected.TransferFields(TempTicketWaitingList, true);
             TmpTicketWaitingListSelected.Insert();
-        until (TmpTicketWaitingList.Next() = 0) or (SelectCounter + OpenNotificationCount >= WaitingListSetup."Simultaneous Notification Cnt.");
+        until (TempTicketWaitingList.Next() = 0) or (SelectCounter + OpenNotificationCount >= WaitingListSetup."Simultaneous Notification Cnt.");
     end;
 
     procedure ProcessAdmissionScheduleEntry(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; ReferenceDate: Date; ReferenceTime: Time; SendNotifications: Boolean)
     var
-        TmpTicketWaitingListToNotify: Record "NPR TM Ticket Wait. List" temporary;
-        TmpTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
+        TempTicketWaitingListToNotify: Record "NPR TM Ticket Wait. List" temporary;
+        TempTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         FromEntryNo: Integer;
@@ -365,21 +365,21 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
     begin
 
         // Fill up the temp table TmpTicketWaitingListToNotify
-        SelectWaitingListEntries(AdmissionScheduleEntry, ReferenceDate, ReferenceTime, TmpTicketWaitingListToNotify);
-        CreateWaitingListNotifications(TmpTicketWaitingListToNotify, TmpTicketNotificationEntry);
+        SelectWaitingListEntries(AdmissionScheduleEntry, ReferenceDate, ReferenceTime, TempTicketWaitingListToNotify);
+        CreateWaitingListNotifications(TempTicketWaitingListToNotify, TempTicketNotificationEntry);
 
         if (not SendNotifications) then
             exit;
 
-        TmpTicketNotificationEntry.Reset();
-        if (TmpTicketNotificationEntry.IsEmpty()) then
+        TempTicketNotificationEntry.Reset();
+        if (TempTicketNotificationEntry.IsEmpty()) then
             exit;
 
-        TmpTicketNotificationEntry.FindFirst();
-        FromEntryNo := TmpTicketNotificationEntry."Entry No.";
+        TempTicketNotificationEntry.FindFirst();
+        FromEntryNo := TempTicketNotificationEntry."Entry No.";
 
-        TmpTicketNotificationEntry.FindLast();
-        ToEntryNo := TmpTicketNotificationEntry."Entry No.";
+        TempTicketNotificationEntry.FindLast();
+        ToEntryNo := TempTicketNotificationEntry."Entry No.";
 
         TicketNotificationEntry.SetFilter("Entry No.", '%1..%2', FromEntryNo, ToEntryNo);
         TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::WAITINGLIST);

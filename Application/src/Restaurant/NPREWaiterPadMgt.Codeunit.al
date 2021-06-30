@@ -340,13 +340,13 @@
 
     local procedure WPIsServed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
     var
-        FlowStatusTmp: Record "NPR NPRE Flow Status" temporary;
+        TempFlowStatus: Record "NPR NPRE Flow Status" temporary;
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link";
-        KitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
-        PrintCategoryTmp: Record "NPR NPRE Print/Prod. Cat." temporary;
+        TempKitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
+        TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
+        TempWPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         RestPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
@@ -358,20 +358,20 @@
         if WaiterPadLine.IsEmpty then
             exit(true);
 
-        RestPrint.InitTempFlowStatusList(FlowStatusTmp, FlowStatusTmp."Status Object"::WaiterPadLineMealFlow);
-        RestPrint.InitTempPrintCategoryList(PrintCategoryTmp);
+        RestPrint.InitTempFlowStatusList(TempFlowStatus, TempFlowStatus."Status Object"::WaiterPadLineMealFlow);
+        RestPrint.InitTempPrintCategoryList(TempPrintCategory);
         RestPrint.BufferEligibleForSendingWPadLines(
           WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
-          FlowStatusTmp, PrintCategoryTmp, true, false, WPadLineBuffer);
+          TempFlowStatus, TempPrintCategory, true, false, TempWPadLineBuffer);
 
-        if WPadLineBuffer.FindSet() then
+        if TempWPadLineBuffer.FindSet() then
             repeat
-                if WaiterPadLine.Get(WPadLineBuffer."Waiter Pad No.", WPadLineBuffer."Waiter Pad Line No.") then
+                if WaiterPadLine.Get(TempWPadLineBuffer."Waiter Pad No.", TempWPadLineBuffer."Waiter Pad Line No.") then
                     if KitchenOrderMgt.FindApplicableWPLineKitchenStations(
-                        KitchenStationBuffer, WaiterPadLine, WPadLineBuffer."Serving Step", WPadLineBuffer."Print Category Code")
+                        TempKitchenStationBuffer, WaiterPadLine, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code")
                     then begin
                         KitchenOrderMgt.InitKitchenReqSourceFromWaiterPadLine(
-                          KitchenReqSourceParam, WaiterPadLine, KitchenStationBuffer."Restaurant Code", WPadLineBuffer."Serving Step", 0DT);
+                          KitchenReqSourceParam, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", TempWPadLineBuffer."Serving Step", 0DT);
                         KitchenOrderMgt.FindKitchenRequests(KitchenRequest, KitchenReqSourceParam);
                         if not KitchenRequest.FindSet() then
                             exit(false);
@@ -380,7 +380,7 @@
                                 exit(false);
                         until KitchenRequest.Next() = 0;
                     end;
-            until WPadLineBuffer.Next() = 0;
+            until TempWPadLineBuffer.Next() = 0;
 
         exit(true);
     end;
@@ -472,7 +472,7 @@
     procedure SelectPrintCategories(AppliesToRecID: RecordID)
     var
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
-        AssignedFlowStatusTmp: Record "NPR NPRE Assigned Flow Status" temporary;
+        TempAssignedFlowStatus: Record "NPR NPRE Assigned Flow Status" temporary;
         AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
         PrintCategoryList: Page "NPR NPRE Slct Prnt Cat.";
@@ -489,8 +489,8 @@
                     FilterAssignedFlowStatuses(AssignedPrintCategory.RecordId, AssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatus);
                     if AssignedFlowStatus.FindSet() then
                         repeat
-                            AssignedFlowStatusTmp := AssignedFlowStatus;
-                            AssignedFlowStatusTmp.Insert();
+                            TempAssignedFlowStatus := AssignedFlowStatus;
+                            TempAssignedFlowStatus.Insert();
                         until AssignedFlowStatus.Next() = 0;
                 end;
             until AssignedPrintCategory.Next() = 0;
@@ -502,14 +502,14 @@
 
         Clear(PrintCategoryList);
         PrintCategoryList.SetDataset(PrintCategory);
-        PrintCategoryList.SetAssignedFlowStatusRecordset(AssignedFlowStatusTmp);
+        PrintCategoryList.SetAssignedFlowStatusRecordset(TempAssignedFlowStatus);
         PrintCategoryList.SetSourceRecID(AppliesToRecID);
         PrintCategoryList.SetMultiSelectionMode(true);
         PrintCategoryList.LookupMode(true);
         if PrintCategoryList.RunModal() <> ACTION::LookupOK then
             exit;
         PrintCategoryList.GetDataset(PrintCategory);
-        PrintCategoryList.GetAssignedFlowStatusRecordset(AssignedFlowStatusTmp);
+        PrintCategoryList.GetAssignedFlowStatusRecordset(TempAssignedFlowStatus);
         PrintCategory.MarkedOnly(true);
 
         Handled := false;
@@ -526,16 +526,16 @@
                 AssignedPrintCategory."Print/Prod. Category Code" := PrintCategory.Code;
                 AssignedPrintCategory.Insert();
 
-                FilterAssignedFlowStatuses(AssignedPrintCategory.RecordId, AssignedFlowStatusTmp."Flow Status Object"::WaiterPadLineMealFlow, AssignedFlowStatusTmp);
-                if AssignedFlowStatusTmp.FindSet() then
+                FilterAssignedFlowStatuses(AssignedPrintCategory.RecordId, TempAssignedFlowStatus."Flow Status Object"::WaiterPadLineMealFlow, TempAssignedFlowStatus);
+                if TempAssignedFlowStatus.FindSet() then
                     repeat
-                        AssignedFlowStatus := AssignedFlowStatusTmp;
+                        AssignedFlowStatus := TempAssignedFlowStatus;
                         AssignedFlowStatus.Insert();
-                    until AssignedFlowStatusTmp.Next() = 0;
+                    until TempAssignedFlowStatus.Next() = 0;
             until PrintCategory.Next() = 0;
 
-        AssignedFlowStatusTmp.Reset();
-        AssignedFlowStatusTmp.DeleteAll();
+        TempAssignedFlowStatus.Reset();
+        TempAssignedFlowStatus.DeleteAll();
     end;
 
     procedure AssignWPadLinePrintCategories(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RemoveExisting: Boolean)

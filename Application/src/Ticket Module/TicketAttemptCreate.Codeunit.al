@@ -6,7 +6,7 @@
     begin
         case _AttemptFunction of
             _AttemptFunction::REUSE:
-                DoRevalidateRequestForTicketReuse(_TmpTicketReservationRequest, _ReusedTokenId);
+                DoRevalidateRequestForTicketReuse(TempTicketReservationRequest, _ReusedTokenId);
 
             _AttemptFunction::VALIDATE_ARRIVAL:
                 DoValidateTicketForArrival(_TicketIdentifierType, _TicketIdentifier, _AdmissionCode, _AdmissionScheduleEntryNo);
@@ -27,7 +27,7 @@
 
     var
         _TicketAttemptCreate: Codeunit "NPR Ticket Attempt Create";
-        _TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
         _TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         _ReusedTokenId: Text;
         _TicketNo: Code[20];
@@ -61,7 +61,7 @@
     procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; ReusedTokenId: Text; var ResponseMessage: Text): Boolean
     begin
 
-        _TmpTicketReservationRequest.Copy(TmpTicketReservationRequest, true);
+        TempTicketReservationRequest.Copy(TmpTicketReservationRequest, true);
         _AttemptFunction := _AttemptFunction::REUSE;
 
         exit(InvokeAttemptAction(ResponseMessage));

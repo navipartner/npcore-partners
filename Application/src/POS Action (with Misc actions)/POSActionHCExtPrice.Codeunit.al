@@ -37,7 +37,7 @@ then begin
         CustomerPriceManagement: Codeunit "NPR POS HC Ext. Price";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
-        TmpSalesLine: Record "Sales Line" temporary;
+        TempSalesLine: Record "Sales Line" temporary;
         GeneralLedgerSetup: Record "General Ledger Setup";
         EndpointSetup: Record "NPR POS HC Endpoint Setup";
         PrevRec: Text;
@@ -64,25 +64,25 @@ then begin
             exit;
 
         repeat
-            TmpSalesLine."Document Type" := TmpSalesLine."Document Type"::Quote;
-            TmpSalesLine."Document No." := SaleLinePOS."Sales Ticket No.";
-            TmpSalesLine."Line No." := SaleLinePOS."Line No.";
-            TmpSalesLine.Type := TmpSalesLine.Type::Item;
-            TmpSalesLine."No." := SaleLinePOS."No.";
-            TmpSalesLine."Variant Code" := SaleLinePOS."Variant Code";
-            TmpSalesLine.Quantity := SaleLinePOS.Quantity;
-            TmpSalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-            TmpSalesLine.Insert();
+            TempSalesLine."Document Type" := TempSalesLine."Document Type"::Quote;
+            TempSalesLine."Document No." := SaleLinePOS."Sales Ticket No.";
+            TempSalesLine."Line No." := SaleLinePOS."Line No.";
+            TempSalesLine.Type := TempSalesLine.Type::Item;
+            TempSalesLine."No." := SaleLinePOS."No.";
+            TempSalesLine."Variant Code" := SaleLinePOS."Variant Code";
+            TempSalesLine.Quantity := SaleLinePOS.Quantity;
+            TempSalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
+            TempSalesLine.Insert();
         until (SaleLinePOS.Next() = 0);
 
-        CustomerPriceManagement.GetCustomerPrice(EndpointSetup.Code, SalePOS."Customer No.", SalePOS."Sales Ticket No.", GeneralLedgerSetup."LCY Code", TmpSalesLine);
+        CustomerPriceManagement.GetCustomerPrice(EndpointSetup.Code, SalePOS."Customer No.", SalePOS."Sales Ticket No.", GeneralLedgerSetup."LCY Code", TempSalesLine);
 
         SaleLinePOS.FindSet();
         repeat
-            TmpSalesLine.Get(TmpSalesLine."Document Type"::Quote, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
+            TempSalesLine.Get(TempSalesLine."Document Type"::Quote, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
             PrevRec := Format(SaleLinePOS);
 
-            CustomerPriceManagement.UpdateSaleLinePOS(TmpSalesLine, SaleLinePOS);
+            CustomerPriceManagement.UpdateSaleLinePOS(TempSalesLine, SaleLinePOS);
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
 
             if PrevRec <> Format(SaleLinePOS) then

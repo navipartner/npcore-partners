@@ -20,7 +20,7 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInNpGlobalPOSSalesSetup(ExistingNpGlobalPOSSalesSetup, Rec.Code);
+                        CheckIfNoAvailableInNpGlobalPOSSalesSetup(TempExistingNpGlobalPOSSalesSetup, Rec.Code);
                     end;
                 }
                 field("Company Name"; Rec."Company Name")
@@ -59,7 +59,7 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
     end;
 
     var
-        ExistingNpGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup" temporary;
+        TempExistingNpGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup" temporary;
 
     procedure GetRec(var TempGlobalPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     begin
@@ -108,8 +108,8 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
     begin
         if NpGlobalPOSSalesSetup.FindSet() then
             repeat
-                ExistingNpGlobalPOSSalesSetup := NpGlobalPOSSalesSetup;
-                ExistingNpGlobalPOSSalesSetup.Insert();
+                TempExistingNpGlobalPOSSalesSetup := NpGlobalPOSSalesSetup;
+                TempExistingNpGlobalPOSSalesSetup.Insert();
             until NpGlobalPOSSalesSetup.Next() = 0;
     end;
 

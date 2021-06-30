@@ -169,31 +169,31 @@ table 6150710 "NPR POS View"
     var
         POSUnit: Record "NPR POS Unit";
         Salesperson: Record "Salesperson/Purchaser";
-        POSUnitTemp: Record "NPR POS Unit" temporary;
-        SalespersonTemp: Record "Salesperson/Purchaser" temporary;
+        TempPOSUnit: Record "NPR POS Unit" temporary;
+        TempSalesperson: Record "Salesperson/Purchaser" temporary;
     begin
         if UnitCode <> '' then begin
             if POSUnit.Get(UnitCode) then begin
-                POSUnitTemp := POSUnit;
-                POSUnitTemp.Insert();
+                TempPOSUnit := POSUnit;
+                TempPOSUnit.Insert();
             end;
         end;
 
         if SalespersonCode <> '' then begin
             if Salesperson.Get(SalespersonCode) then begin
-                SalespersonTemp := Salesperson;
-                SalespersonTemp.Insert();
+                TempSalesperson := Salesperson;
+                TempSalesperson.Insert();
             end;
         end;
 
         if DefaultView.FindSet() then
             repeat
                 if DefaultView."Register Filter" <> '' then
-                    POSUnitTemp.SetFilter("No.", DefaultView."Register Filter");
+                    TempPOSUnit.SetFilter("No.", DefaultView."Register Filter");
                 if DefaultView."Salesperson Filter" <> '' then
-                    SalespersonTemp.SetFilter(Code, DefaultView."Salesperson Filter");
+                    TempSalesperson.SetFilter(Code, DefaultView."Salesperson Filter");
 
-                if ((not POSUnitTemp.IsEmpty()) or (UnitCode = '')) and ((not SalespersonTemp.IsEmpty) or (SalespersonCode = '')) then begin
+                if ((not TempPOSUnit.IsEmpty()) or (UnitCode = '')) and ((not TempSalesperson.IsEmpty) or (SalespersonCode = '')) then begin
                     DefaultView.TestField("POS View Code");
                     Get(DefaultView."POS View Code");
                     exit(true);

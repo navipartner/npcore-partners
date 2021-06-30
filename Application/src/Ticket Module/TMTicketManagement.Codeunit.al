@@ -2511,7 +2511,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure CheckTicketBaseCalendarWorker(AdmissionCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionDate: Date; var NonWorking: Boolean; var ResponseMessage: Text)
     var
         TicketBOM: Record "NPR TM Ticket Admission BOM";
-        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
+        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
         CalendarManagement: Codeunit "Calendar Management";
         CalendarDesc: Text;
     begin
@@ -2520,31 +2520,31 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         TicketBOM.Get(ItemNo, VariantCode, AdmissionCode);
         if (TicketBOM."Ticket Base Calendar Code" <> '') then begin
-            CustomizedCalendarChangeTemp.Init();
-            CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Service;
-            CustomizedCalendarChangeTemp."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
-            CustomizedCalendarChangeTemp."Date" := AdmissionDate;
-            CustomizedCalendarChangeTemp.Description := CalendarDesc;
-            CustomizedCalendarChangeTemp."Source Code" := AdmissionCode;
-            CustomizedCalendarChangeTemp.Insert();
+            TempCustomizedCalendarChange.Init();
+            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
+            TempCustomizedCalendarChange."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
+            TempCustomizedCalendarChange."Date" := AdmissionDate;
+            TempCustomizedCalendarChange.Description := CalendarDesc;
+            TempCustomizedCalendarChange."Source Code" := AdmissionCode;
+            TempCustomizedCalendarChange.Insert();
 
-            CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
+            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
 
-            if (not CustomizedCalendarChangeTemp.Nonworking) then begin
-                CustomizedCalendarChangeTemp.DeleteAll();
-                CustomizedCalendarChangeTemp.Init();
-                CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Service;
-                CustomizedCalendarChangeTemp."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
-                CustomizedCalendarChangeTemp."Date" := AdmissionDate;
-                CustomizedCalendarChangeTemp.Description := CalendarDesc;
-                CustomizedCalendarChangeTemp."Source Code" := AdmissionCode;
-                CustomizedCalendarChangeTemp."Additional Source Code" := ItemNo;
-                CustomizedCalendarChangeTemp.Insert();
+            if (not TempCustomizedCalendarChange.Nonworking) then begin
+                TempCustomizedCalendarChange.DeleteAll();
+                TempCustomizedCalendarChange.Init();
+                TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
+                TempCustomizedCalendarChange."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
+                TempCustomizedCalendarChange."Date" := AdmissionDate;
+                TempCustomizedCalendarChange.Description := CalendarDesc;
+                TempCustomizedCalendarChange."Source Code" := AdmissionCode;
+                TempCustomizedCalendarChange."Additional Source Code" := ItemNo;
+                TempCustomizedCalendarChange.Insert();
 
-                CalendarManagement.CheckDateStatus(CustomizedCalendarChangeTemp);
+                CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
             end;
 
-            NonWorking := CustomizedCalendarChangeTemp.Nonworking;
+            NonWorking := TempCustomizedCalendarChange.Nonworking;
             if (NonWorking) then
                 if (CalendarDesc = '') then
                     CalendarDesc := StrSubstNo(TICKET_CALENDAR, ItemNo, VariantCode, AdmissionCode, AdmissionDate);
@@ -2603,10 +2603,10 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     procedure HandlePostpaidTickets(PreviewDocument: Boolean)
     var
-        TmpTicket: Record "NPR TM Ticket" temporary;
-        TmpAggregatedPerRequest: Record "NPR TM Ticket Access Entry" temporary;
-        TmpAdmissionPerDate: Record "NPR TM Det. Ticket AccessEntry" temporary;
-        TmpDetailedAccessEntries: Record "NPR TM Det. Ticket AccessEntry" temporary;
+        TempTicket: Record "NPR TM Ticket" temporary;
+        TempAggregatedPerRequest: Record "NPR TM Ticket Access Entry" temporary;
+        TempAdmissionPerDate: Record "NPR TM Det. Ticket AccessEntry" temporary;
+        TempDetailedAccessEntries: Record "NPR TM Det. Ticket AccessEntry" temporary;
         FirstInvoiceNo: Code[20];
         LastInvoiceNo: Code[20];
         InvoiceDetailsMessage: Text;
@@ -2621,17 +2621,17 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (ShowDialog) then
             gWindow.Open(HANDLE_POSTPAID_STATUS);
 
-        CollectUnhandledPostpaidTickets(ShowDialog, TmpTicket, TmpDetailedAccessEntries);
-        AggregatePaymentEntries(ShowDialog, TmpTicket, TmpAggregatedPerRequest, TmpAdmissionPerDate);
+        CollectUnhandledPostpaidTickets(ShowDialog, TempTicket, TempDetailedAccessEntries);
+        AggregatePaymentEntries(ShowDialog, TempTicket, TempAggregatedPerRequest, TempAdmissionPerDate);
 
         if (not PreviewDocument) then begin
-            CreatePostpaidTicketInvoice(ShowDialog, TmpAggregatedPerRequest, TmpAdmissionPerDate);
-            MarkPostpaidTicketAsInvoiced(ShowDialog, TmpDetailedAccessEntries, TmpAggregatedPerRequest, TmpTicket);
-            if (not TmpAggregatedPerRequest.IsEmpty()) then begin
-                TmpAggregatedPerRequest.FindFirst();
-                FirstInvoiceNo := CopyStr(TmpAggregatedPerRequest.Description, 1, 20);
-                TmpAggregatedPerRequest.FindLast();
-                LastInvoiceNo := CopyStr(TmpAggregatedPerRequest.Description, 1, 20);
+            CreatePostpaidTicketInvoice(ShowDialog, TempAggregatedPerRequest, TempAdmissionPerDate);
+            MarkPostpaidTicketAsInvoiced(ShowDialog, TempDetailedAccessEntries, TempAggregatedPerRequest, TempTicket);
+            if (not TempAggregatedPerRequest.IsEmpty()) then begin
+                TempAggregatedPerRequest.FindFirst();
+                FirstInvoiceNo := CopyStr(TempAggregatedPerRequest.Description, 1, 20);
+                TempAggregatedPerRequest.FindLast();
+                LastInvoiceNo := CopyStr(TempAggregatedPerRequest.Description, 1, 20);
                 InvoiceDetailsMessage := StrSubstNo(FromToInvLbl, FirstInvoiceNo, LastInvoiceNo);
             end;
         end;
@@ -2639,7 +2639,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (ShowDialog) then
             gWindow.Close();
 
-        Message(POSTPAID_RESULT, TmpTicket.Count(), TmpAggregatedPerRequest.Count(), InvoiceDetailsMessage);
+        Message(POSTPAID_RESULT, TempTicket.Count(), TempAggregatedPerRequest.Count(), InvoiceDetailsMessage);
     end;
 
     local procedure CollectUnhandledPostpaidTickets(ShowDialog: Boolean; var TmpPostpaidTickets: Record "NPR TM Ticket" temporary; var TmpDetailedAccessEntries: Record "NPR TM Det. Ticket AccessEntry" temporary)

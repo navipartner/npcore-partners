@@ -9,7 +9,7 @@
     var
         MagentoSetup: Record "NPR Magento Setup";
         MagentoDisplayGroup: Record "NPR Magento Display Group";
-        M2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
         M2ValueBufferList: Page "NPR M2 Value Buffer List";
     begin
         MagentoSetup.Get();
@@ -21,22 +21,22 @@
             exit;
         end;
 
-        SetupDisplayGroups(M2ValueBuffer);
-        if M2ValueBuffer.FindFirst() then;
-        if M2ValueBuffer.Get(Customer."NPR Magento Display Group") then;
+        SetupDisplayGroups(TempM2ValueBuffer);
+        if TempM2ValueBuffer.FindFirst() then;
+        if TempM2ValueBuffer.Get(Customer."NPR Magento Display Group") then;
 
         Clear(M2ValueBufferList);
         M2ValueBufferList.SetCaption(Customer.FieldCaption("NPR Magento Display Group"));
         M2ValueBufferList.SetShowValue(true);
         M2ValueBufferList.SetShowLabel(true);
         M2ValueBufferList.SetShowPosition(false);
-        M2ValueBufferList.SetSourceTable(M2ValueBuffer);
+        M2ValueBufferList.SetSourceTable(TempM2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal() <> ACTION::LookupOK then
             exit;
 
-        M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."NPR Magento Display Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Display Group"));
+        M2ValueBufferList.GetRecord(TempM2ValueBuffer);
+        Customer."NPR Magento Display Group" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Display Group"));
     end;
 
     local procedure SetupDisplayGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
@@ -97,25 +97,25 @@
 
     procedure LookupShippingGroup(var Customer: Record Customer)
     var
-        M2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
         M2ValueBufferList: Page "NPR M2 Value Buffer List";
     begin
-        SetupShippingGroups(M2ValueBuffer);
-        if M2ValueBuffer.FindFirst() then;
-        if M2ValueBuffer.Get(Customer."NPR Magento Shipping Group") then;
+        SetupShippingGroups(TempM2ValueBuffer);
+        if TempM2ValueBuffer.FindFirst() then;
+        if TempM2ValueBuffer.Get(Customer."NPR Magento Shipping Group") then;
 
         Clear(M2ValueBufferList);
         M2ValueBufferList.SetCaption(Customer.FieldCaption("NPR Magento Shipping Group"));
         M2ValueBufferList.SetShowValue(true);
         M2ValueBufferList.SetShowLabel(false);
         M2ValueBufferList.SetShowPosition(false);
-        M2ValueBufferList.SetSourceTable(M2ValueBuffer);
+        M2ValueBufferList.SetSourceTable(TempM2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal() <> ACTION::LookupOK then
             exit;
 
-        M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."NPR Magento Shipping Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Shipping Group"));
+        M2ValueBufferList.GetRecord(TempM2ValueBuffer);
+        Customer."NPR Magento Shipping Group" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Shipping Group"));
     end;
 
     local procedure SetupShippingGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
@@ -169,24 +169,24 @@
 
     procedure LookupPaymentGroup(var Customer: Record Customer)
     var
-        M2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
         M2ValueBufferList: Page "NPR M2 Value Buffer List";
     begin
-        SetupPaymentGroups(M2ValueBuffer);
-        if M2ValueBuffer.FindFirst() then;
+        SetupPaymentGroups(TempM2ValueBuffer);
+        if TempM2ValueBuffer.FindFirst() then;
 
         Clear(M2ValueBufferList);
         M2ValueBufferList.SetCaption(Customer.FieldCaption("NPR Magento Payment Group"));
         M2ValueBufferList.SetShowValue(true);
         M2ValueBufferList.SetShowLabel(false);
         M2ValueBufferList.SetShowPosition(false);
-        M2ValueBufferList.SetSourceTable(M2ValueBuffer);
+        M2ValueBufferList.SetSourceTable(TempM2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal() <> ACTION::LookupOK then
             exit;
 
-        M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."NPR Magento Payment Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Payment Group"));
+        M2ValueBufferList.GetRecord(TempM2ValueBuffer);
+        Customer."NPR Magento Payment Group" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Payment Group"));
     end;
 
     local procedure SetupPaymentGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
@@ -242,7 +242,7 @@
     var
         MagentoSetup: Record "NPR Magento Setup";
         MagentoCustomerGroup: Record "NPR Magento Customer Group";
-        M2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
         M2ValueBufferList: Page "NPR M2 Value Buffer List";
     begin
         MagentoSetup.Get();
@@ -254,22 +254,22 @@
             exit;
         end;
 
-        SetupCustomerGroups(M2ValueBuffer);
-        if M2ValueBuffer.FindFirst() then;
-        if M2ValueBuffer.Get(Contact."NPR Magento Customer Group") then;
+        SetupCustomerGroups(TempM2ValueBuffer);
+        if TempM2ValueBuffer.FindFirst() then;
+        if TempM2ValueBuffer.Get(Contact."NPR Magento Customer Group") then;
 
         Clear(M2ValueBufferList);
         M2ValueBufferList.SetCaption(Contact.FieldCaption("NPR Magento Customer Group"));
         M2ValueBufferList.SetShowValue(true);
         M2ValueBufferList.SetShowLabel(true);
         M2ValueBufferList.SetShowPosition(false);
-        M2ValueBufferList.SetSourceTable(M2ValueBuffer);
+        M2ValueBufferList.SetSourceTable(TempM2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal() <> ACTION::LookupOK then
             exit;
 
-        M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Contact."NPR Magento Customer Group" := UpperCase(CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Contact."NPR Magento Customer Group")));
+        M2ValueBufferList.GetRecord(TempM2ValueBuffer);
+        Contact."NPR Magento Customer Group" := UpperCase(CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Contact."NPR Magento Customer Group")));
     end;
 
     local procedure SetupCustomerGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
@@ -334,7 +334,7 @@
     var
         MagentoSetup: Record "NPR Magento Setup";
         MagentoStore: Record "NPR Magento Store";
-        M2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
         M2ValueBufferList: Page "NPR M2 Value Buffer List";
     begin
         MagentoSetup.Get();
@@ -346,22 +346,22 @@
             exit;
         end;
 
-        SetupMagentoStores(M2ValueBuffer);
-        if M2ValueBuffer.FindFirst() then;
-        if M2ValueBuffer.Get(Customer."NPR Magento Store Code") then;
+        SetupMagentoStores(TempM2ValueBuffer);
+        if TempM2ValueBuffer.FindFirst() then;
+        if TempM2ValueBuffer.Get(Customer."NPR Magento Store Code") then;
 
         Clear(M2ValueBufferList);
         M2ValueBufferList.SetCaption(Customer.FieldCaption("NPR Magento Store Code"));
         M2ValueBufferList.SetShowValue(true);
         M2ValueBufferList.SetShowLabel(true);
         M2ValueBufferList.SetShowPosition(false);
-        M2ValueBufferList.SetSourceTable(M2ValueBuffer);
+        M2ValueBufferList.SetSourceTable(TempM2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal() <> ACTION::LookupOK then
             exit;
 
-        M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."NPR Magento Store Code" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Store Code"));
+        M2ValueBufferList.GetRecord(TempM2ValueBuffer);
+        Customer."NPR Magento Store Code" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Store Code"));
     end;
 
     local procedure SetupMagentoStores(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)

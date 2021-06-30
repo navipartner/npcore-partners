@@ -141,7 +141,7 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
     local procedure TicketMakeReservation(ExternalItemNumber: Code[50]; AdmissionCode: Code[20]; MemberReference: Code[20]; ScannerStation: Code[10]; var Token: Text[100]; var ResponseMessage: Text) ReservationStatus: Boolean
     var
         xmltext: Text;
-        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        TempBLOBbuffer: Record "NPR BLOB buffer" temporary;
         iStream: InStream;
         oStream: OutStream;
         TicketReservation: XMLport "NPR TM Ticket Reservation";
@@ -157,12 +157,12 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
         '   </reserve_tickets>' +
         '</tickets>';
 
-        TmpBLOBbuffer.Insert();
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
+        TempBLOBbuffer.Insert();
+        TempBLOBbuffer."Buffer 1".CreateOutStream(oStream);
         oStream.WriteText(xmltext);
-        TmpBLOBbuffer.Modify();
+        TempBLOBbuffer.Modify();
 
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
+        TempBLOBbuffer."Buffer 1".CreateInStream(iStream);
         TicketReservation.SetSource(iStream);
         TicketReservation.Import();
 
@@ -177,7 +177,7 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
     local procedure TicketConfirmReservation(Token: Text[100]; ScannerStation: Code[10]; var TicketNumber: Code[20]; var ResponseMessage: Text) ConfirmationStatus: Boolean
     var
         xmltext: Text;
-        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        TempBLOBbuffer: Record "NPR BLOB buffer" temporary;
         iStream: InStream;
         oStream: OutStream;
         TicketWebService: Codeunit "NPR TM Ticket WebService";
@@ -197,12 +197,12 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
         '  </ticket_tokens>' +
         '</tickets>';
 
-        TmpBLOBbuffer.Insert();
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
+        TempBLOBbuffer.Insert();
+        TempBLOBbuffer."Buffer 1".CreateOutStream(oStream);
         oStream.WriteText(xmltext);
-        TmpBLOBbuffer.Modify();
+        TempBLOBbuffer.Modify();
 
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
+        TempBLOBbuffer."Buffer 1".CreateInStream(iStream);
         TicketConfirmation.SetSource(iStream);
         TicketConfirmation.Import();
 

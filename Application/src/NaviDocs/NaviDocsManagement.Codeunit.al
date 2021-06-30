@@ -1123,7 +1123,7 @@
         MailSeparators: List of [Text];
         Txt001: Label 'NaviDocs Error %1 - %2';
         MailManagement: Codeunit "Mail Management";
-        EmailItem: Record "Email Item" temporary;
+        TempEmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         NaviDocsSetup.Get();
@@ -1137,7 +1137,7 @@
         MailSeparators.Add(',');
 
 
-        EmailSenderHandler.CreateEmailItem(EmailItem, EmailSetup."From Name", EmailSetup."From E-mail Address",
+        EmailSenderHandler.CreateEmailItem(TempEmailItem, EmailSetup."From Name", EmailSetup."From E-mail Address",
                                             NaviDocsSetup."Warning E-mail".Split(MailSeparators),
                                             StrSubstNo(Txt001, NaviDocsEntry."Document Description", NaviDocsEntry."No."), '', true);
 
@@ -1146,9 +1146,9 @@
         NaviDocsEntryComment.SetRange("Document Type", NaviDocsEntry."Document Type");
         NaviDocsEntryComment.SetRange("Document No.", NaviDocsEntry."No.");
         if NaviDocsEntryComment.FindLast() then
-            EmailSenderHandler.AppendBodyLine(EmailItem, NaviDocsEntryComment.Description + '<br><br>');
+            EmailSenderHandler.AppendBodyLine(TempEmailItem, NaviDocsEntryComment.Description + '<br><br>');
 
-        EmailSenderHandler.Send(EmailItem);
+        EmailSenderHandler.Send(TempEmailItem);
     end;
 
     procedure NaviDocsStatusUnhandled(): Integer

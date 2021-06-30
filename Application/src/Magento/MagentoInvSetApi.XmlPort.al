@@ -38,7 +38,7 @@
 
                             trigger OnAfterAssignVariable()
                             var
-                                RetailInventoryBuffer2: Record "NPR RIS Retail Inv. Buffer" temporary;
+                                TempRetailInventoryBuffer2: Record "NPR RIS Retail Inv. Buffer" temporary;
                                 RISRetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
                                 Position: Integer;
                             begin
@@ -51,16 +51,16 @@
                                     TempItemVariant.Code := CopyStr(sku, Position + 1, MaxStrLen(TempItemVariant.Code));
                                 end;
 
-                                RISRetailInventorySetMgt.ProcessInventorySet(RISRetailInventorySet, TempItemVariant."Item No.", TempItemVariant.Code, RetailInventoryBuffer2);
-                                if RetailInventoryBuffer2.FindSet() then
+                                RISRetailInventorySetMgt.ProcessInventorySet(RISRetailInventorySet, TempItemVariant."Item No.", TempItemVariant.Code, TempRetailInventoryBuffer2);
+                                if TempRetailInventoryBuffer2.FindSet() then
                                     repeat
                                         LineNo += 1;
-                                        RetailInventoryBuffer.Init();
-                                        RetailInventoryBuffer := RetailInventoryBuffer2;
-                                        RetailInventoryBuffer."Location Filter" := Format(RetailInventoryBuffer."Line No.");
-                                        RetailInventoryBuffer."Line No." := LineNo;
-                                        RetailInventoryBuffer.Insert();
-                                    until RetailInventoryBuffer2.Next() = 0;
+                                        TempRetailInventoryBuffer.Init();
+                                        TempRetailInventoryBuffer := TempRetailInventoryBuffer2;
+                                        TempRetailInventoryBuffer."Location Filter" := Format(TempRetailInventoryBuffer."Line No.");
+                                        TempRetailInventoryBuffer."Line No." := LineNo;
+                                        TempRetailInventoryBuffer.Insert();
+                                    until TempRetailInventoryBuffer2.Next() = 0;
                             end;
                         }
                     }
@@ -120,13 +120,13 @@
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    Clear(RetailInventoryBuffer);
-                                    RetailInventoryBuffer.SetRange("Set Code", RISRetailInventorySetEntry."Set Code");
-                                    RetailInventoryBuffer.SetRange("Location Filter", Format(RISRetailInventorySetEntry."Line No."));
-                                    RetailInventoryBuffer.SetRange("Item Filter", TempItemVariant2."Item No.");
-                                    RetailInventoryBuffer.SetFilter("Variant Filter", '=%1', TempItemVariant2.Code);
-                                    if RetailInventoryBuffer.FindFirst() then;
-                                    inventory := Format(RetailInventoryBuffer.Inventory, 0, 9);
+                                    Clear(TempRetailInventoryBuffer);
+                                    TempRetailInventoryBuffer.SetRange("Set Code", RISRetailInventorySetEntry."Set Code");
+                                    TempRetailInventoryBuffer.SetRange("Location Filter", Format(RISRetailInventorySetEntry."Line No."));
+                                    TempRetailInventoryBuffer.SetRange("Item Filter", TempItemVariant2."Item No.");
+                                    TempRetailInventoryBuffer.SetFilter("Variant Filter", '=%1', TempItemVariant2.Code);
+                                    if TempRetailInventoryBuffer.FindFirst() then;
+                                    inventory := Format(TempRetailInventoryBuffer.Inventory, 0, 9);
                                 end;
                             }
 
@@ -147,6 +147,6 @@
     }
 
     var
-        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
+        TempRetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
         LineNo: Integer;
 }

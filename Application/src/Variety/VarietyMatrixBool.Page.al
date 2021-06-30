@@ -1690,7 +1690,7 @@ page 6059978 "NPR Variety Matrix Bool"
     var
         VarietySetup: Record "NPR Variety Setup";
         MatrixRecords: array[100] of Record "NPR Variety Buffer" temporary;
-        MatrixRecord: Record "NPR Variety Buffer" temporary;
+        TempMatrixRecord: Record "NPR Variety Buffer" temporary;
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[100] of Boolean;
         Item: Record Item;
@@ -1938,24 +1938,24 @@ page 6059978 "NPR Variety Matrix Bool"
 
     local procedure MATRIX_OnAfterGetRecord(MATRIX_ColumnOrdinal: Integer)
     var
-        VRTBuffer: Record "NPR Variety Buffer" temporary;
+        TempVRTBuffer: Record "NPR Variety Buffer" temporary;
         TMPBool: Boolean;
     begin
-        MatrixRecord := MatrixRecords[MATRIX_ColumnOrdinal];
+        TempMatrixRecord := MatrixRecords[MATRIX_ColumnOrdinal];
 
-        VRTBuffer := Rec;
+        TempVRTBuffer := Rec;
         case ShowAsCrossVRT of
             ShowAsCrossVRT::Variety1:
-                VRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 1 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety2:
-                VRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 2 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety3:
-                VRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 3 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
             ShowAsCrossVRT::Variety4:
-                VRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
+                TempVRTBuffer."Variety 4 Value" := MATRIX_CaptionSet[MATRIX_ColumnOrdinal];
         end;
-        TMPBool := VRTMatrixMgt.GetValueBool(VRTBuffer."Variety 1 Value", VRTBuffer."Variety 2 Value",
-                                                VRTBuffer."Variety 3 Value", VRTBuffer."Variety 4 Value",
+        TMPBool := VRTMatrixMgt.GetValueBool(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value",
+                                                TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value",
                                                 CurrVRTField, LocationFilter, GD1, GD2);
         MATRIX_CellData[MATRIX_ColumnOrdinal] := TMPBool;
     end;

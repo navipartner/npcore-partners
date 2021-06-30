@@ -313,7 +313,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
     var
         FromWaiterPad: Record "NPR NPRE Waiter Pad";
         FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        TouchedWaiterPad: Record "NPR NPRE Waiter Pad" temporary;
+        TempTouchedWaiterPad: Record "NPR NPRE Waiter Pad" temporary;
         ToWaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
@@ -350,9 +350,9 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
                                         FromWaiterPadLine.Find();
                                         WaiterPadPOSMgt.SplitWaiterPadLine(FromWaiterPad, FromWaiterPadLine, MoveQty, ToWaiterPad);
 
-                                        TouchedWaiterPad := FromWaiterPad;
-                                        if not TouchedWaiterPad.Find() then
-                                            TouchedWaiterPad.Insert();
+                                        TempTouchedWaiterPad := FromWaiterPad;
+                                        if not TempTouchedWaiterPad.Find() then
+                                            TempTouchedWaiterPad.Insert();
                                         ChangesFound := true;
                                     end;
                                 end;
@@ -362,11 +362,11 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
                 end;
             end;
 
-        if TouchedWaiterPad.FindSet() then
+        if TempTouchedWaiterPad.FindSet() then
             repeat
-                FromWaiterPad.Get(TouchedWaiterPad."No.");
+                FromWaiterPad.Get(TempTouchedWaiterPad."No.");
                 WaiterPadMgt.CloseWaiterPad(FromWaiterPad, false);
-            until TouchedWaiterPad.Next() = 0;
+            until TempTouchedWaiterPad.Next() = 0;
     end;
 
     local procedure FindWaiterPad(var CurrentWaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPad: Record "NPR NPRE Waiter Pad")

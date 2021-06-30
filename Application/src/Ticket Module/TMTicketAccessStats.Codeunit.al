@@ -454,7 +454,7 @@
     procedure BuildCompressedStatistics(SuggestedMaxDate: Date)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary;
+        TempTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary;
         StartDate: Date;
         MaxDate: Date;
         FirstEntryNo: Integer;
@@ -481,7 +481,7 @@
             if (FirstEntryNo = 0) then
                 exit; // Done, someone else did all work already.
 
-            BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, false, TmpTicketStatisticsResult);
+            BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, false, TempTicketStatisticsResult);
 
         end;
     end;
@@ -517,8 +517,8 @@
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        TmpTicketStatistics: Record "NPR TM Ticket Access Stats" temporary;
-        TmpRecBuf: Record "Record Buffer" temporary;
+        TempTicketStatistics: Record "NPR TM Ticket Access Stats" temporary;
+        TempRecBuf: Record "Record Buffer" temporary;
         PreviousAdmissionDate: Date;
         Ticket: Record "NPR TM Ticket";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
@@ -569,9 +569,9 @@
 
                     if (PreviousAdmissionDate <> DT2Date(DetailAccessEntry."Created Datetime")) then begin
                         if (PreviousAdmissionDate <> 0D) then begin
-                            SaveStatistics(TmpTicketStatistics, AdHoc, TmpTicketStatisticsResult);
-                            TmpTicketStatistics.DeleteAll();
-                            TmpRecBuf.DeleteAll();
+                            SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult);
+                            TempTicketStatistics.DeleteAll();
+                            TempRecBuf.DeleteAll();
                             Commit();
 
                             if (not AdHoc) then begin
@@ -588,14 +588,14 @@
                         end;
                     end;
 
-                    AddAccessStatistic(TmpTicketStatistics, TicketAccessEntry, Ticket, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
+                    AddAccessStatistic(TempTicketStatistics, TicketAccessEntry, Ticket, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
                     PreviousAdmissionDate := DT2Date(DetailAccessEntry."Created Datetime");
 
                 end;
             end;
         until ((DetailAccessEntry.Next() = 0) or (DoneAggregating));
 
-        SaveStatistics(TmpTicketStatistics, AdHoc, TmpTicketStatisticsResult);
+        SaveStatistics(TempTicketStatistics, AdHoc, TmpTicketStatisticsResult);
 
         if (GuiAllowed) then
             Window.Close();

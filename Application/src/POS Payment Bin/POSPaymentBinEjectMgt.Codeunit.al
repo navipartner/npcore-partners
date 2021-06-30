@@ -21,11 +21,11 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 
     procedure LookupInvokeMethods(POSPaymentBin: Record "NPR POS Payment Bin"; var SelectedMethod: Text): Boolean
     var
-        tmpRetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
-        OnLookupBinInvokeMethods(tmpRetailList);
-        if PAGE.RunModal(0, tmpRetailList) = ACTION::LookupOK then begin
-            SelectedMethod := tmpRetailList.Value;
+        OnLookupBinInvokeMethods(TempRetailList);
+        if PAGE.RunModal(0, TempRetailList) = ACTION::LookupOK then begin
+            SelectedMethod := TempRetailList.Value;
             exit(true);
         end;
     end;

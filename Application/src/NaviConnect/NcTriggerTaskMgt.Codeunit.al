@@ -152,14 +152,14 @@ codeunit 6151522 "NPR Nc Trigger Task Mgt."
 
     procedure ManualTransferOutput(NcTriggerCode: Code[20]; var NcTask: Record "NPR Nc Task"; var Output: Text; var Filename: Text; var Subject: Text; var Body: Text): Boolean
     var
-        TaskOutput: Record "NPR Nc Task Output" temporary;
+        TempTaskOutput: Record "NPR Nc Task Output" temporary;
         IsAssertError: Boolean;
     begin
-        WriteArgsForManualTransferOutputNcTriggerTaskMgt(TaskOutput, NcTriggerCode, NcTask, Output, FileName, Subject, Body);
+        WriteArgsForManualTransferOutputNcTriggerTaskMgt(TempTaskOutput, NcTriggerCode, NcTask, Output, FileName, Subject, Body);
 
         Commit();
-        if not Codeunit.Run(Codeunit::"NPR Nc Try Catch Mgt.", TaskOutput) then begin
-            ReadArgsForManualTransferOutputNcTriggerTaskMgt(TaskOutput, NcTriggerCode, NcTask, Output, FileName, Subject, Body, IsAssertError);
+        if not Codeunit.Run(Codeunit::"NPR Nc Try Catch Mgt.", TempTaskOutput) then begin
+            ReadArgsForManualTransferOutputNcTriggerTaskMgt(TempTaskOutput, NcTriggerCode, NcTask, Output, FileName, Subject, Body, IsAssertError);
             exit(IsAssertError);
         end;
     end;

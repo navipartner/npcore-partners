@@ -421,11 +421,11 @@ report 6014457 "NPR Sales Stat/Analysis"
 
                             trigger OnAfterGetRecord()
                             begin
-                                if ItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 4)) then
+                                if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 4)) then
                                     CurrReport.Skip();
 
-                                ItemCategoryPrinted."Code" := "Code";
-                                ItemCategoryPrinted.Insert();
+                                TempItemCategoryPrinted."Code" := "Code";
+                                TempItemCategoryPrinted.Insert();
 
                                 CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
 
@@ -454,11 +454,11 @@ report 6014457 "NPR Sales Stat/Analysis"
 
                         trigger OnAfterGetRecord()
                         begin
-                            if ItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 3)) then
+                            if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 3)) then
                                 CurrReport.Skip();
 
-                            ItemCategoryPrinted."Code" := "Code";
-                            ItemCategoryPrinted.Insert();
+                            TempItemCategoryPrinted."Code" := "Code";
+                            TempItemCategoryPrinted.Insert();
 
                             CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
 
@@ -487,11 +487,11 @@ report 6014457 "NPR Sales Stat/Analysis"
 
                     trigger OnAfterGetRecord()
                     begin
-                        if ItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 2)) then
+                        if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 2)) then
                             CurrReport.Skip();
 
-                        ItemCategoryPrinted."Code" := "Code";
-                        ItemCategoryPrinted.Insert();
+                        TempItemCategoryPrinted."Code" := "Code";
+                        TempItemCategoryPrinted.Insert();
 
                         CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
 
@@ -520,11 +520,11 @@ report 6014457 "NPR Sales Stat/Analysis"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if ItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 1)) then
+                    if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 1)) then
                         CurrReport.Skip();
 
-                    ItemCategoryPrinted."Code" := "Code";
-                    ItemCategoryPrinted.Insert();
+                    TempItemCategoryPrinted."Code" := "Code";
+                    TempItemCategoryPrinted.Insert();
 
                     CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
 
@@ -603,11 +603,11 @@ report 6014457 "NPR Sales Stat/Analysis"
                 Clear(STurnoverPct);
                 Clear(SQty);
 
-                if ItemCategoryPrinted.Get("Code") then
+                if TempItemCategoryPrinted.Get("Code") then
                     CurrReport.Skip();
 
-                ItemCategoryPrinted."Code" := "Code";
-                ItemCategoryPrinted.Insert();
+                TempItemCategoryPrinted."Code" := "Code";
+                TempItemCategoryPrinted.Insert();
 
                 CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
 
@@ -627,8 +627,8 @@ report 6014457 "NPR Sales Stat/Analysis"
 
             trigger OnPreDataItem()
             begin
-                ItemCategoryPrinted.SetCurrentKey("Code");
-                ItemCategoryPrinted.DeleteAll();
+                TempItemCategoryPrinted.SetCurrentKey("Code");
+                TempItemCategoryPrinted.DeleteAll();
             end;
         }
         dataitem(Total; "Integer")
@@ -753,7 +753,7 @@ report 6014457 "NPR Sales Stat/Analysis"
     var
         CompanyInfo: Record "Company Information";
         ItemCategory1: Record "Item Category";
-        ItemCategoryPrinted: Record "Item Category" temporary;
+        TempItemCategoryPrinted: Record "Item Category" temporary;
         OnlySales: Boolean;
         ShowItem: Boolean;
         Coverage: Decimal;

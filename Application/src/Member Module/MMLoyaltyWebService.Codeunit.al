@@ -177,10 +177,10 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
     procedure RegisterSale(var RegisterSale: XMLport "NPR MM Register Sale")
     var
-        TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        TmpSalesLines: Record "NPR MM Reg. Sales Buffer" temporary;
-        TmpPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
-        TmpPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
@@ -205,9 +205,9 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         // Process
         RegisterSale.SetDocumentId := ImportEntry."Document ID";
-        RegisterSale.GetRequest(TmpAuthorization, TmpSalesLines, TmpPaymentLines);
-        if (LoyaltyPointsMgrServer.RegisterSales(TmpAuthorization, TmpSalesLines, TmpPaymentLines, TmpPointsResponse, ResponseMessage, ResponseMessageId)) then begin
-            RegisterSale.SetResponse(TmpPointsResponse);
+        RegisterSale.GetRequest(TempAuthorization, TempSalesLines, TempPaymentLines);
+        if (LoyaltyPointsMgrServer.RegisterSales(TempAuthorization, TempSalesLines, TempPaymentLines, TempPointsResponse, ResponseMessage, ResponseMessageId)) then begin
+            RegisterSale.SetResponse(TempPointsResponse);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := false;
@@ -230,9 +230,9 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
     procedure ReservePoints(var ReservePoints: XMLport "NPR MM Reserve Points")
     var
-        TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        TmpPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
-        TmpPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
@@ -257,9 +257,9 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         // Process
         ReservePoints.SetDocumentId := ImportEntry."Document ID";
-        ReservePoints.GetRequest(TmpAuthorization, TmpPaymentLines);
-        if (LoyaltyPointsMgrServer.ReservePoints(TmpAuthorization, TmpPaymentLines, TmpPointsResponse, ResponseMessage, ResponseMessageId)) then begin
-            ReservePoints.SetResponse(TmpPointsResponse);
+        ReservePoints.GetRequest(TempAuthorization, TempPaymentLines);
+        if (LoyaltyPointsMgrServer.ReservePoints(TempAuthorization, TempPaymentLines, TempPointsResponse, ResponseMessage, ResponseMessageId)) then begin
+            ReservePoints.SetResponse(TempPointsResponse);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := false;
@@ -282,8 +282,8 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
     procedure GetLoyaltyConfiguration(var GetLoyaltyConfiguration: XMLport "NPR MM Get Loyalty Config.")
     var
-        TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary;
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempLoyaltySetup: Record "NPR MM Loyalty Setup" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
@@ -308,10 +308,10 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         // Process
         GetLoyaltyConfiguration.SetDocumentId := ImportEntry."Document ID";
-        GetLoyaltyConfiguration.GetRequest(TmpAuthorization);
+        GetLoyaltyConfiguration.GetRequest(TempAuthorization);
 
-        if (LoyaltyPointsMgrServer.GetLoyaltySetup(TmpAuthorization, TmpLoyaltySetup, ResponseMessage, ResponseMessageId)) then begin
-            GetLoyaltyConfiguration.SetResponse(TmpLoyaltySetup);
+        if (LoyaltyPointsMgrServer.GetLoyaltySetup(TempAuthorization, TempLoyaltySetup, ResponseMessage, ResponseMessageId)) then begin
+            GetLoyaltyConfiguration.SetResponse(TempLoyaltySetup);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := false;
@@ -334,8 +334,8 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
     procedure GetCouponEligibility(var LoyaltyCouponEligibility: XMLport "NPR MM Loyalty Coupon Elig.")
     var
-        TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
-        TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         MembershipEntryNo: Integer;
         ImportEntry: Record "NPR Nc Import Entry";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -362,19 +362,19 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         Commit();
 
         // Process
-        LoyaltyCouponEligibility.GetRequest(TmpMemberInfoCapture);
-        if (TmpMemberInfoCapture."External Card No." <> '') then
-            MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(TmpMemberInfoCapture."External Card No.", Today, ResponseMessage);
+        LoyaltyCouponEligibility.GetRequest(TempMemberInfoCapture);
+        if (TempMemberInfoCapture."External Card No." <> '') then
+            MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(TempMemberInfoCapture."External Card No.", Today, ResponseMessage);
 
-        if (TmpMemberInfoCapture."External Membership No." <> '') then
-            MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(TmpMemberInfoCapture."External Membership No.");
+        if (TempMemberInfoCapture."External Membership No." <> '') then
+            MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(TempMemberInfoCapture."External Membership No.");
 
-        if (TmpMemberInfoCapture."Document No." <> '') then
-            MembershipEntryNo := MembershipManagement.GetMembershipFromCustomerNo(TmpMemberInfoCapture."Document No.");
+        if (TempMemberInfoCapture."Document No." <> '') then
+            MembershipEntryNo := MembershipManagement.GetMembershipFromCustomerNo(TempMemberInfoCapture."Document No.");
 
         if (MembershipEntryNo > 0) then begin
-            LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Amount Incl VAT", ResponseMessage);
-            LoyaltyCouponEligibility.AddResponse(MembershipEntryNo, TmpLoyaltyPointsSetup, ResponseMessage);
+            LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TempLoyaltyPointsSetup, TempMemberInfoCapture."Amount Incl VAT", ResponseMessage);
+            LoyaltyCouponEligibility.AddResponse(MembershipEntryNo, TempLoyaltyPointsSetup, ResponseMessage);
 
         end else begin
             LoyaltyCouponEligibility.AddErrorResponse('Invalid Search Value.');
@@ -393,12 +393,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
     procedure CreateCoupon(var LoyaltyCreateCoupon: XMLport "NPR MM Loyalty Create Coup.")
     var
-        TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
-        TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
-        TmpLoyaltyPointsSetupEligible: Record "NPR MM Loyalty Point Setup" temporary;
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
+        TempLoyaltyPointsSetupEligible: Record "NPR MM Loyalty Point Setup" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         Coupon: Record "NPR NpDc Coupon";
-        TmpCoupon: Record "NPR NpDc Coupon" temporary;
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         OutStr: OutStream;
@@ -425,32 +425,32 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         Commit();
 
         // Process
-        LoyaltyCreateCoupon.GetRequest(TmpMemberInfoCapture, TmpLoyaltyPointsSetup);
-        if (TmpMemberInfoCapture."External Membership No." <> '') then
-            MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(TmpMemberInfoCapture."External Membership No.");
+        LoyaltyCreateCoupon.GetRequest(TempMemberInfoCapture, TempLoyaltyPointsSetup);
+        if (TempMemberInfoCapture."External Membership No." <> '') then
+            MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(TempMemberInfoCapture."External Membership No.");
 
         if (MembershipEntryNo > 0) then begin
-            TmpLoyaltyPointsSetup.Reset();
-            if (TmpLoyaltyPointsSetup.FindSet()) then begin
+            TempLoyaltyPointsSetup.Reset();
+            if (TempLoyaltyPointsSetup.FindSet()) then begin
                 repeat
 
-                    TmpLoyaltyPointsSetupEligible.DeleteAll();
-                    LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TmpLoyaltyPointsSetupEligible, TmpMemberInfoCapture."Amount Incl VAT", ResponseMessage);
-                    if (TmpLoyaltyPointsSetupEligible.Get(TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) then begin
+                    TempLoyaltyPointsSetupEligible.DeleteAll();
+                    LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TempLoyaltyPointsSetupEligible, TempMemberInfoCapture."Amount Incl VAT", ResponseMessage);
+                    if (TempLoyaltyPointsSetupEligible.Get(TempLoyaltyPointsSetup.Code, TempLoyaltyPointsSetup."Line No.")) then begin
 
-                        TmpLoyaltyPointsSetup.TransferFields(TmpLoyaltyPointsSetupEligible, true);
+                        TempLoyaltyPointsSetup.TransferFields(TempLoyaltyPointsSetupEligible, true);
 
-                        if (Coupon.Get(LoyaltyPointManagement.IssueOneCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Document No.", TmpMemberInfoCapture."Document Date", TmpMemberInfoCapture."Amount Incl VAT"))) then begin
+                        if (Coupon.Get(LoyaltyPointManagement.IssueOneCoupon(MembershipEntryNo, TempLoyaltyPointsSetup, TempMemberInfoCapture."Document No.", TempMemberInfoCapture."Document Date", TempMemberInfoCapture."Amount Incl VAT"))) then begin
 
-                            TmpCoupon.TransferFields(Coupon, true);
-                            TmpCoupon.Insert();
+                            TempCoupon.TransferFields(Coupon, true);
+                            TempCoupon.Insert();
                         end;
                     end;
-                until (TmpLoyaltyPointsSetup.Next() = 0);
+                until (TempLoyaltyPointsSetup.Next() = 0);
             end;
 
-            if (not TmpCoupon.IsEmpty()) then begin
-                LoyaltyCreateCoupon.AddResponse(MembershipEntryNo, TmpCoupon, ResponseMessage);
+            if (not TempCoupon.IsEmpty()) then begin
+                LoyaltyCreateCoupon.AddResponse(MembershipEntryNo, TempCoupon, ResponseMessage);
                 Commit();
             end else begin
                 LoyaltyCreateCoupon.AddErrorResponse('No coupons created.');
@@ -474,10 +474,10 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
     procedure ListCoupons(var LoyaltyListCoupon: XMLport "NPR MM Loyalty List Coupon")
     var
-        TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
         Coupon: Record "NPR NpDc Coupon";
-        TmpCoupon: Record "NPR NpDc Coupon" temporary;
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
         Membership: Record "NPR MM Membership";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         OutStr: OutStream;
@@ -504,9 +504,9 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         Commit();
 
         // Process
-        LoyaltyListCoupon.GetRequest(TmpMemberInfoCapture);
-        if (TmpMemberInfoCapture."External Membership No." <> '') then
-            MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(TmpMemberInfoCapture."External Membership No.");
+        LoyaltyListCoupon.GetRequest(TempMemberInfoCapture);
+        if (TempMemberInfoCapture."External Membership No." <> '') then
+            MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(TempMemberInfoCapture."External Membership No.");
 
         if (MembershipEntryNo > 0) then begin
 
@@ -518,16 +518,16 @@ codeunit 6060141 "NPR MM Loyalty WebService"
                     Coupon.SetAutoCalcFields("In-use Quantity", "Remaining Quantity");
                     if (Coupon.FindSet()) then begin
                         repeat
-                            TmpCoupon.TransferFields(Coupon, true);
+                            TempCoupon.TransferFields(Coupon, true);
                             if (Coupon."In-use Quantity" < Coupon."Remaining Quantity") then
-                                TmpCoupon.Insert();
+                                TempCoupon.Insert();
                         until (Coupon.Next() = 0);
                     end;
                 end;
             end;
 
-            if (not TmpCoupon.IsEmpty()) then begin
-                LoyaltyListCoupon.AddResponse(MembershipEntryNo, TmpCoupon, ResponseMessage);
+            if (not TempCoupon.IsEmpty()) then begin
+                LoyaltyListCoupon.AddResponse(MembershipEntryNo, TempCoupon, ResponseMessage);
                 Commit();
             end else begin
                 LoyaltyListCoupon.AddErrorResponse('No coupons available.');

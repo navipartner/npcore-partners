@@ -546,7 +546,7 @@
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         Item: Record Item;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-        TMPDiscountPriority: Record "NPR Discount Priority" temporary;
+        TempDiscountPriority: Record "NPR Discount Priority" temporary;
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSUnit: Record "NPR POS Unit";
         POSPricingProfile: Record "NPR POS Pricing Profile";
@@ -594,15 +594,15 @@
         TempSaleLinePOS."Register No." := "Register No.";
 #pragma warning restore
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
-        POSSalesDiscountCalcMgt.InitDiscountPriority(TMPDiscountPriority);
+        POSSalesDiscountCalcMgt.InitDiscountPriority(TempDiscountPriority);
         TempSaleLinePOS2 := TempSaleLinePOS;
         TempSaleLinePOS2.Insert();
-        TMPDiscountPriority.SetCurrentKey(Priority);
-        if TMPDiscountPriority.FindSet() then
+        TempDiscountPriority.SetCurrentKey(Priority);
+        if TempDiscountPriority.FindSet() then
             repeat
-                POSSalesDiscountCalcMgt.ApplyDiscount(TMPDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
+                POSSalesDiscountCalcMgt.ApplyDiscount(TempDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
                 TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
-            until (TMPDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
+            until (TempDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
         "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
         "VAT %" := TempSaleLinePOS2."VAT %";
         "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
@@ -614,7 +614,7 @@
 
     procedure calcProfit()
     var
-        tItem: Record Item temporary;
+        TempItem: Record Item temporary;
         Item1: Record Item;
     begin
         if ("Discount Price Incl. Vat" = 0) then
@@ -631,12 +631,12 @@
             end;
         end else begin
             if "Item No." <> '' then begin
-                tItem.Init();
-                tItem."No." := "Item No.";
-                tItem.Validate("Item Category Code", "Item group");
-                tItem."Unit Cost" := "Last Direct Cost";
-                tItem.Validate("Unit Price", "Discount Price Incl. Vat");
-                "Profit % (new)" := tItem."Profit %";
+                TempItem.Init();
+                TempItem."No." := "Item No.";
+                TempItem.Validate("Item Category Code", "Item group");
+                TempItem."Unit Cost" := "Last Direct Cost";
+                TempItem.Validate("Unit Price", "Discount Price Incl. Vat");
+                "Profit % (new)" := TempItem."Profit %";
             end;
         end;
     end;

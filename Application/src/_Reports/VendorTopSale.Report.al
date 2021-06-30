@@ -38,21 +38,21 @@ report 6014426 "NPR Vendor Top/Sale"
                     if ("NPR Sales (LCY)" = 0) and ("Balance (LCY)" = 0) and ("NPR Sales (LCY)" - "NPR COGS (LCY)" = 0) then
                         CurrReport.Skip();
 
-                    VendorAmountLastYear.Init();
-                    VendorAmountLastYear."Vendor No." := "No.";
+                    TempVendorAmountLastYear.Init();
+                    TempVendorAmountLastYear."Vendor No." := "No.";
 
                     case ShowType of
                         ShowType::"Item Sales":
                             begin
-                                VendorAmountLastYear."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
+                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
                             end;
                         ShowType::Gains:
                             begin
-                                VendorAmountLastYear."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
+                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
                             end;
                     end;
 
-                    VendorAmountLastYear.Insert();
+                    TempVendorAmountLastYear.Insert();
                     SalesLastYear += "NPR Sales (LCY)";
                     DbLastYear += "NPR Sales (LCY)" - "NPR COGS (LCY)";
                 end;
@@ -70,25 +70,25 @@ report 6014426 "NPR Vendor Top/Sale"
 
 
 
-                VendorAmount.Init();
-                VendorAmount."Vendor No." := "No.";
+                TempVendorAmount.Init();
+                TempVendorAmount."Vendor No." := "No.";
                 case ShowType of
                     ShowType::"Item Sales":
                         begin
-                            VendorAmount."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
+                            TempVendorAmount."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
                         end;
                     ShowType::Gains:
                         begin
-                            VendorAmount."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
+                            TempVendorAmount."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
                         end;
                 end;
 
-                VendorAmount.Insert();
+                TempVendorAmount.Insert();
                 if (ShowQty = 0) or (i < ShowQty) then
                     i := i + 1
                 else begin
-                    VendorAmount.FindLast();
-                    VendorAmount.Delete();
+                    TempVendorAmount.FindLast();
+                    TempVendorAmount.Delete();
                 end;
 
                 //Item sales
@@ -105,22 +105,22 @@ report 6014426 "NPR Vendor Top/Sale"
             begin
                 // Insert order in the temp table which includes last year's values
                 q := 1;
-                if VendorAmountLastYear.FindFirst() then
+                if TempVendorAmountLastYear.FindFirst() then
                     repeat
-                        if not (VendorAmountLastYear."Amount (LCY)" = 0.0) then begin
-                            VendorAmountLastYear.Delete();
-                            VendorAmountLastYear."Amount 2 (LCY)" := q;
-                            VendorAmountLastYear.Insert();
+                        if not (TempVendorAmountLastYear."Amount (LCY)" = 0.0) then begin
+                            TempVendorAmountLastYear.Delete();
+                            TempVendorAmountLastYear."Amount 2 (LCY)" := q;
+                            TempVendorAmountLastYear.Insert();
                             q := q + 1;
                         end;
-                    until VendorAmountLastYear.Next() = 0;
+                    until TempVendorAmountLastYear.Next() = 0;
             end;
 
             trigger OnPreDataItem()
             begin
                 i := 0;
-                VendorAmount.DeleteAll();
-                VendorAmountLastYear.DeleteAll();
+                TempVendorAmount.DeleteAll();
+                TempVendorAmountLastYear.DeleteAll();
             end;
         }
         dataitem("Integer"; "Integer")
@@ -234,15 +234,15 @@ report 6014426 "NPR Vendor Top/Sale"
                     Greyed := true;
 
                 if Number = 1 then begin
-                    if not VendorAmount.FindFirst() then
+                    if not TempVendorAmount.FindFirst() then
                         CurrReport.Break();
                 end else
-                    if VendorAmount.Next() = 0 then
+                    if TempVendorAmount.Next() = 0 then
                         CurrReport.Break();
 
-                VendorAmount."Amount (LCY)" := Multipl * VendorAmount."Amount (LCY)";
+                TempVendorAmount."Amount (LCY)" := Multipl * TempVendorAmount."Amount (LCY)";
 
-                Vendor.Get(VendorAmount."Vendor No.");
+                Vendor.Get(TempVendorAmount."Vendor No.");
                 Vendor.CalcFields("NPR Sales (LCY)", "Balance (LCY)", "NPR COGS (LCY)", "NPR Sales (Qty.)");
                 ProfitPct := "Pct."(Vendor."NPR Sales (LCY)" - Vendor."NPR COGS (LCY)", Vendor."NPR Sales (LCY)");
 
@@ -251,17 +251,17 @@ report 6014426 "NPR Vendor Top/Sale"
                 else
                     Share := 0;
 
-                VendorAmount."Amount (LCY)" := Multipl * VendorAmount."Amount (LCY)";
+                TempVendorAmount."Amount (LCY)" := Multipl * TempVendorAmount."Amount (LCY)";
 
                 // Sales last year and db
-                Vendor2.Get(VendorAmount."Vendor No.");
+                Vendor2.Get(TempVendorAmount."Vendor No.");
                 Vendor2.SetRange("Date Filter", StartDateLastYear, EndDateLastYear);
                 Vendor2.CalcFields("NPR Sales (LCY)", "NPR COGS (LCY)", "Balance (LCY)");
 
                 // Read last year's ranking
-                VendorAmountLastYear.SetFilter("Vendor No.", VendorAmount."Vendor No.");
-                if VendorAmountLastYear.FindFirst() then
-                    RankingLastYear := VendorAmountLastYear."Amount 2 (LCY)";
+                TempVendorAmountLastYear.SetFilter("Vendor No.", TempVendorAmount."Vendor No.");
+                if TempVendorAmountLastYear.FindFirst() then
+                    RankingLastYear := TempVendorAmountLastYear."Amount 2 (LCY)";
 
                 case ShowType of
                     ShowType::"Item Sales":
@@ -284,7 +284,7 @@ report 6014426 "NPR Vendor Top/Sale"
                 Vendor.CopyFilter("Global Dimension 1 Filter", Vendor3."Global Dimension 1 Filter");
                 Vendor.CopyFilter("NPR Item Category Filter", Vendor3."NPR Item Category Filter");
 
-                Vendor3.Get(VendorAmount."Vendor No.");
+                Vendor3.Get(TempVendorAmount."Vendor No.");
                 Vendor3.CalcFields("NPR Stock");
                 PctOfTotalInventory := "Pct."(Vendor3."NPR Stock", InventoryTotal);
 
@@ -438,8 +438,8 @@ report 6014426 "NPR Vendor Top/Sale"
         AuxValueEntry2: Record "NPR Aux. Value Entry";
         Vendor2: Record Vendor;
         Vendor3: Record Vendor;
-        VendorAmount: Record "Vendor Amount" temporary;
-        VendorAmountLastYear: Record "Vendor Amount" temporary;
+        TempVendorAmount: Record "Vendor Amount" temporary;
+        TempVendorAmountLastYear: Record "Vendor Amount" temporary;
         Greyed: Boolean;
         EndDate: Date;
         EndDateLastYear: Date;

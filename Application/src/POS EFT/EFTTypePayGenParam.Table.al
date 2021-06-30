@@ -149,7 +149,7 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
 
     procedure LookupValue()
     var
-        tmpRetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
         Parts: DotNet NPRNetArray;
         "Part": DotNet NPRNetString;
         OptionStringCaption: Text;
@@ -172,16 +172,16 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
             SplitString(OptionString, Parts);
 
         foreach Part in Parts do begin
-            tmpRetailList.Number += 1;
-            tmpRetailList.Choice := Part;
-            tmpRetailList.Insert();
+            TempRetailList.Number += 1;
+            TempRetailList.Choice := Part;
+            TempRetailList.Insert();
         end;
 
-        if tmpRetailList.IsEmpty then
+        if TempRetailList.IsEmpty then
             exit;
 
-        if PAGE.RunModal(0, tmpRetailList) = ACTION::LookupOK then
-            Validate(Value, tmpRetailList.Choice);
+        if PAGE.RunModal(0, TempRetailList) = ACTION::LookupOK then
+            Validate(Value, TempRetailList.Choice);
     end;
 
     procedure ValidateValue()

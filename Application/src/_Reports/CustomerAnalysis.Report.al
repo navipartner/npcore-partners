@@ -22,8 +22,8 @@ report 6014432 "NPR Customer Analysis"
                 CalcFields("Sales (LCY)", "Balance (LCY)", "Profit (LCY)");
                 if ("Sales (LCY)" = 0) and ("Balance (LCY)" = 0) and ("Profit (LCY)" = 0) then
                     CurrReport.Skip();
-                CustomerAmountTemp.Init();
-                CustomerAmountTemp."Customer No." := "No.";
+                TempCustomerAmount.Init();
+                TempCustomerAmount."Customer No." := "No.";
 
                 if Sorting = Sorting::Maximum then
                     Multipl := -1
@@ -33,27 +33,27 @@ report 6014432 "NPR Customer Analysis"
                 case ShowType of
                     ShowType::Sales:
                         begin
-                            CustomerAmountTemp."Amount (LCY)" := Multipl * "Sales (LCY)";
-                            CustomerAmountTemp."Amount 2 (LCY)" := Multipl * "Balance (LCY)";
+                            TempCustomerAmount."Amount (LCY)" := Multipl * "Sales (LCY)";
+                            TempCustomerAmount."Amount 2 (LCY)" := Multipl * "Balance (LCY)";
                         end;
                     ShowType::Balance:
                         begin
-                            CustomerAmountTemp."Amount (LCY)" := Multipl * "Balance (LCY)";
-                            CustomerAmountTemp."Amount 2 (LCY)" := Multipl * "Sales (LCY)";
+                            TempCustomerAmount."Amount (LCY)" := Multipl * "Balance (LCY)";
+                            TempCustomerAmount."Amount 2 (LCY)" := Multipl * "Sales (LCY)";
                         end;
                     ShowType::Margin:
                         begin
-                            CustomerAmountTemp."Amount (LCY)" := Multipl * "Profit (LCY)";
-                            CustomerAmountTemp."Amount 2 (LCY)" := Multipl * "Balance (LCY)";
+                            TempCustomerAmount."Amount (LCY)" := Multipl * "Profit (LCY)";
+                            TempCustomerAmount."Amount 2 (LCY)" := Multipl * "Balance (LCY)";
                         end;
                 end;
 
-                CustomerAmountTemp.Insert();
+                TempCustomerAmount.Insert();
                 if (ShowQty = 0) or (i < ShowQty) then
                     i := i + 1
                 else begin
-                    CustomerAmountTemp.FindLast();
-                    CustomerAmountTemp.Delete();
+                    TempCustomerAmount.FindLast();
+                    TempCustomerAmount.Delete();
                 end;
 
                 CustomerSalesTotal += "Sales (LCY)";
@@ -72,7 +72,7 @@ report 6014432 "NPR Customer Analysis"
 
                 DebCount := Customer.Count();
                 i := 0;
-                CustomerAmountTemp.DeleteAll();
+                TempCustomerAmount.DeleteAll();
             end;
         }
         dataitem(Integer1; "Integer")
@@ -93,8 +93,8 @@ report 6014432 "NPR Customer Analysis"
 
                 if (Customer1."Sales (LCY)" = 0) and (Customer1."Balance (LCY)" = 0) and (Customer1."Profit (LCY)" = 0) then
                     CurrReport.Skip();
-                CustomerAmountTemp2.Init();
-                CustomerAmountTemp2."Customer No." := Customer1."No.";
+                TempCustomerAmount2.Init();
+                TempCustomerAmount2."Customer No." := Customer1."No.";
                 TempCustomerBuffer.Init();
                 TempCustomerBuffer."No." := Customer1."No.";
 
@@ -106,24 +106,24 @@ report 6014432 "NPR Customer Analysis"
                 case ShowType of
                     ShowType::Sales:
                         begin
-                            CustomerAmountTemp2."Amount (LCY)" := Multipl * Customer1."Sales (LCY)";
-                            CustomerAmountTemp2."Amount 2 (LCY)" := Multipl * Customer1."Balance (LCY)";
+                            TempCustomerAmount2."Amount (LCY)" := Multipl * Customer1."Sales (LCY)";
+                            TempCustomerAmount2."Amount 2 (LCY)" := Multipl * Customer1."Balance (LCY)";
                             TempCustomerBuffer.Amount := Multipl * Customer1."Profit (LCY)";
                         end;
                     ShowType::Balance:
                         begin
-                            CustomerAmountTemp2."Amount (LCY)" := Multipl * Customer1."Balance (LCY)";
-                            CustomerAmountTemp2."Amount 2 (LCY)" := Multipl * Customer1."Sales (LCY)";
+                            TempCustomerAmount2."Amount (LCY)" := Multipl * Customer1."Balance (LCY)";
+                            TempCustomerAmount2."Amount 2 (LCY)" := Multipl * Customer1."Sales (LCY)";
                             TempCustomerBuffer.Amount := Multipl * Customer1."Profit (LCY)";
                         end;
                     ShowType::Margin:
                         begin
-                            CustomerAmountTemp2."Amount (LCY)" := Multipl * Customer1."Profit (LCY)";
-                            CustomerAmountTemp2."Amount 2 (LCY)" := Multipl * Customer1."Sales (LCY)";
+                            TempCustomerAmount2."Amount (LCY)" := Multipl * Customer1."Profit (LCY)";
+                            TempCustomerAmount2."Amount 2 (LCY)" := Multipl * Customer1."Sales (LCY)";
                             TempCustomerBuffer.Amount := Multipl * Customer1."Balance (LCY)";
                         end;
                 end;
-                CustomerAmountTemp2.Insert();
+                TempCustomerAmount2.Insert();
                 TempCustomerBuffer.Insert();
 
                 i += 1;
@@ -154,31 +154,31 @@ report 6014432 "NPR Customer Analysis"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not CustomerAmountTemp2.FindFirst() then
+                    if not TempCustomerAmount2.FindFirst() then
                         CurrReport.Break();
                 end else
-                    if CustomerAmountTemp2.Next() = 0 then begin
+                    if TempCustomerAmount2.Next() = 0 then begin
                         CurrReport.Break();
                     end;
 
-                TempCustomerBuffer.Get(CustomerAmountTemp2."Customer No.");
+                TempCustomerBuffer.Get(TempCustomerAmount2."Customer No.");
 
                 if Number <= ShowQty then
                     case ShowType of
                         ShowType::Sales:
                             begin
-                                CustSalesDKK1 += -CustomerAmountTemp2."Amount (LCY)";
+                                CustSalesDKK1 += -TempCustomerAmount2."Amount (LCY)";
                                 CustProfitDKK1 += -TempCustomerBuffer.Amount;
                             end;
                         ShowType::Balance:
                             begin
-                                CustSalesDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
+                                CustSalesDKK1 += -TempCustomerAmount2."Amount 2 (LCY)";
                                 CustProfitDKK1 += -TempCustomerBuffer.Amount;
                             end;
                         ShowType::Margin:
                             begin
-                                CustSalesDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
-                                CustProfitDKK1 += -CustomerAmountTemp2."Amount (LCY)";
+                                CustSalesDKK1 += -TempCustomerAmount2."Amount 2 (LCY)";
+                                CustProfitDKK1 += -TempCustomerAmount2."Amount (LCY)";
                             end;
                     end;
 
@@ -386,15 +386,15 @@ report 6014432 "NPR Customer Analysis"
                     Greyed := true;
 
                 if Number = 1 then begin
-                    if not CustomerAmountTemp.FindFirst() then
+                    if not TempCustomerAmount.FindFirst() then
                         CurrReport.Break();
                 end else
-                    if CustomerAmountTemp.Next() = 0 then
+                    if TempCustomerAmount.Next() = 0 then
                         CurrReport.Break();
 
-                CustomerAmountTemp."Amount (LCY)" := Multipl * CustomerAmountTemp."Amount (LCY)";
+                TempCustomerAmount."Amount (LCY)" := Multipl * TempCustomerAmount."Amount (LCY)";
 
-                Customer.Get(CustomerAmountTemp."Customer No.");
+                Customer.Get(TempCustomerAmount."Customer No.");
                 Customer.CalcFields("Sales (LCY)", "Balance (LCY)", "Profit (LCY)");
 
                 //Added Because createtotals no more supported
@@ -406,26 +406,26 @@ report 6014432 "NPR Customer Analysis"
                 AvancePct := "Pct."(Customer."Profit (LCY)", Customer."Sales (LCY)");
 
                 if (Sorting = Sorting::Minimum) and (Number = 1) then begin
-                    CustomerAmountTemp := CustomerAmountTemp;
-                    CustomerAmountTemp.Next(+ShowQty);
-                    MaxAmount := CustomerAmountTemp."Amount (LCY)";
-                    CustomerAmountTemp := CustomerAmountTemp;
+                    TempCustomerAmount := TempCustomerAmount;
+                    TempCustomerAmount.Next(+ShowQty);
+                    MaxAmount := TempCustomerAmount."Amount (LCY)";
+                    TempCustomerAmount := TempCustomerAmount;
                 end else begin
                     if Number = 1 then
-                        MaxAmount := CustomerAmountTemp."Amount (LCY)";
+                        MaxAmount := TempCustomerAmount."Amount (LCY)";
                 end;
 
-                CustomerAmountTemp2.SetRange("Customer No.", Customer."No.");
-                if CustomerAmountTemp2.FindFirst() then begin
-                    TempCustomerBuffer.Get(CustomerAmountTemp2."Customer No.");
+                TempCustomerAmount2.SetRange("Customer No.", Customer."No.");
+                if TempCustomerAmount2.FindFirst() then begin
+                    TempCustomerBuffer.Get(TempCustomerAmount2."Customer No.");
                     LastLocation := TempCustomerBuffer."Last Statement No.";
                 end else begin
-                    CustomerAmountTemp2."Amount (LCY)" := 0;
-                    CustomerAmountTemp2."Amount 2 (LCY)" := 0;
+                    TempCustomerAmount2."Amount (LCY)" := 0;
+                    TempCustomerAmount2."Amount 2 (LCY)" := 0;
                     LastLocation := 0;
                 end;
 
-                CustVarAmt := Multipl * CustomerAmountTemp2."Amount (LCY)";
+                CustVarAmt := Multipl * TempCustomerAmount2."Amount (LCY)";
                 if (CustVarAmt = 0) then
                     Clear(LastLocation);
 
@@ -433,22 +433,22 @@ report 6014432 "NPR Customer Analysis"
                     ShowType::Sales:
                         begin
                             TotalPct := "Pct."(Customer."Sales (LCY)", CustSalesDKK);
-                            Index := "Pct."(Customer."Sales (LCY)", -CustomerAmountTemp2."Amount (LCY)");
+                            Index := "Pct."(Customer."Sales (LCY)", -TempCustomerAmount2."Amount (LCY)");
                         end;
                     ShowType::Balance:
                         begin
                             TotalPct := "Pct."(Customer."Balance (LCY)", CustBalanceDKK);
-                            Index := "Pct."(Customer."Balance (LCY)", -CustomerAmountTemp2."Amount (LCY)");
+                            Index := "Pct."(Customer."Balance (LCY)", -TempCustomerAmount2."Amount (LCY)");
                         end;
                     ShowType::Margin:
                         begin
                             TotalPct := "Pct."(Customer."Profit (LCY)", CustProfitDKK);
-                            Index := "Pct."(Customer."Profit (LCY)", -CustomerAmountTemp2."Amount (LCY)");
+                            Index := "Pct."(Customer."Profit (LCY)", -TempCustomerAmount2."Amount (LCY)");
                         end;
                 end;
 
-                Share := "Pct."(CustomerAmountTemp."Amount (LCY)", MaxAmount);
-                CustomerAmountTemp."Amount (LCY)" := Multipl * CustomerAmountTemp."Amount (LCY)";
+                Share := "Pct."(TempCustomerAmount."Amount (LCY)", MaxAmount);
+                TempCustomerAmount."Amount (LCY)" := Multipl * TempCustomerAmount."Amount (LCY)";
             end;
 
             trigger OnPreDataItem()
@@ -511,8 +511,8 @@ report 6014432 "NPR Customer Analysis"
     var
         CompanyInfo: Record "Company Information";
         Customer1: Record Customer;
-        CustomerAmountTemp: Record "Customer Amount" temporary;
-        CustomerAmountTemp2: Record "Customer Amount" temporary;
+        TempCustomerAmount: Record "Customer Amount" temporary;
+        TempCustomerAmount2: Record "Customer Amount" temporary;
         TempCustomerBuffer: Record Customer temporary;
         Greyed: Boolean;
         MaxDate: Date;

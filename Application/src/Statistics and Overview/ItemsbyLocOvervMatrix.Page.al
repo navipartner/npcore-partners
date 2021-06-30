@@ -245,11 +245,11 @@
         MATRIX_CurrentColumnOrdinal: Integer;
     begin
         MATRIX_CurrentColumnOrdinal := 0;
-        if MatrixRecord.FindSet() then
+        if TempMatrixRecord.FindSet() then
             repeat
                 MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
                 MATRIX_CellData[MATRIX_CurrentColumnOrdinal] := MatrixCalcCell(MATRIX_CurrentColumnOrdinal);
-            until (MatrixRecord.Next(1) = 0) or (MATRIX_CurrentColumnOrdinal = MatrixMaxNoOfColumns());
+            until (TempMatrixRecord.Next(1) = 0) or (MATRIX_CurrentColumnOrdinal = MatrixMaxNoOfColumns());
 
         Rec.Quantity := MatrixCalcCell(0);
     end;
@@ -264,9 +264,9 @@
         Found: Boolean;
     begin
         ApplyFilters();
-        ItemVariantTmp."Item No." := Rec."Item No.";
-        ItemVariantTmp.Code := Rec."Variant Code";
-        Found := ItemVariantTmp.Find(Which);
+        TempItemVariant."Item No." := Rec."Item No.";
+        TempItemVariant.Code := Rec."Variant Code";
+        Found := TempItemVariant.Find(Which);
         if Found then
             CopyItemVariantToBuf();
         exit(Found);
@@ -297,9 +297,9 @@
         ResultSteps: Integer;
     begin
         ApplyFilters();
-        ItemVariantTmp."Item No." := Rec."Item No.";
-        ItemVariantTmp.Code := Rec."Variant Code";
-        ResultSteps := ItemVariantTmp.Next(Steps);
+        TempItemVariant."Item No." := Rec."Item No.";
+        TempItemVariant.Code := Rec."Variant Code";
+        ResultSteps := TempItemVariant.Next(Steps);
         if ResultSteps <> 0 then
             CopyItemVariantToBuf();
         exit(ResultSteps);
@@ -311,9 +311,9 @@
     end;
 
     var
-        ItemVariantTmp: Record "Item Variant" temporary;
+        TempItemVariant: Record "Item Variant" temporary;
         MatrixRecords: array[32] of Record Location;
-        MatrixRecord: Record Location temporary;
+        TempMatrixRecord: Record Location temporary;
         MATRIX_CellData: array[32] of Decimal;
         ShowItems: Option "On Inventory","Not on Inventory",All;
         MATRIX_CaptionSet: array[32] of Text[80];
@@ -348,7 +348,7 @@
         Clear(MATRIX_CellData);
         CopyArray(MATRIX_CaptionSet, _MatrixColumns, 1);
         CopyArray(MatrixRecords, _MatrixRecords, 1);
-        MatrixRecord.Copy(_MatrixRecord, true);
+        TempMatrixRecord.Copy(_MatrixRecord, true);
         SetVisible(false);
     end;
 
@@ -357,50 +357,50 @@
         Item: Record Item;
         ItemVariant: Record "Item Variant";
     begin
-        ItemVariantTmp.DeleteAll();
+        TempItemVariant.DeleteAll();
         if Item.FindSet() then
             repeat
                 ItemVariant.SetRange("Item No.", Item."No.");
                 if ItemVariant.FindSet() then
                     repeat
-                        ItemVariantTmp := ItemVariant;
-                        ItemVariantTmp.Insert();
+                        TempItemVariant := ItemVariant;
+                        TempItemVariant.Insert();
                     until ItemVariant.Next() = 0;
-                ItemVariantTmp.Init();
-                ItemVariantTmp."Item No." := Item."No.";
-                ItemVariantTmp.Code := '';
-                ItemVariantTmp.Description := WOutVariantLbl;
-                ItemVariantTmp.Insert();
+                TempItemVariant.Init();
+                TempItemVariant."Item No." := Item."No.";
+                TempItemVariant.Code := '';
+                TempItemVariant.Description := WOutVariantLbl;
+                TempItemVariant.Insert();
             until Item.Next() = 0;
     end;
 
     local procedure ApplyFilters()
     begin
-        ItemVariantTmp.Reset();
+        TempItemVariant.Reset();
         if ItemFilter <> '' then
-            ItemVariantTmp.SetFilter("Item No.", ItemFilter);
+            TempItemVariant.SetFilter("Item No.", ItemFilter);
         if VariantFilter <> '' then
-            ItemVariantTmp.SetFilter(Code, VariantFilter);
+            TempItemVariant.SetFilter(Code, VariantFilter);
         if VarietyValueFilter[1] <> '' then
-            ItemVariantTmp.SetFilter("NPR Variety 1 Value", VarietyValueFilter[1]);
+            TempItemVariant.SetFilter("NPR Variety 1 Value", VarietyValueFilter[1]);
         if VarietyValueFilter[2] <> '' then
-            ItemVariantTmp.SetFilter("NPR Variety 2 Value", VarietyValueFilter[2]);
+            TempItemVariant.SetFilter("NPR Variety 2 Value", VarietyValueFilter[2]);
         if VarietyValueFilter[3] <> '' then
-            ItemVariantTmp.SetFilter("NPR Variety 3 Value", VarietyValueFilter[3]);
+            TempItemVariant.SetFilter("NPR Variety 3 Value", VarietyValueFilter[3]);
         if VarietyValueFilter[4] <> '' then
-            ItemVariantTmp.SetFilter("NPR Variety 4 Value", VarietyValueFilter[4]);
+            TempItemVariant.SetFilter("NPR Variety 4 Value", VarietyValueFilter[4]);
     end;
 
     local procedure CopyItemVariantToBuf()
     var
         Item: Record Item;
     begin
-        Item.Get(ItemVariantTmp."Item No.");
+        Item.Get(TempItemVariant."Item No.");
         Rec.Init();
-        Rec."Item No." := ItemVariantTmp."Item No.";
-        Rec."Variant Code" := ItemVariantTmp.Code;
+        Rec."Item No." := TempItemVariant."Item No.";
+        Rec."Variant Code" := TempItemVariant.Code;
         Rec."Item Description" := Item.Description;
-        Rec."Variant Description" := ItemVariantTmp.Description;
+        Rec."Variant Description" := TempItemVariant.Description;
     end;
 
     local procedure MatrixOnDrillDown(ColumnID: Integer)
@@ -420,8 +420,8 @@
     var
         Item: Record Item;
     begin
-        Item.Get(ItemVariantTmp."Item No.");
-        Item.SetRange("Variant Filter", ItemVariantTmp.Code);
+        Item.Get(TempItemVariant."Item No.");
+        Item.SetRange("Variant Filter", TempItemVariant.Code);
         if ColumnID <> 0 then
             Item.SetRange("Location Filter", AdjustMatrixRecordCode(MatrixRecords[ColumnID].Code));
         Item.CalcFields(Inventory);

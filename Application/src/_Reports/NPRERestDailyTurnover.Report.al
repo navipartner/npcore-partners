@@ -45,8 +45,8 @@
                 DimensionBufferID: Integer;
             begin
                 POSEntry2.Reset();
-                TableCounterBuf.Reset();
-                TableCounterBuf.DeleteAll();
+                TempTableCounterBuf.Reset();
+                TempTableCounterBuf.DeleteAll();
 
                 if "POS Entry".GetFilter("Posting Date") <> '' then
                     POSEntryQry.SetFilter(Posting_Date, "POS Entry".GetFilter("Posting Date"));
@@ -99,11 +99,11 @@
                         POSEntry2.Mark := true;
                         POSSalesLineCons."POS Period Register No." := POSSalesLineCons."POS Period Register No." + POSEntry2."NPRE Number of Guests";
                     end;
-                    TableCounterBuf.Init();
-                    TableCounterBuf."Business Unit Code" := POSSalesLine2."NPRE Seating Code";
-                    TableCounterBuf."Entry No." := POSSalesLine2."POS Entry No.";
-                    if not TableCounterBuf.Find() then begin
-                        TableCounterBuf.Insert();
+                    TempTableCounterBuf.Init();
+                    TempTableCounterBuf."Business Unit Code" := POSSalesLine2."NPRE Seating Code";
+                    TempTableCounterBuf."Entry No." := POSSalesLine2."POS Entry No.";
+                    if not TempTableCounterBuf.Find() then begin
+                        TempTableCounterBuf.Insert();
                         POSSalesLineCons."Item Entry No." += 1;
                     end;
                     POSSalesLineCons.Modify();
@@ -113,24 +113,24 @@
         dataitem(AppliedFilterLoop; "Integer")
         {
             DataItemTableView = SORTING(Number);
-            column(FilterFieldName; AppliedFilterBuffer.Name)
+            column(FilterFieldName; TempAppliedFilterBuffer.Name)
             {
             }
-            column(FilterValue; AppliedFilterBuffer.Value)
+            column(FilterValue; TempAppliedFilterBuffer.Value)
             {
             }
 
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then
-                    AppliedFilterBuffer.FindSet()
+                    TempAppliedFilterBuffer.FindSet()
                 else
-                    AppliedFilterBuffer.Next();
+                    TempAppliedFilterBuffer.Next();
             end;
 
             trigger OnPreDataItem()
             begin
-                SetRange(Number, 1, AppliedFilterBuffer.Count());
+                SetRange(Number, 1, TempAppliedFilterBuffer.Count());
             end;
         }
         dataitem(POSSalesLineCons; "NPR POS Entry Sales Line")
@@ -271,8 +271,8 @@
         DimSelectionBuf: Record "Dimension Selection Buffer";
         TempDimSetEntryBuffer: Record "Dimension Set Entry" temporary;
         DimValue: Record "Dimension Value";
-        TableCounterBuf: Record "Entry No. Amount Buffer" temporary;
-        AppliedFilterBuffer: Record "Name/Value Buffer" temporary;
+        TempTableCounterBuf: Record "Entry No. Amount Buffer" temporary;
+        TempAppliedFilterBuffer: Record "Name/Value Buffer" temporary;
         SelectedDim: Record "Selected Dimension";
         TempSelectedDim: Record "Selected Dimension" temporary;
         DimBufMgt: Codeunit "Dimension Buffer Management";
@@ -347,7 +347,7 @@
         RecRef: RecordRef;
         FilterNo: Integer;
     begin
-        AppliedFilterBuffer.DeleteAll();
+        TempAppliedFilterBuffer.DeleteAll();
         FilterNo := 100;
         RecRef.GetTable("POS Entry");
         CheckAndAddRecFiltersToBuffer(RecRef, FilterNo);
@@ -390,11 +390,11 @@
     begin
         if AppliedFilter = '' then
             exit;
-        AppliedFilterBuffer.Init();
-        AppliedFilterBuffer.ID := FilterNo;
-        AppliedFilterBuffer.Name := CopyStr(FieldName, 1, MaxStrLen(AppliedFilterBuffer.Name));
-        AppliedFilterBuffer.Value := CopyStr(AppliedFilter, 1, MaxStrLen(AppliedFilterBuffer.Value));
-        AppliedFilterBuffer.Insert();
+        TempAppliedFilterBuffer.Init();
+        TempAppliedFilterBuffer.ID := FilterNo;
+        TempAppliedFilterBuffer.Name := CopyStr(FieldName, 1, MaxStrLen(TempAppliedFilterBuffer.Name));
+        TempAppliedFilterBuffer.Value := CopyStr(AppliedFilter, 1, MaxStrLen(TempAppliedFilterBuffer.Value));
+        TempAppliedFilterBuffer.Insert();
         FilterNo += 1;
     end;
 

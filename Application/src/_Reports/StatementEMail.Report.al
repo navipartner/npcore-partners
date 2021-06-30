@@ -14,7 +14,7 @@ report 6014550 "NPR Statement E-Mail"
 
             trigger OnAfterGetRecord()
             var
-                EmailAttachmentTemp: Record "NPR E-mail Attachment" temporary;
+                TempEmailAttachment: Record "NPR E-mail Attachment" temporary;
                 EmailTemplateHeader: Record "NPR E-mail Template Header";
                 ReportSelections: Record "Report Selections";
                 DocSendProfile: Record "Document Sending Profile";
@@ -40,25 +40,25 @@ report 6014550 "NPR Statement E-Mail"
                         if Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send now" then
                             if EmailMgt.GetEmailTemplateHeader(RecRef, EmailTemplateHeader) then begin
                                 Filename := EmailMgt.GetFilename(EmailTemplateHeader, RecRef);
-                                EmailAttachmentTemp.DeleteAll();
-                                EmailAttachmentTemp.Init();
-                                EmailAttachmentTemp.Description := Filename;
-                                EmailAttachmentTemp."Attached File".CreateOutStream(OStream);
+                                TempEmailAttachment.DeleteAll();
+                                TempEmailAttachment.Init();
+                                TempEmailAttachment.Description := Filename;
+                                TempEmailAttachment."Attached File".CreateOutStream(OStream);
                                 FldRef := RecRef.Field(1);
                                 FilterGroupNo := SetNextGroupFilter(RecRef, FldRef, Customer."No.");
                                 ReportGenerated := REPORT.SaveAs(ReportSelections."Report ID", RequestPageParameters, REPORTFORMAT::Pdf, OStream, RecRef);
                                 SetGroupFilter(RecRef, FldRef, '', FilterGroupNo);
                                 if ReportGenerated then
-                                    ReportGenerated := EmailAttachmentTemp."Attached File".HasValue;
+                                    ReportGenerated := TempEmailAttachment."Attached File".HasValue;
                                 if ReportGenerated then begin
                                     ReportGenerated := false;
                                     SendToEmail := GetCustomReportSelectionEmail(Customer."No.", ReportSelections."Report ID");
                                     if SendToEmail = '' then
                                         SendToEmail := Customer."E-Mail";
-                                    EmailAttachmentTemp.Insert();
+                                    TempEmailAttachment.Insert();
                                     if EmailMgt.SetupEmailTemplate(RecRef, SendToEmail, true, EmailTemplateHeader) = '' then
                                         if EmailMgt.CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, DATABASE::Customer) = '' then begin
-                                            if EmailMgt.AddAttachmentToSmtpMessage(EmailAttachmentTemp) then begin
+                                            if EmailMgt.AddAttachmentToSmtpMessage(TempEmailAttachment) then begin
                                                 EmailMgt.SendSmtpMessage(RecRef, true);
                                                 ReportGenerated := true;
                                             end;

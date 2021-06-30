@@ -124,10 +124,10 @@ table 6059974 "NPR Variety Buffer"
         VRT2: Record "NPR Variety Value";
         VRT3: Record "NPR Variety Value";
         VRT4: Record "NPR Variety Value";
-        TMPVRT1: Record "NPR Variety Value" temporary;
-        TMPVRT2: Record "NPR Variety Value" temporary;
-        TMPVRT3: Record "NPR Variety Value" temporary;
-        TMPVRT4: Record "NPR Variety Value" temporary;
+        TempVRT1: Record "NPR Variety Value" temporary;
+        TempVRT2: Record "NPR Variety Value" temporary;
+        TempVRT3: Record "NPR Variety Value" temporary;
+        TempVRT4: Record "NPR Variety Value" temporary;
         VRT1Desc: Text[30];
         VRT2Desc: Text[30];
         VRT3Desc: Text[30];
@@ -144,247 +144,247 @@ table 6059974 "NPR Variety Buffer"
         case CrossVRTNo of
             CrossVRTNo::VRT1:
                 begin
-                    TMPVRT1.Type := '';
-                    TMPVRT1.Table := '';
-                    TMPVRT1.Insert();
+                    TempVRT1.Type := '';
+                    TempVRT1.Table := '';
+                    TempVRT1.Insert();
 
                     if Item."NPR Variety 2" = '' then begin
-                        TMPVRT2.Type := '';
-                        TMPVRT2.Table := '';
-                        TMPVRT2.Insert();
+                        TempVRT2.Type := '';
+                        TempVRT2.Table := '';
+                        TempVRT2.Insert();
                     end else begin
                         VRT2.SetRange(Type, Item."NPR Variety 2");
                         VRT2.SetRange(Table, Item."NPR Variety 2 Table");
                         if VRT2.FindSet() then
                             repeat
-                                TMPVRT2 := VRT2;
-                                TMPVRT2.Insert();
+                                TempVRT2 := VRT2;
+                                TempVRT2.Insert();
                             until VRT2.Next() = 0;
                     end;
 
                     if Item."NPR Variety 3" = '' then begin
-                        TMPVRT3.Type := '';
-                        TMPVRT3.Table := '';
-                        TMPVRT3.Insert();
+                        TempVRT3.Type := '';
+                        TempVRT3.Table := '';
+                        TempVRT3.Insert();
                     end else begin
                         VRT3.SetRange(Type, Item."NPR Variety 3");
                         VRT3.SetRange(Table, Item."NPR Variety 3 Table");
                         if VRT3.FindSet() then
                             repeat
-                                TMPVRT3 := VRT3;
-                                TMPVRT3.Insert();
+                                TempVRT3 := VRT3;
+                                TempVRT3.Insert();
                             until VRT3.Next() = 0;
                     end;
 
                     if Item."NPR Variety 4" = '' then begin
-                        TMPVRT4.Type := '';
-                        TMPVRT4.Table := '';
-                        TMPVRT4.Insert();
+                        TempVRT4.Type := '';
+                        TempVRT4.Table := '';
+                        TempVRT4.Insert();
                     end else begin
                         VRT4.SetRange(Type, Item."NPR Variety 4");
                         VRT4.SetRange(Table, Item."NPR Variety 4 Table");
                         if VRT4.FindSet() then
                             repeat
-                                TMPVRT4 := VRT4;
-                                TMPVRT4.Insert();
+                                TempVRT4 := VRT4;
+                                TempVRT4.Insert();
                             until VRT4.Next() = 0;
                     end;
                 end;
             CrossVRTNo::VRT2:
                 begin
                     if Item."NPR Variety 1" = '' then begin
-                        TMPVRT1.Type := '';
-                        TMPVRT1.Table := '';
-                        TMPVRT1.Insert();
+                        TempVRT1.Type := '';
+                        TempVRT1.Table := '';
+                        TempVRT1.Insert();
                     end else begin
                         VRT1.SetRange(Type, Item."NPR Variety 1");
                         VRT1.SetRange(Table, Item."NPR Variety 1 Table");
                         if VRT1.FindSet() then
                             repeat
-                                TMPVRT1 := VRT1;
-                                TMPVRT1.Insert();
+                                TempVRT1 := VRT1;
+                                TempVRT1.Insert();
                             until VRT1.Next() = 0;
                     end;
 
-                    TMPVRT2.Type := '';
-                    TMPVRT2.Table := '';
-                    TMPVRT2.Insert();
+                    TempVRT2.Type := '';
+                    TempVRT2.Table := '';
+                    TempVRT2.Insert();
 
                     if Item."NPR Variety 3" = '' then begin
-                        TMPVRT3.Type := '';
-                        TMPVRT3.Table := '';
-                        TMPVRT3.Insert();
+                        TempVRT3.Type := '';
+                        TempVRT3.Table := '';
+                        TempVRT3.Insert();
                     end else begin
                         VRT3.SetRange(Type, Item."NPR Variety 3");
                         VRT3.SetRange(Table, Item."NPR Variety 3 Table");
                         if VRT3.FindSet() then
                             repeat
-                                TMPVRT3 := VRT3;
-                                TMPVRT3.Insert();
+                                TempVRT3 := VRT3;
+                                TempVRT3.Insert();
                             until VRT3.Next() = 0;
                     end;
 
                     if Item."NPR Variety 4" = '' then begin
-                        TMPVRT4.Type := '';
-                        TMPVRT4.Table := '';
-                        TMPVRT4.Insert();
+                        TempVRT4.Type := '';
+                        TempVRT4.Table := '';
+                        TempVRT4.Insert();
                     end else begin
                         VRT4.SetRange(Type, Item."NPR Variety 4");
                         VRT4.SetRange(Table, Item."NPR Variety 4 Table");
                         if VRT4.FindSet() then
                             repeat
-                                TMPVRT4 := VRT4;
-                                TMPVRT4.Insert();
+                                TempVRT4 := VRT4;
+                                TempVRT4.Insert();
                             until VRT4.Next() = 0;
                     end;
                 end;
             CrossVRTNo::VRT3:
                 begin
                     if Item."NPR Variety 1" = '' then begin
-                        TMPVRT1.Type := '';
-                        TMPVRT1.Table := '';
-                        TMPVRT1.Insert();
+                        TempVRT1.Type := '';
+                        TempVRT1.Table := '';
+                        TempVRT1.Insert();
                     end else begin
                         VRT1.SetRange(Type, Item."NPR Variety 1");
                         VRT1.SetRange(Table, Item."NPR Variety 1 Table");
                         if VRT1.FindSet() then
                             repeat
-                                TMPVRT1 := VRT1;
-                                TMPVRT1.Insert();
+                                TempVRT1 := VRT1;
+                                TempVRT1.Insert();
                             until VRT1.Next() = 0;
                     end;
 
                     if Item."NPR Variety 2" = '' then begin
-                        TMPVRT2.Type := '';
-                        TMPVRT2.Table := '';
-                        TMPVRT2.Insert();
+                        TempVRT2.Type := '';
+                        TempVRT2.Table := '';
+                        TempVRT2.Insert();
                     end else begin
                         VRT2.SetRange(Type, Item."NPR Variety 2");
                         VRT2.SetRange(Table, Item."NPR Variety 2 Table");
                         if VRT2.FindSet() then
                             repeat
-                                TMPVRT2 := VRT2;
-                                TMPVRT2.Insert();
+                                TempVRT2 := VRT2;
+                                TempVRT2.Insert();
                             until VRT2.Next() = 0;
                     end;
 
-                    TMPVRT3.Type := '';
-                    TMPVRT3.Table := '';
-                    TMPVRT3.Insert();
+                    TempVRT3.Type := '';
+                    TempVRT3.Table := '';
+                    TempVRT3.Insert();
 
                     if Item."NPR Variety 4" = '' then begin
-                        TMPVRT4.Type := '';
-                        TMPVRT4.Table := '';
-                        TMPVRT4.Insert();
+                        TempVRT4.Type := '';
+                        TempVRT4.Table := '';
+                        TempVRT4.Insert();
                     end else begin
                         VRT4.SetRange(Type, Item."NPR Variety 4");
                         VRT4.SetRange(Table, Item."NPR Variety 4 Table");
                         if VRT4.FindSet() then
                             repeat
-                                TMPVRT4 := VRT4;
-                                TMPVRT4.Insert();
+                                TempVRT4 := VRT4;
+                                TempVRT4.Insert();
                             until VRT4.Next() = 0;
                     end;
                 end;
             CrossVRTNo::VRT4:
                 begin
                     if Item."NPR Variety 1" = '' then begin
-                        TMPVRT1.Type := '';
-                        TMPVRT1.Table := '';
-                        TMPVRT1.Insert();
+                        TempVRT1.Type := '';
+                        TempVRT1.Table := '';
+                        TempVRT1.Insert();
                     end else begin
                         VRT1.SetRange(Type, Item."NPR Variety 1");
                         VRT1.SetRange(Table, Item."NPR Variety 1 Table");
                         if VRT1.FindSet() then
                             repeat
-                                TMPVRT1 := VRT1;
-                                TMPVRT1.Insert();
+                                TempVRT1 := VRT1;
+                                TempVRT1.Insert();
                             until VRT1.Next() = 0;
                     end;
 
                     if Item."NPR Variety 2" = '' then begin
-                        TMPVRT2.Type := '';
-                        TMPVRT2.Table := '';
-                        TMPVRT2.Insert();
+                        TempVRT2.Type := '';
+                        TempVRT2.Table := '';
+                        TempVRT2.Insert();
                     end else begin
                         VRT2.SetRange(Type, Item."NPR Variety 2");
                         VRT2.SetRange(Table, Item."NPR Variety 2 Table");
                         if VRT2.FindSet() then
                             repeat
-                                TMPVRT2 := VRT2;
-                                TMPVRT2.Insert();
+                                TempVRT2 := VRT2;
+                                TempVRT2.Insert();
                             until VRT2.Next() = 0;
                     end;
 
                     if Item."NPR Variety 3" = '' then begin
-                        TMPVRT3.Type := '';
-                        TMPVRT3.Table := '';
-                        TMPVRT3.Insert();
+                        TempVRT3.Type := '';
+                        TempVRT3.Table := '';
+                        TempVRT3.Insert();
                     end else begin
                         VRT3.SetRange(Type, Item."NPR Variety 3");
                         VRT3.SetRange(Table, Item."NPR Variety 3 Table");
                         if VRT3.FindSet() then
                             repeat
-                                TMPVRT3 := VRT3;
-                                TMPVRT3.Insert();
+                                TempVRT3 := VRT3;
+                                TempVRT3.Insert();
                             until VRT3.Next() = 0;
                     end;
 
-                    TMPVRT4.Type := '';
-                    TMPVRT4.Table := '';
-                    TMPVRT4.Insert();
+                    TempVRT4.Type := '';
+                    TempVRT4.Table := '';
+                    TempVRT4.Insert();
                 end;
         end;
 
-        TMPVRT1.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindSet() then
+        TempVRT1.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT2.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT3.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT4.SetCurrentKey(Type, Table, "Sort Order");
+        if TempVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindSet() then
+                if TempVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindSet() then
+                        if TempVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindSet() then
+                                if TempVRT4.FindSet() then
                                     repeat
                                         TMPVRTBuffer.Init();
-                                        TMPVRTBuffer."Variety 1 Value" := TMPVRT1.Value;
-                                        TMPVRTBuffer."Variety 2 Value" := TMPVRT2.Value;
-                                        TMPVRTBuffer."Variety 3 Value" := TMPVRT3.Value;
-                                        TMPVRTBuffer."Variety 4 Value" := TMPVRT4.Value;
-                                        TMPVRTBuffer."Variety 1 Sort Order" := TMPVRT1."Sort Order";
-                                        TMPVRTBuffer."Variety 2 Sort Order" := TMPVRT2."Sort Order";
-                                        TMPVRTBuffer."Variety 3 Sort Order" := TMPVRT3."Sort Order";
-                                        TMPVRTBuffer."Variety 4 Sort Order" := TMPVRT4."Sort Order";
+                                        TMPVRTBuffer."Variety 1 Value" := TempVRT1.Value;
+                                        TMPVRTBuffer."Variety 2 Value" := TempVRT2.Value;
+                                        TMPVRTBuffer."Variety 3 Value" := TempVRT3.Value;
+                                        TMPVRTBuffer."Variety 4 Value" := TempVRT4.Value;
+                                        TMPVRTBuffer."Variety 1 Sort Order" := TempVRT1."Sort Order";
+                                        TMPVRTBuffer."Variety 2 Sort Order" := TempVRT2."Sort Order";
+                                        TMPVRTBuffer."Variety 3 Sort Order" := TempVRT3."Sort Order";
+                                        TMPVRTBuffer."Variety 4 Sort Order" := TempVRT4."Sort Order";
                                         TMPVRTBuffer."Item No." := ItemNo;
 
-                                        if TMPVRT1.Description = '' then
-                                            VRT1Desc := TMPVRT1.Value
+                                        if TempVRT1.Description = '' then
+                                            VRT1Desc := TempVRT1.Value
                                         else
-                                            VRT1Desc := TMPVRT1.Description;
+                                            VRT1Desc := TempVRT1.Description;
 
-                                        if TMPVRT2.Description = '' then
-                                            VRT2Desc := TMPVRT2.Value
+                                        if TempVRT2.Description = '' then
+                                            VRT2Desc := TempVRT2.Value
                                         else
-                                            VRT2Desc := TMPVRT2.Description;
+                                            VRT2Desc := TempVRT2.Description;
 
-                                        if TMPVRT3.Description = '' then
-                                            VRT3Desc := TMPVRT3.Value
+                                        if TempVRT3.Description = '' then
+                                            VRT3Desc := TempVRT3.Value
                                         else
-                                            VRT3Desc := TMPVRT3.Description;
+                                            VRT3Desc := TempVRT3.Description;
 
-                                        if TMPVRT4.Description = '' then
-                                            VRT4Desc := TMPVRT4.Value
+                                        if TempVRT4.Description = '' then
+                                            VRT4Desc := TempVRT4.Value
                                         else
-                                            VRT4Desc := TMPVRT4.Description;
+                                            VRT4Desc := TempVRT4.Description;
 
                                         TMPVRTBuffer.Description := CopyStr(VRT1Desc + ' ' + VRT2Desc + ' ' + VRT3Desc + ' ' + VRT4Desc, 1, MaxStrLen(TMPVRTBuffer.Description));
                                         TMPVRTBuffer.Insert();
-                                    until TMPVRT4.Next() = 0;
-                            until TMPVRT3.Next() = 0;
-                    until TMPVRT2.Next() = 0;
-            until TMPVRT1.Next() = 0;
+                                    until TempVRT4.Next() = 0;
+                            until TempVRT3.Next() = 0;
+                    until TempVRT2.Next() = 0;
+            until TempVRT1.Next() = 0;
     end;
 
     procedure LoadAll(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID)
@@ -394,10 +394,10 @@ table 6059974 "NPR Variety Buffer"
         VRT2: Record "NPR Variety Value";
         VRT3: Record "NPR Variety Value";
         VRT4: Record "NPR Variety Value";
-        TMPVRT1: Record "NPR Variety Value" temporary;
-        TMPVRT2: Record "NPR Variety Value" temporary;
-        TMPVRT3: Record "NPR Variety Value" temporary;
-        TMPVRT4: Record "NPR Variety Value" temporary;
+        TempVRT1: Record "NPR Variety Value" temporary;
+        TempVRT2: Record "NPR Variety Value" temporary;
+        TempVRT3: Record "NPR Variety Value" temporary;
+        TempVRT4: Record "NPR Variety Value" temporary;
         ItemVar: Record "Item Variant";
         RecRef: RecordRef;
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
@@ -407,82 +407,82 @@ table 6059974 "NPR Variety Buffer"
 
         Item.Get(ItemNo);
         if Item."NPR Variety 1" = '' then begin
-            TMPVRT1.Type := '';
-            TMPVRT1.Table := '';
-            TMPVRT1.Insert();
+            TempVRT1.Type := '';
+            TempVRT1.Table := '';
+            TempVRT1.Insert();
         end else begin
             VRT1.SetRange(Type, Item."NPR Variety 1");
             VRT1.SetRange(Table, Item."NPR Variety 1 Table");
             if VRT1.FindSet() then
                 repeat
-                    TMPVRT1 := VRT1;
-                    TMPVRT1.Insert();
+                    TempVRT1 := VRT1;
+                    TempVRT1.Insert();
                 until VRT1.Next() = 0;
         end;
 
         if Item."NPR Variety 2" = '' then begin
-            TMPVRT2.Type := '';
-            TMPVRT2.Table := '';
-            TMPVRT2.Insert();
+            TempVRT2.Type := '';
+            TempVRT2.Table := '';
+            TempVRT2.Insert();
         end else begin
             VRT2.SetRange(Type, Item."NPR Variety 2");
             VRT2.SetRange(Table, Item."NPR Variety 2 Table");
             if VRT2.FindSet() then
                 repeat
-                    TMPVRT2 := VRT2;
-                    TMPVRT2.Insert();
+                    TempVRT2 := VRT2;
+                    TempVRT2.Insert();
                 until VRT2.Next() = 0;
         end;
 
         if Item."NPR Variety 3" = '' then begin
-            TMPVRT3.Type := '';
-            TMPVRT3.Table := '';
-            TMPVRT3.Insert();
+            TempVRT3.Type := '';
+            TempVRT3.Table := '';
+            TempVRT3.Insert();
         end else begin
             VRT3.SetRange(Type, Item."NPR Variety 3");
             VRT3.SetRange(Table, Item."NPR Variety 3 Table");
             if VRT3.FindSet() then
                 repeat
-                    TMPVRT3 := VRT3;
-                    TMPVRT3.Insert();
+                    TempVRT3 := VRT3;
+                    TempVRT3.Insert();
                 until VRT3.Next() = 0;
         end;
 
         if Item."NPR Variety 4" = '' then begin
-            TMPVRT4.Type := '';
-            TMPVRT4.Table := '';
-            TMPVRT4.Insert();
+            TempVRT4.Type := '';
+            TempVRT4.Table := '';
+            TempVRT4.Insert();
         end else begin
             VRT4.SetRange(Type, Item."NPR Variety 4");
             VRT4.SetRange(Table, Item."NPR Variety 4 Table");
             if VRT4.FindSet() then
                 repeat
-                    TMPVRT4 := VRT4;
-                    TMPVRT4.Insert();
+                    TempVRT4 := VRT4;
+                    TempVRT4.Insert();
                 until VRT4.Next() = 0;
         end;
 
-        TMPVRT1.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindSet() then
+        TempVRT1.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT2.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT3.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT4.SetCurrentKey(Type, Table, "Sort Order");
+        if TempVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindSet() then
+                if TempVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindSet() then
+                        if TempVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindSet() then
+                                if TempVRT4.FindSet() then
                                     repeat
                                         TMPVRTBuffer.Init();
-                                        TMPVRTBuffer."Variety 1 Value" := TMPVRT1.Value;
-                                        TMPVRTBuffer."Variety 2 Value" := TMPVRT2.Value;
-                                        TMPVRTBuffer."Variety 3 Value" := TMPVRT3.Value;
-                                        TMPVRTBuffer."Variety 4 Value" := TMPVRT4.Value;
-                                        TMPVRTBuffer."Variety 1 Sort Order" := TMPVRT1."Sort Order";
-                                        TMPVRTBuffer."Variety 2 Sort Order" := TMPVRT2."Sort Order";
-                                        TMPVRTBuffer."Variety 3 Sort Order" := TMPVRT3."Sort Order";
-                                        TMPVRTBuffer."Variety 4 Sort Order" := TMPVRT4."Sort Order";
+                                        TMPVRTBuffer."Variety 1 Value" := TempVRT1.Value;
+                                        TMPVRTBuffer."Variety 2 Value" := TempVRT2.Value;
+                                        TMPVRTBuffer."Variety 3 Value" := TempVRT3.Value;
+                                        TMPVRTBuffer."Variety 4 Value" := TempVRT4.Value;
+                                        TMPVRTBuffer."Variety 1 Sort Order" := TempVRT1."Sort Order";
+                                        TMPVRTBuffer."Variety 2 Sort Order" := TempVRT2."Sort Order";
+                                        TMPVRTBuffer."Variety 3 Sort Order" := TempVRT3."Sort Order";
+                                        TMPVRTBuffer."Variety 4 Sort Order" := TempVRT4."Sort Order";
                                         TMPVRTBuffer."Item No." := ItemNo;
                                         TMPVRTBuffer."Master Record ID" := MasterRecordID;
                                         //-NPR5.29 [263917]
@@ -497,10 +497,10 @@ table 6059974 "NPR Variety Buffer"
                                             end;
                                         end;
                                         TMPVRTBuffer.Insert();
-                                    until TMPVRT4.Next() = 0;
-                            until TMPVRT3.Next() = 0;
-                    until TMPVRT2.Next() = 0;
-            until TMPVRT1.Next() = 0;
+                                    until TempVRT4.Next() = 0;
+                            until TempVRT3.Next() = 0;
+                    until TempVRT2.Next() = 0;
+            until TempVRT1.Next() = 0;
     end;
 
     procedure LoadMatrixRows(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; HideInactive: Boolean)
@@ -531,10 +531,10 @@ table 6059974 "NPR Variety Buffer"
     procedure LoadCombinations(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; ItemNo: Code[20]; SetRecordID2ItemVar: Boolean; MasterRecordID: RecordID; HideInactive: Boolean)
     var
         Item: Record Item;
-        TMPVRT1: Record "NPR Variety Value" temporary;
-        TMPVRT2: Record "NPR Variety Value" temporary;
-        TMPVRT3: Record "NPR Variety Value" temporary;
-        TMPVRT4: Record "NPR Variety Value" temporary;
+        TempVRT1: Record "NPR Variety Value" temporary;
+        TempVRT2: Record "NPR Variety Value" temporary;
+        TempVRT3: Record "NPR Variety Value" temporary;
+        TempVRT4: Record "NPR Variety Value" temporary;
         ItemVar: Record "Item Variant";
         RecRef: RecordRef;
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
@@ -551,42 +551,42 @@ table 6059974 "NPR Variety Buffer"
 
         if HideInactive then begin
             //Warning - sort order is not filled into the tmp buffer from below function call (and its not used for anything)
-            LoadUsedValuesVRT1(Item, TMPVRT1);
-            LoadUsedValuesVRT2(Item, TMPVRT2);
-            LoadUsedValuesVRT3(Item, TMPVRT3);
-            LoadUsedValuesVRT4(Item, TMPVRT4);
+            LoadUsedValuesVRT1(Item, TempVRT1);
+            LoadUsedValuesVRT2(Item, TempVRT2);
+            LoadUsedValuesVRT3(Item, TempVRT3);
+            LoadUsedValuesVRT4(Item, TempVRT4);
         end else begin
-            InsertAllValuesInTmpTable(Item."NPR Variety 1", Item."NPR Variety 1 Table", TMPVRT1);
-            InsertAllValuesInTmpTable(Item."NPR Variety 2", Item."NPR Variety 2 Table", TMPVRT2);
-            InsertAllValuesInTmpTable(Item."NPR Variety 3", Item."NPR Variety 3 Table", TMPVRT3);
-            InsertAllValuesInTmpTable(Item."NPR Variety 4", Item."NPR Variety 4 Table", TMPVRT4);
+            InsertAllValuesInTmpTable(Item."NPR Variety 1", Item."NPR Variety 1 Table", TempVRT1);
+            InsertAllValuesInTmpTable(Item."NPR Variety 2", Item."NPR Variety 2 Table", TempVRT2);
+            InsertAllValuesInTmpTable(Item."NPR Variety 3", Item."NPR Variety 3 Table", TempVRT3);
+            InsertAllValuesInTmpTable(Item."NPR Variety 4", Item."NPR Variety 4 Table", TempVRT4);
         end;
 
-        TMPVRT1.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindSet() then
+        TempVRT1.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT2.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT3.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT4.SetCurrentKey(Type, Table, "Sort Order");
+        if TempVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindSet() then
+                if TempVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindSet() then
+                        if TempVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindSet() then
+                                if TempVRT4.FindSet() then
                                     repeat
                                         //-NPR5.50 [348210]
-                                        Window.Update(1, TMPVRT1.Value + ' ' + TMPVRT2.Value + ' ' + TMPVRT3.Value + ' ' + TMPVRT4.Value + ' ');
+                                        Window.Update(1, TempVRT1.Value + ' ' + TempVRT2.Value + ' ' + TempVRT3.Value + ' ' + TempVRT4.Value + ' ');
                                         //+NPR5.50 [348210]
 
                                         TMPVRTBuffer.Init();
-                                        TMPVRTBuffer."Variety 1 Value" := TMPVRT1.Value;
-                                        TMPVRTBuffer."Variety 2 Value" := TMPVRT2.Value;
-                                        TMPVRTBuffer."Variety 3 Value" := TMPVRT3.Value;
-                                        TMPVRTBuffer."Variety 4 Value" := TMPVRT4.Value;
-                                        TMPVRTBuffer."Variety 1 Sort Order" := TMPVRT1."Sort Order";
-                                        TMPVRTBuffer."Variety 2 Sort Order" := TMPVRT2."Sort Order";
-                                        TMPVRTBuffer."Variety 3 Sort Order" := TMPVRT3."Sort Order";
-                                        TMPVRTBuffer."Variety 4 Sort Order" := TMPVRT4."Sort Order";
+                                        TMPVRTBuffer."Variety 1 Value" := TempVRT1.Value;
+                                        TMPVRTBuffer."Variety 2 Value" := TempVRT2.Value;
+                                        TMPVRTBuffer."Variety 3 Value" := TempVRT3.Value;
+                                        TMPVRTBuffer."Variety 4 Value" := TempVRT4.Value;
+                                        TMPVRTBuffer."Variety 1 Sort Order" := TempVRT1."Sort Order";
+                                        TMPVRTBuffer."Variety 2 Sort Order" := TempVRT2."Sort Order";
+                                        TMPVRTBuffer."Variety 3 Sort Order" := TempVRT3."Sort Order";
+                                        TMPVRTBuffer."Variety 4 Sort Order" := TempVRT4."Sort Order";
                                         TMPVRTBuffer."Item No." := ItemNo;
                                         TMPVRTBuffer."Master Record ID" := MasterRecordID;
                                         //-NPR5.29 [263917]
@@ -601,10 +601,10 @@ table 6059974 "NPR Variety Buffer"
                                             end;
                                         end;
                                         TMPVRTBuffer.Insert();
-                                    until TMPVRT4.Next() = 0;
-                            until TMPVRT3.Next() = 0;
-                    until TMPVRT2.Next() = 0;
-            until TMPVRT1.Next() = 0;
+                                    until TempVRT4.Next() = 0;
+                            until TempVRT3.Next() = 0;
+                    until TempVRT2.Next() = 0;
+            until TempVRT1.Next() = 0;
         //+NPR5.36 [285733]
 
         //-NPR5.50 [348210]
@@ -650,70 +650,70 @@ table 6059974 "NPR Variety Buffer"
 
     local procedure LoadAllRows(var TMPVRTBuffer: Record "NPR Variety Buffer" temporary; Item: Record Item; CrossVRTNo: Option VRT1,VRT2,VRT3,VRT4)
     var
-        TMPVRT1: Record "NPR Variety Value" temporary;
-        TMPVRT2: Record "NPR Variety Value" temporary;
-        TMPVRT3: Record "NPR Variety Value" temporary;
-        TMPVRT4: Record "NPR Variety Value" temporary;
+        TempVRT1: Record "NPR Variety Value" temporary;
+        TempVRT2: Record "NPR Variety Value" temporary;
+        TempVRT3: Record "NPR Variety Value" temporary;
+        TempVRT4: Record "NPR Variety Value" temporary;
         VRT1Desc: Text[30];
         VRT2Desc: Text[30];
         VRT3Desc: Text[30];
         VRT4Desc: Text[30];
     begin
         //-NPR5.36 [285733]
-        LoadTmpValue(TMPVRT1, Item."NPR Variety 1", Item."NPR Variety 1 Table", CrossVRTNo = CrossVRTNo::VRT1);
-        LoadTmpValue(TMPVRT2, Item."NPR Variety 2", Item."NPR Variety 2 Table", CrossVRTNo = CrossVRTNo::VRT2);
-        LoadTmpValue(TMPVRT3, Item."NPR Variety 3", Item."NPR Variety 3 Table", CrossVRTNo = CrossVRTNo::VRT3);
-        LoadTmpValue(TMPVRT4, Item."NPR Variety 4", Item."NPR Variety 4 Table", CrossVRTNo = CrossVRTNo::VRT4);
+        LoadTmpValue(TempVRT1, Item."NPR Variety 1", Item."NPR Variety 1 Table", CrossVRTNo = CrossVRTNo::VRT1);
+        LoadTmpValue(TempVRT2, Item."NPR Variety 2", Item."NPR Variety 2 Table", CrossVRTNo = CrossVRTNo::VRT2);
+        LoadTmpValue(TempVRT3, Item."NPR Variety 3", Item."NPR Variety 3 Table", CrossVRTNo = CrossVRTNo::VRT3);
+        LoadTmpValue(TempVRT4, Item."NPR Variety 4", Item."NPR Variety 4 Table", CrossVRTNo = CrossVRTNo::VRT4);
 
-        TMPVRT1.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT2.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT3.SetCurrentKey(Type, Table, "Sort Order");
-        TMPVRT4.SetCurrentKey(Type, Table, "Sort Order");
-        if TMPVRT1.FindSet() then
+        TempVRT1.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT2.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT3.SetCurrentKey(Type, Table, "Sort Order");
+        TempVRT4.SetCurrentKey(Type, Table, "Sort Order");
+        if TempVRT1.FindSet() then
             repeat
-                if TMPVRT2.FindSet() then
+                if TempVRT2.FindSet() then
                     repeat
-                        if TMPVRT3.FindSet() then
+                        if TempVRT3.FindSet() then
                             repeat
-                                if TMPVRT4.FindSet() then
+                                if TempVRT4.FindSet() then
                                     repeat
                                         TMPVRTBuffer.Init();
-                                        TMPVRTBuffer."Variety 1 Value" := TMPVRT1.Value;
-                                        TMPVRTBuffer."Variety 2 Value" := TMPVRT2.Value;
-                                        TMPVRTBuffer."Variety 3 Value" := TMPVRT3.Value;
-                                        TMPVRTBuffer."Variety 4 Value" := TMPVRT4.Value;
-                                        TMPVRTBuffer."Variety 1 Sort Order" := TMPVRT1."Sort Order";
-                                        TMPVRTBuffer."Variety 2 Sort Order" := TMPVRT2."Sort Order";
-                                        TMPVRTBuffer."Variety 3 Sort Order" := TMPVRT3."Sort Order";
-                                        TMPVRTBuffer."Variety 4 Sort Order" := TMPVRT4."Sort Order";
+                                        TMPVRTBuffer."Variety 1 Value" := TempVRT1.Value;
+                                        TMPVRTBuffer."Variety 2 Value" := TempVRT2.Value;
+                                        TMPVRTBuffer."Variety 3 Value" := TempVRT3.Value;
+                                        TMPVRTBuffer."Variety 4 Value" := TempVRT4.Value;
+                                        TMPVRTBuffer."Variety 1 Sort Order" := TempVRT1."Sort Order";
+                                        TMPVRTBuffer."Variety 2 Sort Order" := TempVRT2."Sort Order";
+                                        TMPVRTBuffer."Variety 3 Sort Order" := TempVRT3."Sort Order";
+                                        TMPVRTBuffer."Variety 4 Sort Order" := TempVRT4."Sort Order";
                                         TMPVRTBuffer."Item No." := Item."No.";
 
-                                        if TMPVRT1.Description = '' then
-                                            VRT1Desc := TMPVRT1.Value
+                                        if TempVRT1.Description = '' then
+                                            VRT1Desc := TempVRT1.Value
                                         else
-                                            VRT1Desc := TMPVRT1.Description;
+                                            VRT1Desc := TempVRT1.Description;
 
-                                        if TMPVRT2.Description = '' then
-                                            VRT2Desc := TMPVRT2.Value
+                                        if TempVRT2.Description = '' then
+                                            VRT2Desc := TempVRT2.Value
                                         else
-                                            VRT2Desc := TMPVRT2.Description;
+                                            VRT2Desc := TempVRT2.Description;
 
-                                        if TMPVRT3.Description = '' then
-                                            VRT3Desc := TMPVRT3.Value
+                                        if TempVRT3.Description = '' then
+                                            VRT3Desc := TempVRT3.Value
                                         else
-                                            VRT3Desc := TMPVRT3.Description;
+                                            VRT3Desc := TempVRT3.Description;
 
-                                        if TMPVRT4.Description = '' then
-                                            VRT4Desc := TMPVRT4.Value
+                                        if TempVRT4.Description = '' then
+                                            VRT4Desc := TempVRT4.Value
                                         else
-                                            VRT4Desc := TMPVRT4.Description;
+                                            VRT4Desc := TempVRT4.Description;
 
                                         TMPVRTBuffer.Description := CopyStr(VRT1Desc + ' ' + VRT2Desc + ' ' + VRT3Desc + ' ' + VRT4Desc, 1, MaxStrLen(TMPVRTBuffer.Description));
                                         TMPVRTBuffer.Insert();
-                                    until TMPVRT4.Next() = 0;
-                            until TMPVRT3.Next() = 0;
-                    until TMPVRT2.Next() = 0;
-            until TMPVRT1.Next() = 0;
+                                    until TempVRT4.Next() = 0;
+                            until TempVRT3.Next() = 0;
+                    until TempVRT2.Next() = 0;
+            until TempVRT1.Next() = 0;
         //+NPR5.36 [285733]
     end;
 

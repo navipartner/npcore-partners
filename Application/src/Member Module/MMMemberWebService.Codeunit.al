@@ -888,7 +888,7 @@ codeunit 6060128 "NPR MM Member WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         MemberCommunication: Record "NPR MM Member Communication";
-        TmpMemberCommunication: Record "NPR MM Member Communication" temporary;
+        TempMemberCommunication: Record "NPR MM Member Communication" temporary;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         ExternalMemberNo: Code[20];
         ExternalMembershipNo: Code[20];
@@ -913,7 +913,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
-            GetSetMemberComOptions.GetRequest(ExternalMemberNo, ExternalMembershipNo, TmpMemberCommunication);
+            GetSetMemberComOptions.GetRequest(ExternalMemberNo, ExternalMembershipNo, TempMemberCommunication);
 
             MemberEntryNo := MembershipManagement.GetMemberFromExtMemberNo(ExternalMemberNo);
             MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(ExternalMembershipNo);
@@ -923,21 +923,21 @@ codeunit 6060128 "NPR MM Member WebService"
                 GetSetMemberComOptions.SetErrorResponse(ResponseMessage);
 
             end else begin
-                TmpMemberCommunication.Reset();
+                TempMemberCommunication.Reset();
 
                 MembershipManagement.CreateMemberCommunicationDefaultSetup(MemberEntryNo);
 
-                if (TmpMemberCommunication.FindSet()) then begin
+                if (TempMemberCommunication.FindSet()) then begin
                     repeat
-                        if (MemberCommunication.Get(MemberEntryNo, MembershipEntryNo, TmpMemberCommunication."Message Type")) then begin
-                            MemberCommunication.TransferFields(TmpMemberCommunication, false);
+                        if (MemberCommunication.Get(MemberEntryNo, MembershipEntryNo, TempMemberCommunication."Message Type")) then begin
+                            MemberCommunication.TransferFields(TempMemberCommunication, false);
                             MemberCommunication."Changed At" := CurrentDateTime();
                             MemberCommunication.Modify();
                         end;
-                    until (TmpMemberCommunication.Next() = 0);
+                    until (TempMemberCommunication.Next() = 0);
 
-                    if (TmpMemberCommunication.IsTemporary()) then
-                        TmpMemberCommunication.DeleteAll();
+                    if (TempMemberCommunication.IsTemporary()) then
+                        TempMemberCommunication.DeleteAll();
                 end;
 
                 MemberCommunication.Reset();
@@ -945,12 +945,12 @@ codeunit 6060128 "NPR MM Member WebService"
                 MemberCommunication.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
                 if (MemberCommunication.FindSet()) then begin
                     repeat
-                        TmpMemberCommunication.TransferFields(MemberCommunication, true);
-                        TmpMemberCommunication.Insert();
+                        TempMemberCommunication.TransferFields(MemberCommunication, true);
+                        TempMemberCommunication.Insert();
                     until (MemberCommunication.Next() = 0);
                 end;
 
-                GetSetMemberComOptions.SetResponse(ExternalMemberNo, ExternalMembershipNo, TmpMemberCommunication);
+                GetSetMemberComOptions.SetResponse(ExternalMemberNo, ExternalMembershipNo, TempMemberCommunication);
 
             end;
         end else begin

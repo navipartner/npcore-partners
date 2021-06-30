@@ -12,7 +12,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
             group(Control6014401)
             {
                 ShowCaption = false;
-                field(StartingDate; JobPlanningLineTemp."Planning Date")
+                field(StartingDate; TempJobPlanningLine."Planning Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Date';
@@ -20,12 +20,12 @@ page 6059831 "NPR Event Period Distr. Dialog"
 
                     trigger OnValidate()
                     begin
-                        if (JobPlanningLineTemp."Planning Date" <> 0D) and (JobPlanningLineTemp."Planned Delivery Date" = 0D) then
-                            JobPlanningLineTemp."Planned Delivery Date" := CalcDate('1D', JobPlanningLineTemp."Planning Date");
+                        if (TempJobPlanningLine."Planning Date" <> 0D) and (TempJobPlanningLine."Planned Delivery Date" = 0D) then
+                            TempJobPlanningLine."Planned Delivery Date" := CalcDate('1D', TempJobPlanningLine."Planning Date");
                         CheckDate();
                     end;
                 }
-                field(EndingDate; JobPlanningLineTemp."Planned Delivery Date")
+                field(EndingDate; TempJobPlanningLine."Planned Delivery Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Date';
@@ -33,12 +33,12 @@ page 6059831 "NPR Event Period Distr. Dialog"
 
                     trigger OnValidate()
                     begin
-                        if (JobPlanningLineTemp."Planned Delivery Date" <> 0D) and (JobPlanningLineTemp."Planning Date" = 0D) then
-                            JobPlanningLineTemp."Planning Date" := CalcDate('-1D', JobPlanningLineTemp."Planned Delivery Date");
+                        if (TempJobPlanningLine."Planned Delivery Date" <> 0D) and (TempJobPlanningLine."Planning Date" = 0D) then
+                            TempJobPlanningLine."Planning Date" := CalcDate('-1D', TempJobPlanningLine."Planned Delivery Date");
                         CheckDate();
                     end;
                 }
-                field(StartingTime; JobPlanningLineTemp."NPR Starting Time")
+                field(StartingTime; TempJobPlanningLine."NPR Starting Time")
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Time';
@@ -47,10 +47,10 @@ page 6059831 "NPR Event Period Distr. Dialog"
                     trigger OnValidate()
                     begin
                         CheckTime();
-                        EventPlanLineGroupingMgt.CalcTimeQty(JobPlanningLineTemp."NPR Starting Time", JobPlanningLineTemp."NPR Ending Time", JobPlanningLineTemp.Quantity);
+                        EventPlanLineGroupingMgt.CalcTimeQty(TempJobPlanningLine."NPR Starting Time", TempJobPlanningLine."NPR Ending Time", TempJobPlanningLine.Quantity);
                     end;
                 }
-                field(EndingTime; JobPlanningLineTemp."NPR Ending Time")
+                field(EndingTime; TempJobPlanningLine."NPR Ending Time")
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Time';
@@ -59,16 +59,16 @@ page 6059831 "NPR Event Period Distr. Dialog"
                     trigger OnValidate()
                     begin
                         CheckTime();
-                        EventPlanLineGroupingMgt.CalcTimeQty(JobPlanningLineTemp."NPR Starting Time", JobPlanningLineTemp."NPR Ending Time", JobPlanningLineTemp.Quantity);
+                        EventPlanLineGroupingMgt.CalcTimeQty(TempJobPlanningLine."NPR Starting Time", TempJobPlanningLine."NPR Ending Time", TempJobPlanningLine.Quantity);
                     end;
                 }
-                field(UnitOfMeasure; JobPlanningLineTemp."Unit of Measure Code")
+                field(UnitOfMeasure; TempJobPlanningLine."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit of Measure';
                     ToolTip = 'Specifies the value of the Unit of Measure field';
                 }
-                field(Quantity; JobPlanningLineTemp.Quantity)
+                field(Quantity; TempJobPlanningLine.Quantity)
                 {
                     ApplicationArea = All;
                     Caption = 'Quantity';
@@ -150,7 +150,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
     end;
 
     var
-        JobPlanningLineTemp: Record "Job Planning Line" temporary;
+        TempJobPlanningLine: Record "Job Planning Line" temporary;
         DaysOfWeek: array[7] of Boolean;
         DateError: Label '%1 must be before %2.';
         DaysOfWeekOption: Option All,Some;
@@ -160,12 +160,12 @@ page 6059831 "NPR Event Period Distr. Dialog"
 
     procedure SetParameters(JobPlanningLine: Record "Job Planning Line")
     begin
-        JobPlanningLineTemp := JobPlanningLine;
+        TempJobPlanningLine := JobPlanningLine;
     end;
 
     procedure GetParameters(var JobPlanningLine2: Record "Job Planning Line"; var DaysOfWeek2: array[7] of Boolean)
     begin
-        JobPlanningLine2 := JobPlanningLineTemp;
+        JobPlanningLine2 := TempJobPlanningLine;
         CopyArray(DaysOfWeek2, DaysOfWeek, 1);
     end;
 
@@ -173,7 +173,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
     var
         Job: Record Job;
     begin
-        if JobPlanningLineTemp."Planning Date" >= JobPlanningLineTemp."Planned Delivery Date" then
+        if TempJobPlanningLine."Planning Date" >= TempJobPlanningLine."Planned Delivery Date" then
             Error(DateError, Job.FieldCaption("Starting Date"), Job.FieldCaption("Ending Date"));
     end;
 
@@ -181,8 +181,8 @@ page 6059831 "NPR Event Period Distr. Dialog"
     var
         Job: Record Job;
     begin
-        if JobPlanningLineTemp."Planning Date" = JobPlanningLineTemp."Planned Delivery Date" then
-            if (JobPlanningLineTemp."NPR Starting Time" > JobPlanningLineTemp."NPR Ending Time") and (JobPlanningLineTemp."NPR Starting Time" <> 0T) and (JobPlanningLineTemp."NPR Ending Time" <> 0T) then
+        if TempJobPlanningLine."Planning Date" = TempJobPlanningLine."Planned Delivery Date" then
+            if (TempJobPlanningLine."NPR Starting Time" > TempJobPlanningLine."NPR Ending Time") and (TempJobPlanningLine."NPR Starting Time" <> 0T) and (TempJobPlanningLine."NPR Ending Time" <> 0T) then
                 Error(TimeError, Job.FieldCaption("NPR Starting Time"), Job.FieldCaption("NPR Ending Time"));
     end;
 

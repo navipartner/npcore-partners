@@ -11,19 +11,19 @@
 
     procedure CheckVouchers(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
-        NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
+        TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
     begin
         SetGlobalLanguage(UserId);
 
         vouchers.Import();
-        vouchers.GetSourceTable(NpRvExtVoucherBuffer);
-        if NpRvExtVoucherBuffer.IsEmpty then
+        vouchers.GetSourceTable(TempNpRvExtVoucherBuffer);
+        if TempNpRvExtVoucherBuffer.IsEmpty then
             exit;
 
-        NpRvExtVoucherBuffer.FindSet();
+        TempNpRvExtVoucherBuffer.FindSet();
         repeat
-            CheckVoucher(NpRvExtVoucherBuffer);
-        until NpRvExtVoucherBuffer.Next() = 0;
+            CheckVoucher(TempNpRvExtVoucherBuffer);
+        until TempNpRvExtVoucherBuffer.Next() = 0;
     end;
 
     local procedure CheckVoucher(var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary)
@@ -39,7 +39,7 @@
     procedure GetVouchersByCustomerNo(CustomerNo: Text; var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
+        TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
         DocNo: Text;
         LineNo: Integer;
     begin
@@ -53,20 +53,20 @@
             repeat
                 LineNo += 10000;
 
-                NpRvExtVoucherBuffer.Init();
-                NpRvExtVoucherBuffer."Document No." := DocNo;
-                NpRvExtVoucherBuffer."Line No." := LineNo;
-                NpRvExtVoucherBuffer.Insert();
-                Voucher2Buffer(NpRvVoucher, NpRvExtVoucherBuffer);
+                TempNpRvExtVoucherBuffer.Init();
+                TempNpRvExtVoucherBuffer."Document No." := DocNo;
+                TempNpRvExtVoucherBuffer."Line No." := LineNo;
+                TempNpRvExtVoucherBuffer.Insert();
+                Voucher2Buffer(NpRvVoucher, TempNpRvExtVoucherBuffer);
             until NpRvVoucher.Next() = 0;
 
-        vouchers.SetSourceTable(NpRvExtVoucherBuffer);
+        vouchers.SetSourceTable(TempNpRvExtVoucherBuffer);
     end;
 
     procedure GetVouchersByEmail(Email: Text; var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
+        TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
         DocNo: Text;
         LineNo: Integer;
     begin
@@ -80,30 +80,30 @@
             repeat
                 LineNo += 10000;
 
-                NpRvExtVoucherBuffer.Init();
-                NpRvExtVoucherBuffer."Document No." := DocNo;
-                NpRvExtVoucherBuffer."Line No." := LineNo;
-                NpRvExtVoucherBuffer.Insert();
-                Voucher2Buffer(NpRvVoucher, NpRvExtVoucherBuffer);
+                TempNpRvExtVoucherBuffer.Init();
+                TempNpRvExtVoucherBuffer."Document No." := DocNo;
+                TempNpRvExtVoucherBuffer."Line No." := LineNo;
+                TempNpRvExtVoucherBuffer.Insert();
+                Voucher2Buffer(NpRvVoucher, TempNpRvExtVoucherBuffer);
             until NpRvVoucher.Next() = 0;
 
-        vouchers.SetSourceTable(NpRvExtVoucherBuffer);
+        vouchers.SetSourceTable(TempNpRvExtVoucherBuffer);
     end;
 
     procedure CreateVouchers(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
-        NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
+        TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
     begin
         vouchers.Import();
-        vouchers.GetSourceTable(NpRvExtVoucherBuffer);
+        vouchers.GetSourceTable(TempNpRvExtVoucherBuffer);
 
-        if NpRvExtVoucherBuffer.IsEmpty then
+        if TempNpRvExtVoucherBuffer.IsEmpty then
             exit;
 
-        NpRvExtVoucherBuffer.FindSet();
+        TempNpRvExtVoucherBuffer.FindSet();
         repeat
-            CreateVoucher(NpRvExtVoucherBuffer);
-        until NpRvExtVoucherBuffer.Next() = 0;
+            CreateVoucher(TempNpRvExtVoucherBuffer);
+        until TempNpRvExtVoucherBuffer.Next() = 0;
     end;
 
     local procedure CreateVoucher(var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary)
@@ -177,20 +177,20 @@
 
     procedure ReserveVouchers(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
-        NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
+        TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
     begin
         SetGlobalLanguage(UserId);
 
         vouchers.Import();
-        vouchers.GetSourceTable(NpRvExtVoucherBuffer);
+        vouchers.GetSourceTable(TempNpRvExtVoucherBuffer);
 
-        if NpRvExtVoucherBuffer.IsEmpty then
+        if TempNpRvExtVoucherBuffer.IsEmpty then
             exit;
 
-        NpRvExtVoucherBuffer.FindSet();
+        TempNpRvExtVoucherBuffer.FindSet();
         repeat
-            ReserveVoucher(NpRvExtVoucherBuffer);
-        until NpRvExtVoucherBuffer.Next() = 0;
+            ReserveVoucher(TempNpRvExtVoucherBuffer);
+        until TempNpRvExtVoucherBuffer.Next() = 0;
     end;
 
     local procedure ReserveVoucher(var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary)
@@ -243,19 +243,19 @@
 
     procedure CancelVoucherReservations(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
-        NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
+        TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
     begin
         SetGlobalLanguage(UserId);
 
         vouchers.Import();
-        vouchers.GetSourceTable(NpRvExtVoucherBuffer);
-        if NpRvExtVoucherBuffer.IsEmpty then
+        vouchers.GetSourceTable(TempNpRvExtVoucherBuffer);
+        if TempNpRvExtVoucherBuffer.IsEmpty then
             exit;
 
-        NpRvExtVoucherBuffer.FindSet();
+        TempNpRvExtVoucherBuffer.FindSet();
         repeat
-            CancelVoucherReservation(NpRvExtVoucherBuffer);
-        until NpRvExtVoucherBuffer.Next() = 0;
+            CancelVoucherReservation(TempNpRvExtVoucherBuffer);
+        until TempNpRvExtVoucherBuffer.Next() = 0;
     end;
 
     local procedure CancelVoucherReservation(var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary)

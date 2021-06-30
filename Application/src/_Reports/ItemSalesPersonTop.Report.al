@@ -63,28 +63,28 @@ report 6014474 "NPR Item/Sales Person Top"
                         CurrReport.Skip();
 
                     if Sorting then begin
-                        ItemAmount."Item No." := Code;
+                        TempItemAmount."Item No." := Code;
 
                         case SortBy of
                             SortBy::Turnover:
                                 begin
-                                    ItemAmount.Amount := Abs("NPR Sales (LCY)");
-                                    ItemAmount."Amount 2" := Abs("NPR Sales (Qty.)");
+                                    TempItemAmount.Amount := Abs("NPR Sales (LCY)");
+                                    TempItemAmount."Amount 2" := Abs("NPR Sales (Qty.)");
                                 end;
                             SortBy::"Qty.":
                                 begin
-                                    ItemAmount.Amount := Abs("NPR Sales (Qty.)");
-                                    ItemAmount."Amount 2" := Abs("NPR Sales (LCY)");
+                                    TempItemAmount.Amount := Abs("NPR Sales (Qty.)");
+                                    TempItemAmount."Amount 2" := Abs("NPR Sales (LCY)");
                                 end;
                         end;
-                        ItemAmount.Insert();
+                        TempItemAmount.Insert();
                     end;
                 end;
 
                 trigger OnPreDataItem()
                 begin
                     if Sorting then
-                        ItemAmount.DeleteAll();
+                        TempItemAmount.DeleteAll();
 
                     if Item.GetFilter("Date Filter") <> '' then
                         Item.CopyFilter("Date Filter", "Salesperson/Purchaser"."Date Filter");
@@ -110,13 +110,13 @@ report 6014474 "NPR Item/Sales Person Top"
                 trigger OnAfterGetRecord()
                 begin
                     if Number = 1 then begin
-                        if not ItemAmount.FindFirst() then
+                        if not TempItemAmount.FindFirst() then
                             CurrReport.Break();
                     end else
-                        if ItemAmount.Next() = 0 then
+                        if TempItemAmount.Next() = 0 then
                             CurrReport.Break();
 
-                    if Salesperson.Get(ItemAmount."Item No.") then;
+                    if Salesperson.Get(TempItemAmount."Item No.") then;
 
                     Clear(CalcAmt);
                     Clear(Qty2);
@@ -124,13 +124,13 @@ report 6014474 "NPR Item/Sales Person Top"
                     case SortBy of
                         SortBy::Turnover:
                             begin
-                                CalcAmt := ItemAmount.Amount;
-                                Qty2 := ItemAmount."Amount 2";
+                                CalcAmt := TempItemAmount.Amount;
+                                Qty2 := TempItemAmount."Amount 2";
                             end;
                         SortBy::"Qty.":
                             begin
-                                Qty2 := ItemAmount.Amount;
-                                CalcAmt := ItemAmount."Amount 2";
+                                Qty2 := TempItemAmount.Amount;
+                                CalcAmt := TempItemAmount."Amount 2";
                             end;
                     end;
                 end;
@@ -215,19 +215,19 @@ report 6014474 "NPR Item/Sales Person Top"
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
         if Sorting then begin
-            ItemAmount.SetCurrentKey(Amount, "Amount 2", "Item No.");
+            TempItemAmount.SetCurrentKey(Amount, "Amount 2", "Item No.");
             case Key of
                 Key::stigende:
-                    ItemAmount.Ascending(false);
+                    TempItemAmount.Ascending(false);
                 Key::faldende:
-                    ItemAmount.Ascending(true);
+                    TempItemAmount.Ascending(true);
             end;
         end;
     end;
 
     var
         CompanyInfo: Record "Company Information";
-        ItemAmount: Record "Item Amount" temporary;
+        TempItemAmount: Record "Item Amount" temporary;
         Salesperson: Record "Salesperson/Purchaser";
         [InDataSet]
         ShowSort: Boolean;

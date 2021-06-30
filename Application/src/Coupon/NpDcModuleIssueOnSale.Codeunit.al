@@ -361,21 +361,21 @@
     local procedure IssueOnSaleAchieved(SalePOS: Record "NPR POS Sale"; CouponType: Record "NPR NpDc Coupon Type") NewCouponQty: Integer
     var
         NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup";
-        NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary;
+        TempNpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary;
     begin
         if not NpDcIssueOnSaleSetup.Get(CouponType.Code) then
             exit;
 
-        SalePOS2DiscBuffer(SalePOS, CouponType, NpDcItemBuffer);
-        NpDcItemBuffer.CalcSums("Line Amount", Quantity);
+        SalePOS2DiscBuffer(SalePOS, CouponType, TempNpDcItemBuffer);
+        TempNpDcItemBuffer.CalcSums("Line Amount", Quantity);
         case NpDcIssueOnSaleSetup.Type of
             NpDcIssueOnSaleSetup.Type::"Item Sales Amount":
-                NewCouponQty := NpDcItemBuffer."Line Amount" div NpDcIssueOnSaleSetup."Item Sales Amount";
+                NewCouponQty := TempNpDcItemBuffer."Line Amount" div NpDcIssueOnSaleSetup."Item Sales Amount";
             NpDcIssueOnSaleSetup.Type::"Item Sales Qty.":
-                NewCouponQty := NpDcItemBuffer.Quantity div NpDcIssueOnSaleSetup."Item Sales Qty.";
+                NewCouponQty := TempNpDcItemBuffer.Quantity div NpDcIssueOnSaleSetup."Item Sales Qty.";
             NpDcIssueOnSaleSetup.Type::Lot:
                 begin
-                    NewCouponQty := GetLotQty(NpDcIssueOnSaleSetup, NpDcItemBuffer);
+                    NewCouponQty := GetLotQty(NpDcIssueOnSaleSetup, TempNpDcItemBuffer);
                 end;
             else
                 exit(0);

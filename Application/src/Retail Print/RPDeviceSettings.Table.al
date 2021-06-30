@@ -24,7 +24,7 @@ table 6014560 "NPR RP Device Settings"
                 LinePrinterInterface: Codeunit "NPR RP Line Printer Interf.";
                 MatrixPrinterInterface: Codeunit "NPR RP Matrix Printer Interf.";
                 LookupOK: Boolean;
-                tmpDeviceSetting: Record "NPR RP Device Settings" temporary;
+                TempDeviceSetting: Record "NPR RP Device Settings" temporary;
             begin
                 RPTemplateHeader.Get(GetFilter(Template));
                 RPTemplateHeader.TestField("Printer Device");
@@ -32,19 +32,19 @@ table 6014560 "NPR RP Device Settings"
                     RPTemplateHeader."Printer Type"::Line:
                         begin
                             LinePrinterInterface.Construct(RPTemplateHeader."Printer Device");
-                            LinePrinterInterface.OnLookupDeviceSetting(LookupOK, tmpDeviceSetting);
+                            LinePrinterInterface.OnLookupDeviceSetting(LookupOK, TempDeviceSetting);
                         end;
                     RPTemplateHeader."Printer Type"::Matrix:
                         begin
                             MatrixPrinterInterface.Construct(RPTemplateHeader."Printer Device");
-                            MatrixPrinterInterface.OnLookupDeviceSetting(LookupOK, tmpDeviceSetting);
+                            MatrixPrinterInterface.OnLookupDeviceSetting(LookupOK, TempDeviceSetting);
                         end;
                 end;
 
                 if LookupOK then begin
-                    Rec.Name := tmpDeviceSetting.Name;
-                    Rec."Data Type" := tmpDeviceSetting."Data Type";
-                    Rec.Options := tmpDeviceSetting.Options;
+                    Rec.Name := TempDeviceSetting.Name;
+                    Rec."Data Type" := TempDeviceSetting."Data Type";
+                    Rec.Options := TempDeviceSetting.Options;
                 end;
             end;
         }
@@ -65,7 +65,7 @@ table 6014560 "NPR RP Device Settings"
                 StringLibrary: Codeunit "NPR String Library";
                 i: Integer;
                 OptionCount: Integer;
-                tmpRetailList: Record "NPR Retail List" temporary;
+                TempRetailList: Record "NPR Retail List" temporary;
             begin
                 if "Data Type" <> "Data Type"::Option then
                     exit;
@@ -76,16 +76,16 @@ table 6014560 "NPR RP Device Settings"
                     exit;
 
                 for i := 1 to OptionCount + 1 do begin
-                    tmpRetailList.Number += 1;
-                    tmpRetailList.Choice := StringLibrary.SelectStringSep(i, ',');
-                    tmpRetailList.Insert();
+                    TempRetailList.Number += 1;
+                    TempRetailList.Choice := StringLibrary.SelectStringSep(i, ',');
+                    TempRetailList.Insert();
                 end;
 
-                if tmpRetailList.IsEmpty then
+                if TempRetailList.IsEmpty then
                     exit;
 
-                if PAGE.RunModal(PAGE::"NPR Retail List", tmpRetailList) = ACTION::LookupOK then
-                    Value := tmpRetailList.Choice;
+                if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then
+                    Value := TempRetailList.Choice;
             end;
         }
         field(6; Options; Text[250])

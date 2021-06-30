@@ -178,18 +178,18 @@ codeunit 6184499 "NPR EFT Framework Mgt."
     var
         EFTInterface: Codeunit "NPR EFT Interface";
         Handled: Boolean;
-        tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary;
+        TempEFTAuxOperation: Record "NPR EFT Aux Operation" temporary;
     begin
         InitGenericRequest(EFTTransactionRequest, EFTSetup, POSUnitNo, SalesReceiptNo);
 
-        EFTInterface.OnDiscoverAuxiliaryOperations(tmpEFTAuxOperation);
-        tmpEFTAuxOperation.SetRange("Integration Type", EFTTransactionRequest."Integration Type");
-        tmpEFTAuxOperation.SetRange("Auxiliary ID", AuxFunction);
-        tmpEFTAuxOperation.FindFirst();
+        EFTInterface.OnDiscoverAuxiliaryOperations(TempEFTAuxOperation);
+        TempEFTAuxOperation.SetRange("Integration Type", EFTTransactionRequest."Integration Type");
+        TempEFTAuxOperation.SetRange("Auxiliary ID", AuxFunction);
+        TempEFTAuxOperation.FindFirst();
 
         EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
         EFTTransactionRequest."Auxiliary Operation ID" := AuxFunction;
-        EFTTransactionRequest."Auxiliary Operation Desc." := tmpEFTAuxOperation.Description;
+        EFTTransactionRequest."Auxiliary Operation Desc." := TempEFTAuxOperation.Description;
         EFTInterface.OnCreateAuxRequest(EFTTransactionRequest, Handled);
         CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::AUXILIARY), Handled);
     end;

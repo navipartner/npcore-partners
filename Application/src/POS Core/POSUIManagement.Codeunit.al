@@ -68,7 +68,7 @@ codeunit 6150702 "NPR POS UI Management"
     procedure InitializeMenus(POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser"; POSSession: Codeunit "NPR POS Session")
     var
         Menu: Record "NPR POS Menu";
-        tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary;
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
         POSViewProfile: Record "NPR POS View Profile";
         MenuObj: Codeunit "NPR POS Menu";
         Menus: JsonArray;
@@ -76,7 +76,7 @@ codeunit 6150702 "NPR POS UI Management"
         if not POSViewProfile.Get(POSUnit."POS View Profile") then
             Clear(POSViewProfile);
 
-        PreloadParameters(tmpPOSParameterValue);
+        PreloadParameters(TempPOSParameterValue);
 
         Menu.SetRange(Blocked, false);
         Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
@@ -86,7 +86,7 @@ codeunit 6150702 "NPR POS UI Management"
         if Menu.FindSet() then
             repeat
                 Clear(MenuObj);
-                InitializeMenu(Menu, MenuObj, POSSession, tmpPOSParameterValue);
+                InitializeMenu(Menu, MenuObj, POSSession, TempPOSParameterValue);
                 Menus.Add(MenuObj.GetJson());
             until Menu.Next() = 0;
         FrontEnd.ConfigureMenu(Menus);
@@ -228,40 +228,40 @@ codeunit 6150702 "NPR POS UI Management"
     var
         AdminTemplate: Record "NPR POS Admin. Template";
         AdminTemplateScope: Record "NPR POS Admin. Template Scope";
-        AdminTemplateScopeTmp: Record "NPR POS Admin. Template Scope" temporary;
+        TempAdminTemplateScope: Record "NPR POS Admin. Template Scope" temporary;
         Templates: JsonArray;
         Template: JsonObject;
     begin
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::All);
         if AdminTemplateScope.FindSet() then
             repeat
-                AdminTemplateScopeTmp := AdminTemplateScope;
-                AdminTemplateScopeTmp.Insert();
+                TempAdminTemplateScope := AdminTemplateScope;
+                TempAdminTemplateScope.Insert();
             until AdminTemplateScope.Next() = 0;
 
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::"POS Unit");
         AdminTemplateScope.SetRange("Applies To Code", POSUnit."No.");
         if AdminTemplateScope.FindSet() then
             repeat
-                AdminTemplateScopeTmp := AdminTemplateScope;
-                AdminTemplateScopeTmp.Insert();
+                TempAdminTemplateScope := AdminTemplateScope;
+                TempAdminTemplateScope.Insert();
             until AdminTemplateScope.Next() = 0;
 
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::User);
         AdminTemplateScope.SetRange("Applies To Code", UserId);
         if AdminTemplateScope.FindSet() then
             repeat
-                AdminTemplateScopeTmp := AdminTemplateScope;
-                AdminTemplateScopeTmp.Insert();
+                TempAdminTemplateScope := AdminTemplateScope;
+                TempAdminTemplateScope.Insert();
             until AdminTemplateScope.Next() = 0;
 
-        if AdminTemplateScopeTmp.IsEmpty then
+        if TempAdminTemplateScope.IsEmpty then
             exit;
 
-        AdminTemplateScopeTmp.FindSet();
+        TempAdminTemplateScope.FindSet();
         repeat
-            if AdminTemplate.Get(AdminTemplateScopeTmp."POS Admin. Template Id") and (AdminTemplate.Status <> AdminTemplate.Status::Draft) then begin
-                Template := CreateAdministrativeTemplatePolicy(AdminTemplate.Id, AdminTemplate."Persist on Client", AdminTemplateScopeTmp."Applies To");
+            if AdminTemplate.Get(TempAdminTemplateScope."POS Admin. Template Id") and (AdminTemplate.Status <> AdminTemplate.Status::Draft) then begin
+                Template := CreateAdministrativeTemplatePolicy(AdminTemplate.Id, AdminTemplate."Persist on Client", TempAdminTemplateScope."Applies To");
                 case AdminTemplate.Status of
                     AdminTemplate.Status::Active:
                         begin
@@ -273,7 +273,7 @@ codeunit 6150702 "NPR POS UI Management"
                 end;
             end;
             Templates.Add(Template);
-        until AdminTemplateScopeTmp.Next() = 0;
+        until TempAdminTemplateScope.Next() = 0;
         FrontEnd.ApplyAdministrativeTemplates(Templates);
     end;
 
@@ -641,36 +641,36 @@ codeunit 6150702 "NPR POS UI Management"
 
     procedure ConfigureReusableWorkflows(POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup")
     var
-        "Action": Record "NPR POS Action" temporary;
+        TempAction: Record "NPR POS Action" temporary;
         POSSetup: Record "NPR POS Setup";
         ConfigureReusableWorkflowLbl: Label '%1, %2', Locked = true;
     begin
-        Setup.Action_Item(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Item Insert Action Code")), POSSetup.FieldNo("Item Insert Action Code"));
+        Setup.Action_Item(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Item Insert Action Code")), POSSetup.FieldNo("Item Insert Action Code"));
 
-        Setup.Action_Payment(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Payment Action Code")), POSSetup.FieldNo("Payment Action Code"));
+        Setup.Action_Payment(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Payment Action Code")), POSSetup.FieldNo("Payment Action Code"));
 
-        Setup.Action_Customer(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Customer Action Code")), POSSetup.FieldNo("Customer Action Code"));
+        Setup.Action_Customer(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Customer Action Code")), POSSetup.FieldNo("Customer Action Code"));
 
-        Setup.Action_LockPOS(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Lock POS Action Code")), POSSetup.FieldNo("Lock POS Action Code"));
+        Setup.Action_LockPOS(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Lock POS Action Code")), POSSetup.FieldNo("Lock POS Action Code"));
 
-        Setup.Action_UnlockPOS(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Unlock POS Action Code")), POSSetup.FieldNo("Unlock POS Action Code"));
+        Setup.Action_UnlockPOS(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Unlock POS Action Code")), POSSetup.FieldNo("Unlock POS Action Code"));
 
-        Setup.Action_Login(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Login Action Code")), POSSetup.FieldNo("Login Action Code"));
+        Setup.Action_Login(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Login Action Code")), POSSetup.FieldNo("Login Action Code"));
 
-        Setup.Action_TextEnter(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Text Enter Action Code")), POSSetup.FieldNo("Text Enter Action Code"));
+        Setup.Action_TextEnter(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Text Enter Action Code")), POSSetup.FieldNo("Text Enter Action Code"));
 
-        Setup.Action_IdleTimeout(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
+        Setup.Action_IdleTimeout(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
 
-        Setup.Action_AdminMenu(Action, POSSession);
-        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
+        Setup.Action_AdminMenu(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
 
         OnConfigureReusableWorkflows(POSSession, Setup);
     end;
@@ -678,7 +678,7 @@ codeunit 6150702 "NPR POS UI Management"
     procedure ConfigureReusableWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; Source: Text; FieldNumber: Integer)
     var
         Button: Record "NPR POS Menu Button";
-        POSParameterValue: Record "NPR POS Parameter Value" temporary;
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
         POSUnit: Record "NPR POS Unit";
         WorkflowAction: Codeunit "NPR Workflow Action";
         POSSetup: Codeunit "NPR POS Setup";
@@ -689,10 +689,10 @@ codeunit 6150702 "NPR POS UI Management"
         Button."Action Type" := Button."Action Type"::Action;
         Button."Action Code" := Action.Code;
 
-        RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", POSParameterValue);
+        RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", TempPOSParameterValue);
         WorkflowAction.ConfigureFromMenuButton(Button, POSSession, WorkflowAction);
 
-        POSParameterValue.Reset();
+        TempPOSParameterValue.Reset();
         FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
     end;
 

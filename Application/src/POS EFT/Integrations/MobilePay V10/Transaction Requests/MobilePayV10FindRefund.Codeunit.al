@@ -8,7 +8,7 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
         _response: text;
         _responseHttpCode: Integer;
         _filter: Text;
-        MobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
+        TempMobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
         MobilePayV10RefundBuffInitiated: Boolean;
         REFUND_DETAIL_BUFFER_NOT_INITIALIZED_Err: Label 'Refund detail buffer has not been initiated! This is a programming bug.';
 
@@ -34,7 +34,7 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
 
     internal procedure SetRefundDetailBuffer(var MobilePayV10RefundBuffer: Record "NPR MobilePayV10 Refund" temporary)
     begin
-        MobilePayV10RefundBuff.Copy(MobilePayV10RefundBuffer, true);
+        TempMobilePayV10RefundBuff.Copy(MobilePayV10RefundBuffer, true);
         MobilePayV10RefundBuffInitiated := true;
     end;
 
@@ -87,7 +87,7 @@ codeunit 6014516 "NPR MobilePayV10 Find Refund"
             Error(REFUND_DETAIL_BUFFER_NOT_INITIALIZED_Err);
         end;
 
-        ParseMultiRefundsAndInsertToBuffer(jsonArray, MobilePayV10RefundBuff);
+        ParseMultiRefundsAndInsertToBuffer(jsonArray, TempMobilePayV10RefundBuff);
     end;
 
     local procedure ParseMultiRefundsAndInsertToBuffer(var PaymentsJsonArray: JsonArray; var MobilePayV10RefundBuffer: Record "NPR MobilePayV10 Refund" temporary)

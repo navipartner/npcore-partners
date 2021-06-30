@@ -42,34 +42,34 @@ report 6014490 "NPR Advanced Sales Stat."
             column(Number_Integer; Integer.Number)
             {
             }
-            column(No_Buffer; Buffer."No.")
+            column(No_Buffer; TempBuffer."No.")
             {
             }
-            column(Description_Buffer; Buffer.Description)
+            column(Description_Buffer; TempBuffer.Description)
             {
             }
-            column(Sales_Qty_Buffer; Buffer."Sales qty." * -1)
+            column(Sales_Qty_Buffer; TempBuffer."Sales qty." * -1)
             {
             }
-            column(Sales_Qty_LastYr_Buffer; Buffer."Sales qty. last year" * -1)
+            column(Sales_Qty_LastYr_Buffer; TempBuffer."Sales qty. last year" * -1)
             {
             }
-            column(Sales_LCY_Buffer; Buffer."Sales LCY")
+            column(Sales_LCY_Buffer; TempBuffer."Sales LCY")
             {
             }
-            column(Sales_LCY_LastYr_Buffer; Buffer."Sales LCY last year")
+            column(Sales_LCY_LastYr_Buffer; TempBuffer."Sales LCY last year")
             {
             }
-            column(Profit_LCY_Buffer; Buffer."Profit LCY")
+            column(Profit_LCY_Buffer; TempBuffer."Profit LCY")
             {
             }
-            column(Profit_LCY_LastYr_Buffer; Buffer."Profit LCY last year")
+            column(Profit_LCY_LastYr_Buffer; TempBuffer."Profit LCY last year")
             {
             }
-            column(Profit_Pct_Buffer; Buffer."Profit %")
+            column(Profit_Pct_Buffer; TempBuffer."Profit %")
             {
             }
-            column(Profit_Pct_LastYr_Buffer; Buffer."Profit % last year")
+            column(Profit_Pct_LastYr_Buffer; TempBuffer."Profit % last year")
             {
             }
             column(Totals_1; Totals[1] * -1)
@@ -104,12 +104,12 @@ report 6014490 "NPR Advanced Sales Stat."
                 else begin
 
                 end;
-                Totals[1] += Buffer."Sales qty.";
-                Totals[2] += Buffer."Sales qty. last year";
-                Totals[3] += Buffer."Sales LCY";
-                Totals[4] += Buffer."Sales LCY last year";
-                Totals[5] += Buffer."Profit LCY";
-                Totals[6] += Buffer."Profit LCY last year";
+                Totals[1] += TempBuffer."Sales qty.";
+                Totals[2] += TempBuffer."Sales qty. last year";
+                Totals[3] += TempBuffer."Sales LCY";
+                Totals[4] += TempBuffer."Sales LCY last year";
+                Totals[5] += TempBuffer."Profit LCY";
+                Totals[6] += TempBuffer."Profit LCY last year";
                 if Totals[3] <> 0 then
                     Totals[7] := Totals[5] / Totals[3] * 100
                 else
@@ -118,10 +118,10 @@ report 6014490 "NPR Advanced Sales Stat."
                     Totals[8] := Totals[6] / Totals[4] * 100
                 else
                     Totals[8] := 0;
-                if Integer.Number = Buffer.Count() then
+                if Integer.Number = TempBuffer.Count() then
                     CurrReport.Break();
                 if Integer.Number > 0 then
-                    Buffer.Next();
+                    TempBuffer.Next();
             end;
 
             trigger OnPostDataItem()
@@ -145,7 +145,7 @@ report 6014490 "NPR Advanced Sales Stat."
 
                 // Rewind
                 UpdateSortKey();
-                if not Buffer.Find('-') then begin
+                if not TempBuffer.Find('-') then begin
                     if CurrReport.Language = 1030 then
                         Error(EmptyLinesDeErr)
                     else
@@ -266,7 +266,7 @@ report 6014490 "NPR Advanced Sales Stat."
         DateRecord: Record Date;
         Item: Record Item;
         AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
-        Buffer: Record "NPR Advanced Sales Statistics" temporary;
+        TempBuffer: Record "NPR Advanced Sales Statistics" temporary;
         ItemCategory: Record "Item Category";
         "Salesperson/Purchaser": Record "Salesperson/Purchaser";
         AuxValueEntry: Record "NPR Aux. Value Entry";
@@ -329,7 +329,7 @@ report 6014490 "NPR Advanced Sales Stat."
     var
         NoTypeErr: Label 'No Type selected';
     begin
-        Buffer.DeleteAll();
+        TempBuffer.DeleteAll();
 
         case Type of
             Type::Period:
@@ -422,23 +422,23 @@ report 6014490 "NPR Advanced Sales Stat."
                 SetItemLedgerEntryFilter(AuxItemLedgerEntry, false, Format(Field.Value));
                 AuxItemLedgerEntry.CalcSums(Quantity);
 
-                Buffer.Init();
+                TempBuffer.Init();
                 if Type = Type::Period then begin
-                    Buffer."Date 1" := Field.Value;
-                    Buffer."No." := Format(Count);
+                    TempBuffer."Date 1" := Field.Value;
+                    TempBuffer."No." := Format(Count);
                 end else
-                    Buffer."No." := Format(Field.Value);
+                    TempBuffer."No." := Format(Field.Value);
                 if not (Type = Type::Projectcode) then
-                    Buffer.Description := Format(Caption.Value)
+                    TempBuffer.Description := Format(Caption.Value)
                 else
-                    Buffer.Description := StrSubstNo(Pct2Lbl, ProjektKodeStart, ProjektKodeSlut);
-                Buffer."Sales qty." := AuxItemLedgerEntry.Quantity;
-                Buffer."Sales LCY" := AuxValueEntry."Sales Amount (Actual)";
-                Buffer."Profit LCY" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
-                if Buffer."Sales LCY" <> 0 then
-                    Buffer."Profit %" := Buffer."Profit LCY" / Buffer."Sales LCY" * 100
+                    TempBuffer.Description := StrSubstNo(Pct2Lbl, ProjektKodeStart, ProjektKodeSlut);
+                TempBuffer."Sales qty." := AuxItemLedgerEntry.Quantity;
+                TempBuffer."Sales LCY" := AuxValueEntry."Sales Amount (Actual)";
+                TempBuffer."Profit LCY" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
+                if TempBuffer."Sales LCY" <> 0 then
+                    TempBuffer."Profit %" := TempBuffer."Profit LCY" / TempBuffer."Sales LCY" * 100
                 else
-                    Buffer."Profit %" := 0;
+                    TempBuffer."Profit %" := 0;
 
                 // Dernæst sidste år
                 SetValueEntryFilter(AuxValueEntry, true, Format(Field.Value));
@@ -447,15 +447,15 @@ report 6014490 "NPR Advanced Sales Stat."
                 SetItemLedgerEntryFilter(AuxItemLedgerEntry, true, Format(Field.Value));
                 AuxItemLedgerEntry.CalcSums(Quantity);
 
-                Buffer."Sales qty. last year" := AuxItemLedgerEntry.Quantity;
-                Buffer."Sales LCY last year" := AuxValueEntry."Sales Amount (Actual)";
-                Buffer."Profit LCY last year" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
-                if Buffer."Sales LCY last year" <> 0 then
-                    Buffer."Profit % last year" := Buffer."Profit LCY last year" / Buffer."Sales LCY last year" * 100
+                TempBuffer."Sales qty. last year" := AuxItemLedgerEntry.Quantity;
+                TempBuffer."Sales LCY last year" := AuxValueEntry."Sales Amount (Actual)";
+                TempBuffer."Profit LCY last year" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
+                if TempBuffer."Sales LCY last year" <> 0 then
+                    TempBuffer."Profit % last year" := TempBuffer."Profit LCY last year" / TempBuffer."Sales LCY last year" * 100
                 else
-                    Buffer."Profit % last year" := 0;
+                    TempBuffer."Profit % last year" := 0;
 
-                Buffer.Insert();
+                TempBuffer.Insert();
             until (Record.Next() = 0) or ((Type = Type::Period) and (Count >= Lines));
         end;
         d.Close();
@@ -562,30 +562,30 @@ report 6014490 "NPR Advanced Sales Stat."
         // UpdateSortKey
         case SortBy of
             SortBy::Description:
-                Buffer.SetCurrentKey(Description);
+                TempBuffer.SetCurrentKey(Description);
             SortBy::"Period Start":
-                Buffer.SetCurrentKey("Period Start");
+                TempBuffer.SetCurrentKey("Period Start");
             SortBy::"Sales qty.":
-                Buffer.SetCurrentKey("Sales qty.");
+                TempBuffer.SetCurrentKey("Sales qty.");
             SortBy::"Sales qty. last year":
-                Buffer.SetCurrentKey("Sales qty. last year");
+                TempBuffer.SetCurrentKey("Sales qty. last year");
             SortBy::"Sales LCY":
-                Buffer.SetCurrentKey("Sales LCY");
+                TempBuffer.SetCurrentKey("Sales LCY");
             SortBy::"Sales LCY last year":
-                Buffer.SetCurrentKey("Sales LCY last year");
+                TempBuffer.SetCurrentKey("Sales LCY last year");
             SortBy::"Profit LCY":
-                Buffer.SetCurrentKey("Profit LCY");
+                TempBuffer.SetCurrentKey("Profit LCY");
             SortBy::"Profit LCY last year":
-                Buffer.SetCurrentKey("Profit LCY last year");
+                TempBuffer.SetCurrentKey("Profit LCY last year");
             SortBy::"Profit %":
-                Buffer.SetCurrentKey("Profit %");
+                TempBuffer.SetCurrentKey("Profit %");
             SortBy::"Profit % last year":
-                Buffer.SetCurrentKey("Profit % last year");
+                TempBuffer.SetCurrentKey("Profit % last year");
             else begin
                     if Type = Type::Period then
-                        Buffer.SetCurrentKey("Date 1")
+                        TempBuffer.SetCurrentKey("Date 1")
                     else
-                        Buffer.SetCurrentKey("No.");
+                        TempBuffer.SetCurrentKey("No.");
                 end;
         end;
     end;

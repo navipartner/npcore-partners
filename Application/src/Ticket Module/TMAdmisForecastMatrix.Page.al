@@ -178,7 +178,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
         MATRIX_PeriodRecords: array[32] of Record Date;
         i: Integer;
         RecRef: RecordRef;
-        TmpAdmSchEntry: Record "NPR TM Admis. Schedule Entry" temporary;
+        TempAdmSchEntry: Record "NPR TM Admis. Schedule Entry" temporary;
     begin
 
         Clear(MATRIX_CaptionSet);
@@ -189,48 +189,48 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
             MATRIX_PrimKeyFirstCaptionInCu := '';
 
         if (PagePeriodOption = PagePeriodOption::ACTUAL) then begin
-            TmpAdmSchEntry.Reset();
-            if (TmpAdmSchEntry.IsTemporary()) then TmpAdmSchEntry.DeleteAll();
+            TempAdmSchEntry.Reset();
+            if (TempAdmSchEntry.IsTemporary()) then TempAdmSchEntry.DeleteAll();
 
             // Find all dates this admission has time slots
             AdmSchEntry.SetFilter("Admission Code", '=%1', PageAdmissionCode);
             AdmSchEntry.SetFilter(Cancelled, '=%1', false);
             if (AdmSchEntry.FindSet()) then begin
                 repeat
-                    TmpAdmSchEntry.SetFilter("Admission Start Date", '=%1', AdmSchEntry."Admission Start Date");
-                    if (TmpAdmSchEntry.IsEmpty()) then begin
-                        TmpAdmSchEntry.TransferFields(AdmSchEntry, true);
-                        TmpAdmSchEntry.Insert();
+                    TempAdmSchEntry.SetFilter("Admission Start Date", '=%1', AdmSchEntry."Admission Start Date");
+                    if (TempAdmSchEntry.IsEmpty()) then begin
+                        TempAdmSchEntry.TransferFields(AdmSchEntry, true);
+                        TempAdmSchEntry.Insert();
                     end;
                 until (AdmSchEntry.Next() = 0);
             end;
 
-            if (TmpAdmSchEntry.IsEmpty()) then
+            if (TempAdmSchEntry.IsEmpty()) then
                 exit;
 
-            TmpAdmSchEntry.Reset();
-            RecRef.GetTable(TmpAdmSchEntry);
-            RecRef.SetTable(TmpAdmSchEntry);
+            TempAdmSchEntry.Reset();
+            RecRef.GetTable(TempAdmSchEntry);
+            RecRef.SetTable(TempAdmSchEntry);
 
-            TmpAdmSchEntry.Reset();
-            TmpAdmSchEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
-            TmpAdmSchEntry.SetFilter("Admission Start Date", '>=%1', Today);
+            TempAdmSchEntry.Reset();
+            TempAdmSchEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
+            TempAdmSchEntry.SetFilter("Admission Start Date", '>=%1', Today);
 
-            if (not TmpAdmSchEntry.FindFirst()) then begin
-                TmpAdmSchEntry.Reset();
-                if (TmpAdmSchEntry.Find('+')) then
-                    i := TmpAdmSchEntry.Next(-MATRIX_CurrentNoOfColumns + 1);
+            if (not TempAdmSchEntry.FindFirst()) then begin
+                TempAdmSchEntry.Reset();
+                if (TempAdmSchEntry.Find('+')) then
+                    i := TempAdmSchEntry.Next(-MATRIX_CurrentNoOfColumns + 1);
             end;
 
-            TmpAdmSchEntry.Reset();
+            TempAdmSchEntry.Reset();
             if (MATRIX_PrimKeyFirstCaptionInCu = '') then begin
-                MATRIX_PrimKeyFirstCaptionInCu := TmpAdmSchEntry.GetPosition();
+                MATRIX_PrimKeyFirstCaptionInCu := TempAdmSchEntry.GetPosition();
                 RecRef.SetPosition(MATRIX_PrimKeyFirstCaptionInCu);
                 MATRIX_SetWanted := MATRIX_SetWanted::Same;
             end;
 
             MatrixMgt.GenerateMatrixData(
-              RecRef, MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, TmpAdmSchEntry.FieldNo("Admission Start Date"),
+              RecRef, MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, TempAdmSchEntry.FieldNo("Admission Start Date"),
               MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
 
             for i := 1 to MATRIX_CurrentNoOfColumns do begin

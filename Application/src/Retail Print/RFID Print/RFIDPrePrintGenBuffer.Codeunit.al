@@ -23,7 +23,7 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
 
     local procedure ConvertToBuffer(var RecRef: RecordRef)
     var
-        tmpRetailJournalLine: Record "NPR Retail Journal Line" temporary;
+        TempRetailJournalLine: Record "NPR Retail Journal Line" temporary;
         RetailJournalLine: Record "NPR Retail Journal Line";
         RetailJournalLineIn: Record "NPR Retail Journal Line";
         i: Integer;
@@ -43,27 +43,27 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
 
         repeat
             for i := 1 to RetailJournalLine."Quantity to Print" do begin
-                tmpRetailJournalLine := RetailJournalLine;
+                TempRetailJournalLine := RetailJournalLine;
                 LineNo += 1;
-                tmpRetailJournalLine."Line No." := LineNo;
-                tmpRetailJournalLine."Quantity to Print" := 1;
-                tmpRetailJournalLine."RFID Tag Value" := RFIDMgt.GetNextRFIDValue();
-                RFIDMgt.CheckItemReference(tmpRetailJournalLine."RFID Tag Value");
-                tmpRetailJournalLine.Insert();
+                TempRetailJournalLine."Line No." := LineNo;
+                TempRetailJournalLine."Quantity to Print" := 1;
+                TempRetailJournalLine."RFID Tag Value" := RFIDMgt.GetNextRFIDValue();
+                RFIDMgt.CheckItemReference(TempRetailJournalLine."RFID Tag Value");
+                TempRetailJournalLine.Insert();
             end;
         until RetailJournalLine.Next() = 0;
 
-        if tmpRetailJournalLine.FindSet() then begin
+        if TempRetailJournalLine.FindSet() then begin
             GlobalPrintBatchID := CreateGuid();
             repeat
-                RFIDMgt.OnBeforeSaveItemReferenceValue(tmpRetailJournalLine);
-                RFIDMgt.InsertItemReference(tmpRetailJournalLine."Item No.", tmpRetailJournalLine."Variant Code", tmpRetailJournalLine."RFID Tag Value");
-                RFIDMgt.LogRFIDPrint(tmpRetailJournalLine, GlobalPrintBatchID);
-            until tmpRetailJournalLine.Next() = 0;
+                RFIDMgt.OnBeforeSaveItemReferenceValue(TempRetailJournalLine);
+                RFIDMgt.InsertItemReference(TempRetailJournalLine."Item No.", TempRetailJournalLine."Variant Code", TempRetailJournalLine."RFID Tag Value");
+                RFIDMgt.LogRFIDPrint(TempRetailJournalLine, GlobalPrintBatchID);
+            until TempRetailJournalLine.Next() = 0;
         end;
 
         RecRef.Close();
-        RecRef.GetTable(tmpRetailJournalLine);
+        RecRef.GetTable(TempRetailJournalLine);
     end;
 
     procedure SetOriginalRecord(var RetailJournalLineIn: Record "NPR Retail Journal Line")

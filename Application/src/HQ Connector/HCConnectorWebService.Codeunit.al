@@ -81,8 +81,8 @@
         NaviConnectImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
         CustomerPriceManagement: Codeunit "NPR HC Customer Price Mgt.";
-        TmpSalesHeader: Record "Sales Header" temporary;
-        TmpSalesLine: Record "Sales Line" temporary;
+        TempSalesHeader: Record "Sales Header" temporary;
+        TempSalesLine: Record "Sales Line" temporary;
         CustomerPriceRequestSetErrorResponseLbl: Label '<h3>HQ Connect Server:</h3><br>%1', Locked = true;
     begin
         SelectLatestVersion();
@@ -97,14 +97,14 @@
         NaviConnectImportEntry.Modify(true);
         Commit();
 
-        customerPriceRequest.GetRequest(TmpSalesHeader, TmpSalesLine);
+        customerPriceRequest.GetRequest(TempSalesHeader, TempSalesLine);
         ClearLastError();
-        if (not CustomerPriceManagement.TryProcessRequest(TmpSalesHeader, TmpSalesLine)) then begin
+        if (not CustomerPriceManagement.TryProcessRequest(TempSalesHeader, TempSalesLine)) then begin
             customerPriceRequest.SetErrorResponse(StrSubstNo(CustomerPriceRequestSetErrorResponseLbl, GetLastErrorText));
             NaviConnectImportEntry.Imported := false;
             NaviConnectImportEntry."Runtime Error" := true;
         end else begin
-            customerPriceRequest.SetResponse(TmpSalesHeader, TmpSalesLine);
+            customerPriceRequest.SetResponse(TempSalesHeader, TempSalesLine);
             NaviConnectImportEntry.Imported := true;
             NaviConnectImportEntry."Runtime Error" := false;
         end;
@@ -123,7 +123,7 @@
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
         HCGenericWebReqManagement: Codeunit "NPR HC Generic Web Req. Mgt.";
-        TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
+        TempHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
         GenericRequestSetErrorResponseLbl: Label '<h3>HQ Connect Server:</h3><br>%1', Locked = true;
     begin
         SelectLatestVersion();
@@ -138,14 +138,14 @@
         NaviConnectImportEntry.Modify(true);
         Commit();
 
-        genericrequest.GetRequest(TmpHCGenericWebRequest);
+        genericrequest.GetRequest(TempHCGenericWebRequest);
         ClearLastError();
-        if (not HCGenericWebReqManagement.TryProcessRequest(TmpHCGenericWebRequest)) then begin
+        if (not HCGenericWebReqManagement.TryProcessRequest(TempHCGenericWebRequest)) then begin
             genericrequest.SetErrorResponse(StrSubstNo(GenericRequestSetErrorResponseLbl, GetLastErrorText));
             NaviConnectImportEntry.Imported := false;
             NaviConnectImportEntry."Runtime Error" := true;
         end else begin
-            genericrequest.SetResponse(TmpHCGenericWebRequest);
+            genericrequest.SetResponse(TempHCGenericWebRequest);
             NaviConnectImportEntry.Imported := true;
             NaviConnectImportEntry."Runtime Error" := false;
         end;

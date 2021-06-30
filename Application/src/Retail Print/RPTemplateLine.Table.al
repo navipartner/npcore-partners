@@ -334,11 +334,11 @@ table 6014445 "NPR RP Template Line"
 
             trigger OnLookup()
             var
-                tmpAllObj: Record AllObj temporary;
+                TempAllObj: Record AllObj temporary;
             begin
-                OnBuildFunctionCodeunitList(tmpAllObj);
-                if PAGE.RunModal(PAGE::"All Objects", tmpAllObj) = ACTION::LookupOK then
-                    "Processing Codeunit" := tmpAllObj."Object ID";
+                OnBuildFunctionCodeunitList(TempAllObj);
+                if PAGE.RunModal(PAGE::"All Objects", TempAllObj) = ACTION::LookupOK then
+                    "Processing Codeunit" := TempAllObj."Object ID";
             end;
         }
         field(36; "Processing Function ID"; Code[30])
@@ -348,11 +348,11 @@ table 6014445 "NPR RP Template Line"
 
             trigger OnLookup()
             var
-                tmpRetailList: Record "NPR Retail List" temporary;
+                TempRetailList: Record "NPR Retail List" temporary;
             begin
-                OnBuildFunctionList("Processing Codeunit", tmpRetailList);
-                if PAGE.RunModal(0, tmpRetailList) = ACTION::LookupOK then
-                    "Processing Function ID" := tmpRetailList.Choice;
+                OnBuildFunctionList("Processing Codeunit", TempRetailList);
+                if PAGE.RunModal(0, TempRetailList) = ACTION::LookupOK then
+                    "Processing Function ID" := TempRetailList.Choice;
             end;
         }
         field(37; "Processing Value"; Text[250])

@@ -68,7 +68,7 @@
     begin
         if "EFT BIN Range".FindSet() then
             repeat
-                tmpEFTBINGroup.Get("EFT BIN Range"."BIN Group Code");
+                TempEFTBINGroup.Get("EFT BIN Range"."BIN Group Code");
                 EFTBinRange.Init();
                 EFTBinRange."BIN from" := "EFT BIN Range"."BIN from";
                 EFTBinRange."BIN to" := "EFT BIN Range"."BIN to";
@@ -90,13 +90,13 @@
 
         if EFTBINGroup.FindSet() then
             repeat
-                tmpEFTBINGroup := EFTBINGroup;
-                tmpEFTBINGroup.Insert();
+                TempEFTBINGroup := EFTBINGroup;
+                TempEFTBINGroup.Insert();
             until EFTBINGroup.Next() = 0;
     end;
 
     var
-        tmpEFTBINGroup: Record "NPR EFT BIN Group" temporary;
+        TempEFTBINGroup: Record "NPR EFT BIN Group" temporary;
         DeleteRanges: Boolean;
         DeleteGroups: Boolean;
 
@@ -104,15 +104,15 @@
     var
         EFTBinGroup: Record "NPR EFT BIN Group";
     begin
-        if not tmpEFTBINGroup.Get("EFT BIN Range"."BIN Group Code") then begin
+        if not TempEFTBINGroup.Get("EFT BIN Range"."BIN Group Code") then begin
             EFTBinGroup.Init();
             EFTBinGroup.Code := "EFT BIN Range"."BIN Group Code";
             EFTBinGroup.Description := BINGroupDescription;
             Evaluate(EFTBinGroup.Priority, Priority);
             EFTBinGroup.Insert();
 
-            tmpEFTBINGroup := EFTBinGroup;
-            tmpEFTBINGroup.Insert();
+            TempEFTBINGroup := EFTBinGroup;
+            TempEFTBINGroup.Insert();
         end;
     end;
 }

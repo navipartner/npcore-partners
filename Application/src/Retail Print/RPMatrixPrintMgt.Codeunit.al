@@ -74,7 +74,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     end;
 
     var
-        GlobalBuffer: Record "NPR RP Print Buffer" temporary;
+        TempGlobalBuffer: Record "NPR RP Print Buffer" temporary;
         CurrentLineNo: Integer;
         CurrentFont: Text[30];
         CurrentBold: Boolean;
@@ -198,13 +198,13 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     procedure ProcessBufferForCodeunit(CodeunitID: Integer; NoOfPrints: Integer)
     begin
         PrintBuffer('', CodeunitID, 0, NoOfPrints);
-        GlobalBuffer.DeleteAll();
+        TempGlobalBuffer.DeleteAll();
     end;
 
     procedure ProcessBufferForReport(ReportID: Integer; NoOfPrints: Integer)
     begin
         PrintBuffer('', 0, ReportID, NoOfPrints);
-        GlobalBuffer.DeleteAll();
+        TempGlobalBuffer.DeleteAll();
     end;
 
     procedure SetPrintIterationFieldNo(FieldNo: Integer)
@@ -254,7 +254,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
             exit;
 
         repeat
-            GlobalBuffer.DeleteAll();
+            TempGlobalBuffer.DeleteAll();
 
             //-NPR5.51 [359771]
             UpperBound := DataJoinBuffer.FindSubset(CurrentRecNo, 0);
@@ -284,10 +284,10 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
             for i := 1 to Itt do begin
                 MatrixPrinter.OnInitJob(DeviceSettings);
-                if GlobalBuffer.FindSet() then
+                if TempGlobalBuffer.FindSet() then
                     repeat
-                        MatrixPrinter.OnPrintData(GlobalBuffer);
-                    until GlobalBuffer.Next() = 0;
+                        MatrixPrinter.OnPrintData(TempGlobalBuffer);
+                    until TempGlobalBuffer.Next() = 0;
                 MatrixPrinter.OnEndJob();
             end;
             //+NPR5.51 [360975]
@@ -320,7 +320,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         DataItems: Record "NPR RP Data Items";
         DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt.";
     begin
-        GlobalBuffer.DeleteAll();
+        TempGlobalBuffer.DeleteAll();
         SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
 
         DataItems.SetRange(Code, TemplateHeader.Code);
@@ -344,10 +344,10 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         MatrixPrinter.Construct(DeviceType);
         MatrixPrinter.OnInitJob(DeviceSettings);
 
-        if GlobalBuffer.FindSet() then
+        if TempGlobalBuffer.FindSet() then
             repeat
-                MatrixPrinter.OnPrintData(GlobalBuffer);
-            until GlobalBuffer.Next() = 0;
+                MatrixPrinter.OnPrintData(TempGlobalBuffer);
+            until TempGlobalBuffer.Next() = 0;
 
         MatrixPrinter.OnEndJob();
         OnSendPrintJob(TemplateCode, CodeunitId, ReportId, MatrixPrinter, NoOfPrints);
@@ -496,26 +496,26 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
     local procedure UpdateField(X: Integer; Y: Integer; Align: Integer; Width: Integer; Rotation: Integer; Height: Integer; Font: Text[30]; Text: Text[100])
     begin
-        GlobalBuffer."Line No." := CurrentLineNo;
-        GlobalBuffer.Text := Text;
+        TempGlobalBuffer."Line No." := CurrentLineNo;
+        TempGlobalBuffer.Text := Text;
 
         if Font = '' then
-            GlobalBuffer.Font := CurrentFont
+            TempGlobalBuffer.Font := CurrentFont
         else
-            GlobalBuffer.Font := Font;
+            TempGlobalBuffer.Font := Font;
 
-        GlobalBuffer.Width := Width;
-        GlobalBuffer.X := X;
-        GlobalBuffer.Y := Y;
-        GlobalBuffer.Height := Height;
-        GlobalBuffer.Bold := CurrentBold;
-        GlobalBuffer.Underline := CurrentUnderLine;
-        GlobalBuffer.DoubleStrike := CurrentDoubleStrike;
-        GlobalBuffer.Rotation := Rotation;
-        GlobalBuffer.Align := Align;
+        TempGlobalBuffer.Width := Width;
+        TempGlobalBuffer.X := X;
+        TempGlobalBuffer.Y := Y;
+        TempGlobalBuffer.Height := Height;
+        TempGlobalBuffer.Bold := CurrentBold;
+        TempGlobalBuffer.Underline := CurrentUnderLine;
+        TempGlobalBuffer.DoubleStrike := CurrentDoubleStrike;
+        TempGlobalBuffer.Rotation := Rotation;
+        TempGlobalBuffer.Align := Align;
 
-        if not GlobalBuffer.Insert() then
-            GlobalBuffer.Modify();
+        if not TempGlobalBuffer.Insert() then
+            TempGlobalBuffer.Modify();
 
         CurrentLineNo += 1;
     end;

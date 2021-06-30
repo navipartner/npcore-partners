@@ -160,25 +160,25 @@
 
                                     trigger OnBeforePassVariable()
                                     begin
-                                        Clear(NpCsStoreInventoryBuffer);
-                                        if NpCsStoreInventoryBuffer.Get(TempNpCsStore2.Code, TempItem2."Search Description") then;
-                                        ItemInventory := Format(NpCsStoreInventoryBuffer.Inventory, 0, 9);
+                                        Clear(TempNpCsStoreInventoryBuffer);
+                                        if TempNpCsStoreInventoryBuffer.Get(TempNpCsStore2.Code, TempItem2."Search Description") then;
+                                        ItemInventory := Format(TempNpCsStoreInventoryBuffer.Inventory, 0, 9);
                                     end;
                                 }
 
                                 trigger OnAfterGetRecord()
                                 begin
-                                    Clear(NpCsStoreInventoryBuffer);
-                                    if NpCsStoreInventoryBuffer.Get(TempNpCsStore2.Code, TempItem2."Search Description") then;
+                                    Clear(TempNpCsStoreInventoryBuffer);
+                                    if TempNpCsStoreInventoryBuffer.Get(TempNpCsStore2.Code, TempItem2."Search Description") then;
                                     case StockStatusFilter of
                                         StockStatusFilter::"In Stock":
                                             begin
-                                                if not NpCsStoreInventoryBuffer."In Stock" then
+                                                if not TempNpCsStoreInventoryBuffer."In Stock" then
                                                     currXMLport.Skip();
                                             end;
                                         StockStatusFilter::"Out of Stock":
                                             begin
-                                                if NpCsStoreInventoryBuffer."In Stock" then
+                                                if TempNpCsStoreInventoryBuffer."In Stock" then
                                                     currXMLport.Skip();
                                             end;
                                     end;
@@ -217,7 +217,7 @@
                             Store2InventoryBuffer();
                         until TempNpCsStore.Next() = 0;
 
-                    NpCsStoreMgt.SetBufferInventory(NpCsStoreInventoryBuffer);
+                    NpCsStoreMgt.SetBufferInventory(TempNpCsStoreInventoryBuffer);
                     TempNpCsStore2.Copy(TempNpCsStore, true);
                 end;
 
@@ -236,7 +236,7 @@
 
     var
         MagentoSetup: Record "NPR Magento Setup";
-        NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
+        TempNpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
         ItemNo: Code[20];
         StockStatusFilter: Option Any,"In Stock","Out of Stock";
 
@@ -244,12 +244,12 @@
     begin
         TempItem.FindSet();
         repeat
-            if not NpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Search Description") then begin
-                NpCsStoreInventoryBuffer.Init();
-                NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
-                NpCsStoreInventoryBuffer.Sku := TempItem."Search Description";
-                NpCsStoreInventoryBuffer.Quantity := TempItem."Reorder Quantity";
-                NpCsStoreInventoryBuffer.Insert();
+            if not TempNpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Search Description") then begin
+                TempNpCsStoreInventoryBuffer.Init();
+                TempNpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
+                TempNpCsStoreInventoryBuffer.Sku := TempItem."Search Description";
+                TempNpCsStoreInventoryBuffer.Quantity := TempItem."Reorder Quantity";
+                TempNpCsStoreInventoryBuffer.Insert();
             end;
         until TempItem.Next() = 0;
     end;
@@ -310,27 +310,27 @@
 
     local procedure HasItems(NpCsStore: Record "NPR NpCs Store"): Boolean
     begin
-        Clear(NpCsStoreInventoryBuffer);
-        NpCsStoreInventoryBuffer.SetRange("Store Code", NpCsStore.Code);
+        Clear(TempNpCsStoreInventoryBuffer);
+        TempNpCsStoreInventoryBuffer.SetRange("Store Code", NpCsStore.Code);
         case StockStatusFilter of
             StockStatusFilter::"In Stock":
                 begin
-                    NpCsStoreInventoryBuffer.SetRange("In Stock", true);
+                    TempNpCsStoreInventoryBuffer.SetRange("In Stock", true);
                 end;
             StockStatusFilter::"Out of Stock":
                 begin
-                    NpCsStoreInventoryBuffer.SetRange("In Stock", false);
+                    TempNpCsStoreInventoryBuffer.SetRange("In Stock", false);
                 end;
         end;
 
-        exit(NpCsStoreInventoryBuffer.FindFirst());
+        exit(TempNpCsStoreInventoryBuffer.FindFirst());
     end;
 
     local procedure AllProductsInStock(NpCsStore: Record "NPR NpCs Store"): Boolean
     begin
-        Clear(NpCsStoreInventoryBuffer);
-        NpCsStoreInventoryBuffer.SetRange("Store Code", NpCsStore.Code);
-        NpCsStoreInventoryBuffer.SetRange("In Stock", false);
-        exit(NpCsStoreInventoryBuffer.IsEmpty());
+        Clear(TempNpCsStoreInventoryBuffer);
+        TempNpCsStoreInventoryBuffer.SetRange("Store Code", NpCsStore.Code);
+        TempNpCsStoreInventoryBuffer.SetRange("In Stock", false);
+        exit(TempNpCsStoreInventoryBuffer.IsEmpty());
     end;
 }
