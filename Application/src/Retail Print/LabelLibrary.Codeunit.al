@@ -86,7 +86,7 @@
         SalesHeader: Record "Sales Header";
         PrintSetupHeader: Record "NPR RP Template Header";
         DataItem: Record "NPR RP Data Items";
-        tmpCustomer: Record Customer temporary;
+        TempCustomer: Record Customer temporary;
         tmpCustRef: RecordRef;
         MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
         Customer: Record Customer;
@@ -96,17 +96,17 @@
                 begin
                     RecRef.SetTable(SalesHeader);
                     ShippingAgent.Get(SalesHeader."Shipping Agent Code");
-                    tmpCustomer.Init();
-                    tmpCustomer.Name := SalesHeader."Ship-to Name";
-                    tmpCustomer."Name 2" := SalesHeader."Ship-to Name 2";
-                    tmpCustomer.Address := SalesHeader."Ship-to Address";
-                    tmpCustomer."Address 2" := SalesHeader."Ship-to Address 2";
-                    tmpCustomer.City := SalesHeader."Ship-to City";
-                    tmpCustomer."Post Code" := SalesHeader."Ship-to Post Code";
-                    tmpCustomer."Country/Region Code" := SalesHeader."Ship-to Country/Region Code";
-                    tmpCustomer.County := SalesHeader."Ship-to County";
-                    tmpCustomer.Insert();
-                    tmpCustRef.GetTable(tmpCustomer);
+                    TempCustomer.Init();
+                    TempCustomer.Name := SalesHeader."Ship-to Name";
+                    TempCustomer."Name 2" := SalesHeader."Ship-to Name 2";
+                    TempCustomer.Address := SalesHeader."Ship-to Address";
+                    TempCustomer."Address 2" := SalesHeader."Ship-to Address 2";
+                    TempCustomer.City := SalesHeader."Ship-to City";
+                    TempCustomer."Post Code" := SalesHeader."Ship-to Post Code";
+                    TempCustomer."Country/Region Code" := SalesHeader."Ship-to Country/Region Code";
+                    TempCustomer.County := SalesHeader."Ship-to County";
+                    TempCustomer.Insert();
+                    tmpCustRef.GetTable(TempCustomer);
                 end;
             DATABASE::Customer:
                 begin

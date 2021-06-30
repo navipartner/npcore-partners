@@ -20,7 +20,7 @@ page 6014681 "NPR POS Posting Profiles Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInPOSPOSPostingProfile(ExistingPOSPostingProfiles, Rec.Code);
+                        CheckIfNoAvailableInPOSPOSPostingProfile(TempExistingPOSPostingProfiles, Rec.Code);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -63,7 +63,7 @@ page 6014681 "NPR POS Posting Profiles Step"
     end;
 
     var
-        ExistingPOSPostingProfiles: Record "NPR POS Posting Profile" temporary;
+        TempExistingPOSPostingProfiles: Record "NPR POS Posting Profile" temporary;
 
     procedure GetRec(var TempPOSPostingProfile: Record "NPR POS Posting Profile")
     begin
@@ -112,8 +112,8 @@ page 6014681 "NPR POS Posting Profiles Step"
     begin
         if POSPOSPostingProfile.FindSet() then
             repeat
-                ExistingPOSPostingProfiles := POSPOSPostingProfile;
-                ExistingPOSPostingProfiles.Insert();
+                TempExistingPOSPostingProfiles := POSPOSPostingProfile;
+                TempExistingPOSPostingProfiles.Insert();
             until POSPOSPostingProfile.Next() = 0;
     end;
 

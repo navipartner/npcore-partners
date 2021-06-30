@@ -8,7 +8,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
     var
         EndpointSetup: Record "NPR POS HC Endpoint Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        TmpSalesLine: Record "Sales Line" temporary;
+        TempSalesLine: Record "Sales Line" temporary;
     begin
         if POSPricingProfile."Item Price Codeunit ID" <> GetPublisherCodeunitId() then
             exit;
@@ -21,22 +21,22 @@ codeunit 6150910 "NPR POS HC Ext. Price"
 
         if SalePOS.Get(SalePOS."Register No.", SalePOS."Sales Ticket No.") then;
 
-        TmpSalesLine."Document Type" := TmpSalesLine."Document Type"::Quote;
-        TmpSalesLine."Document No." := SaleLinePOS."Sales Ticket No.";
-        TmpSalesLine."Line No." := SaleLinePOS."Line No.";
-        TmpSalesLine.Type := TmpSalesLine.Type::Item;
-        TmpSalesLine."No." := SaleLinePOS."No.";
-        TmpSalesLine."Variant Code" := SaleLinePOS."Variant Code";
-        TmpSalesLine.Quantity := SaleLinePOS.Quantity;
-        TmpSalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-        TmpSalesLine.Insert();
+        TempSalesLine."Document Type" := TempSalesLine."Document Type"::Quote;
+        TempSalesLine."Document No." := SaleLinePOS."Sales Ticket No.";
+        TempSalesLine."Line No." := SaleLinePOS."Line No.";
+        TempSalesLine.Type := TempSalesLine.Type::Item;
+        TempSalesLine."No." := SaleLinePOS."No.";
+        TempSalesLine."Variant Code" := SaleLinePOS."Variant Code";
+        TempSalesLine.Quantity := SaleLinePOS.Quantity;
+        TempSalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
+        TempSalesLine.Insert();
 
-        GetCustomerPrice(EndpointSetup.Code, SalePOS."Customer No.", SalePOS."Sales Ticket No.", GeneralLedgerSetup."LCY Code", TmpSalesLine);
+        GetCustomerPrice(EndpointSetup.Code, SalePOS."Customer No.", SalePOS."Sales Ticket No.", GeneralLedgerSetup."LCY Code", TempSalesLine);
 
-        if not TmpSalesLine.Get(TmpSalesLine."Document Type"::Quote, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.") then
+        if not TempSalesLine.Get(TempSalesLine."Document Type"::Quote, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.") then
             exit;
 
-        UpdateSaleLinePOS(TmpSalesLine, SaleLinePOS);
+        UpdateSaleLinePOS(TempSalesLine, SaleLinePOS);
     end;
 
     procedure UpdateSaleLinePOS(TmpSalesLine: Record "Sales Line" temporary; var SaleLinePOS: Record "NPR POS Sale Line")

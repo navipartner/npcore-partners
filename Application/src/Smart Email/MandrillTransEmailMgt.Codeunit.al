@@ -138,9 +138,9 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
 
     procedure SendSmartEmail(SmartEmail: Record "NPR Smart Email"; Recipient: Text; Cc: Text; Bcc: Text; RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text
     var
-        Attachment: Record "NPR E-mail Attachment" temporary;
+        TempAttachment: Record "NPR E-mail Attachment" temporary;
     begin
-        exit(SendSmartEmailWAttachment(SmartEmail, Recipient, Cc, Bcc, RecRef, Attachment, Silent));
+        exit(SendSmartEmailWAttachment(SmartEmail, Recipient, Cc, Bcc, RecRef, TempAttachment, Silent));
     end;
 
     procedure SendSmartEmailWAttachment(SmartEmail: Record "NPR Smart Email"; Recipient: Text; Cc: Text; Bcc: Text; RecRef: RecordRef; var Attachment: Record "NPR E-mail Attachment"; Silent: Boolean) ErrorMessage: Text

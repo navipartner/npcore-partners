@@ -8,44 +8,44 @@ codeunit 6060110 "NPR TM Statistics WebService"
     var
         FromDate: Date;
         UntilDate: Date;
-        TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
-        TmpLineFacts: Record "NPR TM Ticket Access Fact" temporary;
-        TmpColumnFacts: Record "NPR TM Ticket Access Fact" temporary;
+        TempTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
+        TempLineFacts: Record "NPR TM Ticket Access Fact" temporary;
+        TempColumnFacts: Record "NPR TM Ticket Access Fact" temporary;
     begin
 
         FromDate := 20190110D;
         UntilDate := 20190114D;
 
-        TmpLineFacts."Fact Name" := TmpLineFacts."Fact Name"::ADMISSION_CODE;
-        TmpColumnFacts."Fact Name" := TmpColumnFacts."Fact Name"::ITEM;
+        TempLineFacts."Fact Name" := TempLineFacts."Fact Name"::ADMISSION_CODE;
+        TempColumnFacts."Fact Name" := TempColumnFacts."Fact Name"::ITEM;
 
-        Build2DimensionalStatistics(FromDate, UntilDate, TmpLineFacts."Fact Name", TmpColumnFacts."Fact Name", TmpTicketAccessStatistics, TmpLineFacts, TmpColumnFacts);
+        Build2DimensionalStatistics(FromDate, UntilDate, TempLineFacts."Fact Name", TempColumnFacts."Fact Name", TempTicketAccessStatistics, TempLineFacts, TempColumnFacts);
     end;
 
     procedure GetNDimTicketStatistics(var TicketStatistics: XMLport "NPR TM Ticket Statistics N-Dim")
     var
         FromDate: Date;
         UntilDate: Date;
-        TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
+        TempTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
         TicketAccessStatistics: Codeunit "NPR TM Ticket Access Stats";
     begin
 
         TicketStatistics.Import();
 
         TicketStatistics.GetRequest(FromDate, UntilDate);
-        TicketAccessStatistics.BuildCompressedStatisticsAdHoc(FromDate, UntilDate, TmpTicketAccessStatistics);
-        TicketStatistics.SetResponse(TmpTicketAccessStatistics);
+        TicketAccessStatistics.BuildCompressedStatisticsAdHoc(FromDate, UntilDate, TempTicketAccessStatistics);
+        TicketStatistics.SetResponse(TempTicketAccessStatistics);
     end;
 
     procedure Get2DimTicketStatistics(var TicketStatistics: XMLport "NPR TM Ticket Statistics 2-Dim")
     var
         FromDate: Date;
         UntilDate: Date;
-        TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
-        TmpLineFacts: Record "NPR TM Ticket Access Fact" temporary;
-        TmpColumnFacts: Record "NPR TM Ticket Access Fact" temporary;
-        Columns: Record "NPR TM Ticket Access Fact" temporary;
-        Lines: Record "NPR TM Ticket Access Fact" temporary;
+        TempTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
+        TempLineFacts: Record "NPR TM Ticket Access Fact" temporary;
+        TempColumnFacts: Record "NPR TM Ticket Access Fact" temporary;
+        TempColumns: Record "NPR TM Ticket Access Fact" temporary;
+        TempLines: Record "NPR TM Ticket Access Fact" temporary;
         Dim1: Text;
         Dim2: Text;
         ReasonText: Text;
@@ -55,18 +55,18 @@ codeunit 6060110 "NPR TM Statistics WebService"
         TicketStatistics.Import();
         TicketStatistics.GetRequest(FromDate, UntilDate, Dim1, Dim2);
 
-        if (not GetFactOption(Dim1, Lines."Fact Name", ReasonText)) then begin
+        if (not GetFactOption(Dim1, TempLines."Fact Name", ReasonText)) then begin
             TicketStatistics.SetErrorResponse(ReasonText);
             exit;
         end;
 
-        if (not GetFactOption(Dim2, Columns."Fact Name", ReasonText)) then begin
+        if (not GetFactOption(Dim2, TempColumns."Fact Name", ReasonText)) then begin
             TicketStatistics.SetErrorResponse(ReasonText);
             exit;
         end;
 
-        Build2DimensionalStatistics(FromDate, UntilDate, Lines."Fact Name", Columns."Fact Name", TmpTicketAccessStatistics, TmpLineFacts, TmpColumnFacts);
-        TicketStatistics.SetResponse(TmpLineFacts, TmpColumnFacts, TmpTicketAccessStatistics);
+        Build2DimensionalStatistics(FromDate, UntilDate, TempLines."Fact Name", TempColumns."Fact Name", TempTicketAccessStatistics, TempLineFacts, TempColumnFacts);
+        TicketStatistics.SetResponse(TempLineFacts, TempColumnFacts, TempTicketAccessStatistics);
     end;
 
     local procedure GetFactOption(DimensionText: Text; var FactCode: Option; var ReasonText: Text): Boolean
@@ -99,7 +99,7 @@ codeunit 6060110 "NPR TM Statistics WebService"
 
     procedure Build2DimensionalStatistics(FromDate: Date; UntilDate: Date; Dim1: Option; Dim2: Option; var Tmp2DimStatistics: Record "NPR TM Ticket Access Stats" temporary; var TmpLineFacts: Record "NPR TM Ticket Access Fact" temporary; var TmpColumnFacts: Record "NPR TM Ticket Access Fact" temporary)
     var
-        TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
+        TempTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary;
         TicketAccessStatistics: Codeunit "NPR TM Ticket Access Stats";
         AdmissionHour: Integer;
         AdmissionDate: Date;
@@ -107,11 +107,11 @@ codeunit 6060110 "NPR TM Statistics WebService"
     begin
 
         EntryNumber := 0;
-        TicketAccessStatistics.BuildCompressedStatisticsAdHoc(FromDate, UntilDate, TmpTicketAccessStatistics);
+        TicketAccessStatistics.BuildCompressedStatisticsAdHoc(FromDate, UntilDate, TempTicketAccessStatistics);
 
         // build a fact table based on the dataset in tmp statistics
-        BuildFactTable(TmpTicketAccessStatistics, TmpLineFacts);
-        BuildFactTable(TmpTicketAccessStatistics, TmpColumnFacts);
+        BuildFactTable(TempTicketAccessStatistics, TmpLineFacts);
+        BuildFactTable(TempTicketAccessStatistics, TmpColumnFacts);
 
         // Keep the expressed line & column facts only
         TmpLineFacts.SetFilter("Fact Name", '<>%1', Dim1);
@@ -133,57 +133,57 @@ codeunit 6060110 "NPR TM Statistics WebService"
 
                         case TmpLineFacts."Fact Name" of
                             TmpLineFacts."Fact Name"::ADMISSION_CODE:
-                                TmpTicketAccessStatistics.SetFilter("Admission Code", '=%1', TmpLineFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Admission Code", '=%1', TmpLineFacts."Fact Code");
                             TmpLineFacts."Fact Name"::ADMISSION_HOUR:
                                 begin
                                     Evaluate(AdmissionHour, TmpLineFacts."Fact Code");
-                                    TmpTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
+                                    TempTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
                                 end;
                             TmpLineFacts."Fact Name"::ITEM:
-                                TmpTicketAccessStatistics.SetFilter("Item No.", '=%1', TmpLineFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Item No.", '=%1', TmpLineFacts."Fact Code");
                             TmpLineFacts."Fact Name"::TICKET_TYPE:
-                                TmpTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TmpLineFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TmpLineFacts."Fact Code");
                             TmpLineFacts."Fact Name"::VARIANT_CODE:
-                                TmpTicketAccessStatistics.SetFilter("Variant Code", '=%1', TmpLineFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Variant Code", '=%1', TmpLineFacts."Fact Code");
                             TmpLineFacts."Fact Name"::ADMISSION_DATE:
                                 begin
                                     Evaluate(AdmissionDate, TmpLineFacts."Fact Code", 9);
-                                    TmpTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
+                                    TempTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
                                 end;
                         end;
 
                         case TmpColumnFacts."Fact Name" of
                             TmpColumnFacts."Fact Name"::ADMISSION_CODE:
-                                TmpTicketAccessStatistics.SetFilter("Admission Code", '=%1', TmpColumnFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Admission Code", '=%1', TmpColumnFacts."Fact Code");
                             TmpColumnFacts."Fact Name"::ADMISSION_HOUR:
                                 begin
                                     Evaluate(AdmissionHour, TmpColumnFacts."Fact Code");
-                                    TmpTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
+                                    TempTicketAccessStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
                                 end;
                             TmpColumnFacts."Fact Name"::ITEM:
-                                TmpTicketAccessStatistics.SetFilter("Item No.", '=%1', TmpColumnFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Item No.", '=%1', TmpColumnFacts."Fact Code");
                             TmpColumnFacts."Fact Name"::TICKET_TYPE:
-                                TmpTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TmpColumnFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Ticket Type", '=%1', TmpColumnFacts."Fact Code");
                             TmpColumnFacts."Fact Name"::VARIANT_CODE:
-                                TmpTicketAccessStatistics.SetFilter("Variant Code", '=%1', TmpColumnFacts."Fact Code");
+                                TempTicketAccessStatistics.SetFilter("Variant Code", '=%1', TmpColumnFacts."Fact Code");
                             TmpColumnFacts."Fact Name"::ADMISSION_DATE:
                                 begin
                                     Evaluate(AdmissionDate, TmpColumnFacts."Fact Code", 9);
-                                    TmpTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
+                                    TempTicketAccessStatistics.SetFilter("Admission Date", '=%1', AdmissionDate);
                                 end;
                         end;
 
                         // hi-jack "item no." for lines and "admission code" for columns
-                        if (TmpTicketAccessStatistics.FindSet()) then begin
+                        if (TempTicketAccessStatistics.FindSet()) then begin
                             repeat
                                 Tmp2DimStatistics.SetFilter("Item No.", '=%1', TmpLineFacts."Fact Code");
                                 Tmp2DimStatistics.SetFilter("Admission Code", '=%1', TmpColumnFacts."Fact Code");
                                 if (Tmp2DimStatistics.FindFirst()) then begin
-                                    Tmp2DimStatistics."Admission Count" += TmpTicketAccessStatistics."Admission Count";
-                                    Tmp2DimStatistics."Admission Count (Neg)" += TmpTicketAccessStatistics."Admission Count (Neg)";
-                                    Tmp2DimStatistics."Admission Count (Re-Entry)" += TmpTicketAccessStatistics."Admission Count (Re-Entry)";
-                                    Tmp2DimStatistics."Generated Count (Neg)" += TmpTicketAccessStatistics."Generated Count (Neg)";
-                                    Tmp2DimStatistics."Generated Count (Pos)" += TmpTicketAccessStatistics."Generated Count (Pos)";
+                                    Tmp2DimStatistics."Admission Count" += TempTicketAccessStatistics."Admission Count";
+                                    Tmp2DimStatistics."Admission Count (Neg)" += TempTicketAccessStatistics."Admission Count (Neg)";
+                                    Tmp2DimStatistics."Admission Count (Re-Entry)" += TempTicketAccessStatistics."Admission Count (Re-Entry)";
+                                    Tmp2DimStatistics."Generated Count (Neg)" += TempTicketAccessStatistics."Generated Count (Neg)";
+                                    Tmp2DimStatistics."Generated Count (Pos)" += TempTicketAccessStatistics."Generated Count (Pos)";
                                     Tmp2DimStatistics.Modify();
                                 end else begin
                                     Tmp2DimStatistics.Init();
@@ -191,15 +191,15 @@ codeunit 6060110 "NPR TM Statistics WebService"
                                     Tmp2DimStatistics."Entry No." := EntryNumber;
                                     Tmp2DimStatistics."Item No." := TmpLineFacts."Fact Code";
                                     Tmp2DimStatistics."Admission Code" := TmpColumnFacts."Fact Code";
-                                    Tmp2DimStatistics."Admission Count" := TmpTicketAccessStatistics."Admission Count";
-                                    Tmp2DimStatistics."Admission Count (Neg)" := TmpTicketAccessStatistics."Admission Count (Neg)";
-                                    Tmp2DimStatistics."Admission Count (Re-Entry)" := TmpTicketAccessStatistics."Admission Count (Re-Entry)";
-                                    Tmp2DimStatistics."Generated Count (Neg)" := TmpTicketAccessStatistics."Generated Count (Neg)";
-                                    Tmp2DimStatistics."Generated Count (Pos)" := TmpTicketAccessStatistics."Generated Count (Pos)";
+                                    Tmp2DimStatistics."Admission Count" := TempTicketAccessStatistics."Admission Count";
+                                    Tmp2DimStatistics."Admission Count (Neg)" := TempTicketAccessStatistics."Admission Count (Neg)";
+                                    Tmp2DimStatistics."Admission Count (Re-Entry)" := TempTicketAccessStatistics."Admission Count (Re-Entry)";
+                                    Tmp2DimStatistics."Generated Count (Neg)" := TempTicketAccessStatistics."Generated Count (Neg)";
+                                    Tmp2DimStatistics."Generated Count (Pos)" := TempTicketAccessStatistics."Generated Count (Pos)";
 
                                     Tmp2DimStatistics.Insert();
                                 end;
-                            until (TmpTicketAccessStatistics.Next() = 0);
+                            until (TempTicketAccessStatistics.Next() = 0);
                         end else begin
                             Tmp2DimStatistics.Init();
                             EntryNumber += 1;
@@ -213,7 +213,7 @@ codeunit 6060110 "NPR TM Statistics WebService"
             until (TmpLineFacts.Next() = 0);
 
         Tmp2DimStatistics.Reset();
-        TmpTicketAccessStatistics.Reset();
+        TempTicketAccessStatistics.Reset();
     end;
 
     local procedure BuildFactTable(var TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary; var TmpTicketAccessFact: Record "NPR TM Ticket Access Fact" temporary)

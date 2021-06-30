@@ -1625,21 +1625,21 @@
     procedure CreateAndSendETicket(TicketNo: Code[20]; var ReasonText: Text): Boolean
     var
         Ticket: Record "NPR TM Ticket";
-        TmpTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
+        TempTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
     begin
 
         Ticket.Get(TicketNo);
-        if (not CreateETicketNotificationEntry(Ticket, TmpTicketNotificationEntry, false, ReasonText)) then
+        if (not CreateETicketNotificationEntry(Ticket, TempTicketNotificationEntry, false, ReasonText)) then
             exit(false);
 
-        TmpTicketNotificationEntry.Reset();
-        TmpTicketNotificationEntry.FindSet();
+        TempTicketNotificationEntry.Reset();
+        TempTicketNotificationEntry.FindSet();
         repeat
 
-            if (not SendETicketNotification(TmpTicketNotificationEntry."Entry No.", false, ReasonText)) then
+            if (not SendETicketNotification(TempTicketNotificationEntry."Entry No.", false, ReasonText)) then
                 exit(false);
 
-        until (TmpTicketNotificationEntry.Next() = 0);
+        until (TempTicketNotificationEntry.Next() = 0);
 
         ReasonText := '';
         exit(true);

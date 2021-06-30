@@ -124,7 +124,7 @@ table 6150703 "NPR POS Action"
     end;
 
     var
-        DiscoveredAction: Record "NPR POS Action" temporary;
+        TempDiscoveredAction: Record "NPR POS Action" temporary;
         POSSession: Codeunit "NPR POS Session";
         WorkflowObj: Codeunit "NPR Workflow";
         WorkflowInvocationParameters: JsonObject;
@@ -139,7 +139,7 @@ table 6150703 "NPR POS Action"
         Text006: Label 'Attempting to set a non-%1 value to a %1 parameter %2 on action %3.';
         ActionUpdateRequired: Boolean;
         Version20: Boolean;
-        tmpUpdatedActions: Record "NPR POS Action" temporary;
+        TempUpdatedActions: Record "NPR POS Action" temporary;
         Text007: Label 'You have called a Workflow 1.0 function in the context of a Workflow 2.0 discovery process.';
         Text008: Label 'You have called a Workflow 2.0 function in the context of a Workflow 1.0 discovery process.';
 
@@ -169,12 +169,12 @@ table 6150703 "NPR POS Action"
         if ActionInDiscovery <> '' then
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text002, Action, ActionInDiscovery));
 
-        DiscoveredAction.Code := Action;
-        if DiscoveredAction.Find() then begin
+        TempDiscoveredAction.Code := Action;
+        if TempDiscoveredAction.Find() then begin
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, Action));
             exit;
         end;
-        DiscoveredAction.Insert();
+        TempDiscoveredAction.Insert();
     end;
 
     procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
@@ -274,20 +274,20 @@ table 6150703 "NPR POS Action"
         POSAction.SetRange(Code, Code);
         POSAction.SetRange(Version, Version);
         if POSAction.IsEmpty then begin
-            tmpUpdatedActions.Code := Code;
-            tmpUpdatedActions.Insert();
+            TempUpdatedActions.Code := Code;
+            TempUpdatedActions.Insert();
             exit(true);
         end;
     end;
 
     local procedure HandleActionUpdates()
     begin
-        tmpUpdatedActions.SetAutoCalcFields(Workflow);
-        tmpUpdatedActions.SetAutoCalcFields("Custom JavaScript Logic");
-        if tmpUpdatedActions.FindSet() then
+        TempUpdatedActions.SetAutoCalcFields(Workflow);
+        TempUpdatedActions.SetAutoCalcFields("Custom JavaScript Logic");
+        if TempUpdatedActions.FindSet() then
             repeat
-                OnAfterActionUpdated(tmpUpdatedActions);
-            until tmpUpdatedActions.Next() = 0;
+                OnAfterActionUpdated(TempUpdatedActions);
+            until TempUpdatedActions.Next() = 0;
     end;
 
     procedure RegisterWorkflowStep(Label: Text; "Code": Text)
@@ -472,9 +472,9 @@ table 6150703 "NPR POS Action"
         if Rec.IsTemporary then
             POSSession.DiscoverSessionAction(Rec);
 
-        if tmpUpdatedActions.Get(Rec.Code) then begin
-            tmpUpdatedActions := Rec;
-            tmpUpdatedActions.Modify();
+        if TempUpdatedActions.Get(Rec.Code) then begin
+            TempUpdatedActions := Rec;
+            TempUpdatedActions.Modify();
         end;
     end;
 
@@ -482,8 +482,8 @@ table 6150703 "NPR POS Action"
     begin
         ActionInRefresh := Code;
         OnDiscoverActions();
-        if tmpUpdatedActions.Find() then
-            OnAfterActionUpdated(tmpUpdatedActions);
+        if TempUpdatedActions.Find() then
+            OnAfterActionUpdated(TempUpdatedActions);
     end;
 
     local procedure StreamWorkflowToBlob()

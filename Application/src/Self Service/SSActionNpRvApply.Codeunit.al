@@ -143,7 +143,7 @@
     local procedure ApplyVoucher(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
+        TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -165,27 +165,27 @@
             Clear(VoucherType);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        NpRvVoucherBuffer.Init();
-        NpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
-        NpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
-        NpRvVoucherBuffer."Reference No." := ReferenceNo;
-        NpRvVoucherBuffer."Redeem Date" := SalePOS.Date;
-        NpRvVoucherBuffer."Redeem Partner Code" := VoucherType."Partner Code";
-        NpRvVoucherBuffer."Redeem Register No." := SalePOS."Register No.";
-        NpRvVoucherBuffer."Redeem Sales Ticket No." := SalePOS."Sales Ticket No.";
-        NpRvVoucherBuffer."Redeem User ID" := SalePOS."Salesperson Code";
+        TempNpRvVoucherBuffer.Init();
+        TempNpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
+        TempNpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
+        TempNpRvVoucherBuffer."Reference No." := ReferenceNo;
+        TempNpRvVoucherBuffer."Redeem Date" := SalePOS.Date;
+        TempNpRvVoucherBuffer."Redeem Partner Code" := VoucherType."Partner Code";
+        TempNpRvVoucherBuffer."Redeem Register No." := SalePOS."Register No.";
+        TempNpRvVoucherBuffer."Redeem Sales Ticket No." := SalePOS."Sales Ticket No.";
+        TempNpRvVoucherBuffer."Redeem User ID" := SalePOS."Salesperson Code";
 
-        NpRvVoucherMgt.ValidateVoucher(NpRvVoucherBuffer);
+        NpRvVoucherMgt.ValidateVoucher(TempNpRvVoucherBuffer);
 
-        VoucherType.Get(NpRvVoucherBuffer."Voucher Type");
+        VoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(SaleLinePOS);
 
         SaleLinePOS."No." := VoucherType."Payment Type";
         SaleLinePOS."Register No." := SalePOS."Register No.";
-        SaleLinePOS.Description := NpRvVoucherBuffer.Description;
+        SaleLinePOS.Description := TempNpRvVoucherBuffer.Description;
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        SaleLinePOS."Amount Including VAT" := NpRvVoucherBuffer.Amount;
+        SaleLinePOS."Amount Including VAT" := TempNpRvVoucherBuffer.Amount;
         POSPaymentLine.InsertPaymentLine(SaleLinePOS, 0);
         POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
 
@@ -199,8 +199,8 @@
         NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
         NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
         NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
-        NpRvSalesLine."Voucher No." := NpRvVoucherBuffer."No.";
-        NpRvSalesLine."Reference No." := NpRvVoucherBuffer."Reference No.";
+        NpRvSalesLine."Voucher No." := TempNpRvVoucherBuffer."No.";
+        NpRvSalesLine."Reference No." := TempNpRvVoucherBuffer."Reference No.";
         NpRvSalesLine."Voucher Type" := VoucherType.Code;
         NpRvSalesLine.Description := VoucherType.Description;
         NpRvSalesLine.Insert(true);

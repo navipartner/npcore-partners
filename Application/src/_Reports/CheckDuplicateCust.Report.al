@@ -42,19 +42,19 @@ report 6060111 "NPR Check Duplicate Cust."
                 dataitem("Integer"; "Integer")
                 {
                     DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
-                    column(Temp_Customer_No; TMPCust."No.")
+                    column(Temp_Customer_No; TempCust."No.")
                     {
                         IncludeCaption = true;
                     }
-                    column(Temp_Customer_Name; TMPCust.Name)
+                    column(Temp_Customer_Name; TempCust.Name)
                     {
                         IncludeCaption = true;
                     }
-                    column(Temp_Customer_Address; TMPCust.Address)
+                    column(Temp_Customer_Address; TempCust.Address)
                     {
                         IncludeCaption = true;
                     }
-                    column(Temp_Customer_Phone_No; TMPCust."Phone No.")
+                    column(Temp_Customer_Phone_No; TempCust."Phone No.")
                     {
                         IncludeCaption = true;
                     }
@@ -62,10 +62,10 @@ report 6060111 "NPR Check Duplicate Cust."
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then begin
-                            if not TMPCust.FindFirst() then
+                            if not TempCust.FindFirst() then
                                 CurrReport.Break();
                         end else
-                            if TMPCust.Next() = 0 then
+                            if TempCust.Next() = 0 then
                                 CurrReport.Break();
                     end;
                 }
@@ -74,7 +74,7 @@ report 6060111 "NPR Check Duplicate Cust."
                 var
                     Cust2: Record Customer;
                 begin
-                    TMPCust.DeleteAll();
+                    TempCust.DeleteAll();
                     Cust2.Reset();
 
                     Cust2.SetFilter("No.", '<>%1', Customer."No.");
@@ -87,9 +87,9 @@ report 6060111 "NPR Check Duplicate Cust."
 
                     if Cust2.FindSet() then
                         repeat
-                            TMPCust.Init();
-                            TMPCust.TransferFields(Cust2);
-                            TMPCust.Insert();
+                            TempCust.Init();
+                            TempCust.TransferFields(Cust2);
+                            TempCust.Insert();
                         until Cust2.Next() = 0
                     else
                         CurrReport.Skip();
@@ -170,7 +170,7 @@ report 6060111 "NPR Check Duplicate Cust."
 
     var
         Company: Record "Company Information";
-        TMPCust: Record Customer temporary;
+        TempCust: Record Customer temporary;
         CheckAddr: Boolean;
         CheckName: Boolean;
         CheckPhone: Boolean;

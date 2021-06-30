@@ -858,38 +858,38 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
 
     procedure SelectFont(var Value: Text): Boolean
     var
-        RetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
-        ConstructFontSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"NPR Retail List", RetailList) = ACTION::LookupOK then begin
-            Value := RetailList.Choice;
+        ConstructFontSelectionList(TempRetailList);
+        if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then begin
+            Value := TempRetailList.Choice;
             exit(true);
         end;
     end;
 
     procedure SelectCommand(var Value: Text): Boolean
     var
-        RetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
     begin
-        ConstructCommandSelectionList(RetailList);
-        if PAGE.RunModal(PAGE::"NPR Retail List", RetailList) = ACTION::LookupOK then begin
-            Value := RetailList.Choice;
+        ConstructCommandSelectionList(TempRetailList);
+        if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then begin
+            Value := TempRetailList.Choice;
             exit(true);
         end;
     end;
 
     local procedure SelectDeviceSetting(var tmpDeviceSetting: Record "NPR RP Device Settings" temporary): Boolean
     var
-        tmpRetailList: Record "NPR Retail List" temporary;
+        TempRetailList: Record "NPR Retail List" temporary;
         RetailList: Page "NPR Retail List";
     begin
-        ConstructDeviceSettingList(tmpRetailList);
+        ConstructDeviceSettingList(TempRetailList);
         RetailList.SetShowValue(true);
-        RetailList.SetRec(tmpRetailList);
+        RetailList.SetRec(TempRetailList);
         RetailList.LookupMode(true);
         if RetailList.RunModal() = ACTION::LookupOK then begin
-            RetailList.GetRec(tmpRetailList);
-            tmpDeviceSetting.Name := tmpRetailList.Value;
+            RetailList.GetRec(TempRetailList);
+            tmpDeviceSetting.Name := TempRetailList.Value;
             case tmpDeviceSetting.Name of
                 'MEDIA_WIDTH':
                     begin

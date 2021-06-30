@@ -104,18 +104,18 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         eftTransRequest: Record "NPR EFT Transaction Request";
         mobilePayV10AuxiliaryRequest: Enum "NPR MobilePayV10 Auxiliary Request";
         mobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
-        mobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
-        mobilePayV10RefundBuff2: Record "NPR MobilePayV10 Refund" temporary;
+        TempMobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
+        TempMobilePayV10RefundBuff2: Record "NPR MobilePayV10 Refund" temporary;
         mobilePayCancelRefund: Codeunit "NPR MobilePayV10 Can. Refund";
         mobilePayProtocol: Codeunit "NPR MobilePayV10 Protocol";
         eftEntryNo: Integer;
         success: Boolean;
         PosIdLbl: Label 'posId=%1', Locked = true;
     begin
-        mobilePayV10RefundBuff.Reset();
-        mobilePayV10RefundBuff.DeleteAll();
+        TempMobilePayV10RefundBuff.Reset();
+        TempMobilePayV10RefundBuff.DeleteAll();
 
-        mobilePayV10RefundBuff2.Copy(mobilePayV10RefundBuff, true);
+        TempMobilePayV10RefundBuff2.Copy(TempMobilePayV10RefundBuff, true);
 
         mobilePayV10UnitSetup.Get(EftSetup."POS Unit No.");
 
@@ -124,35 +124,35 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         Commit();
 
         mobilePayV10FindRefunds.SetFilter(StrSubstNo(PosIdLbl, mobilePayV10UnitSetup."MobilePay POS ID"));
-        mobilePayV10FindRefunds.SetRefundDetailBuffer(mobilePayV10RefundBuff);
+        mobilePayV10FindRefunds.SetRefundDetailBuffer(TempMobilePayV10RefundBuff);
         mobilePayV10FindRefunds.Run(eftTransRequest);  // TODO: Handling... (I will move this to MobilePay protocol codeunit, only the part that returns list of payments).
 
-        mobilePayV10RefundBuff.Reset();
-        if (mobilePayV10RefundBuff.FindSet()) then begin
+        TempMobilePayV10RefundBuff.Reset();
+        if (TempMobilePayV10RefundBuff.FindSet()) then begin
             repeat
-                mobilePayV10RefundBuff2 := mobilePayV10RefundBuff;
+                TempMobilePayV10RefundBuff2 := TempMobilePayV10RefundBuff;
 
                 Clear(eftTransRequest);
                 eftFrameworkMgt.CreateAuxRequest(eftTransRequest, eftSetup, mobilePayV10AuxiliaryRequest::GetRefundDetail.AsInteger(), EftSetup."POS Unit No.", '');
-                eftTransRequest."Reference Number Output" := mobilePayV10RefundBuff2.RefundId;
+                eftTransRequest."Reference Number Output" := TempMobilePayV10RefundBuff2.RefundId;
                 eftTransRequest.Modify();
                 Commit();
 
-                mobilePayV10GetRefund.SetRefundDetailBuffer(mobilePayV10RefundBuff2);
+                mobilePayV10GetRefund.SetRefundDetailBuffer(TempMobilePayV10RefundBuff2);
                 mobilePayV10GetRefund.Run(eftTransRequest);
 
-                mobilePayV10RefundBuff2.Get(mobilePayV10RefundBuff);
+                TempMobilePayV10RefundBuff2.Get(TempMobilePayV10RefundBuff);
 
-                Evaluate(eftEntryNo, mobilePayV10RefundBuff2.RefundOrderId);
+                Evaluate(eftEntryNo, TempMobilePayV10RefundBuff2.RefundOrderId);
                 eftTransRequest.Get(eftEntryNo);
                 if (eftTransRequest."Reference Number Output" = '') then begin
-                    eftTransRequest."Reference Number Output" := mobilePayV10RefundBuff2.RefundId;
+                    eftTransRequest."Reference Number Output" := TempMobilePayV10RefundBuff2.RefundId;
                     eftTransRequest.Modify();
                 end;
 
                 Commit();
 
-                case mobilePayV10RefundBuff2.Status of
+                case TempMobilePayV10RefundBuff2.Status of
                     "NPR MobilePayV10 Result Code"::Reserved:
                         begin
                             success := mobilePayCancelRefund.Run(eftTransRequest);
@@ -161,7 +161,7 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
                         end;
                 end;
 
-            until MobilePayV10RefundBuff.Next() = 0;
+            until TempMobilePayV10RefundBuff.Next() = 0;
         end;
     end;
 }

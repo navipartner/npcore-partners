@@ -480,14 +480,14 @@
         FileName: Text[1024];
         Serverfilename: Text;
         TempBLOB: Codeunit "Temp Blob";
-        Attachment: Record Attachment temporary;
+        TempAttachment: Record Attachment temporary;
     begin
         SuggestFileName := '';
 
         Filename := FileManagement.BLOBImportWithFilter(TempBLOB, SELECT_FILE_CAPTION, SuggestFileName, FILE_FILTER, 'csv');
 
-        Attachment.SetAttachmentFileFromBlob(TempBLOB);
-        Attachment."Attachment File".Export(Filename);
+        TempAttachment.SetAttachmentFileFromBlob(TempBLOB);
+        TempAttachment."Attachment File".Export(Filename);
 
         if (SuggestFileName = FileName) then
             Error('');

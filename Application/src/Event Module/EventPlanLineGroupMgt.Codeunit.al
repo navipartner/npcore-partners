@@ -19,9 +19,9 @@
     procedure DistributeAccrossPeriod(var Rec: Record "Job Planning Line")
     var
         NewRec: Record "Job Planning Line";
-        JobPlanningLineTemp: Record "Job Planning Line" temporary;
-        JobPlanningLineBackupTemp: Record "Job Planning Line" temporary;
-        EventPlanLineBuffer: Record "NPR Event Plan. Line Buffer" temporary;
+        TempJobPlanningLine: Record "Job Planning Line" temporary;
+        TempJobPlanningLineBackup: Record "Job Planning Line" temporary;
+        TempEventPlanLineBuffer: Record "NPR Event Plan. Line Buffer" temporary;
         Date: Record Date;
         EventPeriodDistrDlg: Page "NPR Event Period Distr. Dialog";
         DaysOfWeek: array[7] of Boolean;
@@ -33,10 +33,10 @@
         EventPeriodDistrDlg.SetParameters(Rec);
         if EventPeriodDistrDlg.RunModal() <> ACTION::OK then
             exit;
-        EventPeriodDistrDlg.GetParameters(JobPlanningLineTemp, DaysOfWeek);
+        EventPeriodDistrDlg.GetParameters(TempJobPlanningLine, DaysOfWeek);
         CheckParameters(DaysOfWeek);
 
-        BackupCurrentDistribution(Rec, JobPlanningLineBackupTemp);
+        BackupCurrentDistribution(Rec, TempJobPlanningLineBackup);
         NewRec := Rec;
         Rec.Delete(true);
         Commit(); //lines need to be deleted here as InsertBuffer has availability check which must not take current lines -
@@ -45,25 +45,25 @@
                   //this means BackupCurrentDistribution and RestoreOldDistribution will not be needed
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
-        Date.SetRange("Period Start", JobPlanningLineTemp."Planning Date", JobPlanningLineTemp."Planned Delivery Date");
+        Date.SetRange("Period Start", TempJobPlanningLine."Planning Date", TempJobPlanningLine."Planned Delivery Date");
         Date.SetFilter("Period No.", PrepareDaysFilter(DaysOfWeek));
         if Date.FindSet() then
             repeat
                 LineNo += 10000;
-                JobPlanningLineTemp."Planning Date" := Date."Period Start";
-                InsertBuffer(JobPlanningLineTemp, LineNo, EventPlanLineBuffer);
+                TempJobPlanningLine."Planning Date" := Date."Period Start";
+                InsertBuffer(TempJobPlanningLine, LineNo, TempEventPlanLineBuffer);
             until Date.Next() = 0;
 
-        EventPlanLineBuffer.FilterGroup := 2;
-        EventPlanLineBuffer.SetRange("Job No.", Rec."Job No.");
-        EventPlanLineBuffer.SetRange("Job Task No.", Rec."Job Task No.");
-        EventPlanLineBuffer.SetRange("Job Planning Line No.", Rec."Line No.");
-        EventPlanLineBuffer.FilterGroup := 0;
-        if PAGE.RunModal(PAGE::"NPR Event Plan. Line Buffer", EventPlanLineBuffer) = ACTION::LookupOK then begin
-            EventPlanLineBuffer.SetRange("Action Type", EventPlanLineBuffer."Action Type"::Create);
-            CreateJobPlanningLineFromBuffer(NewRec, EventPlanLineBuffer);
+        TempEventPlanLineBuffer.FilterGroup := 2;
+        TempEventPlanLineBuffer.SetRange("Job No.", Rec."Job No.");
+        TempEventPlanLineBuffer.SetRange("Job Task No.", Rec."Job Task No.");
+        TempEventPlanLineBuffer.SetRange("Job Planning Line No.", Rec."Line No.");
+        TempEventPlanLineBuffer.FilterGroup := 0;
+        if PAGE.RunModal(PAGE::"NPR Event Plan. Line Buffer", TempEventPlanLineBuffer) = ACTION::LookupOK then begin
+            TempEventPlanLineBuffer.SetRange("Action Type", TempEventPlanLineBuffer."Action Type"::Create);
+            CreateJobPlanningLineFromBuffer(NewRec, TempEventPlanLineBuffer);
         end else
-            RestoreOldDistribution(JobPlanningLineBackupTemp);
+            RestoreOldDistribution(TempJobPlanningLineBackup);
     end;
 
     local procedure CheckParameters(DaysOfWeek: array[7] of Boolean)
@@ -112,7 +112,7 @@
     local procedure CheckCapAndTimeAvailability(var JobPlanningLine: Record "Job Planning Line"; var EventPlanLineBuffer: Record "NPR Event Plan. Line Buffer")
     var
         JobsSetup: Record "Jobs Setup";
-        xJobPlanningLineTemp: Record "Job Planning Line" temporary;
+        TempxJobPlanningLine: Record "Job Planning Line" temporary;
         EventMgt: Codeunit "NPR Event Management";
         ReturnMsg: Text;
         OverCapacitateSetup: Integer;
@@ -128,9 +128,9 @@
         if EventPlanLineBuffer.Quantity = 0 then
             ReturnMsg := EventMgt.CheckResTimeFrameAvailability(JobPlanningLine)
         else begin
-            xJobPlanningLineTemp := JobPlanningLine;
-            xJobPlanningLineTemp.Quantity := 0;
-            ReturnMsg := EventMgt.CheckResAvailability(JobPlanningLine, xJobPlanningLineTemp);
+            TempxJobPlanningLine := JobPlanningLine;
+            TempxJobPlanningLine.Quantity := 0;
+            ReturnMsg := EventMgt.CheckResAvailability(JobPlanningLine, TempxJobPlanningLine);
         end;
         if ReturnMsg <> '' then begin
             EventPlanLineBuffer."Status Text" := CopyStr(ReturnMsg, 1, MaxStrLen(EventPlanLineBuffer."Status Text"));
@@ -153,18 +153,18 @@
 
     procedure CheckCapAndTimeAvailabilityOnDemand(var EventPlanLineBuffer: Record "NPR Event Plan. Line Buffer"; WithModify: Boolean)
     var
-        JobPlanningLineTemp: Record "Job Planning Line" temporary;
+        TempJobPlanningLine: Record "Job Planning Line" temporary;
     begin
-        JobPlanningLineTemp."Job No." := EventPlanLineBuffer."Job No.";
-        JobPlanningLineTemp."Job Task No." := EventPlanLineBuffer."Job Task No.";
-        JobPlanningLineTemp.Type := "Job Planning Line Type".FromInteger(EventPlanLineBuffer.Type);
-        JobPlanningLineTemp."No." := EventPlanLineBuffer."No.";
-        JobPlanningLineTemp."Planning Date" := EventPlanLineBuffer."Planning Date";
-        JobPlanningLineTemp."NPR Starting Time" := EventPlanLineBuffer."Starting Time";
-        JobPlanningLineTemp."NPR Ending Time" := EventPlanLineBuffer."Ending Time";
-        JobPlanningLineTemp.Quantity := EventPlanLineBuffer.Quantity;
-        JobPlanningLineTemp."Unit of Measure Code" := EventPlanLineBuffer."Unit of Measure Code";
-        CheckCapAndTimeAvailability(JobPlanningLineTemp, EventPlanLineBuffer);
+        TempJobPlanningLine."Job No." := EventPlanLineBuffer."Job No.";
+        TempJobPlanningLine."Job Task No." := EventPlanLineBuffer."Job Task No.";
+        TempJobPlanningLine.Type := "Job Planning Line Type".FromInteger(EventPlanLineBuffer.Type);
+        TempJobPlanningLine."No." := EventPlanLineBuffer."No.";
+        TempJobPlanningLine."Planning Date" := EventPlanLineBuffer."Planning Date";
+        TempJobPlanningLine."NPR Starting Time" := EventPlanLineBuffer."Starting Time";
+        TempJobPlanningLine."NPR Ending Time" := EventPlanLineBuffer."Ending Time";
+        TempJobPlanningLine.Quantity := EventPlanLineBuffer.Quantity;
+        TempJobPlanningLine."Unit of Measure Code" := EventPlanLineBuffer."Unit of Measure Code";
+        CheckCapAndTimeAvailability(TempJobPlanningLine, EventPlanLineBuffer);
         if WithModify then
             EventPlanLineBuffer.Modify();
     end;
@@ -205,7 +205,7 @@
         JobTask: Record "Job Task";
         JobPlanningLine2: Record "Job Planning Line";
         Resource: Record Resource;
-        ResourceTemp: Record Resource temporary;
+        TempResource: Record Resource temporary;
         LineNo: Integer;
         MinDate: Date;
         MaxDate: Date;
@@ -224,12 +224,12 @@
         EventPlanLineBuffer.SetRange(Type, EventPlanLineBuffer.Type::Resource);
         if EventPlanLineBuffer.FindSet() then
             repeat
-                if not ResourceTemp.Get(EventPlanLineBuffer."No.") then begin
-                    ResourceTemp."No." := EventPlanLineBuffer."No.";
-                    ResourceTemp.Insert();
+                if not TempResource.Get(EventPlanLineBuffer."No.") then begin
+                    TempResource."No." := EventPlanLineBuffer."No.";
+                    TempResource.Insert();
                 end;
             until EventPlanLineBuffer.Next() = 0;
-        if ResourceTemp.FindSet() then
+        if TempResource.FindSet() then
             repeat
                 Resource.Get(Rec."No.");
                 Rec."No." := Resource."No.";
@@ -237,7 +237,7 @@
                 Rec."NPR Group Line" := true;
                 Rec.Insert();
                 LineNo += 10000;
-                EventPlanLineBuffer.SetRange("No.", ResourceTemp."No.");
+                EventPlanLineBuffer.SetRange("No.", TempResource."No.");
                 if EventPlanLineBuffer.FindSet() then
                     repeat
                         JobPlanningLine2.Init();
@@ -267,7 +267,7 @@
                     until EventPlanLineBuffer.Next() = 0;
                 Rec."Description 2" := StrSubstNo(Desc2AsPeriod, Format(MinDate), Format(MaxDate), Format(EventPlanLineBuffer.Count));
                 Rec.Modify();
-            until ResourceTemp.Next() = 0;
+            until TempResource.Next() = 0;
     end;
 
     local procedure BackupCurrentDistribution(Rec: Record "Job Planning Line"; var RecBackup: Record "Job Planning Line")

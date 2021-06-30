@@ -604,7 +604,7 @@
     procedure CreateTableCopy(var Item: Record Item; VarietyNo: Option Ask,Variety1,Variety2,Variety3,Variety4; ExcludeLockedTables: Boolean)
     var
         VRTTable: Record "NPR Variety Table";
-        TMPVRTTable: Record "NPR Variety Table" temporary;
+        TempVRTTable: Record "NPR Variety Table" temporary;
         VRTGroup: Record "NPR Variety Group";
         NewTableCode: Code[20];
         ItemVariant: Record "Item Variant";
@@ -613,98 +613,98 @@
             VarietyNo::Ask:
                 begin
                     if VRTTable.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                     if VRTTable.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                     if VRTTable.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                     if VRTTable.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety1:
                 begin
                     if VRTTable.Get(Item."NPR Variety 1", Item."NPR Variety 1 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety2:
                 begin
                     if VRTTable.Get(Item."NPR Variety 2", Item."NPR Variety 2 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety3:
                 begin
                     if VRTTable.Get(Item."NPR Variety 3", Item."NPR Variety 3 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                 end;
             VarietyNo::Variety4:
                 begin
                     if VRTTable.Get(Item."NPR Variety 4", Item."NPR Variety 4 Table") then begin
-                        TMPVRTTable := VRTTable;
-                        TMPVRTTable.Insert();
+                        TempVRTTable := VRTTable;
+                        TempVRTTable.Insert();
                     end;
                 end;
         end;
 
 
         if ExcludeLockedTables then
-            TMPVRTTable.SetRange("Lock Table", false);
+            TempVRTTable.SetRange("Lock Table", false);
 
-        case TMPVRTTable.Count() of
+        case TempVRTTable.Count() of
             0:
                 Error(Text007);
             1:
-                TMPVRTTable.FindFirst();
+                TempVRTTable.FindFirst();
             else
-                if not (PAGE.RunModal(0, TMPVRTTable) = ACTION::LookupOK) then
+                if not (PAGE.RunModal(0, TempVRTTable) = ACTION::LookupOK) then
                     exit;
         end;
 
         if GuiAllowed then
-            if not Confirm(Text008, false, TMPVRTTable.Type, TMPVRTTable.Code, Item."No.") then
+            if not Confirm(Text008, false, TempVRTTable.Type, TempVRTTable.Code, Item."No.") then
                 exit;
 
         Clear(VRTTable);
 
         //Create the new table
-        NewTableCode := TMPVRTTable.Code + '-' + Item."No.";
-        VRTGroup.CopyTable2NewTable(TMPVRTTable.Type, TMPVRTTable.Code, NewTableCode);
+        NewTableCode := TempVRTTable.Code + '-' + Item."No.";
+        VRTGroup.CopyTable2NewTable(TempVRTTable.Type, TempVRTTable.Code, NewTableCode);
 
         //Change the item
         ItemVariant.SetRange("Item No.", Item."No.");
         case true of
-            Item."NPR Variety 1" = TMPVRTTable.Type:
+            Item."NPR Variety 1" = TempVRTTable.Type:
                 begin
                     Item."NPR Variety 1 Table" := NewTableCode;
                     Item.Modify(false);
                     ItemVariant.ModifyAll("NPR Variety 1 Table", NewTableCode, false);
                 end;
-            Item."NPR Variety 2" = TMPVRTTable.Type:
+            Item."NPR Variety 2" = TempVRTTable.Type:
                 begin
                     Item."NPR Variety 2 Table" := NewTableCode;
                     Item.Modify(false);
                     ItemVariant.ModifyAll("NPR Variety 2 Table", NewTableCode, false);
                 end;
-            Item."NPR Variety 3" = TMPVRTTable.Type:
+            Item."NPR Variety 3" = TempVRTTable.Type:
                 begin
                     Item."NPR Variety 3 Table" := NewTableCode;
                     Item.Modify(false);
                     ItemVariant.ModifyAll("NPR Variety 3 Table", NewTableCode, false);
                 end;
-            Item."NPR Variety 4" = TMPVRTTable.Type:
+            Item."NPR Variety 4" = TempVRTTable.Type:
                 begin
                     Item."NPR Variety 4 Table" := NewTableCode;
                     Item.Modify(false);

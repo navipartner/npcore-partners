@@ -4,7 +4,7 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
 
     var
         HandlerCodeunit: Integer;
-        tmpRFIDPrintBuffer: Record "NPR RFID Print Buffer" temporary;
+        TempRFIDPrintBuffer: Record "NPR RFID Print Buffer" temporary;
         LastLineQuantity: Decimal;
         ERR_PRINT_QUANTITY: Label 'Can only handle one RFID print per item quantity';
         RecordSend: Boolean;
@@ -41,19 +41,19 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
         RecordSend := false;
         LastLineQuantity := JournalLine."Quantity to Print";
 
-        tmpRFIDPrintBuffer."Item No." := JournalLine."Item No.";
-        tmpRFIDPrintBuffer."Variant Code" := JournalLine."Variant Code";
-        tmpRFIDPrintBuffer."Serial No." := JournalLine."Serial No.";
+        TempRFIDPrintBuffer."Item No." := JournalLine."Item No.";
+        TempRFIDPrintBuffer."Variant Code" := JournalLine."Variant Code";
+        TempRFIDPrintBuffer."Serial No." := JournalLine."Serial No.";
     end;
 
     procedure HandleRFIDBuffer()
     begin
-        if tmpRFIDPrintBuffer.IsEmpty then
+        if TempRFIDPrintBuffer.IsEmpty then
             exit;
         if HandlerCodeunit = 0 then
             exit;
 
-        OnHandleRFIDBuffer(HandlerCodeunit, tmpRFIDPrintBuffer);
+        OnHandleRFIDBuffer(HandlerCodeunit, TempRFIDPrintBuffer);
     end;
 
     local procedure PrintRetailJournalLineRecord(JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
@@ -114,12 +114,12 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
             Error(ERR_PRINT_QUANTITY);
 
         Printer.OnGetPrintBytes(PrintJob);
-        tmpRFIDPrintBuffer."Print Job".CreateOutStream(OutStream);
+        TempRFIDPrintBuffer."Print Job".CreateOutStream(OutStream);
         OutStream.Write(PrintJob);
 
         for i := 1 to NoOfPrints do begin
-            tmpRFIDPrintBuffer."Tag No." += 1;
-            tmpRFIDPrintBuffer.Insert();
+            TempRFIDPrintBuffer."Tag No." += 1;
+            TempRFIDPrintBuffer.Insert();
         end;
     end;
 

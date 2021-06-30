@@ -54,7 +54,7 @@ codeunit 6014582 "NPR Print Method Mgt."
     var
         InStream: InStream;
         Separators: List of [Text];
-        EmailItem: Record "Email Item" temporary;
+        TempEmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         if Stream.Length < 1 then
@@ -62,15 +62,15 @@ codeunit 6014582 "NPR Print Method Mgt."
         Separators.Add(';');
         Separators.Add(',');
 
-        EmailSenderHandler.CreateEmailItem(EmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
-        EmailSenderHandler.AddAttachmentFromStream(EmailItem, Stream, 'Document.pdf');
-        EmailSenderHandler.Send(EmailItem);
+        EmailSenderHandler.CreateEmailItem(TempEmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
+        EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, Stream, 'Document.pdf');
+        EmailSenderHandler.Send(TempEmailItem);
     end;
 
     procedure PrintViaEmail(PrinterName: Text; var Stream: InStream)
     var
         Separators: List of [Text];
-        EmailItem: Record "Email Item" temporary;
+        TempEmailItem: Record "Email Item" temporary;
         EmailSenderHandler: Codeunit "NPR Email Sending Handler";
     begin
         if Stream.EOS then
@@ -78,9 +78,9 @@ codeunit 6014582 "NPR Print Method Mgt."
         Separators.Add(';');
         Separators.Add(',');
 
-        EmailSenderHandler.CreateEmailItem(EmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
-        EmailSenderHandler.AddAttachmentFromStream(EmailItem, Stream, 'Document.pdf');
-        EmailSenderHandler.Send(EmailItem);
+        EmailSenderHandler.CreateEmailItem(TempEmailItem, 'NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
+        EmailSenderHandler.AddAttachmentFromStream(TempEmailItem, Stream, 'Document.pdf');
+        EmailSenderHandler.Send(TempEmailItem);
     end;
 
     procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: DotNet NPRNetMemoryStream; DocumentDescription: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)

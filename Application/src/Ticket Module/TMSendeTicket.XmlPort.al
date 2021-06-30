@@ -105,7 +105,7 @@ xmlport 6060124 "NPR TM Send eTicket"
         Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ReasonText: Text;
-        TmpTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
+        TempTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
     begin
 
@@ -141,18 +141,18 @@ xmlport 6060124 "NPR TM Send eTicket"
                 exit(false);
             end;
 
-            if (not TicketRequestManager.CreateETicketNotificationEntry(Ticket, TmpTicketNotificationEntry, (tmpTicketReservationRequest."Notification Address" = ''), ReasonText)) then begin
+            if (not TicketRequestManager.CreateETicketNotificationEntry(Ticket, TempTicketNotificationEntry, (tmpTicketReservationRequest."Notification Address" = ''), ReasonText)) then begin
                 CreateErrorResponse(ReasonText);
                 exit(false);
             end;
 
 
-            TmpTicketNotificationEntry.Reset();
-            TmpTicketNotificationEntry.FindSet();
+            TempTicketNotificationEntry.Reset();
+            TempTicketNotificationEntry.FindSet();
             repeat
 
                 if (tmpTicketReservationRequest."Notification Address" <> '') then begin
-                    TicketNotificationEntry.Get(TmpTicketNotificationEntry."Entry No.");
+                    TicketNotificationEntry.Get(TempTicketNotificationEntry."Entry No.");
                     TicketNotificationEntry."Notification Address" := tmpTicketReservationRequest."Notification Address";
                     TicketNotificationEntry."Notification Trigger" := TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE;
                     TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
@@ -161,16 +161,16 @@ xmlport 6060124 "NPR TM Send eTicket"
                     TicketNotificationEntry.Modify();
                 end;
 
-                if (TmpTicketNotificationEntry."Notification Send Status" = TmpTicketNotificationEntry."Notification Send Status"::PENDING) then begin
-                    if (not TicketRequestManager.SendETicketNotification(TmpTicketNotificationEntry."Entry No.", (tmpTicketReservationRequest."Notification Address" = ''), ReasonText)) then begin
+                if (TempTicketNotificationEntry."Notification Send Status" = TempTicketNotificationEntry."Notification Send Status"::PENDING) then begin
+                    if (not TicketRequestManager.SendETicketNotification(TempTicketNotificationEntry."Entry No.", (tmpTicketReservationRequest."Notification Address" = ''), ReasonText)) then begin
                         CreateErrorResponse(ReasonText);
                         exit(false);
                     end;
-                    TmpTicketNotificationEntry."Notification Send Status" := TmpTicketNotificationEntry."Notification Send Status"::SENT;
-                    TmpTicketNotificationEntry.Modify();
+                    TempTicketNotificationEntry."Notification Send Status" := TempTicketNotificationEntry."Notification Send Status"::SENT;
+                    TempTicketNotificationEntry.Modify();
                 end;
 
-            until (TmpTicketNotificationEntry.Next() = 0);
+            until (TempTicketNotificationEntry.Next() = 0);
 
         until (Ticket.Next() = 0);
 
@@ -178,13 +178,13 @@ xmlport 6060124 "NPR TM Send eTicket"
         tmpTicketReservationResponse."Response Message" := 'OK';
         tmpTicketReservationResponse.Insert();
 
-        TmpTicketNotificationEntry.Reset();
-        TmpTicketNotificationEntry.FindSet();
+        TempTicketNotificationEntry.Reset();
+        TempTicketNotificationEntry.FindSet();
         repeat
-            TicketNotificationEntry.Get(TmpTicketNotificationEntry."Entry No.");
+            TicketNotificationEntry.Get(TempTicketNotificationEntry."Entry No.");
             TmpTicketNotificationResponse.TransferFields(TicketNotificationEntry, true);
             TmpTicketNotificationResponse.Insert();
-        until (TmpTicketNotificationEntry.Next() = 0);
+        until (TempTicketNotificationEntry.Next() = 0);
 
     end;
 

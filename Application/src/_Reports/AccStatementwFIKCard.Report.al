@@ -192,12 +192,12 @@
                     dataitem(CustLedgEntryHdr; "Integer")
                     {
                         DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
-                        column(STRSUBSTNO_Text001_Currency2_Code_; StrSubstNo(Text001, Currency2.Code))
+                        column(STRSUBSTNO_Text001_Currency2_Code_; StrSubstNo(Text001, TempCurrency2.Code))
                         {
                         }
                         column(StartBalance; StartBalance)
                         {
-                            AutoFormatExpression = Currency2.Code;
+                            AutoFormatExpression = TempCurrency2.Code;
                             AutoFormatType = 1;
                         }
                         column(PrintLine; PrintLine)
@@ -256,7 +256,7 @@
                                 AutoFormatExpression = "Currency Code";
                                 AutoFormatType = 1;
                             }
-                            column(Currency2Code; Currency2.Code)
+                            column(Currency2Code; TempCurrency2.Code)
                             {
                             }
                             column(DtlEntries_CurrencyCode3; CurrencyCode3)
@@ -341,13 +341,13 @@
                             begin
                                 SetRange("Customer No.", Customer."No.");
                                 SetRange("Posting Date", StartDate, EndDate);
-                                SetRange("Currency Code", Currency2.Code);
+                                SetRange("Currency Code", TempCurrency2.Code);
 
-                                if Currency2.Code = '' then begin
+                                if TempCurrency2.Code = '' then begin
                                     GLSetup.TestField("LCY Code");
                                     CurrencyCode3 := GLSetup."LCY Code";
                                 end else
-                                    CurrencyCode3 := Currency2.Code;
+                                    CurrencyCode3 := TempCurrency2.Code;
                             end;
                         }
                     }
@@ -359,7 +359,7 @@
                         }
                         column(CustBalance_Control71; CustBalance)
                         {
-                            AutoFormatExpression = Currency2.Code;
+                            AutoFormatExpression = TempCurrency2.Code;
                             AutoFormatType = 1;
                         }
                         column(EntriesExists_Control98; EntriesExists)
@@ -377,7 +377,7 @@
                         DataItemLink = "Customer No." = FIELD("No.");
                         DataItemLinkReference = Customer;
                         DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date");
-                        column(STRSUBSTNO_Text002_Currency2_Code_; StrSubstNo(Text002, Currency2.Code))
+                        column(STRSUBSTNO_Text002_Currency2_Code_; StrSubstNo(Text002, TempCurrency2.Code))
                         {
                         }
                         column(CustLedgEntry2__Remaining_Amount_; "Remaining Amount")
@@ -412,7 +412,7 @@
                         column(PrintEntriesDue; PrintEntriesDue)
                         {
                         }
-                        column(Currency2Code_2nd; Currency2.Code)
+                        column(Currency2Code_2nd; TempCurrency2.Code)
                         {
                         }
                         column(CustLedgEntry2__Remaining_Amount__Control64; "Remaining Amount")
@@ -459,7 +459,7 @@
                                 CurrReport.Skip();
 
                             if IncludeAgingBand and ("Posting Date" <= EndDate) then
-                                UpdateBuffer(Currency2.Code, GetDate("Posting Date", "Due Date"), "Remaining Amount");
+                                UpdateBuffer(TempCurrency2.Code, GetDate("Posting Date", "Due Date"), "Remaining Amount");
                             if ("Due Date" >= EndDate) or ("Remaining Amount" < 0) then
                                 CurrReport.Skip();
                         end;
@@ -470,7 +470,7 @@
                                 SetRange("Due Date", 0D, EndDate - 1);
                                 SetRange(Positive, true);
                             end;
-                            SetRange("Currency Code", Currency2.Code);
+                            SetRange("Currency Code", TempCurrency2.Code);
                             if (not PrintEntriesDue) and (not IncludeAgingBand) then
                                 CurrReport.Break();
                         end;
@@ -479,27 +479,27 @@
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then
-                            Currency2.FindFirst()
+                            TempCurrency2.FindFirst()
                         else
-                            if Currency2.Next() = 0 then
+                            if TempCurrency2.Next() = 0 then
                                 CurrReport.Break();
 
                         Cust2 := Customer;
                         Cust2.SetRange("Date Filter", 0D, StartDate - 1);
-                        Cust2.SetRange("Currency Filter", Currency2.Code);
+                        Cust2.SetRange("Currency Filter", TempCurrency2.Code);
                         Cust2.CalcFields("Net Change");
                         StartBalance := Cust2."Net Change";
                         CustBalance := Cust2."Net Change";
                         "Cust. Ledger Entry".SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
                         "Cust. Ledger Entry".SetRange("Customer No.", Customer."No.");
                         "Cust. Ledger Entry".SetRange("Posting Date", StartDate, EndDate);
-                        "Cust. Ledger Entry".SetRange("Currency Code", Currency2.Code);
+                        "Cust. Ledger Entry".SetRange("Currency Code", TempCurrency2.Code);
                         EntriesExists := "Cust. Ledger Entry".FindFirst();
                     end;
 
                     trigger OnPreDataItem()
                     begin
-                        Customer.CopyFilter("Currency Filter", Currency2.Code);
+                        Customer.CopyFilter("Currency Filter", TempCurrency2.Code);
                     end;
                 }
                 dataitem(AgingBandLoop; "Integer")
@@ -532,29 +532,29 @@
                     column(AgingDate_5_; Format(AgingDate[5]))
                     {
                     }
-                    column(AgingBandBuf__Column_1_Amt__; AgingBandBuf."Column 1 Amt.")
+                    column(AgingBandBuf__Column_1_Amt__; TempAgingBandBuf."Column 1 Amt.")
                     {
-                        AutoFormatExpression = AgingBandBuf."Currency Code";
+                        AutoFormatExpression = TempAgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandBuf__Column_2_Amt__; AgingBandBuf."Column 2 Amt.")
+                    column(AgingBandBuf__Column_2_Amt__; TempAgingBandBuf."Column 2 Amt.")
                     {
-                        AutoFormatExpression = AgingBandBuf."Currency Code";
+                        AutoFormatExpression = TempAgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandBuf__Column_3_Amt__; AgingBandBuf."Column 3 Amt.")
+                    column(AgingBandBuf__Column_3_Amt__; TempAgingBandBuf."Column 3 Amt.")
                     {
-                        AutoFormatExpression = AgingBandBuf."Currency Code";
+                        AutoFormatExpression = TempAgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandBuf__Column_4_Amt__; AgingBandBuf."Column 4 Amt.")
+                    column(AgingBandBuf__Column_4_Amt__; TempAgingBandBuf."Column 4 Amt.")
                     {
-                        AutoFormatExpression = AgingBandBuf."Currency Code";
+                        AutoFormatExpression = TempAgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandBuf__Column_5_Amt__; AgingBandBuf."Column 5 Amt.")
+                    column(AgingBandBuf__Column_5_Amt__; TempAgingBandBuf."Column 5 Amt.")
                     {
-                        AutoFormatExpression = AgingBandBuf."Currency Code";
+                        AutoFormatExpression = TempAgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AgingBandCurrencyCode; AgingBandCurrencyCode)
@@ -570,12 +570,12 @@
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then begin
-                            if not AgingBandBuf.FindFirst() then
+                            if not TempAgingBandBuf.FindFirst() then
                                 CurrReport.Break();
                         end else
-                            if AgingBandBuf.Next() = 0 then
+                            if TempAgingBandBuf.Next() = 0 then
                                 CurrReport.Break();
-                        AgingBandCurrencyCode := AgingBandBuf."Currency Code";
+                        AgingBandCurrencyCode := TempAgingBandBuf."Currency Code";
                         if AgingBandCurrencyCode = '' then
                             AgingBandCurrencyCode := GLSetup."LCY Code";
                     end;
@@ -590,19 +590,19 @@
 
             trigger OnAfterGetRecord()
             begin
-                AgingBandBuf.DeleteAll();
+                TempAgingBandBuf.DeleteAll();
                 CurrReport.Language := Language.GetLanguageID("Language Code");
                 PrintLine := false;
                 Cust2 := Customer;
-                CopyFilter("Currency Filter", Currency2.Code);
+                CopyFilter("Currency Filter", TempCurrency2.Code);
                 if PrintAllHavingBal then begin
-                    if Currency2.FindFirst() then
+                    if TempCurrency2.FindFirst() then
                         repeat
                             Cust2.SetRange("Date Filter", 0D, EndDate);
-                            Cust2.SetRange("Currency Filter", Currency2.Code);
+                            Cust2.SetRange("Currency Filter", TempCurrency2.Code);
                             Cust2.CalcFields("Net Change");
                             PrintLine := Cust2."Net Change" <> 0;
-                        until (Currency2.Next() = 0) or PrintLine;
+                        until (TempCurrency2.Next() = 0) or PrintLine;
                 end;
                 if (not PrintLine) and PrintAllHavingEntry then begin
                     "Cust. Ledger Entry".Reset();
@@ -648,13 +648,13 @@
                 CompanyInfo.Get();
                 FormatAddr.Company(CompanyAddr, CompanyInfo);
 
-                Currency2.Code := '';
-                Currency2.Insert();
+                TempCurrency2.Code := '';
+                TempCurrency2.Insert();
                 CopyFilter("Currency Filter", Currency.Code);
                 if Currency.FindFirst() then
                     repeat
-                        Currency2 := Currency;
-                        Currency2.Insert();
+                        TempCurrency2 := Currency;
+                        TempCurrency2.Insert();
                     until Currency.Next() = 0;
             end;
         }
@@ -827,10 +827,10 @@
     end;
 
     var
-        AgingBandBuf: Record "Aging Band Buffer" temporary;
+        TempAgingBandBuf: Record "Aging Band Buffer" temporary;
         CompanyInfo: Record "Company Information";
         Currency: Record Currency;
-        Currency2: Record Currency temporary;
+        TempCurrency2: Record Currency temporary;
         "Cust. Ledger Entry": Record "Cust. Ledger Entry";
         Cust2: Record Customer;
         DtldCustLedgEntries2: Record "Detailed Cust. Ledg. Entry";
@@ -945,41 +945,41 @@
         GoOn: Boolean;
         I: Integer;
     begin
-        AgingBandBuf.Init();
-        AgingBandBuf."Currency Code" := CurrencyCode;
-        if not AgingBandBuf.Find() then
-            AgingBandBuf.Insert();
+        TempAgingBandBuf.Init();
+        TempAgingBandBuf."Currency Code" := CurrencyCode;
+        if not TempAgingBandBuf.Find() then
+            TempAgingBandBuf.Insert();
         I := 1;
         GoOn := true;
         while (I <= 5) and GoOn do begin
             if Date <= AgingDate[I] then
                 if I = 1 then begin
-                    AgingBandBuf."Column 1 Amt." := AgingBandBuf."Column 1 Amt." + Amount;
+                    TempAgingBandBuf."Column 1 Amt." := TempAgingBandBuf."Column 1 Amt." + Amount;
                     GoOn := false;
                 end;
             if Date <= AgingDate[I] then
                 if I = 2 then begin
-                    AgingBandBuf."Column 2 Amt." := AgingBandBuf."Column 2 Amt." + Amount;
+                    TempAgingBandBuf."Column 2 Amt." := TempAgingBandBuf."Column 2 Amt." + Amount;
                     GoOn := false;
                 end;
             if Date <= AgingDate[I] then
                 if I = 3 then begin
-                    AgingBandBuf."Column 3 Amt." := AgingBandBuf."Column 3 Amt." + Amount;
+                    TempAgingBandBuf."Column 3 Amt." := TempAgingBandBuf."Column 3 Amt." + Amount;
                     GoOn := false;
                 end;
             if Date <= AgingDate[I] then
                 if I = 4 then begin
-                    AgingBandBuf."Column 4 Amt." := AgingBandBuf."Column 4 Amt." + Amount;
+                    TempAgingBandBuf."Column 4 Amt." := TempAgingBandBuf."Column 4 Amt." + Amount;
                     GoOn := false;
                 end;
             if Date <= AgingDate[I] then
                 if I = 5 then begin
-                    AgingBandBuf."Column 5 Amt." := AgingBandBuf."Column 5 Amt." + Amount;
+                    TempAgingBandBuf."Column 5 Amt." := TempAgingBandBuf."Column 5 Amt." + Amount;
                     GoOn := false;
                 end;
             I := I + 1;
         end;
-        AgingBandBuf.Modify();
+        TempAgingBandBuf.Modify();
     end;
 
     procedure SkipReversedUnapplied(var DtldCustLedgEntries: Record "Detailed Cust. Ledg. Entry"): Boolean

@@ -7,7 +7,7 @@ codeunit 6014505 "NPR MobilePayV10 Get Refund"
         _request: text;
         _response: text;
         _responseHttpCode: Integer;
-        MobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
+        TempMobilePayV10RefundBuff: Record "NPR MobilePayV10 Refund" temporary;
         MobilePayV10RefundBuffInitiated: Boolean;
         REFUND_DETAIL_BUFFER_NOT_INITIALIZED_Err: Label 'Refund detail buffer has not been initiated! This is a programming bug.';
 
@@ -28,7 +28,7 @@ codeunit 6014505 "NPR MobilePayV10 Get Refund"
 
     internal procedure SetRefundDetailBuffer(var MobilePayV10RefundBuffer: Record "NPR MobilePayV10 Refund" temporary)
     begin
-        MobilePayV10RefundBuff.Copy(MobilePayV10RefundBuffer, true);
+        TempMobilePayV10RefundBuff.Copy(MobilePayV10RefundBuffer, true);
         MobilePayV10RefundBuffInitiated := true;
     end;
 
@@ -75,32 +75,32 @@ codeunit 6014505 "NPR MobilePayV10 Get Refund"
         jsonResponse.SelectToken('refundId', jsonToken);
         Evaluate(refundId, jsonToken.AsValue().AsText());
 
-        if (not MobilePayV10RefundBuff.Get(refundId)) then begin
-            MobilePayV10RefundBuff.Init();
-            MobilePayV10RefundBuff.RefundId := refundId;
-            MobilePayV10RefundBuff.Insert();
+        if (not TempMobilePayV10RefundBuff.Get(refundId)) then begin
+            TempMobilePayV10RefundBuff.Init();
+            TempMobilePayV10RefundBuff.RefundId := refundId;
+            TempMobilePayV10RefundBuff.Insert();
         end;
 
         jsonResponse.SelectToken('paymentId', jsonToken);
-        Evaluate(MobilePayV10RefundBuff.PaymentId, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10RefundBuff.PaymentId, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('refundOrderId', jsonToken);
-        Evaluate(MobilePayV10RefundBuff.RefundOrderId, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10RefundBuff.RefundOrderId, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('amount', jsonToken);
-        Evaluate(MobilePayV10RefundBuff.Amount, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10RefundBuff.Amount, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('currencyCode', jsonToken);
-        Evaluate(MobilePayV10RefundBuff.CurrencyCode, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10RefundBuff.CurrencyCode, jsonToken.AsValue().AsText());
 
         jsonResponse.SelectToken('status', jsonToken);
-        Evaluate(MobilePayV10RefundBuff.Status, jsonToken.AsValue().AsText());
+        Evaluate(TempMobilePayV10RefundBuff.Status, jsonToken.AsValue().AsText());
 
         if (jsonResponse.SelectToken('pollDelayInMs', jsonToken)) then begin
-            Evaluate(MobilePayV10RefundBuff.PollDelayInMs, jsonToken.AsValue().AsText());
+            Evaluate(TempMobilePayV10RefundBuff.PollDelayInMs, jsonToken.AsValue().AsText());
         end;
 
-        MobilePayV10RefundBuff.Modify();
+        TempMobilePayV10RefundBuff.Modify();
     end;
 
     local procedure GetEndpoint(): Text

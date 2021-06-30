@@ -20,7 +20,7 @@ page 6014673 "NPR Ean Box Setup Step"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInEanBoxSetup(ExistingEanBoxSetup, Rec.Code);
+                        CheckIfNoAvailableInEanBoxSetup(TempExistingEanBoxSetup, Rec.Code);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -43,7 +43,7 @@ page 6014673 "NPR Ean Box Setup Step"
     end;
 
     var
-        ExistingEanBoxSetup: Record "NPR Ean Box Setup" temporary;
+        TempExistingEanBoxSetup: Record "NPR Ean Box Setup" temporary;
 
     procedure GetRec(var TempEanBoxSetup: Record "NPR Ean Box Setup")
     begin
@@ -92,8 +92,8 @@ page 6014673 "NPR Ean Box Setup Step"
     begin
         if EanBoxSetup.FindSet() then
             repeat
-                ExistingEanBoxSetup := EanBoxSetup;
-                ExistingEanBoxSetup.Insert();
+                TempExistingEanBoxSetup := EanBoxSetup;
+                TempExistingEanBoxSetup.Insert();
             until EanBoxSetup.Next() = 0;
     end;
 

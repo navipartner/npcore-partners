@@ -141,15 +141,15 @@
     [EventSubscriber(ObjectType::Codeunit, 6014628, 'OnLoadPackage', '', false, false)]
     local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JObject: JsonToken; LoadType: Option File,Blob,Download)
     var
-        tmpImportWorksheet: Record "NPR RP Imp. Worksh." temporary;
-        tmpTemplateHeader: Record "NPR RP Template Header" temporary;
-        tmpTemplateLine: Record "NPR RP Template Line" temporary;
-        tmpDataItem: Record "NPR RP Data Items" temporary;
-        tmpDataItemLinks: Record "NPR RP Data Item Links" temporary;
-        tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary;
-        tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary;
-        tmpDeviceSettings: Record "NPR RP Device Settings" temporary;
-        tmpMediaInfo: Record "NPR RP Template Media Info" temporary;
+        TempImportWorksheet: Record "NPR RP Imp. Worksh." temporary;
+        TempTemplateHeader: Record "NPR RP Template Header" temporary;
+        TempTemplateLine: Record "NPR RP Template Line" temporary;
+        TempDataItem: Record "NPR RP Data Items" temporary;
+        TempDataItemLinks: Record "NPR RP Data Item Links" temporary;
+        TempDataItemConstraint: Record "NPR RP Data Item Constr." temporary;
+        TempDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary;
+        TempDeviceSettings: Record "NPR RP Device Settings" temporary;
+        TempMediaInfo: Record "NPR RP Template Media Info" temporary;
         RPTemplateHeader: Record "NPR RP Template Header";
     begin
         if Handled then
@@ -161,28 +161,28 @@
 
         Handled := true;
 
-        if not ParsePackage(JObject, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo) then
+        if not ParsePackage(JObject, TempTemplateHeader, TempTemplateLine, TempDataItem, TempDataItemLinks, TempDataItemConstraint, TempDataItemConstraintLinks, TempDeviceSettings, TempMediaInfo) then
             exit;
 
         repeat
-            tmpImportWorksheet.Init();
-            tmpImportWorksheet."Entry No." += 1;
-            tmpImportWorksheet.Template := tmpTemplateHeader.Code;
-            tmpImportWorksheet."New Description" := tmpTemplateHeader.Description;
-            tmpImportWorksheet."New Last Modified At" := tmpTemplateHeader."Last Modified At";
-            tmpImportWorksheet."New Version" := tmpTemplateHeader.Version;
-            if RPTemplateHeader.Get(tmpTemplateHeader.Code) then begin
-                tmpImportWorksheet."Existing Description" := RPTemplateHeader.Description;
-                tmpImportWorksheet."Existing Last Modified At" := RPTemplateHeader."Last Modified At";
-                tmpImportWorksheet."Existing Version" := RPTemplateHeader.Version;
+            TempImportWorksheet.Init();
+            TempImportWorksheet."Entry No." += 1;
+            TempImportWorksheet.Template := TempTemplateHeader.Code;
+            TempImportWorksheet."New Description" := TempTemplateHeader.Description;
+            TempImportWorksheet."New Last Modified At" := TempTemplateHeader."Last Modified At";
+            TempImportWorksheet."New Version" := TempTemplateHeader.Version;
+            if RPTemplateHeader.Get(TempTemplateHeader.Code) then begin
+                TempImportWorksheet."Existing Description" := RPTemplateHeader.Description;
+                TempImportWorksheet."Existing Last Modified At" := RPTemplateHeader."Last Modified At";
+                TempImportWorksheet."Existing Version" := RPTemplateHeader.Version;
             end;
-            tmpImportWorksheet.Insert(true);
-        until tmpTemplateHeader.Next() = 0;
+            TempImportWorksheet.Insert(true);
+        until TempTemplateHeader.Next() = 0;
 
-        if PAGE.RunModal(PAGE::"NPR RP Imp. Worksh.", tmpImportWorksheet) <> ACTION::LookupOK then
+        if PAGE.RunModal(PAGE::"NPR RP Imp. Worksh.", TempImportWorksheet) <> ACTION::LookupOK then
             exit;
 
-        ImportPackage(tmpImportWorksheet, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo);
+        ImportPackage(TempImportWorksheet, TempTemplateHeader, TempTemplateLine, TempDataItem, TempDataItemLinks, TempDataItemConstraint, TempDataItemConstraintLinks, TempDeviceSettings, TempMediaInfo);
     end;
 
     local procedure ParsePackage(JToken: JsonToken; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary): Boolean

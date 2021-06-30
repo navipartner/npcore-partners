@@ -140,7 +140,7 @@ page 6060121 "NPR TM Ticket BOM"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Base Calendar Code field';
                 }
-                field("Ticket Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
+                field("Ticket Customized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChange))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Customized Calendar';
@@ -151,7 +151,7 @@ page 6060121 "NPR TM Ticket BOM"
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Ticket Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
+                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChange);
                     end;
                 }
                 field("Publish As eTicket"; Rec."Publish As eTicket")
@@ -300,11 +300,11 @@ page 6060121 "NPR TM Ticket BOM"
 
     trigger OnAfterGetCurrRecord()
     begin
-        Clear(CustomizedCalendarChangeTemp);
-        CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Service;
-        CustomizedCalendarChangeTemp."Source Code" := Rec."Admission Code";
-        CustomizedCalendarChangeTemp."Base Calendar Code" := Rec."Ticket Base Calendar Code";
-        if (not CustomizedCalendarChangeTemp.Insert()) then;
+        Clear(TempCustomizedCalendarChange);
+        TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
+        TempCustomizedCalendarChange."Source Code" := Rec."Admission Code";
+        TempCustomizedCalendarChange."Base Calendar Code" := Rec."Ticket Base Calendar Code";
+        if (not TempCustomizedCalendarChange.Insert()) then;
     end;
 
     var
@@ -312,7 +312,7 @@ page 6060121 "NPR TM Ticket BOM"
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
         EXPORT_TO_EXCEL: Label 'Do you want to export generated tickets to excel?';
         OFFLINE_VALIDATION: Label 'Do you want to create offline ticket validation entries to be able to create admissions.';
-        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
+        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 
     local procedure MakeTickets(PaymentType: Option)

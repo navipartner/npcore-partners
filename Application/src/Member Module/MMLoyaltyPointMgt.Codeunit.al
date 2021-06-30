@@ -1111,7 +1111,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
     var
         AvailableCoupons: Page "NPR MM Available Coupons";
         PageAction: Action;
-        TmpLoyaltyPointsSetupResponse: Record "NPR MM Loyalty Point Setup" temporary;
+        TempLoyaltyPointsSetupResponse: Record "NPR MM Loyalty Point Setup" temporary;
     begin
 
         LineNo := 0;
@@ -1120,8 +1120,8 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         AvailableCoupons.LookupMode(true);
         PageAction := AvailableCoupons.RunModal();
         if (PageAction = Action::LookupOK) then begin
-            AvailableCoupons.GetRecord(TmpLoyaltyPointsSetupResponse);
-            LineNo := TmpLoyaltyPointsSetupResponse."Line No.";
+            AvailableCoupons.GetRecord(TempLoyaltyPointsSetupResponse);
+            LineNo := TempLoyaltyPointsSetupResponse."Line No.";
         end;
 
         exit(LineNo);
@@ -1363,7 +1363,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
     procedure ExpirePointsPerPeriodWorker(LoyaltySetup: Record "NPR MM Loyalty Setup"; Membership: Record "NPR MM Membership")
     var
-        TmpMembershipPointsSummary: Record "NPR MM Members. Points Summary" temporary;
+        TempMembershipPointsSummary: Record "NPR MM Members. Points Summary" temporary;
         Period: Integer;
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
         ExpireLbl: Label 'EXP-%1', Locked = true;
@@ -1372,22 +1372,22 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         if (not LoyaltySetup."Expire Uncollected Points") then
             exit;
 
-        TmpMembershipPointsSummary."Membership Entry No." := Membership."Entry No.";
+        TempMembershipPointsSummary."Membership Entry No." := Membership."Entry No.";
 
         for Period := 0 downto -5 do begin
-            TmpMembershipPointsSummary."Relative Period" := Period;
-            GetRelativePeriodToday(LoyaltySetup, Period, TmpMembershipPointsSummary."Earn Period Start", TmpMembershipPointsSummary."Earn Period End");
+            TempMembershipPointsSummary."Relative Period" := Period;
+            GetRelativePeriodToday(LoyaltySetup, Period, TempMembershipPointsSummary."Earn Period Start", TempMembershipPointsSummary."Earn Period End");
 
-            TmpMembershipPointsSummary."Points Remaining" := CalculateRedeemablePointsRelativePeriod(Membership."Entry No.", Period);
-            TmpMembershipPointsSummary."Burn Period Start" := CalcDate('<+1D>', TmpMembershipPointsSummary."Earn Period End");
-            TmpMembershipPointsSummary."Burn Period End" := CalcDate(LoyaltySetup."Expire Uncollected After", TmpMembershipPointsSummary."Burn Period Start");
+            TempMembershipPointsSummary."Points Remaining" := CalculateRedeemablePointsRelativePeriod(Membership."Entry No.", Period);
+            TempMembershipPointsSummary."Burn Period Start" := CalcDate('<+1D>', TempMembershipPointsSummary."Earn Period End");
+            TempMembershipPointsSummary."Burn Period End" := CalcDate(LoyaltySetup."Expire Uncollected After", TempMembershipPointsSummary."Burn Period Start");
 
-            TmpMembershipPointsSummary.Insert();
+            TempMembershipPointsSummary.Insert();
 
-            if (TmpMembershipPointsSummary."Points Remaining" <> 0) then
-                if (TmpMembershipPointsSummary."Burn Period End" < Today) then
-                    AdjustPointsAbsoluteWorker2(Membership."Entry No.", MembershipPointsEntry."Entry Type"::EXPIRED, -1 * TmpMembershipPointsSummary."Points Remaining", 0,
-                                                 TmpMembershipPointsSummary."Burn Period End", TmpMembershipPointsSummary."Burn Period End",
+            if (TempMembershipPointsSummary."Points Remaining" <> 0) then
+                if (TempMembershipPointsSummary."Burn Period End" < Today) then
+                    AdjustPointsAbsoluteWorker2(Membership."Entry No.", MembershipPointsEntry."Entry Type"::EXPIRED, -1 * TempMembershipPointsSummary."Points Remaining", 0,
+                                                 TempMembershipPointsSummary."Burn Period End", TempMembershipPointsSummary."Burn Period End",
                                                  StrSubstNo(ExpireLbl, Format(Today(), 0, 9)), 'Points Expiry');
         end;
 
@@ -1706,7 +1706,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
     procedure CalculateFixedPeriodPointsTransaction(LoyaltySetup: Record "NPR MM Loyalty Setup"; Membership: Record "NPR MM Membership"; RelativePeriod: Integer; var TmpMembershipPointsSummary: Record "NPR MM Members. Points Summary" temporary)
     var
-        TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
+        TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
         ReasonText: Text;
     begin
 
@@ -1742,13 +1742,13 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
 
         // Estimate value of points
-        if (DoGetCoupon(Membership."Entry No.", TmpLoyaltyPointsSetup, 1000000000, TmpMembershipPointsSummary."Points Earned", TmpMembershipPointsSummary."Points Remaining", ReasonText)) then begin
-            TmpLoyaltyPointsSetup.Reset();
-            TmpLoyaltyPointsSetup.SetCurrentKey(Code, "Amount LCY");
-            TmpLoyaltyPointsSetup.FindLast();
-            TmpMembershipPointsSummary."Amount Earned (LCY)" := Round(TmpMembershipPointsSummary."Points Earned" * TmpLoyaltyPointsSetup."Point Rate", 1);
-            TmpMembershipPointsSummary."Amount Redeemed (LCY)" := Round(TmpMembershipPointsSummary."Points Redeemed" * TmpLoyaltyPointsSetup."Point Rate", 1);
-            TmpMembershipPointsSummary."Amount Remaining (LCY)" := Round(TmpMembershipPointsSummary."Points Remaining" * TmpLoyaltyPointsSetup."Point Rate", 1);
+        if (DoGetCoupon(Membership."Entry No.", TempLoyaltyPointsSetup, 1000000000, TmpMembershipPointsSummary."Points Earned", TmpMembershipPointsSummary."Points Remaining", ReasonText)) then begin
+            TempLoyaltyPointsSetup.Reset();
+            TempLoyaltyPointsSetup.SetCurrentKey(Code, "Amount LCY");
+            TempLoyaltyPointsSetup.FindLast();
+            TmpMembershipPointsSummary."Amount Earned (LCY)" := Round(TmpMembershipPointsSummary."Points Earned" * TempLoyaltyPointsSetup."Point Rate", 1);
+            TmpMembershipPointsSummary."Amount Redeemed (LCY)" := Round(TmpMembershipPointsSummary."Points Redeemed" * TempLoyaltyPointsSetup."Point Rate", 1);
+            TmpMembershipPointsSummary."Amount Remaining (LCY)" := Round(TmpMembershipPointsSummary."Points Remaining" * TempLoyaltyPointsSetup."Point Rate", 1);
         end;
 
         TmpMembershipPointsSummary.Insert();

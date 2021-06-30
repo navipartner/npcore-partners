@@ -271,7 +271,7 @@
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         SaleLinePos2: Record "NPR POS Sale Line";
-        SaleLinePosTmp: Record "NPR POS Sale Line" temporary;
+        TempSaleLinePos: Record "NPR POS Sale Line" temporary;
     begin
         FrontEndUpdateIsNeeded := false;
         if not POSInfoTransParam."Once per Transaction" and (pApplicScope in [pApplicScope::"Current Line", pApplicScope::"All Lines"]) then begin
@@ -283,21 +283,21 @@
                 SaleLinePos2.SetRange("Line No.", pSaleLinePos."Line No.");
             if SaleLinePos2.FindSet() then begin
                 repeat
-                    SaleLinePosTmp := SaleLinePos2;
-                    SaleLinePosTmp.Insert();
+                    TempSaleLinePos := SaleLinePos2;
+                    TempSaleLinePos.Insert();
                 until SaleLinePos2.Next() = 0;
             end else
                 if (pApplicScope = pApplicScope::"Current Line") and (pSaleLinePos."Line No." <> 0) then
-                    InsertTempSaleLine(SaleLinePosTmp, pSaleLinePos, pSaleLinePos."Line No.");
+                    InsertTempSaleLine(TempSaleLinePos, pSaleLinePos, pSaleLinePos."Line No.");
         end;
         if POSInfoTransParam."Once per Transaction" or (pApplicScope in [pApplicScope::"All Lines", pApplicScope::"New Lines"]) then
-            InsertTempSaleLine(SaleLinePosTmp, pSaleLinePos, 0);
+            InsertTempSaleLine(TempSaleLinePos, pSaleLinePos, 0);
 
         POSInfo.Get(POSInfoTransParam."POS Info Code");
         SetPosInfoTransactionFilters(POSInfoTransaction, pSaleLinePos, POSInfo, pApplicScope);
-        if SaleLinePosTmp.FindSet() then
+        if TempSaleLinePos.FindSet() then
             repeat
-                POSInfoTransaction.SetRange("Sales Line No.", SaleLinePosTmp."Line No.");
+                POSInfoTransaction.SetRange("Sales Line No.", TempSaleLinePos."Line No.");
                 if POSInfoTransaction.FindFirst() then begin
                     if pClearInfo then
                         POSInfoTransaction.Delete()
@@ -309,11 +309,11 @@
                 end else
                     if not pClearInfo then begin
                         POSInfoTransaction.Init();
-                        POSInfoTransaction."Register No." := SaleLinePosTmp."Register No.";
-                        POSInfoTransaction."Sales Ticket No." := SaleLinePosTmp."Sales Ticket No.";
-                        POSInfoTransaction."Sales Line No." := SaleLinePosTmp."Line No.";
-                        POSInfoTransaction."Sale Date" := SaleLinePosTmp.Date;
-                        POSInfoTransaction."Receipt Type" := SaleLinePosTmp.Type;
+                        POSInfoTransaction."Register No." := TempSaleLinePos."Register No.";
+                        POSInfoTransaction."Sales Ticket No." := TempSaleLinePos."Sales Ticket No.";
+                        POSInfoTransaction."Sales Line No." := TempSaleLinePos."Line No.";
+                        POSInfoTransaction."Sale Date" := TempSaleLinePos.Date;
+                        POSInfoTransaction."Receipt Type" := TempSaleLinePos.Type;
                         POSInfoTransaction."Entry No." := 0;
                         POSInfoTransaction."POS Info Code" := POSInfoTransParam."POS Info Code";
                         POSInfoTransaction."POS Info" := POSInfoTransParam."POS Info";
@@ -322,7 +322,7 @@
                         POSInfoTransaction.Insert(true);
                         FrontEndUpdateIsNeeded := true;
                     end;
-            until SaleLinePosTmp.Next() = 0;
+            until TempSaleLinePos.Next() = 0;
     end;
 
     local procedure InsertTempSaleLine(var ToSaleLinePos: Record "NPR POS Sale Line"; pSaleLinePos: Record "NPR POS Sale Line"; LineNo: Integer)

@@ -21,32 +21,32 @@
     procedure SplitBill(WaiterPad: Record "NPR NPRE Waiter Pad"; POSSession: Codeunit "NPR POS Session"; NumberOfGuests: Integer; CopyToSale: Boolean)
     var
         NewWaiterPad: Record "NPR NPRE Waiter Pad";
-        TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        TempWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         ChoosenWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
-        if not UIShowWaiterPadSplitBilForm(WaiterPad, TMPWaiterPadLine) then
+        if not UIShowWaiterPadSplitBilForm(WaiterPad, TempWaiterPadLine) then
             Error(SplitCancelled);
 
-        TMPWaiterPadLine.SetRange(Marked, true);
-        TMPWaiterPadLine.FilterGroup(-1);
-        TMPWaiterPadLine.SetFilter("Marked Qty", '<>%1', 0);
-        TMPWaiterPadLine.SetRange(Type, TMPWaiterPadLine.Type::Comment);
-        TMPWaiterPadLine.FilterGroup(0);
-        if TMPWaiterPadLine.IsEmpty then
+        TempWaiterPadLine.SetRange(Marked, true);
+        TempWaiterPadLine.FilterGroup(-1);
+        TempWaiterPadLine.SetFilter("Marked Qty", '<>%1', 0);
+        TempWaiterPadLine.SetRange(Type, TempWaiterPadLine.Type::Comment);
+        TempWaiterPadLine.FilterGroup(0);
+        if TempWaiterPadLine.IsEmpty then
             exit;
 
         WaiterPad.CalcFields("Current Seating FF");
         WaiterPadMgt.DuplicateWaiterPadHdr(WaiterPad, NewWaiterPad);
         WaiterPadMgt.MoveNumberOfGuests(WaiterPad, NewWaiterPad, NumberOfGuests);
 
-        TMPWaiterPadLine.FindSet();
+        TempWaiterPadLine.FindSet();
         repeat
-            ChoosenWaiterPadLine.Get(TMPWaiterPadLine."Waiter Pad No.", TMPWaiterPadLine."Line No.");
-            SplitWaiterPadLine(WaiterPad, ChoosenWaiterPadLine, TMPWaiterPadLine."Marked Qty", NewWaiterPad);
-        until (0 = TMPWaiterPadLine.Next());
+            ChoosenWaiterPadLine.Get(TempWaiterPadLine."Waiter Pad No.", TempWaiterPadLine."Line No.");
+            SplitWaiterPadLine(WaiterPad, ChoosenWaiterPadLine, TempWaiterPadLine."Marked Qty", NewWaiterPad);
+        until (0 = TempWaiterPadLine.Next());
 
         WaiterPadMgt.CloseWaiterPad(WaiterPad, false);
 
@@ -121,7 +121,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        TouchedWaiterPadLineTmp: Record "NPR NPRE Waiter Pad Line" temporary;
+        TempTouchedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         NPHHospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
         SaleLinesExist: Boolean;
     begin
@@ -132,12 +132,12 @@
         SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinesExist := SaleLinePOS.FindSet(CleanupSale);
         if SaleLinesExist then begin
-            TouchedWaiterPadLineTmp.DeleteAll();
+            TempTouchedWaiterPadLine.DeleteAll();
             CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
             repeat
                 MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine);
-                TouchedWaiterPadLineTmp := WaiterPadLine;
-                TouchedWaiterPadLineTmp.Insert();
+                TempTouchedWaiterPadLine := WaiterPadLine;
+                TempTouchedWaiterPadLine.Insert();
             until SaleLinePOS.Next() = 0;
 
             WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -145,8 +145,8 @@
             WaiterPadLine.SetAutoCalcFields("Kitchen Order Sent", "Serving Requested");
             if WaiterPadLine.FindSet() then
                 repeat
-                    TouchedWaiterPadLineTmp := WaiterPadLine;
-                    if not TouchedWaiterPadLineTmp.Find() then begin
+                    TempTouchedWaiterPadLine := WaiterPadLine;
+                    if not TempTouchedWaiterPadLine.Find() then begin
                         if (WaiterPadLine."Kitchen Order Sent" or WaiterPadLine."Serving Requested") and
                            (WaiterPadLine.Type = WaiterPadLine.Type::Item)
                         then begin

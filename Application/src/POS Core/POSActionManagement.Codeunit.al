@@ -3,7 +3,7 @@ codeunit 6150719 "NPR POS Action Management"
     EventSubscriberInstance = Manual;
 
     var
-        DiscoveryState: Record "Event Subscription" temporary;
+        TempDiscoveryState: Record "Event Subscription" temporary;
         ActionsDiscovered: Boolean;
 
     procedure LookupAction(var ActionCode: Code[20]): Boolean
@@ -61,23 +61,23 @@ codeunit 6150719 "NPR POS Action Management"
 
     procedure InitializeActionDiscovery()
     begin
-        InitializeDiscoveryState(DiscoveryState);
+        InitializeDiscoveryState(TempDiscoveryState);
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnActionDiscovered', '', false, false)]
     local procedure OnActionDiscovered(var Rec: Record "NPR POS Action")
     var
-        NewDiscoveryState: Record "Event Subscription" temporary;
+        TempNewDiscoveryState: Record "Event Subscription" temporary;
     begin
-        InitializeDiscoveryState(NewDiscoveryState);
-        if NewDiscoveryState.FindSet() then
+        InitializeDiscoveryState(TempNewDiscoveryState);
+        if TempNewDiscoveryState.FindSet() then
             repeat
-                if DiscoveryState.Get(NewDiscoveryState."Subscriber Codeunit ID", NewDiscoveryState."Subscriber Function")
-                  and (DiscoveryState."Number of Calls" <> NewDiscoveryState."Number of Calls") then begin
-                    DiscoveryState."Number of Calls" := NewDiscoveryState."Number of Calls";
-                    Rec."Codeunit ID" := NewDiscoveryState."Subscriber Codeunit ID";
+                if TempDiscoveryState.Get(TempNewDiscoveryState."Subscriber Codeunit ID", TempNewDiscoveryState."Subscriber Function")
+                  and (TempDiscoveryState."Number of Calls" <> TempNewDiscoveryState."Number of Calls") then begin
+                    TempDiscoveryState."Number of Calls" := TempNewDiscoveryState."Number of Calls";
+                    Rec."Codeunit ID" := TempNewDiscoveryState."Subscriber Codeunit ID";
                 end;
-            until NewDiscoveryState.Next() = 0;
+            until TempNewDiscoveryState.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

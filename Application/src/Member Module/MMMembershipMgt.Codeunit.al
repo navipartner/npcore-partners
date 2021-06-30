@@ -2533,7 +2533,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     procedure GetMembershipChangeOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary): Boolean
     var
-        TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         Item: Record Item;
         EntryNo: Integer;
         IsValidOption: Boolean;
@@ -2547,22 +2547,22 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (MembershipAlterationSetup.FindSet()) then begin
             repeat
                 EntryNo += 1;
-                TmpMemberInfoCapture."Membership Entry No." := MembershipEntryNo;
-                TmpMemberInfoCapture."Item No." := MembershipAlterationSetup."Sales Item No.";
-                if (Item.Get(TmpMemberInfoCapture."Item No.")) then;
+                TempMemberInfoCapture."Membership Entry No." := MembershipEntryNo;
+                TempMemberInfoCapture."Item No." := MembershipAlterationSetup."Sales Item No.";
+                if (Item.Get(TempMemberInfoCapture."Item No.")) then;
 
                 IsValidOption := false;
                 case MembershipAlterationSetup."Alteration Type" of
                     MembershipAlterationSetup."Alteration Type"::RENEW:
-                        IsValidOption := RenewMembership(TmpMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        IsValidOption := RenewMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
                     MembershipAlterationSetup."Alteration Type"::EXTEND:
-                        IsValidOption := ExtendMembership(TmpMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        IsValidOption := ExtendMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
                     MembershipAlterationSetup."Alteration Type"::UPGRADE:
-                        IsValidOption := UpgradeMembership(TmpMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        IsValidOption := UpgradeMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
                     MembershipAlterationSetup."Alteration Type"::REGRET:
-                        IsValidOption := RegretMembership(TmpMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        IsValidOption := RegretMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
                     MembershipAlterationSetup."Alteration Type"::CANCEL:
-                        IsValidOption := CancelMembership(TmpMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        IsValidOption := CancelMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
                 end;
 
                 if (IsValidOption) then begin

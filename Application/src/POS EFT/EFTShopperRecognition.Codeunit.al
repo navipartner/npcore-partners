@@ -9,24 +9,24 @@ codeunit 6184507 "NPR EFT Shopper Recognition"
 
     procedure GetShopperReference(var EFTShopperRecognition: Record "NPR EFT Shopper Recognition") ReferenceFound: Boolean
     var
-        TmpShopperReference: Record "NPR EFT Shopper Recognition" temporary;
+        TempShopperReference: Record "NPR EFT Shopper Recognition" temporary;
     begin
 
-        TmpShopperReference.Init();
+        TempShopperReference.Init();
 
-        if (not GetShopperReferenceWorker(EFTShopperRecognition."Entity Type", EFTShopperRecognition."Entity Key", EFTShopperRecognition."Integration Type", EFTShopperRecognition."Contract Type", EFTShopperRecognition."Contract ID", TmpShopperReference)) then
+        if (not GetShopperReferenceWorker(EFTShopperRecognition."Entity Type", EFTShopperRecognition."Entity Key", EFTShopperRecognition."Integration Type", EFTShopperRecognition."Contract Type", EFTShopperRecognition."Contract ID", TempShopperReference)) then
             exit(false);
 
         if (EFTShopperRecognition."Shopper Reference" <> '') then
-            if (EFTShopperRecognition."Shopper Reference" <> TmpShopperReference."Shopper Reference") then
+            if (EFTShopperRecognition."Shopper Reference" <> TempShopperReference."Shopper Reference") then
                 exit(false);
 
         if (EFTShopperRecognition.IsTemporary()) then begin
             EFTShopperRecognition.Delete();
-            EFTShopperRecognition.TransferFields(TmpShopperReference, true);
+            EFTShopperRecognition.TransferFields(TempShopperReference, true);
             EFTShopperRecognition.Insert();
         end else begin
-            EFTShopperRecognition."Shopper Reference" := TmpShopperReference."Shopper Reference";
+            EFTShopperRecognition."Shopper Reference" := TempShopperReference."Shopper Reference";
         end;
 
         exit(true);
@@ -79,12 +79,12 @@ codeunit 6184507 "NPR EFT Shopper Recognition"
     local procedure CreateShopperReferenceWorker(EntityType: Option; EntityKey: Code[20]; IntegrationType: Text[50]; ContractType: Text[50]; ContractId: Text[50]; var ShopperReference: Text[50]): Boolean
     var
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
-        TmpEFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary;
+        TempEFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary;
     begin
 
         if (ShopperReference <> '') then
-            if (GetShopperReferenceWorker(EntityType, EntityKey, IntegrationType, ContractType, ContractId, TmpEFTShopperRecognition)) then
-                exit(ShopperReference = TmpEFTShopperRecognition."Shopper Reference");
+            if (GetShopperReferenceWorker(EntityType, EntityKey, IntegrationType, ContractType, ContractId, TempEFTShopperRecognition)) then
+                exit(ShopperReference = TempEFTShopperRecognition."Shopper Reference");
 
         if (ShopperReference = '') then
             ShopperReference := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));

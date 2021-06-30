@@ -73,15 +73,15 @@ xmlport 6151137 "NPR M2 Get WorkingDay Calendar"
                         trigger OnAfterGetRecord()
                         var
                             CalendarMgmt: Codeunit "Calendar Management";
-                            CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
+                            TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
                         begin
-                            CustomizedCalendarChangeTemp."Base Calendar Code" := BaseCalendarCode;
-                            CustomizedCalendarChangeTemp."Date" := PeriodResponse."Period Start";
-                            CustomizedCalendarChangeTemp.Description := Description;
-                            CustomizedCalendarChangeTemp.Insert();
+                            TempCustomizedCalendarChange."Base Calendar Code" := BaseCalendarCode;
+                            TempCustomizedCalendarChange."Date" := PeriodResponse."Period Start";
+                            TempCustomizedCalendarChange.Description := Description;
+                            TempCustomizedCalendarChange.Insert();
 
-                            CalendarMgmt.CheckDateStatus(CustomizedCalendarChangeTemp);
-                            WorkingDay := Format(not CustomizedCalendarChangeTemp.Nonworking, 0, 9);
+                            CalendarMgmt.CheckDateStatus(TempCustomizedCalendarChange);
+                            WorkingDay := Format(not TempCustomizedCalendarChange.Nonworking, 0, 9);
                             WeekNumber := Format(Date2DWY(PeriodResponse."Period Start", 2), 0, 9);
                         end;
                     }

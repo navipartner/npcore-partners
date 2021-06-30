@@ -12,11 +12,11 @@
         Text010: Label 'Would you like to resend the e-mail?';
         Text011: Label 'E-mail Template was not found';
         Text012: Label 'Report ID is 0 which is why PDF can not be generated';
-        EmailItem: Record "Email Item" temporary;
+        TempEmailItem: Record "Email Item" temporary;
         EmailSendingHandler: Codeunit "NPR Email Sending Handler";
         UseCustomReportSelection: Boolean;
         GlobalCustomReportSelection: Record "Custom Report Selection";
-        AttachmentBuffer: Record "NPR E-mail Attachment" temporary;
+        TempAttachmentBuffer: Record "NPR E-mail Attachment" temporary;
         TransactionalType: Option " ",Smart,Classic;
         UseTransactionalEmailCode: Code[20];
         TransactionalEmailRecipient: Text;
@@ -135,7 +135,7 @@
 
     procedure AddFileToSmtpMessage(Filename: Text[250]) FileAttached: Boolean
     var
-        EmailAttachmentTemp: Record "NPR E-mail Attachment" temporary;
+        TempEmailAttachment: Record "NPR E-mail Attachment" temporary;
         InStream: InStream;
         OutStream: OutStream;
         Pos: Integer;
@@ -150,17 +150,17 @@
 #endif
             exit;
 
-        EmailAttachmentTemp.Init();
-        EmailAttachmentTemp."Attached File".CreateOutStream(OutStream);
+        TempEmailAttachment.Init();
+        TempEmailAttachment."Attached File".CreateOutStream(OutStream);
         CopyStream(OutStream, InStream);
         Pos := StrPos(Filename, '\');
         while Pos > 0 do begin
             Filename := CopyStr(Filename, Pos + 1);
             Pos := StrPos(Filename, '\');
         end;
-        EmailAttachmentTemp.Description := ReplaceSpecialChar(Filename);
-        EmailAttachmentTemp.Insert();
-        AddAttachmentToBuffer(EmailAttachmentTemp);
+        TempEmailAttachment.Description := ReplaceSpecialChar(Filename);
+        TempEmailAttachment.Insert();
+        AddAttachmentToBuffer(TempEmailAttachment);
         exit(true);
     end;
 
@@ -178,16 +178,16 @@
             if SetLastErrorMessage(StrSubstNo(AttachmentNoData, EmailAttachment.Description)) then;
             exit(false);
         end;
-        AttachmentBuffer.Reset();
-        if AttachmentBuffer.FindLast() then
-            NextAttachmentLineNo := AttachmentBuffer."Line No." + 1
+        TempAttachmentBuffer.Reset();
+        if TempAttachmentBuffer.FindLast() then
+            NextAttachmentLineNo := TempAttachmentBuffer."Line No." + 1
         else
             NextAttachmentLineNo := 1;
-        AttachmentBuffer := EmailAttachment;
-        AttachmentBuffer."Table No." := 0;
-        AttachmentBuffer."Primary Key" := '';
-        AttachmentBuffer."Line No." := NextAttachmentLineNo;
-        AttachmentBuffer.Insert();
+        TempAttachmentBuffer := EmailAttachment;
+        TempAttachmentBuffer."Table No." := 0;
+        TempAttachmentBuffer."Primary Key" := '';
+        TempAttachmentBuffer."Line No." := NextAttachmentLineNo;
+        TempAttachmentBuffer.Insert();
         exit(true);
     end;
 
@@ -221,31 +221,31 @@
         end;
 
         InitMailAdrSeparators(Separators);
-        EmailSendingHandler.CreateEmailItem(EmailItem,
+        EmailSendingHandler.CreateEmailItem(TempEmailItem,
           EmailTemplateHeader."From E-mail Name", EmailTemplateHeader."From E-mail Address",
           EmailTemplateHeader."Default Recipient Address".Split(Separators), '', '', true);
 
         if EmailTemplateHeader."Sender as bcc" then
-            EmailSendingHandler.AddRecipientBCC(EmailItem, EmailTemplateHeader."From E-mail Address".Split(Separators));
+            EmailSendingHandler.AddRecipientBCC(TempEmailItem, EmailTemplateHeader."From E-mail Address".Split(Separators));
 
         if EmailTemplateHeader."Default Recipient Address CC" <> '' then
-            EmailSendingHandler.AddRecipientCC(EmailItem, EmailTemplateHeader."Default Recipient Address CC".Split(Separators));
+            EmailSendingHandler.AddRecipientCC(TempEmailItem, EmailTemplateHeader."Default Recipient Address CC".Split(Separators));
 
         if EmailTemplateHeader."Default Recipient Address BCC" <> '' then
-            EmailSendingHandler.AddRecipientBCC(EmailItem, EmailTemplateHeader."Default Recipient Address BCC".Split(Separators));
+            EmailSendingHandler.AddRecipientBCC(TempEmailItem, EmailTemplateHeader."Default Recipient Address BCC".Split(Separators));
 
         if TransactionalType <> TransactionalType::Smart then begin
             HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateHeader.Subject, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
-            EmailSendingHandler.AddSubject(EmailItem, HtmlLine);
+            EmailSendingHandler.AddSubject(TempEmailItem, HtmlLine);
             if not EmailTemplateHeader."Use HTML Template" then begin
                 EmailTemplateLine.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
                 if EmailTemplateLine.FindSet() then
                     repeat
                         HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateLine."Mail Body Line", EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
-                        EmailSendingHandler.AppendBodyLine(EmailItem, HtmlLine);
+                        EmailSendingHandler.AppendBodyLine(TempEmailItem, HtmlLine);
                     until EmailTemplateLine.Next() = 0;
             end else begin
-                EmailSendingHandler.HtmlMessage(EmailItem, true);
+                EmailSendingHandler.HtmlMessage(TempEmailItem, true);
                 EmailTemplateHeader.CalcFields("HTML Template");
                 if EmailTemplateHeader."HTML Template".HasValue() then begin
                     EmailTemplateHeader."HTML Template".CreateInStream(InStream, TEXTENCODING::UTF8);
@@ -253,14 +253,14 @@
                         HtmlLine := '';
                         InStream.ReadText(HtmlLine);
                         HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, HtmlLine, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
-                        EmailSendingHandler.AppendBodyLine(EmailItem, HtmlLine);
+                        EmailSendingHandler.AppendBodyLine(TempEmailItem, HtmlLine);
                     end;
                     Clear(InStream);
                 end;
             end;
         end;
 
-        AttachmentBuffer.DeleteAll();
+        TempAttachmentBuffer.DeleteAll();
 
         exit('');
     end;
@@ -282,22 +282,22 @@
         EmailLogPrepared := false;
         if TransactionalType = TransactionalType::Smart then
             if TransactionalEmail.Get(UseTransactionalEmailCode) then begin
-                ErrorMessage := CopyStr(TransactionalEmailMgt.SendSmartEmailWAttachment(TransactionalEmail, TransactionalEmailRecipient, EmailItem."Send CC", EmailItem."Send BCC", RecRef, AttachmentBuffer, Silent), 1, MaxStrLen(ErrorMessage));
+                ErrorMessage := CopyStr(TransactionalEmailMgt.SendSmartEmailWAttachment(TransactionalEmail, TransactionalEmailRecipient, TempEmailItem."Send CC", TempEmailItem."Send BCC", RecRef, TempAttachmentBuffer, Silent), 1, MaxStrLen(ErrorMessage));
                 HandledByTransactional := true;
             end;
         if TransactionalType = TransactionalType::Classic then begin
-            FromAddress := EmailItem."From Address";
+            FromAddress := TempEmailItem."From Address";
             if FromAddress.LastIndexOf('"') > 0 then begin
                 FromName := CopyStr(FromAddress, 1, FromAddress.LastIndexOf('"'));
                 FromName := FromName.TrimStart('"').TrimEnd('"');
                 FromAddress := CopyStr(FromAddress, FromAddress.LastIndexOf('"') + 1);
                 FromAddress := FromAddress.Trim();
             end;
-            EmailItem.CalcFields(Body);
-            EmailItem.Body.CreateInStream(InStr);
-            EmailItem.Modify();
+            TempEmailItem.CalcFields(Body);
+            TempEmailItem.Body.CreateInStream(InStr);
+            TempEmailItem.Modify();
             InStr.Read(BodyText);
-            ErrorMessage := TransactionalEmailMgt.SendClassicMail(TransactionalEmailRecipient, EmailItem."Send CC", EmailItem."Send BCC", EmailItem.Subject, BodyText, '', FromAddress, FromName, '', true, true, '', '', AttachmentBuffer, Silent);
+            ErrorMessage := TransactionalEmailMgt.SendClassicMail(TransactionalEmailRecipient, TempEmailItem."Send CC", TempEmailItem."Send BCC", TempEmailItem.Subject, BodyText, '', FromAddress, FromName, '', true, true, '', '', TempAttachmentBuffer, Silent);
             HandledByTransactional := true;
         end;
 
@@ -307,30 +307,30 @@
                     exit(Text008);
                 Error(Text008);
             end;
-            AttachmentBuffer.Reset();
-            if AttachmentBuffer.FindSet() then
+            TempAttachmentBuffer.Reset();
+            if TempAttachmentBuffer.FindSet() then
                 repeat
-                    if AttachmentBuffer.Description <> '' then begin
-                        AttachmentBuffer.CalcFields("Attached File");
+                    if TempAttachmentBuffer.Description <> '' then begin
+                        TempAttachmentBuffer.CalcFields("Attached File");
                         Clear(IStream);
-                        if AttachmentBuffer."Attached File".HasValue() then begin
-                            AttachmentBuffer."Attached File".CreateInStream(IStream);
-                            EmailSendingHandler.AddAttachmentFromStream(EmailItem, IStream, AttachmentBuffer.Description);
+                        if TempAttachmentBuffer."Attached File".HasValue() then begin
+                            TempAttachmentBuffer."Attached File".CreateInStream(IStream);
+                            EmailSendingHandler.AddAttachmentFromStream(TempEmailItem, IStream, TempAttachmentBuffer.Description);
                         end;
 
 
                     end;
-                until AttachmentBuffer.Next() = 0;
+                until TempAttachmentBuffer.Next() = 0;
             PrepareEmailLogEntry(EmailLog, RecRef);
             EmailLogPrepared := true;
 
             MailManagement.SetHideMailDialog(true);
             MailManagement.SetHideEmailSendingError(true);
 
-            if not EmailSendingHandler.Send(EmailItem) then
+            if not EmailSendingHandler.Send(TempEmailItem) then
                 EmailSendingHandler.GetLastError(ErrorMessage);
         end;
-        AttachmentBuffer.DeleteAll();
+        TempAttachmentBuffer.DeleteAll();
 
         if ErrorMessage = '' then begin
             AddEmailLogEntry(EmailLog, RecRef, EmailLogPrepared);
@@ -380,24 +380,24 @@
 
     local procedure PrintPDF(ReportID: Integer; RecVariant: Variant; Filename: Text): Boolean
     var
-        EmailAttachmentTemp: Record "NPR E-mail Attachment" temporary;
+        TempEmailAttachment: Record "NPR E-mail Attachment" temporary;
         Result: Boolean;
         OStream: OutStream;
         Parameters: Text;
     begin
         SetGlobalCustomReport();
-        EmailAttachmentTemp.Description := Filename;
-        EmailAttachmentTemp."Attached File".CreateOutStream(OStream);
+        TempEmailAttachment.Description := Filename;
+        TempEmailAttachment."Attached File".CreateOutStream(OStream);
         Parameters := GetReqParametersFromStore(ReportID);
         Result := REPORT.SaveAs(ReportID, Parameters, REPORTFORMAT::Pdf, OStream, RecVariant);
         ClearRequestParameters(ReportID);
-        if not EmailAttachmentTemp."Attached File".HasValue() then begin
+        if not TempEmailAttachment."Attached File".HasValue() then begin
             Result := false;
             if SetLastErrorMessage(NoOutputFromReport) then;
         end;
         if Result then begin
-            EmailAttachmentTemp.Insert();
-            Result := AddAttachmentToBuffer(EmailAttachmentTemp);
+            TempEmailAttachment.Insert();
+            Result := AddAttachmentToBuffer(TempEmailAttachment);
         end;
 
         ClearGlobalCustomReport();
@@ -683,10 +683,10 @@
         EmailLog."Sent Time" := Time;
         EmailLog."Sent Date" := Today();
         EmailLog."Sent Username" := UserId;
-        EmailLog."Recipient E-mail" := CopyStr(EmailItem."Send to", 1, MaxStrLen(EmailLog."Recipient E-mail"));
-        EmailLog."From E-mail" := CopyStr(EmailItem."From Address", 1, MaxStrLen(EmailLog."From E-mail"));
-        EmailLog."E-mail subject" := CopyStr(EmailItem.Subject, 1, MaxStrLen(EmailLog."E-mail subject"));
-        EmailLog.Filename := CopyStr(AttachmentBuffer.Description, 1, MaxStrLen(EmailLog.Filename));
+        EmailLog."Recipient E-mail" := CopyStr(TempEmailItem."Send to", 1, MaxStrLen(EmailLog."Recipient E-mail"));
+        EmailLog."From E-mail" := CopyStr(TempEmailItem."From Address", 1, MaxStrLen(EmailLog."From E-mail"));
+        EmailLog."E-mail subject" := CopyStr(TempEmailItem.Subject, 1, MaxStrLen(EmailLog."E-mail subject"));
+        EmailLog.Filename := CopyStr(TempAttachmentBuffer.Description, 1, MaxStrLen(EmailLog.Filename));
     end;
 
     local procedure AddEmailLogEntry(EmailLog: Record "NPR E-mail Log"; RecRef: RecordRef; EmailLogPrepared: Boolean)

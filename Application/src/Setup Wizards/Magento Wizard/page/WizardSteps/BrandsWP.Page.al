@@ -23,7 +23,7 @@ page 6014552 "NPR Brands WP"
 
                     trigger OnValidate()
                     begin
-                        CheckIfNoAvailableInMagBrand(ExistingMagBrands, Rec.Id);
+                        CheckIfNoAvailableInMagBrand(TempExistingMagBrands, Rec.Id);
                     end;
                 }
                 field(Name; Rec.Name)
@@ -51,7 +51,7 @@ page 6014552 "NPR Brands WP"
     end;
 
     var
-        ExistingMagBrands: Record "NPR Magento Brand" temporary;
+        TempExistingMagBrands: Record "NPR Magento Brand" temporary;
 
     procedure CopyRealAndTemp(var TempMagentoBrand: Record "NPR Magento Brand")
     var
@@ -95,8 +95,8 @@ page 6014552 "NPR Brands WP"
     begin
         if MagentoBrand.FindSet() then
             repeat
-                ExistingMagBrands := MagentoBrand;
-                ExistingMagBrands.Insert();
+                TempExistingMagBrands := MagentoBrand;
+                TempExistingMagBrands.Insert();
             until MagentoBrand.Next() = 0;
     end;
 

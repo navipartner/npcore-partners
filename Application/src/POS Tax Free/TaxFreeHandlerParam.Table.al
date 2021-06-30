@@ -69,7 +69,7 @@ table 6014642 "NPR Tax Free Handler Param."
         JSON: Text;
         InStream: InStream;
         JsonTextReadWrite: Codeunit "Json Text Reader/Writer";
-        JsonBuffer: Record "JSON Buffer" temporary;
+        TempJsonBuffer: Record "JSON Buffer" temporary;
         JsonPropertyValue: Text;
     begin
         TaxFreeUnit.CalcFields("Handler Parameters");
@@ -79,16 +79,16 @@ table 6014642 "NPR Tax Free Handler Param."
             JSON += Buffer;
         end;
 
-        JsonTextReadWrite.ReadJSonToJSonBuffer(JSON, JsonBuffer);
-        JsonBuffer.SetRange("Token type", JsonBuffer."Token type"::"Property Name");
-        if JsonBuffer.FindSet() then
+        JsonTextReadWrite.ReadJSonToJSonBuffer(JSON, TempJsonBuffer);
+        TempJsonBuffer.SetRange("Token type", TempJsonBuffer."Token type"::"Property Name");
+        if TempJsonBuffer.FindSet() then
             repeat
-                if JsonBuffer.GetPropertyValue(JsonPropertyValue, JsonBuffer.Value) then
-                    if Get(JsonBuffer.Value) then begin
+                if TempJsonBuffer.GetPropertyValue(JsonPropertyValue, TempJsonBuffer.Value) then
+                    if Get(TempJsonBuffer.Value) then begin
                         Value := JsonPropertyValue;
                         Modify()
                     end;
-            until JsonBuffer.Next() = 0;
+            until TempJsonBuffer.Next() = 0;
     end;
 
     [TryFunction]

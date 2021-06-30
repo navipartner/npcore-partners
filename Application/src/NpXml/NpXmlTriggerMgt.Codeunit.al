@@ -22,7 +22,7 @@
     var
         NpXmlTemplateTrigger2: Record "NPR NpXml Template Trigger";
         NpXmlTemplate: Record "NPR NpXml Template";
-        NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
+        TempUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         RecRef2: RecordRef;
     begin
@@ -33,13 +33,13 @@
 
         if NpXmlTemplateTrigger."Parent Line No." = 0 then begin
             repeat
-                NewUniqueTaskBuffer.Init();
-                NewUniqueTaskBuffer."Table No." := RecRef2.Number;
-                NewUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
-                NewUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
-                NewUniqueTaskBuffer."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
-                NewUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
-                if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
+                TempUniqueTaskBuffer.Init();
+                TempUniqueTaskBuffer."Table No." := RecRef2.Number;
+                TempUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
+                TempUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
+                TempUniqueTaskBuffer."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
+                TempUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
+                if NcTaskMgt.ReqisterUniqueTask(TempUniqueTaskBuffer, UniqueTaskBuffer) then
                     RunTemplate(NpXmlTemplate, RecRef2);
             until RecRef2.Next() = 0;
             exit;
@@ -259,7 +259,7 @@
 
     procedure IsUniqueTask(TaskProcessor: Record "NPR Nc Task Processor"; Insert: Boolean; Modify: Boolean; Delete: Boolean; PrevRecRef: RecordRef; RecRef: RecordRef; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary) IsUnique: Boolean
     var
-        NewUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
+        TempUniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary;
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         NpXmlTemplate: Record "NPR NpXml Template";
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
@@ -276,13 +276,13 @@
               SetLinkFilter(NpXmlTemplateTrigger, PrevRecRef, RecRef, Delete, RecRef2)
             then
                 repeat
-                    NewUniqueTaskBuffer.Init();
-                    NewUniqueTaskBuffer."Table No." := RecRef2.Number;
-                    NewUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
-                    NewUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
-                    NewUniqueTaskBuffer."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
-                    NewUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
-                    if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
+                    TempUniqueTaskBuffer.Init();
+                    TempUniqueTaskBuffer."Table No." := RecRef2.Number;
+                    TempUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
+                    TempUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
+                    TempUniqueTaskBuffer."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
+                    TempUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
+                    if NcTaskMgt.ReqisterUniqueTask(TempUniqueTaskBuffer, UniqueTaskBuffer) then
                         IsUnique := true;
                 until RecRef2.Next() = 0;
         until NpXmlTemplateTrigger.Next() = 0;

@@ -185,7 +185,7 @@
         POSPayBinSetFloat: Page "NPR POS Paym.Bin Set Float";
         POSUnit: Record "NPR POS Unit";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        POSPaymentMethodTemp: Record "NPR POS Payment Method" temporary;
+        TempPOSPaymentMethod: Record "NPR POS Payment Method" temporary;
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         BinEntry: Record "NPR POS Bin Entry";
@@ -196,10 +196,10 @@
         POSPayBinSetFloat.LookupMode := true;
         POSPayBinSetFloat.SetPaymentBin(Rec);
         if POSPayBinSetFloat.RunModal() = ACTION::LookupOK then begin
-            POSPayBinSetFloat.GetAmounts(POSPaymentMethodTemp);
+            POSPayBinSetFloat.GetAmounts(TempPOSPaymentMethod);
 
-            POSPaymentMethodTemp.Reset();
-            if POSPaymentMethodTemp.FindSet() then begin
+            TempPOSPaymentMethod.Reset();
+            if TempPOSPaymentMethod.FindSet() then begin
 
                 POSWorkshiftCheckpoint.Init();
                 POSWorkshiftCheckpoint."Entry No." := 0;
@@ -212,7 +212,7 @@
                 POSWorkshiftCheckpoint.Insert();
 
                 repeat
-                    POSPaymentMethod.Get(POSPaymentMethodTemp.Code);
+                    POSPaymentMethod.Get(TempPOSPaymentMethod.Code);
 
                     // Creating the bin checkpoint
                     BinEntry.Init();
@@ -235,9 +235,9 @@
                     POSPaymentBinCheckpoint.Init();
                     POSPaymentBinCheckpoint."Entry No." := 0;
                     POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::ZREPORT;
-                    POSPaymentBinCheckpoint."Float Amount" := POSPaymentMethodTemp."Rounding Precision";
-                    POSPaymentBinCheckpoint."Calculated Amount Incl. Float" := POSPaymentMethodTemp."Rounding Precision";
-                    POSPaymentBinCheckpoint."New Float Amount" := POSPaymentMethodTemp."Rounding Precision";
+                    POSPaymentBinCheckpoint."Float Amount" := TempPOSPaymentMethod."Rounding Precision";
+                    POSPaymentBinCheckpoint."Calculated Amount Incl. Float" := TempPOSPaymentMethod."Rounding Precision";
+                    POSPaymentBinCheckpoint."New Float Amount" := TempPOSPaymentMethod."Rounding Precision";
                     POSPaymentBinCheckpoint."Created On" := CurrentDateTime;
                     POSPaymentBinCheckpoint."Checkpoint Date" := Today();
                     POSPaymentBinCheckpoint."Checkpoint Time" := Time;
@@ -258,11 +258,11 @@
                     BinEntry."Entry No." := 0;
                     BinEntry."Bin Checkpoint Entry No." := POSPaymentBinCheckpoint."Entry No.";
                     BinEntry.Type := BinEntry.Type::FLOAT;
-                    BinEntry."Transaction Amount" := POSPaymentMethodTemp."Rounding Precision";
+                    BinEntry."Transaction Amount" := TempPOSPaymentMethod."Rounding Precision";
                     CalculateTransactionAmountLCY(BinEntry);
                     BinEntry.Insert();
 
-                until POSPaymentMethodTemp.Next() = 0;
+                until TempPOSPaymentMethod.Next() = 0;
             end;
         end;
         //+NPR5.51 [353761]

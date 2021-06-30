@@ -123,33 +123,33 @@
 
     procedure ShowRaptorData(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text)
     var
-        RaptorDataBuffer: Record "NPR Raptor Data Buffer" temporary;
+        TempRaptorDataBuffer: Record "NPR Raptor Data Buffer" temporary;
         RaptorDataBufferEntries: Page "NPR Raptor Data Buffer Entries";
         Handled: Boolean;
     begin
-        GetRaptorData(RaptorAction, UserIdentifier, RaptorDataBuffer);
-        if RaptorDataBuffer.IsEmpty then
+        GetRaptorData(RaptorAction, UserIdentifier, TempRaptorDataBuffer);
+        if TempRaptorDataBuffer.IsEmpty then
             Error(NothingToShowErr, RaptorAction."Data Type Description", UserIdentifier);
 
-        OnBeforeShowRaptorBuffer(RaptorAction, RaptorDataBuffer, Handled);
+        OnBeforeShowRaptorBuffer(RaptorAction, TempRaptorDataBuffer, Handled);
         if not Handled then
             case RaptorAction."Raptor Module Code" of
                 RaptorModule_GetUserIdHistory():
                     begin
-                        RaptorDataBuffer.SetCurrentKey(Priority, "Date-Time Created");
-                        RaptorDataBuffer.FindFirst();
+                        TempRaptorDataBuffer.SetCurrentKey(Priority, "Date-Time Created");
+                        TempRaptorDataBuffer.FindFirst();
                     end;
                 RaptorModule_GetUserRecommendations():
                     begin
-                        RaptorDataBuffer.SetCurrentKey(Priority);
-                        RaptorDataBuffer.FindFirst();
+                        TempRaptorDataBuffer.SetCurrentKey(Priority);
+                        TempRaptorDataBuffer.FindFirst();
                     end;
             end;
 
         Clear(RaptorDataBufferEntries);
-        RaptorDataBufferEntries.SetTableView(RaptorDataBuffer);
+        RaptorDataBufferEntries.SetTableView(TempRaptorDataBuffer);
         RaptorDataBufferEntries.SetRaptorAction(RaptorAction);
-        RaptorDataBufferEntries.SetRecordSet(RaptorDataBuffer);
+        RaptorDataBufferEntries.SetRecordSet(TempRaptorDataBuffer);
         RaptorDataBufferEntries.Run();
     end;
 
@@ -340,16 +340,16 @@
 
     procedure SelectTrackingServiceType(var TrackingServiceType: Text): Boolean
     var
-        ListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
+        TempListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
     begin
-        GetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
+        GetListOfTrackingServiceTypes(TempListOfTrackingServiceTypes);
         if TrackingServiceType <> '' then begin
-            ListOfTrackingServiceTypes.SetRange(Value, TrackingServiceType);
-            if ListOfTrackingServiceTypes.Find('=><') then;
-            ListOfTrackingServiceTypes.SetRange(Value);
+            TempListOfTrackingServiceTypes.SetRange(Value, TrackingServiceType);
+            if TempListOfTrackingServiceTypes.Find('=><') then;
+            TempListOfTrackingServiceTypes.SetRange(Value);
         end;
-        if PAGE.RunModal(PAGE::"Name/Value Lookup", ListOfTrackingServiceTypes) = ACTION::LookupOK then begin
-            TrackingServiceType := CopyStr(ListOfTrackingServiceTypes.Value, 1, MaxStrLen(RaptorSetup."Tracking Service Type"));
+        if PAGE.RunModal(PAGE::"Name/Value Lookup", TempListOfTrackingServiceTypes) = ACTION::LookupOK then begin
+            TrackingServiceType := CopyStr(TempListOfTrackingServiceTypes.Value, 1, MaxStrLen(RaptorSetup."Tracking Service Type"));
             exit(true);
         end else
             exit(false);
@@ -357,13 +357,13 @@
 
     procedure ValidateTrackingServiceType(TrackingServiceType: Text)
     var
-        ListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
+        TempListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
     begin
         if TrackingServiceType = '' then
             exit;
-        GetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
-        ListOfTrackingServiceTypes.SetRange(Value, TrackingServiceType);
-        if ListOfTrackingServiceTypes.IsEmpty then
+        GetListOfTrackingServiceTypes(TempListOfTrackingServiceTypes);
+        TempListOfTrackingServiceTypes.SetRange(Value, TrackingServiceType);
+        if TempListOfTrackingServiceTypes.IsEmpty then
             Error(UnknownValue, RaptorSetup.FieldCaption("Tracking Service Type"), TrackingServiceType);
     end;
 
@@ -415,38 +415,38 @@
 
     procedure SelectWebShopSalespersons(var SalespersonFilter: Text)
     var
-        SalespersonTmp: Record "Salesperson/Purchaser" temporary;
+        TempSalesperson: Record "Salesperson/Purchaser" temporary;
         RaptorSendData: Codeunit "NPR Raptor Send Data";
         SalespersonList: Page "NPR Salesperson List";
         InQuotes: Label '''%1''';
     begin
-        RaptorSendData.CreateTmpSalespersonList(SalespersonTmp);
+        RaptorSendData.CreateTmpSalespersonList(TempSalesperson);
 
         if SalespersonFilter <> '' then begin
-            SalespersonTmp.SetFilter(Code, SalespersonFilter);
-            if SalespersonTmp.FindSet() then
+            TempSalesperson.SetFilter(Code, SalespersonFilter);
+            if TempSalesperson.FindSet() then
                 repeat
-                    SalespersonTmp.Mark := true;
-                until SalespersonTmp.Next() = 0;
-            SalespersonTmp.SetRange(Code);
+                    TempSalesperson.Mark := true;
+                until TempSalesperson.Next() = 0;
+            TempSalesperson.SetRange(Code);
         end;
 
         Clear(SalespersonList);
-        SalespersonList.SetDataset(SalespersonTmp);
+        SalespersonList.SetDataset(TempSalesperson);
         SalespersonList.SetMultiSelectionMode(true);
         SalespersonList.LookupMode(true);
         if SalespersonList.RunModal() <> ACTION::LookupOK then
             exit;
-        SalespersonList.GetDataset(SalespersonTmp);
-        SalespersonTmp.MarkedOnly(true);
+        SalespersonList.GetDataset(TempSalesperson);
+        TempSalesperson.MarkedOnly(true);
 
         SalespersonFilter := '';
-        if SalespersonTmp.FindSet() then
+        if TempSalesperson.FindSet() then
             repeat
                 if SalespersonFilter <> '' then
                     SalespersonFilter := SalespersonFilter + '|';
-                SalespersonFilter := SalespersonFilter + StrSubstNo(InQuotes, SalespersonTmp.Code);
-            until SalespersonTmp.Next() = 0;
+                SalespersonFilter := SalespersonFilter + StrSubstNo(InQuotes, TempSalesperson.Code);
+            until TempSalesperson.Next() = 0;
     end;
 
     procedure GetJsonToken(JObject: JsonObject; TokenKey: Text) JToken: JsonToken

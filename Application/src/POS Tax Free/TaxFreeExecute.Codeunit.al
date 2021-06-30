@@ -23,7 +23,7 @@
             OnRunFunction::VoucherPrint:
                 TaxFreeHandlerInterface.OnVoucherPrint(OnRunTaxFreeRequest, OnRunTaxFreeVoucher, OnRunIsRecentVoucher);
             OnRunFunction::VoucherConsolidate:
-                TaxFreeHandlerInterface.OnVoucherConsolidate(OnRunTaxFreeRequest, OnRunTmpTaxFreeConsolidation);
+                TaxFreeHandlerInterface.OnVoucherConsolidate(OnRunTaxFreeRequest, TempOnRunTaxFreeConsolidation);
             OnRunFunction::IsValidTerminalIIN:
                 TaxFreeHandlerInterface.OnIsValidTerminalIIN(OnRunTaxFreeRequest, OnRunMaskedCardNo, OnRunIsForeignIIN);
             OnRunFunction::IsStoredSaleEligible:
@@ -41,7 +41,7 @@
     var
         OnRunTaxFreeRequest: Record "NPR Tax Free Request";
         OnRunTaxFreeVoucher: Record "NPR Tax Free Voucher";
-        OnRunTmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
+        TempOnRunTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
         TaxFreeHandlerInterface: Interface "NPR Tax Free Handler Interface";
         OnRunFunction: Enum "NPR Tax Free OnRunFunction";
         OnRunSalesReceiptNo: Code[20];
@@ -140,25 +140,25 @@
     procedure OnRunTmpTaxFreeConsolidationGetSet(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; SetPar: Boolean)
     begin
         if SetPar then begin
-            OnRunTmpTaxFreeConsolidation.reset();
-            If (OnRunTmpTaxFreeConsolidation.IsTemporary()) then
-                OnRunTmpTaxFreeConsolidation.DeleteAll();
+            TempOnRunTaxFreeConsolidation.reset();
+            If (TempOnRunTaxFreeConsolidation.IsTemporary()) then
+                TempOnRunTaxFreeConsolidation.DeleteAll();
 
             tmpTaxFreeConsolidation.Reset();
             if (tmpTaxFreeConsolidation.FindSet()) then begin
                 repeat
-                    OnRunTmpTaxFreeConsolidation.TransferFields(tmpTaxFreeConsolidation, true);
-                    if (not OnRunTmpTaxFreeConsolidation.Insert()) then;
+                    TempOnRunTaxFreeConsolidation.TransferFields(tmpTaxFreeConsolidation, true);
+                    if (not TempOnRunTaxFreeConsolidation.Insert()) then;
                 until (tmpTaxFreeConsolidation.next() = 0);
             end;
         end
         else begin
-            OnRunTmpTaxFreeConsolidation.Reset();
-            if (OnRunTmpTaxFreeConsolidation.FindSet()) then begin
+            TempOnRunTaxFreeConsolidation.Reset();
+            if (TempOnRunTaxFreeConsolidation.FindSet()) then begin
                 repeat
-                    TmpTaxFreeConsolidation.TransferFields(OnRunTmpTaxFreeConsolidation, true);
+                    TmpTaxFreeConsolidation.TransferFields(TempOnRunTaxFreeConsolidation, true);
                     if (not TmpTaxFreeConsolidation.Insert()) then;
-                until (OnRunTmpTaxFreeConsolidation.next() = 0);
+                until (TempOnRunTaxFreeConsolidation.next() = 0);
             end;
         end;
     end;

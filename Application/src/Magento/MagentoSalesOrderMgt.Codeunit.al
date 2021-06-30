@@ -16,7 +16,7 @@
 
     var
         MagentoSetup: Record "NPR Magento Setup";
-        VATAmountLineTemp: Record "VAT Amount Line" temporary;
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
         MagentoMgt: Codeunit "NPR Magento Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         SalesPost: Codeunit "Sales-Post";
@@ -625,7 +625,7 @@
 
     local procedure InsertSalesLines(XmlElement: XmlElement; SalesHeader: Record "Sales Header")
     var
-        SalesLineTemp: Record "Sales Line" temporary;
+        TempSalesLine: Record "Sales Line" temporary;
         XNodeList: XmlNodeList;
         XNode: XmlNode;
         LineNo: Integer;
@@ -649,9 +649,9 @@
         if XmlElement.SelectSingleNode('shipment', XNode) then
             InsertSalesLineShipmentFee(XNode.AsXmlElement(), SalesHeader, LineNo);
 
-        SalesPost.GetSalesLines(SalesHeader, SalesLineTemp, 0);
-        SalesLineTemp.CalcVATAmountLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
-        SalesLineTemp.UpdateVATOnLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
+        SalesPost.GetSalesLines(SalesHeader, TempSalesLine, 0);
+        TempSalesLine.CalcVATAmountLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
+        TempSalesLine.UpdateVATOnLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
     end;
 
     local procedure InsertSalesLine(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)

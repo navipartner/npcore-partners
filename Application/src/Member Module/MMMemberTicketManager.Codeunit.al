@@ -22,18 +22,18 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
     procedure ValidateMemberAssignedTickets(Token: Text[100]; FailWithError: Boolean) Success: Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
     begin
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (not (TicketReservationRequest.FindSet())) then
             Error(TOKEN_NOT_FOUND, Token);
 
         repeat
-            TmpTicketReservationRequest.TransferFields(TicketReservationRequest, true);
-            TmpTicketReservationRequest.Insert();
+            TempTicketReservationRequest.TransferFields(TicketReservationRequest, true);
+            TempTicketReservationRequest.Insert();
         until (TicketReservationRequest.Next() = 0);
 
-        exit(PreValidateMemberGuestTicketRequest(TmpTicketReservationRequest, FailWithError));
+        exit(PreValidateMemberGuestTicketRequest(TempTicketReservationRequest, FailWithError));
     end;
 
     procedure PreValidateMemberGuestTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; FailWithError: Boolean) Success: Boolean
@@ -140,7 +140,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
-        TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
@@ -166,69 +166,69 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         if (not Member.Get(MemberEntryNo)) then
             Error(ErrorReason);
 
-        if (not BuildMemberGuestRequest(MembershipEntryNo, MemberEntryNo, TmpTicketReservationRequest)) then
+        if (not BuildMemberGuestRequest(MembershipEntryNo, MemberEntryNo, TempTicketReservationRequest)) then
             exit;
 
         // Let user specify guest count for each ticket type
         Commit();
-        TicketRequestMini.FillRequestTable(TmpTicketReservationRequest);
+        TicketRequestMini.FillRequestTable(TempTicketReservationRequest);
         TicketRequestMini.LookupMode(true);
         PageAction := TicketRequestMini.RunModal();
 
         if (not (PageAction = ACTION::LookupOK)) then
             exit(false); // cancel from the guest dialog - no guests
 
-        Clear(TmpTicketReservationRequest);
-        TmpTicketReservationRequest.DeleteAll();
-        TicketRequestMini.GetTicketRequest(TmpTicketReservationRequest);
+        Clear(TempTicketReservationRequest);
+        TempTicketReservationRequest.DeleteAll();
+        TicketRequestMini.GetTicketRequest(TempTicketReservationRequest);
 
-        TmpTicketReservationRequest.SetFilter(Quantity, '=%1', 0);
-        TmpTicketReservationRequest.DeleteAll();
-        TmpTicketReservationRequest.Reset();
-        if (TmpTicketReservationRequest.IsEmpty()) then
+        TempTicketReservationRequest.SetFilter(Quantity, '=%1', 0);
+        TempTicketReservationRequest.DeleteAll();
+        TempTicketReservationRequest.Reset();
+        if (TempTicketReservationRequest.IsEmpty()) then
             exit(false); // all lines deleted - no guests
 
-        PreValidateMemberGuestTicketRequest(TmpTicketReservationRequest, true);
+        PreValidateMemberGuestTicketRequest(TempTicketReservationRequest, true);
         //**
 
         Commit();
-        if (TicketAttempCreate.AttemptValidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
+        if (TicketAttempCreate.AttemptValidateRequestForTicketReuse(TempTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             TicketToken := ReusedToken;
             Commit();
 
-            PrintReusedGuestTickets(MembershipEntryNo, TmpTicketReservationRequest);
+            PrintReusedGuestTickets(MembershipEntryNo, TempTicketReservationRequest);
             exit(true); // previously created tickets are reused.
         end;
 
         // Create the actual ticket request for the guests
-        TmpTicketReservationRequest.Reset();
-        TmpTicketReservationRequest.FindSet();
+        TempTicketReservationRequest.Reset();
+        TempTicketReservationRequest.FindSet();
         Token := TicketRequestManager.GetNewToken();
         repeat
-            TicketAdmissionBOM.SetFilter("Item No.", '=%1', TmpTicketReservationRequest."Item No.");
-            TicketAdmissionBOM.SetFilter("Variant Code", '=%1', TmpTicketReservationRequest."Variant Code");
+            TicketAdmissionBOM.SetFilter("Item No.", '=%1', TempTicketReservationRequest."Item No.");
+            TicketAdmissionBOM.SetFilter("Variant Code", '=%1', TempTicketReservationRequest."Variant Code");
 
-            if (TmpTicketReservationRequest."Admission Code" <> '') then
-                TicketAdmissionBOM.SetFilter("Admission Code", '=%1', TmpTicketReservationRequest."Admission Code");
+            if (TempTicketReservationRequest."Admission Code" <> '') then
+                TicketAdmissionBOM.SetFilter("Admission Code", '=%1', TempTicketReservationRequest."Admission Code");
 
             if (TicketAdmissionBOM.FindSet()) then begin
                 repeat
 
                     TicketRequestManager.POS_AppendToReservationRequest2(Token,
                       '', 0,
-                      TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code", TicketAdmissionBOM."Admission Code",
-                      TmpTicketReservationRequest.Quantity, 0, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
+                      TempTicketReservationRequest."Item No.", TempTicketReservationRequest."Variant Code", TicketAdmissionBOM."Admission Code",
+                      TempTicketReservationRequest.Quantity, 0, Member."External Member No.", Member."External Member No.", '', TempTicketReservationRequest."Notification Address");
 
                 until (TicketAdmissionBOM.Next() = 0);
 
             end else begin
                 Error(MEMBERGUEST_TICKET, MembershipAdmissionSetup.TableCaption,
-                  MembershipAdmissionSetup."Membership  Code", TmpTicketReservationRequest."Admission Code",
-                  StrSubstNo(PlaceHolderLbl, TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code"),
+                  MembershipAdmissionSetup."Membership  Code", TempTicketReservationRequest."Admission Code",
+                  StrSubstNo(PlaceHolderLbl, TempTicketReservationRequest."External Item Code", TempTicketReservationRequest."Item No.", TempTicketReservationRequest."Variant Code"),
 
                   TicketAdmissionBOM.TableCaption);
             end;
-        until (TmpTicketReservationRequest.Next() = 0);
+        until (TempTicketReservationRequest.Next() = 0);
 
         Commit();
         ResponseMessage := '';

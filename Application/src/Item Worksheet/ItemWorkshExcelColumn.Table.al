@@ -304,7 +304,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
 
     local procedure LookupItemWorksheetField()
     var
-        RecTempField: Record "Field" temporary;
+        TempRecTempField: Record "Field" temporary;
         NPRAttributeIDs: Page "NPR Attribute IDs";
         FieldLookup: Page "NPR Field Lookup";
         I: Integer;
@@ -356,17 +356,17 @@ table 6060051 "NPR Item Worksh. Excel Column"
                 end;
             "Process as"::Other:
                 begin
-                    if RecTempField.IsTemporary then begin
+                    if TempRecTempField.IsTemporary then begin
                         I := 1;
                         repeat
-                            RecTempField.Init();
-                            RecTempField."No." := I;
-                            RecTempField."Field Caption" := TempFieldName(I);
-                            RecTempField.Insert();
+                            TempRecTempField.Init();
+                            TempRecTempField."No." := I;
+                            TempRecTempField."Field Caption" := TempFieldName(I);
+                            TempRecTempField.Insert();
                             I := I + 1;
                         until TempFieldName(I) = '';
-                        if PAGE.RunModal(6014547, RecTempField) = ACTION::LookupOK then
-                            Validate("Map to Field Number", RecTempField."No.")
+                        if PAGE.RunModal(6014547, TempRecTempField) = ACTION::LookupOK then
+                            Validate("Map to Field Number", TempRecTempField."No.")
                         else
                             Validate("Map to Field Number", 0);
                     end;

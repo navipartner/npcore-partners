@@ -97,7 +97,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Base Calendar Code field';
                 }
-                field("Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
+                field("Customized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChange))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Customized Calendar';
@@ -108,7 +108,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
+                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChange);
                     end;
                 }
                 field("Scheduled Start Time"; Rec."Scheduled Start Time")
@@ -273,16 +273,16 @@ page 6060119 "NPR TM Admis. Schedule Lines"
 
     trigger OnAfterGetCurrRecord()
     begin
-        Clear(CustomizedCalendarChangeTemp);
-        CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-        CustomizedCalendarChangeTemp."Source Code" := Rec."Admission Code";
-        CustomizedCalendarChangeTemp."Additional Source Code" := Rec."Schedule Code";
-        CustomizedCalendarChangeTemp."Base Calendar Code" := Rec."Admission Base Calendar Code";
-        if (not CustomizedCalendarChangeTemp.Insert()) then;
+        Clear(TempCustomizedCalendarChange);
+        TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
+        TempCustomizedCalendarChange."Source Code" := Rec."Admission Code";
+        TempCustomizedCalendarChange."Additional Source Code" := Rec."Schedule Code";
+        TempCustomizedCalendarChange."Base Calendar Code" := Rec."Admission Base Calendar Code";
+        if (not TempCustomizedCalendarChange.Insert()) then;
     end;
 
     var
         FORCE_GENERATE: Label 'This action will regenerate all schedules entries based on the schedule definitions. Manual changes will be lost. Do you want to continue?';
-        CustomizedCalendarChangeTemp: Record "Customized Calendar Change" temporary;
+        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
         CalendarMgmt: Codeunit "Calendar Management";
 }

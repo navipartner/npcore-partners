@@ -60,22 +60,22 @@ codeunit 6014442 "NPR DE Fiskaly DSFINVK"
         if PaymentLine.FindSet() then
             repeat
                 PaymentMapper.Get(PaymentLine."POS Payment Method Code");
-                PaymentLineTmp.Reset();
-                PaymentLineTmp.SetRange("POS Period Register No.", PaymentMapper."DSFINVK Type".AsInteger()); //"POS Period Register No." is used for DSFINVK Type
-                PaymentLineTmp.SetRange(Description, DeAuditLog."Transaction ID"); //Description is used for Fiskaly Transaction ID
-                PaymentLineTmp.SetRange("Currency Code", PaymentLine."Currency Code");
-                if PaymentLineTmp.FindFirst() then begin
-                    PaymentLineTmp."Amount (LCY)" += PaymentLine."Amount (LCY)";
-                    PaymentLineTmp.Modify();
+                TempPaymentLine.Reset();
+                TempPaymentLine.SetRange("POS Period Register No.", PaymentMapper."DSFINVK Type".AsInteger()); //"POS Period Register No." is used for DSFINVK Type
+                TempPaymentLine.SetRange(Description, DeAuditLog."Transaction ID"); //Description is used for Fiskaly Transaction ID
+                TempPaymentLine.SetRange("Currency Code", PaymentLine."Currency Code");
+                if TempPaymentLine.FindFirst() then begin
+                    TempPaymentLine."Amount (LCY)" += PaymentLine."Amount (LCY)";
+                    TempPaymentLine.Modify();
                 end
                 else begin
-                    PaymentLineTmp.Init();
-                    PaymentLineTmp := PaymentLine;
-                    if PaymentLineTmp."Currency Code" = '' then
-                        PaymentLineTmp."Currency Code" := GeneralLedgerSetup."LCY Code";
-                    PaymentLineTmp."POS Period Register No." := PaymentMapper."DSFINVK Type".AsInteger(); //"POS Period Register No." is used for DSFINVK Type
-                    PaymentLineTmp.Description := DeAuditLog."Transaction ID"; //Description is used for Fiskaly Transaction ID
-                    PaymentLineTmp.Insert();
+                    TempPaymentLine.Init();
+                    TempPaymentLine := PaymentLine;
+                    if TempPaymentLine."Currency Code" = '' then
+                        TempPaymentLine."Currency Code" := GeneralLedgerSetup."LCY Code";
+                    TempPaymentLine."POS Period Register No." := PaymentMapper."DSFINVK Type".AsInteger(); //"POS Period Register No." is used for DSFINVK Type
+                    TempPaymentLine.Description := DeAuditLog."Transaction ID"; //Description is used for Fiskaly Transaction ID
+                    TempPaymentLine.Insert();
                 end;
             until PaymentLine.Next() = 0;
     end;
@@ -93,21 +93,21 @@ codeunit 6014442 "NPR DE Fiskaly DSFINVK"
                 TaxMapper.SETRANGE("VAT Identifier", TaxAmountLine."VAT Identifier");
                 TaxMapper.FINDFIRST();
 
-                TaxAmountLineTmp.Reset();
-                TaxAmountLineTmp.SetRange("Print Order", TaxMapper."DSFINVK ID"); //"Print Order" is used for DSFINVK Vat ID
-                TaxAmountLineTmp.SetRange("Print Description", DeAuditLog."Transaction ID"); //"Print Description" is used for Fiskaly Transaction ID
-                if TaxAmountLineTmp.FindFirst() then begin
-                    TaxAmountLineTmp."Amount Including Tax" += TaxAmountLine."Amount Including Tax";
-                    TaxAmountLineTmp."Tax Base Amount" += TaxAmountLine."Tax Base Amount";
-                    TaxAmountLineTmp."Tax Amount" += TaxAmountLine."Tax Amount";
-                    TaxAmountLineTmp.Modify();
+                TempTaxAmountLine.Reset();
+                TempTaxAmountLine.SetRange("Print Order", TaxMapper."DSFINVK ID"); //"Print Order" is used for DSFINVK Vat ID
+                TempTaxAmountLine.SetRange("Print Description", DeAuditLog."Transaction ID"); //"Print Description" is used for Fiskaly Transaction ID
+                if TempTaxAmountLine.FindFirst() then begin
+                    TempTaxAmountLine."Amount Including Tax" += TaxAmountLine."Amount Including Tax";
+                    TempTaxAmountLine."Tax Base Amount" += TaxAmountLine."Tax Base Amount";
+                    TempTaxAmountLine."Tax Amount" += TaxAmountLine."Tax Amount";
+                    TempTaxAmountLine.Modify();
                 end
                 else begin
-                    TaxAmountLineTmp.Init();
-                    TaxAmountLineTmp := TaxAmountLine;
-                    TaxAmountLineTmp."Print Order" := TaxMapper."DSFINVK ID"; //"Print Order" is used for DSFINVK Vat ID
-                    TaxAmountLineTmp."Print Description" := DeAuditLog."Transaction ID"; //"Print Description" is used for Fiskaly Transaction ID
-                    TaxAmountLineTmp.Insert();
+                    TempTaxAmountLine.Init();
+                    TempTaxAmountLine := TaxAmountLine;
+                    TempTaxAmountLine."Print Order" := TaxMapper."DSFINVK ID"; //"Print Order" is used for DSFINVK Vat ID
+                    TempTaxAmountLine."Print Description" := DeAuditLog."Transaction ID"; //"Print Description" is used for Fiskaly Transaction ID
+                    TempTaxAmountLine.Insert();
                 end;
             until TaxAmountLine.Next() = 0;
     end;
@@ -160,28 +160,28 @@ codeunit 6014442 "NPR DE Fiskaly DSFINVK"
         InclVat := 0;
         ExclVat := 0;
         Vat := 0;
-        TaxAmountLineTmp.Reset();
-        TaxAmountLineTmp.SetCurrentKey("Print Order"); //"Print Order" is used for DSFINVK Vat ID
+        TempTaxAmountLine.Reset();
+        TempTaxAmountLine.SetCurrentKey("Print Order"); //"Print Order" is used for DSFINVK Vat ID
         if TransactionId <> '' then
-            TaxAmountLineTmp.SetRange("Print Description", TransactionId);
-        if not TaxAmountLineTmp.FindSet() then
+            TempTaxAmountLine.SetRange("Print Description", TransactionId);
+        if not TempTaxAmountLine.FindSet() then
             exit;
         repeat
             if OldVatId < 0 then
-                OldVatId := TaxAmountLineTmp."Print Order";
-            if OldVatId <> TaxAmountLineTmp."Print Order" then begin
+                OldVatId := TempTaxAmountLine."Print Order";
+            if OldVatId <> TempTaxAmountLine."Print Order" then begin
                 AmountsPerVatId.Add(CreateAmountsPerVatIdJson(OldVatId, InclVat, ExclVat, Vat));
-                InclVat := TaxAmountLineTmp."Amount Including Tax";
-                ExclVat := TaxAmountLineTmp."Tax Base Amount";
-                Vat := TaxAmountLineTmp."Tax Amount";
-                OldVatId := TaxAmountLineTmp."Print Order";
+                InclVat := TempTaxAmountLine."Amount Including Tax";
+                ExclVat := TempTaxAmountLine."Tax Base Amount";
+                Vat := TempTaxAmountLine."Tax Amount";
+                OldVatId := TempTaxAmountLine."Print Order";
             end
             else begin
-                InclVat += TaxAmountLineTmp."Amount Including Tax";
-                ExclVat += TaxAmountLineTmp."Tax Base Amount";
-                Vat += TaxAmountLineTmp."Tax Amount";
+                InclVat += TempTaxAmountLine."Amount Including Tax";
+                ExclVat += TempTaxAmountLine."Tax Base Amount";
+                Vat += TempTaxAmountLine."Tax Amount";
             end;
-        until TaxAmountLineTmp.Next() = 0;
+        until TempTaxAmountLine.Next() = 0;
 
         if ((InclVat + ExclVat + Vat) > 0) then
             AmountsPerVatId.Add(CreateAmountsPerVatIdJson(OldVatId, InclVat, ExclVat, Vat));
@@ -212,27 +212,27 @@ codeunit 6014442 "NPR DE Fiskaly DSFINVK"
         PaymentAmout := 0;
         OldType := -1;
         OldCurrency := '';
-        PaymentLineTmp.Reset();
-        PaymentLineTmp.SetCurrentKey("Currency Code");
-        if not PaymentLineTmp.FindSet() then
+        TempPaymentLine.Reset();
+        TempPaymentLine.SetCurrentKey("Currency Code");
+        if not TempPaymentLine.FindSet() then
             exit;
         repeat
-            POSPayment.Get(PaymentLineTmp."POS Payment Method Code");
-            FullAmount += PaymentLineTmp."Amount (LCY)";
+            POSPayment.Get(TempPaymentLine."POS Payment Method Code");
+            FullAmount += TempPaymentLine."Amount (LCY)";
             if POSPayment."Processing Type" = POSPayment."Processing Type"::CASH then
-                CashAmount += PaymentLineTmp."Amount (LCY)";
+                CashAmount += TempPaymentLine."Amount (LCY)";
 
             if OldCurrency = '' then
-                OldCurrency := PaymentLineTmp."Currency Code";
+                OldCurrency := TempPaymentLine."Currency Code";
 
-            if OldCurrency <> PaymentLineTmp."Currency Code" then begin
+            if OldCurrency <> TempPaymentLine."Currency Code" then begin
                 CashAmountsCurrency.Add(CreatePaymentType(OldCurrency, PaymentAmout, ''));
-                PaymentAmout := PaymentLineTmp."Amount (LCY)";
-                OldCurrency := PaymentLineTmp."Currency Code";
+                PaymentAmout := TempPaymentLine."Amount (LCY)";
+                OldCurrency := TempPaymentLine."Currency Code";
             end
             else
-                PaymentAmout += PaymentLineTmp."Amount (LCY)";
-        until PaymentLineTmp.Next() = 0;
+                PaymentAmout += TempPaymentLine."Amount (LCY)";
+        until TempPaymentLine.Next() = 0;
 
         if PaymentAmout > 0 then begin
             CashAmountsCurrency.Add(CreatePaymentType(OldCurrency, PaymentAmout, ''));
@@ -244,28 +244,28 @@ codeunit 6014442 "NPR DE Fiskaly DSFINVK"
         Payment.Add('cash_amount', CashAmount);
         Payment.Add('cash_amounts_by_currency', CashAmountsCurrency);
 
-        PaymentLineTmp.Reset();
-        PaymentLineTmp.SetCurrentKey("POS Period Register No.", "Currency Code");
-        PaymentLineTmp.FindSet();
+        TempPaymentLine.Reset();
+        TempPaymentLine.SetCurrentKey("POS Period Register No.", "Currency Code");
+        TempPaymentLine.FindSet();
         repeat
-            POSPayment.Get(PaymentLineTmp."POS Payment Method Code");
+            POSPayment.Get(TempPaymentLine."POS Payment Method Code");
             if OldCurrency = '' then
-                OldCurrency := PaymentLineTmp."Currency Code";
+                OldCurrency := TempPaymentLine."Currency Code";
             if OldType < 0 then
-                OldType := PaymentLineTmp."POS Period Register No.";
+                OldType := TempPaymentLine."POS Period Register No.";
 
-            if (OldCurrency <> PaymentLineTmp."Currency Code") or (OldType <> PaymentLineTmp."POS Period Register No.") then begin
-                PaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((PaymentLineTmp."POS Period Register No." + 1))));
-                PaymentAmout := PaymentLineTmp."Amount (LCY)";
-                OldCurrency := PaymentLineTmp."Currency Code";
-                OldType := PaymentLineTmp."POS Period Register No.";
+            if (OldCurrency <> TempPaymentLine."Currency Code") or (OldType <> TempPaymentLine."POS Period Register No.") then begin
+                PaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((TempPaymentLine."POS Period Register No." + 1))));
+                PaymentAmout := TempPaymentLine."Amount (LCY)";
+                OldCurrency := TempPaymentLine."Currency Code";
+                OldType := TempPaymentLine."POS Period Register No.";
             end
             else
-                PaymentAmout += PaymentLineTmp."Amount (LCY)";
-        until PaymentLineTmp.Next() = 0;
+                PaymentAmout += TempPaymentLine."Amount (LCY)";
+        until TempPaymentLine.Next() = 0;
 
         if PaymentAmout > 0 then
-            PaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((PaymentLineTmp."POS Period Register No." + 1))));
+            PaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((TempPaymentLine."POS Period Register No." + 1))));
 
         Payment.Add('payment_types', PaymentTypes);
     end;
@@ -332,31 +332,31 @@ codeunit 6014442 "NPR DE Fiskaly DSFINVK"
     begin
         FullAmount := 0;
         OldType := -1;
-        PaymentLineTmp.Reset();
-        PaymentLineTmp.SetCurrentKey("POS Period Register No.", "Currency Code");
-        PaymentLineTmp.SetRange(Description, DeAuditLog."Transaction ID");
-        if not PaymentLineTmp.FindSet() then
+        TempPaymentLine.Reset();
+        TempPaymentLine.SetCurrentKey("POS Period Register No.", "Currency Code");
+        TempPaymentLine.SetRange(Description, DeAuditLog."Transaction ID");
+        if not TempPaymentLine.FindSet() then
             exit;
         repeat
-            POSPayment.Get(PaymentLineTmp."POS Payment Method Code");
+            POSPayment.Get(TempPaymentLine."POS Payment Method Code");
             if OldCurrency = '' then
-                OldCurrency := PaymentLineTmp."Currency Code";
+                OldCurrency := TempPaymentLine."Currency Code";
             if OldType < 0 then
-                OldType := PaymentLineTmp."POS Period Register No.";
+                OldType := TempPaymentLine."POS Period Register No.";
 
-            if (OldCurrency <> PaymentLineTmp."Currency Code") or (OldType <> PaymentLineTmp."POS Period Register No.") then begin
-                TransactionPaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((PaymentLineTmp."POS Period Register No." + 1))));
-                PaymentAmout := PaymentLineTmp."Amount (LCY)";
-                OldCurrency := PaymentLineTmp."Currency Code";
-                OldType := PaymentLineTmp."POS Period Register No.";
+            if (OldCurrency <> TempPaymentLine."Currency Code") or (OldType <> TempPaymentLine."POS Period Register No.") then begin
+                TransactionPaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((TempPaymentLine."POS Period Register No." + 1))));
+                PaymentAmout := TempPaymentLine."Amount (LCY)";
+                OldCurrency := TempPaymentLine."Currency Code";
+                OldType := TempPaymentLine."POS Period Register No.";
             end
             else
-                PaymentAmout += PaymentLineTmp."Amount (LCY)";
-            FullAmount += PaymentLineTmp."Amount (LCY)";
-        until PaymentLineTmp.Next() = 0;
+                PaymentAmout += TempPaymentLine."Amount (LCY)";
+            FullAmount += TempPaymentLine."Amount (LCY)";
+        until TempPaymentLine.Next() = 0;
 
         if PaymentAmout > 0 then
-            TransactionPaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((PaymentLineTmp."POS Period Register No." + 1))));
+            TransactionPaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((TempPaymentLine."POS Period Register No." + 1))));
     end;
 
     local procedure CreateTransactionLines() TransactionLines: JsonArray
@@ -414,8 +414,8 @@ codeunit 6014442 "NPR DE Fiskaly DSFINVK"
         DePosUnit: Record "NPR DE POS Unit Aux. Info";
         PosEntry: Record "NPR POS Entry";
         DeAuditLog: Record "NPR DE POS Audit Log Aux. Info";
-        PaymentLineTmp: Record "NPR POS Entry Payment Line" temporary;
-        TaxAmountLineTmp: Record "NPR POS Entry Tax Line" temporary;
+        TempPaymentLine: Record "NPR POS Entry Payment Line" temporary;
+        TempTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
         WorkShiftDate: Date;
         FirstFiscalNo: Text;
         LastFiscalNo: Text;

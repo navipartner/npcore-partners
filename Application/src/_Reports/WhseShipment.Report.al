@@ -99,7 +99,7 @@ report 6014495 "NPR Whse. - Shipment"
                     column(QtyPicked_WhseShptLine; "Qty. Picked")
                     {
                     }
-                    column(Barcode; BlobBuffer."Buffer 1")
+                    column(Barcode; TempBlobBuffer."Buffer 1")
                     {
                     }
 
@@ -115,7 +115,7 @@ report 6014495 "NPR Whse. - Shipment"
                         BarcodeLib.GenerateBarcode("Warehouse Shipment Line"."Source No.", TmpBarcode);
                         TmpBarcode.CreateInStream(InStr);
                         TmpBarcode.CreateOutStream(OuStr);
-                        BlobBuffer.GetFromTempBlob(TmpBarcode, 1);
+                        TempBlobBuffer.GetFromTempBlob(TmpBarcode, 1);
                     end;
                 }
             }
@@ -129,7 +129,7 @@ report 6014495 "NPR Whse. - Shipment"
 
     var
         Location: Record Location;
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        TempBlobBuffer: Record "NPR BLOB buffer" temporary;
         BarcodeLib: Codeunit "NPR Barcode Image Library";
         TmpBarcode: Codeunit "Temp Blob";
         InStr: InStream;
