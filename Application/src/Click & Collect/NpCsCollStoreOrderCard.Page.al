@@ -223,7 +223,7 @@
                     {
                         ShowCaption = false;
                         Visible = NOT Rec."Store Stock";
-                        field("UPPERCASE(Text002)"; UpperCase(Text002))
+                        field(WarningText; UpperCase(Text002))
                         {
                             ApplicationArea = All;
                             ShowCaption = false;

@@ -19,7 +19,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail field';
                 }
-                field("Password.HASVALUE"; Rec.Password.HasValue())
+                field(PasswordSet; Rec.Password.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Password Set';

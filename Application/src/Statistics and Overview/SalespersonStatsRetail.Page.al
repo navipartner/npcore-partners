@@ -21,7 +21,7 @@ page 6014586 "NPR Salesperson Stats Retail"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("-""Sale Quantity"""; -"Sale Quantity")
+                field("-Sale Quantity"; -"Sale Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (QTY)';
@@ -38,7 +38,7 @@ page 6014586 "NPR Salesperson Stats Retail"
                         AuxItemLedgerEntries.RunModal();
                     end;
                 }
-                field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
+                field("-LastYear Sale Quantity"; -"LastYear Sale Quantity")
                 {
                     ApplicationArea = All;
                     Caption = '-> Last year';
@@ -75,7 +75,7 @@ page 6014586 "NPR Salesperson Stats Retail"
                     Caption = 'Profit (LCY)';
                     ToolTip = 'Specifies the value of the Profit (LCY) field';
                 }
-                field("-""LastYear Profit Amount"""; -"LastYear Profit Amount")
+                field("-LastYear Profit Amount"; -"LastYear Profit Amount")
                 {
                     ApplicationArea = All;
                     Caption = '-> Last year';

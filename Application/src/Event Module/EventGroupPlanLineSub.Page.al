@@ -91,7 +91,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Ending Time field';
                 }
-                field("""Calendar Item ID"" <> ''"; Rec."NPR Calendar Item ID" <> '')
+                field(IsCalendarItemIDEmpty; Rec."NPR Calendar Item ID" <> '')
                 {
                     ApplicationArea = All;
                     Caption = 'Meeting Req. Exists';

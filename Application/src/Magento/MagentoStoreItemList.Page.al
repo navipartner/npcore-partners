@@ -262,7 +262,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150654)
                                     {
                                         ShowCaption = false;
-                                        field("FORMAT(""Webshop Description"".HASVALUE)"; Format(Rec."Webshop Description".HasValue))
+                                        field("Webshop Description"; Format(Rec."Webshop Description".HasValue))
                                         {
                                             ApplicationArea = All;
                                             Caption = 'Description';
@@ -300,7 +300,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150645)
                                     {
                                         ShowCaption = false;
-                                        field("FORMAT(""Webshop Short Desc."".HASVALUE)"; Format(Rec."Webshop Short Desc.".HasValue))
+                                        field("Webshop Short Description"; Format(Rec."Webshop Short Desc.".HasValue))
                                         {
                                             ApplicationArea = All;
                                             Caption = 'Short Description';

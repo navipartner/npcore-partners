@@ -19,7 +19,7 @@ page 6151436 "NPR Magento Item Attr."
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute field';
                 }
-                field("GetValue()"; GetValue())
+                field(Value; GetValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Value';

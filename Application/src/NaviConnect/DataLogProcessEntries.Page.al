@@ -37,7 +37,7 @@ page 6059894 "NPR Data Log Process. Entries"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Log Record Value field';
                 }
-                field("GetErrorMessage()"; Rec.GetErrorMessage())
+                field(ErrorMessage; Rec.GetErrorMessage())
                 {
                     Caption = 'Error Message';
                     ApplicationArea = All;

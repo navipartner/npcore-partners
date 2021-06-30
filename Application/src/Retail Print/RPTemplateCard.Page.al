@@ -178,7 +178,7 @@ page 6014638 "NPR RP Template Card"
             {
                 Caption = 'Media';
                 Editable = NOT Rec.Archived;
-                field("tmpMediaInfo.Picture"; tmpMediaInfo.Image)
+                field("Media Roll Picture"; tmpMediaInfo.Image)
                 {
                     ApplicationArea = All;
                     Caption = 'Media Roll Picture';
@@ -194,7 +194,7 @@ page 6014638 "NPR RP Template Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field("tmpMediaInfo.URL"; tmpMediaInfo.URL)
+                field("Media Roll URL"; tmpMediaInfo.URL)
                 {
                     ApplicationArea = All;
                     Caption = 'Media Roll URL';
@@ -210,7 +210,7 @@ page 6014638 "NPR RP Template Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field("tmpMediaInfo.Description"; tmpMediaInfo.Description)
+                field("Media Roll Description"; tmpMediaInfo.Description)
                 {
                     ApplicationArea = All;
                     Caption = 'Media Roll Description';

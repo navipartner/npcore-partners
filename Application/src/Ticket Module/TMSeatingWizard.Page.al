@@ -64,7 +64,7 @@ page 6151132 "NPR TM Seating Wizard"
                         Caption = 'Start with Number (Row)';
                         ToolTip = 'Specifies the value of the Start with Number (Row) field';
                     }
-                    field("SeatingSetup.""Row Numbering"""; SeatingSetup."Row Numbering")
+                    field("Row Numbering"; SeatingSetup."Row Numbering")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Numbering (Row)';
@@ -87,7 +87,7 @@ page 6151132 "NPR TM Seating Wizard"
                         Caption = 'Start with Number (Seat)';
                         ToolTip = 'Specifies the value of the Start with Number (Seat) field';
                     }
-                    field("SeatingSetup.""Seat Numbering"""; SeatingSetup."Seat Numbering")
+                    field("Seat Numbering"; SeatingSetup."Seat Numbering")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Numbering (Seat)';

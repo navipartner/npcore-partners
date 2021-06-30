@@ -17,7 +17,7 @@ page 6014438 "NPR Posted Documents"
         {
             repeater(Group)
             {
-                field("FORMAT(""Source Record ID"")"; Format(Rec."Source Record ID"))
+                field("Source Record ID"; Format(Rec."Source Record ID"))
                 {
                     ApplicationArea = All;
                     Caption = 'Source Record ID';

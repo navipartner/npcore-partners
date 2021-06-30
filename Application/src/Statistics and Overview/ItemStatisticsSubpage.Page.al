@@ -24,7 +24,7 @@
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("-""Sale Quantity"""; -"Sale Quantity")
+                field("-Sale Quantity"; -"Sale Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (QTY)';
@@ -42,7 +42,7 @@
                         ItemledgerEntryForm.RunModal();
                     end;
                 }
-                field("-""LastYear Sale Quantity"""; -"LastYear Sale Quantity")
+                field("-LastYear Sale Quantity"; -"LastYear Sale Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
@@ -80,7 +80,7 @@
                     Caption = 'Cost (LCY)';
                     ToolTip = 'Specifies the value of the Cost (LCY) field';
                 }
-                field("-""Last Year CostAmt"""; -"Last Year CostAmt")
+                field("-Last Year CostAmt"; -"Last Year CostAmt")
                 {
                     ApplicationArea = All;
                     Caption = 'Last year Cost Amount';
