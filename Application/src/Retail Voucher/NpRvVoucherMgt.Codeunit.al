@@ -1141,9 +1141,9 @@
         SaleLinePOS."Unit Price" := AmtInput;
         case DiscountType of
             '0':
-                SaleLinePOS."Discount %" := DiscountPct;
-            '1':
                 SaleLinePOS."Discount Amount" := DiscountAmount;
+            '1':
+                SaleLinePOS."Discount %" := DiscountPct;
         end;
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if SaleLinePOS."Discount Amount" > 0 then
