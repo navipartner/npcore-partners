@@ -263,6 +263,10 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     var
         Int: Integer;
         Code128: Text;
+        TypeHelper: Codeunit "Type Helper";
+        PLow: Integer;
+        PHigh: Integer;
+        TextLength: Integer;
     begin
         if BarcodeType in ['CODE39', 'Barcode4'] then
             Width := 1;
@@ -326,9 +330,56 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
                     if StrLen(Code128) > 0 then
                         PrintBarCodeB(73, StrLen(Code128), Code128);
                 end;
-            'QR':
+            'QR',
+            'QR1L',
+            'QR1M',
+            'QR1Q',
+            'QR1H',
+            'QR2L',
+            'QR2M',
+            'QR2Q',
+            'QR2H',
+            'QRML',
+            'QRMM',
+            'QRMQ',
+            'QRMH':
                 begin
-                    Error('Not implemented');
+                    // Select QR Model; 1 (Old), 2 (New), M (Micro)
+                    case CopyStr(BarcodeType, 3, 1) of
+                        '1':
+                            QRSelectModel(4, 0, 49, 65, 49, 0);
+                        'M':
+                            QRSelectModel(4, 0, 49, 65, 51, 0);
+                        else // '2'
+                            QRSelectModel(4, 0, 49, 65, 50, 0); // default
+                    end;
+
+                    // Set Size
+                    if Width > 0 then
+                        QRSelectSize(3, 0, 49, 67, Width)
+                    else
+                        QRSelectSize(3, 0, 49, 67, 3); // default
+
+                    // Set Error Correction Level
+                    case CopyStr(BarcodeType, 4, 1) of
+                        'M':
+                            QRSelectErrorLevel(3, 0, 49, 69, 49);
+                        'Q':
+                            QRSelectErrorLevel(3, 0, 49, 69, 50);
+                        'H':
+                            QRSelectErrorLevel(3, 0, 49, 69, 51);
+                        else // 'L'
+                            QRSelectErrorLevel(3, 0, 49, 69, 48); // default
+                    end;
+
+                    // Store QR
+                    TextLength := StrLen(Text) + 3;
+                    PLow := TypeHelper.BitwiseAnd(TextLength, 255);
+                    PHigh := (TextLength - PLow) / 256;
+                    QRStoreData(PLow, PHigh, 49, 80, 48, Text);
+
+                    // Print QR
+                    QRPrintData(3, 0, 49, 81, 48);
                 end;
         end;
 
@@ -518,6 +569,36 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         // Command:
         // GS k m n d1..dn
         AddTextToBuffer(ESC.GS() + 'k' + Format(m) + Format(n) + "d1..dn");
+    end;
+
+    local procedure QRSelectModel(pL: Char; pH: Char; cn: Char; fn: Char; n1: Char; n2: Char)
+    begin
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
+        AddTextToBuffer(ESC.GS() + '(' + 'k' + Format(pL) + Format(pH) + Format(cn) + Format(fn) + Format(n1) + Format(n2));
+    end;
+
+    local procedure QRSelectSize(pL: Char; pH: Char; cn: Char; fn: Char; n: Char)
+    begin
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
+        AddTextToBuffer(ESC.GS() + '(' + 'k' + Format(pL) + Format(pH) + Format(cn) + Format(fn) + Format(n));
+    end;
+
+    local procedure QRSelectErrorLevel(pL: Char; pH: Char; cn: Char; fn: Char; n: Char)
+    begin
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
+        AddTextToBuffer(ESC.GS() + '(' + 'k' + Format(pL) + Format(pH) + Format(cn) + Format(fn) + Format(n));
+    end;
+
+    local procedure QRStoreData(pL: Char; pH: Char; cn: Char; fn: Char; m: Char; "d1..dk": Text)
+    begin
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
+        AddTextToBuffer(ESC.GS() + '(' + 'k' + Format(pL) + Format(pH) + Format(cn) + Format(fn) + Format(m) + "d1..dk");
+    end;
+
+    local procedure QRPrintData(pL: Char; pH: Char; cn: Char; fn: Char; m: Char)
+    begin
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
+        AddTextToBuffer(ESC.GS() + '(' + 'k' + Format(pL) + Format(pH) + Format(cn) + Format(fn) + Format(m));
     end;
 
     local procedure PrintBitmapFromKeyword(Keyword: Code[20]; RegisterNo: Code[10])
@@ -806,7 +887,8 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         if CopyStr(Font, 1, 7) = 'BARCODE' then //Legacy syntax support - Remove this when the hardcoded receipts are deprecated.
             exit(true);
 
-        if Font in ['UPC-A', 'UPC-E', 'EAN13', 'EAN8', 'CODE39', 'ITF', 'CODABAR', 'CODE128', 'QR'] then
+        if Font in ['UPC-A', 'UPC-E', 'EAN13', 'EAN8', 'CODE39', 'ITF', 'CODABAR', 'CODE128',
+                    'QR', 'QR1L', 'QR1M', 'QR1Q', 'QR1H', 'QR2L', 'QR2M', 'QR2Q', 'QR2H', 'QRML', 'QRMM', 'QRMQ', 'QRMH'] then
             exit(true);
     end;
 
@@ -920,6 +1002,19 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         AddOption(RetailList, 'EAN13', '');
         AddOption(RetailList, 'CODE39', '');
         AddOption(RetailList, 'CODE128', '');
+        AddOption(RetailList, 'QR', '');
+        AddOption(RetailList, 'QR1L', '');
+        AddOption(RetailList, 'QR1M', '');
+        AddOption(RetailList, 'QR1Q', '');
+        AddOption(RetailList, 'QR1H', '');
+        AddOption(RetailList, 'QR2L', '');
+        AddOption(RetailList, 'QR2M', '');
+        AddOption(RetailList, 'QR2Q', '');
+        AddOption(RetailList, 'QR2H', '');
+        AddOption(RetailList, 'QRML', '');
+        AddOption(RetailList, 'QRMM', '');
+        AddOption(RetailList, 'QRMQ', '');
+        AddOption(RetailList, 'QRMH', '');
     end;
 
     procedure ConstructCommandSelectionList(var RetailList: Record "NPR Retail List" temporary)
