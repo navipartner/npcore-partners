@@ -217,6 +217,7 @@ table 6150629 "NPR POS Entry Tax Line"
     {
         key(Key1; "POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive)
         {
+            SumIndexFields = "Tax Amount";
         }
         key(Key2; "Print Order", "Tax Area Code for Key", "Tax Jurisdiction Code")
         {
