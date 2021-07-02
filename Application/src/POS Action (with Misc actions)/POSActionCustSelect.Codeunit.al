@@ -190,7 +190,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         case POSParameterValue.Name of
             'CustomerLookupPage':
                 begin
-                    if POSParameterValue.Value = '' then
+                    if (POSParameterValue.Value in ['', '0']) then
                         exit;
                     Evaluate(PageId, POSParameterValue.Value);
                     PageMetadata.SetRange(ID, PageId);
