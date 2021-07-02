@@ -3,8 +3,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
     Caption = 'POS Info Lookup Field Setup';
     DelayedInsert = true;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR POS Info Lookup Setup";
     SourceTableTemporary = true;
 
@@ -23,14 +22,11 @@ page 6150645 "NPR POS Info Look. Field Setup"
                 field("Field No."; Rec."Field No.")
                 {
                     ApplicationArea = All;
-                    AssistEdit = true;
-                    DrillDown = false;
-                    Lookup = false;
                     ToolTip = 'Specifies the value of the Field No. field';
 
-                    trigger OnAssistEdit()
+                    trigger OnLookup(var Text: Text): Boolean
                     begin
-                        AssistEdit();
+                        exit(LookupFieldNo(Text));
                     end;
                 }
                 field("Field Name"; Rec."Field Name")
@@ -42,18 +38,30 @@ page 6150645 "NPR POS Info Look. Field Setup"
         }
     }
 
-    actions
-    {
-    }
+    var
+        POSInfo: Record "NPR POS Info";
 
     trigger OnOpenPage()
     begin
         LoadTable();
-        CurrPage.Update(true);
+        CurrPage.Update();
     end;
 
+    trigger OnClosePage()
     var
-        POSInfo: Record "NPR POS Info";
+        POSInfoLookupSetup: Record "NPR POS Info Lookup Setup";
+    begin
+        POSInfoLookupSetup.SetRange("POS Info Code", POSInfo.Code);
+        POSInfoLookupSetup.DeleteAll();
+
+        Rec.Reset();
+        Rec.SetFilter("Field No.", '<>%1', 0);
+        if Rec.FindSet() then
+            repeat
+                POSInfoLookupSetup := Rec;
+                POSInfoLookupSetup.Insert();
+            until Rec.Next() = 0;
+    end;
 
     local procedure LoadTable()
     var
@@ -71,24 +79,27 @@ page 6150645 "NPR POS Info Look. Field Setup"
         end;
     end;
 
-    local procedure AssistEdit()
+    local procedure LookupFieldNo(var Text: Text): Boolean
     var
         FieldRec: Record "Field";
         FieldList: Page "NPR Field Lookup";
-        POSInfoLookupSetup: Record "NPR POS Info Lookup Setup";
+        CurrentlySelectedFieldNo: Integer;
     begin
+        if not Evaluate(CurrentlySelectedFieldNo, Text) then
+            CurrentlySelectedFieldNo := 0;
         FieldRec.FilterGroup(2);
         FieldRec.SetRange(TableNo, Rec."Table No");
         FieldRec.FilterGroup(0);
+        if CurrentlySelectedFieldNo <> 0 then
+            if FieldRec.Get(Rec."Table No", CurrentlySelectedFieldNo) then;
         FieldList.SetTableView(FieldRec);
         FieldList.LookupMode(true);
         if FieldList.RunModal() = ACTION::LookupOK then begin
             FieldList.GetRecord(FieldRec);
-            Rec."Field No." := FieldRec."No.";
-            POSInfoLookupSetup := Rec;
-            if not POSInfoLookupSetup.Insert() then
-                POSInfoLookupSetup.Modify();
+            Text := Format(FieldRec."No.");
+            exit(true);
         end;
+        exit(false);
     end;
 
     procedure SetPOSInfo(pPOSInfo: Record "NPR POS Info")

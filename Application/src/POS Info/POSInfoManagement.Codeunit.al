@@ -26,15 +26,29 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnBeforeValidateEvent', 'Customer No.', false, false)]
     local procedure OnBeforeValidateCustomerNoSalePos(var Rec: Record "NPR POS Sale"; var xRec: Record "NPR POS Sale"; CurrFieldNo: Integer)
     var
+        Customer: Record Customer;
         POSInfoLinkTable: Record "NPR POS Info Link Table";
         pSaleLinePos: Record "NPR POS Sale Line";
         FrontEndUpdateIsNeeded: Boolean;
     begin
         if Rec.IsTemporary then
             exit;
+        if Rec."Customer No." <> '' then begin
+            Customer.Get(Rec."Customer No.");
+            Customer.CalcFields("Balance (LCY)");
+        end else
+            Clear(Customer);
         POSInfoLinkTable.Reset();
         POSInfoLinkTable.SetRange("Table ID", DATABASE::Customer);
         POSInfoLinkTable.SetRange("Primary Key", Rec."Customer No.");
+        Case true of
+            Customer."Balance (LCY)" > 0:
+                POSInfoLinkTable.SetFilter("When to Use", '%1|%2', POSInfoLinkTable."When to Use"::Always, POSInfoLinkTable."When to Use"::Positive);
+            Customer."Balance (LCY)" < 0:
+                POSInfoLinkTable.SetFilter("When to Use", '%1|%2', POSInfoLinkTable."When to Use"::Always, POSInfoLinkTable."When to Use"::Negative);
+            Customer."Balance (LCY)" = 0:
+                POSInfoLinkTable.SetRange("When to Use", POSInfoLinkTable."When to Use"::Always);
+        end;
 
         pSaleLinePos.Init();
         pSaleLinePos."Register No." := Rec."Register No.";
@@ -548,9 +562,14 @@
     end;
 
     #region DataSource Extension
-    local procedure ThisDataSource(): Text
+    local procedure BuiltInSale_DataSource(): Text
     begin
         exit('BUILTIN_SALE');
+    end;
+
+    local procedure BuiltInSaleLine_DataSource(): Text
+    begin
+        exit('BUILTIN_SALELINE');
     end;
 
     local procedure ThisExtension(): Text
@@ -570,7 +589,7 @@
     var
         POSInfo: Record "NPR POS Info";
     begin
-        if ThisDataSource() <> DataSourceName then
+        if not (DataSourceName in [BuiltInSale_DataSource(), BuiltInSaleLine_DataSource()]) then
             exit;
         POSInfo.SetRange("Available in Front-End", true);
         if POSInfo.IsEmpty then
@@ -586,7 +605,7 @@
         DataType: Enum "NPR Data Type";
         POSInfoLbl: Label 'POS Info: %1', Locked = true;
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if not ((DataSourceName in [BuiltInSale_DataSource(), BuiltInSaleLine_DataSource()]) and (ExtensionName = ThisExtension())) then
             exit;
 
         Handled := true;
@@ -607,9 +626,8 @@
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if not ((DataSourceName in [BuiltInSale_DataSource(), BuiltInSaleLine_DataSource()]) and (ExtensionName = ThisExtension())) then
             exit;
 
         Handled := true;
@@ -620,16 +638,18 @@
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        if SaleLinePOS."Line No." = 0 then begin  //new sale
+        if RecRef.Number = Database::"NPR POS Sale Line" then
+            RecRef.SetTable(SaleLinePOS)
+        else
+            Clear(SaleLinePOS);
+        if SaleLinePOS."Line No." = 0 then begin
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         end;
 
         repeat
             FilterPOSInfoTrans(POSInfoTransaction, POSInfo.Code, SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
-            if POSInfoTransaction.IsEmpty then
+            if POSInfoTransaction.IsEmpty and POSInfo."Once per Transaction" and (SaleLinePOS."Line No." <> 0) then
                 POSInfoTransaction.SetRange("Sales Line No.", 0);
             if not POSInfoTransaction.FindFirst() then
                 POSInfoTransaction.Init();
