@@ -27,8 +27,12 @@ table 6150642 "NPR POS Info Link Table"
             DataClassification = CustomerContent;
             OptionCaption = 'Always,Negative,Positive';
             OptionMembers = Always,Negative,Positive;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Not used';
+
+            trigger OnValidate()
+            begin
+                if "When to Use" <> "When to Use"::Always then
+                    TestField("Table ID", Database::Customer);
+            end;
         }
         field(20; "POS Info Description"; Text[50])
         {
