@@ -135,6 +135,30 @@ table 6150705 "NPR POS Parameter Value"
         Value := Param."Default Value";
     end;
 
+    /// <summary>
+    /// Adds all parameters in the current recordset to target action. This method iterates through the Rec variable, but restores it afterwards.
+    /// You must invoke this function only on temporary variables. Invoking it on non-temporary variables results in error.
+    /// </summary>
+    /// <param name="Target">Target action to which parameters will be added.</param>
+    procedure AddParametersToAction(Target: Interface "NPR IAction")
+    var
+        TempCopyRec: Record "NPR POS Parameter Value" temporary;
+        NotTemporaryRecordErr: Label 'Attempting to invoke AddParametersToAction on non-temporary variable. This operation is not valid and indicates a programming bug.';
+    begin
+        if not Rec.IsTemporary() then
+            Error(NotTemporaryRecordErr);
+        TempCopyRec := Rec;
+        if Rec.FindSet() then
+            repeat
+                AddParameterToAction(Target);
+            until Rec.Next() = 0;
+        Rec := TempCopyRec;
+    end;
+
+    /// <summary>
+    /// Adds a single parameter (current value of Rec) to target action.
+    /// </summary>
+    /// <param name="Target">Target action to which the parameter should be added.</param>
     procedure AddParameterToAction(Target: Interface "NPR IAction")
     var
         Param: Record "NPR POS Action Parameter";
