@@ -3,8 +3,7 @@ page 6151173 "NPR NpGp POS Info POS Entry"
     Caption = 'Global POS Info Entries';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR NpGp POS Info POS Entry";
 
     layout
@@ -71,9 +70,4 @@ page 6151173 "NPR NpGp POS Info POS Entry"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

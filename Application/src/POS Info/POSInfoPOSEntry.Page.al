@@ -1,14 +1,10 @@
 page 6150647 "NPR POS Info POS Entry"
 {
-    // NPR5.41/THRO/20180424 CASE 312185 Page created
-    // NPR5.53/ALPO/20200204 CASE 387750 Added fields: "Document No.", "Entry Date", "POS Unit No.", "Salesperson Code"
-
     Caption = 'POS Info POS Entry';
     Editable = false;
     PageType = List;
     SourceTable = "NPR POS Info POS Entry";
-    UsageCategory = Lists;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -99,9 +95,4 @@ page 6150647 "NPR POS Info POS Entry"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

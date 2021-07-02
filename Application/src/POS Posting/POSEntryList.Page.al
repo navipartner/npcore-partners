@@ -576,6 +576,17 @@
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Period Register List action';
                 }
+                action("POS Info POS Entry List")
+                {
+                    Caption = 'POS Info POS Entry List';
+                    Image = Info;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "NPR POS Info POS Entry";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Info POS Entry List action';
+                }
             }
             group("Failed POS Lists")
             {

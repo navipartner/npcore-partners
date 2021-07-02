@@ -2,8 +2,7 @@
 {
     Caption = 'POS Info Lookup';
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR POS Info Lookup";
     SourceTableTemporary = true;
 
@@ -17,45 +16,47 @@
                 field("Field 1"; Rec."Field 1")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Field1Caption;
+                    CaptionClass = ColumnCaption[1];
+                    Visible = Column1Visible;
                     ToolTip = 'Specifies the value of the Field 1 field';
                 }
                 field("Field 2"; Rec."Field 2")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Field2Caption;
+                    CaptionClass = ColumnCaption[2];
+                    Visible = Column2Visible;
                     ToolTip = 'Specifies the value of the Field 2 field';
                 }
                 field("Field 3"; Rec."Field 3")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Field3Caption;
+                    CaptionClass = ColumnCaption[3];
+                    Visible = Column3Visible;
                     ToolTip = 'Specifies the value of the Field 3 field';
                 }
                 field("Field 4"; Rec."Field 4")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Field4Caption;
+                    CaptionClass = ColumnCaption[4];
+                    Visible = Column4Visible;
                     ToolTip = 'Specifies the value of the Field 4 field';
                 }
                 field("Field 5"; Rec."Field 5")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Field5Caption;
+                    CaptionClass = ColumnCaption[5];
+                    Visible = Column5Visible;
                     ToolTip = 'Specifies the value of the Field 5 field';
                 }
                 field("Field 6"; Rec."Field 6")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Field6Caption;
+                    CaptionClass = ColumnCaption[6];
+                    Visible = Column6Visible;
                     ToolTip = 'Specifies the value of the Field 6 field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()
@@ -70,13 +71,14 @@
 
     var
         POSInfo: Record "NPR POS Info";
-        Field1Caption: Text;
-        Field2Caption: Text;
-        Field3Caption: Text;
-        Field4Caption: Text;
-        Field5Caption: Text;
-        Field6Caption: Text;
-        ErrText001: Label 'You must define subcodes in POS Info %1';
+        ColumnCaption: array[6] of Text;
+        Column1Visible: Boolean;
+        Column2Visible: Boolean;
+        Column3Visible: Boolean;
+        Column4Visible: Boolean;
+        Column5Visible: Boolean;
+        Column6Visible: Boolean;
+        FieldMappingARR: array[6] of Integer;
 
     procedure SetPOSInfo(pPOSInfo: Record "NPR POS Info")
     begin
@@ -87,18 +89,15 @@
     var
         POSInfoLookupSetup: Record "NPR POS Info Lookup Setup";
         RecRef: RecordRef;
-        FieldRef: FieldRef;
-        EntryNo: Integer;
-        FieldMappingARR: array[6] of Integer;
+        FieldMappingNotDefinedErr: Label 'You must define field mapping for POS Info Code %1';
     begin
-        EntryNo := 1;
         Clear(FieldMappingARR);
         POSInfoLookupSetup.SetRange("POS Info Code", POSInfo.Code);
-        if POSInfo."Table No." = 0 then
-            Error('error');
+        POSInfo.TestField("Table No.");
 
-        if not POSInfoLookupSetup.FindSet() then
-            Error('Error');
+        if POSInfoLookupSetup.IsEmpty then
+            Error(FieldMappingNotDefinedErr, POSInfo.Code);
+        POSInfoLookupSetup.FindSet();
         repeat
             case POSInfoLookupSetup."Map To" of
                 POSInfoLookupSetup."Map To"::"Field 1":
@@ -129,42 +128,28 @@
         until POSInfoLookupSetup.Next() = 0;
 
         RecRef.Open(POSInfo."Table No.");
-        if RecRef.FindFirst() then
+        SetColumnCaptions(RecRef);
+
+        Rec."Entry No." := 0;
+        if RecRef.FindSet() then
             repeat
                 Rec.Init();
-                Rec."Entry No." := EntryNo;
-                EntryNo := EntryNo + 1;
+                Rec."Entry No." += 1;
                 Rec."Table No." := 0; //Function to create a combined key
-                if FieldMappingARR[1] <> 0 then begin
+
+                if FieldMappingARR[1] <> 0 then
                     Rec."Field 1" := Format(RecRef.Field(FieldMappingARR[1]).Value);
-                    FieldRef := RecRef.Field(FieldMappingARR[1]);
-                    Field1Caption := FieldRef.Caption;
-                end;
-                if FieldMappingARR[2] <> 0 then begin
+                if FieldMappingARR[2] <> 0 then
                     Rec."Field 2" := Format(RecRef.Field(FieldMappingARR[2]).Value);
-                    FieldRef := RecRef.Field(FieldMappingARR[2]);
-                    Field2Caption := FieldRef.Caption;
-                end;
-                if FieldMappingARR[3] <> 0 then begin
+                if FieldMappingARR[3] <> 0 then
                     Rec."Field 3" := Format(RecRef.Field(FieldMappingARR[3]).Value);
-                    FieldRef := RecRef.Field(FieldMappingARR[3]);
-                    Field3Caption := FieldRef.Caption;
-                end;
-                if FieldMappingARR[4] <> 0 then begin
+                if FieldMappingARR[4] <> 0 then
                     Rec."Field 4" := Format(RecRef.Field(FieldMappingARR[4]).Value);
-                    FieldRef := RecRef.Field(FieldMappingARR[4]);
-                    Field4Caption := FieldRef.Caption;
-                end;
-                if FieldMappingARR[5] <> 0 then begin
+                if FieldMappingARR[5] <> 0 then
                     Rec."Field 5" := Format(RecRef.Field(FieldMappingARR[5]).Value);
-                    FieldRef := RecRef.Field(FieldMappingARR[5]);
-                    Field5Caption := FieldRef.Caption;
-                end;
-                if FieldMappingARR[6] <> 0 then begin
+                if FieldMappingARR[6] <> 0 then
                     Rec."Field 6" := Format(RecRef.Field(FieldMappingARR[6]).Value);
-                    FieldRef := RecRef.Field(FieldMappingARR[6]);
-                    Field6Caption := FieldRef.Caption;
-                end;
+
                 Rec.RecID := RecRef.RecordId;
                 Rec.Insert();
             until RecRef.Next() = 0;
@@ -174,23 +159,44 @@
     var
         POSInfoSubcode: Record "NPR POS Info Subcode";
         EntryNo: Integer;
+        SubcodesNotDefinedErr: Label 'You must define subcodes in POS Info %1';
     begin
         EntryNo := 1;
         POSInfoSubcode.Reset();
         POSInfoSubcode.SetRange(Code, POSInfo.Code);
         if not POSInfoSubcode.FindSet() then
-            Error(ErrText001, POSInfo.Code);
+            Error(SubcodesNotDefinedErr, POSInfo.Code);
         repeat
             Rec.Init();
             Rec."Entry No." := EntryNo;
             EntryNo := EntryNo + 1;
             Rec."Field 1" := POSInfoSubcode.Subcode;
-            Field1Caption := POSInfoSubcode.Subcode;
+            ColumnCaption[1] := POSInfoSubcode.Subcode;
+            Column1Visible := true;
             Rec."Field 2" := POSInfoSubcode.Description;
-            Field2Caption := POSInfoSubcode.Description;
+            ColumnCaption[2] := POSInfoSubcode.Description;
+            Column2Visible := true;
             Rec.Insert();
 
         until POSInfoSubcode.Next() = 0;
     end;
-}
 
+    local procedure SetColumnCaptions(RecRef: RecordRef)
+    var
+        FieldRef: FieldRef;
+        ColumnNo: Integer;
+    begin
+        for ColumnNo := 1 to ArrayLen(FieldMappingARR) do
+            if FieldMappingARR[ColumnNo] <> 0 then begin
+                FieldRef := RecRef.Field(FieldMappingARR[ColumnNo]);
+                ColumnCaption[ColumnNo] := FieldRef.Caption;
+            end;
+
+        Column1Visible := FieldMappingARR[1] <> 0;
+        Column2Visible := FieldMappingARR[2] <> 0;
+        Column3Visible := FieldMappingARR[3] <> 0;
+        Column4Visible := FieldMappingARR[4] <> 0;
+        Column5Visible := FieldMappingARR[5] <> 0;
+        Column6Visible := FieldMappingARR[6] <> 0;
+    end;
+}

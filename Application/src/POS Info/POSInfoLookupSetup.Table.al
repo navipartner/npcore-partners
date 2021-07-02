@@ -31,8 +31,7 @@ table 6150645 "NPR POS Info Lookup Setup"
         }
         field(11; "Field Name"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No"),
-                                                              "No." = FIELD("Field No.")));
+            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No"), "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -45,9 +44,4 @@ table 6150645 "NPR POS Info Lookup Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
