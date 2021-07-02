@@ -44,7 +44,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                 action(TypeOfSales)
                 {
                     Caption = 'Membership Sales Type';
-                    Enabled = TypeOfSales;
+                    Enabled = SalesType;
                     ApplicationArea = All;
                     ToolTip = 'Filters by membership sales type';
                     Image = Filter;
@@ -306,7 +306,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
         StatusText: Text[250];
         NeedsUpdate: Boolean;
         [InDataSet]
-        TypeOfSales: Boolean;
+        SalesType: Boolean;
         [InDataSet]
         OrdersUntilTodayEnabled: Boolean;
         [InDataSet]
@@ -372,7 +372,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
 
     procedure SetActionsEnabled()
     begin
-        TypeOfSales := (MembershipBurndownSetup."Show Memberships" <> MembershipBurndownSetup."Show Memberships"::SALES_TYPE) and IsChartAddInReady;
+        SalesType := (MembershipBurndownSetup."Show Memberships" <> MembershipBurndownSetup."Show Memberships"::SALES_TYPE) and IsChartAddInReady;
 
         //OrdersUntilTodayEnabled :=
         //  (MembershipBurndownSetup."Show Orders" <> MembershipBurndownSetup."Show Orders"::"Orders Until Today") AND

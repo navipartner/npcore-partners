@@ -95,10 +95,10 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                         TempVendorAmount.Init();
                         TempVendorAmount."Vendor No." := Code;
 
-                        case Sort of
-                            Sort::Highest:
+                        case SortOrder of
+                            SortOrder::Highest:
                                 Multpl := -1;
-                            Sort::Lowest:
+                            SortOrder::Lowest:
                                 Multpl := 1;
                         end;
 
@@ -233,14 +233,14 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                         Caption = 'Sort Salespersons';
                         ToolTip = 'Specifies the value of the Sort Salespersons field';
                     }
-                    field(SortBy; SortBy)
+                    field("Sort By"; SortBy)
                     {
                         ApplicationArea = All;
                         Enabled = sortSalesPerson;
                         OptionCaption = 'Quantity,Turnover,DB';
                         ToolTip = 'Specifies the value of the SortBy field';
                     }
-                    field(Sort; Sort)
+                    field(Sort; SortOrder)
                     {
                         ApplicationArea = All;
                         Editable = sortSalesPerson;
@@ -273,7 +273,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
         CompanyInformation.CalcFields(Picture);
         ShowItemsGrpWithoutSale := false;
         SortSalesPerson := false;
-        Sort := Sort::Highest;
+        SortOrder := SortOrder::Highest;
         SortBy := SortBy::Quantity;
     end;
 
@@ -288,7 +288,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
         PercentTotalSale: Decimal;
         TotalSale: Decimal;
         Multpl: Integer;
-        Sort: Option Highest,Lowest;
+        SortOrder: Option Highest,Lowest;
         SortBy: Option Quantity,Turnover,DB;
         PercentItemGroupSale: Text[30];
 }

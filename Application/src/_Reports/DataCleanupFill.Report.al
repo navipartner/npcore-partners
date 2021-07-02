@@ -212,27 +212,27 @@ report 6060100 "NPR Data Cleanup Fill"
         {
             area(content)
             {
-                field(FillTable; FillTable)
+                field("Fill Table"; FillTable)
                 {
                     ApplicationArea = All;
                     Caption = 'Insert Data In Table';
                     ToolTip = 'Specifies the value of the Insert Data In Table field';
                 }
-                field(CleanupAction; CleanupAction)
+                field("Cleanup Action"; CleanupAction)
                 {
                     ApplicationArea = All;
                     Caption = 'Cleanup Action';
                     OptionCaption = 'Delete,Rename';
                     ToolTip = 'Specifies the value of the Cleanup Action field';
                 }
-                field(TableOption; TableOption)
+                field("Table Option"; TableOption)
                 {
                     ApplicationArea = All;
                     Caption = 'Table Option';
                     CaptionClass = 'Customer,Vendor,Item,GLAccount';
                     ToolTip = 'Specifies the value of the Table Option field';
                 }
-                field(ItemRenameOption; ItemRenameOption)
+                field("Item Rename Option"; ItemRenameOption)
                 {
                     ApplicationArea = All;
                     Caption = 'Rename Option for Item';

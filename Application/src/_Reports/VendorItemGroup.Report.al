@@ -139,12 +139,12 @@ report 6014435 "NPR Vendor/Item Group"
                         TempNPRBuffer.Init();
                         TempNPRBuffer.Template := "Code";
                         TempNPRBuffer."Line No." := 0;
-                        case Sorterefter of
-                            Sorterefter::antal:
+                        case SortType of
+                            SortType::antal:
                                 TempNPRBuffer."Decimal 1" := "NPR Sales (Qty.)";
-                            Sorterefter::omsaetning:
+                            SortType::omsaetning:
                                 TempNPRBuffer."Decimal 1" := "NPR Sales (LCY)";
-                            Sorterefter::db:
+                            SortType::db:
                                 TempNPRBuffer."Decimal 1" := ("NPR Sales (LCY)" - "NPR Consumption (Amount)");
                         end;
 
@@ -447,13 +447,13 @@ report 6014435 "NPR Vendor/Item Group"
             {
                 group(Options)
                 {
-                    field(viskunhovedtal; Viskunhovedtal)
+                    field("vis kun hovedtal"; Viskunhovedtal)
                     {
                         Caption = 'Show Only Main Figures';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Only Main Figures field';
                     }
-                    field(sortervaregruppe; Sortervaregruppe)
+                    field("Sortervare gruppe"; Sortervaregruppe)
                     {
                         Caption = 'Sort Item Groups';
                         ApplicationArea = All;
@@ -467,7 +467,7 @@ report 6014435 "NPR Vendor/Item Group"
                                 ShowBool := false;
                         end;
                     }
-                    field(sorterefter; Sorterefter)
+                    field(sorterefter; SortType)
                     {
                         Caption = 'Show';
                         Enabled = ShowBool;
@@ -475,7 +475,7 @@ report 6014435 "NPR Vendor/Item Group"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show field';
                     }
-                    field(sorter; Sorter)
+                    field(sorter; SortOrder)
                     {
                         Caption = 'Show Largest/Smallest';
                         Enabled = ShowBool;
@@ -533,8 +533,8 @@ report 6014435 "NPR Vendor/Item Group"
         Omsaetningsidsteaar := 0;
 
         TempNPRBuffer.SetCurrentKey("Decimal 1");
-        case Sorter of
-            Sorter::Mindste:
+        case SortOrder of
+            SortOrder::Mindste:
                 TempNPRBuffer.Ascending(false);
         end;
     end;
@@ -581,7 +581,7 @@ report 6014435 "NPR Vendor/Item Group"
         TotalVendorSalesLCY: Decimal;
         TurnoverLYSum: Decimal;
         VendorPctoms: Decimal;
-        Sorterefter: Option antal,omsaetning,db;
-        Sorter: Option Stoerste,Mindste;
+        SortType: Option antal,omsaetning,db;
+        SortOrder: Option Stoerste,Mindste;
 }
 

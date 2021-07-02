@@ -154,7 +154,7 @@ report 6014550 "NPR Statement E-Mail"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Include Unapplied Entries field';
                     }
-                    field(IncludeAgingBand; IncludeAgingBand)
+                    field("Include Aging Band"; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
                         ApplicationArea = All;
@@ -173,20 +173,20 @@ report 6014550 "NPR Statement E-Mail"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Aging Band by field';
                     }
-                    field(LogInteraction; LogInteraction)
+                    field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Log Interaction field';
                     }
-                    field(StartDate; StartDate)
+                    field("Start Date"; StartDate)
                     {
                         Caption = 'Start Date';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Start Date field';
                     }
-                    field(EndDate; EndDate)
+                    field("End Date"; EndDate)
                     {
                         Caption = 'End Date';
                         ApplicationArea = All;

@@ -130,13 +130,13 @@ report 6014425 "NPR Event Overview"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(PeriodStart; PeriodStart)
+                    field("Period Start"; PeriodStart)
                     {
                         Caption = 'Period starts at';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Period starts at field';
                     }
-                    field(PeriodEnd; PeriodEnd)
+                    field("Period End"; PeriodEnd)
                     {
                         Caption = 'Period ends at';
                         ApplicationArea = All;
@@ -145,25 +145,25 @@ report 6014425 "NPR Event Overview"
                     group(JobPlanningType)
                     {
                         Caption = 'Type';
-                        field(JobPlanningTypeResource; JobPlanningTypeResource)
+                        field("Job Planning Type Resource"; JobPlanningTypeResource)
                         {
                             Caption = 'Resource';
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Resource field';
                         }
-                        field(JobPlanningTypeItem; JobPlanningTypeItem)
+                        field("Job Planning Type Item"; JobPlanningTypeItem)
                         {
                             Caption = 'Item';
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Item field';
                         }
-                        field(JobPlanningTypeGLAccount; JobPlanningTypeGLAccount)
+                        field("Job Planning Type GL Account"; JobPlanningTypeGLAccount)
                         {
                             Caption = 'G/L Account';
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the G/L Account field';
                         }
-                        field(JobPlanningTypeText; JobPlanningTypeText)
+                        field("Job Planning Type Text"; JobPlanningTypeText)
                         {
                             Caption = 'Text';
                             ApplicationArea = All;
@@ -180,13 +180,13 @@ report 6014425 "NPR Event Overview"
         TypeFitler := '';
 
         if JobPlanningTypeResource then
-            IncreaseTypeFitler(Format(JobPlanningType::Resource));
+            IncreaseTypeFitler(Format(JobPlanningLineType::Resource));
         if JobPlanningTypeItem then
-            IncreaseTypeFitler(Format(JobPlanningType::Item));
+            IncreaseTypeFitler(Format(JobPlanningLineType::Item));
         if JobPlanningTypeGLAccount then
-            IncreaseTypeFitler(Format(JobPlanningType::"G/L Account"));
+            IncreaseTypeFitler(Format(JobPlanningLineType::"G/L Account"));
         if JobPlanningTypeText then
-            IncreaseTypeFitler(Format(JobPlanningType::Text));
+            IncreaseTypeFitler(Format(JobPlanningLineType::Text));
 
         exit(TypeFitler <> '');
     end;
@@ -200,7 +200,7 @@ report 6014425 "NPR Event Overview"
     end;
 
     var
-        JobPlanningType: Enum "Job Planning Line Type";
+        JobPlanningLineType: Enum "Job Planning Line Type";
         PeriodEnd: Date;
         PeriodStart: Date;
         TypeFitler: Text;

@@ -146,7 +146,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
         {
             area(content)
             {
-                field(ShowInventory; ShowInventory)
+                field("Show Inventory"; ShowInventory)
                 {
                     Caption = 'Show Inventory';
                     ApplicationArea = All;

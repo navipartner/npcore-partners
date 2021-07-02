@@ -374,43 +374,43 @@
         {
             area(content)
             {
-                field(Varermedbeholdning; Varermedbeholdning)
+                field("Varer med beholdning"; Varermedbeholdning)
                 {
                     Caption = 'Show Only Items With Inventory';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Only Items With Inventory field';
                 }
-                field(ViewSalesPrice; ViewSalesPrice)
+                field("View Sales Price"; ViewSalesPrice)
                 {
                     Caption = 'View Sales Prices';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the View Sales Prices field';
                 }
-                field(Negativbeh; Negativbeh)
+                field("Negativ beh"; Negativbeh)
                 {
                     Caption = 'Hide Items With Negative Inventory';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Hide Items With Negative Inventory field';
                 }
-                field(NegativVolumeShow; NegativVolumeShow)
+                field("Negativ Volume Show"; NegativVolumeShow)
                 {
                     Caption = 'Show Only Items With Negative Inventory';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Only Items With Negative Inventory field';
                 }
-                field(ShowNoInventory; ShowNoInventory)
+                field("Show No Inventory"; ShowNoInventory)
                 {
                     Caption = 'Do Not Show Inventory';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Do Not Show Inventory field';
                 }
-                field(ShowLocation; ShowLocation)
+                field("Show Location"; ShowLocation)
                 {
                     Caption = 'Show Location';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Location field';
                 }
-                field(ShowBlankLocation; ShowBlankLocation)
+                field("Show Blank Location"; ShowBlankLocation)
                 {
                     Caption = 'Show Blank Location';
                     ApplicationArea = All;

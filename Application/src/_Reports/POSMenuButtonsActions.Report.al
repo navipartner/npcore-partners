@@ -88,7 +88,7 @@ report 6014421 "NPR POS Menu Buttons/Actions"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(ShowParameters; ShowParameters)
+                    field("Show Parameters"; ShowParameters)
                     {
                         Caption = 'Show Parameters';
                         ApplicationArea = All;

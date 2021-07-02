@@ -766,19 +766,19 @@ report 6014510 "NPR Purch Return Order"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(NoOfCopies; NoOfCopies)
+                    field("No Of Copies"; NoOfCopies)
                     {
                         Caption = 'No. of Copies';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the No. of Copies field';
                     }
-                    field(ShowInternalInfo; ShowInternalInfo)
+                    field("Show Internal Info"; ShowInternalInfo)
                     {
                         Caption = 'Show Internal Information';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Internal Information field';
                     }
-                    field(LogInteraction; LogInteraction)
+                    field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;

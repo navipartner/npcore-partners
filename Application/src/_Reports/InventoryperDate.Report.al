@@ -165,43 +165,43 @@ report 6014417 "NPR Inventory per Date"
         {
             area(content)
             {
-                field(EndDate; EndDate)
+                field("End Date"; EndDate)
                 {
                     Caption = 'Date';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date field';
                 }
-                field(IncludeItemStock; IncludeItemStock)
+                field("Include Item Stock"; IncludeItemStock)
                 {
                     Caption = 'Show only products with inventory';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show only products with inventory field';
                 }
-                field(NotUnitPrice; NotUnitPrice)
+                field("Not Unit Price"; NotUnitPrice)
                 {
                     Caption = 'Do not display prices';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Do not display prices field';
                 }
-                field(ShowItemNegativeInventory; ShowItemNegativeInventory)
+                field("Show Item Negative Inventory"; ShowItemNegativeInventory)
                 {
                     Caption = 'Do not display items with negative inventory';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Do not display items with negative inventory field';
                 }
-                field(NegativVolumeShow; NegativVolumeShow)
+                field("Negativ Volume Show"; NegativVolumeShow)
                 {
                     Caption = 'Show only items with negativ volume';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show only items with negativ volume field';
                 }
-                field(ShowNoInventory; ShowNoInventory)
+                field("Show No Inventory"; ShowNoInventory)
                 {
                     Caption = 'Do not show inventory';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Do not show inventory field';
                 }
-                field(ShowZeroInventory; ShowZeroInventory)
+                field("Show Zero Inventory"; ShowZeroInventory)
                 {
                     Caption = 'Show only 0 quantity inventory';
                     ApplicationArea = All;
@@ -214,7 +214,7 @@ report 6014417 "NPR Inventory per Date"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Choose Calc. Method field';
                 }
-                field(GroupByItemGroup; GroupByItemGroup)
+                field("Group By Item Group"; GroupByItemGroup)
                 {
                     Caption = 'Sort items by item group';
                     ApplicationArea = All;

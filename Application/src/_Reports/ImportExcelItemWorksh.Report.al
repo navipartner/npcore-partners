@@ -61,34 +61,34 @@ report 6060042 "NPR Import Excel Item Worksh."
         {
             area(content)
             {
-                field(ImportOption; ImportOption)
+                field("Import Option"; ImportOption)
                 {
                     Caption = 'Option';
                     OptionCaption = 'Replace lines,Add lines';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Option field';
                 }
-                field(SetItemsToSkip; SetItemsToSkip)
+                field("Set Items To Skip"; SetItemsToSkip)
                 {
                     Caption = 'Set all items to SKIP';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Set all items to SKIP field';
                 }
-                field(ActionIfVariantUnknown; ActionIfVariantUnknown)
+                field("Action If Variant Unknown"; ActionIfVariantUnknown)
                 {
                     Caption = 'If the Variant does not exist, but the Variety does';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the If the Variant does not exist, but the Variety does field';
                 }
-                field(ActionIfVarietyUnknown; ActionIfVarietyUnknown)
+                field("Action If Variety Unknown"; ActionIfVarietyUnknown)
                 {
                     Caption = 'If the Variant and Variety do not exist';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the If the Variant and Variety do not exist field';
                 }
-                field(CombineVarieties; CombineVarieties)
+                field("Combine Varieties"; CombineVarieties)
                 {
                     Caption = 'Combine Varieties';
                     ToolTip = 'Automatically try to combine all imported lines to item/variety combinations after import.';

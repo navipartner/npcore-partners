@@ -85,7 +85,7 @@ report 6014420 "NPR Item Group Top"
                     TempNPRBufferSort.DeleteAll();
                     TempNPRBufferSort.SetCurrentKey("Decimal 1", "Short Code 1");
 
-                    if Sorting = Sorting::st then
+                    if SortOrder = SortOrder::st then
                         TempNPRBufferSort.Ascending(false);
                     "Item Category".SetFilter("Item Category"."NPR Global Dimension 1 Filter", "Dimension Value".Code);
                     "Item Category".CopyFilter("NPR Date Filter", Item."Date Filter");
@@ -138,7 +138,7 @@ report 6014420 "NPR Item Group Top"
                 column(COMPANYNAME; CompanyName)
                 {
                 }
-                column(Sorting; Sorting)
+                column(Sorting; SortOrder)
                 {
                 }
                 column(SortType; SortType)
@@ -242,20 +242,20 @@ report 6014420 "NPR Item Group Top"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(SortType; SortType)
+                    field("Sort Type"; SortType)
                     {
                         Caption = 'Show Type';
                         OptionCaption = 'Quantity,Sale(LCY),Contribution Margin,Contribution Ratio';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Type field';
                     }
-                    field(ShowQty; ShowQty)
+                    field("Show Qty"; ShowQty)
                     {
                         Caption = 'Show Quantity';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Quantity field';
                     }
-                    field("Sorting"; Sorting)
+                    field("Sorting"; SortOrder)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
@@ -286,7 +286,7 @@ report 6014420 "NPR Item Group Top"
         CompanyInformation.CalcFields(Picture);
         SortType := SortType::ant;
         ShowQty := 20;
-        Sorting := Sorting::st;
+        SortOrder := SortOrder::st;
     end;
 
     trigger OnPreReport()
@@ -321,7 +321,7 @@ report 6014420 "NPR Item Group Top"
         i: Integer;
         ShowQty: Integer;
         SortType: Option ant,sal,db,dg;
-        Sorting: Option st,mi;
+        SortOrder: Option st,mi;
         FiltersDimValue: Text;
         Dim1Filter: Text[30];
         j: Text[30];

@@ -84,13 +84,13 @@ report 6060052 "NPR Item Wise Sales Figures"
         {
             area(content)
             {
-                field(FromDate; FromDate)
+                field("From Date"; FromDate)
                 {
                     Caption = 'From Date';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the From Date field';
                 }
-                field(ToDate; ToDate)
+                field("To Date"; ToDate)
                 {
                     Caption = 'To Date';
                     ApplicationArea = All;

@@ -127,19 +127,19 @@ report 6060126 "NPR TM Admission List"
             {
                 group(Types)
                 {
-                    field(ShowOpenReservations; ShowOpenReservations)
+                    field("Show Open Reservations"; ShowOpenReservations)
                     {
                         Caption = 'Show Open Reservations';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Open Reservations field';
                     }
-                    field(ShowOpenAdmitted; ShowOpenAdmitted)
+                    field("Show Open Admitted"; ShowOpenAdmitted)
                     {
                         Caption = 'Show Open Admitted';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Open Admitted field';
                     }
-                    field(ShowDeparted; ShowDeparted)
+                    field("Show Departed"; ShowDeparted)
                     {
                         Caption = 'Show Departed';
                         ApplicationArea = All;
@@ -148,13 +148,13 @@ report 6060126 "NPR TM Admission List"
                 }
                 group(Options)
                 {
-                    field(ShowEachMemberOnce; ShowEachMemberOnce)
+                    field("Show Each Member Once"; ShowEachMemberOnce)
                     {
                         Caption = 'Show Each Member Only Once';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Each Member Only Once field';
                     }
-                    field(ShowTicketsWithoutMembers; ShowTicketsWithoutMembers)
+                    field("Show Tickets Without Members"; ShowTicketsWithoutMembers)
                     {
                         Caption = 'Show Entries Without Members/Contact Information';
                         ApplicationArea = All;

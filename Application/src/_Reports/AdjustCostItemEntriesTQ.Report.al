@@ -66,7 +66,7 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
                                   ObjTransl.TranslateObject(ObjTransl."Object Type"::Report, REPORT::"Post Inventory Cost to G/L"));
                         end;
                     }
-                    field(SkipVariousItems; SkipVariousItems)
+                    field("Skip Various Items"; SkipVariousItems)
                     {
                         Caption = 'Skip Various Items';
                         ApplicationArea = All;

@@ -239,25 +239,25 @@
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(StartDate; StartDate)
+                    field("Start Date"; StartDate)
                     {
                         Caption = 'Start Date';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Start Date field';
                     }
-                    field(EndDate; EndDate)
+                    field("End Date"; EndDate)
                     {
                         Caption = 'End Date';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the End Date field';
                     }
-                    field(SkipLineWithZero; SkipLineWithZero)
+                    field("Skip Line With Zero"; SkipLineWithZero)
                     {
                         Caption = 'Skip Zero Amt Lines';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Skip Zero Amt Lines field';
                     }
-                    field(CustomerFilter; CustomerFilter)
+                    field("Customer Filter"; CustomerFilter)
                     {
                         Caption = 'Customer No.';
                         ApplicationArea = All;
@@ -271,13 +271,13 @@
                                 CustomerFilter := Customer."No.";
                         end;
                     }
-                    field(VariantVisibility; VariantVisibility)
+                    field("Variant Visibility"; VariantVisibility)
                     {
                         Caption = 'Show Variant';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Variant field';
                     }
-                    field(AdmissionCode; AdmissionCode)
+                    field("Admission Code"; AdmissionCode)
                     {
                         Caption = 'Admission Code';
                         TableRelation = "NPR TM Ticket Access Fact"."Fact Code" WHERE("Fact Name" = FILTER(ADMISSION_CODE));

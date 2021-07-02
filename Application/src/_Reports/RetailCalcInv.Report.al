@@ -171,7 +171,7 @@ report 6014663 "NPR Retail Calc. Inv."
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(PostingDate; PostingDate)
+                    field("Posting Date"; PostingDate)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Posting Date';
@@ -200,7 +200,7 @@ report 6014663 "NPR Retail Calc. Inv."
                                 IncludeItemWithNoTransaction := false;
                         end;
                     }
-                    field(IncludeItemWithNoTransaction; IncludeItemWithNoTransaction)
+                    field("Include Item With No Transaction"; IncludeItemWithNoTransaction)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Include Item without Transactions';

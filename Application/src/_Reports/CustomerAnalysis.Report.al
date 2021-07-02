@@ -25,7 +25,7 @@ report 6014432 "NPR Customer Analysis"
                 TempCustomerAmount.Init();
                 TempCustomerAmount."Customer No." := "No.";
 
-                if Sorting = Sorting::Maximum then
+                if SortOrder = SortOrder::Maximum then
                     Multipl := -1
                 else
                     Multipl := 1;
@@ -98,7 +98,7 @@ report 6014432 "NPR Customer Analysis"
                 TempCustomerBuffer.Init();
                 TempCustomerBuffer."No." := Customer1."No.";
 
-                if Sorting = Sorting::Maximum then
+                if SortOrder = SortOrder::Maximum then
                     Multipl := -1
                 else
                     Multipl := 1;
@@ -405,8 +405,7 @@ report 6014432 "NPR Customer Analysis"
                 DebSaldoDKKFooter += CustBalanceDKK;
                 AvancePct := "Pct."(Customer."Profit (LCY)", Customer."Sales (LCY)");
 
-                if (Sorting = Sorting::Minimum) and (Number = 1) then begin
-                    TempCustomerAmount := TempCustomerAmount;
+                if (SortOrder = SortOrder::Minimum) and (Number = 1) then begin
                     TempCustomerAmount.Next(+ShowQty);
                     MaxAmount := TempCustomerAmount."Amount (LCY)";
                     TempCustomerAmount := TempCustomerAmount;
@@ -468,21 +467,21 @@ report 6014432 "NPR Customer Analysis"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(ShowType; ShowType)
+                    field("Show Type"; ShowType)
                     {
                         Caption = 'Show Type';
                         OptionCaption = 'Sales,Balance,Margin';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Type field';
                     }
-                    field("Sorting"; Sorting)
+                    field("Sort Order"; SortOrder)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sort By field';
                     }
-                    field(ShowQty; ShowQty)
+                    field("Show Qty"; ShowQty)
                     {
                         Caption = 'Quantity';
                         ApplicationArea = All;
@@ -575,7 +574,7 @@ report 6014432 "NPR Customer Analysis"
         SortingDataLbl: Label 'Sorting Data...\';
         ThisYearCaptionLbl: Label 'This Year';
         TotalCaptionLbl: Label 'Total';
-        Sorting: Option Maximum,Minimum;
+        SortOrder: Option Maximum,Minimum;
         ShowType: Option Sales,Balance,Margin;
         CustomerDateFilter: Text[30];
         CustomerFilter: Text[250];

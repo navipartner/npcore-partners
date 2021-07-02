@@ -201,7 +201,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(SourceCodeFilter; SourceCodeFilter)
+                    field("Source Code Filter"; SourceCodeFilter)
                     {
                         Caption = 'Source Code Filter';
                         TableRelation = "Source Code";

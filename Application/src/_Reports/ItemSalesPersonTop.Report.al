@@ -16,7 +16,7 @@ report 6014474 "NPR Item/Sales Person Top"
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(SortHeading_Item; SortByTxtConst + ' ' + Format(SortBy) + ' ' + Format(Key))
+            column(SortHeading_Item; SortByTxtConst + ' ' + Format(SortBy) + ' ' + Format(SortingStigende))
             {
             }
             column(SalesQty_Item; Item."Sales (Qty.)")
@@ -31,7 +31,7 @@ report 6014474 "NPR Item/Sales Person Top"
             column(Description_Item; Item.Description)
             {
             }
-            column(Sorting_Item; Sorting)
+            column(Sorting_Item; SortOrder)
             {
             }
             column(SortBy_Item; SortBy)
@@ -62,7 +62,7 @@ report 6014474 "NPR Item/Sales Person Top"
                     if "NPR Sales (LCY)" = 0 then
                         CurrReport.Skip();
 
-                    if Sorting then begin
+                    if SortOrder then begin
                         TempItemAmount."Item No." := Code;
 
                         case SortBy of
@@ -83,7 +83,7 @@ report 6014474 "NPR Item/Sales Person Top"
 
                 trigger OnPreDataItem()
                 begin
-                    if Sorting then
+                    if SortOrder then
                         TempItemAmount.DeleteAll();
 
                     if Item.GetFilter("Date Filter") <> '' then
@@ -137,7 +137,7 @@ report 6014474 "NPR Item/Sales Person Top"
 
                 trigger OnPreDataItem()
                 begin
-                    if not Sorting then
+                    if not SortOrder then
                         CurrReport.Break();
                     SetRange(Number, 1, ShowQty);
                 end;
@@ -154,7 +154,7 @@ report 6014474 "NPR Item/Sales Person Top"
             {
                 group("Option")
                 {
-                    field("Sorting"; Sorting)
+                    field("Sorting"; SortOrder)
                     {
                         Caption = 'Sorting';
                         ApplicationArea = All;
@@ -163,10 +163,10 @@ report 6014474 "NPR Item/Sales Person Top"
                         trigger OnValidate()
                         begin
                             ShowSort := false;
-                            ShowSort := Sorting;
+                            ShowSort := SortOrder;
                         end;
                     }
-                    field(SortBy; SortBy)
+                    field("Sort By"; SortBy)
                     {
                         Caption = 'Sort By';
                         Enabled = ShowSort;
@@ -174,7 +174,7 @@ report 6014474 "NPR Item/Sales Person Top"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sort By field';
                     }
-                    field("Key"; Key)
+                    field("Key"; SortingStigende)
                     {
                         Caption = 'Key';
                         Enabled = ShowSort;
@@ -182,7 +182,7 @@ report 6014474 "NPR Item/Sales Person Top"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Key field';
                     }
-                    field(ShowQty; ShowQty)
+                    field("Show Qty"; ShowQty)
                     {
                         Caption = 'Show Qty.';
                         Enabled = ShowSort;
@@ -214,12 +214,13 @@ report 6014474 "NPR Item/Sales Person Top"
     begin
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-        if Sorting then begin
+
+        if SortOrder then begin
             TempItemAmount.SetCurrentKey(Amount, "Amount 2", "Item No.");
-            case Key of
-                Key::stigende:
+            case SortingStigende of
+                SortingStigende::stigende:
                     TempItemAmount.Ascending(false);
-                Key::faldende:
+                SortingStigende::faldende:
                     TempItemAmount.Ascending(true);
             end;
         end;
@@ -231,12 +232,12 @@ report 6014474 "NPR Item/Sales Person Top"
         Salesperson: Record "Salesperson/Purchaser";
         [InDataSet]
         ShowSort: Boolean;
-        Sorting: Boolean;
+        SortOrder: Boolean;
         CalcAmt: Decimal;
         Qty2: Decimal;
         ShowQty: Integer;
         SortByTxtConst: Label 'Sort By:';
         SortBy: Option "Qty.",Turnover;
-        "Key": Option stigende,faldende;
+        SortingStigende: Option stigende,faldende;
 }
 

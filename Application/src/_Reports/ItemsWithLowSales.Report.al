@@ -175,25 +175,25 @@ report 6014540 "NPR Items With Low Sales"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(RankQty; RankQty)
+                    field("Rank Qty"; RankQty)
                     {
                         Caption = 'Rank Quantity';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Rank Quantity field';
                     }
-                    field(PeriodStartDate; PeriodStartDate)
+                    field("Period Start Date"; PeriodStartDate)
                     {
                         Caption = 'Start Period';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Start Period field';
                     }
-                    field(PeriodEndDate; PeriodEndDate)
+                    field("Period End Date"; PeriodEndDate)
                     {
                         Caption = 'End Period';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the End Period field';
                     }
-                    field(ShowNotSold; ShowNotSold)
+                    field("Show Not Sold"; ShowNotSold)
                     {
                         Caption = 'Include Items Not On Inventory Or Not Sold';
                         ApplicationArea = All;

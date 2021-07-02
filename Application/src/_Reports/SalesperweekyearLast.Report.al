@@ -178,13 +178,13 @@ report 6014456 "NPR Sales per week year/Last"
             {
                 group(Options)
                 {
-                    field(Month; Month)
+                    field("Month."; Month)
                     {
                         Caption = 'Month';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Month field';
                     }
-                    field(Year; Year)
+                    field("Year."; Year)
                     {
                         Caption = 'Year';
                         ApplicationArea = All;
@@ -197,7 +197,7 @@ report 6014456 "NPR Sales per week year/Last"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Department field';
                     }
-                    field(DateComparison; DateComparison)
+                    field("Date Comparison"; DateComparison)
                     {
                         Caption = 'Date Comparison';
                         ApplicationArea = All;
@@ -209,7 +209,7 @@ report 6014456 "NPR Sales per week year/Last"
                                 Nearest := false;
                         end;
                     }
-                    field(Nearest; Nearest)
+                    field("Near est"; Nearest)
                     {
                         Caption = 'Compare To Closest Week';
                         ApplicationArea = All;
@@ -221,7 +221,7 @@ report 6014456 "NPR Sales per week year/Last"
                                 DateComparison := false;
                         end;
                     }
-                    field(Multiplier; Multiplier)
+                    field(Multiply; Multiplier)
                     {
                         Caption = 'Multiply With';
                         ApplicationArea = All;

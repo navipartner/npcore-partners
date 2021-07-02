@@ -122,7 +122,7 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(PrintAlsoWithoutSale; PrintAlsoWithoutSale)
+                    field("Print Also Without Sale"; PrintAlsoWithoutSale)
                     {
                         ApplicationArea = Suite;
                         Caption = 'Include Items Not Sold';

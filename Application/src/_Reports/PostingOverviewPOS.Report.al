@@ -305,7 +305,7 @@ report 6150614 "NPR Posting Overview POS"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(IncludeCreditCardTransaction; IncludeCreditCardTransaction)
+                    field("Include Credit Card Transaction"; IncludeCreditCardTransaction)
                     {
                         Caption = 'Include Credit Card Transaction';
                         ApplicationArea = All;

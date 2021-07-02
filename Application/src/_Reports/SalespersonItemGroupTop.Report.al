@@ -285,7 +285,7 @@
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(ShowMainTotal; ShowMainTotal)
+                    field("Show Main Total"; ShowMainTotal)
                     {
                         Caption = 'Show Only Mainfigures';
                         Visible = ShowMainTotalVisible;
@@ -300,7 +300,7 @@
                             RequestOptionsPage.Update();
                         end;
                     }
-                    field(sortSalesPerson; sortSalesPerson)
+                    field("sort Sales Person"; sortSalesPerson)
                     {
                         Caption = 'Sort Salespersons';
                         Visible = SortSalesPersonVisible;
@@ -320,7 +320,7 @@
                             end;
                         end;
                     }
-                    field(ShowQty; ShowQty)
+                    field("Show Qty"; ShowQty)
                     {
                         Caption = 'Show Amounts';
                         Visible = ShowQtyVisible;

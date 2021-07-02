@@ -131,19 +131,19 @@ report 6014439 "NPR Item Sales Postings"
         {
             area(content)
             {
-                field(PrintAlsoWithoutSale; PrintAlsoWithoutSale)
+                field("Print Also Without Sale"; PrintAlsoWithoutSale)
                 {
                     Caption = 'Include Items That Has Not Been Sold';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Include Items That Has Not Been Sold field';
                 }
-                field(ShowVendorItemNo; ShowVendorItemNo)
+                field("Show Vendor Item No"; ShowVendorItemNo)
                 {
                     Caption = 'Show Vendor Item No.';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Vendor Item No. field';
                 }
-                field(ShowVendorNo; ShowVendorNo)
+                field("Show Vendor No"; ShowVendorNo)
                 {
                     Caption = 'Show Vendor No';
                     ApplicationArea = All;

@@ -229,7 +229,7 @@
                             SetDimSelectionMultiple(3, REPORT::"NPR NPRE: Rest. Daily Turnover", ColumnDim);
                         end;
                     }
-                    field(ShowTableNo; ShowTableNo)
+                    field("Show Table No"; ShowTableNo)
                     {
                         Caption = 'Show Seating Code';
                         ApplicationArea = All;

@@ -1096,7 +1096,7 @@ report 6014617 "NPR Purchase Order"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(NoofCopies; NoOfCopies)
+                    field("No of Copies"; NoOfCopies)
                     {
                         Caption = 'No. of Copies';
                         ApplicationArea = All;
@@ -1108,7 +1108,7 @@ report 6014617 "NPR Purchase Order"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Internal Information field';
                     }
-                    field(ArchiveDocument; ArchiveDocument)
+                    field("Archive Document"; ArchiveDocument)
                     {
                         Caption = 'Archive Document';
                         ApplicationArea = All;
@@ -1120,7 +1120,7 @@ report 6014617 "NPR Purchase Order"
                                 LogInteraction := false;
                         end;
                     }
-                    field(LogInteraction; LogInteraction)
+                    field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;

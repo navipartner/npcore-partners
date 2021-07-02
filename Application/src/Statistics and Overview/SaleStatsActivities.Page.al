@@ -400,12 +400,12 @@ page 6059988 "NPR Sale Stats Activities"
         FigureToDisplay: Option "Sale (LCY)","Sale (Qty.)","Profit (LCY)","Profit (Pct.)";
         Context: Option Retail,Web;
         ColumnCount: Integer;
-        "Sale (QTY)": Decimal;
-        "LastYear Sale (QTY)": Decimal;
-        "Sale (LCY)": Decimal;
-        "LastYear Sale (LCY)": Decimal;
-        "Profit (LCY)": Decimal;
-        "LastYear Profit (LCY)": Decimal;
+        SaleQTY: Decimal;
+        LastYearSaleQTY: Decimal;
+        SaleLCY: Decimal;
+        LastYearSaleLCY: Decimal;
+        ProfitLCY: Decimal;
+        LastYearProfitLCY: Decimal;
         "Profit %": Decimal;
         "LastYear Profit %": Decimal;
         LastYear: Boolean;
@@ -434,18 +434,18 @@ page 6059988 "NPR Sale Stats Activities"
                 case FigureToDisplay of
                     FigureToDisplay::"Sale (Qty.)":
                         begin
-                            Rec.SetValue(Text0002, Itt, -"Sale (QTY)");
-                            Rec.SetValue(Text0003, Itt, -"LastYear Sale (QTY)");
+                            Rec.SetValue(Text0002, Itt, -SaleQTY);
+                            Rec.SetValue(Text0003, Itt, -LastYearSaleQTY);
                         end;
                     FigureToDisplay::"Sale (LCY)":
                         begin
-                            Rec.SetValue(Text0002, Itt, "Sale (LCY)");
-                            Rec.SetValue(Text0003, Itt, "LastYear Sale (LCY)");
+                            Rec.SetValue(Text0002, Itt, SaleLCY);
+                            Rec.SetValue(Text0003, Itt, LastYearSaleLCY);
                         end;
                     FigureToDisplay::"Profit (LCY)":
                         begin
-                            Rec.SetValue(Text0002, Itt, "Profit (LCY)");
-                            Rec.SetValue(Text0003, Itt, "LastYear Profit (LCY)");
+                            Rec.SetValue(Text0002, Itt, ProfitLCY);
+                            Rec.SetValue(Text0003, Itt, LastYearProfitLCY);
                         end;
                     FigureToDisplay::"Profit (Pct.)":
                         begin
@@ -471,11 +471,11 @@ page 6059988 "NPR Sale Stats Activities"
         SetItemLedgerEntryFilter(AuxItemLedgerEntry);
         AuxItemLedgerEntry.CalcSums(Quantity);
 
-        "Sale (QTY)" := AuxItemLedgerEntry.Quantity;
-        "Sale (LCY)" := AuxValueEntry."Sales Amount (Actual)";
-        "Profit (LCY)" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
-        if "Sale (LCY)" <> 0 then
-            "Profit %" := "Profit (LCY)" / "Sale (LCY)" * 100
+        SaleQTY := AuxItemLedgerEntry.Quantity;
+        SaleLCY := AuxValueEntry."Sales Amount (Actual)";
+        ProfitLCY := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
+        if SaleLCY <> 0 then
+            "Profit %" := ProfitLCY / SaleLCY * 100
         else
             "Profit %" := 0;
 
@@ -495,11 +495,11 @@ page 6059988 "NPR Sale Stats Activities"
         SetItemLedgerEntryFilter(AuxItemLedgerEntry);
         AuxItemLedgerEntry.CalcSums(Quantity);
 
-        "LastYear Sale (QTY)" := AuxItemLedgerEntry.Quantity;
-        "LastYear Sale (LCY)" := AuxValueEntry."Sales Amount (Actual)";
-        "LastYear Profit (LCY)" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
-        if "LastYear Sale (LCY)" <> 0 then
-            "LastYear Profit %" := "LastYear Profit (LCY)" / "LastYear Sale (LCY)" * 100
+        LastYearSaleQTY := AuxItemLedgerEntry.Quantity;
+        LastYearSaleLCY := AuxValueEntry."Sales Amount (Actual)";
+        LastYearProfitLCY := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
+        if LastYearSaleLCY <> 0 then
+            "LastYear Profit %" := LastYearProfitLCY / LastYearSaleLCY * 100
         else
             "LastYear Profit %" := 0;
 

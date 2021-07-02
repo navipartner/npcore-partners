@@ -46,13 +46,13 @@
         {
             area(content)
             {
-                field(DeleteRanges; DeleteRanges)
+                field("Delete Ranges"; DeleteRanges)
                 {
                     Caption = 'Delete existing BIN ranges';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delete existing BIN ranges field';
                 }
-                field(DeleteGroups; DeleteGroups)
+                field("Delete Groups"; DeleteGroups)
                 {
                     Caption = 'Delete existing BIN groups';
                     ApplicationArea = All;

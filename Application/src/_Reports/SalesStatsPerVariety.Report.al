@@ -187,7 +187,7 @@ report 6014615 "NPR Sales Stats Per Variety"
         {
             area(content)
             {
-                field(PrintAlsoWithoutSale; PrintAlsoWithoutSale)
+                field("Print Also Without Sale"; PrintAlsoWithoutSale)
                 {
                     Caption = 'Include Items Not Sold';
                     ApplicationArea = All;

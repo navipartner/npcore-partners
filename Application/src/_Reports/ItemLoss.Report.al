@@ -101,7 +101,7 @@ report 6014542 "NPR Item - Loss"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(SourceCodeFilter; SourceCodeFilter)
+                    field("Source Code Filter"; SourceCodeFilter)
                     {
                         Caption = 'Source Code Filter';
                         TableRelation = "Source Code";
