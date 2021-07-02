@@ -396,6 +396,7 @@ codeunit 6150700 "NPR POS Session"
 
     procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "NPR POS Action"): Boolean
     begin
+        Clear(ActionOut);
         if not TempSessionActions.Get(ActionCode) then
             exit(false);
 

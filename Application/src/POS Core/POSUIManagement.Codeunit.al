@@ -691,8 +691,8 @@ codeunit 6150702 "NPR POS UI Management"
 
         RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", TempPOSParameterValue);
         WorkflowAction.ConfigureFromMenuButton(Button, POSSession, WorkflowAction);
+        TempPOSParameterValue.AddParametersToAction(WorkflowAction);
 
-        TempPOSParameterValue.Reset();
         FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
     end;
 
