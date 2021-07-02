@@ -171,20 +171,20 @@ report 6014543 "NPR Item - Loss - Top 10"
                 group(Control6150614)
                 {
                     ShowCaption = false;
-                    field(SourceCodeFilter; SourceCodeFilter)
+                    field("Source Code Filter"; SourceCodeFilter)
                     {
                         ApplicationArea = All;
                         Caption = 'Source Code Filter';
                         ToolTip = 'Specifies the value of the Source Code Filter field';
                     }
-                    field("Sorting"; Sorting)
+                    field("Sorting"; SortOrder)
                     {
                         ApplicationArea = All;
                         Caption = 'Quantity';
                         OptionCaption = 'Quantity,CostAmount,Shrinkage';
                         ToolTip = 'Specifies the value of the Quantity field';
                     }
-                    field(NoOfRecordsToPrint; NoOfRecordsToPrint)
+                    field("No Of Records To Print"; NoOfRecordsToPrint)
                     {
                         ApplicationArea = All;
                         Caption = 'Print Lines';
@@ -202,12 +202,12 @@ report 6014543 "NPR Item - Loss - Top 10"
 
     trigger OnPreReport()
     begin
-        case Sorting of
-            Sorting::Quantity:
+        case SortOrder of
+            SortOrder::Quantity:
                 SortBy := Text002;
-            Sorting::CostAmount:
+            SortOrder::CostAmount:
                 SortBy := Text003;
-            Sorting::Shrinkage:
+            SortOrder::Shrinkage:
                 SortBy := Text004;
         end;
     end;
@@ -220,7 +220,7 @@ report 6014543 "NPR Item - Loss - Top 10"
         ItemFilters: Text[250];
         ProgressText: Text[1024];
         SortBy: Text[30];
-        Sorting: Option Quantity,CostAmount,Shrinkage;
+        SortOrder: Option Quantity,CostAmount,Shrinkage;
         ItemCostAmount: Decimal;
         ItemCostAmountTotal: Decimal;
         ItemCostAmountTotal_Top: Decimal;
@@ -296,12 +296,12 @@ report 6014543 "NPR Item - Loss - Top 10"
                         ItemReportSorting."Decimal 3" := ItemReportSorting."Decimal 3" - ItemLedgerEntry.Quantity;
                         ItemReportSorting."Decimal 2" := ItemReportSorting."Decimal 2" - ItemLedgerEntry."Cost Amount (Actual)";
 
-                        case Sorting of
-                            Sorting::Quantity:
+                        case SortOrder of
+                            SortOrder::Quantity:
                                 ItemReportSorting."Decimal 1" := ItemReportSorting."Decimal 3";
-                            Sorting::CostAmount:
+                            SortOrder::CostAmount:
                                 ItemReportSorting."Decimal 1" := ItemReportSorting."Decimal 2";
-                            Sorting::Shrinkage:
+                            SortOrder::Shrinkage:
                                 ItemReportSorting."Decimal 1" := Pct(ItemReportSorting."Decimal 3", ItemReportSorting."Decimal 4");
                         end;
                         ItemReportSorting.Modify();
@@ -315,12 +315,12 @@ report 6014543 "NPR Item - Loss - Top 10"
                         ItemReportSorting."Decimal 4" := -SalesQty;
                         ItemReportSorting."Decimal 2" := -ItemLedgerEntry."Cost Amount (Actual)";
 
-                        case Sorting of
-                            Sorting::Quantity:
+                        case SortOrder of
+                            SortOrder::Quantity:
                                 ItemReportSorting."Decimal 1" := ItemReportSorting."Decimal 3";
-                            Sorting::CostAmount:
+                            SortOrder::CostAmount:
                                 ItemReportSorting."Decimal 1" := ItemReportSorting."Decimal 2";
-                            Sorting::Shrinkage:
+                            SortOrder::Shrinkage:
                                 ItemReportSorting."Decimal 1" := Pct(ItemReportSorting."Decimal 3", ItemReportSorting."Decimal 4");
                         end;
 

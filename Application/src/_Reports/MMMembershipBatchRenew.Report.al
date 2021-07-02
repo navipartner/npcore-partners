@@ -71,7 +71,7 @@ report 6060137 "NPR MM Membership Batch Renew"
                         if (DoRenew(ReportMembership, LogMessage)) then begin
                             AddToJournal(ReportMembership);
                         end else
-                            if (Verbose) then begin
+                            if (ShowVerbose) then begin
                                 LogToJournal(ReportMembership, LogMessage);
                             end;
 
@@ -109,7 +109,7 @@ report 6060137 "NPR MM Membership Batch Renew"
         {
             area(content)
             {
-                field(MembershipCode; MembershipCode)
+                field("Membership Code"; MembershipCode)
                 {
                     Caption = 'Membership Code';
                     ShowMandatory = true;
@@ -135,21 +135,21 @@ report 6060137 "NPR MM Membership Batch Renew"
                         exit(true);
                     end;
                 }
-                field(ValidOnDate; ValidOnDate)
+                field("Valid On Date"; ValidOnDate)
                 {
                     Caption = 'Active On Date';
                     ShowMandatory = true;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active On Date field';
                 }
-                field(TypeOfActive; TypeOfActive)
+                field("Type Of Active"; TypeOfActive)
                 {
                     Caption = 'Active Type';
                     OptionCaption = 'Active,Last Period';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active Type field';
                 }
-                field(RenewUsingItem; RenewUsingItem)
+                field("Renew Using Item"; RenewUsingItem)
                 {
                     Caption = 'Renew Using Item';
                     ShowMandatory = true;
@@ -179,7 +179,7 @@ report 6060137 "NPR MM Membership Batch Renew"
                         exit(true);
                     end;
                 }
-                field(Verbose; Verbose)
+                field(Verbose; ShowVerbose)
                 {
                     Caption = 'Verbose';
                     ApplicationArea = All;
@@ -198,7 +198,7 @@ report 6060137 "NPR MM Membership Batch Renew"
 
     var
         LaunchAltJnlPage: Boolean;
-        Verbose: Boolean;
+        ShowVerbose: Boolean;
         MembershipCode: Code[20];
         RenewUsingItem: Code[20];
         ValidOnDate: Date;

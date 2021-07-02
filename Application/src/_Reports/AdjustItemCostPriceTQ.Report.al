@@ -187,7 +187,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Adjustment Factor field';
                     }
-                    field(RoundingMethod; RoundingMethod.Code)
+                    field("Rounding Method"; RoundingMethod.Code)
                     {
                         Caption = 'Rounding Method';
                         TableRelation = "Rounding Method";

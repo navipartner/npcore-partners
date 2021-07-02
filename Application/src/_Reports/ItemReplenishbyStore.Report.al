@@ -256,27 +256,27 @@ report 6014475 "NPR Item Replenish. by Store"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(ExcludeNoReplenishSetup; ExcludeNoReplenishSetup)
+                    field("Exclude No Replenish Setup"; ExcludeNoReplenishSetup)
                     {
                         ApplicationArea = All;
                         Caption = 'Excl. Empty Replenish Setup';
                         ToolTip = 'Specifies the value of the Excl. Empty Replenish Setup field';
                         Visible = false;
                     }
-                    field(ShowItems; ShowItems)
+                    field("Show Items"; ShowItems)
                     {
                         ApplicationArea = All;
                         Caption = 'Show Items';
                         OptionCaption = 'All,With Replenish. Setup,Without Replenish. Setup';
                         ToolTip = 'Specifies the value of the Show Items field';
                     }
-                    field(PrepareReqWksh; PrepareReqWksh)
+                    field("Prepare Req Wksh"; PrepareReqWksh)
                     {
                         ApplicationArea = All;
                         Caption = 'Prepare Order Planning';
                         ToolTip = 'Specifies the value of the Prepare Order Planning field';
                     }
-                    field(OrderDate; OrderDate)
+                    field("Order Date"; OrderDate)
                     {
                         ApplicationArea = All;
                         Caption = 'Order Date';

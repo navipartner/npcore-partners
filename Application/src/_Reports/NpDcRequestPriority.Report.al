@@ -13,7 +13,7 @@ report 6151597 "NPR NpDc Request Priority"
             {
                 group(Coupons)
                 {
-                    field(Priority; Priority)
+                    field("Priority field"; Priority)
                     {
                         Caption = 'Priority';
                         MinValue = 0;

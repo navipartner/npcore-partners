@@ -10284,8 +10284,8 @@ End Function</Code>
         <Field Name="IndexFormat">
           <DataField>IndexFormat</DataField>
         </Field>
-        <Field Name="ShowType">
-          <DataField>ShowType</DataField>
+        <Field Name="Show_Type">
+          <DataField>Show_Type</DataField>
         </Field>
         <Field Name="Sales_LCY_Vendor2">
           <DataField>Sales_LCY_Vendor2</DataField>

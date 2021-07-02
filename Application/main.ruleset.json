@@ -157,6 +157,11 @@
             "action":"Error",
             "justification": "To avoid confusion, do not give methods the same name as fields or actions in the same scope."
         },
+        {
+            "id": "AA0204",
+            "action":"Error",
+            "justification": "To avoid confusion, do not give global variables the same name as fields, methods or actions in the same scope."
+        },
                 {
             "id": "AA0206",
             "action":"Error",

@@ -140,14 +140,14 @@ report 6014597 "NPR Sales Per Contact"
                 group(Control6150614)
                 {
                     ShowCaption = false;
-                    field("Sorting"; Sorting)
+                    field("Sorting"; SortOrder)
                     {
                         ApplicationArea = All;
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
                         ToolTip = 'Specifies the value of the Sort By field';
                     }
-                    field(ShowQuantity; ShowQuantity)
+                    field("Show Quantity"; ShowQuantity)
                     {
                         ApplicationArea = All;
                         Caption = 'Quantity';
@@ -188,7 +188,7 @@ report 6014597 "NPR Sales Per Contact"
         if ContactDateFilter = '' then
             ContactDateFilter := NoDateFilterLbl;
 
-        if Sorting = Sorting::Largest then
+        if SortOrder = SortOrder::Largest then
             Multiple := -1
         else
             Multiple := 1;
@@ -209,7 +209,7 @@ report 6014597 "NPR Sales Per Contact"
         NoDateFilterLbl: Label 'No date filter entered';
         PeriodLbl: Label 'Period: %1', Comment = '%1 = Contact Date Filter';
         TopLbl: Label 'Top %1', Comment = '%1 = Quantity';
-        Sorting: Option Largest,Smallest;
+        SortOrder: Option Largest,Smallest;
         ContactDateFilter: Text[30];
 }
 

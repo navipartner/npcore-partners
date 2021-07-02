@@ -693,31 +693,31 @@ report 6014459 "NPR Balancing Report A4 POS"
                 group("Print Options")
                 {
                     Caption = 'Print Options';
-                    field(PrintSales; PrintSales)
+                    field("Print Sales"; PrintSales)
                     {
                         Caption = 'Print Sales';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Sales field';
                     }
-                    field(PrintReceipts; PrintReceipts)
+                    field("Print Receipts"; PrintReceipts)
                     {
                         Caption = 'Print Receipts';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Receipts field';
                     }
-                    field(PrintTerminals; PrintTerminals)
+                    field("Print Terminals"; PrintTerminals)
                     {
                         Caption = 'Print Terminals';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Terminals field';
                     }
-                    field(PrintVouchers; PrintVouchers)
+                    field("Print Vouchers"; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Vouchers field';
                     }
-                    field(PrintTurnOver; PrintTurnOver)
+                    field("Print Turn Over"; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
                         ApplicationArea = All;
@@ -726,20 +726,20 @@ report 6014459 "NPR Balancing Report A4 POS"
                     group(PrintDiscount)
                     {
                         Caption = 'Discount';
-                        field(PrintDiscountAmt; PrintDiscountAmt)
+                        field("Print Discount Amt"; PrintDiscountAmt)
                         {
                             Caption = '        Print Discount Amount';
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the         Print Discount Amount field';
                         }
-                        field(PrintDiscountPerc; PrintDiscountPerc)
+                        field("Print Discount Perc"; PrintDiscountPerc)
                         {
                             Caption = '        Print Discount %';
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the         Print Discount % field';
 
                         }
-                        field(PrintDiscountTotal; PrintDiscountTotal)
+                        field("Print Discount Total"; PrintDiscountTotal)
                         {
                             Caption = '        Print Discount Total';
                             ApplicationArea = All;
@@ -747,7 +747,7 @@ report 6014459 "NPR Balancing Report A4 POS"
 
                         }
                     }
-                    field(PrintCounting; PrintCounting)
+                    field("Print Counting"; PrintCounting)
                     {
                         Caption = 'Print Counting';
                         ApplicationArea = All;
@@ -759,19 +759,19 @@ report 6014459 "NPR Balancing Report A4 POS"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Closing field';
                     }
-                    field(PrintVAT; PrintVAT)
+                    field("Print VAT"; PrintVAT)
                     {
                         Caption = 'Print VAT';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print VAT field';
                     }
-                    field(PrintAttachedBins; PrintAttachedBins)
+                    field("Print Attached Bins"; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Attached Bins field';
                     }
-                    field(PrintEmptyLines; PrintEmptyLines)
+                    field("Print Empty Lines"; PrintEmptyLines)
                     {
                         Caption = 'Print Lines where Value is Zero.';
                         ApplicationArea = All;

@@ -117,7 +117,7 @@ report 6014401 "NPR Voucher List"
                 group(options)
                 {
                     Caption = 'Options';
-                    field(ShowSummary; ShowSummary)
+                    field("Show Summary"; ShowSummary)
                     {
                         Caption = 'Show Summary';
                         ApplicationArea = All;

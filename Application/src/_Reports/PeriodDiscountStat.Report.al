@@ -162,7 +162,7 @@ report 6014443 "NPR Period Discount Stat."
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(OnlyItemWithSales; OnlyItemWithSales)
+                    field("Only Item With Sales"; OnlyItemWithSales)
                     {
                         Caption = 'Only Items With Sale';
                         ApplicationArea = All;

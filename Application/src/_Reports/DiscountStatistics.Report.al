@@ -220,7 +220,7 @@ report 6014402 "NPR Discount Statistics"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(ShowItemLedger; ShowItemLedger)
+                    field("Show Item Ledger"; ShowItemLedger)
                     {
                         Caption = 'Show Value Entries';
                         ApplicationArea = All;

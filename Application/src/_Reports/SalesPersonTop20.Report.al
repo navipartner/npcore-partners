@@ -22,7 +22,7 @@ report 6014406 "NPR Sales Person Top 20"
                 TempSalesPerson.Init();
                 TempSalesPerson."Vendor No." := "Salesperson/Purchaser".Code;
 
-                if Sorting = Sorting::Largest then
+                if SortOrder = SortOrder::Largest then
                     Multipl := -1
                 else
                     Multipl := 1;
@@ -194,27 +194,27 @@ report 6014406 "NPR Sales Person Top 20"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(ShowType; ShowType)
+                    field("Show Type"; ShowType)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Turnover,Discount,Contribution Margin,Contribution Ratio';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sort By field';
                     }
-                    field("Sorting"; Sorting)
+                    field("Sorting"; SortOrder)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sort By field';
                     }
-                    field(ShowQty; ShowQty)
+                    field("Show Qty"; ShowQty)
                     {
                         Caption = 'Quantity';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Quantity field';
                     }
-                    field(OnlySales; OnlySales)
+                    field("Only Sales"; OnlySales)
                     {
                         Caption = 'Only Salespersons With Sale';
                         ApplicationArea = All;
@@ -229,7 +229,7 @@ report 6014406 "NPR Sales Person Top 20"
     trigger OnInitReport()
     begin
         ShowType := ShowType::Turnover;
-        Sorting := Sorting::Largest;
+        SortOrder := SortOrder::Largest;
         ShowQty := 20;
     end;
 
@@ -261,7 +261,7 @@ report 6014406 "NPR Sales Person Top 20"
         Report_Caption_Lbl: Label 'Sales Person Top 20';
         TurnoverCaptionLbl: Label 'Turnover (LCY)';
         TextSort: Label 'Turnover,Discount,Contribution Margin,Contribution Ratio';
-        Sorting: Option Largest,Smallest;
+        SortOrder: Option Largest,Smallest;
         ShowType: Option Turnover,Discount,"Contribution Margin","Contribution Ratio";
         J: Text[30];
         SalespersonFilter: Text[250];
