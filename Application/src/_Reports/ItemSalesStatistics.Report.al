@@ -117,7 +117,7 @@ report 6014414 "NPR Item Sales Statistics"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(InventoryPostingGroupFilter; InventoryPostingGroupFilter)
+                    field("Inventory Posting Group Filter"; InventoryPostingGroupFilter)
                     {
                         Caption = 'Item Posting Group Filter:';
                         ApplicationArea = All;
@@ -131,7 +131,7 @@ report 6014414 "NPR Item Sales Statistics"
                                 InventoryPostingGroupFilter := InventoryPostingGroup.Code;
                         end;
                     }
-                    field(VendorItemNoFilter; VendorItemNoFilter)
+                    field("Vendor Item No Filter"; VendorItemNoFilter)
                     {
                         Caption = 'Vendor Item No. Filter:';
                         ApplicationArea = All;

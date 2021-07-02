@@ -671,13 +671,13 @@
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(PrintEntriesDue; PrintEntriesDue)
+                    field("Print Entries Due"; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Overdue Entries field';
                     }
-                    field(PrintAllHavingEntry; PrintAllHavingEntry)
+                    field("Print All Having Entry"; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
@@ -690,7 +690,7 @@
                                 PrintAllHavingBal := true;
                         end;
                     }
-                    field(PrintAllHavingBal; PrintAllHavingBal)
+                    field("Print All Having Bal"; PrintAllHavingBal)
                     {
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
@@ -703,45 +703,45 @@
                                 PrintAllHavingEntry := true;
                         end;
                     }
-                    field(PrintReversedEntries; PrintReversedEntries)
+                    field("Print Reversed Entries"; PrintReversedEntries)
                     {
                         Caption = 'Include Reversed Entries';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Include Reversed Entries field';
                     }
-                    field(PrintUnappliedEntries; PrintUnappliedEntries)
+                    field("Print Unapplied Entries"; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Include Unapplied Entries field';
                     }
-                    field(IncludeAgingBand; IncludeAgingBand)
+                    field("Include Aging Band"; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Include Aging Band field';
                     }
-                    field(PeriodLength; PeriodLength)
+                    field("Period Length"; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Aging Band Period Length field';
                     }
-                    field(DateChoice; DateChoice)
+                    field("Date Choice"; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Aging Band by field';
                     }
-                    field(LogInteraction; LogInteraction)
+                    field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Log Interaction field';
                     }
-                    field(FIKNo; FIKNo)
+                    field("FIK No"; FIKNo)
                     {
                         Caption = 'FIK No.';
                         ApplicationArea = All;

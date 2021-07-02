@@ -794,43 +794,43 @@ report 6014460 "NPR Balancing Report A4"
                 group("Print Options")
                 {
                     Caption = 'Print Options';
-                    field(PrintTurnOver; PrintTurnOver)
+                    field("Print TurnOver"; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print TurnOver field';
                     }
-                    field(PrintDiscount; PrintDiscount)
+                    field("Print Discount"; PrintDiscount)
                     {
                         Caption = 'Print Discount';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Discount field';
                     }
-                    field(PrintVAT; PrintVAT)
+                    field("Print VAT"; PrintVAT)
                     {
                         Caption = 'Print VAT';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print VAT field';
                     }
-                    field(PrintEFT; PrintEFT)
+                    field("Print EFT"; PrintEFT)
                     {
                         Caption = 'Print EFT';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print EFT field';
                     }
-                    field(PrintVouchers; PrintVouchers)
+                    field("Print Vouchers"; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Vouchers field';
                     }
-                    field(PrintCounting; PrintCounting)
+                    field("Print Counting"; PrintCounting)
                     {
                         Caption = 'Print Counting';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Counting field';
                     }
-                    field(PrintCountedAmtInclFloat; PrintCountedAmtInclFloat)
+                    field("Print Counted Amt Incl Float"; PrintCountedAmtInclFloat)
                     {
                         Caption = 'Print Counted Amt Incl Float';
                         ApplicationArea = All;
@@ -842,13 +842,13 @@ report 6014460 "NPR Balancing Report A4"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Closing field';
                     }
-                    field(PrintAttachedBins; PrintAttachedBins)
+                    field("Print Attached Bins"; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Attached Bins field';
                     }
-                    field(PrintEmptyLines; PrintEmptyLines)
+                    field("Print Empty Lines"; PrintEmptyLines)
                     {
                         Caption = 'Print Lines where Value is Zero.';
                         ApplicationArea = All;

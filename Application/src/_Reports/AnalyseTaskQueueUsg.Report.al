@@ -244,21 +244,21 @@ report 6059900 "NPR Analyse Task Queue Usg."
         {
             area(content)
             {
-                field(GroupBy; GroupBy)
+                field("Group By"; GroupBy)
                 {
                     ApplicationArea = All;
                     Caption = 'Group By:';
                     OptionCaption = 'Quarter,Hour,Day';
                     ToolTip = 'Specifies the value of the Group By: field';
                 }
-                field(ShowLines; ShowLines)
+                field("Show Lines"; ShowLines)
                 {
                     ApplicationArea = All;
                     Caption = 'Show Lines';
                     OptionCaption = 'None,UtilizationPct,All';
                     ToolTip = 'Specifies the value of the Show Lines field';
                 }
-                field(WarningLevel; WarningLevel)
+                field("Warning Level"; WarningLevel)
                 {
                     ApplicationArea = All;
                     Caption = 'Show Warning';

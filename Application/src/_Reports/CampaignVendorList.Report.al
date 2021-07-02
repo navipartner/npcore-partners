@@ -172,14 +172,14 @@ report 6014497 "NPR Campaign Vendor List"
         {
             area(content)
             {
-                field(LocationFilter; LocationFilter)
+                field("Location Filter"; LocationFilter)
                 {
                     Caption = 'LocationFilter';
                     TableRelation = Location.Code;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the LocationFilter field';
                 }
-                field(Dimension1Filter; Dimension1Filter)
+                field("Dimension 1 Filter"; Dimension1Filter)
                 {
                     CaptionClass = '1,3,1';
                     Caption = 'DimensionFilter';

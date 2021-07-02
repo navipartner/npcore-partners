@@ -107,19 +107,19 @@
         {
             area(content)
             {
-                field(CheckName; CheckName)
+                field("Check Name"; CheckName)
                 {
                     Caption = 'Name';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(CheckAddr; CheckAddr)
+                field("Check Addr"; CheckAddr)
                 {
                     Caption = 'Address';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Address field';
                 }
-                field(CheckPhone; CheckPhone)
+                field("Check Phone"; CheckPhone)
                 {
                     Caption = 'Phone No.';
                     ApplicationArea = All;

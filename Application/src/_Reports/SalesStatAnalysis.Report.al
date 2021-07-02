@@ -680,19 +680,19 @@ report 6014457 "NPR Sales Stat/Analysis"
                 group(Request)
                 {
                     Caption = 'Request';
-                    field(ShowItem; ShowItem)
+                    field("Show Item"; ShowItem)
                     {
                         Caption = 'Print Items';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Items field';
                     }
-                    field(OnlySales; OnlySales)
+                    field("Only Sales"; OnlySales)
                     {
                         Caption = 'Only Sales';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Only Sales field';
                     }
-                    field(LevelsCount; LevelsCount)
+                    field("Levels Count"; LevelsCount)
                     {
                         Caption = 'Levels';
                         ApplicationArea = All;

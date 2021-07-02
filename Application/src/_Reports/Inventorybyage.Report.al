@@ -698,27 +698,27 @@ report 6014400 "NPR Inventory by age"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Start Date field';
                     }
-                    field(PeriodLength; PeriodLength)
+                    field("Period Length"; PeriodLength)
                     {
                         Caption = 'Period Length';
                         DateFormula = true;
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Period Length field';
                     }
-                    field(ShowItem; ShowItem)
+                    field("Show Item"; ShowItem)
                     {
                         Caption = 'Show Items';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Items field';
                     }
-                    field(ShowZeroLines; ShowZeroLines)
+                    field("Show Zero Lines"; ShowZeroLines)
                     {
                         Caption = 'Show Zero Item Lines';
                         Editable = ShowItem;
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Zero Item Lines field';
                     }
-                    field(ItemGrpLevel; ItemGrpLevel)
+                    field("Item Grp Level"; ItemGrpLevel)
                     {
                         Caption = 'Level';
                         ApplicationArea = All;

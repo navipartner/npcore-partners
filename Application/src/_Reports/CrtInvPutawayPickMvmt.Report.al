@@ -181,13 +181,13 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                             EnableFieldsInPage();
                         end;
                     }
-                    field(PrintDocument; PrintDocument)
+                    field("Print Document"; PrintDocument)
                     {
                         Caption = 'Print Document';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Print Document field';
                     }
-                    field(ShowError; ShowError)
+                    field("Show Error"; ShowError)
                     {
                         Caption = 'Show Error';
                         ApplicationArea = All;

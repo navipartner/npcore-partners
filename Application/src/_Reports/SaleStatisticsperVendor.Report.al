@@ -62,7 +62,7 @@ report 6014416 "NPR Sale Statistics per Vendor"
             column(Avg_Inventory_Caption; Avg_Inventory_Caption_Lbl)
             {
             }
-            column(OnlyTotal; OnlyTotal)
+            column(OnlyTotal; TotalOnly)
             {
             }
             column(DateFilter_Vendor; DateFilterVendor)
@@ -74,7 +74,7 @@ report 6014416 "NPR Sale Statistics per Vendor"
             column(Name_Vendor; Vendor.Name)
             {
             }
-            column(Avoid0Sales; Avoid0Sales)
+            column(Avoid0Sales; AvoidZeroSales)
             {
             }
             column(InventoryDate; InventoryDate)
@@ -314,25 +314,25 @@ report 6014416 "NPR Sale Statistics per Vendor"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(InventoryDate; InventoryDate)
+                    field("Inventory Date"; InventoryDate)
                     {
                         Caption = 'Inventory Per Date';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Inventory Per Date field';
                     }
-                    field(PrintOnePerPage; PrintOnePerPage)
+                    field("Print One Per Page"; PrintOnePerPage)
                     {
                         Caption = 'New Page Per Creditor';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the New Page Per Creditor field';
                     }
-                    field(OnlyTotal; OnlyTotal)
+                    field("Total Only"; TotalOnly)
                     {
                         Caption = 'Totals Only';
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Totals Only field';
                     }
-                    field(Avoid0Sales; Avoid0Sales)
+                    field(Avoid0Sales; AvoidZeroSales)
                     {
                         Caption = 'Avoid 0 Sales';
                         ApplicationArea = All;
@@ -377,8 +377,8 @@ report 6014416 "NPR Sale Statistics per Vendor"
         Item1: Record Item;
         Item2: Record Item;
         VatPostingSetup: Record "VAT Posting Setup";
-        Avoid0Sales: Boolean;
-        OnlyTotal: Boolean;
+        AvoidZeroSales: Boolean;
+        TotalOnly: Boolean;
         PrintOnePerPage: Boolean;
         EndDate: Date;
         InventoryDate: Date;

@@ -223,7 +223,7 @@ report 6014449 "NPR Vendor trx by Item group"
             {
                 group(Options)
                 {
-                    field(visudensalg; visudensalg)
+                    field("visuden salg"; visudensalg)
                     {
                         Caption = 'Display Item Groups With No Sales';
                         ApplicationArea = All;

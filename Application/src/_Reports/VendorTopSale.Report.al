@@ -171,7 +171,7 @@ report 6014426 "NPR Vendor Top/Sale"
             column(Index; Index)
             {
             }
-            column(ShowType; ShowType)
+            column(Show_Type; ShowType)
             {
             }
             column(Sales_LCY_Vendor2; Vendor2."NPR Sales (LCY)")
@@ -343,21 +343,21 @@ report 6014426 "NPR Vendor Top/Sale"
         {
             area(content)
             {
-                field(ShowType; ShowType)
+                field("Show Type"; ShowType)
                 {
                     Caption = 'Show Type';
                     OptionCaption = 'Item Sales,,Gains,Margin';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Type field';
                 }
-                field("Sorting"; Sorting)
+                field("Sorting"; SortOrder)
                 {
                     Caption = 'Sorting';
                     OptionCaption = 'Show the highest first,Show the lowest first';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';
                 }
-                field(ShowQty; ShowQty)
+                field("Show Quantity"; ShowQty)
                 {
                     Caption = 'Show Quantity';
                     ApplicationArea = All;
@@ -426,7 +426,7 @@ report 6014426 "NPR Vendor Top/Sale"
         if EndDate <> NormalDate(EndDate) then
             EndDateLastYear := ClosingDate(EndDateLastYear);
 
-        if Sorting = Sorting::Highest then
+        if SortOrder = SortOrder::Highest then
             Multipl := -1
         else
             Multipl := 1;
@@ -476,7 +476,7 @@ report 6014426 "NPR Vendor Top/Sale"
         VendorInt: Integer;
         Text10600002: Label 'Order by %1 ';
         Text10600001: Label 'Period: %1';
-        Sorting: Option Highest,Lowest;
+        SortOrder: Option Highest,Lowest;
         ShowType: Option "Item Sales",,Gains,Margin;
         j: Text[30];
         VendorDateFilter: Text[30];
