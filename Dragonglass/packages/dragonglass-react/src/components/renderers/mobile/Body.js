@@ -1,16 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import {
-  searchSelector,
-  subpage,
-} from "../../../redux/mobile/mobile-selectors";
+import { searchSelector, subpage } from "../../../redux/mobile/mobile-selectors";
 import { GenericControl } from "./GenericControl";
 import { SearchResults } from "./search/SearchResults";
 
-const mapContent = (content) =>
-  content.map((control, index) => (
-    <GenericControl key={index} control={control} />
-  ));
+const mapContent = (content) => content.map((control, index) => <GenericControl key={index} control={control} />);
 
 export const Body = ({ pages }) => {
   const searchActive = useSelector(searchSelector);
@@ -33,10 +27,6 @@ export const Body = ({ pages }) => {
   }
   const { content } = selectedPage;
 
-  // TODO: Search feature
-  /*
-    Aca, this feature is described in https://dev.azure.com/navipartner/Dragonglass/_workitems/edit/3379
-  */
   if (searchActive) {
     return <SearchResults />;
   }
