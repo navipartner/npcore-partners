@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { balancingSelectView, balancingViewStateEqual } from "../../redux/balancing/balancing-selectors";
 import Statistics from "./Statistics";
-import Counting from "./Counting";
+import Counting from "./Counting/Counting";
 import { getBalancingState } from "./BackEndActions";
 
 export const BalanceView = ({ isStatisticsEnabled }) => {

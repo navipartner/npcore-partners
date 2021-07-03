@@ -8,9 +8,7 @@ import EmptyCart from "./EmptyCart";
 import { AnimateSharedLayout, AnimatePresence, motion } from "framer-motion";
 
 export const DataGrid = ({ layout, clickHandler }) => {
-  const [currentlySwipedItemIndex, setCurrentlySwipedItemIndex] = useState(
-    null
-  );
+  const [currentlySwipedItemIndex, setCurrentlySwipedItemIndex] = useState(null);
 
   if (!layout || !layout.dataSource) {
     return (
@@ -25,13 +23,7 @@ export const DataGrid = ({ layout, clickHandler }) => {
   const provider = ConfigProvider.getLayout(layout);
 
   if (!provider) {
-    return (
-      <Alert
-        messageType={ALERT_MESSAGE_TYPES.DANGER}
-        originFile="DataGrid.js"
-        originProperties={["provider"]}
-      />
-    );
+    return <Alert messageType={ALERT_MESSAGE_TYPES.DANGER} originFile="DataGrid.js" originProperties={["provider"]} />;
   }
 
   let data = useSelector((state) => {
@@ -40,15 +32,8 @@ export const DataGrid = ({ layout, clickHandler }) => {
     return set && source ? { set, source } : null;
   });
 
-  // TODO: Vjeko and Aca to figure out how to set this up without the Alert always flashing before getting the data from useSelector.
   if (data === null) {
     return null;
-    // <Alert
-    //   messageType={ALERT_MESSAGE_TYPES.DANGER}
-    //   originFile="DataGrid.js"
-    //   originProperties={["data source"]}
-    //   additionalMessage="Unknown dataSource was specified."
-    // />
   }
 
   return (
@@ -62,9 +47,7 @@ export const DataGrid = ({ layout, clickHandler }) => {
               item={item}
               itemIndex={item.position}
               dataSource={layout.dataSource}
-              setCurrentlySwipedItemIndex={(itemIndex) =>
-                setCurrentlySwipedItemIndex(itemIndex)
-              }
+              setCurrentlySwipedItemIndex={(itemIndex) => setCurrentlySwipedItemIndex(itemIndex)}
               currentlySwipedItemIndex={currentlySwipedItemIndex}
               clickHandler={clickHandler}
             />

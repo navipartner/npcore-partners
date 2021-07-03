@@ -43,13 +43,13 @@ const __mock_state_balancing = {
     },
     discount: {
       discountAmounts: {
-        campaignDiscountLcy: 100,
-        mixDiscountLcy: 100,
-        quantityDiscountLcy: 100,
-        customDiscountLcy: 100,
-        bomDiscountLcy: 100,
-        customerDiscountLcy: 100,
-        lineDiscountLcy: 100,
+        campaignDiscountLcy: 106,
+        mixDiscountLcy: 130,
+        quantityDiscountLcy: 41,
+        customDiscountLcy: 75,
+        bomDiscountLcy: 24,
+        customerDiscountLcy: 78,
+        lineDiscountLcy: 36,
       },
       discountPercent: {
         campaignDiscountPct: 100,
@@ -67,21 +67,21 @@ const __mock_state_balancing = {
     },
     turnover: {
       general: {
-        turnoverLcy: 100,
-        netTurnoverLcy: 100,
-        netCostLcy: 100,
+        turnoverLcy: 30,
+        netTurnoverLcy: 95,
+        netCostLcy: 10,
       },
       profit: {
-        profitAmountLcy: 100,
-        profitPct: 100,
+        profitAmountLcy: 55,
+        profitPct: 65,
       },
       direct: {
-        directTurnoverLcy: 100,
-        directNetTurnoverLcy: 100,
+        directTurnoverLcy: 65,
+        directNetTurnoverLcy: 15,
       },
       credit: {
-        creditTurnoverLcy: 100,
-        creditNetTurnoverLcy: 100,
+        creditTurnoverLcy: 35,
+        creditNetTurnoverLcy: 80,
       },
     },
     taxSummary: [
