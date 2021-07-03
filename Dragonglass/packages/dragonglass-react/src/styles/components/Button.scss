@@ -172,9 +172,13 @@
       }
 
       > span {
-        white-space: nowrap;
+        // Multiline text-overflow ellipsis:
+        // https://dropshado.ws/post/1015351370/webkit-line-clamp
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
         text-overflow: ellipsis;
-        max-height: 100%;
 
         > img {
           max-height: 15vh;

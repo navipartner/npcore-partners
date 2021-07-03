@@ -16,6 +16,7 @@ importers:
       '@types/react': ^17.0.0
       babel-loader: ^8.1.0
       case-sensitive-paths-webpack-plugin: ^2.3.0
+      chart.js: ^3.3.2
       clean-webpack-plugin: ^3.0.0
       css-loader: ^4.2.2
       dragonglass-core: file:./packages/dragonglass-core
@@ -35,6 +36,7 @@ importers:
       np-hwc: file:external/np-hwc-1.0.0.tgz
       numeral: ^2.0.6
       react: ^16.13.1
+      react-chartjs-2: ^3.0.3
       react-dom: ^16.13.1
       react-qr-svg: ^2.2.2
       react-redux: ^7.2.1
@@ -56,6 +58,7 @@ importers:
       webpack-cli: ^3.3.12
       webpack-dev-server: ^3.11.0
     dependencies:
+      chart.js: 3.3.2
       dragonglass-core: link:packages/dragonglass-core
       dragonglass-front-end-async: link:packages/dragonglass-front-end-async
       dragonglass-nav: link:packages/dragonglass-nav
@@ -69,6 +72,7 @@ importers:
       np-hwc: file:external/np-hwc-1.0.0.tgz
       numeral: 2.0.6
       react: 16.13.1
+      react-chartjs-2: 3.0.3_chart.js@3.3.2+react@16.13.1
       react-dom: 16.13.1_react@16.13.1
       react-qr-svg: 2.2.2_react@16.13.1
       react-redux: 7.2.1_49f644e2f7de4182503f8b93abece808
@@ -2799,6 +2803,10 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  /chart.js/3.3.2:
+    resolution: {integrity: sha512-H0hSO7xqTIrwxoACqnSoNromEMfXvfuVnrbuSt2TuXfBDDofbnto4zuZlRtRvC73/b37q3wGAWZyUU41QPvNbA==}
+    dev: false
+
   /check-types/8.0.3:
     resolution: {integrity: sha512-YpeKZngUmG65rLudJ4taU7VLkOCTMhNl/u4ctNC56LQS/zJTyNH0Lrtwm1tfTsbLlwvlfsA2d1c8vCf/Kh2KwQ==}
     dev: true
@@ -3084,6 +3092,13 @@ packages:
     resolution: {integrity: sha512-4FJkXzKXEDB1snCFZlLP4gpC3JILicCpGbzG9f9G7tGqGCzETQ2hWPrcinA9oU4wtf2biUaEH5065UnMeR33oA==}
     dependencies:
       safe-buffer: 5.1.2
+    dev: true
+
+  /convert-source-map/1.8.0:
+    resolution: {integrity: sha512-+OQdjP49zViI/6i7nIJpA8rAl4sV/JdPfU9nZs3VqOwGIgizICvuN2ru6fMd+4llL0tar18UYJXfZ/TWtmhUjA==}
+    dependencies:
+      safe-buffer: 5.1.2
+    dev: false
 
   /cookie-signature/1.0.6:
     resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
@@ -4468,7 +4483,7 @@ packages:
       make-error-cause: 1.2.2
       safe-buffer: 5.2.1
       through2: 2.0.5
-      uglify-js: 3.13.9
+      uglify-js: 3.13.10
       vinyl-sourcemaps-apply: 0.2.1
     dev: false
 
@@ -6077,6 +6092,10 @@ packages:
     resolution: {integrity: sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==}
     dev: true
 
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
+
   /loglevel/1.7.0:
     resolution: {integrity: sha512-i2sY04nal5jDcagM3FMfG++T69GEEM8CYuOfeOIvmXzOIcwE9a/CJPR0MFM97pYMj/u10lzz7/zd7+qwhrBTqQ==}
     engines: {node: '>= 0.6.0'}
@@ -7334,6 +7353,17 @@ packages:
       iconv-lite: 0.4.24
       unpipe: 1.0.0
     dev: true
+
+  /react-chartjs-2/3.0.3_chart.js@3.3.2+react@16.13.1:
+    resolution: {integrity: sha512-jOFZKwZ8sMLkddewZ/tToxuu4pYimAvvY5I6uK+hCpSFT16Pvo2bdHhUoZ0X87zu9I+dx2I+JCqaLN6XhmrbDg==}
+    peerDependencies:
+      chart.js: ^3.1.0
+      react: ^16.8.0 || ^17.0.0
+    dependencies:
+      chart.js: 3.3.2
+      lodash: 4.17.21
+      react: 16.13.1
+    dev: false
 
   /react-dom/16.13.1_react@16.13.1:
     resolution: {integrity: sha512-81PIMmVLnCNLO/fFOQxdQkvEq/+Hfpv24XNJfpyZhTRfO0QcmQIF/PgCa1zCOj2w1hrn12MFLyaJ/G0+Mxtfag==}
@@ -8920,8 +8950,8 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
 
-  /uglify-js/3.13.9:
-    resolution: {integrity: sha512-wZbyTQ1w6Y7fHdt8sJnHfSIuWeDgk6B5rCb4E/AM6QNNPbOMIZph21PW5dRB3h7Df0GszN+t7RuUH6sWK5bF0g==}
+  /uglify-js/3.13.10:
+    resolution: {integrity: sha512-57H3ACYFXeo1IaZ1w02sfA71wI60MGco/IQFjOqK+WtKoprh7Go2/yvd2HPtoJILO2Or84ncLccI4xoHMTSbGg==}
     engines: {node: '>=0.8.0'}
     hasBin: true
     dev: false
@@ -9155,7 +9185,7 @@ packages:
     engines: {node: '>= 0.10'}
     dependencies:
       append-buffer: 1.0.2
-      convert-source-map: 1.7.0
+      convert-source-map: 1.8.0
       graceful-fs: 4.2.6
       normalize-path: 2.1.1
       now-and-later: 2.0.1

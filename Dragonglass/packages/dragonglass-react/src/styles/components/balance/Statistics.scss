@@ -1,6 +1,7 @@
 .statistics {
   height: 100%;
-  --section-margin: 1em;
+  --section-margin: 1rem;
+  --subsection-margin: 0.5em;
 
   .filter-container {
     display: flex;
@@ -54,7 +55,7 @@
     height: calc(90% - var(--section-margin));
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
+    flex-direction: row;
     background: $colorSecondary200;
     color: $colorText100;
     align-content: space-between;
@@ -63,7 +64,12 @@
     &--centered {
       align-content: center;
       justify-content: center;
-      font-size: 0.95em;
+      font-size: 1em;
+    }
+
+    &--column {
+      flex-direction: column;
+      align-items: center;
     }
 
     h2 {
@@ -72,19 +78,59 @@
       font-weight: 500;
     }
 
+    .section-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: var(--section-margin);
+
+      &--column {
+        flex-direction: column;
+      }
+
+      &--inline {
+        width: calc(50% - var(--section-margin) / 2);
+        flex-direction: column;
+
+        &-row {
+          flex-direction: row;
+        }
+      }
+    }
+
     .section {
       height: fit-content;
       width: calc(50% - var(--section-margin) / 2);
+      width: 100%;
       margin-bottom: var(--section-margin);
       padding: 1em;
       background: $colorSecondary100;
       border-radius: $borderRadius;
       box-shadow: $boxShadow;
+      z-index: 10;
 
       h1 {
         font-size: 1.2em;
         border-bottom: 1px solid $colorPrimary100;
         font-weight: 500;
+        margin-top: 0;
+      }
+
+      &--balancing {
+        padding: 0.4em 0.75em;
+        font-size: 1.1em;
+        width: calc(50% - var(--section-margin) / 2);
+
+        .subsection {
+          box-shadow: unset;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+      }
+
+      &--tax {
+        width: calc(50% - var(--section-margin) / 2);
       }
 
       &--single {
@@ -92,15 +138,14 @@
         margin: 0 auto var(--section-margin) auto;
       }
 
-      &--balancing {
-        padding: 0.4em 0;
-        font-size: 1.1em;
+      &--column {
+        width: calc(50% - var(--section-margin) / 2);
+        margin: 0;
+        margin-right: var(--section-margin);
+      }
 
-        .subsection {
-          box-shadow: unset;
-          margin-bottom: 0;
-          padding-bottom: 0;
-        }
+      &--inline-row {
+        width: calc(60% - var(--section-margin) / 2);
       }
     }
 
@@ -111,11 +156,11 @@
     }
 
     .subsection {
-      width: 49.5%;
+      width: calc(50% - var(--subsection-margin) / 2);
       border-radius: $borderRadius;
       box-shadow: $boxShadowLight;
       padding: 0.5em 1em;
-      margin-bottom: 0.5em;
+      margin-bottom: var(--subsection-margin);
 
       &__field-container {
         display: flex;
@@ -125,6 +170,10 @@
 
         &:last-child {
           margin-bottom: 0;
+        }
+
+        &--discount {
+          flex-direction: column;
         }
       }
 
@@ -141,15 +190,44 @@
 
       &__label {
         margin-right: 0.5em;
+        margin-right: auto;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       &__value {
-        background: $colorPrimary300;
         border-radius: $borderRadius $borderRadius $borderRadius 0;
         padding: 0.25em 0.5em;
+        background: $colorPrimary300;
+      }
+
+      &__value-cell {
+        padding: 0.25em 0.5em;
+        width: 5em;
+        text-align: center;
+      }
+
+      &__discount-row {
+        display: flex;
+        align-items: flex-end;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.25em 0.25em 0.25em 0.75em;
+        border-radius: $borderRadius;
+
+        &--total {
+          font-weight: 500;
+        }
+
+        &--heading {
+          justify-content: flex-end;
+          font-weight: 500;
+        }
+
+        &--highlight {
+          background: $colorPrimary300;
+        }
       }
 
       &--single {
@@ -158,6 +236,13 @@
         .subsection__field {
           width: 32%;
         }
+      }
+
+      &--discount {
+        box-shadow: none;
+        width: 100%;
+        margin-bottom: 0;
+        padding: 0 1em;
       }
     }
 
@@ -191,6 +276,7 @@
       font-size: 1.6em;
       text-align: center;
       font-weight: 400;
+      width: 100%;
     }
   }
 
@@ -256,5 +342,86 @@
     border-radius: $borderRadius;
     box-shadow: $boxShadow;
     font-size: 1.1em;
+  }
+
+  .charts {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+
+    &--single {
+      width: 75%;
+    }
+
+    &__container {
+      position: relative;
+
+      &--bar {
+        width: calc(70% - 1rem);
+        margin-right: 1rem;
+        height: 100%;
+      }
+
+      &--pie {
+        width: 30%;
+        height: 100%;
+      }
+    }
+
+    &__connector {
+      width: 1em;
+      height: 4em;
+      background: $colorPrimary300;
+      position: absolute;
+      top: -2em;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &__chart {
+      background: $colorSecondary100;
+      border-radius: $borderRadius;
+      box-shadow: $boxShadow;
+      position: relative;
+
+      &--bar {
+        padding: 0.75em;
+      }
+
+      &--pie {
+        padding: 0.75em;
+      }
+    }
+  }
+
+  .discount-chart {
+    width: calc(25% - var(--section-margin) / 2);
+    position: relative;
+
+    &--inline-row {
+      width: calc(40% - var(--section-margin) / 2);
+    }
+
+    &__connector {
+      width: 4em;
+      height: 1em;
+      background: $colorPrimary300;
+      position: absolute;
+      top: 50%;
+      left: -2em;
+      transform: translateY(-50%);
+    }
+
+    &__chart {
+      width: 100%;
+      background: $colorSecondary100;
+      border-radius: $borderRadius;
+      box-shadow: $boxShadow;
+      padding: 1.25em;
+      position: relative;
+      height: 100%;
+    }
   }
 }

@@ -38,6 +38,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "chart.js": "^3.3.2",
     "dragonglass-core": "file:./packages/dragonglass-core",
     "dragonglass-front-end-async": "file:./packages/dragonglass-front-end-async",
     "dragonglass-nav": "file:./packages/dragonglass-nav",
@@ -51,6 +52,7 @@
     "np-hwc": "file:external/np-hwc-1.0.0.tgz",
     "numeral": "^2.0.6",
     "react": "^16.13.1",
+    "react-chartjs-2": "^3.0.3",
     "react-dom": "^16.13.1",
     "react-qr-svg": "^2.2.2",
     "react-redux": "^7.2.1",
