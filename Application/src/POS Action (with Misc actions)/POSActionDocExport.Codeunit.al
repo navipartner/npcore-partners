@@ -106,7 +106,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
         DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
         ReadingErr: Label 'reading in %1 of %2';
-
+        CaptionCustomerTableView: Label 'Customer Table View';
+        CaptionCustomerLookupPage: Label 'Customer Lookup Page';
+        DescCustomerTableView: Label 'Pre-filtered customer list';
+        DescCustomerLookupPage: Label 'Custom customer lookup page';
 
     local procedure ActionCode(): Text
     begin
@@ -115,7 +118,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.11');
+        exit('1.12');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -183,6 +186,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             Sender.RegisterOptionParameter('UseLocationFrom', '<Undefined>,POS Store,POS Sale,SpecificLocation', 'POS Store');
             Sender.RegisterTextParameter('UseSpecLocationCode', '');
             Sender.RegisterBooleanParameter('SendICOrderConfirmation', false);
+            Sender.RegisterTextParameter('CustomerTableView', '');
+            Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
         end;
     end;
 
@@ -222,6 +227,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         SalesHeader: Record "Sales Header";
+        CustomerTableView: Text;
+        CustomerLookupPage: Integer;
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -234,7 +241,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         SalePOS.FindFirst();
 
         if (JSON.GetBooleanParameter('SelectCustomer')) then begin
-            if not SelectCustomer(SalePOS, POSSale) then
+            CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
+            CustomerLookupPage := JSON.GetIntegerParameterOrFail('CustomerLookupPage', ActionCode());
+            if not SelectCustomer(SalePOS, POSSale, CustomerTableView, CustomerLookupPage) then
                 SalePOS.TestField("Customer No.");
         end;
         SetReference(SalePOS, JSON);
@@ -380,7 +389,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         RetailSalesDocMgt.TestSalePOS(SalePOS);
     end;
 
-    local procedure SelectCustomer(var SalePOS: Record "NPR POS Sale"; POSSale: Codeunit "NPR POS Sale"): Boolean
+    local procedure SelectCustomer(var SalePOS: Record "NPR POS Sale"; POSSale: Codeunit "NPR POS Sale"; CustomerTableView: Text; CustomerLookupPage: Integer): Boolean
     var
         Customer: Record Customer;
     begin
@@ -389,7 +398,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             exit(true);
         end;
 
-        if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
+        if CustomerTableView <> '' then
+            Customer.SetView(CustomerTableView);
+
+        if PAGE.RunModal(CustomerLookupPage, Customer) <> ACTION::LookupOK then
             exit(false);
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
@@ -650,6 +662,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := CaptionUseSpecLocationCode;
             'SendICOrderConfirmation':
                 Caption := CaptionSendICOrderConfirmation;
+            'CustomerTableView':
+                Caption := CaptionCustomerTableView;
+            'CustomerLookupPage':
+                Caption := CaptionCustomerLookupPage;
         end;
     end;
 
@@ -742,6 +758,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := StrSubstNo(DescUseSpecLocationCode, CaptionUseLocationFrom, SelectStr(4, OptionUseLocationFrom));
             'SendICOrderConfirmation':
                 Caption := DescSendICOrderConfirmation;
+            'CustomerTableView':
+                Caption := DescCustomerTableView;
+            'CustomerLookupPage':
+                Caption := DescCustomerLookupPage;
         end;
     end;
 
@@ -765,6 +785,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         Location: Record Location;
+        FilterBuilder: FilterPageBuilder;
+        Customer: Record Customer;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -778,6 +800,16 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                     if PAGE.RunModal(0, Location) = ACTION::LookupOK then
                         POSParameterValue.Value := Location.Code;
                 end;
+            'CustomerTableView':
+                begin
+                    FilterBuilder.AddRecord(Customer.TableCaption, Customer);
+                    if POSParameterValue.Value <> '' then begin
+                        Customer.SetView(POSParameterValue.Value);
+                        FilterBuilder.SetView(Customer.TableCaption, Customer.GetView(false));
+                    end;
+                    if FilterBuilder.RunModal() then
+                        POSParameterValue.Value := FilterBuilder.GetView(Customer.TableCaption, false);
+                end;
         end;
     end;
 
@@ -785,6 +817,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         Location: Record Location;
+        Customer: Record Customer;
+        PageId: Integer;
+        PageMetadata: Record "Page Metadata";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -797,6 +832,20 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                     Location.SetRange("Use As In-Transit", false);
                     Location.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Location.Code));
                     Location.Find();
+                end;
+            'CustomerTableView':
+                begin
+                    if POSParameterValue.Value <> '' then
+                        Customer.SetView(POSParameterValue.Value);
+                end;
+            'CustomerLookupPage':
+                begin
+                    if (POSParameterValue.Value in ['', '0']) then
+                        exit;
+                    Evaluate(PageId, POSParameterValue.Value);
+                    PageMetadata.SetRange(ID, PageId);
+                    PageMetadata.SetRange(SourceTable, Database::Customer);
+                    PageMetadata.FindFirst();
                 end;
         end;
     end;
