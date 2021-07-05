@@ -237,10 +237,11 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
                 exit;
             NpCsArchDocument.CalcFields("Callback Data");
             NpCsDocument."Callback Data" := NpCsArchDocument."Callback Data";
+        end else begin
+            if not NpCsDocument."Callback Data".HasValue() then
+                exit;
+            NpCsDocument.CalcFields("Callback Data");
         end;
-        if not NpCsDocument."Callback Data".HasValue() then
-            exit;
-        NpCsDocument.CalcFields("Callback Data");
         NpCsDocument."Callback Data".CreateInStream(InStr, TEXTENCODING::UTF8);
         XmlDocument.ReadFrom(InStr, Document);
         Document.GetRoot(Element);

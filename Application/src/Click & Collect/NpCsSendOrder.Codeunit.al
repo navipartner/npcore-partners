@@ -79,67 +79,67 @@ codeunit 6151197 "NPR NpCs Send Order"
               '<ImportSalesDocuments xmlns="urn:microsoft-dynamics-schemas/codeunit/' + ServiceName + '">' +
                 '<sales_documents>' +
                   '<sales_document xmlns="urn:microsoft-dynamics-nav/xmlports/collect_in_store_sales_document"' +
-                  ' document_type="' + Format(NpCsDocument."Document Type", 0, 2) + '" document_no="' + NpCsDocument."Document No." + '">' +
-                    '<reference_no>' + NpCsDocument."Reference No." + '</reference_no>' +
+                  ' document_type="' + Format(NpCsDocument."Document Type", 0, 2) + '" document_no="' + Escape(NpCsDocument."Document No.") + '">' +
+                    '<reference_no>' + Escape(NpCsDocument."Reference No.") + '</reference_no>' +
                     '<to_document_type>' + Format(NpCsDocument."To Document Type", 0, 2) + '</to_document_type>' +
-                    '<from_store store_code="' + NpCsStoreLocal.Code + '">' +
-                      '<company_name>' + NpCsStoreLocal."Company Name" + '</company_name>' +
-                      '<name>' + NpCsStoreLocal.Name + '</name>' +
-                      '<service_url>' + NpCsStoreLocal."Service Url" + '</service_url>' +
-                      '<service_username>' + NpCsStoreLocal."Service Username" + '</service_username>' +
-                      '<service_password>' + NpCsStoreLocal."Service Password" + '</service_password>' +
-                      '<email>' + NpCsStoreLocal."E-mail" + '</email>' +
-                      '<mobile_phone_no>' + NpCsStoreLocal."Mobile Phone No." + '</mobile_phone_no>' +
+                    '<from_store store_code="' + Escape(NpCsStoreLocal.Code) + '">' +
+                      '<company_name>' + Escape(NpCsStoreLocal."Company Name") + '</company_name>' +
+                      '<name>' + Escape(NpCsStoreLocal.Name) + '</name>' +
+                      '<service_url>' + Escape(NpCsStoreLocal."Service Url") + '</service_url>' +
+                      '<service_username>' + Escape(NpCsStoreLocal."Service Username") + '</service_username>' +
+                      '<service_password>' + Escape(NpCsStoreLocal."Service Password") + '</service_password>' +
+                      '<email>' + Escape(NpCsStoreLocal."E-mail") + '</email>' +
+                      '<mobile_phone_no>' + Escape(NpCsStoreLocal."Mobile Phone No.") + '</mobile_phone_no>' +
                       '<callback encoding="base64">' + InitCallback(NpCsDocument) + '</callback>' +
                     '</from_store>' +
-                    '<to_store store_code="' + NpCsDocument."To Store Code" + '" />' +
+                    '<to_store store_code="' + Escape(NpCsDocument."To Store Code") + '" />' +
                     '<processing_status>' + Format(NpCsDocument."Processing Status"::Pending, 0, 2) + '</processing_status>' +
                     '<order_date>' + Format(SalesHeader."Order Date", 0, 9) + '</order_date>' +
                     '<posting_date>' + Format(SalesHeader."Posting Date", 0, 9) + '</posting_date>' +
                     '<due_date>' + Format(SalesHeader."Due Date", 0, 9) + '</due_date>' +
-                    '<sell_to_customer customer_no="' + CustNo + '" customer_mapping="' + Format(NpCsWorkflow."Customer Mapping", 0, 2) + '">' +
-                      '<name>' + SalesHeader."Sell-to Customer Name" + '</name>' +
-                      '<name_2>' + SalesHeader."Sell-to Customer Name 2" + '</name_2>' +
-                      '<address>' + SalesHeader."Sell-to Address" + '</address>' +
-                      '<address_2>' + SalesHeader."Sell-to Address 2" + '</address_2>' +
-                      '<post_code>' + SalesHeader."Sell-to Post Code" + '</post_code>' +
-                      '<city>' + SalesHeader."Sell-to City" + '</city>' +
-                      '<country_code>' + SalesHeader."Sell-to Country/Region Code" + '</country_code>' +
-                      '<contact>' + SalesHeader."Sell-to Contact" + '</contact>' +
-                      '<phone_no>' + NpCsDocument."Customer Phone No." + '</phone_no>' +
-                      '<email>' + NpCsDocument."Customer E-mail" + '</email>' +
+                    '<sell_to_customer customer_no="' + Escape(CustNo) + '" customer_mapping="' + Format(NpCsWorkflow."Customer Mapping", 0, 2) + '">' +
+                      '<name>' + Escape(SalesHeader."Sell-to Customer Name") + '</name>' +
+                      '<name_2>' + Escape(SalesHeader."Sell-to Customer Name 2") + '</name_2>' +
+                      '<address>' + Escape(SalesHeader."Sell-to Address") + '</address>' +
+                      '<address_2>' + Escape(SalesHeader."Sell-to Address 2") + '</address_2>' +
+                      '<post_code>' + Escape(SalesHeader."Sell-to Post Code") + '</post_code>' +
+                      '<city>' + Escape(SalesHeader."Sell-to City") + '</city>' +
+                      '<country_code>' + Escape(SalesHeader."Sell-to Country/Region Code") + '</country_code>' +
+                      '<contact>' + Escape(SalesHeader."Sell-to Contact") + '</contact>' +
+                      '<phone_no>' + Escape(NpCsDocument."Customer Phone No.") + '</phone_no>' +
+                      '<email>' + Escape(NpCsDocument."Customer E-mail") + '</email>' +
                     '</sell_to_customer>' +
                     '<notification>' +
                       '<send_notification_from_store>' + Format(NpCsDocument."Send Notification from Store", 0, 9) + '</send_notification_from_store>' +
                       '<notify_customer_via_email>' + Format(NpCsDocument."Notify Customer via E-mail", 0, 9) + '</notify_customer_via_email>' +
-                      '<email_template_pending>' + NpCsDocument."E-mail Template (Pending)" + '</email_template_pending>' +
-                      '<email_template_confirmed>' + NpCsDocument."E-mail Template (Confirmed)" + '</email_template_confirmed>' +
-                      '<email_template_rejected>' + NpCsDocument."E-mail Template (Rejected)" + '</email_template_rejected>' +
-                      '<email_template_expired>' + NpCsDocument."E-mail Template (Expired)" + '</email_template_expired>' +
+                      '<email_template_pending>' + Escape(NpCsDocument."E-mail Template (Pending)") + '</email_template_pending>' +
+                      '<email_template_confirmed>' + Escape(NpCsDocument."E-mail Template (Confirmed)") + '</email_template_confirmed>' +
+                      '<email_template_rejected>' + Escape(NpCsDocument."E-mail Template (Rejected)") + '</email_template_rejected>' +
+                      '<email_template_expired>' + Escape(NpCsDocument."E-mail Template (Expired)") + '</email_template_expired>' +
                       '<notify_customer_via_sms>' + Format(NpCsDocument."Notify Customer via Sms", 0, 9) + '</notify_customer_via_sms>' +
-                      '<sms_template_pending>' + NpCsDocument."Sms Template (Pending)" + '</sms_template_pending>' +
-                      '<sms_template_confirmed>' + NpCsDocument."Sms Template (Confirmed)" + '</sms_template_confirmed>' +
-                      '<sms_template_rejected>' + NpCsDocument."Sms Template (Rejected)" + '</sms_template_rejected>' +
-                      '<sms_template_expired>' + NpCsDocument."Sms Template (Expired)" + '</sms_template_expired>' +
-                      '<opening_hour_set>' + NpCsDocument."Opening Hour Set" + '</opening_hour_set>' +
+                      '<sms_template_pending>' + Escape(NpCsDocument."Sms Template (Pending)") + '</sms_template_pending>' +
+                      '<sms_template_confirmed>' + Escape(NpCsDocument."Sms Template (Confirmed)") + '</sms_template_confirmed>' +
+                      '<sms_template_rejected>' + Escape(NpCsDocument."Sms Template (Rejected)") + '</sms_template_rejected>' +
+                      '<sms_template_expired>' + Escape(NpCsDocument."Sms Template (Expired)") + '</sms_template_expired>' +
+                      '<opening_hour_set>' + Escape(NpCsDocument."Opening Hour Set") + '</opening_hour_set>' +
                       '<processing_expiry_duration>' + Format(NpCsDocument."Processing Expiry Duration", 0, 9) + '</processing_expiry_duration>' +
                       '<delivery_expiry_days_qty>' + Format(NpCsDocument."Delivery Expiry Days (Qty.)", 0, 9) + '</delivery_expiry_days_qty>' +
                     '</notification>' +
-                    '<bill_to_customer_no>' + NpCsStore."Bill-to Customer No." + '</bill_to_customer_no>' +
-                    '<ship_to_contact>' + NpCsDocument."Ship-to Contact" + '</ship_to_contact>' +
+                    '<bill_to_customer_no>' + Escape(NpCsStore."Bill-to Customer No.") + '</bill_to_customer_no>' +
+                    '<ship_to_contact>' + Escape(NpCsDocument."Ship-to Contact") + '</ship_to_contact>' +
                     '<archive_on_delivery>' + Format(NpCsDocument."Archive on Delivery", 0, 9) + '</archive_on_delivery>' +
                     '<store_stock>' + Format(NpCsDocument."Store Stock", 0, 9) + '</store_stock>' +
                     '<post_on>' + Format(NpCsDocument."Post on", 0, 2) + '</post_on>' +
                     '<bill_via>' + Format(NpCsDocument."Bill via", 0, 2) + '</bill_via>' +
-                    '<processing_print_template>' + NpCsDocument."Processing Print Template" + '</processing_print_template>' +
-                    '<delivery_print_template_pos>' + NpCsDocument."Delivery Print Template (POS)" + '</delivery_print_template_pos>' +
-                    '<delivery_print_template_sales_doc>' + NpCsDocument."Delivery Print Template (S.)" + '</delivery_print_template_sales_doc>' +
+                    '<processing_print_template>' + Escape(NpCsDocument."Processing Print Template") + '</processing_print_template>' +
+                    '<delivery_print_template_pos>' + Escape(NpCsDocument."Delivery Print Template (POS)") + '</delivery_print_template_pos>' +
+                    '<delivery_print_template_sales_doc>' + Escape(NpCsDocument."Delivery Print Template (S.)") + '</delivery_print_template_sales_doc>' +
                     '<prepaid_amount>' + Format(NpCsDocument."Prepaid Amount", 0, 9) + '</prepaid_amount>' +
-                    '<prepayment_account_no>' + NpCsDocument."Prepayment Account No." + '</prepayment_account_no>' +
-                    '<location_code>' + NpCsStore."Location Code" + ' </location_code>' +
-                    '<salesperson_code>' + NpCsStore."Salesperson Code" + '</salesperson_code>' +
-                    '<payment_method_code>' + NpCsWorkflow."Payment Method Code" + '</payment_method_code>' +
-                    '<shipment_method_code>' + NpCsWorkflow."Shipment Method Code" + '</shipment_method_code>' +
+                    '<prepayment_account_no>' + Escape(NpCsDocument."Prepayment Account No.") + '</prepayment_account_no>' +
+                    '<location_code>' + Escape(NpCsStore."Location Code") + ' </location_code>' +
+                    '<salesperson_code>' + Escape(NpCsStore."Salesperson Code") + '</salesperson_code>' +
+                    '<payment_method_code>' + Escape(NpCsWorkflow."Payment Method Code") + '</payment_method_code>' +
+                    '<shipment_method_code>' + Escape(NpCsWorkflow."Shipment Method Code") + '</shipment_method_code>' +
                     '<prices_including_vat>' + Format(SalesHeader."Prices Including VAT", 0, 9) + '</prices_including_vat>' +
                     '<sales_lines>';
 
@@ -150,12 +150,12 @@ codeunit 6151197 "NPR NpCs Send Order"
                 Content +=
                           '<sales_line line_no="' + Format(SalesLine."Line No.", 0, 9) + '">' +
                             '<type>' + Format(SalesLine.Type, 0, 2) + '</type>' +
-                            '<no>' + SalesLine."No." + '</no>' +
-                            '<variant_code>' + SalesLine."Variant Code" + '</variant_code>' +
-                            '<cross_reference_no>' + GetItemRefNo(SalesLine) + '</cross_reference_no>' +
-                            '<unit_of_measure_code>' + SalesLine."Unit of Measure Code" + '</unit_of_measure_code>' +
-                            '<description>' + SalesLine.Description + '</description>' +
-                            '<description_2>' + SalesLine."Description 2" + '</description_2>' +
+                            '<no>' + Escape(SalesLine."No.") + '</no>' +
+                            '<variant_code>' + Escape(SalesLine."Variant Code") + '</variant_code>' +
+                            '<cross_reference_no>' + Escape(GetItemRefNo(SalesLine)) + '</cross_reference_no>' +
+                            '<unit_of_measure_code>' + Escape(SalesLine."Unit of Measure Code") + '</unit_of_measure_code>' +
+                            '<description>' + Escape(SalesLine.Description) + '</description>' +
+                            '<description_2>' + Escape(SalesLine."Description 2") + '</description_2>' +
                             '<unit_price>' + Format(SalesLine."Unit Price", 0, 9) + '</unit_price>' +
                             '<quantity>' + Format(SalesLine.Quantity, 0, 9) + '</quantity>' +
                             '<line_discount_pct>' + Format(SalesLine."Line Discount %", 0, 9) + '</line_discount_pct>' +
@@ -199,10 +199,10 @@ codeunit 6151197 "NPR NpCs Send Order"
                       '<collect_document' +
                       ' type="' + Format(NpCsDocument.Type, 0, 2) + '"' +
                       ' from_document_type="' + Format(NpCsDocument."Document Type", 0, 2) + '"' +
-                      ' from_document_no="' + NpCsDocument."Document No." + '"' +
-                      ' from_store_code="' + NpCsDocument."From Store Code" + '"' +
+                      ' from_document_no="' + Escape(NpCsDocument."Document No.") + '"' +
+                      ' from_store_code="' + Escape(NpCsDocument."From Store Code") + '"' +
                       ' xmlns="urn:microsoft-dynamics-nav/xmlports/collect_document">' +
-                        '<reference_no>' + NpCsDocument."Reference No." + '</reference_no>' +
+                        '<reference_no>' + Escape(NpCsDocument."Reference No.") + '</reference_no>' +
                       '</collect_document>' +
                     '</collect_documents>' +
                   '</RunNextWorkflowStep>' +
@@ -215,6 +215,17 @@ codeunit 6151197 "NPR NpCs Send Order"
 
         exit(Callback);
     end;
+
+    local procedure Escape(StringValue: Text): Text
+    begin
+        StringValue := StringValue.Replace('&', '&amp;');
+        StringValue := StringValue.Replace('<', '&lt;');
+        StringValue := StringValue.Replace('>', '&gt;');
+        StringValue := StringValue.Replace('"', '&quot;');
+        StringValue := StringValue.Replace('''', '&apos;');
+        exit(StringValue);
+    end;
+
 
     [EventSubscriber(ObjectType::Codeunit, 6151196, 'OnInitWorkflowModules', '', true, true)]
     local procedure OnInitWorkflowModules(var NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
