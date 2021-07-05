@@ -72,8 +72,8 @@ table 6059964 "NPR MPOS QR Code"
             Caption = 'QR code';
             DataClassification = CustomerContent;
             SubType = Bitmap;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Use Media instead of Blob type.';
+            // ObsoleteState = Removed;
+            // ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(21; "Cash Register Id"; Code[10])
         {
@@ -158,6 +158,7 @@ table 6059964 "NPR MPOS QR Code"
         ClientType: Text[1];
         PaymentType: Text[10];
         InStr: InStream;
+        OuStr: OutStream;
     begin
         MPOSQRCode.TestField("User ID");
         MPOSQRCode.TestField(Url);
@@ -191,7 +192,9 @@ table 6059964 "NPR MPOS QR Code"
 
         GenerateBarcode(JsonString, TmpQR);
         TmpQR.CreateInStream(InStr);
-        MPOSQRCode."QR Image".ImportStream(InStr, MPOSQRCode.FieldName("QR Image"));
+        // MPOSQRCode."QR Image".ImportStream(InStr, MPOSQRCode.FieldName("QR Image"));
+        MPOSQRCode."QR code".CreateOutStream(OuStr);
+        CopyStream(OuStr, InStr);
         MPOSQRCode.Modify();
     end;
 
@@ -214,6 +217,7 @@ table 6059964 "NPR MPOS QR Code"
         PaymentType: Text[10];
         JObject: JsonObject;
         InStr: InStream;
+        OuStr: OutStream;
     begin
         MPOSQRCode.TestField("User ID");
         MPOSQRCode.TestField(Url);
@@ -248,7 +252,10 @@ table 6059964 "NPR MPOS QR Code"
         GenerateBarcode(JsonString, TmpQR);
 
         TmpQR.CreateInStream(InStr);
-        MPOSQRCode."QR Image".ImportStream(InStr, MPOSQRCode.FieldName("QR Image"));
+        // MPOSQRCode."QR Image".ImportStream(InStr, MPOSQRCode.FieldName("QR Image"));
+        MPOSQRCode."QR code".CreateOutStream(OuStr);
+        CopyStream(OuStr, InStr);
+        
         MPOSQRCode.Modify();
     end;
 

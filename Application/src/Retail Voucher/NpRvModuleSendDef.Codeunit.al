@@ -115,7 +115,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
 #if BC17
         TempBlob: Codeunit "Temp Blob";
         BarcodeLibrary: Codeunit "NPR Barcode Image Library";
-        InStr: InStream;
+        // InStr: InStream;
 #endif
         EmailManagement: Codeunit "NPR E-mail Management";
         RecRef: RecordRef;
@@ -126,10 +126,14 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
                 EmailTemplateHeader.SetRecFilter();
         end;
 #if BC17
-        if not Voucher."Barcode Image".HasValue() then begin
+        // if not Voucher."Barcode Image".HasValue() then begin
+        if not Voucher.Barcode.HasValue() then begin
             BarcodeLibrary.GenerateBarcode(Voucher."Reference No.", TempBlob);
-            TempBlob.CreateInStream(InStr);
-            Voucher."Barcode Image".ImportStream(InStr, Voucher.FieldName("Barcode Image"));
+            // TempBlob.CreateInStream(InStr);
+            // Voucher."Barcode Image".ImportStream(InStr, Voucher.FieldName("Barcode Image"));
+            RecRef.GetTable(Voucher);
+            TempBlob.ToRecordRef(RecRef, Voucher.FieldNo(Barcode));
+            RecRef.SetTable(Voucher);
             Voucher.Modify();
         end;
 #endif

@@ -11,7 +11,8 @@ page 6151306 "NPR AF Test Service Picture"
     {
         area(content)
         {
-            field(Picture; Rec.Picture)
+            // field(Picture; Rec.Picture)
+            field(Picture; Rec.Image)
             {
                 ApplicationArea = Basic, Suite, Invoicing;
                 ShowCaption = false;
@@ -36,9 +37,11 @@ page 6151306 "NPR AF Test Service Picture"
                     FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
+                    OuStr: OutStream;
                     FileName: Text;
                 begin
-                    if Rec.Picture.HasValue() then
+                    // if Rec.Picture.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -46,35 +49,38 @@ page 6151306 "NPR AF Test Service Picture"
                     if FileName = '' then
                         exit;
 
-                    Clear(Rec.Picture);
+                    // Clear(Rec.Picture);
+                    Clear(Rec.Image);
                     TempBlob.CreateInStream(InStr);
-                    Rec.Picture.ImportStream(InStr, FileName);
+                    // Rec.Picture.ImportStream(InStr, FileName);
+                    Rec.Image.CreateOutStream(OuStr);
+                    CopyStream(OuStr, InStr);
                     Rec.Modify(true);
                 end;
             }
-            action(ExportPicture)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Export';
-                Enabled = DeleteExportEnabled;
-                Image = Export;
-                ToolTip = 'Export the picture to a file.';
+            // action(ExportPicture)
+            // {
+            //     ApplicationArea = Basic, Suite;
+            //     Caption = 'Export';
+            //     Enabled = DeleteExportEnabled;
+            //     Image = Export;
+            //     ToolTip = 'Export the picture to a file.';
 
-                trigger OnAction()
-                var
-                    TenantMedia: Record "Tenant Media";
-                    FileManagement: Codeunit "File Management";
-                    TempBlob: Codeunit "Temp Blob";
-                    OutStr: OutStream;
-                    ToFile: Text;
-                begin
-                    Rec.GetImageContent(TenantMedia);
-                    ToFile := TenantMedia."File Name";
-                    TempBlob.CreateOutStream(OutStr);
-                    Rec.Picture.ExportStream(OutStr);
-                    FileManagement.BLOBExport(TempBlob, ToFile, true);
-                end;
-            }
+            //     trigger OnAction()
+            //     var
+            //         TenantMedia: Record "Tenant Media";
+            //         FileManagement: Codeunit "File Management";
+            //         TempBlob: Codeunit "Temp Blob";
+            //         OutStr: OutStream;
+            //         ToFile: Text;
+            //     begin
+            //         Rec.GetImageContent(TenantMedia);
+            //         ToFile := TenantMedia."File Name";
+            //         TempBlob.CreateOutStream(OutStr);
+            //         Rec.Picture.ExportStream(OutStr);
+            //         FileManagement.BLOBExport(TempBlob, ToFile, true);
+            //     end;
+            // }
             action(DeletePicture)
             {
                 ApplicationArea = Basic, Suite;
@@ -88,7 +94,8 @@ page 6151306 "NPR AF Test Service Picture"
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Rec.Picture);
+                    // Clear(Rec.Picture);
+                    Clear(Rec.Image);
                     Rec.Modify(true);
                 end;
             }
@@ -107,7 +114,8 @@ page 6151306 "NPR AF Test Service Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Rec.Picture.HasValue();
+        // DeleteExportEnabled := Rec.Picture.HasValue();
+        DeleteExportEnabled := Rec.Image.HasValue();
     end;
 }
 

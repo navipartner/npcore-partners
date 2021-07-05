@@ -63,7 +63,8 @@ page 6060140 "NPR MM POS Member Card"
             }
             group(CRM)
             {
-                field(Picture; Rec.Image)
+                // field(Picture; Rec.Image)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Picture field';

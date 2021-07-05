@@ -122,7 +122,8 @@ report 6151015 "NPR NpRv Voucher 3"
             column(VoucherMessage_NpRvVoucher; "NpRv Voucher"."Voucher Message")
             {
             }
-            column(Barcode_NpRvVoucher; TenantMedia.Content)
+            // column(Barcode_NpRvVoucher; TenantMedia.Content)
+            column(Barcode_NpRvVoucher; "NpRv Voucher".Barcode)
             {
             }
             column(IssueDate_NpRvVoucher; "NpRv Voucher"."Issue Date")
@@ -161,13 +162,13 @@ report 6151015 "NPR NpRv Voucher 3"
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
                 Evaluate(IssuedDate, Format("NpRv Voucher"."Issue Date"));
-                "NPRv Voucher".GetImageContent(TenantMedia);
+                // "NPRv Voucher".GetImageContent(TenantMedia);
             end;
         }
     }
 
     var
-        TenantMedia: Record "Tenant Media";
+        // TenantMedia: Record "Tenant Media";
         EndingDate: Text;
         IssuedDate: Text;
         StartingDate: Text;

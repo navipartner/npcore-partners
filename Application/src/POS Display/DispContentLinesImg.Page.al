@@ -10,7 +10,8 @@ page 6059953 "NPR Disp. Content Lines Img"
     {
         area(content)
         {
-            field(Image; Rec.Picture)
+            // field(Image; Rec.Picture)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Image field';
@@ -33,12 +34,14 @@ page 6059953 "NPR Disp. Content Lines Img"
                     FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
+                    OuStr: OutStream;
                     FileName: Text;
                 begin
                     Rec.TestField("Content Code");
                     Rec.TestField("Line No.");
 
-                    if Rec.Picture.HasValue() then
+                    // if Rec.Picture.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -46,38 +49,41 @@ page 6059953 "NPR Disp. Content Lines Img"
                     if FileName = '' then
                         exit;
 
-                    Clear(Rec.Picture);
+                    // Clear(Rec.Picture);
+                    Clear(Rec.Image);
                     TempBlob.CreateInStream(InStr);
-                    Rec.Picture.ImportStream(InStr, FileName);
+                    // Rec.Picture.ImportStream(InStr, FileName);
+                    Rec.Image.CreateOutStream(OuStr);
+                    CopyStream(OuStr, InStr);
                     Rec.Modify(true);
                 end;
             }
-            action(ExportPicture)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Export';
-                Enabled = DeleteExportEnabled;
-                Image = Export;
-                ToolTip = 'Export the picture to a file.';
+            // action(ExportPicture)
+            // {
+            //     ApplicationArea = Basic, Suite;
+            //     Caption = 'Export';
+            //     Enabled = DeleteExportEnabled;
+            //     Image = Export;
+            //     ToolTip = 'Export the picture to a file.';
 
-                trigger OnAction()
-                var
-                    TenantMedia: Record "Tenant Media";
-                    FileManagement: Codeunit "File Management";
-                    TempBlob: Codeunit "Temp Blob";
-                    OutStr: OutStream;
-                    ToFile: Text;
-                begin
-                    Rec.TestField("Content Code");
-                    Rec.TestField("Line No.");
+            //     trigger OnAction()
+            //     var
+            //         TenantMedia: Record "Tenant Media";
+            //         FileManagement: Codeunit "File Management";
+            //         TempBlob: Codeunit "Temp Blob";
+            //         OutStr: OutStream;
+            //         ToFile: Text;
+            //     begin
+            //         Rec.TestField("Content Code");
+            //         Rec.TestField("Line No.");
 
-                    Rec.GetImageContent(TenantMedia);
-                    ToFile := TenantMedia."File Name";
-                    TempBlob.CreateOutStream(OutStr);
-                    Rec.Picture.ExportStream(OutStr);
-                    FileManagement.BLOBExport(TempBlob, ToFile, true);
-                end;
-            }
+            //         Rec.GetImageContent(TenantMedia);
+            //         ToFile := TenantMedia."File Name";
+            //         TempBlob.CreateOutStream(OutStr);
+            //         Rec.Picture.ExportStream(OutStr);
+            //         FileManagement.BLOBExport(TempBlob, ToFile, true);
+            //     end;
+            // }
             action(DeletePicture)
             {
                 ApplicationArea = Basic, Suite;
@@ -94,7 +100,8 @@ page 6059953 "NPR Disp. Content Lines Img"
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Rec.Picture);
+                    // Clear(Rec.Picture);
+                    Clear(Rec.Image);
                     Rec.Modify(true);
                 end;
             }
@@ -113,7 +120,8 @@ page 6059953 "NPR Disp. Content Lines Img"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Rec.Picture.HasValue();
+        // DeleteExportEnabled := Rec.Picture.HasValue();
+        DeleteExportEnabled := Rec.Image.HasValue();
     end;
 }
 

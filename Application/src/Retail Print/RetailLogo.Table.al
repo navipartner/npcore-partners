@@ -39,8 +39,8 @@ table 6014478 "NPR Retail Logo"
             Caption = 'Logo';
             SubType = Bitmap;
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Use Media instead of Blob type.';
+            // ObsoleteState = Removed;
+            // ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(7; ESCPOSLogo; BLOB)
         {
@@ -113,13 +113,13 @@ table 6014478 "NPR Retail Logo"
         Sequence := RetailLogo2.Sequence + 1;
     end;
 
-    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    begin
-        TenantMedia.Init();
-        if not Rec."POS Logo".HasValue() then
-            exit;
-        if TenantMedia.Get(Rec."POS Logo".MediaId()) then
-            TenantMedia.CalcFields(Content);
-    end;
+    // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
+    // begin
+    //     TenantMedia.Init();
+    //     if not Rec."POS Logo".HasValue() then
+    //         exit;
+    //     if TenantMedia.Get(Rec."POS Logo".MediaId()) then
+    //         TenantMedia.CalcFields(Content);
+    // end;
 }
 
