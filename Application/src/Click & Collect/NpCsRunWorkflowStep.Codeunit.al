@@ -120,7 +120,7 @@
         NpCsWorkflowModule.Get(NpCsWorkflowModule.Type::"Post Processing", NpCsDocument."Post Processing Module");
         NpCsWorkflowMgt.PerformPostProcessing(NpCsDocument, LogMessage);
         if LogMessage <> '' then begin
-            NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, LogMessage);
+            NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
             LogMessage := '';
         end;
     end;
