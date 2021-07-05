@@ -50,13 +50,13 @@ const Columns = ({
             style={cellStyle(column, row.fields)}
           >
             {showSelectColumn && index === 0 ? (
-              <label class="custom-checkbox">
+              <label className="custom-checkbox">
                 <input
                   type="checkbox"
                   checked={active}
                   onChange={toggleSelection}
                 />
-                <span class="checkmark"></span>
+                <span className="checkmark"></span>
               </label>
             ) : null}
             {value}

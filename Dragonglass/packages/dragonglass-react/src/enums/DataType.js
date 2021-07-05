@@ -148,7 +148,7 @@ export const DataType = {
                 return null;
             },
             isCalculated: val => DataType.behavior[DataType.DATETIME].calculate(val) instanceof Date && !(DataType.behavior[DataType.DATETIME].parse(val, true) instanceof Date),
-            isValidValue: val => calculated = DataType.behavior[DataType.DATETIME].calculate(val) instanceof Date,
+            isValidValue: val => DataType.behavior[DataType.DATETIME].calculate(val) instanceof Date,
             isValidDuringEntry: val => !!DataType.behavior[DataType.DATETIME].parse(val)
         },
         4: { // Decimal
