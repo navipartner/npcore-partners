@@ -59,7 +59,6 @@
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
         ContentHeader.Add('SOAPAction', 'GetCollectDocuments');
-        ContentHeader.Remove('Connection');
         ContentHeader := Client.DefaultRequestHeaders();
 
         Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
@@ -171,14 +170,24 @@
                   '<collect_document xmlns="urn:microsoft-dynamics-nav/xmlports/collect_document"' +
                   ' type="' + Format(NpCsDocument.Type::"Collect in Store", 0, 2) + '"' +
                   ' from_document_type="' + Format(NpCsDocument."Document Type", 0, 2) + '"' +
-                  ' from_document_no="' + NpCsDocument."Document No." + '"' +
-                  ' from_store_code="' + NpCsDocument."From Store Code" + '">' +
-                    '<reference_no>' + NpCsDocument."Reference No." + '</reference_no>' +
+                  ' from_document_no="' + Escape(NpCsDocument."Document No.") + '"' +
+                  ' from_store_code="' + Escape(NpCsDocument."From Store Code") + '">' +
+                    '<reference_no>' + Escape(NpCsDocument."Reference No.") + '</reference_no>' +
                   '</collect_document>' +
                 '</collect_documents>' +
               '</GetCollectDocuments>' +
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
+    end;
+
+    local procedure Escape(StringValue: Text): Text
+    begin
+        StringValue := StringValue.Replace('&', '&amp;');
+        StringValue := StringValue.Replace('<', '&lt;');
+        StringValue := StringValue.Replace('>', '&gt;');
+        StringValue := StringValue.Replace('"', '&quot;');
+        StringValue := StringValue.Replace('''', '&apos;');
+        exit(StringValue);
     end;
 
     local procedure CurrCodeunitId(): Integer

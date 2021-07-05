@@ -191,7 +191,8 @@ page 6151504 "NPR Nc Import List"
                     BoolCurrFilterOnFieldImported: Boolean;
                 begin
                     TxtCurrFilterOnFieldImported := Rec.GetFilter(Imported);
-                    Evaluate(BoolCurrFilterOnFieldImported, TxtCurrFilterOnFieldImported);
+                    if not Evaluate(BoolCurrFilterOnFieldImported, TxtCurrFilterOnFieldImported) then
+                        BoolCurrFilterOnFieldImported := true;
                     Rec.SetRange(Imported, not BoolCurrFilterOnFieldImported);
                     CurrPage.Update();
                 end;

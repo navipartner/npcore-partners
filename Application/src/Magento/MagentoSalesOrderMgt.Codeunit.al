@@ -112,6 +112,7 @@
 
         NpCsWorkflow.Get(MagentoSetup."NpCs Workflow Code");
         NpCsCollectMgt.InitSendToStoreDocument(SalesHeader, NpCsStoreTo, NpCsWorkflow, NpCsDocument);
+        OnAfterInitSendToStoreDocument(SalesHeader, NpCsStoreTo, NpCsWorkflow, NpCsDocument);
 
         SalesHeader.CalcFields("NPR Magento Payment Amount");
         if SalesHeader."NPR Magento Payment Amount" <> 0 then
@@ -140,6 +141,8 @@
         if not NpCsDocument."Notify Customer via Sms" then
             NpCsDocument."Notify Customer via E-mail" := true;
 
+        SalesHeader.CalcFields("NPR Magento Payment Amount");
+        NpCsDocument."Prepaid Amount" := SalesHeader."NPR Magento Payment Amount";
         NpCsDocument.Modify(true);
 
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
@@ -486,6 +489,7 @@
         if SalesHeader."External Document No." = '' then
             SalesHeader."External Document No." := SalesHeader."NPR External Order No.";
         SalesHeader."Your Reference" := NpXmlDomMgt.GetXmlText(XmlElement, 'your_reference', MaxStrLen(SalesHeader."Your Reference"), false);
+        OnBeforeInsertSalesHeader(CurrImportType, CurrImportEntry, XmlElement, SalesHeader);
         SalesHeader.Insert(true);
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
         SalesHeader."Sell-to Customer Name" := NpXmlDomMgt.GetElementText(XmlElement2, 'name', MaxStrLen(SalesHeader."Sell-to Customer Name"), true);
@@ -1563,6 +1567,11 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertSalesHeader(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterInsertSalesHeader(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header")
     begin
     end;
@@ -1585,5 +1594,11 @@
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCommit(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header")
     begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitSendToStoreDocument(SalesHeader: Record "Sales Header"; NpCsStore: Record "NPR NpCs Store"; NpCsWorkflow: Record "NPR NpCs Workflow"; var NpCsDocument: Record "NPR NpCs Document")
+    begin
+
     end;
 }

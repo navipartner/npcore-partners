@@ -47,8 +47,8 @@
             '<soapenv:Body>' +
               '<GetCollectStores xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpCsStore) + '">' +
                 '<stores>' +
-                  '<store store_code="' + NpCsStore.Code + '" xmlns="urn:microsoft-dynamics-nav/xmlports/collect_store">' +
-                    '<location_code>' + NpCsStore."Location Code" + '</location_code>' +
+                  '<store store_code="' + Escape(NpCsStore.Code) + '" xmlns="urn:microsoft-dynamics-nav/xmlports/collect_store">' +
+                    '<location_code>' + Escape(NpCsStore."Location Code") + '</location_code>' +
                   '</store>' +
                 '</stores>' +
               '</GetCollectStores>' +
@@ -107,6 +107,17 @@
         if PrevRec <> Format(NpCsStore) then
             NpCsStore.Modify(true);
     end;
+
+    local procedure Escape(StringValue: Text): Text
+    begin
+        StringValue := StringValue.Replace('&', '&amp;');
+        StringValue := StringValue.Replace('<', '&lt;');
+        StringValue := StringValue.Replace('>', '&gt;');
+        StringValue := StringValue.Replace('"', '&quot;');
+        StringValue := StringValue.Replace('''', '&apos;');
+        exit(StringValue);
+    end;
+
 
     [TryFunction]
     procedure TryGetCollectService(NpCsStore: Record "NPR NpCs Store")
