@@ -54,6 +54,32 @@ table 6151247 "NPR POS Entry Cue."
             CalcFormula = Count("NPR NpDc Coupon");
             FieldClass = FlowField;
         }
+        field(11; "EFT Reconciliation Errors"; Integer)
+        {
+            CalcFormula = Count("NPR EFT Transaction Request" where("Result Amount" = Filter(<> 0),
+                                                                    "Transaction Date" = Field("EFT Errors Date Filter"),
+                                                                    "FF Moved to POS Entry" = Filter(false)));
+            FieldClass = FlowField;
+        }
+        field(12; "Unfinished EFT Requests"; Integer)
+        {
+            CalcFormula = Count("NPR EFT Transaction Request" where(Finished = Filter(0DT),
+                                                                    "Transaction Date" = Field("EFT Errors Date Filter"),
+                                                                    "Amount Input" = Filter(<> 0)));
+            FieldClass = FlowField;
+        }
+        field(13; "EFT Req. with unknown result"; Integer)
+        {
+            CalcFormula = Count("NPR EFT Transaction Request" where("External Result Known" = Filter(false),
+                                                                    "Transaction Date" = Field("EFT Errors Date Filter"),
+                                                                    "Amount Input" = Filter(<> 0)));
+            FieldClass = FlowField;
+        }
+        field(14; "EFT Errors Date Filter"; Date)
+        {
+            FieldClass = FlowFilter;
+        }
+
     }
     keys
     {
