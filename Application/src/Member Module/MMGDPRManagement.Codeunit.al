@@ -253,7 +253,8 @@ codeunit 6151121 "NPR MM GDPR Management"
         Member.Country := '';
         Member.Gender := Member.Gender::NOT_SPECIFIED;
         Member.Birthday := 0D;
-        Clear(Member.Image);
+        // Clear(Member.Image);
+        Clear(Member.Picture);
         Member."E-Mail Address" := StrSubstNo(DummyEMailAddressLbl, Member."External Member No.");
         Member."Notification Method" := Member."Notification Method"::NONE;
         Member."E-Mail News Letter" := Member."E-Mail News Letter"::NOT_SPECIFIED;

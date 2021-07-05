@@ -14,7 +14,8 @@
                 ShowCaption = false;
                 Visible = HasPicture;
             }
-            field("Magento Picture"; TempMagentoPicture.Image)
+            // field("Magento Picture"; TempMagentoPicture.Image)
+            field("Magento Picture"; TempMagentoPicture.Picture)
             {
                 ApplicationArea = All;
                 ShowCaption = false;
@@ -38,8 +39,8 @@
     var
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
+    // TempBlob: Codeunit "Temp Blob";
+    // OutStr: OutStream;
     begin
         HasPicture := false;
         Initialize();
@@ -47,7 +48,8 @@
             exit;
         if not (MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"]) then
             exit;
-        Clear(TempMagentoPicture.Image);
+        // Clear(TempMagentoPicture.Image);
+        Clear(TempMagentoPicture.Picture);
         MagentoPictureLink.SetRange("Item No.", Rec."No.");
         MagentoPictureLink.SetRange("Base Image", true);
         if not MagentoPictureLink.FindFirst() then
@@ -66,9 +68,10 @@
         end;
 
         TempMagentoPicture.DownloadPicture(TempMagentoPicture);
-        TempBlob.CreateOutStream(OutStr);
-        TempMagentoPicture.Image.ExportStream(OutStr);
-        HasPicture := TempBlob.HasValue();
+        // TempBlob.CreateOutStream(OutStr);
+        // TempMagentoPicture.Image.ExportStream(OutStr);
+        // HasPicture := TempBlob.HasValue();
+        HasPicture := TempMagentoPicture.Picture.HasValue();
     end;
 
     local procedure Initialize()

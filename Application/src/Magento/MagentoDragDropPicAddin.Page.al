@@ -155,13 +155,15 @@
     begin
         if MagentoPicture.Get(PictureType, TempMagentoPicture2.Name) then begin
             MagentoPicture."Size (kb)" := TempMagentoPicture."Size (kb)";
-            Clear(MagentoPicture.Image);
+            // Clear(MagentoPicture.Image);
+            Clear(MagentoPicture.Picture);
             MagentoPicture.Modify(true);
         end else begin
             MagentoPicture.Init();
             MagentoPicture := TempMagentoPicture2;
             MagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
-            Clear(MagentoPicture.Image);
+            // Clear(MagentoPicture.Image);
+            Clear(MagentoPicture.Picture);
             MagentoPicture.Insert(true);
         end;
         MagentoPictureMgt.DragDropPicture(MagentoPicture.Name, MagentoPicture.GetMagentoType(), TempMagentoPicture2.GetBase64());
@@ -250,7 +252,8 @@
             exit;
         end;
 
-        if Rec.Image.HasValue() then begin
+        // if Rec.Image.HasValue() then begin
+        if Rec.Picture.HasValue() then begin
             CurrPage.DragDropAddin.DisplayData(GetDataUri());
             exit;
         end;
@@ -262,16 +265,19 @@
     var
         Convert: Codeunit "Base64 Convert";
         ImageHelpers: Codeunit "Image Helpers";
-        TempBlob: Codeunit "Temp Blob";
+        // TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
-        OutStr: OutStream;
+    // OutStr: OutStream;
     begin
-        if not Rec.Image.HasValue() then
+        // if not Rec.Image.HasValue() then
+        if not Rec.Picture.HasValue() then
             exit;
 
-        TempBlob.CreateOutStream(OutStr);
-        Rec.Image.ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
+        // TempBlob.CreateOutStream(OutStr);
+        // Rec.Image.ExportStream(OutStr);
+        // TempBlob.CreateInStream(InStr);
+        Rec.CalcFields(Picture);
+        Rec.Picture.CreateInStream(InStr);
 
         DataUri := 'data:image/' + ImageHelpers.GetImageType(InStr);
         DataUri += ';base64,' + Convert.ToBase64(InStr);

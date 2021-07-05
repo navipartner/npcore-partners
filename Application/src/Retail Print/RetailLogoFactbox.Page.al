@@ -42,9 +42,11 @@ page 6014567 "NPR Retail Logo Factbox"
                     FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
                     InStr: InStream;
+                    OuStr: OutStream;
                     FileName: Text;
                 begin
-                    if Rec."POS Logo".HasValue() then
+                    // if Rec."POS Logo".HasValue() then
+                    if Rec.Logo.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -52,35 +54,38 @@ page 6014567 "NPR Retail Logo Factbox"
                     if FileName = '' then
                         exit;
 
-                    Clear(Rec."POS Logo");
+                    // Clear(Rec."POS Logo");
+                    Clear(Rec.Logo);
                     TempBlob.CreateInStream(InStr);
-                    Rec."POS Logo".ImportStream(InStr, FileName);
+                    // Rec."POS Logo".ImportStream(InStr, FileName);
+                    Rec.Logo.CreateOutStream(OuStr);
+                    CopyStream(OuStr, InStr);
                     Rec.Modify(true);
                 end;
             }
-            action(ExportPicture)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Export';
-                Enabled = DeleteExportEnabled;
-                Image = Export;
-                ToolTip = 'Export the picture to a file.';
+            // action(ExportPicture)
+            // {
+            //     ApplicationArea = Basic, Suite;
+            //     Caption = 'Export';
+            //     Enabled = DeleteExportEnabled;
+            //     Image = Export;
+            //     ToolTip = 'Export the picture to a file.';
 
-                trigger OnAction()
-                var
-                    TenantMedia: Record "Tenant Media";
-                    FileManagement: Codeunit "File Management";
-                    TempBlob: Codeunit "Temp Blob";
-                    OutStr: OutStream;
-                    ToFile: Text;
-                begin
-                    Rec.GetImageContent(TenantMedia);
-                    ToFile := TenantMedia."File Name";
-                    TempBlob.CreateOutStream(OutStr);
-                    Rec."POS Logo".ExportStream(OutStr);
-                    FileManagement.BLOBExport(TempBlob, ToFile, true);
-                end;
-            }
+            //     trigger OnAction()
+            //     var
+            //         TenantMedia: Record "Tenant Media";
+            //         FileManagement: Codeunit "File Management";
+            //         TempBlob: Codeunit "Temp Blob";
+            //         OutStr: OutStream;
+            //         ToFile: Text;
+            //     begin
+            //         Rec.GetImageContent(TenantMedia);
+            //         ToFile := TenantMedia."File Name";
+            //         TempBlob.CreateOutStream(OutStr);
+            //         Rec."POS Logo".ExportStream(OutStr);
+            //         FileManagement.BLOBExport(TempBlob, ToFile, true);
+            //     end;
+            // }
             action(DeletePicture)
             {
                 ApplicationArea = Basic, Suite;
@@ -94,7 +99,8 @@ page 6014567 "NPR Retail Logo Factbox"
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Rec."POS Logo");
+                    // Clear(Rec."POS Logo");
+                    Clear(Rec.Logo);
                     Rec.Modify(true);
                 end;
             }
@@ -113,7 +119,8 @@ page 6014567 "NPR Retail Logo Factbox"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Rec."POS Logo".HasValue();
+        // DeleteExportEnabled := Rec."POS Logo".HasValue();
+        DeleteExportEnabled := Rec.Logo.HasValue();
     end;
 }
 

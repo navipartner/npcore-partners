@@ -244,7 +244,8 @@ codeunit 85016 "NPR MM API Smoke Test"
         AddMembershipMember();
 
         // [TEST]
-        if (_LastMember.Image.HasValue()) then
+        // if (_LastMember.Image.HasValue()) then
+        if (_LastMember.Picture.HasValue()) then
             Error('Initial member is not expected to have picture.');
 
         ClearLastError();
@@ -252,12 +253,14 @@ codeunit 85016 "NPR MM API Smoke Test"
         Assert.IsTrue(true, StrSubstNo('Update member API failed: %1', GetLastErrorText()));
 
         _LastMember.Get(_LastMember."Entry No.");
-        if (not _LastMember.Image.HasValue()) then
+        // if (not _LastMember.Image.HasValue()) then
+        if (not _LastMember.Picture.HasValue()) then
             Error('Member is expected to have picture after update.');
 
-        TempBlob.CreateOutStream(OutStr);
-        _LastMember.Image.ExportStream(OutStr);
-        Assert.AreEqual(1002, TempBlob.Length(), 'Incorrect length in BLOB when checking stored picture size.');
+        // TempBlob.CreateOutStream(OutStr);
+        // _LastMember.Image.ExportStream(OutStr);
+        // Assert.AreEqual(1002, TempBlob.Length(), 'Incorrect length in BLOB when checking stored picture size.');
+        Assert.AreEqual(1098, _LastMember.Picture.Length(), 'Incorrect length in BLOB when checking stored picture size.');
 
     end;
 
