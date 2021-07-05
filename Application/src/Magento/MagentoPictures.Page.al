@@ -116,6 +116,7 @@
     begin
         CountRelations();
         if TempMagentoPicture.Get(Rec.Type, Rec.Name) then begin
+            TempMagentoPicture.CalcFields(Picture);
             exit;
         end;
         Clear(TempMagentoPicture2);
@@ -124,7 +125,8 @@
 
         TempMagentoPicture.Init();
         TempMagentoPicture := Rec;
-        TempMagentoPicture.Image := TempMagentoPicture2.Image;
+        // TempMagentoPicture.Image := TempMagentoPicture2.Image;
+        TempMagentoPicture.Picture := TempMagentoPicture2.Picture;
         TempMagentoPicture.Insert();
     end;
 

@@ -178,7 +178,8 @@ page 6014638 "NPR RP Template Card"
             {
                 Caption = 'Media';
                 Editable = NOT Rec.Archived;
-                field("Media Roll Picture"; tmpMediaInfo.Image)
+                // field("Media Roll Picture"; tmpMediaInfo.Image)
+                field("Media Roll Picture"; tmpMediaInfo.Picture)
                 {
                     ApplicationArea = All;
                     Caption = 'Media Roll Picture';
@@ -189,7 +190,8 @@ page 6014638 "NPR RP Template Card"
                         MediaInfo: Record "NPR RP Template Media Info";
                     begin
                         GetMediaInfoRecord(MediaInfo, true);
-                        MediaInfo.Image := tmpMediaInfo.Image;
+                        // MediaInfo.Image := tmpMediaInfo.Image;
+                        MediaInfo.Picture := tmpMediaInfo.Picture;
                         MediaInfo.Modify(true);
                         CurrPage.Update(true);
                     end;
@@ -354,6 +356,7 @@ page 6014638 "NPR RP Template Card"
 
     local procedure GetMediaInfoRecord(var MediaInfo: Record "NPR RP Template Media Info"; WithInsert: Boolean) Return: Boolean
     begin
+        MediaInfo.SetAutoCalcFields(Picture);
         Return := MediaInfo.Get(Rec.Code);
         if not Return then
             if WithInsert then begin

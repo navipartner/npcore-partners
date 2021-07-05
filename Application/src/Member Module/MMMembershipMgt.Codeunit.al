@@ -489,20 +489,23 @@ codeunit 6060127 "NPR MM Membership Mgt."
     var
         Member: Record "NPR MM Member";
         Base64Convert: Codeunit "Base64 Convert";
-        TempBlob: Codeunit "Temp Blob";
+        // TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
-        OutStr: OutStream;
+    // OutStr: OutStream;
     begin
 
         if (not Member.Get(MemberEntryNo)) then
             exit(false);
 
-        if (not Member.Image.HasValue()) then
+        // if (not Member.Image.HasValue()) then
+        if (not Member.Picture.HasValue()) then
             exit(false);
 
-        TempBlob.CreateOutStream(OutStr);
-        Member.Image.ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
+        // TempBlob.CreateOutStream(OutStr);
+        // Member.Image.ExportStream(OutStr);
+        // TempBlob.CreateInStream(InStr);
+        Member.CalcFields(Picture);
+        Member.Picture.CreateInStream(InStr);
         Base64StringImage := Base64Convert.ToBase64(InStr);
         exit(true);
     end;
@@ -538,18 +541,19 @@ codeunit 6060127 "NPR MM Membership Mgt."
     procedure UpdateMemberImage(MemberEntryNo: Integer; Base64StringImage: Text) Success: Boolean
     var
         OutStr: OutStream;
-        InStr: InStream;
+        // InStr: InStream;
         Member: Record "NPR MM Member";
         Base64Convert: Codeunit "Base64 Convert";
-        TempBlob: Codeunit "Temp Blob";
+    // TempBlob: Codeunit "Temp Blob";
     begin
         if (not Member.Get(MemberEntryNo)) then
             exit(false);
 
-        TempBlob.CreateOutStream(OutStr);
+        Member.Picture.CreateOutStream(OutStr);
+        // TempBlob.CreateOutStream(OutStr);
         Base64Convert.FromBase64(Base64StringImage, OutStr);
-        TempBlob.CreateInStream(InStr);
-        Member.Image.ImportStream(InStr, Member.FieldName(Image));
+        // TempBlob.CreateInStream(InStr);
+        // Member.Image.ImportStream(InStr, Member.FieldName(Image));
         exit(Member.Modify());
     end;
 
@@ -827,9 +831,12 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (not IssueMemberCardWorker(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture, true, CardEntryNo, ResponseMessage, false)) then
             exit(false);
 
-        if MemberInfoCapture.Image.HasValue() then begin
+        MemberInfoCapture.CalcFields(Picture);
+        // if MemberInfoCapture.Image.HasValue() then begin
+        if MemberInfoCapture.Picture.HasValue() then begin
             if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
-                Member.Image := MemberInfoCapture.Image;
+                // Member.Image := MemberInfoCapture.Image;
+                Member.Picture := MemberInfoCapture.Picture;
                 Member.Modify();
             end;
         end;
@@ -3950,8 +3957,11 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 Member."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
         end;
 
-        if MemberInfoCapture.Image.HasValue() then begin
-            Member.Image := MemberInfoCapture.Image;
+        // if MemberInfoCapture.Image.HasValue() then begin
+        // Member.Image := MemberInfoCapture.Image;
+        MemberInfoCapture.CalcFields(Picture);
+        if MemberInfoCapture.Picture.HasValue() then begin
+            Member.Picture := MemberInfoCapture.Picture;
         end;
 
         Member."Display Name" := StrSubstNo(PlaceHolder2Lbl, Member."First Name", Member."Last Name");
@@ -5129,10 +5139,13 @@ codeunit 6060127 "NPR MM Membership Mgt."
     var
         Camera: Codeunit Camera;
         PictureStream: InStream;
+        OStream: OutStream;
         PictureName: Text;
     begin
         if Camera.GetPicture(PictureStream, PictureName) then begin
-            MMMemberInfoCapture.Image.ImportStream(PictureStream, PictureName);
+            // MMMemberInfoCapture.Image.ImportStream(PictureStream, PictureName);
+            MMMemberInfoCapture.Picture.CreateOutStream(OStream);
+            CopyStream(OStream, PictureStream);
             MMMemberInfoCapture.Modify();
         end;
     end;
@@ -5141,10 +5154,13 @@ codeunit 6060127 "NPR MM Membership Mgt."
     var
         Camera: Codeunit Camera;
         PictureStream: InStream;
+        OStream: OutStream;
         PictureName: Text;
     begin
         if Camera.GetPicture(PictureStream, PictureName) then begin
-            MMMember.Image.ImportStream(PictureStream, PictureName);
+            MMMember.Picture.CreateOutStream(OStream);
+            CopyStream(OStream, PictureStream);
+            // MMMember.Image.ImportStream(PictureStream, PictureName);
             MMMember.Modify();
             Commit();
             TrainFacialRecognitionService(MMMember, PictureStream);
