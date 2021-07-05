@@ -162,7 +162,12 @@
             "action":"Error",
             "justification": "To avoid confusion, do not give global variables the same name as fields, methods or actions in the same scope."
         },
-                {
+        {
+            "id": "AA0205",
+            "action":"Hidden",
+            "justification": "Always initialize a variable before usage. This can improve readability and make debugging easier."
+        },
+        {
             "id": "AA0206",
             "action":"Error",
             "justification": "The value assigned to a variable must be used."
