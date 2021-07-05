@@ -36,7 +36,27 @@
                     ToolTip = 'Specifies the value of the Failed G/L Posting Trans. field';
                 }
             }
-
+            cuegroup("EFT Errors")
+            {
+                field("EFT Reconciliation Errors"; Rec."EFT Reconciliation Errors")
+                {
+                    Caption = 'EFT Reconciliation Errors';
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Reconciliation EFT Errors in last 30 days';
+                }
+                field("Unfinished EFT Requests"; "Unfinished EFT Requests")
+                {
+                    Caption = 'Unfinished EFT Requests';
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies Unfinished EFT Requests in last 30 days';
+                }
+                field("EFT Req. with unknown result"; "EFT Req. with unknown result")
+                {
+                    Caption = 'EFT Requests with unknown result';
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the value of the EFT Requests with unknown result in last 30 days';
+                }
+            }
             cuegroup("Active Discounts, Coupons & Vouchers")
             {
                 field("Campaign Discount"; Rec."Campaign Discount List")
@@ -55,6 +75,7 @@
                     ToolTip = 'Specifies the value of the Mix Discount field';
                 }
             }
+
         }
     }
 
@@ -65,6 +86,7 @@
             Rec.Init();
             Rec.Insert();
         end;
+        Rec.SetRange("EFT Errors Date Filter", CalcDate('<-30D>'), Today());
     end;
 }
 
