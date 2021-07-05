@@ -20,15 +20,6 @@
                     ShowCaption = true;
                     ToolTip = 'Specifies the value of the POS Sales Scenarios field';
                 }
-
-                field("POS Input BOX Setup"; Rec."EAN SETUP")
-                {
-                    ApplicationArea = All;
-                    Caption = 'POS Input Box Setup';
-                    ShowCaption = true;
-                    ToolTip = 'Specifies the value of the POS Input BOX SETUP field';
-                }
-
             }
             cuegroup("Product Videos")
             {
