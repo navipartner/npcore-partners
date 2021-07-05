@@ -15141,6 +15141,46 @@ const __mockMenus = [
         },
       },
       {
+        Caption: `Popup - datepad`,
+        Tooltip: "Show a numpad dialog",
+        Action: {
+          State: {},
+          Workflow: {
+            Name: "DEV-MENU-DIALOG-06",
+            RequestContext: false,
+            Steps: [
+              {
+                Label: null,
+                Code: `
+                                    var data = await popup.datepad({ title: "We need the date", caption: "Care to enter a date?", value: Date.now() });
+                                    alert(data + "");
+                                `,
+              },
+            ],
+            Content: {
+              engineVersion: "2.0",
+            },
+          },
+          Parameters: {},
+          Type: "Workflow",
+          Content: {},
+        },
+        BackgroundColor: "indigo",
+        Color: "",
+        IconClass: "fa-calendar-week",
+        Class: "",
+        Bold: false,
+        FontSize: 2,
+        Row: 0,
+        Column: 0,
+        Enabled: 0,
+        MenuButtons: [],
+        Content: {
+          keyMenu: "SALE-TOP",
+          keyId: 7,
+        },
+      },
+      {
         Caption: `Popup - simple payment`,
         Tooltip: "Shows a payment dialog",
         Action: {
