@@ -15,7 +15,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -44,7 +44,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         ItemReference: Record "Item Reference";
@@ -52,7 +52,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         Captions.AddActionCaption(ActionCode(), 'Barcode', Format(ItemReference."Reference Type"::"Bar Code"));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -155,7 +155,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         exit(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         Item: Record Item;
@@ -172,7 +172,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
         case EanBoxEvent.Code of
@@ -183,7 +183,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeItemQty(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         Item: Record Item;
@@ -228,10 +228,7 @@ codeunit 6150856 "NPR POS Action: Item Qty."
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.47 [333409]
-        //EXIT(CODEUNIT::"POS Action - Ret. Amt. Dialog");
         exit(CODEUNIT::"NPR POS Action: Item Qty.");
-        //+NPR5.47 [333409]
     end;
 
     local procedure EventCodeItemQty(): Code[20]

@@ -1,11 +1,6 @@
 codeunit 6150837 "NPR POS Action: Boarding Pass"
 {
 
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'POS Action for boarding pass scan';
         ERRNOTVALID: Label 'Scanned code can not be validated as boarding pass.';
@@ -24,7 +19,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -52,13 +47,13 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode(), 'BoardingPass', Text001);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
     local procedure OnLookupParameterPosInfo(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         POSInfo: Record "NPR POS Info";
@@ -76,7 +71,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
             POSParameterValue.Value := POSInfo.Code;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, true)]
     local procedure OnValidateParameterPosInfo(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         POSInfo: Record "NPR POS Info";
@@ -103,7 +98,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         POSInfo.TestField(Type, POSInfo.Type::"Request Data");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -291,7 +286,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         oDate := CalcDate(CalcDateFormula, oDate);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     begin
         if not EanBoxEvent.Get(EventCodeBoardingPass()) then begin
@@ -306,7 +301,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
         case EanBoxEvent.Code of
@@ -317,7 +312,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeBoardingPass(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     begin
         if EanBoxSetupEvent."Event Code" <> EventCodeBoardingPass() then

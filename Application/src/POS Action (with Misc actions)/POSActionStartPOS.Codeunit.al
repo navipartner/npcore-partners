@@ -24,7 +24,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
         exit('1.3');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -39,14 +39,14 @@ codeunit 6150858 "NPR POS Action: Start POS"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode(), 'title', Title);
         Captions.AddActionCaption(ActionCode(), 'balancenow', BalanceNow);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         MasterPOSUnit: Record "NPR POS Unit";
@@ -125,7 +125,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
         FrontEnd.SetActionContext(ActionCode(), Context);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
@@ -201,9 +201,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
                         // Start Sale
                         POSSession.StartTransaction();
-                        //POSSession.GetSale(POSSale);
-                        //POSSale.GetCurrentSale(SalePOS);
-                        //POSSession.ChangeViewSale();
 
                         POSSession.GetSetup(Setup);
                         Setup.GetPOSViewProfile(POSViewProfile);

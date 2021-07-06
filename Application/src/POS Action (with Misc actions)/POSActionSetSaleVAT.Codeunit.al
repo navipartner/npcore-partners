@@ -1,13 +1,5 @@
 codeunit 6150842 "NPR POS Action - Set Sale VAT"
 {
-    // NPR5.38/MMV /20180119 CASE 302307 Created
-    // NPR5.45/MHA /20180803  CASE 323705 Signature changed on SaleLinePOS.FindItemSalesPrice()
-    // NPR5.48/THRO/20181129  CASE 333938 Added option to set Gen. Bus. Posting Group
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         ActionDescription: Label 'Action for changing VAT Business Posting Group of active sale.';
@@ -25,12 +17,10 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.48 [333938]
         exit('1.1');
-        //+NPR5.48 [333938]
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -50,14 +40,12 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
             Sender.RegisterDecimalParameter('MaximumSaleAmount', 0);
             Sender.RegisterBooleanParameter('AddCommentLine', false);
             Sender.RegisterBooleanParameter('ConfirmDialog', true);
-            //-NPR5.48 [333938]
             Sender.RegisterTextParameter('GenBusPostingGroup', '');
-            //+NPR5.48 [333938]
             Sender.RegisterTextParameter('VATBusPostingGroup', '');
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
@@ -66,7 +54,7 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         Captions.AddActionCaption(ActionCode(), 'confirmLead', StrSubstNo(ConfirmLead, VATBusinessPostingGroup.TableCaption));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -89,15 +77,11 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         MaxSaleAmountLimit := JSON.GetBooleanParameterOrFail('MaximumSaleAmountLimit', ActionCode());
         MaxSaleAmount := JSON.GetDecimalParameterOrFail('MaximumSaleAmount', ActionCode());
         AddCommentLine := JSON.GetBooleanParameterOrFail('AddCommentLine', ActionCode());
-        //-NPR5.48 [333938]
         GenBusPostingGroup := JSON.GetStringParameterOrFail('GenBusPostingGroup', ActionCode());
-        //+NPR5.48 [333938]
         VATBusPostingGroup := JSON.GetStringParameterOrFail('VATBusPostingGroup', ActionCode());
 
         CheckLimits(POSSession, MinSaleAmount, MinSaleAmountLimit, MaxSaleAmount, MaxSaleAmountLimit);
-        //-NPR5.48 [333938]
         ChangeSaleVATBusPostingGroup(POSSession, GenBusPostingGroup, VATBusPostingGroup, AddCommentLine);
-        //+NPR5.48 [333938]
     end;
 
     local procedure CheckLimits(POSSession: Codeunit "NPR POS Session"; MinSaleAmount: Decimal; MinSaleAmountLimit: Boolean; MaxSaleAmount: Decimal; MaxSaleAmountLimit: Boolean)
@@ -147,10 +131,8 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         OldVATTotal: Decimal;
         NewVATTotal: Decimal;
     begin
-        //-NPR5.48 [333938]
         if NewGenBusPostingGroup <> '' then
             GenBusinessPostingGroup.Get(NewGenBusPostingGroup);
-        //+NPR5.48 [333938]
         VATBusinessPostingGroup.Get(NewVATBusPostingGroup);
 
         POSSession.GetSaleLine(POSSaleLine);
@@ -159,31 +141,21 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
 
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
-        //-NPR5.48 [333938]
-        //SaleLinePOS.SETFILTER("VAT Bus. Posting Group", '<>%1', VATBusinessPostingGroup.Code);
-        //+NPR5.48 [333938]
         if SaleLinePOS.FindSet() then
             repeat
                 OldVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
-                //-NPR5.48 [333938]
                 if (NewGenBusPostingGroup <> '') and (SaleLinePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
                     SaleLinePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
                 if (NewVATBusPostingGroup <> '') and (SaleLinePOS."VAT Bus. Posting Group" <> VATBusinessPostingGroup.Code) then
                     SaleLinePOS.Validate("VAT Bus. Posting Group", NewVATBusPostingGroup);
-                //+NPR5.48 [333938]
                 SaleLinePOS.UpdateVATSetup();
-                //-NPR5.45 [323705]
-                //SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice(SaleLinePOS);
                 SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
-                //+NPR5.45 [323705]
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
                 SaleLinePOS.Modify();
                 NewVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
             until SaleLinePOS.Next() = 0;
-        //-NPR5.48 [333938]
         if (NewGenBusPostingGroup <> '') and (SalePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
             SalePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
-        //+NPR5.48 [333938]
         SalePOS.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup.Code);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
