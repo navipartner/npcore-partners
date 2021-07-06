@@ -4,8 +4,7 @@
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Magento Item Custom Option";
     SourceTableTemporary = true;
 
