@@ -1,7 +1,5 @@
 table 6150726 "NPR POS Action Sequence"
 {
-    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
-
     Caption = 'POS Action Sequence';
     DataClassification = CustomerContent;
 
@@ -64,10 +62,6 @@ table 6150726 "NPR POS Action Sequence"
         key(Key1; "Reference Type", "Reference POS Action Code", "POS Action Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

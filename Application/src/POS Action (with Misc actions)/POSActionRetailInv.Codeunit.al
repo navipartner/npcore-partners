@@ -1,26 +1,18 @@
 codeunit 6151086 "NPR POS Action - Retail Inv."
 {
-    // NPR5.40/MHA /20180320  CASE 307025 Object created - Retail Inventory Set
-    // NPR5.46/MHA /20180910  CASE 326622 Changed from PAGE.RUN to PAGE.RunModal() to fix issue with focus
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'This is a built-in action for Inventory Lookup using Retail Inventory Set';
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode(),
-  Text000,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Single)
-then begin
+            ActionCode(),
+            Text000,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Single)
+        then begin
             Sender.RegisterWorkflowStep('ProcessInventorySet', 'respond();');
 
             Sender.RegisterTextParameter('FixedInventorySetCode', '');
@@ -29,7 +21,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -68,10 +60,7 @@ then begin
             exit;
 
         RetailInventorySetMgt.ProcessInventorySet(RetailInventorySet, SaleLinePOS."No.", SaleLinePOS."Variant Code", TempRetailInventoryBuffer);
-        //-NPR5.46 [326622]
-        //PAGE.RUN(0,RetailInventoryBuffer);
         PAGE.RunModal(0, TempRetailInventoryBuffer);
-        //+NPR5.46 [326622]
     end;
 
     local procedure SelectRetailInventorySetCode(JSON: Codeunit "NPR POS JSON Management"; var RetailInventorySet: Record "NPR RIS Retail Inv. Set") EntrySetSelected: Boolean

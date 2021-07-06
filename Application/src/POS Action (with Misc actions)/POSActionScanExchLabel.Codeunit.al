@@ -8,17 +8,16 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
-
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep('prompt', 'if (param.PromptForBarcode == true) { input(labels.InpTitle, labels.InpLead, labels.InpInstr, param.ExchLabelBarcode, true).respond().cancel() } else { respond() };');
 
             Sender.RegisterWorkflow(false);
@@ -28,7 +27,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -62,7 +61,7 @@ then begin
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
 
@@ -98,14 +97,13 @@ then begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        //ExchangeLabelManagement.ScanExchangeLabel(SalePOS, CodeBarcode, CodeBarcode);
         if ExchangeLabelManagement.ScanExchangeLabel(SalePOS, CodeBarcode, CodeBarcode) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.SetFirst();
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         ExchangeLabel: Record "NPR Exchange Label";
@@ -114,7 +112,6 @@ then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeExchLabel();
             EanBoxEvent."Module Name" := InpTitle;
-            //EanBoxEvent.Description := ExchangeLabel.FIELDCAPTION(Barcode);
             EanBoxEvent.Description := CopyStr(ExchangeLabel.FieldCaption(Barcode), 1, MaxStrLen(EanBoxEvent.Description));
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
@@ -123,7 +120,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
         case EanBoxEvent.Code of
@@ -135,7 +132,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeExchLabel(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         ExchangeLabel: Record "NPR Exchange Label";

@@ -6,7 +6,7 @@
         DialogType: Option TextField,List;
         IsAlreadyAssigned: Label 'The Event ''%1'' has already been set up as active event for %2=''%3''.';
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(

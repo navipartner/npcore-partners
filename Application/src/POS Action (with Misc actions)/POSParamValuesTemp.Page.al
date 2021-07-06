@@ -1,7 +1,5 @@
 page 6150727 "NPR POS Param. Values Temp."
 {
-    // NPR5.40/NPKNAV/20180330  CASE 306347 Transport NPR5.40 - 30 March 2018
-
     Caption = 'POS Parameter Values';
     DelayedInsert = true;
     DeleteAllowed = false;

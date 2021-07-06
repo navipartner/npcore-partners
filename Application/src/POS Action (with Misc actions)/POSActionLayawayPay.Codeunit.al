@@ -1,13 +1,5 @@
 codeunit 6150869 "NPR POS Action: Layaway Pay"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-    // NPR5.52/MMV /20191004 CASE 352473 Updated parameters to insert final amount.
-    // NPR5.53/MMV /20200108 CASE 373453 Error if there are unposted POS entries related to any of the layaway prepayment invoices.
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         ActionDescription: Label 'Pay a layaway prepayment invoice';
@@ -34,7 +26,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -52,7 +44,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -79,9 +71,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         if not SelectOrder(POSSession, SalesHeader, OrderPaymentTermsFilter) then
             exit;
 
-        //-NPR5.53 [373453]
         CheckForUnpostedLinkedPOSEntries(SalesHeader);
-        //+NPR5.53 [373453]
 
         if not SelectPrepaymentInvoice(SalesHeader, SalesInvoiceHeader, SelectionMethod) then
             exit;
@@ -176,9 +166,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         if GetNextDuePrepayment(SalesHeader, NextInvoice, SalesInvoiceHeader."Due Date", false) then
             exit;
 
-        //-NPR5.52 [352473]
         RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, false, false, false, true);
-        //+NPR5.52 [352473]
     end;
 
     local procedure GetTotalRemainingLayawayAmount(SalesHeader: Record "Sales Header"; DueLaterThan: Date): Decimal
@@ -263,7 +251,6 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         POSEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.53 [373453]
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
         if SalesInvoiceHeader.FindSet() then
             repeat
@@ -283,10 +270,9 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
                         end;
                     until POSEntrySalesDocLink.Next() = 0;
             until SalesInvoiceHeader.Next() = 0;
-        //+NPR5.53 [373453]
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -302,7 +288,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -318,7 +304,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', false, false)]
     local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -330,7 +316,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
     local procedure OnLookupParameter(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         PaymentTerms: Record "Payment Terms";
@@ -347,7 +333,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
     local procedure OnValidateParameter(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         PaymentTerms: Record "Payment Terms";

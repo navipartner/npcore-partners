@@ -1,12 +1,5 @@
 codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
 {
-    // NPR5.51/ALST/20190704 CASE 359598 new object
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescriptionCaption: Label 'This action is used to print an exchange label after a sale has been posted, either last sale or selectively.';
         ChooseDocumentCaption: Label 'Please choose sale';
@@ -23,16 +16,16 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescriptionCaption,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
+            ActionCode(),
+            ActionDescriptionCaption,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep('', 'respond();');
             Sender.RegisterWorkflow(false);
             Sender.RegisterTextParameter('Template', '');
@@ -41,7 +34,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSEntry: Record "NPR POS Entry";
