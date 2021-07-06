@@ -8064,26 +8064,6 @@ body {
     .transcendence .view.payment .container.top .buttongrid {
       height: auto; } }
 
-.transcendence .view.sale > .container:first-child > .container:first-child,
-.transcendence .view.payment > .container:first-child > .container:first-child {
-  max-height: 45%; }
-  @media (min-width: 320px) and (max-width: 768px) {
-    .transcendence .view.sale > .container:first-child > .container:first-child,
-    .transcendence .view.payment > .container:first-child > .container:first-child {
-      max-height: inherit; } }
-
-.transcendence .view.sale > .container:first-child > .container:last-child,
-.transcendence .view.payment > .container:first-child > .container:last-child {
-  max-height: calc(55% - 1.25em); }
-  @media (min-width: 320px) and (max-width: 768px) {
-    .transcendence .view.sale > .container:first-child > .container:last-child,
-    .transcendence .view.payment > .container:first-child > .container:last-child {
-      max-height: inherit; } }
-
-.transcendence .view.sale > .container > .container:last-child,
-.transcendence .view.payment > .container > .container:last-child {
-  max-height: calc(50% - 6.5em); }
-
 .transcendence .view.sale .input--with-caption,
 .transcendence .view.payment .input--with-caption {
   margin-bottom: 0; }
@@ -9376,8 +9356,7 @@ body {
           position: relative;
           z-index: 1; }
         #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] {
-          height: calc(100% - 6em);
-          overflow-y: scroll; }
+          height: calc(100% - 6em); }
           #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] .simplebar-content-wrapper {
             padding: 0; }
           #popup-host .dialog__container .dialog__body .dialog__settings__body [data-simplebar] section {
