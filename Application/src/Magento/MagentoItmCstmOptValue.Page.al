@@ -85,6 +85,7 @@
         CustomOptionValue: Record "NPR Magento Custom Optn. Value";
         ItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
     begin
+        Rec.Reset();
         Rec.DeleteAll();
         if (not CustomOption.Get(CustomOptionNo)) or
            not (CustomOption.Type in [CustomOption.Type::SelectDropDown, CustomOption.Type::SelectRadioButtons,
