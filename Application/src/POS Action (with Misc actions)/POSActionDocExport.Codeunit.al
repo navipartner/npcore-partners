@@ -121,7 +121,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         exit('1.12');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -191,7 +191,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode(), 'ExtDocNo', TextExtDocNoLabel);
@@ -204,7 +204,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         Captions.AddActionCaption(ActionCode(), 'prepaymentAmountLead', TextPrepaymentAmountLead);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -573,7 +573,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'GetNumpad', ActionCode())));
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -669,7 +669,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -765,7 +765,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', false, false)]
     local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -781,7 +781,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
     local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         Location: Record Location;
@@ -813,7 +813,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
     local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         Location: Record Location;

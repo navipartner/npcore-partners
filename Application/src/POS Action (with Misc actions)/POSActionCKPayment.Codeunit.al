@@ -412,14 +412,14 @@
         FrontEnd.InvokeDevice(CashKeeperRequest, 'CK_PAYMENT', StepTxt);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', true, true)]
     local procedure OnDeviceResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
         if (ActionName <> 'CK_PAYMENT') then
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', true, true)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     begin
         if (ActionName <> 'CK_PAYMENT') then
@@ -468,7 +468,7 @@
     #endregion
 
     #region Subscriber
-    [EventSubscriber(ObjectType::Table, 6059946, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR CashKeeper Transaction", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnCashKeeperTransModify(var Rec: Record "NPR CashKeeper Transaction"; var xRec: Record "NPR CashKeeper Transaction"; RunTrigger: Boolean)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";

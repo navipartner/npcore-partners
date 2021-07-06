@@ -31,9 +31,5 @@ page 6150706 "NPR POS Action Workflow"
             }
         }
     }
-
-    actions
-    {
-    }
 }
 

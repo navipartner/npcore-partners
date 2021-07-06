@@ -131,20 +131,8 @@ page 6150703 "NPR POS Actions"
 
     trigger OnOpenPage()
     begin
-        //-NPR5.40 [306347]
         if not SkipDiscovery then begin
-            //+NPR5.40 [306347]
-            //-NPR5.32.11 [281618]
-            //-NPR5.40 [306347]
-            //  CodeunitInstanceDetector.InitializeActionDiscovery();
-            //  BINDSUBSCRIPTION(CodeunitInstanceDetector);
-            //+NPR5.40 [306347]
-            //-NPR5.32.11 [281618]
-            //-NPR5.39 [299114]
             Rec.DiscoverActions();
-            //Rec.OnDiscoverActions();
-            //+NPR5.39 [299114]
-            //-NPR5.40 [306347]
         end;
 
         if ActionSpecified then begin
@@ -152,7 +140,6 @@ page 6150703 "NPR POS Actions"
             Rec.Find('=><');
         end else
             if Rec.FindFirst() then;
-        //+NPR5.40 [306347]
     end;
 
     var
@@ -178,17 +165,13 @@ page 6150703 "NPR POS Actions"
 
     procedure SetAction(POSActionCodeIn: Code[20])
     begin
-        //-NPR5.40 [306347]
         POSActionCode := POSActionCodeIn;
         ActionSpecified := true;
-        //+NPR5.40 [306347]
     end;
 
     procedure SetSkipDiscovery(SkipDiscoveryIn: Boolean)
     begin
-        //-NPR5.40 [306347]
         SkipDiscovery := SkipDiscoveryIn;
-        //+NPR5.40 [306347]
     end;
 }
 

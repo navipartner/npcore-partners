@@ -1,7 +1,5 @@
 page 6150726 "NPR POS Action Sequences"
 {
-    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
-
     Caption = 'POS Action Sequences';
     PageType = List;
     SourceTable = "NPR POS Action Sequence";

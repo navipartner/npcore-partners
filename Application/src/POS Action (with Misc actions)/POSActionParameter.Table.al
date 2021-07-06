@@ -56,9 +56,6 @@ table 6150704 "NPR POS Action Parameter"
         }
     }
 
-    fieldgroups
-    {
-    }
 
     var
         BoolYes: Label 'Yes';

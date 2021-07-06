@@ -13,14 +13,14 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
         exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction20(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion())
-then begin
+            ActionCode(),
+            ActionDescription,
+            ActionVersion())
+        then begin
             Sender.RegisterWorkflow20(
               'let paymentCreated = await workflow.respond("PrepareRequest");' +
 
@@ -32,7 +32,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -75,7 +75,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151291, 'OnGetPaymentHandler', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR SS Action: Payment", 'OnGetPaymentHandler', '', false, false)]
     local procedure OnGetPaymentHandlerSelfService(POSPaymentMethod: Record "NPR POS Payment Method"; var PaymentHandler: Text; var ForceAmount: Decimal)
     begin
         if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then

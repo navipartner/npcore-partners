@@ -7,7 +7,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         Text001: Label 'User %1 is not allowed to Switch Register';
         ReadingErr: Label 'reading in %1';
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(

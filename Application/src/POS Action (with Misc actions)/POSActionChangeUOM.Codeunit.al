@@ -1,13 +1,5 @@
 codeunit 6151140 "NPR POS Action: Change UOM"
 {
-    // NPR5.50/ALST/20190418 CASE 342880 New object
-    // NPR5.51/TSA /20190418 CASE 342880 Renumbered object due to 6151130..6151139 Tickets and seating
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescriptionCaption: Label 'Change unit of measure for POS sales line';
 
@@ -21,7 +13,7 @@ codeunit 6151140 "NPR POS Action: Change UOM"
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -36,7 +28,7 @@ codeunit 6151140 "NPR POS Action: Change UOM"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";

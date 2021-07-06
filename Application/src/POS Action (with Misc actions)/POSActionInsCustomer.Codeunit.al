@@ -1,28 +1,19 @@
 ﻿codeunit 6150726 "NPR POSAction: Ins. Customer"
 {
-    // NPR5.38/MHA /20180121  CASE 302639 Implemented functionality for direct creation of Customer/Contact
-    // NPR5.49/MHA /20190319  CASE 343617 Implemented OnAfterLog POS Workflow Interface
-    // NPR5.50/MMV /20190430 CASE 353380 Copied function from standard W1 codeunit, to avoid breaking change conflict in v14.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for setting a customer on the current transaction';
         Text000: Label 'Required Customer select after Login';
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Single)
-then begin
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Single)
+        then begin
             Sender.RegisterWorkflowStep('CreateContact', 'if(param.CustomerType == 0) {respond()}');
             Sender.RegisterWorkflowStep('CreateCustomer', 'if(param.CustomerType == 1) {respond()}');
 
@@ -33,7 +24,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSSale: Codeunit "NPR POS Sale";
@@ -83,10 +74,7 @@ then begin
         if CardPageId > 0 then
             PAGE.RunModal(CardPageId, Contact)
         else
-            //-NPR5.50 [353380]
-            //  PageMgt.PageRunModalWithFieldFocus(Contact,Contact.FIELDNO(Name));
             PageRunModalWithFieldFocus(Contact, Contact.FieldNo(Name));
-        //+NPR5.50 [353380]
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Cash;
         SalePOS.Validate("Customer No.", Contact."No.");
@@ -108,10 +96,7 @@ then begin
         if CardPageId > 0 then
             PAGE.RunModal(CardPageId, Customer)
         else
-            //-NPR5.50 [353380]
-            //  PageMgt.PageRunModalWithFieldFocus(Customer,Customer.FIELDNO(Name));
             PageRunModalWithFieldFocus(Customer, Customer.FieldNo(Name));
-        //+NPR5.50 [353380]
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
@@ -135,7 +120,6 @@ then begin
         PageMgt: Codeunit "Page Management";
         DataTypeManagement: Codeunit "Data Type Management";
     begin
-        //-NPR5.50 [353380]
         if not GuiAllowed then
             exit(false);
 
@@ -151,10 +135,9 @@ then begin
         end;
 
         exit(false);
-        //+NPR5.50 [353380]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnAfterLogin', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnAfterLogin', '', true, true)]
     local procedure SelectCustomerRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         Customer: Record Customer;
@@ -162,7 +145,6 @@ then begin
         POSSale: Codeunit "NPR POS Sale";
         PrevRec: Text;
     begin
-        //-NPR5.49 [343617]
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'SelectCustomerRequired' then
@@ -181,13 +163,11 @@ then begin
 
         if PrevRec <> Format(SalePOS) then
             SalePOS.Modify(true);
-        //+NPR5.49 [343617]
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertPOSSalesWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-        //-NPR5.49 [343617]
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
 
@@ -199,14 +179,11 @@ then begin
                     Rec.Enabled := false;
                 end;
         end;
-        //+NPR5.49 [343617]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.49 [343617]
         exit(CODEUNIT::"NPR POSAction: Ins. Customer");
-        //+NPR5.49 [343617]
     end;
 }
 

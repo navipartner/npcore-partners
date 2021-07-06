@@ -43,10 +43,6 @@ page 6150704 "NPR POS Action Param."
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetCurrRecord()
     begin
         SetOptionsEditable();

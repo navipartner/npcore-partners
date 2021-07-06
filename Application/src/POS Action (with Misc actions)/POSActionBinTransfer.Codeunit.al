@@ -1,15 +1,7 @@
 codeunit 6150851 "NPR POS Action: Bin Transfer"
 {
-    // 
-    // NPR5.43/TSA /20180416 CASE 311964 Transfer content from one bin to another bin
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        ActionDescription: Label 'This action transfer funds from one bin to a different bin using the thPOS';
+        ActionDescriptionLbl: Label 'This action transfer funds from one bin to a different bin using the thPOS';
 
     local procedure ActionCode(): Text
     begin
@@ -21,12 +13,12 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
           ActionCode(),
-          ActionDescription,
+          ActionDescriptionLbl,
           ActionVersion(),
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
@@ -42,12 +34,12 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -85,14 +77,11 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         JSON.InitializeJObjectParser(Context, FrontEnd);
         FromBinNo := JSON.GetStringOrFail('FROM_BIN', ReadingErr);
 
-        //-NPR5.43 [310815]
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(FromBinNo);
 
-        //-NPR5.43 [311964]
         WorkshiftCheckpoint.Get(CheckpointEntryNo);
         WorkshiftCheckpoint.Type := WorkshiftCheckpoint.Type::TRANSFER;
         WorkshiftCheckpoint.Modify();
-        //+NPR5.43 [311964]
 
         PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(GetUnitNo(POSSession), FromBinNo, CheckpointEntryNo);
         Commit();
@@ -120,7 +109,6 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
 
                 EntryNo := POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, false, CheckpointEntryNo);
 
-                //-NPR5.43 [311964]
                 // Posting
                 POSEntryToPost.Get(EntryNo);
                 POSEntryToPost.SetRecFilter();
@@ -137,11 +125,8 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
                 Commit();
 
                 POSSession.ChangeViewLogin();
-                //+NPR5.43 [311964]
-
             end;
         end;
-        //+NPR5.43 [310815]
     end;
 
     local procedure SelectSourceBin(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")

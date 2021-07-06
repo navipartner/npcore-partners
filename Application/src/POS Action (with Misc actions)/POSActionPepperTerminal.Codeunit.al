@@ -125,7 +125,7 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
             NextWorkflowStep::Done:
                 FrontEnd.ContinueAtStep('done');
             else
-                ; //FrontEnd.ResumeWorkflow ();
+                ;
         end;
     end;
 
