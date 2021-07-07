@@ -94,10 +94,7 @@ page 6014659 "NPR Web Client Dependencies"
         }
     }
 
-    var
-        TextUnsupportedFormat: Label 'You have specified a file in an unsupported format. Supported formats are JPG, PNG, and GIF.';
-
-    procedure ImportFile()
+    local procedure ImportFile()
     var
         TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
@@ -144,7 +141,7 @@ page 6014659 "NPR Web Client Dependencies"
         end;
     end;
 
-    procedure ExportFile()
+    local procedure ExportFile()
     var
         FileBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
@@ -169,51 +166,24 @@ page 6014659 "NPR Web Client Dependencies"
         end;
     end;
 
-    procedure ConvertImgToDataUri(InStr: InStream; var OutStr: OutStream)
+    local procedure ConvertImgToDataUri(InStr: InStream; var OutStr: OutStream)
     var
+        Ext: Text;
         DataUri: Text;
-        p: integer;
-        b: Byte;
-        OutStm1: OutStream;
-        OutStm2: OutStream;
-        InStm1: InStream;
-        InStm2: InStream;
-        TempBlob: Codeunit "Temp Blob";
-        Base64Convert: Codeunit "Base64 Convert";
         ImageFormat: Codeunit "NPR Image Format";
+        Base64: Codeunit "Base64 Convert";
+        UnsupportedFormatErr: Label 'You have specified a file in an unsupported image format.';
+        DataUriLabel: Label 'data:image/%1;base64,%2', Locked = true;
     begin
-        DataUri := 'data:image/';
+        Ext := ImageFormat.GetImageExtensionFromHeader(InStr);
+        if Ext = '' then
+            Error(UnsupportedFormatErr);
 
-        //duplicate in-stream for analysis
-        TempBlob.CreateOutStream(OutStm1);
-        TempBlob.CreateOutStream(OutStm2);
-        while not InStr.EOS do begin
-            InStr.Read(b);
-            p := p + 1;
-            if p <= 10 then //image header. 10 bytes in enough.
-                OutStm1.Write(b);
-            OutStm2.Write(b); //original in-stream copy               
-        end;
-        CopyStream(OutStm1, InStm1);
-        CopyStream(OutStm2, InStm2);
-
-        case ImageFormat.GetImageExtensionFromHeader(InStm1) of
-            'gif':
-                DataUri += 'gif';
-            'jpg':
-                DataUri += 'jpg';
-            'png':
-                DataUri += 'png';
-            'jpeg':
-                DataUri += 'jpeg';
-            else
-                Error(TextUnsupportedFormat);
-        end;
-        DataUri += ';base64,' + Base64Convert.ToBase64(InStm2);
+        DataUri := StrSubstNo(DataUriLabel, Ext, Base64.ToBase64(InStr));
         OutStr.WriteText(DataUri);
     end;
 
-    procedure ConvertSVGToDataUri(InStm: InStream; var OutStm: OutStream)
+    local procedure ConvertSVGToDataUri(InStm: InStream; var OutStm: OutStream)
     var
         DataUri: Text;
         SVGText: Text;

@@ -32,6 +32,8 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
                 RequireScript(ID, JSON, FrontEnd);
             'image':
                 RequireImage(ID, JSON, FrontEnd);
+            'picture.item':
+                RequireItemPicture(ID, JSON, FrontEnd);
             else begin
                     OnRequireCustom(ID, Type, JSON, FrontEnd, CustomHandled);
                     if not CustomHandled then begin
@@ -112,6 +114,31 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
         ImageCode := JSON.GetStringOrFail('code', StrSubstNo(ReadingErr, MethodName()));
         FrontEnd.RequireResponse(ID, WebClientDependency.GetDataUri(ImageCode));
+    end;
+
+    local procedure RequireItemPicture(ID: Integer; JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        ItemNo: Code[20];
+        Item: Record Item;
+        Media: Record "Tenant Media";
+        Base64: Codeunit "Base64 Convert";
+        Stream: InStream;
+        DataUri: Text;
+        MediaId: Guid;
+        DataUriLabel: Label 'data:%1;base64,%2', Locked = true;
+    begin
+        JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
+        ItemNo := JSON.GetStringOrFail('id', StrSubstNo(ReadingErr, MethodName()));
+        if Item.Get(ItemNo) and (Item.Picture.Count > 0) then begin
+            MediaId := Item.Picture.Item(1);
+            Media.Get(MediaId);
+            if (Media.Content.HasValue()) then begin
+                Media.CalcFields(Content);
+                Media.Content.CreateInStream(Stream);
+                DataUri := StrSubstNo(DataUriLabel, Media."Mime Type", Base64.ToBase64(Stream));
+            end;
+        end;
+        FrontEnd.RequireResponse(ID, DataUri);
     end;
 
     [IntegrationEvent(false, false)]

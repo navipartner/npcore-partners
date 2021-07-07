@@ -82,7 +82,7 @@ codeunit 6014561 "NPR Image Format"
         exit(left + right);
     end;
 
-    procedure GetSignature(SignatureBytes: array[10] of Byte; NoOfBytes: integer): Text;
+    local procedure GetSignature(SignatureBytes: array[10] of Byte; NoOfBytes: integer): Text;
     var
         i: Integer;
         Result: text;
@@ -92,46 +92,58 @@ codeunit 6014561 "NPR Image Format"
         exit(Result);
     end;
 
-    procedure GetImageExtensionFromHeader(InS: InStream): Text;
+    /// <summary>
+    /// Gets image format from stream. It does so by analyzing the stream header bytes, as explained in https://en.wikipedia.org/wiki/List_of_file_signatures
+    /// </summary>
+    /// <param name="InStr">Input stream to get image format from. It has to be by reference, because the stream is read inside the function.
+    /// If it were not by reference, the stream would be unusable after completion of this function.</param>
+    /// <returns>Image format (if succesfully identified), or empty string (if not identified)</returns>
+    procedure GetImageExtensionFromHeader(var InStr: InStream): Text;
     var
+        TempBlob: Codeunit "Temp Blob";
+        InStrCopy: InStream;
+        OutStr: OutStream;
         SignatureBytes: array[10] of Byte;
-        c: Char;
+        c: Byte;
         i: Integer;
-        UnknownImageFormatErr: Label 'Unknown/unrecognized image format.';
     begin
+        // Copy stream for header analysis
+        TempBlob.CreateOutStream(OutStr);
+        CopyStream(OutStr, InStr);
+        TempBlob.CreateInStream(InStrCopy);
+
+        // Resetting the original stream variable (because it was fully read)
+        TempBlob.CreateInStream(InStr);
+
         for i := 1 to ArrayLen(SignatureBytes) do begin
-            InS.Read(c);
+            InStrCopy.Read(c);
             SignatureBytes[i] := c;
         end;
 
-        //File signatues:
-        //  https://en.wikipedia.org/wiki/List_of_file_signatures
-
-        //FF D8 FF DB - jpeg
-        //FF D8 FF E0 - jpeg
-        //FF D8 FF EE - jpeg
-        //FF D8 FF E1 - jpeg
+        // JPEG headers
         if GetSignature(SignatureBytes, 4) = 'FFD8FFDB' then exit('jpeg');
         if GetSignature(SignatureBytes, 4) = 'FFD8FFE0' then exit('jpeg');
         if GetSignature(SignatureBytes, 4) = 'FFD8FFEE' then exit('jpeg');
         if GetSignature(SignatureBytes, 4) = 'FFD8FFE1' then exit('jpeg');
-        //89 50 4E 47 - png
+
+        // PNG header
         if GetSignature(SignatureBytes, 4) = '89504E47' then exit('png');
-        //42 4D - bmp
+
+        // BMP header
         if GetSignature(SignatureBytes, 2) = '424D' then exit('bmp');
-        //47 49 46 38 37 61 - gif
-        //47 49 46 38 39 61 - gif
+
+        // GIF headers
         if GetSignature(SignatureBytes, 6) = '474946383761' then exit('gif');
         if GetSignature(SignatureBytes, 6) = '474946383961' then exit('gif');
-        //49 49 2A 00 - tiff
-        //4D 4D 00 2A - tiff
+
+        // TIFF headers
         if GetSignature(SignatureBytes, 4) = '49492A00' then exit('tiff');
         if GetSignature(SignatureBytes, 4) = '4D4D002A' then exit('tiff');
-        //00 00 01 00 - ico
-        if GetSignature(SignatureBytes, 4) = '00000100' then exit('ico');
-        //D7 CD C6 9A - wmf
-        if GetSignature(SignatureBytes, 4) = 'D7CDC69A' then exit('wmf');
 
-        Error(UnknownImageFormatErr);
+        // ICO header
+        if GetSignature(SignatureBytes, 4) = '00000100' then exit('ico');
+
+        // WMF header
+        if GetSignature(SignatureBytes, 4) = 'D7CDC69A' then exit('wmf');
     end;
 }
