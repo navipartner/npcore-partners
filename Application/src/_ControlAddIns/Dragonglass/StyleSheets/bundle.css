@@ -9276,6 +9276,8 @@ body {
     border-bottom: 1px solid var(--color-secondary-200);
     padding-bottom: 0.75em;
     margin-bottom: 0.75em; }
+  .mobile-view .infobox__footer {
+    display: flex; }
   .mobile-view .infobox__row {
     display: flex;
     justify-content: space-between;
@@ -9313,7 +9315,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding-top: 3em;
+    padding-top: 2em;
     overflow-y: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none; }
@@ -9339,11 +9341,10 @@ body {
     overflow: hidden; }
   .mobile-view .drawer .logo-container {
     width: 100%;
-    margin-bottom: 3em;
-    display: flex;
-    justify-content: center; }
+    margin-bottom: 1em;
+    padding-left: 1.75em; }
     .mobile-view .drawer .logo-container__image {
-      width: 60%; }
+      width: 50%; }
 
 .animated-content {
   width: 100%;
