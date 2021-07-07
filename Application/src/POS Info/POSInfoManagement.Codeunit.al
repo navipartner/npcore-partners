@@ -129,7 +129,7 @@
         if POSInfoLinkTable.FindSet() then
             repeat
                 POSInfo.Get(POSInfoLinkTable."POS Info Code");
-                if ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope) then begin
+                if ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope, true) then begin
                     TempPOSInfoTransaction.Init();
                     TempPOSInfoTransaction.CopyFromPOSInfo(POSInfo);
                     TempPOSInfoTransaction."POS Info" := CopyStr(GetPosInfoOutput(POSInfo, UserInputString), 1, MaxStrLen(TempPOSInfoTransaction."POS Info"));
@@ -154,7 +154,7 @@
         POSInfo.Get(pPOSInfoCode);
         CheckAndAdjustApplicationScope(pSaleLinePos, POSInfo, pApplicScope);
         if not pClearInfo then
-            if not ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope) then
+            if not ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope, false) then
                 exit;
 
         POSInfoTransParam.Init();
@@ -194,7 +194,7 @@
             Error('');
     end;
 
-    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask): Boolean
+    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; CalledByPOSInfoLinks: Boolean): Boolean
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
         Confirmed: Boolean;
@@ -203,7 +203,8 @@
         SetPosInfoTransactionFilters(POSInfoTransaction, pSaleLinePos, POSInfo, pApplicScope);
         Confirmed := POSInfoTransaction.IsEmpty();
         if not Confirmed then
-            Confirmed := Confirm(StrSubstNo(ConfirmOverwriteQst, POSInfo.Code), true);
+            if not (CalledByPOSInfoLinks and POSInfo."Once per Transaction" and (pApplicScope = pApplicScope::"Current Line")) then
+                Confirmed := Confirm(StrSubstNo(ConfirmOverwriteQst, POSInfo.Code), true);
         exit(Confirmed);
     end;
 
