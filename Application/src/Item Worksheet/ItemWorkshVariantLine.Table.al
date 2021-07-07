@@ -564,26 +564,33 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
     local procedure GetExistingVariantPrice(): Decimal
     var
-        SalesPrice: Record "Sales Price";
+        PriceListLine: Record "Price List Line";
     begin
-        SalesPrice.SetRange("Item No.", "Existing Item No.");
-        SalesPrice.SetRange("Variant Code", "Existing Variant Code");
-        SalesPrice.SetRange("Sales Type", SalesPrice."Sales Type"::"All Customers");
-        if SalesPrice.FindFirst() then
-            exit(SalesPrice."Unit Price")
+        PriceListLine.SetRange("Source Type", PriceListLine."Source Type"::"All Customers");
+        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
+        PriceListLine.SetRange("Asset No.", "Existing Item No.");
+        PriceListLine.SetRange("Variant Code", "Existing Variant Code");
+        PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
+        PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
+        if PriceListLine.FindFirst() then
+            exit(PriceListLine."Unit Price")
         else
             exit(0);
     end;
 
     local procedure GetExistingVariantCost(): Decimal
     var
-        PurchasePrice: Record "Purchase Price";
+        PriceListLine: Record "Price List Line";
     begin
-        PurchasePrice.SetRange("Item No.", "Existing Item No.");
-        PurchasePrice.SetRange("Variant Code", "Existing Variant Code");
-        PurchasePrice.SetRange("Vendor No.", ItemWorksheetLine."Vendor No.");
-        if PurchasePrice.FindFirst() then
-            exit(PurchasePrice."Direct Unit Cost")
+        PriceListLine.SetRange("Source Type", PriceListLine."Source Type"::Vendor);
+        PriceListLine.SetRange("Source No.", ItemWorksheetLine."Vendor No.");
+        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
+        PriceListLine.SetRange("Asset No.", "Existing Item No.");
+        PriceListLine.SetRange("Variant Code", "Existing Variant Code");
+        PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Purchase);
+        PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
+        if PriceListLine.FindFirst() then
+            exit(PriceListLine."Unit Price")
         else
             exit(0);
     end;

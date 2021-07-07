@@ -104,7 +104,7 @@ table 6014417 "NPR Discount Priority"
     begin
         NumberOfObjects := 4;
         DiscountPriorities[1] := DATABASE::"NPR Mixed Discount";
-        DiscountPriorities[2] := DATABASE::"Sales Line Discount";
+        DiscountPriorities[2] := DATABASE::"Price List Line";
         DiscountPriorities[3] := DATABASE::"NPR Period Discount";
         DiscountPriorities[4] := DATABASE::"NPR Quantity Discount Header";
 

@@ -7295,7 +7295,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
 
     local procedure DiscSourceTableId(): Integer
     begin
-        exit(DATABASE::"Sales Line Discount");
+        exit(DATABASE::"Price List Line");
     end;
 
     local procedure DeleteDiscounts()
@@ -7322,14 +7322,18 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
 
     local procedure CreateDiscount(Item: Record Item; LineDiscPct: Decimal): Decimal
     var
-        SalesLineDiscount: Record "Sales Line Discount";
+        PriceListLine: Record "Price List Line";
     begin
-        SalesLineDiscount."Sales Type" := SalesLineDiscount."Sales Type"::"All Customers";
-        SalesLineDiscount."Sales Code" := '';
-        SalesLineDiscount.Validate(Code, Item."No.");
-        SalesLineDiscount."Line Discount %" := LineDiscPct;
-        SalesLineDiscount."Starting Date" := Today() - 7;
-        SalesLineDiscount.Insert();
-        exit(SalesLineDiscount."Line Discount %");
+        PriceListLine."Price Type" := PriceListLine."Price Type"::Sale;
+        PriceListLine."Amount Type" := PriceListLine."Amount Type"::Discount;
+        PriceListLine."Source Type" := PriceListLine."Source Type"::"All Customers";
+        PriceListLine."Source No." := '';
+        PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
+        PriceListLine.Validate("Asset No.", Item."No.");
+        PriceListLine."Line Discount %" := LineDiscPct;
+        PriceListLine."Starting Date" := Today() - 7;
+        PriceListLine.Status := PriceListLine.Status::Active;
+        PriceListLine.Insert();
+        exit(PriceListLine."Line Discount %");
     end;
 }

@@ -14,7 +14,12 @@ codeunit 85037 "NPR Test Fixture"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Library - Test Initialize", 'OnTestInitialize', '', false, false)]
     local procedure OnTestInitialize(CallerCodeunitID: Integer)
+    var
+        SalesSetup: Record "Sales & Receivables Setup";
     begin
-
+        if SalesSetup.Get() then begin
+            SalesSetup.Validate("Discount Posting", SalesSetup."Discount Posting"::"All Discounts");
+            SalesSetup.Modify();
+        end;
     end;
 }

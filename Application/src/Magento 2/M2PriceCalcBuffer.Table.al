@@ -1,8 +1,7 @@
 table 6151145 "NPR M2 Price Calc. Buffer"
 {
-    Caption = 'Sales Price';
+    Caption = 'Sales Price Buffer';
     DataClassification = CustomerContent;
-    LookupPageID = "Sales Prices";
 
     fields
     {

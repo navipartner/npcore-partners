@@ -1,8 +1,8 @@
-pageextension 6014475 "NPR Sales Price" extends "Sales Prices"
+pageextension 6014475 "NPR Price List Line Review" extends "Price List Line Review"
 {
     actions
     {
-        addafter(ClearFilter)
+        addlast(Navigation)
         {
             group("NPR Variants")
             {
@@ -19,6 +19,12 @@ pageextension 6014475 "NPR Sales Price" extends "Sales Prices"
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Variety action';
+                trigger OnAction()
+                var
+                    VRTWrapper: Codeunit "NPR Variety Wrapper";
+                begin
+                    VRTWrapper.PriceShowVariety(Rec, 0);
+                end;
             }
         }
     }

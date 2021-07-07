@@ -394,7 +394,7 @@ page 6151401 "NPR Magento Setup"
                 {
                     ShowCaption = false;
                     Visible = Rec."Replicate to Sales Prices";
-                    field("Replicate to Sales Type"; Rec."Replicate to Sales Type")
+                    field("Replicate to Price Source Type"; Rec."Replicate to Price Source Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Replicate to Sales Type field';
@@ -402,7 +402,7 @@ page 6151401 "NPR Magento Setup"
                     group(Control6151427)
                     {
                         ShowCaption = false;
-                        Visible = Rec."Replicate to Sales Type" <> Rec."Replicate to Sales Type"::"All Customers";
+                        Visible = Rec."Replicate to Price Source Type" <> Rec."Replicate to Price Source Type"::"All Customers";
                         field("Replicate to Sales Code"; Rec."Replicate to Sales Code")
                         {
                             ApplicationArea = All;
@@ -832,7 +832,7 @@ page 6151401 "NPR Magento Setup"
                 {
                     Caption = 'Replicate Special Prices to Sales Prices';
                     Image = SuggestSalesPrice;
-                    Visible = Rec."Replicate to Sales Prices" AND ((Rec."Replicate to Sales Type" = Rec."Replicate to Sales Type"::"All Customers") OR (Rec."Replicate to Sales Code" <> ''));
+                    Visible = Rec."Replicate to Sales Prices" AND ((Rec."Replicate to Price Source Type" = Rec."Replicate to Price Source Type"::"All Customers") OR (Rec."Replicate to Sales Code" <> ''));
                     ApplicationArea = All;
                     ToolTip = 'Executes the Replicate Special Prices to Sales Prices action';
 

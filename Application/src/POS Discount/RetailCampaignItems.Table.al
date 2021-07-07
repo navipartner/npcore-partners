@@ -398,7 +398,6 @@ table 6014612 "NPR Retail Campaign Items"
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         RetailComment: Record "NPR Retail Comment";
         LineNo: Integer;
-        PurchPriceCalcMgt: Codeunit "Purch. Price Calc. Mgt.";
         RequisitionLine: Record "Requisition Line";
     begin
         DeleteAll();
@@ -446,7 +445,7 @@ table 6014612 "NPR Retail Campaign Items"
                                             RequisitionLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
                                             RequisitionLine.Validate("Order Date", Today);
                                             RequisitionLine.Validate("Vendor No.", Item."Vendor No.");
-                                            PurchPriceCalcMgt.FindReqLinePrice(RequisitionLine, 0);
+                                            FindRequsitionLinePrice(RequisitionLine);
                                             "Unit Purchase Price" := RequisitionLine."Direct Unit Cost";
                                         end;
 
@@ -505,7 +504,7 @@ table 6014612 "NPR Retail Campaign Items"
                                             RequisitionLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
                                             RequisitionLine.Validate("Order Date", Today);
                                             RequisitionLine.Validate("Vendor No.", Item."Vendor No.");
-                                            PurchPriceCalcMgt.FindReqLinePrice(RequisitionLine, 0);
+                                            FindRequsitionLinePrice(RequisitionLine);
                                             "Unit Purchase Price" := RequisitionLine."Direct Unit Cost";
                                         end;
                                         if "Unit Purchase Price" = 0 then
@@ -604,6 +603,30 @@ table 6014612 "NPR Retail Campaign Items"
         AuxItemLedgerEntry.CalcSums(Quantity);
 
         QuantitySold := -AuxItemLedgerEntry.Quantity;
+    end;
+
+    local procedure FindRequsitionLinePrice(var RequisitionLine: Record "Requisition Line")
+    var
+        PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+        LineWithPrice: Interface "Line With Price";
+        PriceCalculation: Interface "Price Calculation";
+        Line: Variant;
+        PriceType: enum "Price Type";
+    begin
+        GetLineWithPrice(LineWithPrice);
+        LineWithPrice.SetLine(PriceType::Purchase, RequisitionLine);
+        PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
+        PriceCalculation.ApplyDiscount();
+        PriceCalculation.ApplyPrice(0);
+        PriceCalculation.GetLine(Line);
+        RequisitionLine := Line;
+    end;
+
+    procedure GetLineWithPrice(var LineWithPrice: Interface "Line With Price")
+    var
+        RequisitionLinePrice: Codeunit "Requisition Line - Price";
+    begin
+        LineWithPrice := RequisitionLinePrice;
     end;
 }
 

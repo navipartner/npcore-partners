@@ -38,18 +38,18 @@
 
     local procedure EnableSalesPriceLog()
     var
-        SalesPrice: Record "Sales Price";
+        PriceListLine: Record "Price List Line";
     begin
-        EnableChangeLogSetupField(DATABASE::"Sales Price", SalesPrice.FieldNo("Unit Price"));
-        EnableChangeLogSetupTable(DATABASE::"Sales Price");
+        EnableChangeLogSetupField(DATABASE::"Price List Line", PriceListLine.FieldNo("Unit Price"));
+        EnableChangeLogSetupTable(DATABASE::"Price List Line");
     end;
 
     local procedure EnableSalesLineDiscountLog()
     var
-        SalesLineDiscount: Record "Sales Line Discount";
+        PriceListLine: Record "Price List Line";
     begin
-        EnableChangeLogSetupField(DATABASE::"Sales Line Discount", SalesLineDiscount.FieldNo("Line Discount %"));
-        EnableChangeLogSetupTable(DATABASE::"Sales Line Discount");
+        EnableChangeLogSetupField(DATABASE::"Price List Line", PriceListLine.FieldNo("Line Discount %"));
+        EnableChangeLogSetupTable(DATABASE::"Price List Line");
     end;
 
     local procedure EnablePeriodDiscountLog()
@@ -299,7 +299,7 @@
     local procedure FindNewSalesPriceLogEntries(var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
     var
         ChangeLogEntry: Record "Change Log Entry";
-        SalesPrice: Record "Sales Price";
+        PriceListLine: Record "Price List Line";
         LastChangeLogEntryNo: BigInteger;
         FieldNoFilter: Text;
         TableNoFilter: Text;
@@ -309,8 +309,8 @@
         if TempRetailPriceLogEntry.FindLast() then;
         i := TempRetailPriceLogEntry."Entry No.";
 
-        TableNoFilter := Format(DATABASE::"Sales Price");
-        FieldNoFilter := Format(SalesPrice.FieldNo("Unit Price"));
+        TableNoFilter := Format(DATABASE::"Price List Line");
+        FieldNoFilter := Format(PriceListLine.FieldNo("Unit Price"));
         LastChangeLogEntryNo := GetLastChangeLogEntryNo(TableNoFilter, FieldNoFilter);
         if not SetChangeLogEntryFilter(LastChangeLogEntryNo, TableNoFilter, FieldNoFilter, ChangeLogEntry) then
             exit;
@@ -319,8 +319,8 @@
         repeat
             i += 1;
 
-            SalesPrice.SetPosition(ChangeLogEntry."Primary Key");
-            if SalesPrice."Sales Type" = SalesPrice."Sales Type"::"All Customers" then begin
+            PriceListLine.SetPosition(ChangeLogEntry."Primary Key");
+            if PriceListLine."Source Type" = PriceListLine."Source Type"::"All Customers" then begin
                 TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
@@ -336,7 +336,7 @@
     local procedure FindNewSalesLineDiscountLogEntries(var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
     var
         ChangeLogEntry: Record "Change Log Entry";
-        SalesLineDiscount: Record "Sales Line Discount";
+        PriceListLine: Record "Price List Line";
         LastChangeLogEntryNo: BigInteger;
         FieldNoFilter: Text;
         TableNoFilter: Text;
@@ -346,8 +346,8 @@
         if TempRetailPriceLogEntry.FindLast() then;
         i := TempRetailPriceLogEntry."Entry No.";
 
-        TableNoFilter := Format(DATABASE::"Sales Line Discount");
-        FieldNoFilter := Format(SalesLineDiscount.FieldNo("Line Discount %"));
+        TableNoFilter := Format(DATABASE::"Price List Line");
+        FieldNoFilter := Format(PriceListLine.FieldNo("Line Discount %"));
         LastChangeLogEntryNo := GetLastChangeLogEntryNo(TableNoFilter, FieldNoFilter);
         if not SetChangeLogEntryFilter(LastChangeLogEntryNo, TableNoFilter, FieldNoFilter, ChangeLogEntry) then
             exit;
@@ -356,8 +356,8 @@
         repeat
             i += 1;
 
-            SalesLineDiscount.SetPosition(ChangeLogEntry."Primary Key");
-            if (SalesLineDiscount.Type = SalesLineDiscount.Type::Item) and (SalesLineDiscount."Sales Type" = SalesLineDiscount."Sales Type"::"All Customers") then begin
+            PriceListLine.SetPosition(ChangeLogEntry."Primary Key");
+            if (PriceListLine."Asset Type" = PriceListLine."Asset Type"::Item) and (PriceListLine."Source Type" = PriceListLine."Source Type"::"All Customers") then begin
                 TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
