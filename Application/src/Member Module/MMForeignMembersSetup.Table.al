@@ -47,13 +47,11 @@ table 6060143 "NPR MM Foreign Members. Setup"
         {
             Caption = 'Append Local Suffix';
             DataClassification = CustomerContent;
-            Enabled = false;
         }
         field(65; "Remove Local Suffix"; Code[10])
         {
             Caption = 'Remove Local Suffix';
             DataClassification = CustomerContent;
-            Enabled = false;
         }
     }
 
