@@ -37,7 +37,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
             exit;
 
         Sender.RegisterWorkflowStep('voucher_type_input', 'if (!param.VoucherTypeCode) {respond()} else {context.VoucherTypeCode = param.VoucherTypeCode}');
-        Sender.RegisterWorkflowStep('amt_input', '{numpad({title: labels.IssueReturnVoucherTitle,caption: labels.Amount,value: context.voucher_amount,notBlank: true}).cancel(abort)};');
+        Sender.RegisterWorkflowStep('amt_input', 'if (!context.IsUnattendedPOS) {numpad({title: labels.IssueReturnVoucherTitle,caption: labels.Amount,value: context.voucher_amount,notBlank: true}).cancel(abort)};');
         Sender.RegisterWorkflowStep('validate_amt', 'respond();');
         Sender.RegisterWorkflowStep('select_send_method', 'respond();');
         Sender.RegisterWorkflowStep('send_method_email',
@@ -127,8 +127,10 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        POSUnit: Record "NPR POS Unit";
         Context: Codeunit "NPR POS JSON Management";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
+        Setup: Codeunit "NPR POS Setup";
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SaleAmount: Decimal;
@@ -164,6 +166,9 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
             Error(Text007, NpRvVoucherType.TableCaption, NpRvVoucherType.Code, NpRvVoucherType."Minimum Amount Issue");
 
         Context.SetContext('voucher_amount', -ReturnAmount);
+        POSSession.GetSetup(Setup);
+        Setup.GetPOSUnit(POSUnit);
+        Context.SetContext('IsUnattendedPOS', POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED);
         FrontEnd.SetActionContext(ActionCode(), Context);
     end;
 
@@ -328,22 +333,28 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         VoucherType: Record "NPR NpRv Voucher Type";
         VoucherTypeCode: Text;
         Amount: Decimal;
+        IsUnattendedPOS: Boolean;
     begin
         JSON.SetScopeRoot();
         VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ActionCode())));
         VoucherType.Get(VoucherTypeCode);
         POSPaymentMethod.Get(VoucherType."Payment Type");
 
-        JSON.SetScopeRoot();
-        JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, ActionCode()));
-        Amount := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
-        if POSPaymentMethod."Rounding Precision" > 0 then
-            Amount := Round(Amount, POSPaymentMethod."Rounding Precision");
+        IsUnattendedPOS := JSON.GetBoolean('IsUnattendedPOS');
+        if IsUnattendedPOS then
+            Amount := JSON.GetDecimalOrFail('voucher_amount', StrSubstNo(ReadingErr, ActionCode()))
+        else begin
+            JSON.SetScopeRoot();
+            JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, ActionCode()));
+            Amount := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
+            if POSPaymentMethod."Rounding Precision" > 0 then
+                Amount := Round(Amount, POSPaymentMethod."Rounding Precision");
 
-        if VoucherType."Minimum Amount Issue" < 0 then
-            VoucherType."Minimum Amount Issue" := 0;
-        if Amount < VoucherType."Minimum Amount Issue" then
-            Error(Text006, Amount, VoucherType."Minimum Amount Issue");
+            if VoucherType."Minimum Amount Issue" < 0 then
+                VoucherType."Minimum Amount Issue" := 0;
+            if Amount < VoucherType."Minimum Amount Issue" then
+                Error(Text006, Amount, VoucherType."Minimum Amount Issue");
+        end;
 
         JSON.SetContext('ReturnVoucherAmount', Amount);
         FrontEnd.SetActionContext(ActionCode(), JSON);
@@ -418,6 +429,4 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
     begin
         exit('1.1');
     end;
-
-
 }
