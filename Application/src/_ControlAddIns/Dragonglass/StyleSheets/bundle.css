@@ -9,6 +9,12 @@
 .mobile-view .mobile-button.mobile-button--primary .mobile-button__icon {
   background-color: var(--primary); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-primary {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-primary .button__icon {
+      background-color: var(--primary) !important; } }
+
 .transcendence .button .button--color-primary-mobile,
 .transcendence .button.image-below .button--color-primary-mobile .button__caption,
 .transcendence .button.image-above .button--color-primary-mobile .button__caption {
@@ -19,6 +25,12 @@
 
 .mobile-view .mobile-button.mobile-button--primary-mobile .mobile-button__icon {
   background-color: var(--primary-mobile); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-primary-mobile {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-primary-mobile .button__icon {
+      background-color: var(--primary-mobile) !important; } }
 
 .transcendence .button .button--color-secondary,
 .transcendence .button.image-below .button--color-secondary .button__caption,
@@ -31,6 +43,12 @@
 .mobile-view .mobile-button.mobile-button--secondary .mobile-button__icon {
   background-color: var(--secondary); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-secondary {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-secondary .button__icon {
+      background-color: var(--secondary) !important; } }
+
 .transcendence .button .button--color-green,
 .transcendence .button.image-below .button--color-green .button__caption,
 .transcendence .button.image-above .button--color-green .button__caption {
@@ -41,6 +59,12 @@
 
 .mobile-view .mobile-button.mobile-button--green .mobile-button__icon {
   background-color: var(--green); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-green {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-green .button__icon {
+      background-color: var(--green) !important; } }
 
 .transcendence .button .button--color-red,
 .transcendence .button.image-below .button--color-red .button__caption,
@@ -53,6 +77,12 @@
 .mobile-view .mobile-button.mobile-button--red .mobile-button__icon {
   background-color: var(--red); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-red {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-red .button__icon {
+      background-color: var(--red) !important; } }
+
 .transcendence .button .button--color-dark-red,
 .transcendence .button.image-below .button--color-dark-red .button__caption,
 .transcendence .button.image-above .button--color-dark-red .button__caption {
@@ -63,6 +93,12 @@
 
 .mobile-view .mobile-button.mobile-button--dark-red .mobile-button__icon {
   background-color: var(--dark-red); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-dark-red {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-dark-red .button__icon {
+      background-color: var(--dark-red) !important; } }
 
 .transcendence .button .button--color-gray,
 .transcendence .button.image-below .button--color-gray .button__caption,
@@ -75,6 +111,12 @@
 .mobile-view .mobile-button.mobile-button--gray .mobile-button__icon {
   background-color: var(--gray); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-gray {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-gray .button__icon {
+      background-color: var(--gray) !important; } }
+
 .transcendence .button .button--color-light-gray,
 .transcendence .button.image-below .button--color-light-gray .button__caption,
 .transcendence .button.image-above .button--color-light-gray .button__caption {
@@ -85,6 +127,12 @@
 
 .mobile-view .mobile-button.mobile-button--light-gray .mobile-button__icon {
   background-color: var(--light-gray); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-light-gray {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-light-gray .button__icon {
+      background-color: var(--light-gray) !important; } }
 
 .transcendence .button .button--color-purple,
 .transcendence .button.image-below .button--color-purple .button__caption,
@@ -97,6 +145,12 @@
 .mobile-view .mobile-button.mobile-button--purple .mobile-button__icon {
   background-color: var(--purple); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-purple {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-purple .button__icon {
+      background-color: var(--purple) !important; } }
+
 .transcendence .button .button--color-indigo,
 .transcendence .button.image-below .button--color-indigo .button__caption,
 .transcendence .button.image-above .button--color-indigo .button__caption {
@@ -107,6 +161,12 @@
 
 .mobile-view .mobile-button.mobile-button--indigo .mobile-button__icon {
   background-color: var(--indigo); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-indigo {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-indigo .button__icon {
+      background-color: var(--indigo) !important; } }
 
 .transcendence .button .button--color-yellow,
 .transcendence .button.image-below .button--color-yellow .button__caption,
@@ -119,6 +179,12 @@
 .mobile-view .mobile-button.mobile-button--yellow .mobile-button__icon {
   background-color: var(--yellow); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-yellow {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-yellow .button__icon {
+      background-color: var(--yellow) !important; } }
+
 .transcendence .button .button--color-orange,
 .transcendence .button.image-below .button--color-orange .button__caption,
 .transcendence .button.image-above .button--color-orange .button__caption {
@@ -129,6 +195,12 @@
 
 .mobile-view .mobile-button.mobile-button--orange .mobile-button__icon {
   background-color: var(--orange); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-orange {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-orange .button__icon {
+      background-color: var(--orange) !important; } }
 
 .transcendence .button .button--color-white,
 .transcendence .button.image-below .button--color-white .button__caption,
@@ -141,6 +213,12 @@
 .mobile-view .mobile-button.mobile-button--white .mobile-button__icon {
   background-color: var(--white); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-white {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-white .button__icon {
+      background-color: var(--white) !important; } }
+
 .transcendence .button .button--color-dark-gray,
 .transcendence .button.image-below .button--color-dark-gray .button__caption,
 .transcendence .button.image-above .button--color-dark-gray .button__caption {
@@ -151,6 +229,12 @@
 
 .mobile-view .mobile-button.mobile-button--dark-gray .mobile-button__icon {
   background-color: var(--dark-gray); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-dark-gray {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-dark-gray .button__icon {
+      background-color: var(--dark-gray) !important; } }
 
 .transcendence .button .button--color-blue,
 .transcendence .button.image-below .button--color-blue .button__caption,
@@ -163,6 +247,12 @@
 .mobile-view .mobile-button.mobile-button--blue .mobile-button__icon {
   background-color: var(--blue); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-blue {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-blue .button__icon {
+      background-color: var(--blue) !important; } }
+
 .transcendence .button .button--color-dark-blue,
 .transcendence .button.image-below .button--color-dark-blue .button__caption,
 .transcendence .button.image-above .button--color-dark-blue .button__caption {
@@ -174,6 +264,12 @@
 .mobile-view .mobile-button.mobile-button--dark-blue .mobile-button__icon {
   background-color: var(--dark-blue); }
 
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-dark-blue {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-dark-blue .button__icon {
+      background-color: var(--dark-blue) !important; } }
+
 .transcendence .button .button--color-light-blue,
 .transcendence .button.image-below .button--color-light-blue .button__caption,
 .transcendence .button.image-above .button--color-light-blue .button__caption {
@@ -184,6 +280,12 @@
 
 .mobile-view .mobile-button.mobile-button--light-blue .mobile-button__icon {
   background-color: var(--light-blue); }
+
+@media (min-width: 260px) and (max-width: 768px) {
+  .dialog__container--menu .buttongrid .button--color-light-blue {
+    background-color: var(--color-secondary-100) !important; }
+    .dialog__container--menu .buttongrid .button--color-light-blue .button__icon {
+      background-color: var(--light-blue) !important; } }
 
 .transcendence .button .button--color-default:hover,
 .transcendence .button.image-below .button--color-default:hover .button__caption,
@@ -8969,6 +9071,7 @@ body {
 
 .expanded-item {
   height: 100%;
+  width: 100%;
   position: absolute;
   top: 0;
   z-index: 25;
@@ -9264,7 +9367,7 @@ body {
       border-radius: 40em;
       position: relative;
       top: -0.5em;
-      margin-bottom: 0.25em; }
+      margin-bottom: 0.4em; }
       #popup-host .dialog__swipe-handle::after {
         content: "";
         display: block;
@@ -9274,6 +9377,10 @@ body {
         border-radius: 40em;
         position: absolute;
         top: 0.5em; }
+      #popup-host .dialog__swipe-handle--dark {
+        background: var(--color-primary-100); }
+        #popup-host .dialog__swipe-handle--dark::after {
+          background: var(--color-primary-100); }
     #popup-host div,
     #popup-host input {
       background-color: transparent;
@@ -9458,8 +9565,53 @@ body {
         background: var(--color-accent-100); }
       #popup-host .dialog__container--numpad .input, #popup-host .dialog__container--input .input {
         width: 75%; }
-  .animated-content {
-    bottom: -70%; } }
+      #popup-host .dialog__container--menu {
+        background: var(--color-secondary-200);
+        color: var(--color-text-100);
+        padding-bottom: 6em;
+        height: fit-content; }
+        #popup-host .dialog__container--menu .dialog__body {
+          flex-direction: row;
+          overflow-y: visible;
+          align-items: flex-start;
+          min-height: unset;
+          height: fit-content; }
+        #popup-host .dialog__container--menu div,
+        #popup-host .dialog__container--menu span {
+          color: var(--color-text-100); }
+        #popup-host .dialog__container--menu .buttongrid {
+          height: unset;
+          max-height: 29em;
+          overflow-y: auto; }
+          #popup-host .dialog__container--menu .buttongrid__row {
+            padding-top: 0.5em; }
+          #popup-host .dialog__container--menu .buttongrid .button {
+            font-size: 1.4em;
+            box-shadow: var(--box-shadow);
+            background: var(--color-secondary-100); }
+            #popup-host .dialog__container--menu .buttongrid .button > div {
+              display: flex;
+              align-items: center;
+              padding: 0; }
+            #popup-host .dialog__container--menu .buttongrid .button__icon {
+              margin-bottom: 0;
+              min-width: 4.05em;
+              min-height: 4.05em;
+              background: var(--color-primary-mobile-100);
+              color: var(--color-text-200); }
+              #popup-host .dialog__container--menu .buttongrid .button__icon--empty {
+                min-width: 3.55em;
+                min-height: 3.55em;
+                margin-bottom: 0; }
+            #popup-host .dialog__container--menu .buttongrid .button__caption {
+              font-size: 1em;
+              height: 100%;
+              background: var(--color-secondary-100); }
+              #popup-host .dialog__container--menu .buttongrid .button__caption span {
+                padding: 1.2em 0;
+                width: 100%;
+                text-align: left;
+                padding-left: 1em; } }
 
 .mobile-view .alert {
   background-color: var(--color-secondary-100);
