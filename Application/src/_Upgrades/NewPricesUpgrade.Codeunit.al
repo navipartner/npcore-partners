@@ -1,4 +1,4 @@
-codeunit 6014576 "NPR New Prices Upgrade"
+codeunit 6014595 "NPR New Prices Upgrade"
 {
 
     Subtype = Upgrade;
