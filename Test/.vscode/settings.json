@@ -1,5 +1,4 @@
 {
-    "al.packageCachePath": "../.alpackages",
     "al.assemblyProbingPaths": [
         "../.netpackages"
     ]

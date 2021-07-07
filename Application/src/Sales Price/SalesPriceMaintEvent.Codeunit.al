@@ -71,7 +71,8 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
     procedure UpdateSalesPricesForStaff(var Item: Record Item)
     var
         SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup";
-        "Sales Price": Record "Sales Price";
+        PriceListLine: Record "Price List Line";
+        PriceListHeader: Record "Price List Header";
         Customer: Record Customer;
         VATPostingSetup: Record "VAT Posting Setup";
         CustomerPriceGroup: Record "Customer Price Group";
@@ -125,20 +126,28 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                     VATBusPostingGrp := '';
                     PricesInCurrency := false;
 
-                    Clear("Sales Price");
-                    "Sales Price".SetRange("Item No.", Item."No.");
-                    "Sales Price".SetRange("Sales Type", SalesPriceMaintenanceSetup."Sales Type");
-                    "Sales Price".SetRange("Sales Code", SalesPriceMaintenanceSetup."Sales Code");
-                    "Sales Price".SetRange("Currency Code", SalesPriceMaintenanceSetup."Currency Code");
+                    Clear(PriceListLine);
+                    PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
+                    PriceListLine.SetRange("Asset No.", Item."No.");
+                    PriceListLine.SetRange("Source Type", GetSourceType(SalesPriceMaintenanceSetup."Sales Type"));
+                    PriceListLine.SetRange("Source No.", SalesPriceMaintenanceSetup."Sales Code");
+                    PriceListLine.SetRange("Currency Code", SalesPriceMaintenanceSetup."Currency Code");
+                    PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
 
-                    if not "Sales Price".FindFirst() then begin
-                        Clear("Sales Price");
-                        "Sales Price".Init();
-                        "Sales Price".Validate("Item No.", Item."No.");
-                        "Sales Price".Validate("Sales Type", SalesPriceMaintenanceSetup."Sales Type");
-                        "Sales Price".Validate("Sales Code", SalesPriceMaintenanceSetup."Sales Code");
-                        "Sales Price".Validate("Currency Code", SalesPriceMaintenanceSetup."Currency Code");
-                        "Sales Price".Insert(true);
+                    if not PriceListLine.FindFirst() then begin
+                        Clear(PriceListLine);
+                        if not PriceListHeader.Get(SalesPriceMaintenanceSetup."Sales Code") then
+                            CreatePriceListHeader(SalesPriceMaintenanceSetup."Sales Code");
+                        PriceListLine.Init();
+                        PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
+                        PriceListLine.Validate("Asset No.", Item."No.");
+                        PriceListLine.Validate("Source Type", GetSourceType(SalesPriceMaintenanceSetup."Sales Type"));
+                        PriceListLine.Validate("Source No.", SalesPriceMaintenanceSetup."Sales Code");
+                        PriceListLine.Validate("Currency Code", SalesPriceMaintenanceSetup."Currency Code");
+                        PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
+                        PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
+                        PriceListLine.Validate(Status, PriceListLine.Status::Active);
+                        PriceListLine.Insert(true);
                     end;
 
                     case SalesPriceMaintenanceSetup."Sales Type" of
@@ -223,14 +232,15 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                     end;
 
                     ConvertPriceLCYToFCY(PricesInCurrency, ExchRateDate, Currency, UnitPrice, CurrencyFactor);
-                    "Sales Price".Validate("Unit Price", UnitPrice);
+                    PriceListLine.Status := PriceListLine.Status::Draft;
+                    PriceListLine.Validate("Unit Price", UnitPrice);
 
-                    "Sales Price".Validate("Price Includes VAT", SalesPriceMaintenanceSetup."Prices Including VAT");
-                    "Sales Price".Validate("Allow Invoice Disc.", SalesPriceMaintenanceSetup."Allow Invoice Disc.");
-                    "Sales Price".Validate("Allow Line Disc.", SalesPriceMaintenanceSetup."Allow Line Disc.");
-                    "Sales Price".Validate("VAT Bus. Posting Gr. (Price)", VATBusPostingGrp);
-
-                    "Sales Price".Modify(true)
+                    PriceListLine.Validate("Price Includes VAT", SalesPriceMaintenanceSetup."Prices Including VAT");
+                    PriceListLine.Validate("Allow Invoice Disc.", SalesPriceMaintenanceSetup."Allow Invoice Disc.");
+                    PriceListLine.Validate("Allow Line Disc.", SalesPriceMaintenanceSetup."Allow Line Disc.");
+                    PriceListLine.Validate("VAT Bus. Posting Gr. (Price)", VATBusPostingGrp);
+                    PriceListLine.Status := PriceListLine.Status::Active;
+                    PriceListLine.Modify(true)
                 end;
             until SalesPriceMaintenanceSetup.Next() = 0;
         end;
@@ -251,6 +261,32 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
 
         if ExcludeItemGroup(ItemCategory."Parent Category", ItemCategory_To_Exclude) then
             exit(true);
+    end;
+
+    local procedure GetSourceType(SalesType: Option Customer,"Customer Price Group","All Customers",Campaign) SourceType: Enum "Price Source Type"
+    begin
+        case SalesType of
+            SalesType::Customer:
+                SourceType := SourceType::Customer;
+            SalesType::"Customer Price Group":
+                SourceType := SourceType::"Customer Price Group";
+            SalesType::"All Customers":
+                SourceType := SourceType::"All Customers";
+            SalesType::Campaign:
+                SourceType := SourceType::Campaign;
+        end;
+    end;
+
+    local procedure CreatePriceListHeader(WorksheetTemplateName: Code[10])
+    var
+        PriceListHeader: Record "Price List Header";
+    begin
+        PriceListHeader.Init();
+        PriceListHeader.Code := WorksheetTemplateName;
+        PriceListHeader.Insert(true);
+        PriceListHeader.Validate("Source Group", PriceListHeader."Source Group"::All);
+        PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
+        PriceListHeader.Modify(true);
     end;
 }
 

@@ -104,7 +104,7 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    procedure SalesPriceShowVariety(SalesPrice: Record "Sales Price"; ShowFieldNo: Integer)
+    procedure PriceShowVariety(PriceListLine: Record "Price List Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -113,56 +113,25 @@ codeunit 6059970 "NPR Variety Wrapper"
         RecRef: RecordRef;
     begin
         //Fetch base data
-        Item.Get(SalesPrice."Item No.");
+        Item.Get(PriceListLine."Asset No.");
         //check its a Variety item
         TestItemIsVariety(Item);
         //find or create a line that is a master line
-        if not MasterLineMap.Get(Database::"Sales Price", SalesPrice.SystemId) then
+        if not MasterLineMap.Get(Database::"Price List Line", PriceListLine.SystemId) then
             Clear(MasterLineMap);
 
         if not MasterLineMap."Is Master" then
             if IsNullGuid(MasterLineMap."Master Id") then begin
                 //virgin line - can only be done on blank Variant Code
-                SalesPrice.TestField(SalesPrice."Variant Code", '');
-                MasterLineMapMgt.CreateMap(Database::"Sales Price", SalesPrice.SystemId, SalesPrice.SystemId);
+                PriceListLine.TestField("Variant Code", '');
+                MasterLineMapMgt.CreateMap(Database::"Price List Line", PriceListLine.SystemId, PriceListLine.SystemId);
                 Commit();
             end else
                 //existing Variety
-                SalesPrice.GetBySystemId(MasterLineMap."Master Id");
+                PriceListLine.GetBySystemId(MasterLineMap."Master Id");
 
         //Show the matrix form
-        RecRef.GetTable(SalesPrice);
-        VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-    end;
-
-    procedure PurchPriceShowVariety(PurchPrice: Record "Purchase Price"; ShowFieldNo: Integer)
-    var
-        Item: Record Item;
-        MasterLineMap: Record "NPR Master Line Map";
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
-        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
-        RecRef: RecordRef;
-    begin
-        //Fetch base data
-        Item.Get(PurchPrice."Item No.");
-        //check its a Variety item
-        TestItemIsVariety(Item);
-        //find or create a line that is a master line
-        if not MasterLineMap.Get(Database::"Purchase Price", PurchPrice.SystemId) then
-            Clear(MasterLineMap);
-
-        if not MasterLineMap."Is Master" then
-            if IsNullGuid(MasterLineMap."Master Id") then begin
-                //virgin line - can only be done on blank Variant Code
-                PurchPrice.TestField(PurchPrice."Variant Code", '');
-                MasterLineMapMgt.CreateMap(Database::"Purchase Price", PurchPrice.SystemId, PurchPrice.SystemId);
-                Commit();
-            end else
-                //existing Variety
-                PurchPrice.GetBySystemId(MasterLineMap."Master Id");
-
-        //Show the matrix form
-        RecRef.GetTable(PurchPrice);
+        RecRef.GetTable(PriceListLine);
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
@@ -340,24 +309,8 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTWrapper.ShowVarietyMatrix(Rec, 0);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Sales Prices", 'OnAfterActionEvent', 'NPR Variety', false, false)]
-    local procedure SalesPricesOnAfterActionEventVariety(var Rec: Record "Sales Price")
-    var
-        VRTWrapper: Codeunit "NPR Variety Wrapper";
-    begin
-        VRTWrapper.SalesPriceShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Purchase Prices", 'OnAfterActionEvent', 'NPR Variety', false, false)]
-    local procedure PurchasePricesAfterActionEventVariety(var Rec: Record "Purchase Price")
-    var
-        VRTWrapper: Codeunit "NPR Variety Wrapper";
-    begin
-        VRTWrapper.PurchPriceShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'NPR Variety Group', true, false)]
-    local procedure ItemOnAfterValVarietyGroup(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'NPR Variety Group', true, false)]
+    local procedure T27OnAfterValVarietyGroup(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     var
         VrtGroup: Record "NPR Variety Group";
         VrtCheck: Codeunit "NPR Variety Check";

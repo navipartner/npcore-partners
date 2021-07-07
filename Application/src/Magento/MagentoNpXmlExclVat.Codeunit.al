@@ -33,12 +33,13 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
     var
         Item: Record Item;
         GeneralLedgerSetup: Record "General Ledger Setup";
-        SalesPrice: Record "Sales Price";
+        PriceListLine: Record "Price List Line";
         VATPostingSetup: Record "VAT Posting Setup";
         FieldRef: FieldRef;
         DecimalValue: Decimal;
         MagentoItemCustomOption: Record "NPR Magento Item Custom Option";
         MagentoItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
+        NotSupportedErr: Label 'Unsupported table: %1 %2 - codeunit 6151454 "NPR Magento NpXml ExclVat" ';
     begin
         FieldRef := RecRef.Field(FieldNo);
         if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
@@ -56,16 +57,15 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
                     end;
                 end;
-            DATABASE::"Sales Price":
+            Database::"Price List Line":
                 begin
-                    RecRef.SetTable(SalesPrice);
-                    if SalesPrice.Find() and SalesPrice."Price Includes VAT" then begin
-                        Item.Get(SalesPrice."Item No.");
-                        VATPostingSetup.Get(SalesPrice."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
+                    RecRef.SetTable(PriceListLine);
+                    if PriceListLine.Find() and PriceListLine."Price Includes VAT" then begin
+                        Item.Get(PriceListLine."Asset No.");
+                        VATPostingSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
                     end;
                 end;
-
             DATABASE::"NPR Magento Item Custom Option":
                 begin
                     RecRef.SetTable(MagentoItemCustomOption);
@@ -85,6 +85,8 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
                     end;
                 end;
+            else
+                Error(NotSupportedErr, RecRef.Number, RecRef.Caption);
         end;
 
         GeneralLedgerSetup.Get();

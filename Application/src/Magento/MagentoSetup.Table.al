@@ -422,10 +422,19 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Replicate to Sales Prices';
             DataClassification = CustomerContent;
+
         }
         field(605; "Replicate to Sales Type"; Enum "Sales Price Type")
         {
             Caption = 'Replicate to Sales Type';
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with "Replicate to Price Source Type"';
+
+        }
+        field(606; "Replicate to Price Source Type"; Enum "Price Source Type")
+        {
+            Caption = 'Replicate to Price Source Type';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -437,11 +446,11 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Replicate to Sales Code';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Replicate to Sales Type" = CONST("Customer Price Group")) "Customer Price Group"
+            TableRelation = IF ("Replicate to Price Source Type" = CONST("Customer Price Group")) "Customer Price Group"
             ELSE
-            IF ("Replicate to Sales Type" = CONST(Customer)) Customer
+            IF ("Replicate to Price Source Type" = CONST(Customer)) Customer
             ELSE
-            IF ("Replicate to Sales Type" = CONST(Campaign)) Campaign;
+            IF ("Replicate to Price Source Type" = CONST(Campaign)) Campaign;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -451,16 +460,16 @@ table 6151401 "NPR Magento Setup"
                 CustPriceGr: Record "Customer Price Group";
             begin
                 if "Replicate to Sales Code" <> '' then
-                    case "Replicate to Sales Type" of
-                        "Replicate to Sales Type"::"Customer Price Group":
+                    case "Replicate to Price Source Type" of
+                        "Replicate to Price Source Type"::"Customer Price Group":
                             begin
                                 CustPriceGr.Get("Replicate to Sales Code");
                             end;
-                        "Replicate to Sales Type"::Customer:
+                        "Replicate to Price Source Type"::Customer:
                             begin
                                 Cust.Get("Replicate to Sales Code");
                             end;
-                        "Replicate to Sales Type"::Campaign:
+                        "Replicate to Price Source Type"::Campaign:
                             begin
                                 Campaign.Get("Replicate to Sales Code");
                             end;

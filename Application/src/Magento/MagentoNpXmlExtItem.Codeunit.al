@@ -36,8 +36,7 @@ codeunit 6151457 "NPR Magento NpXml Ext. Item"
         ItemVariant: Record "Item Variant";
         MagentoItemCustomOption: Record "NPR Magento Item Custom Option";
         MagentoItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
-        SalesPrice: Record "Sales Price";
-        SalesLineDiscount: Record "Sales Line Discount";
+        PriceListLine: Record "Price List Line";
     begin
         case RecRef.Number of
             DATABASE::Item:
@@ -53,23 +52,15 @@ codeunit 6151457 "NPR Magento NpXml Ext. Item"
                     else
                         exit(ItemVariant."Item No.");
                 end;
-            DATABASE::"Sales Price":
+            Database::"Price List Line":
                 begin
-                    RecRef.SetTable(SalesPrice);
-                    if SalesPrice."Variant Code" <> '' then
-                        exit(SalesPrice."Item No." + '_' + SalesPrice."Variant Code")
+                    RecRef.SetTable(PriceListLine);
+                    if PriceListLine."Variant Code" <> '' then
+                        exit(PriceListLine."Asset No." + '_' + PriceListLine."Variant Code")
                     else
-                        exit(SalesPrice."Item No.");
+                        exit(PriceListLine."Asset No.");
                 end;
-            DATABASE::"Sales Line Discount":
-                begin
-                    RecRef.SetTable(SalesLineDiscount);
-                    SalesLineDiscount.SetRange(Type, SalesLineDiscount.Type::Item);
-                    if SalesLineDiscount."Variant Code" <> '' then
-                        exit(SalesLineDiscount.Code + '_' + SalesLineDiscount."Variant Code")
-                    else
-                        exit(SalesLineDiscount.Code);
-                end;
+
 
             DATABASE::"NPR Magento Item Custom Option":
                 begin

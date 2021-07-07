@@ -5,8 +5,8 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         Item: Record Item;
         PricesInclVATCantBeCalcErr: Label 'Prices including VAT cannot be calculated when %1 is %2.', Comment = '%1=VATPostingSetup.FieldCaption("VAT Calculation Type");%2=VATPostingSetup."VAT Calculation Type")';
         Currency: Record Currency;
-        TempSalesPrice: Record "Sales Price" temporary;
-        TempSalesLineDisc: Record "Sales Line Discount" temporary;
+        TempSalesPriceListLine: Record "Price List Line" temporary;
+        TempSalesPriceLineDisc: Record "Price List Line" temporary;
         LineDiscPerCent: Decimal;
         Qty: Decimal;
         AllowLineDisc: Boolean;
@@ -20,7 +20,8 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         CurrencyFactor: Decimal;
         ExchRateDate: Date;
         FoundSalesPrice: Boolean;
-        SalesPriceCalcMgt: Codeunit "Sales Price Calc. Mgt.";
+
+
 
     procedure InitTempPOSItemSale(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSalePOS: Record "NPR POS Sale" temporary)
     var
@@ -101,28 +102,29 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         Item.Get(SaleLinePOS."No.");
 
         if Item."NPR Group sale" or SaleLinePOS."Custom Price" then begin
-            TempSalesPrice.DeleteAll();
-            TempSalesPrice."Sales Type" := TempSalesPrice."Sales Type"::"All Customers";
-            TempSalesPrice."Item No." := SaleLinePOS."No.";
-            TempSalesPrice."VAT Bus. Posting Gr. (Price)" := SaleLinePOS."VAT Bus. Posting Group";
-            TempSalesPrice."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-            TempSalesPrice."Currency Code" := SaleLinePOS."Currency Code";
-            TempSalesPrice."Unit Price" := SaleLinePOS."Unit Price";
-            TempSalesPrice."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
-            TempSalesPrice.Insert();
+            TempSalesPriceListLine.DeleteAll();
+            TempSalesPriceListLine."Source Type" := TempSalesPriceListLine."Source Type"::"All Customers";
+            TempSalesPriceListLine."Asset Type" := TempSalesPriceListLine."Asset Type"::Item;
+            TempSalesPriceListLine."Asset No." := SaleLinePOS."No.";
+            TempSalesPriceListLine."VAT Bus. Posting Gr. (Price)" := SaleLinePOS."VAT Bus. Posting Group";
+            TempSalesPriceListLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
+            TempSalesPriceListLine."Currency Code" := SaleLinePOS."Currency Code";
+            TempSalesPriceListLine."Unit Price" := SaleLinePOS."Unit Price";
+            TempSalesPriceListLine."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
+            TempSalesPriceListLine.Insert();
         end else
-            SalesLinePriceExists(SalePOS, SaleLinePOS, false);
+            SalesLinePriceExists(SalePOS, SaleLinePOS);
 
-        CalcBestUnitPrice(TempSalesPrice);
+        CalcBestUnitPrice(TempSalesPriceListLine);
 
         if Item.Get(SaleLinePOS."No.") and Item."NPR Explode BOM auto" then
             SaleLinePOS."Unit Price" := 0
         else
-            SaleLinePOS."Unit Price" := TempSalesPrice."Unit Price";
+            SaleLinePOS."Unit Price" := TempSalesPriceListLine."Unit Price";
 
         SaleLinePOS."Price Includes VAT" := SalePOS."Prices Including VAT";
-        SaleLinePOS."Allow Line Discount" := TempSalesPrice."Allow Line Disc.";
-        SaleLinePOS."Allow Invoice Discount" := TempSalesPrice."Allow Invoice Disc.";
+        SaleLinePOS."Allow Line Discount" := TempSalesPriceListLine."Allow Line Disc.";
+        SaleLinePOS."Allow Invoice Discount" := TempSalesPriceListLine."Allow Invoice Disc.";
         if not SaleLinePOS."Allow Line Discount" then
             SaleLinePOS."Discount %" := 0;
     end;
@@ -135,83 +137,117 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         SetUoM(Abs(SaleLinePOS.Quantity), 1);
 
         SalesLineLineDiscExists(SalePOS, SaleLinePOS, false);
-        CalcBestLineDisc(TempSalesLineDisc);
 
-        SaleLinePOS."Discount %" := TempSalesLineDisc."Line Discount %";
+        CalcBestLineDisc(TempSalesPriceLineDisc);
+
+        SaleLinePOS."Discount %" := TempSalesPriceLineDisc."Line Discount %";
     end;
 
-    local procedure SalesLinePriceExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; ShowAll: Boolean): Boolean
+    local procedure SalesLinePriceExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
         Customer: Record Customer;
+        PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+        LineWithPrice: Interface "Line With Price";
+        PriceCalculation: Interface "Price Calculation";
     begin
         if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
 
-        if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
-            if Customer.Get(SalePOS."Customer No.") then;
 
-        SalesPriceCalcMgt.FindSalesPrice(
-            TempSalesPrice, Customer."No.", '',
-            SalePOS."Customer Price Group", '',
-            SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Unit of Measure Code",
-            '', SalePOS.Date, ShowAll);
-        exit(TempSalesPrice.FindFirst());
+        SalesLine.Init();
+        SalesLine.Type := SalesLine.Type::Item;
+        SalesLine."No." := Item."No.";
+        SalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
+        SalesLine."Variant Code" := SaleLinePOS."Variant Code";
+        SalesLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
+        SalesLine."Posting Date" := SalePOS.Date;
+        SalesHeader."Posting Date" := SalePOS.Date;
+        SalesHeader."Currency Code" := Currency.Code;
+        SalesHeader.UpdateCurrencyFactor();
+
+        if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
+            if Customer.Get(SalePOS."Customer No.") then begin
+                SalesHeader."Bill-to Customer No." := Customer."No.";
+                SalesHeader."Customer Price Group" := Customer."Customer Price Group";
+                SalesLine."Customer Price Group" := Customer."Customer Price Group";
+                SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
+            end;
+
+        SalesLine.GetLineWithPrice(LineWithPrice);
+        LineWithPrice.SetLine(TempSalesPriceListLine."Price Type"::Sale, SalesHeader, SalesLine);
+
+        PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
+        PriceCalculation.FindPrice(TempSalesPriceListLine, false);
+        exit(TempSalesPriceListLine.FindFirst());
     end;
 
     procedure SalesLineLineDiscExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; ShowAll: Boolean): Boolean
     var
         Customer: Record Customer;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+        LineWithPrice: Interface "Line With Price";
+        PriceCalculation: Interface "Price Calculation";
     begin
         if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
 
-        if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
-            if Customer.Get(SalePOS."Customer No.") then;
 
-        SalesPriceCalcMgt.FindSalesLineDisc(
-            TempSalesLineDisc, Customer."No.", '',
-            SalePOS."Customer Disc. Group", '', SaleLinePOS."No.", Item."Item Disc. Group", SaleLinePOS."Variant Code", SaleLinePOS."Unit of Measure Code",
-            '', SalePOS.Date, ShowAll);
-        exit(TempSalesLineDisc.FindFirst());
+        SalesLine.Init();
+        SalesLine.Type := SalesLine.Type::Item;
+        SalesLine."No." := Item."No.";
+        SalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
+        SalesLine."Variant Code" := SaleLinePOS."Variant Code";
+        SalesLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
+        SalesLine."Posting Date" := SalePOS.Date;
+        SalesHeader."Posting Date" := SalePOS.Date;
+        SalesHeader."Currency Code" := Currency.Code;
+        SalesHeader.UpdateCurrencyFactor();
+        if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
+            if Customer.Get(SalePOS."Customer No.") then begin
+                SalesHeader."Bill-to Customer No." := Customer."No.";
+                SalesHeader."Customer Price Group" := Customer."Customer Price Group";
+                SalesLine."Customer Price Group" := Customer."Customer Price Group";
+                SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
+            end;
+        SalesLine.GetLineWithPrice(LineWithPrice);
+        LineWithPrice.SetLine(TempSalesPriceLineDisc."Price Type"::Sale, SalesHeader, SalesLine);
+
+        PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
+        PriceCalculation.FindDiscount(TempSalesPriceLineDisc, false);
+        exit(TempSalesPriceLineDisc.FindFirst());
     end;
 
-    local procedure CalcBestUnitPrice(var SalesPrice: Record "Sales Price")
+    local procedure CalcBestUnitPrice(var PriceListLine: Record "Price List Line")
     var
-        BestSalesPrice: Record "Sales Price";
+        BestPriceListLine: Record "Price List Line";
         BestSalesPriceFound: Boolean;
     begin
-        FoundSalesPrice := SalesPrice.FindSet();
+        FoundSalesPrice := PriceListLine.FindSet();
         if FoundSalesPrice then
             repeat
-                if IsInMinQty(SalesPrice."Unit of Measure Code", SalesPrice."Minimum Quantity") then begin
+                if IsInMinQty(PriceListLine."Unit of Measure Code", PriceListLine."Minimum Quantity") then begin
                     ConvertPriceToVAT(
-                        SalesPrice."Price Includes VAT", Item."VAT Prod. Posting Group",
-                        SalesPrice."VAT Bus. Posting Gr. (Price)", SalesPrice."Unit Price");
-                    ConvertPriceToUoM(SalesPrice."Unit of Measure Code", SalesPrice."Unit Price");
-                    ConvertPriceLCYToFCY(SalesPrice."Currency Code", SalesPrice."Unit Price");
+                        PriceListLine."Price Includes VAT", Item."VAT Prod. Posting Group",
+                        PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."Unit Price");
+                    ConvertPriceToUoM(PriceListLine."Unit of Measure Code", PriceListLine."Unit Price");
+                    ConvertPriceLCYToFCY(PriceListLine."Currency Code", PriceListLine."Unit Price");
 
-                    case true of
-                        ((BestSalesPrice."Currency Code" = '') and (SalesPrice."Currency Code" <> '')) or
-                        ((BestSalesPrice."Variant Code" = '') and (SalesPrice."Variant Code" <> '')):
-                            begin
-                                BestSalesPrice := SalesPrice;
-                                BestSalesPriceFound := true;
-                            end;
-                        ((BestSalesPrice."Currency Code" = '') or (SalesPrice."Currency Code" <> '')) and
-                        ((BestSalesPrice."Variant Code" = '') or (SalesPrice."Variant Code" <> '')):
-                            if (BestSalesPrice."Unit Price" = 0) or
-                                (CalcLineAmount(BestSalesPrice) > CalcLineAmount(SalesPrice))
+                    if (BestPriceListLine."Unit Price" = 0) or
+                                (CalcLineAmount(BestPriceListLine) > CalcLineAmount(PriceListLine))
                             then begin
-                                BestSalesPrice := SalesPrice;
-                                BestSalesPriceFound := true;
-                            end;
+                        BestPriceListLine := PriceListLine;
+                        BestSalesPriceFound := true;
                     end;
                 end;
-            until SalesPrice.Next() = 0;
+            until PriceListLine.Next() = 0;
 
         // No price found in agreement
         if not BestSalesPriceFound then begin
@@ -221,34 +257,27 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
             ConvertPriceToUoM('', Item."Unit Price");
             ConvertPriceLCYToFCY('', Item."Unit Price");
 
-            Clear(BestSalesPrice);
-            BestSalesPrice."Unit Price" := Item."Unit Price";
-            BestSalesPrice."Allow Line Disc." := AllowLineDisc;
-            BestSalesPrice."Allow Invoice Disc." := AllowInvDisc;
+            Clear(BestPriceListLine);
+            BestPriceListLine."Unit Price" := Item."Unit Price";
+            BestPriceListLine."Allow Line Disc." := AllowLineDisc;
+            BestPriceListLine."Allow Invoice Disc." := AllowInvDisc;
         end;
 
-        SalesPrice := BestSalesPrice;
+        PriceListLine := BestPriceListLine;
     end;
 
-    local procedure CalcBestLineDisc(var SalesLineDisc: Record "Sales Line Discount")
+    local procedure CalcBestLineDisc(var PriceListLine: Record "Price List Line")
     var
-        BestSalesLineDisc: Record "Sales Line Discount";
+        BestPriceListLine: Record "Price List Line";
     begin
-        if SalesLineDisc.FindSet() then
+        if PriceListLine.FindSet() then
             repeat
-                if IsInMinQty(SalesLineDisc."Unit of Measure Code", SalesLineDisc."Minimum Quantity") then
-                    case true of
-                        ((BestSalesLineDisc."Currency Code" = '') and (SalesLineDisc."Currency Code" <> '')) or
-                        ((BestSalesLineDisc."Variant Code" = '') and (SalesLineDisc."Variant Code" <> '')):
-                            BestSalesLineDisc := SalesLineDisc;
-                        ((BestSalesLineDisc."Currency Code" = '') or (SalesLineDisc."Currency Code" <> '')) and
-                        ((BestSalesLineDisc."Variant Code" = '') or (SalesLineDisc."Variant Code" <> '')):
-                            if BestSalesLineDisc."Line Discount %" < SalesLineDisc."Line Discount %" then
-                                BestSalesLineDisc := SalesLineDisc;
-                    end;
-            until SalesLineDisc.Next() = 0;
+                if IsInMinQty(PriceListLine."Unit of Measure Code", PriceListLine."Minimum Quantity") then
+                    if BestPriceListLine."Line Discount %" < PriceListLine."Line Discount %" then
+                        BestPriceListLine := PriceListLine;
+            until PriceListLine.Next() = 0;
 
-        SalesLineDisc := BestSalesLineDisc;
+        PriceListLine := BestPriceListLine;
     end;
 
     local procedure SetCurrency(CurrencyCode2: Code[10]; CurrencyFactor2: Decimal; ExchRateDate2: Date)
@@ -348,11 +377,11 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
             UnitPrice := Round(UnitPrice, GLSetup."Unit-Amount Rounding Precision");
     end;
 
-    local procedure CalcLineAmount(SalesPrice: Record "Sales Price"): Decimal
+    local procedure CalcLineAmount(PriceListLine: Record "Price List Line"): Decimal
     begin
-        if SalesPrice."Allow Line Disc." then
-            exit(SalesPrice."Unit Price" * (1 - LineDiscPerCent / 100));
-        exit(SalesPrice."Unit Price");
+        if PriceListLine."Allow Line Disc." then
+            exit(PriceListLine."Unit Price" * (1 - LineDiscPerCent / 100));
+        exit(PriceListLine."Unit Price");
     end;
 
     local procedure GetCurrencyFactor(CurrencyCode: Code[10]; CurrencyDate: Date) Rate: Decimal
@@ -423,5 +452,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         FilterSubscribedFunction(EventSubscription, POSPricingProfile);
         EventSubscription.FindFirst();
     end;
+
+
 }
 

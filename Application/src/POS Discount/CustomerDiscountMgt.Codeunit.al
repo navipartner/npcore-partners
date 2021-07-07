@@ -130,7 +130,7 @@
 
     local procedure DiscSourceTableId(): Integer
     begin
-        exit(DATABASE::"Sales Line Discount");
+        exit(DATABASE::"Price List Line");
     end;
 
     local procedure DiscCalcCodeunitId(): Integer

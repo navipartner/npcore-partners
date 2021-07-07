@@ -1035,13 +1035,12 @@ page 6014519 "NPR Sales Order Pick Subform"
                 Image = "Action";
                 action(GetPrice)
                 {
-                    AccessByPermission = TableData "Sales Price" = R;
+
                     Caption = 'Get Price';
                     Ellipsis = true;
                     Image = Price;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Get Price action';
-
                     trigger OnAction()
                     begin
                         ShowPrices();
@@ -1049,7 +1048,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 }
                 action("Get Li&ne Discount")
                 {
-                    AccessByPermission = TableData "Sales Line Discount" = R;
+
                     Caption = 'Get Li&ne Discount';
                     Ellipsis = true;
                     Image = LineDiscount;
@@ -1217,7 +1216,7 @@ page 6014519 "NPR Sales Order Pick Subform"
         DocumentTotals: Codeunit "Document Totals";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
-        SalesPriceCalcMgt: Codeunit "Sales Price Calc. Mgt.";
+
         TransferExtendedText: Codeunit "Transfer Extended Text";
         InvDiscAmountEditable: Boolean;
         LocationCodeMandatory: Boolean;
@@ -1312,16 +1311,15 @@ page 6014519 "NPR Sales Order Pick Subform"
 
     procedure ShowPrices()
     begin
-        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
-        Clear(SalesPriceCalcMgt);
-        SalesPriceCalcMgt.GetSalesLinePrice(SalesHeader, Rec);
+        Rec.PickPrice();
+        CurrPage.Update();
     end;
 
     procedure ShowLineDisc()
     begin
-        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
-        Clear(SalesPriceCalcMgt);
-        SalesPriceCalcMgt.GetSalesLineLineDisc(SalesHeader, Rec);
+        Rec.PickDiscount();
+        CurrPage.Update();
+
     end;
 
     procedure ShowOrderPromisingLines()
