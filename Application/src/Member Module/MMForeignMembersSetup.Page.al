@@ -96,7 +96,6 @@ page 6060146 "NPR MM Foreign Members. Setup"
 
                 trigger OnAction()
                 begin
-
                     ShowDashboard();
                 end;
             }
@@ -105,7 +104,6 @@ page 6060146 "NPR MM Foreign Members. Setup"
 
     trigger OnInit()
     begin
-
         ForeignMembershipMgr.RediscoverNewManagers();
     end;
 
@@ -129,7 +127,6 @@ page 6060146 "NPR MM Foreign Members. Setup"
 
     local procedure ShowDashboard()
     begin
-
         ForeignMembershipMgr.ShowDashboard(Rec);
     end;
 }
