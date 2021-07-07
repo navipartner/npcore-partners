@@ -26,12 +26,12 @@
         MasterSalesLine: Record "Sales Line";
         ItemVariant: Record "Item Variant";
         MasterPurchLine: Record "Purchase Line";
-        MasterSalesPrice: Record "Sales Price";
         MasterRetailJournalLine: Record "NPR Retail Journal Line";
         MasterItemReplenishment: Record "NPR Item Repl. by Store";
         MasterTransferLine: Record "Transfer Line";
-        MasterPurchPrice: Record "Purchase Price";
         MasterItemJnlLine: Record "Item Journal Line";
+        PriceListLine: Record "Price List Line";
+        NotSupportedErr: Label 'Unsupported table: %1 %2 - codeunit 6059972 "NPR Variety Clone Data"';
     begin
         if not GetFromVariety(ItemVariant, Item."No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value",
                                          TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
@@ -56,11 +56,10 @@
                     MRecref.SetTable(MasterPurchLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupPurchLine(MasterPurchLine, Item, ItemVariant));
                 end;
-
-            DATABASE::"Sales Price":
+            Database::"Price List Line":
                 begin
-                    MRecref.SetTable(MasterSalesPrice);
-                    Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupSalesPrice(MasterSalesPrice, Item, ItemVariant));
+                    MRecref.SetTable(PriceListLine);
+                    Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupPriceListLine(PriceListLine, Item, ItemVariant));
                 end;
 
             DATABASE::"NPR Retail Journal Line":
@@ -74,25 +73,18 @@
                     MRecref.SetTable(MasterItemReplenishment);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupItemReplenishment(MasterItemReplenishment, Item, ItemVariant));
                 end;
-
             DATABASE::"Transfer Line":
                 begin
                     MRecref.SetTable(MasterTransferLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupTransferLine(MasterTransferLine, Item, ItemVariant));
                 end;
-
-            DATABASE::"Purchase Price":
-                begin
-                    MRecref.SetTable(MasterPurchPrice);
-                    Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupPurchPrice(MasterPurchPrice, Item, ItemVariant));
-                end;
-
             DATABASE::"Item Journal Line":
                 begin
                     MRecref.SetTable(MasterItemJnlLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupItemJnlLine(MasterItemJnlLine, Item, ItemVariant));
                 end;
-
+            else
+                Error(NotSupportedErr, MRecref.Number, MRecref.Caption);
         end;
         //if the master record has been changed (the record ID is identical), a reload is needed
         if (Format(MRecref.RecordId) = Format(TMPVRTBuffer."Record ID (TMP)")) then
@@ -234,39 +226,22 @@
         VRTBuffer."Variant Code" := ItemVariant.Code;
     end;
 
-    procedure SetupSalesPrice(var MasterSalesPrice: Record "Sales Price"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
+    procedure SetupPriceListLine(var MasterPriceListLine: Record "Price List Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
-        NewSalesPrice: Record "Sales Price";
+        NewPriceListLine: Record "Price List Line";
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
         //check if a new line is needed (is variant code filled?)
-        NewSalesPrice := MasterSalesPrice;
-        NewSalesPrice."Variant Code" := ItemVariant.Code;
-        NewSalesPrice.Insert();
+        NewPriceListLine := MasterPriceListLine;
+        NewPriceListLine."Variant Code" := ItemVariant.Code;
+        NewPriceListLine.Insert();
 
-        MasterLineMapMgt.CreateMap(Database::"Sales Price", NewSalesPrice.SystemId, MasterSalesPrice.SystemId);
+        MasterLineMapMgt.CreateMap(Database::"Price List Line", NewPriceListLine.SystemId, MasterPriceListLine.SystemId);
 
-        RecRef.GetTable(NewSalesPrice);
+        RecRef.GetTable(NewPriceListLine);
         exit(Format(RecRef.RecordId));
 
-    end;
-
-    procedure SetupPurchPrice(var MasterPurchPrice: Record "Purchase Price"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
-    var
-        NewPurchPrice: Record "Purchase Price";
-        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
-        RecRef: RecordRef;
-    begin
-        //check if a new line is needed (is variant code filled?)
-        NewPurchPrice := MasterPurchPrice;
-        NewPurchPrice."Variant Code" := ItemVariant.Code;
-        NewPurchPrice.Insert();
-
-        MasterLineMapMgt.CreateMap(Database::"Purchase Price", NewPurchPrice.SystemId, MasterPurchPrice.SystemId);
-
-        RecRef.GetTable(NewPurchPrice);
-        exit(Format(RecRef.RecordId));
     end;
 
     procedure SetupRetailJournalLine(var MasterRetailJournalLine: Record "NPR Retail Journal Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]

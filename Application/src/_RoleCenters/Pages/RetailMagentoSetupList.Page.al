@@ -228,7 +228,7 @@ page 6151242 "NPR Retail Magento Setup List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Replicate to Sales Prices field';
                 }
-                field("Replicate to Sales Type"; Rec."Replicate to Sales Type")
+                field("Replicate to Price Source Type"; Rec."Replicate to Price Source Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Replicate to Sales Type field';

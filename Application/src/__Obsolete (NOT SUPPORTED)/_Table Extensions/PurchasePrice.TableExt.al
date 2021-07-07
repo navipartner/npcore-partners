@@ -1,5 +1,6 @@
 #pragma warning disable AL0432
 tableextension 6014451 "NPR Purchase Price" extends "Purchase Price"
+
 {
     fields
     {

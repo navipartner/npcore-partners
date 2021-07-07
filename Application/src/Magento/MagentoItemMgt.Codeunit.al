@@ -139,7 +139,8 @@
 
     local procedure ReplicateSpecialPrice2SalesPrice(Item: Record Item; DeleteTrigger: Boolean)
     var
-        SalesPrice: Record "Sales Price";
+        PriceListLine: Record "Price List Line";
+        PriceListHeader: Record "Price List Header";
     begin
         if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
             exit;
@@ -147,49 +148,55 @@
         if Item."NPR Special Price" <= 0 then
             DeleteTrigger := true;
 
-        if FindSalesPrices(Item, SalesPrice) then begin
+        if FindSalesPrices(Item, PriceListLine) then begin
             if not DeleteTrigger then begin
-                SalesPrice.SetRange("Starting Date", Item."NPR Special Price From");
-                SalesPrice.SetRange("Ending Date", Item."NPR Special Price To");
-                if not SalesPrice.IsEmpty then
+                PriceListLine.SetRange("Starting Date", Item."NPR Special Price From");
+                PriceListLine.SetRange("Ending Date", Item."NPR Special Price To");
+                if not PriceListLine.IsEmpty then
                     exit;
 
-                SalesPrice.SetRange("Starting Date");
-                SalesPrice.SetRange("Ending Date");
+                PriceListLine.SetRange("Starting Date");
+                PriceListLine.SetRange("Ending Date");
             end;
 
-            SalesPrice.DeleteAll();
+            PriceListLine.DeleteAll();
         end;
 
         if DeleteTrigger then
             exit;
-        if (MagentoSetup."Replicate to Sales Type" <> MagentoSetup."Replicate to Sales Type"::"All Customers") and (MagentoSetup."Replicate to Sales Code" = '') then
-            SalesPrice.Init();
-        SalesPrice.Validate("Item No.", Item."No.");
-        SalesPrice."Sales Type" := MagentoSetup."Replicate to Sales Type";
-        if MagentoSetup."Replicate to Sales Type" <> MagentoSetup."Replicate to Sales Type"::"All Customers" then
-            SalesPrice.Validate("Sales Code", MagentoSetup."Replicate to Sales Code");
-        SalesPrice."Starting Date" := Item."NPR Special Price From";
-        SalesPrice."Minimum Quantity" := 0;
-        SalesPrice."Unit Price" := Item."NPR Special Price";
-        SalesPrice."Ending Date" := Item."NPR Special Price To";
-        SalesPrice."VAT Bus. Posting Gr. (Price)" := Item."VAT Bus. Posting Gr. (Price)";
-        SalesPrice."Price Includes VAT" := Item."Price Includes VAT";
-        SalesPrice.Insert(true);
+        if (MagentoSetup."Replicate to Price Source Type" <> MagentoSetup."Replicate to Price Source Type"::"All Customers") and (MagentoSetup."Replicate to Sales Code" = '') then
+            PriceListLine.Init();
+        if not PriceListHeader.Get(MagentoSetup."Replicate to Sales Code") then
+            CreatePriceListHeader(MagentoSetup."Replicate to Sales Code", Item."NPR Special Price From", Item."NPR Special Price To");
+        PriceListLine.Validate("Price List Code", MagentoSetup."Replicate to Sales Code");
+        PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
+        PriceListLine.Validate("Asset No.", Item."No.");
+        PriceListLine."Source Type" := MagentoSetup."Replicate to Price Source Type";
+        if MagentoSetup."Replicate to Price Source Type" <> MagentoSetup."Replicate to Price Source Type"::"All Customers" then
+            PriceListLine.Validate("Source No.", MagentoSetup."Replicate to Sales Code");
+        PriceListLine."Starting Date" := Item."NPR Special Price From";
+        PriceListLine."Minimum Quantity" := 0;
+        PriceListLine."Unit Price" := Item."NPR Special Price";
+        PriceListLine."Ending Date" := Item."NPR Special Price To";
+        PriceListLine."VAT Bus. Posting Gr. (Price)" := Item."VAT Bus. Posting Gr. (Price)";
+        PriceListLine."Price Includes VAT" := Item."Price Includes VAT";
+        PriceListLine.Status := PriceListLine.Status::Active;
+        PriceListLine.Insert(true);
     end;
 
-    local procedure FindSalesPrices(Item: Record Item; var SalesPrice: Record "Sales Price"): Boolean
+    local procedure FindSalesPrices(Item: Record Item; var PriceListLine: Record "Price List Line"): Boolean
     begin
         if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
             exit(false);
 
-        Clear(SalesPrice);
-        SalesPrice.SetRange("Item No.", Item."No.");
-        SalesPrice.SetRange("Sales Type", MagentoSetup."Replicate to Sales Type");
-        if MagentoSetup."Replicate to Sales Type" <> MagentoSetup."Replicate to Sales Type"::"All Customers" then
-            SalesPrice.SetRange("Sales Code", MagentoSetup."Replicate to Sales Code");
-        SalesPrice.SetRange("Variant Code", '');
-        exit(not SalesPrice.IsEmpty());
+        Clear(PriceListLine);
+        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
+        PriceListLine.SetRange("Asset No.", Item."No.");
+        PriceListLine.SetRange("Source Type", MagentoSetup."Replicate to Price Source Type");
+        if MagentoSetup."Replicate to Price Source Type" <> MagentoSetup."Replicate to Price Source Type"::"All Customers" then
+            PriceListLine.SetRange("Source No.", MagentoSetup."Replicate to Sales Code");
+        PriceListLine.SetRange("Variant Code", '');
+        exit(not PriceListLine.IsEmpty());
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'NPR Seo Link', true, true)]
@@ -559,6 +566,20 @@
         TempSalesLine := SalesLine;
         TempSalesLine.Insert();
         exit(true)
+    end;
+
+    local procedure CreatePriceListHeader(WorksheetTemplateName: Code[10]; SalesPriceStartDate: Date; SalesPriceEndDate: Date)
+    var
+        PriceListHeader: Record "Price List Header";
+    begin
+        PriceListHeader.Init();
+        PriceListHeader.Code := WorksheetTemplateName;
+        PriceListHeader.Insert(true);
+        PriceListHeader.Validate("Starting Date", SalesPriceStartDate);
+        PriceListHeader.Validate("Ending Date", SalesPriceEndDate);
+        PriceListHeader.Validate("Source Group", PriceListHeader."Source Group"::All);
+        PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
+        PriceListHeader.Modify(true);
     end;
 
     local procedure CurrCodeunitId(): Integer

@@ -268,18 +268,18 @@
     [TryFunction]
     local procedure FindPricePoints(var TmpSalesPriceResponse: Record "NPR M2 Price Calc. Buffer" temporary; var TmpPricePoint: Record "NPR M2 Price Calc. Buffer" temporary)
     var
-        SalesPriceCalcMgt: Codeunit "Sales Price Calc. Mgt.";
         Customer: Record Customer;
         Item: Record Item;
         TempSalesHeader: Record "Sales Header" temporary;
         TempSalesLine: Record "Sales Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         ItemUnitofMeasure: Record "Item Unit of Measure";
-        SalesPrice: Record "Sales Price";
-        SalesLineDiscount: Record "Sales Line Discount";
+        PriceListLinePrice: Record "Price List Line";
+        PriceListLineDiscount: Record "Price List Line";
         TempQtyBracket: Record "NPR M2 Price Calc. Buffer" temporary;
         TmpPricePointNew: Record "NPR M2 Price Calc. Buffer";
-        SalesType: Enum "Sales Price Type";
+        SalesType: Enum "Price Source Type";
+        PriceCalculation: Interface "Price Calculation";
         CampaignCode: Code[20];
     begin
 
@@ -329,123 +329,126 @@
         if (not TempQtyBracket.Insert()) then;
 
         // Unit Price Brackets
-        SalesPrice.SetFilter("Item No.", '=%1', TmpSalesPriceResponse."Item No.");
-        SalesPrice.SetFilter("Starting Date", '=%1|<=%2', 0D, TmpSalesPriceResponse."Price End Date");
-        SalesPrice.SetFilter("Ending Date", '=%1|>=%2', 0D, TmpSalesPriceResponse."Price End Date");
-
-        SalesPrice.SetFilter("Variant Code", '=%1|=%2', '', TmpSalesPriceResponse."Variant Code");
-        SalesPrice.SetFilter("Currency Code", '=%1|=%2', '', TmpSalesPriceResponse."Currency Code");
-        SalesPrice.SetFilter("Unit of Measure Code", '=%1|=%2', '', TmpSalesPriceResponse."Unit of Measure Code");
+        PriceListLinePrice.SetFilter("Asset Type", '=%1', PriceListLinePrice."Asset Type"::Item);
+        PriceListLinePrice.SetFilter("Asset No.", '=%1', TmpSalesPriceResponse."Item No.");
+        PriceListLinePrice.SetFilter("Starting Date", '=%1|<=%2', 0D, TmpSalesPriceResponse."Price End Date");
+        PriceListLinePrice.SetFilter("Ending Date", '=%1|>=%2', 0D, TmpSalesPriceResponse."Price End Date");
+        PriceListLinePrice.SetRange("Amount Type", PriceListLinePrice."Amount Type"::Price);
+        PriceListLinePrice.SetFilter("Variant Code", '=%1|=%2', '', TmpSalesPriceResponse."Variant Code");
+        PriceListLinePrice.SetFilter("Currency Code", '=%1|=%2', '', TmpSalesPriceResponse."Currency Code");
+        PriceListLinePrice.SetFilter("Unit of Measure Code", '=%1|=%2', '', TmpSalesPriceResponse."Unit of Measure Code");
+        PriceListLinePrice.SetRange("Price Type", PriceListLinePrice."Price Type"::Sale);
         if (TmpSalesPriceResponse."Minimum Quantity" > 0) then
-            SalesPrice.SetFilter("Minimum Quantity", '=%1', TmpSalesPriceResponse."Minimum Quantity");
+            PriceListLinePrice.SetFilter("Minimum Quantity", '=%1', TmpSalesPriceResponse."Minimum Quantity");
 
 
         // Item Discount % Brackets
-        SalesLineDiscount.Reset();
-        SalesLineDiscount.SetFilter(Type, '=%1', SalesLineDiscount.Type::Item);
-        SalesLineDiscount.SetFilter(Code, '=%1', TmpSalesPriceResponse."Item No.");
-        SalesLineDiscount.SetFilter("Starting Date", '=%1|<=%2', 0D, TmpSalesPriceResponse."Price End Date");
-        SalesLineDiscount.SetFilter("Ending Date", '=%1|>=%2', 0D, TmpSalesPriceResponse."Price End Date");
-
-        SalesLineDiscount.SetFilter("Variant Code", '=%1|=%2', '', TmpSalesPriceResponse."Variant Code");
-        SalesLineDiscount.SetFilter("Currency Code", '=%1|=%2', '', TmpSalesPriceResponse."Currency Code");
-        SalesLineDiscount.SetFilter("Unit of Measure Code", '=%1|=%2', '', TmpSalesPriceResponse."Unit of Measure Code");
+        PriceListLineDiscount.Reset();
+        PriceListLineDiscount.SetFilter("Asset Type", '=%1', PriceListLineDiscount."Asset Type"::Item);
+        PriceListLineDiscount.SetFilter("Asset No.", '=%1', TmpSalesPriceResponse."Item No.");
+        PriceListLineDiscount.SetFilter("Starting Date", '=%1|<=%2', 0D, TmpSalesPriceResponse."Price End Date");
+        PriceListLineDiscount.SetFilter("Ending Date", '=%1|>=%2', 0D, TmpSalesPriceResponse."Price End Date");
+        PriceListLineDiscount.SetRange("Amount Type", PriceListLineDiscount."Amount Type"::Discount);
+        PriceListLineDiscount.SetFilter("Variant Code", '=%1|=%2', '', TmpSalesPriceResponse."Variant Code");
+        PriceListLineDiscount.SetFilter("Currency Code", '=%1|=%2', '', TmpSalesPriceResponse."Currency Code");
+        PriceListLineDiscount.SetFilter("Unit of Measure Code", '=%1|=%2', '', TmpSalesPriceResponse."Unit of Measure Code");
+        PriceListLineDiscount.SetRange("Price Type", PriceListLinePrice."Price Type"::Sale);
         if (TmpSalesPriceResponse."Minimum Quantity" > 0) then
-            SalesLineDiscount.SetFilter("Minimum Quantity", '=%1', TmpSalesPriceResponse."Minimum Quantity");
+            PriceListLineDiscount.SetFilter("Minimum Quantity", '=%1', TmpSalesPriceResponse."Minimum Quantity");
 
         // SalesPrice: Customer,Customer Price Group,All Customers,Campaign
         // SaleLineDiscount: Customer,Customer Disc. Group,All Customers,Campaign
-        for SalesType := SalesPrice."Sales Type"::Customer to SalesPrice."Sales Type"::Campaign do begin
-            SalesPrice.SetFilter("Sales Type", '=%1', SalesType);
-            SalesLineDiscount.SetFilter(Type, '=%1', SalesLineDiscount.Type::Item);
-            SalesLineDiscount.SetFilter(Code, '=%1', TmpSalesPriceResponse."Item No.");
+        for SalesType := PriceListLinePrice."Source Type"::Customer to PriceListLinePrice."Source Type"::Campaign do begin
+            PriceListLinePrice.SetFilter("Source Type", '=%1', SalesType);
+            PriceListLineDiscount.SetFilter("Asset Type", '=%1', PriceListLineDiscount."Asset Type"::Item);
+            PriceListLineDiscount.SetFilter("Asset No.", '=%1', TmpSalesPriceResponse."Item No.");
 
             case SalesType of
                 SalesType::Customer:
                     begin
-                        SalesPrice.SetFilter("Sales Code", '=%1', Customer."No.");
-                        SalesLineDiscount.SetFilter("Sales Code", '=%1', Customer."No.");
+                        PriceListLinePrice.SetFilter("Source No.", '=%1', Customer."No.");
+                        PriceListLineDiscount.SetFilter("Source No.", '=%1', Customer."No.");
                     end;
                 SalesType::"Customer Price Group":
                     begin
-                        SalesPrice.SetFilter("Sales Code", '=%1', Customer."Customer Price Group");
-                        SalesLineDiscount.SetFilter("Sales Code", '=%1', Customer."Customer Disc. Group");
+                        PriceListLinePrice.SetFilter("Source No.", '=%1', Customer."Customer Price Group");
+                        PriceListLineDiscount.SetFilter("Source No.", '=%1', Customer."Customer Disc. Group");
                     end;
                 SalesType::"All Customers":
                     begin
-                        SalesPrice.SetFilter("Sales Code", '=%1', '');
-                        SalesLineDiscount.SetFilter("Sales Code", '=%1', '');
+                        PriceListLinePrice.SetFilter("Source No.", '=%1', '');
+                        PriceListLineDiscount.SetFilter("Source No.", '=%1', '');
                     end;
                 SalesType::Campaign:
                     begin
-                        SalesPrice.SetFilter("Sales Code", '=%1', CampaignCode);
-                        SalesLineDiscount.SetFilter("Sales Code", '=%1', CampaignCode);
+                        PriceListLinePrice.SetFilter("Source No.", '=%1', CampaignCode);
+                        PriceListLineDiscount.SetFilter("Source No.", '=%1', CampaignCode);
                     end;
             end;
 
-            if (SalesPrice.FindSet()) then begin
+            if (PriceListLinePrice.FindSet()) then begin
                 repeat
                     TempQtyBracket.TransferFields(TmpSalesPriceResponse, true);
-                    TempQtyBracket."Minimum Quantity" := SalesPrice."Minimum Quantity";
-                    TempQtyBracket."Price End Date" := SalesPrice."Ending Date";
-                    TempQtyBracket."Unit Price Base" := SalesPrice."Unit Price";
+                    TempQtyBracket."Minimum Quantity" := PriceListLinePrice."Minimum Quantity";
+                    TempQtyBracket."Price End Date" := PriceListLinePrice."Ending Date";
+                    TempQtyBracket."Unit Price Base" := PriceListLinePrice."Unit Price";
 
                     if (not TempQtyBracket.Insert()) then begin
                         TempQtyBracket.Get(TempQtyBracket."Item No.", TempQtyBracket."Source Type", TempQtyBracket."Source Code", TempQtyBracket."Starting Date",
                             TempQtyBracket."Currency Code", TempQtyBracket."Variant Code", TempQtyBracket."Unit of Measure Code", TempQtyBracket."Minimum Quantity", TempQtyBracket."Request ID");
 
                         // This will break when VAT is included in one of the prices but not the other. (The ending date could be wrong)
-                        if (TempQtyBracket."Unit Price Base" > SalesPrice."Unit Price") then begin
-                            TempQtyBracket."Unit Price Base" := SalesPrice."Unit Price";
-                            TempQtyBracket."Price End Date" := SalesPrice."Ending Date";
+                        if (TempQtyBracket."Unit Price Base" > PriceListLinePrice."Unit Price") then begin
+                            TempQtyBracket."Unit Price Base" := PriceListLinePrice."Unit Price";
+                            TempQtyBracket."Price End Date" := PriceListLinePrice."Ending Date";
                             TempQtyBracket.Modify();
                         end;
                     end;
-                until (SalesPrice.Next() = 0);
+                until (PriceListLinePrice.Next() = 0);
             end;
 
-            if (SalesLineDiscount.FindSet()) then begin
+            if (PriceListLineDiscount.FindSet()) then begin
                 repeat
                     TempQtyBracket.TransferFields(TmpSalesPriceResponse, true);
-                    TempQtyBracket."Minimum Quantity" := SalesLineDiscount."Minimum Quantity";
-                    TempQtyBracket."Line Discount %" := SalesLineDiscount."Line Discount %";
-                    TempQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
+                    TempQtyBracket."Minimum Quantity" := PriceListLineDiscount."Minimum Quantity";
+                    TempQtyBracket."Line Discount %" := PriceListLineDiscount."Line Discount %";
+                    TempQtyBracket."Discount End Date" := PriceListLineDiscount."Ending Date";
 
                     if (not TempQtyBracket.Insert()) then begin
                         TempQtyBracket.Get(TempQtyBracket."Item No.", TempQtyBracket."Source Type", TempQtyBracket."Source Code", TempQtyBracket."Starting Date", TempQtyBracket."Currency Code",
                             TempQtyBracket."Variant Code", TempQtyBracket."Unit of Measure Code", TempQtyBracket."Minimum Quantity", TempQtyBracket."Request ID");
-                        if (TempQtyBracket."Line Discount %" < SalesLineDiscount."Line Discount %") then begin
-                            TempQtyBracket."Line Discount %" := SalesLineDiscount."Line Discount %";
-                            TempQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
+                        if (TempQtyBracket."Line Discount %" < PriceListLineDiscount."Line Discount %") then begin
+                            TempQtyBracket."Line Discount %" := PriceListLineDiscount."Line Discount %";
+                            TempQtyBracket."Discount End Date" := PriceListLineDiscount."Ending Date";
                             TempQtyBracket.Modify();
                         end;
                     end;
 
-                until (SalesLineDiscount.Next() = 0);
+                until (PriceListLineDiscount.Next() = 0);
             end;
 
             // Item Group Discount % Brackets
             if (Item."Item Disc. Group" <> '') then begin
-                SalesLineDiscount.SetFilter(Type, '=%1', SalesLineDiscount.Type::"Item Disc. Group");
-                SalesLineDiscount.SetFilter(Code, '=%1', Item."Item Disc. Group");
-                if (SalesLineDiscount.FindSet()) then begin
+                PriceListLineDiscount.SetFilter("Asset Type", '=%1', PriceListLineDiscount."Asset Type"::"Item Discount Group");
+                PriceListLineDiscount.SetFilter("Asset No.", '=%1', Item."Item Disc. Group");
+                if (PriceListLineDiscount.FindSet()) then begin
                     repeat
                         TempQtyBracket.TransferFields(TmpSalesPriceResponse, true);
-                        TempQtyBracket."Minimum Quantity" := SalesLineDiscount."Minimum Quantity";
-                        TempQtyBracket."Line Discount %" := SalesLineDiscount."Line Discount %";
-                        TempQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
+                        TempQtyBracket."Minimum Quantity" := PriceListLineDiscount."Minimum Quantity";
+                        TempQtyBracket."Line Discount %" := PriceListLineDiscount."Line Discount %";
+                        TempQtyBracket."Discount End Date" := PriceListLineDiscount."Ending Date";
 
                         if (not TempQtyBracket.Insert()) then begin
                             TempQtyBracket.Get(TempQtyBracket."Item No.", TempQtyBracket."Source Type", TempQtyBracket."Source Code", TempQtyBracket."Starting Date",
                                 TempQtyBracket."Currency Code", TempQtyBracket."Variant Code", TempQtyBracket."Unit of Measure Code", TempQtyBracket."Minimum Quantity", TempQtyBracket."Request ID");
-                            if (TempQtyBracket."Line Discount %" > SalesLineDiscount."Line Discount %") then begin
-                                TempQtyBracket."Line Discount %" := SalesLineDiscount."Line Discount %";
-                                TempQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
+                            if (TempQtyBracket."Line Discount %" > PriceListLineDiscount."Line Discount %") then begin
+                                TempQtyBracket."Line Discount %" := PriceListLineDiscount."Line Discount %";
+                                TempQtyBracket."Discount End Date" := PriceListLineDiscount."Ending Date";
                                 TempQtyBracket.Modify();
                             end;
                         end;
 
-                    until (SalesLineDiscount.Next() = 0);
+                    until (PriceListLineDiscount.Next() = 0);
                 end;
             end;
         end;
@@ -464,10 +467,13 @@
                 TempSalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
                 TempSalesLine."Customer Price Group" := Customer."Customer Price Group";
 
-                SalesPriceCalcMgt.FindSalesLinePrice(TempSalesHeader, TempSalesLine, 0);
+                GetPriceCalculationHandler(PriceListLinePrice."Price Type"::Sale, TempSalesHeader, PriceCalculation, TempSalesLine);
+
+                TempSalesLine.ApplyPrice(0, PriceCalculation);
+
 
                 if (TempSalesLine."Allow Line Disc.") then
-                    SalesPriceCalcMgt.FindSalesLineLineDisc(TempSalesHeader, TempSalesLine);
+                    TempSalesLine.ApplyDiscount(PriceCalculation);
 
                 TmpPricePoint.TransferFields(TmpSalesPriceResponse);
                 TmpPricePoint."Unit Price Base" := TempSalesLine."Unit Price";
@@ -493,6 +499,20 @@
             until (TempQtyBracket.Next() = 0);
         end;
     end;
+
+
+    local procedure GetPriceCalculationHandler(PriceType: Enum "Price Type"; SalesHeader: Record "Sales Header"; var PriceCalculation: Interface "Price Calculation"; TmpSalesLine: Record "Sales Line" temporary)
+    var
+        PriceCalculationMgt: codeunit "Price Calculation Mgt.";
+        LineWithPrice: Interface "Line With Price";
+    begin
+        if (SalesHeader."No." = '') and (TmpSalesLine."Document No." <> '') then
+            SalesHeader.Get(TmpSalesLine."Document Type", TmpSalesLine."Document No.");
+        TmpSalesLine.GetLineWithPrice(LineWithPrice);
+        LineWithPrice.SetLine(PriceType, SalesHeader, TmpSalesLine);
+        PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
+    end;
+
 
     procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "NPR M2 Item Availab. By Period")
     begin
