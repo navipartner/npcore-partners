@@ -1,14 +1,6 @@
 codeunit 6184520 "NPR EFT Adyen Cloud Sign Dia."
 {
-    // NPR5.48/MMV /20190124 CASE 341237 Created object
-    // NPR5.49/MMV /20190312 CASE 345188 Renamed object
-    // NPR5.49/MMV /20190410 CASE 347476 Increased signature line width
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Model: DotNet NPRNetModel;

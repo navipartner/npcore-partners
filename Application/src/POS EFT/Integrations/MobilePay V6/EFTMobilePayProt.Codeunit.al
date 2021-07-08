@@ -1,16 +1,10 @@
+// TODO: Case 430713
+//       UI in this Codeunit can be replaced with Workflows 2.0 mobilePay dialog.
+//       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki?wikiVersion=GBwikiMaster&pagePath=%2FWorkflows%202.0%20Reference%2FFront%20End%20(JavaScript)%2FWorkflows%202.0%20Front%252Dend%20API%3A%20%60popup%60%20object&pageId=36&_a=edit&anchor=code-example%3A-%60mobilepay%60-dialog
+
 codeunit 6184514 "NPR EFT MobilePay Prot."
 {
-    // NPR5.46/MMV /20181008 CASE 290734 Created object
-    // NPR5.47/MMV /20181030 CASE 334510 Added string length check
-    // NPR5.49/MMV /20190312 CASE 345188 Renamed object
-    // NPR5.53/MMV /20191112 CASE 375566 Do not clear activemodelID to prevent handling of late events.
-    // NPR5.54/MMV /20200206 CASE 388507 Attempt auto cancel if new purchase cannot be started.
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Model: DotNet NPRNetModel;
