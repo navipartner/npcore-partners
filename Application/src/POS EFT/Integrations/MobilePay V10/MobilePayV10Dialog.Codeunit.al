@@ -1,3 +1,7 @@
+// TODO: Case 430713
+//       UI in this Codeunit can be replaced with Workflows 2.0 mobilePay dialog.
+//       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki?wikiVersion=GBwikiMaster&pagePath=%2FWorkflows%202.0%20Reference%2FFront%20End%20(JavaScript)%2FWorkflows%202.0%20Front%252Dend%20API%3A%20%60popup%60%20object&pageId=36&_a=edit&anchor=code-example%3A-%60mobilepay%60-dialog
+
 codeunit 6014517 "NPR MobilePayV10 Dialog"
 {
     SingleInstance = true;
