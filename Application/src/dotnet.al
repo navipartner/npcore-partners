@@ -14,59 +14,7 @@ dotnet
         {
         }
 
-        type("System.Xml.XmlNamespaceManager"; "NPRNetXmlNamespaceManager")
-        {
-        }
-
         type("System.Xml.XmlNode"; "NPRNetXmlNode")
-        {
-        }
-
-        type("System.Xml.XmlElement"; "NPRNetXmlElement")
-        {
-        }
-
-        type("System.Xml.XmlTextReader"; "NPRNetXmlTextReader")
-        {
-        }
-
-        type("System.Xml.XmlNodeType"; "NPRNetXmlNodeType")
-        {
-        }
-
-        type("System.Xml.XmlAttribute"; "NPRNetXmlAttribute")
-        {
-        }
-
-        type("System.Xml.XmlNameTable"; "NPRNetXmlNameTable")
-        {
-        }
-
-        type("System.Xml.Xsl.XslCompiledTransform"; "NPRNetXslCompiledTransform")
-        {
-        }
-
-        type("System.Xml.XmlReader"; "NPRNetXmlReader")
-        {
-        }
-
-        type("System.Xml.XmlWriter"; "NPRNetXmlWriter")
-        {
-        }
-
-        type("System.Xml.XmlConvert"; "NPRNetXmlConvert")
-        {
-        }
-
-        type("System.Xml.XmlCDataSection"; "NPRNetXmlCDataSection")
-        {
-        }
-
-        type("System.Xml.XmlComment"; "NPRNetXmlComment")
-        {
-        }
-
-        type("System.Xml.XmlException"; "NPRNetXmlException")
         {
         }
     }
@@ -82,14 +30,6 @@ dotnet
         }
 
         type("System.Diagnostics.ProcessStartInfo"; "NPRNetProcessStartInfo")
-        {
-        }
-
-        type("System.Net.FtpWebRequest"; "NPRNetFtpWebRequest")
-        {
-        }
-
-        type("System.Net.FtpWebResponse"; "NPRNetFtpWebResponse")
         {
         }
 
@@ -125,39 +65,7 @@ dotnet
         {
         }
 
-        type("System.Net.WebClient"; "NPRNetWebClient")
-        {
-        }
-
         type("System.Collections.Specialized.NameValueCollection"; "NPRNetNameValueCollection")
-        {
-        }
-
-        type("System.Text.RegularExpressions.MatchCollection"; "NPRNetMatchCollection")
-        {
-        }
-
-        type("System.Text.RegularExpressions.Match"; "NPRNetMatch")
-        {
-        }
-
-        type("System.Diagnostics.FileVersionInfo"; "NPRNetFileVersionInfo")
-        {
-        }
-
-        type("System.Net.NetworkInformation.NetworkInterface"; "NPRNetNetworkInterface")
-        {
-        }
-
-        type("System.Net.WebResponse"; "NPRNetWebResponse")
-        {
-        }
-
-        type("System.Net.Security.AuthenticationLevel"; "NPRNetAuthenticationLevel")
-        {
-        }
-
-        type("System.Net.WebUtility"; "NPRNetWebUtility")
         {
         }
 
@@ -220,23 +128,7 @@ dotnet
         {
         }
 
-        type("System.Text.StringBuilder"; "NPRNetStringBuilder")
-        {
-        }
-
         type("System.Type"; "NPRNetType")
-        {
-        }
-
-        type("System.IO.FileStream"; "NPRNetFileStream")
-        {
-        }
-
-        type("System.Collections.IEnumerable"; "NPRNetIEnumerable")
-        {
-        }
-
-        type("System.IO.Directory"; "NPRNetDirectory")
         {
         }
 
@@ -244,19 +136,7 @@ dotnet
         {
         }
 
-        type("System.Byte"; "NPRNetByte")
-        {
-        }
-
-        type("System.IO.SeekOrigin"; "NPRNetSeekOrigin")
-        {
-        }
-
         type("System.BitConverter"; "NPRNetBitConverter")
-        {
-        }
-
-        type("System.IntPtr"; "NPRNetIntPtr")
         {
         }
 
@@ -264,27 +144,7 @@ dotnet
         {
         }
 
-        type("System.Int32"; "NPRNetInt32")
-        {
-        }
-
-        type("System.Activator"; "NPRNetActivator")
-        {
-        }
-
-        type("System.Reflection.Assembly"; "NPRNetAssembly")
-        {
-        }
-
-        type("System.Object"; "NPRNetObject")
-        {
-        }
-
         type("System.Collections.Generic.List`1"; "NPRNetList_Of_T")
-        {
-        }
-
-        type("System.Decimal"; "NPRNetDecimal")
         {
         }
 
@@ -300,31 +160,7 @@ dotnet
         {
         }
 
-        type("System.Collections.Generic.IEnumerable`1"; "NPRNetIEnumerable_Of_T")
-        {
-        }
-
         type("System.IO.StringReader"; "NPRNetStringReader")
-        {
-        }
-
-        type("System.IO.DirectoryInfo"; "NPRNetDirectoryInfo")
-        {
-        }
-
-        type("System.IO.FileInfo"; "NPRNetFileInfo")
-        {
-        }
-
-        type("System.Text.UTF32Encoding"; "NPRNetUTF32Encoding")
-        {
-        }
-
-        type("System.IO.Path"; "NPRNetPath")
-        {
-        }
-
-        type("System.Math"; "NPRNetMath")
         {
         }
 
@@ -332,55 +168,11 @@ dotnet
         {
         }
 
-        type("System.IO.BinaryWriter"; "NPRNetBinaryWriter")
-        {
-        }
-
         type("System.TimeZoneInfo"; "NPRNetTimeZoneInfo")
         {
         }
 
-        type("System.DateTimeOffset"; "NPRNetDateTimeOffset")
-        {
-        }
-
-        type("System.Collections.IList"; "NPRNetIList")
-        {
-        }
-
-        type("System.Security.SecurityElement"; "NPRNetSecurityElement")
-        {
-        }
-
-        type("System.Security.Cryptography.MD5CryptoServiceProvider"; "NPRNetMD5CryptoServiceProvider")
-        {
-        }
-
-        type("System.Boolean"; "NPRNetBoolean")
-        {
-        }
-
-        type("System.Text.UTF8Encoding"; "NPRNetUTF8Encoding")
-        {
-        }
-
         type("System.Security.Cryptography.HMACSHA256"; "NPRNetHMACSHA256")
-        {
-        }
-
-        type("System.Security.Cryptography.TripleDESCryptoServiceProvider"; "NPRNetTripleDESCryptoServiceProvider")
-        {
-        }
-
-        type("System.Security.Cryptography.ICryptoTransform"; "NPRNetICryptoTransform")
-        {
-        }
-
-        type("System.Security.Cryptography.CipherMode"; "NPRNetCipherMode")
-        {
-        }
-
-        type("System.Security.Cryptography.PaddingMode"; "NPRNetPaddingMode")
         {
         }
 
@@ -395,18 +187,6 @@ dotnet
         type("System.Security.Cryptography.CryptoConfig"; "NPRNetCryptoConfig")
         {
         }
-
-        type("System.Security.Cryptography.KeyedHashAlgorithm"; "NPRNetKeyedHashAlgorithm")
-        {
-        }
-
-        type("System.IO.TextReader"; "NPRNetTextReader")
-        {
-        }
-
-        type("System.Security.Cryptography.MD5"; "NPRNetMD5")
-        {
-        }
     }
 
     assembly("NaviPartner.Retail.Nav")
@@ -415,27 +195,7 @@ dotnet
         Culture = 'neutral';
         PublicKeyToken = '909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Template"; "NPRNetTemplate")
-        {
-        }
-
         type("NaviPartner.Retail.Nav.ObjectModel.Model"; "NPRNetModel")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.TextAlign"; "NPRNetTextAlign")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.NumberFormat"; "NPRNetNumberFormat")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Row"; "NPRNetRow")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Info"; "NPRNetInfo")
         {
         }
 
@@ -452,71 +212,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Nav.ObjectModel.Label"; "NPRNetLabel")
-        {
-        }
-    }
-
-    assembly("Renci.SshNet")
-    {
-        Version = '2016.1.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '1cee9f8bde3db106';
-
-        type("Renci.SshNet.SftpClient"; "NPRNetSftpClient")
-        {
-        }
-
-        type("Renci.SshNet.ConnectionInfo"; "NPRNetConnectionInfo")
-        {
-        }
-
-        type("Renci.SshNet.PasswordAuthenticationMethod"; "NPRNetPasswordAuthenticationMethod")
-        {
-        }
-
-        type("Renci.SshNet.AuthenticationMethod"; "NPRNetAuthenticationMethod")
-        {
-        }
-
-        type("Renci.SshNet.PrivateKeyFile"; "NPRNetPrivateKeyFile")
-        {
-        }
-
-        type("Renci.SshNet.PrivateKeyAuthenticationMethod"; "NPRNetPrivateKeyAuthenticationMethod")
-        {
-        }
-
-        type("Renci.SshNet.Sftp.SftpDownloadAsyncResult"; "NPRNetSftpDownloadAsyncResult")
-        {
-        }
-
-        type("Renci.SshNet.Sftp.SftpFile"; "NPRNetSftpFile")
-        {
-        }
-    }
-
-    assembly("SFTPClientWrapper")
-    {
-        Version = '5.3.1370.1';
-        Culture = 'neutral';
-        PublicKeyToken = '828b6037e4db846c';
-
-        type("SFTPClientWrapper.SFTPClientWrapper"; "NPRNetSFTPClientWrapper")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Utility")
-    {
-        Version = '1.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '867142ff84820aec';
-
-        type("NaviPartner.Utility.FileWrapper"; "NPRNetFileWrapper")
-        {
-        }
-
-        type("NaviPartner.Utilities.CRC32"; "NPRNetCRC32")
         {
         }
     }
@@ -554,42 +249,6 @@ dotnet
         {
         }
 
-        type("System.Drawing.Bitmap"; "NPRNetBitmap")
-        {
-        }
-
-        type("System.Drawing.Color"; "NPRNetColor")
-        {
-        }
-
-        type("System.Drawing.Graphics"; "NPRNetGraphics")
-        {
-        }
-
-        type("System.Drawing.Imaging.PixelFormat"; "NPRNetPixelFormat")
-        {
-        }
-
-        type("System.Drawing.Drawing2D.PixelOffsetMode"; "NPRNetPixelOffsetMode")
-        {
-        }
-
-        type("System.Drawing.Rectangle"; "NPRNetRectangle")
-        {
-        }
-
-        type("System.Drawing.Size"; "NPRNetSize")
-        {
-        }
-
-        type("System.Drawing.Drawing2D.InterpolationMode"; "NPRNetInterpolationMode")
-        {
-        }
-
-        type("System.Drawing.GraphicsUnit"; "NPRNetGraphicsUnit")
-        {
-        }
-
         type("System.Drawing.ImageConverter"; "NPRNetImageConverter")
         {
         }
@@ -620,15 +279,7 @@ dotnet
         Culture = 'neutral';
         PublicKeyToken = '909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Device.Messaging.VoidResponse"; "NPRNetVoidResponse")
-        {
-        }
-
         type("NaviPartner.Retail.Device.Envelope.ResponseEnvelope"; "NPRNetResponseEnvelope")
-        {
-        }
-
-        type("NaviPartner.Retail.Device.Envelope.Envelope"; "NPRNetEnvelope")
         {
         }
 
@@ -657,27 +308,8 @@ dotnet
         type("Newtonsoft.Json.DateParseHandling"; "NPRNetDateParseHandling")
         {
         }
-        type("Newtonsoft.Json.Formatting"; "NPRNetFormatting")
-        {
-        }
-        type("Newtonsoft.Json.Linq.JTokenType"; "NPRNetJTokenType")
-        {
-        }
-        type("Newtonsoft.Json.Linq.JProperty"; "NPRNetJProperty")
-        {
-        }
 
-        type("Newtonsoft.Json.Linq.JTokenWriter"; "NPRNetJTokenWriter")
-        {
-        }
-        type("Newtonsoft.Json.Linq.JContainer"; "NPRNetJContainer")
-        {
-        }
         type("Newtonsoft.Json.FloatParseHandling"; "NPRNetFloatParseHandling")
-        {
-        }
-
-        type("Newtonsoft.Json.FloatFormatHandling"; "NPRNetFloatFormatHandling")
         {
         }
 
@@ -724,109 +356,11 @@ dotnet
         }
     }
 
-    assembly("System.Windows.Forms")
-    {
-        Version = '4.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = 'b77a5c561934e089';
-
-        type("System.Windows.Forms.PrintDialog"; "NPRNetPrintDialog")
-        {
-        }
-
-        type("System.Windows.Forms.Keys"; "NPRNetKeys")
-        {
-        }
-
-        type("System.Windows.Forms.SendKeys"; "NPRNetSendKeys")
-        {
-        }
-
-        type("System.Windows.Forms.Form"; "NPRNetForm")
-        {
-        }
-
-        type("System.Windows.Forms.TextBox"; "NPRNetTextBox")
-        {
-        }
-
-        type("System.Windows.Forms.DockStyle"; "NPRNetDockStyle")
-        {
-        }
-
-        type("System.Windows.Forms.WebBrowser"; "NPRNetWebBrowser")
-        {
-        }
-
-        type("System.Windows.Forms.FormWindowState"; "NPRNetFormWindowState")
-        {
-        }
-    }
-
-    assembly("System.Net.Http")
-    {
-        Version = '4.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = 'b03f5f7f11d50a3a';
-
-        type("System.Net.Http.MultipartFormDataContent"; "NPRNetMultipartFormDataContent")
-        {
-        }
-
-        type("System.Net.Http.ByteArrayContent"; "NPRNetByteArrayContent")
-        {
-        }
-
-        type("System.Net.Http.Headers.AuthenticationHeaderValue"; "NPRNetAuthenticationHeaderValue")
-        {
-        }
-
-        type("System.Net.Http.HttpResponseMessage"; "NPRNetHttpResponseMessage")
-        {
-        }
-
-        type("System.Net.Http.FormUrlEncodedContent"; "NPRNetFormUrlEncodedContent")
-        {
-        }
-
-        type("System.Net.Http.StringContent"; "NPRNetStringContent")
-        {
-        }
-
-        type("System.Net.Http.HttpContent"; "NPRNetHttpContent")
-        {
-        }
-
-        type("System.Net.Http.HttpClient"; "NPRNetHttpClient")
-        {
-        }
-
-        type("System.Net.Http.Headers.EntityTagHeaderValue"; "NPRNetEntityTagHeaderValue")
-        {
-        }
-
-        type("System.Net.Http.HttpRequestMessage"; "NPRNetHttpRequestMessage")
-        {
-        }
-
-        type("System.Net.Http.HttpMethod"; "NPRNetHttpMethod")
-        {
-        }
-    }
-
     assembly("System.Core")
     {
         Version = '4.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = 'b77a5c561934e089';
-
-        type("System.Collections.Generic.HashSet`1"; "NPRNetHashSet_Of_T")
-        {
-        }
-
-        type("System.Collections.Generic.HashSet`1+Enumerator"; "NPRNetHashSet_Of_T_Enumerator")
-        {
-        }
 
         type("System.Security.Cryptography.SHA256CryptoServiceProvider"; "NPRNetSHA256CryptoServiceProvider")
         {
@@ -842,55 +376,6 @@ dotnet
         type("System.Web.HttpUtility"; "NPRNetHttpUtility")
         {
         }
-
-        type("System.Web.Security.FormsAuthentication"; "NPRNetFormsAuthentication")
-        {
-        }
-
-        type("System.Web.MimeMapping"; "NPRNetMimeMapping")
-        {
-        }
-    }
-
-    assembly("NavHelper.AssemblyResolver")
-    {
-        Version = '2.4.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = 'cc06fd55bdc3ade8';
-
-        type("NavHelper.AssemblyResolver.AssemblyResolver"; "NPRNetAssemblyResolver")
-        {
-        }
-    }
-
-    assembly("ChilkatDotNet4")
-    {
-        Version = '9.4.1.0';
-        Culture = 'neutral';
-        PublicKeyToken = 'eb5fc1fc52ef09bd';
-
-        type("Chilkat.SFtp"; "NPRNetSFtp")
-        {
-        }
-    }
-
-    assembly("System.Xml.Linq")
-    {
-        Version = '3.5.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = 'b77a5c561934e089';
-
-        type("System.Xml.Linq.XDocument"; "NPRNetXDocument")
-        {
-        }
-
-        type("System.Xml.Linq.XElement"; "NPRNetXElement")
-        {
-        }
-
-        type("System.Xml.Linq.XName"; "NPRNetXName")
-        {
-        }
     }
 
     assembly("NaviPartner.Retail.Device.Messaging.CashKeeper")
@@ -904,120 +389,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Device.Messaging.CashKeeper.Process.State+Action"; "NPRNetState_Action")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Cognitive.Services")
-    {
-        Version = '1.0.0.7';
-        Culture = 'neutral';
-        PublicKeyToken = 'a2a51e153e198db2';
-
-        type("NaviPartner.Cognitive.Services.FaceServiceAPI"; "NPRNetFaceServiceAPI")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Models.GroupEntity"; "NPRNetGroupEntity")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Models.ErrorEntity"; "NPRNetErrorEntity")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Models.PersonEntity"; "NPRNetPersonEntity")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Models.FaceResponseEntity"; "NPRNetFaceResponseEntity")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Models.FaceEntity"; "NPRNetFaceEntity")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.RecommendationServiceAPI"; "NPRNetRecommendationServiceAPI")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.ModelInfo"; "NPRNetModelInfo")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.ModelInfoList"; "NPRNetModelInfoList")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.CatalogImportStats"; "NPRNetCatalogImportStats")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.UsageImportStats"; "NPRNetUsageImportStats")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.BuildRequestInfo"; "NPRNetBuildRequestInfo")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.BuildParameters"; "NPRNetBuildParameters")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.RandomSplitterParameters"; "NPRNetRandomSplitterParameters")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendationBuildParameters"; "NPRNetRecommendationBuildParameters")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.SplitterStrategy"; "NPRNetSplitterStrategy")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.BuildType"; "NPRNetBuildType")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.OperationStatus"; "NPRNetOperationStatus")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.OperationInfo"; "NPRNetOperationInfo")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemSetInfoList"; "NPRNetRecommendedItemSetInfoList")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemSetInfo"; "NPRNetRecommendedItemSetInfo")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemInfo"; "NPRNetRecommendedItemInfo")
-        {
-        }
-
-        type("NaviPartner.Cognitive.Services.Helpers.UpdateActiveBuildInfo"; "NPRNetUpdateActiveBuildInfo")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Device.Messaging.Webcam")
-    {
-        Version = '1.0.0.4';
-        Culture = 'neutral';
-        PublicKeyToken = '2440db6279d79962';
-
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Requests.WebcamCaptureRequest"; "NPRNetWebcamCaptureRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Requests.WebcamIdentityRequest"; "NPRNetWebcamIdentityRequest")
         {
         }
     }
@@ -1063,60 +434,6 @@ dotnet
         type("NaviPartner.Retail.Stargate.Messaging.EmptyResponse"; "NPRNetEmptyResponse")
         {
         }
-
-        type("NaviPartner.Retail.Stargate.Messaging.Packaging.AssemblyPackageContent"; "NPRNetAssemblyPackageContent")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Stargate.Messaging.Webcam")
-    {
-        Version = '5.3.745.2';
-        Culture = 'neutral';
-        PublicKeyToken = '2440db6279d79962';
-
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.State"; "NPRNetState3")
-        {
-        }
-
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Requests.WebcamCaptureRequest"; "NPRNetWebcamCaptureRequest0")
-        {
-        }
-
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.State+Action"; "NPRNetState_Action1")
-        {
-        }
-
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.PersonEntity"; "NPRNetPersonEntity1")
-        {
-        }
-
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Requests.WebcamIdentityRequest"; "NPRNetWebcamIdentityRequest0")
-        {
-        }
-
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.FaceEntity"; "NPRNetFaceEntity1")
-        {
-        }
-    }
-
-    assembly("Microsoft.Office.Interop.Word")
-    {
-        Version = '15.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '71e9bce111e9429c';
-
-        type("Microsoft.Office.Interop.Word.ApplicationClass"; "NPRNetApplicationClass")
-        {
-        }
-
-        type("Microsoft.Office.Interop.Word.Document"; "NPRNetDocument")
-        {
-        }
-
-        type("Microsoft.Office.Interop.Word.WdWindowState"; "NPRNetWdWindowState")
-        {
-        }
     }
 
     assembly("Microsoft.Exchange.WebServices")
@@ -1133,19 +450,7 @@ dotnet
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.NameResolutionCollection"; "NPRNetNameResolutionCollection")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.NameResolution"; "NPRNetNameResolution")
-        {
-        }
-
         type("Microsoft.Exchange.WebServices.Data.ExchangeVersion"; "NPRNetExchangeVersion")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.ExchangeServerInfo"; "NPRNetExchangeServerInfo")
         {
         }
 
@@ -1214,20 +519,6 @@ dotnet
         }
 
         type("Microsoft.Exchange.WebServices.Data.EmailAddressCollection"; "NPRNetEmailAddressCollection")
-        {
-        }
-    }
-
-    assembly("Microsoft.Dynamics.Nav.Integration.Office")
-    {
-        Culture = 'neutral';
-        PublicKeyToken = '31bf3856ad364e35';
-
-        type("Microsoft.Dynamics.Nav.Integration.Office.Word.WordHelper"; "NPRNetWordHelper")
-        {
-        }
-
-        type("Microsoft.Dynamics.Nav.Integration.Office.Word.WordHandler"; "NPRNetWordHandler")
         {
         }
     }
@@ -1326,54 +617,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Stargate.Messaging.FilePrint.Responses.FilePrintResponse"; "NPRNetFilePrintResponse0")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Stargate.Messaging.CustDisplay")
-    {
-        Version = '5.3.745.1';
-        Culture = 'neutral';
-        PublicKeyToken = '5c893ded5dd60b96';
-
-        type("NaviPartner.Retail.Stargate.Messaging.CustDisplay.Requests.SecondaryMonitorRequest"; "NPRNetSecondaryMonitorRequest")
-        {
-        }
-    }
-
-    assembly("System.Web.Extensions")
-    {
-        Version = '4.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '31bf3856ad364e35';
-
-        type("System.Web.Script.Serialization.JavaScriptSerializer"; "NPRNetJavaScriptSerializer")
-        {
-        }
-    }
-
-    assembly("SharpSSH")
-    {
-        Version = '2.0.1.17082';
-        Culture = 'neutral';
-        PublicKeyToken = 'ebad8a5963bb8e78';
-
-        type("Tamir.SharpSsh.jsch.ChannelSftp+LsEntry"; "NPRNetChannelSftp_LsEntry")
-        {
-        }
-
-        type("Tamir.SharpSsh.Sftp"; "NPRNetSftp0")
-        {
-        }
-    }
-
-    assembly("NaviPartner.NaviConnect.NpWebRequest.1.01")
-    {
-        Version = '1.1.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '867142ff84820aec';
-
-        type("NaviPartner.NaviConnect.NpWebRequest.NpWebRequest"; "NPRNetNpWebRequest")
         {
         }
     }
@@ -1727,64 +970,9 @@ dotnet
         }
     }
 
-    assembly("PresentationCore")
-    {
-        Version = '4.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '31bf3856ad364e35';
-
-        type("System.Windows.Clipboard"; "NPRNetClipboard")
-        {
-        }
-    }
-
-    assembly("System.Runtime.Serialization")
-    {
-        Version = '4.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = 'b77a5c561934e089';
-
-        type("System.Runtime.Serialization.Json.DataContractJsonSerializer"; "NPRNetDataContractJsonSerializer")
-        {
-        }
-    }
-
-    assembly("Microsoft.Dynamics.Nav.ClientExtensions")
-    {
-        Culture = 'neutral';
-        PublicKeyToken = '31bf3856ad364e35';
-
-        type("Microsoft.Dynamics.Nav.Client.Capabilities.CameraProvider"; "NPRNetCameraProvider")
-        {
-        }
-    }
-
     assembly("Microsoft.Dynamics.Nav.Client.PingPong")
     {
         type("Microsoft.Dynamics.Nav.Client.PingPong.PingPongAddIn"; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
-        {
-            IsControlAddIn = true;
-        }
-    }
-
-    assembly("NaviPartner.Retail.Stargate.Packager")
-    {
-        Version = '5.3.756.0';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Stargate.Packager.AssemblyDetector"; "NPRNetAssemblyDetector")
-        {
-        }
-
-        type("NaviPartner.Retail.Stargate.Packager.DetectionResult"; "NPRNetDetectionResult")
-        {
-        }
-    }
-
-    assembly("NaviPartner.POS.Camera")
-    {
-        type("NaviPartner.POS.Camera.ICamera"; "NPRNaviPartner.POS.Camera")
         {
             IsControlAddIn = true;
         }

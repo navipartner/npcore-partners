@@ -1,12 +1,10 @@
-﻿codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
+﻿// TODO: Case 430713
+//       UI in this Codeunit can be replaced with Workflows 2.0 simplePayment dialog.
+//       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object?anchor=code-example%3A-%60simplepayment%60-dialog
+
+codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
 {
-    // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Model: DotNet NPRNetModel;

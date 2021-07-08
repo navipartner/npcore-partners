@@ -1,9 +1,9 @@
+// TODO: Case 430713
+//       This dialog does not really need Model UI. The only thing it does is that it runs some JavaScript. It should never have been
+//       built with Model UI. This can be done easily with a Workflows 2.0 action that runs the exact same JavaScript code.
+
 codeunit 6014584 "NPR Mobile Print Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Err_PrintFailed: Label 'Print failed';
         Err_InvalidClientType: Label 'Can not print through mobile add-in on %1';
@@ -106,4 +106,3 @@ codeunit 6014584 "NPR Mobile Print Mgt."
         JSON += '}';
     end;
 }
-

@@ -1,19 +1,10 @@
-﻿codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
+﻿// TODO: Case 430713
+//       UI in this Codeunit can be replaced with Workflows 2.0 simplePayment dialog.
+//       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object?anchor=code-example%3A-%60simplepayment%60-dialog
+
+codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
 {
-    // NPR5.48/MMV /20190124 CASE 341237 Created object
-    // NPR5.49/MMV /20190305 CASE 345188 Added support for AcquireCard
-    // NPR5.49/MMV /20190409 CASE 351678 Check response via codeunit.run instead of tryfunction
-    // NPR5.50/MMV /20190430 CASE 352465 Added support for silent price reduction after customer recognition.
-    // NPR5.51/MMV /20190827 CASE 357279 Changed timings on dialog
-    // NPR5.53/MMV /20191120 CASE 377533 Added force abort button
-    // NPR5.53/MMV /20200126 CASE 377533 Changed force abort timer limit
-    // NPR5.54/MMV /20200226 CASE 364340 Split up the error handling between finding
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Model: DotNet NPRNetModel;
