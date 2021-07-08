@@ -41,9 +41,11 @@ codeunit 6150931 "NPR UPG POS View Profile"
             exit;
         repeat
             if not POSUnit.GetProfile(POSViewProfile) then begin
-                POSViewProfile.Code := POSUnit."No." + '_UPG';
-                POSViewProfile.Init();
-                POSViewProfile.Insert();
+                POSViewProfile.Code := CopyStr(POSUnit."No." + '_UPG', 1, MaxStrLen(POSViewProfile.Code));
+                if not POSViewProfile.Find() then begin
+                    POSViewProfile.Init();
+                    POSViewProfile.Insert();
+                end;
             end;
             if POSViewProfile."Lock Timeout" = POSViewProfile."Lock Timeout"::NEVER then begin
                 POSViewProfile."Lock Timeout" := "NPR POS View LockTimeout".FromInteger(POSUnit."Lock Timeout");
