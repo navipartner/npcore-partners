@@ -9,7 +9,7 @@ table 6151247 "NPR POS Entry Cue."
         }
         field(2; "Failed G/L Posting Trans."; Integer)
         {
-            CalcFormula = Count("NPR POS Entry" WHERE("Post Item Entry Status" = FILTER("Error while Posting")));
+            CalcFormula = Count("NPR POS Entry" WHERE("Post Entry Status" = FILTER("Error while Posting")));
             FieldClass = FlowField;
         }
         field(3; "Unposted Item Trans."; Integer)
