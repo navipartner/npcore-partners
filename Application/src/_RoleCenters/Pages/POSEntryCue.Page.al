@@ -29,11 +29,15 @@
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Failed Item Transaction. field';
+                    Style = Unfavorable;
+                    StyleExpr = FailedItemTransExists;
                 }
                 field("Failed G/L Posting Trans."; Rec."Failed G/L Posting Trans.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Failed G/L Posting Trans. field';
+                    Style = Unfavorable;
+                    StyleExpr = FailedGLPostTransExists;
                 }
             }
             cuegroup("EFT Errors")
@@ -79,6 +83,10 @@
         }
     }
 
+    var
+        FailedItemTransExists: Boolean;
+        FailedGLPostTransExists: Boolean;
+
     trigger OnOpenPage()
     begin
         Rec.Reset();
@@ -88,5 +96,10 @@
         end;
         Rec.SetRange("EFT Errors Date Filter", CalcDate('<-30D>'), Today());
     end;
-}
 
+    trigger OnAfterGetRecord()
+    begin
+        FailedItemTransExists := "Failed Item Transaction." > 0;
+        FailedGLPostTransExists := "Failed G/L Posting Trans." > 0;
+    end;
+}
