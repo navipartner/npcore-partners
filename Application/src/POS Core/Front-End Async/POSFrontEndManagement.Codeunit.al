@@ -838,6 +838,7 @@
 
     #region Model UI - TODO: refactor into Dragonglass!
 
+    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
     procedure ShowModel(Model: DotNet NPRNetModel) ModelID: Guid
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -860,6 +861,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
     procedure UpdateModel(Model: DotNet NPRNetModel; ModelID: Guid)
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -881,6 +883,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
     procedure CloseModel(ModelID: Guid)
     var
         Request: Codeunit "NPR Front-End: Generic";
