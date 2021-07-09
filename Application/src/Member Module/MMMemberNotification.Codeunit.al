@@ -787,7 +787,7 @@ codeunit 6060136 "NPR MM Member Notification"
         if (not JObject.SelectToken(Key, JToken)) then
             exit('');
 
-        JToken.WriteTo(TokenStringValue);
+        TokenStringValue := JToken.AsValue().AsText();
         exit(TokenStringValue);
     end;
 
@@ -942,7 +942,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
         Url := '';
         if Json.SelectToken('messages.success[0].message', JToken) then
-            JToken.WriteTo(Url);
+            Url := JToken.AsValue().AsText();
     end;
 
     procedure MagentoApiPost(ApiUrl: Text; Method: Text; var Body: JsonToken; var Result: JsonToken)
@@ -971,7 +971,6 @@ codeunit 6060136 "NPR MM Member Notification"
         SetHttpHeaderValue(HttpContentHeader, ContentTypeLabel, ContentTypeValueLabel);
 
         HttpRequestHeader := WebClient.DefaultRequestHeaders();
-        WebClient.Post(ApiUrl + Method, Content, WebResponse);
         if (MagentoSetup."Api Authorization" <> '') then
             SetHttpHeaderValue(HttpRequestHeader, AuthorizationLabel, MagentoSetup."Api Authorization");
 
