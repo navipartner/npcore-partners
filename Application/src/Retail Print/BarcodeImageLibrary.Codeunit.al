@@ -16,7 +16,7 @@ codeunit 6014528 "NPR Barcode Image Library"
         NoAA: Boolean;
         NoBarcodeText: Boolean;
 
-    procedure GenerateBarcode(BarCode: Code[250]; var TempBlob: Codeunit "Temp Blob")
+    procedure GenerateBarcode(BarCode: Text; var TempBlob: Codeunit "Temp Blob")
     var
         MemoryStream: DotNet NPRNetMemoryStream;
         OutStream: OutStream;
@@ -32,7 +32,7 @@ codeunit 6014528 "NPR Barcode Image Library"
         CopyStream(OutStream, MemoryStream);
     end;
 
-    local procedure Initialize(BarCode: Code[250])
+    local procedure Initialize(BarCode: Text)
     begin
         BarCodeSettings := BarCodeSettings.BarcodeSettings();
         BarCodeSettings.Data := BarCode;
