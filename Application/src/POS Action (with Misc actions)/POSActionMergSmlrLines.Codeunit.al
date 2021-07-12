@@ -77,6 +77,8 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
             SaleLinePOS.SetRange("No.", SaleLinePOS."No.");
             SaleLinePOS.SetRange("Variant Code", SaleLinePOS."Variant Code");
             SaleLinePOS.SetRange("Unit Price", SaleLinePOS."Unit Price");
+            SaleLinePOS.SetRange("Unit of Measure Code", SaleLinePOS."Unit of Measure Code");
+            SaleLinePOS.SetRange("Discount %", SaleLinePOS."Discount %");
 
             if SaleLinePOS.Count() > 1 then begin
 
@@ -99,6 +101,8 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
             SaleLinePOS.SetRange("No.");
             SaleLinePOS.SetRange("Variant Code");
             SaleLinePOS.SetRange("Unit Price");
+            SaleLinePOS.SetRange("Unit of Measure Code");
+            SaleLinePOS.SetRange("Discount %");
         until SaleLinePOS.Next() = 0;
 
         if not TempSaleLinePOS.FindSet() then
@@ -106,6 +110,7 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
 
         repeat
             SaleLinePOS := TempSaleLinePOS;
+            POSSaleLine.SetUseLinePriceVATParams(true);
             POSSaleLine.InsertLine(SaleLinePOS);
 
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
