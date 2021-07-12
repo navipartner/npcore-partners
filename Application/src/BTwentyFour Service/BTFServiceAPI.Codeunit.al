@@ -14,7 +14,7 @@ codeunit 6014641 "NPR BTF Service API"
         BearerTokenLbl: Label 'bearer %1', locked = true;
         ClassIdTok: Label 'classid=%1', Locked = true;
 
-    procedure VerifyServiceURL(var ServiceURL: Text)
+    procedure VerifyServiceURL(var ServiceURL: Text[250])
     var
         HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
     begin
@@ -24,7 +24,7 @@ codeunit 6014641 "NPR BTF Service API"
         RemoveLastSlashFromPath(ServiceURL, 8);
     end;
 
-    procedure RemoveLastSlashFromPath(var Path: Text; StartLength: Integer)
+    procedure RemoveLastSlashFromPath(var Path: Text[250]; StartLength: Integer)
     begin
         if Path = '' then
             exit;

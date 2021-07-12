@@ -47,7 +47,7 @@ codeunit 6014640 "NPR BTF Register Service"
         OnAfterRegisterService(sender);
     end;
 
-    local procedure GetServiceCode(): Text
+    local procedure GetServiceCode(): Code[20]
     var
         ServiceAPI: Codeunit "NPR BTF Service API";
     begin
@@ -94,6 +94,7 @@ codeunit 6014640 "NPR BTF Register Service"
     local procedure RegisterServiceEndPointMessages(sender: Record "NPR BTF Service EndPoint")
     var
         ServiceSetup: Record "NPR BTF Service Setup";
+        ImportType: Record "NPR Nc Import Type";
         ServiceAPI: Codeunit "NPR BTF Service API";
         ProcessMessageEndPointId: Text;
     begin
@@ -114,7 +115,7 @@ codeunit 6014640 "NPR BTF Register Service"
                     "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
                     'BF0DBE87-5369-405F-AA67-4D2640B4678C', ProcessMessageEndPointId);
 
-        ServiceAPI.RegisterNcImportType(sender."EndPoint ID", sender.Description, "NPR Nc IL Update Handler"::B24GetInvoice);
+        ServiceAPI.RegisterNcImportType(CopyStr(sender."EndPoint ID", 1, MaxStrlen(ImportType.Code)), sender.Description, "NPR Nc IL Update Handler"::B24GetInvoice);
         ServiceAPI.ScheduleJobQueueEntry(sender);
         OnAfterRegisterServiceEndPoint(sender);
 
@@ -124,7 +125,7 @@ codeunit 6014640 "NPR BTF Register Service"
                     "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
                     'BF0DBE87-5369-405F-AA67-4D2640B4678C', ProcessMessageEndPointId);
 
-        ServiceAPI.RegisterNcImportType(sender."EndPoint ID", sender.Description, "NPR Nc IL Update Handler"::B24GetOrderResp);
+        ServiceAPI.RegisterNcImportType(CopyStr(sender."EndPoint ID", 1, MaxStrlen(ImportType.Code)), sender.Description, "NPR Nc IL Update Handler"::B24GetOrderResp);
         ServiceAPI.ScheduleJobQueueEntry(sender);
         OnAfterRegisterServiceEndPoint(sender);
 
@@ -134,7 +135,7 @@ codeunit 6014640 "NPR BTF Register Service"
                     "NPR BTF Content Type"::"application/json", "NPR BTF Content Type"::"application/xml",
                     'BF0DBE87-5369-405F-AA67-4D2640B4678C', ProcessMessageEndPointId);
 
-        ServiceAPI.RegisterNcImportType(sender."EndPoint ID", sender.Description, "NPR Nc IL Update Handler"::B24GetPriCat);
+        ServiceAPI.RegisterNcImportType(CopyStr(sender."EndPoint ID", 1, MaxStrlen(ImportType.Code)), sender.Description, "NPR Nc IL Update Handler"::B24GetPriCat);
         ServiceAPI.ScheduleJobQueueEntry(sender);
         OnAfterRegisterServiceEndPoint(sender);
     end;

@@ -6,15 +6,8 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
         RequestNotSentLbl: Label 'Failed to send request to %1', Comment = '%1=Request URI';
         DefaultFileNameLbl: Label 'GetPriCat_%1', Comment = '%1=Current Date and Time';
         ErrorLogInfoLbl: Label 'Error encountered. Check out error log for more details.';
-        PriCatNotDeliveredLbl: Label 'Price Catalogue %1 has been imported successfully. However, due to offline import, this Price Catalogue is still available in a B24 queue under the messageId %2 and has to be set as a delivered.', Comment = '%1=Price Catlogue No.;%2=Message ID';
         PriCatNotFoundInContentLbl: Label 'Price Catalogue or it''s lines not found in the content';
-        PriCatRemovedLbl: Label 'Price Catalogue %1 has been created under the same number with the same action.', Comment = '%1=Price Catalogue Name';
-        MessageIdNotFoundLbl: Label 'Message Id not found in "%1" under the %2.', Comment = '%1="NPR Item Worksheet".TableCaption();%2="NPR Item Worksheet".FieldName(Name)';
-        ItemWrksAlreadyCreatedLbl: Label 'Item Worksheet that you are trying to import has been already created.';
-        ItemWrksAlreadyRegisteredLbl: Label 'Item Worksheet that you are trying to import has been already registered.';
-        ItemWrksCreatedInLiveEnvLbl: Label 'Since this is live environment, this Item Worksheet has to be removed from B24 queue by sending message id of this document to B24 portal. Message ID could be found under the %1 or under the property messageId in the original content downloaded from B24.', Comment = '%1="NPR Item Worksheet".FieldName(Name)';
-        DefaultWrksTemplateNameLbl: Label 'Integration';
-        OpenCardLbl: Label 'Open';
+        NextEndPointNotFoundLbl: Label 'Next Service EndPoint has not been connected to %1 or it is but it''s not enabled.', Comment = '%1=ServiceEndPoint."EndPoint ID"';
 
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
@@ -156,69 +149,41 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
 
     procedure ProcessImportedContent(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"): Boolean
     var
-        NextServiceEndPoint: Record "NPR BTF Service EndPoint";
-        ServiceSetup: Record "NPR BTF Service Setup";
         TempItemWrks: Record "NPR Item Worksheet" temporary;
         TempItemWrksLine: Record "NPR Item Worksheet Line" temporary;
-        ItemWrks: Record "NPR Item Worksheet";
-        RegisteredItemWrks: Record "NPR Registered Item Works.";
-        Request: Codeunit "Temp Blob";
+        NextServiceEndPoint: Record "NPR BTF Service EndPoint";
+        ServiceSetup: Record "NPR BTF Service Setup";
+        NextEndPointRequest: Codeunit "Temp Blob";
         Response: Codeunit "Temp Blob";
         ServiceAPI: Codeunit "NPR BTF Service API";
         FormatResponse: Interface "NPR BTF IFormatResponse";
-        OutStr: OutStream;
         StatusCode: Integer;
-        MessageId: Text;
+        Handled: Boolean;
     begin
         FormatResponse := ServiceEndPoint.Accept;
-        FormatResponse.GetPriceCat(Content, TempItemWrks, TempItemWrksLine);
-        if (not TempItemWrks.Find()) or TempItemWrksLine.IsEmpty() then begin
-            FormatResponse.FormatInternalError('internal_business_central_error', PriCatNotFoundInContentLbl, Response);
-            ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), ItemWrks.RecordId());
-            exit;
-        end;
-
-        if ItemWrksRegistered(RegisteredItemWrks, TempItemWrks) then
+        if not FormatResponse.GetPriceCat(Content, TempItemWrks, TempItemWrksLine) then
             exit;
 
-        if not ItemWrksCreated(ItemWrks, TempItemWrks) then begin
-            CreateItemWrksTemplateIfNotFound(TempItemWrks."Item Template Name");
-            CreateItemWorksheet(ItemWrks, TempItemWrks);
-            CreateItemWorksheetLines(TempItemWrksLine);
-            if not ItemWrksLineCreated(ItemWrks) then begin
-                FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(PriCatRemovedLbl, ItemWrks.Description), Response);
-                ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), ItemWrks.RecordId());
-                ItemWrks.Delete(true);
-                exit;
-            end;
-        end;
-
-        MessageId := ItemWrks.Name;
-
-        if MessageId = '' then begin
-            FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(MessageIdNotFoundLbl, ItemWrks.TableCaption(), ItemWrks.FieldName(Name)), Response);
-            ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), ItemWrks.RecordId());
-            ItemWrks.Delete(true);
+        OnProcessImportedContent(Content, ServiceEndPoint, TempItemWrks, TempItemWrksLine, NextEndPointRequest, Handled);
+        if not Handled then
             exit;
-        end;
 
-        NextServiceEndPoint."Service Code" := ServiceEndPoint."Service Code";
-        NextServiceEndPoint."EndPoint ID" := ServiceEndPoint."Next EndPoint ID";
-        NextServiceEndPoint.Find();
-        NextServiceEndPoint.TestField(Enabled);
-
-        ServiceSetup.Code := NextServiceEndPoint."Service Code";
+        ServiceSetup.Code := ServiceEndPoint."Service Code";
         ServiceSetup.Find();
         ServiceSetup.TestField(Enabled);
 
-        Request.CreateOutStream(OutStr);
-        OutStr.WriteText(MessageId);
+        NextServiceEndPoint."Service Code" := ServiceEndPoint."Service Code";
+        NextServiceEndPoint."EndPoint ID" := ServiceEndPoint."Next EndPoint ID";
+        if (not NextServiceEndPoint.Find()) or (not NextServiceEndPoint.Enabled) then begin
+            FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(NextEndPointNotFoundLbl, ServiceEndPoint."EndPoint ID"), Response);
+            ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), TempItemWrks.RecordId());
+            exit;
+        end;
 
-        ServiceAPI.SendWebRequest(ServiceSetup, NextServiceEndPoint, Request, Response, StatusCode);
+        ServiceAPI.SendWebRequest(ServiceSetup, NextServiceEndPoint, NextEndPointRequest, Response, StatusCode);
         FormatResponse := NextServiceEndPoint.Accept;
         if FormatResponse.FoundErrorInResponse(Response, StatusCode) then begin
-            ServiceAPI.LogEndPointError(ServiceSetup, NextServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), ItemWrks.RecordId());
-            ItemWrks.Delete(true);
+            ServiceAPI.LogEndPointError(ServiceSetup, NextServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), TempItemWrks.RecordId());
             exit;
         end;
         exit(true);
@@ -229,11 +194,12 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
         TempItemWrks: Record "NPR Item Worksheet" temporary;
         TempItemWrksLine: Record "NPR Item Worksheet Line" temporary;
         ItemWrks: Record "NPR Item Worksheet";
-        RegisteredItemWrks: Record "NPR Registered Item Works.";
         ServiceSetup: Record "NPR BTF Service Setup";
         Response: Codeunit "Temp Blob";
         ServiceAPI: Codeunit "NPR BTF Service API";
         FormatResponse: Interface "NPR BTF IFormatResponse";
+        NewSystemId: Guid;
+        Handled: Boolean;
     begin
         ServiceSetup.Code := ServiceEndPoint."Service Code";
         ServiceSetup.Find();
@@ -249,119 +215,22 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
             exit;
         end;
 
-        if ItemWrksCreated(ItemWrks, TempItemWrks) then begin
-            if ServiceSetup.Environment = ServiceSetup.Environment::production then begin
-                FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(PriCatNotDeliveredLbl, TempItemWrks.Description, TempItemWrks.Name), Response);
-                ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), ItemWrks.RecordId());
-                ItemWrks.SetRecFilter();
-                Page.RunModal(0, ItemWrks);
-                SendItemWrksNotification(GetItemWrksCreatedInLiveEnvNotificationId(), ItemWrksAlreadyCreatedLbl + ' ' + ItemWrksCreatedInLiveEnvLbl, ItemWrks."Item Template Name", ItemWrks.Name, 'OpenWorksheet');
-            end else begin
-                ItemWrks.SetRecFilter();
-                Page.RunModal(0, ItemWrks);
-                SendItemWrksNotification(GetItemWrksAlreadyCreatedNotificationId(), ItemWrksAlreadyCreatedLbl, ItemWrks."Item Template Name", ItemWrks.Name, 'OpenWorksheet');
-            end;
+        OnProcessImportedContentOffline(Content, ServiceEndPoint, TempItemWrks, TempItemWrksLine, NewSystemId, Handled);
+        if not Handled then
             exit;
-        end else begin
-            if ItemWrksRegistered(RegisteredItemWrks, TempItemWrks) then begin
-                RegisteredItemWrks.SetRecFilter();
-                Page.RunModal(0, RegisteredItemWrks);
-                SendItemWrksNotification(GetItemWrksAlreadyPostedNotificationId(), ItemWrksAlreadyRegisteredLbl, '', RegisteredItemWrks."Worksheet Name", 'OpenRegisteredWorksheet');
-                exit;
-            end;
-        end;
 
-        CreateItemWrksTemplateIfNotFound(TempItemWrks."Item Template Name");
-        CreateItemWorksheet(ItemWrks, TempItemWrks);
-        CreateItemWorksheetLines(TempItemWrksLine);
-
+        ItemWrks.GetBySystemId(NewSystemId);
         ItemWrks.SetRecFilter();
         Page.Run(0, ItemWrks);
     end;
 
 
-    local procedure CreateItemWrksTemplateIfNotFound(TemplateName: Text)
-    var
-        ItemWorkshTemplate: Record "NPR Item Worksh. Template";
-        ServiceAPI: Codeunit "NPR BTF Service API";
-    begin
-        ItemWorkshTemplate.Name := TemplateName;
-        if ItemWorkshTemplate.Name = '' then
-            ItemWorkshTemplate.Name := ServiceAPI.GetIntegrationPrefix();
-        if ItemWorkshTemplate.Find() then
-            exit;
-        ItemWorkshTemplate.Init();
-        ItemWorkshTemplate.Description := CopyStr(ServiceAPI.GetIntegrationPrefix() + ' ' + DefaultWrksTemplateNameLbl, 1, MaxStrLen(ItemWorkshTemplate.Description));
-        ItemWorkshTemplate."Create Internal Barcodes" := ItemWorkshTemplate."Create Internal Barcodes"::"As Cross Reference";
-        ItemWorkshTemplate."Create Vendor  Barcodes" := ItemWorkshTemplate."Create Vendor  Barcodes"::"As Cross Reference";
-        ItemWorkshTemplate.Insert(true);
-    end;
-
-    local procedure CreateItemWorksheet(var ItemWrks: Record "NPR Item Worksheet"; TempItemWrks: Record "NPR Item Worksheet")
-    begin
-        ItemWrks.TransferFields(TempItemWrks);
-        ItemWrks.Validate("Vendor No.");
-        ItemWrks.Validate("Currency Code");
-        ItemWrks.Insert(true);
-    end;
-
-    local procedure CreateItemWorksheetLines(var TempItemWrksLine: Record "NPR Item Worksheet Line")
-    var
-        ItemWrksLine: Record "NPR Item Worksheet Line";
-        ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
-    begin
-        if TempItemWrksLine.FindSet() then
-            repeat
-                if not ItemWrksLineCreatedWithSameAction(ItemWrksLine, TempItemWrksLine) then begin
-                    Clear(ItemWrksLine);
-                    ItemWrksLine.TransferFields(TempItemWrksLine);
-                    ItemWrksLine.Validate(Action);
-                    ItemWrksLine.Validate("Item No.");
-                    ItemWrksLine.Validate("Base Unit of Measure");
-                    ItemWrksLine.Insert(true);
-                    ItemWkshCheckLine.RunCheck(ItemWrksLine, false, false);
-                end;
-            until TempItemWrksLine.next() = 0;
-    end;
-
-    local procedure ItemWrksCreated(var ItemWrks: Record "NPR Item Worksheet"; TempItemWrks: Record "NPR Item Worksheet"): Boolean
-    begin
-        ItemWrks."Item Template Name" := TempItemWrks."Item Template Name";
-        ItemWrks.Name := TempItemWrks.Name;
-        exit(ItemWrks.Find());
-    end;
-
-    local procedure ItemWrksLineCreatedWithSameAction(var ItemWrksLine: Record "NPR Item Worksheet Line"; var TempItemWrksLine: Record "NPR Item Worksheet Line"): Boolean
-    begin
-        Clear(ItemWrksLine);
-        ItemWrksLine.SetRange("Worksheet Template Name", TempItemWrksLine."Worksheet Template Name");
-        ItemWrksLine.SetRange("Worksheet Name", TempItemWrksLine."Worksheet Name");
-        ItemWrksLine.SetRange("Item No.", TempItemWrksLine."Item No.");
-        ItemWrksLine.SetRange(Action, TempItemWrksLine.Action);
-        exit(not ItemWrksLine.IsEmpty());
-    end;
-
-    local procedure ItemWrksLineCreated(ItemWrks: Record "NPR Item Worksheet"): Boolean
-    var
-        ItemWrksLine: Record "NPR Item Worksheet Line";
-    begin
-        ItemWrksLine.SetRange("Worksheet Template Name", ItemWrks."Item Template Name");
-        ItemWrksLine.SetRange("Worksheet Name", ItemWrks.Name);
-        exit(not ItemWrksLine.IsEmpty());
-    end;
-
-    local procedure ItemWrksRegistered(var RegisteredItemWorksheet: Record "NPR Registered Item Works."; ItemWorksheet: Record "NPR Item Worksheet"): Boolean
-    begin
-        RegisteredItemWorksheet."Worksheet Name" := ItemWorksheet.Name;
-        exit(RegisteredItemWorksheet.FindFirst());
-    end;
-
     procedure OpenWorksheet(ItemWkrsNotification: Notification)
     var
         ItemWrks: Record "NPR Item Worksheet";
     begin
-        ItemWrks."Item Template Name" := ItemWkrsNotification.GetData('WrksTemplate');
-        ItemWrks.Name := ItemWkrsNotification.GetData('WrksName');
+        ItemWrks."Item Template Name" := CopyStr(ItemWkrsNotification.GetData('WrksTemplate'), 1, MaxStrLen(ItemWrks."Item Template Name"));
+        ItemWrks.Name := CopyStr(ItemWkrsNotification.GetData('WrksName'), 1, MaxStrLen(ItemWrks.Name));
         ItemWrks.SetRecFilter();
         Page.Run(0, ItemWrks);
     end;
@@ -370,42 +239,23 @@ codeunit 6014652 "NPR BTF GetPriCat" implements "NPR BTF IEndPoint", "NPR Nc Imp
     var
         RegisteredItemWorksheet: Record "NPR Registered Item Works.";
     begin
-        RegisteredItemWorksheet."Worksheet Name" := ItemWkrsNotification.GetData('WrksName');
+        RegisteredItemWorksheet."Worksheet Name" := CopyStr(ItemWkrsNotification.GetData('WrksName'), 1, MaxStrLen(RegisteredItemWorksheet."Worksheet Name"));
         RegisteredItemWorksheet.SetRecFilter();
         Page.Run(0, RegisteredItemWorksheet);
-    end;
-
-    local procedure SendItemWrksNotification(ItemWkrsNotificationId: Guid; Msg: Text; WkrsTemplate: Text; WkrsName: Text; ActionName: Text)
-    var
-        ItemWkrsNotification: Notification;
-    begin
-        ItemWkrsNotification.Id := ItemWkrsNotificationId;
-        ItemWkrsNotification.Recall();
-        ItemWkrsNotification.Message(Msg);
-        ItemWkrsNotification.Scope(NOTIFICATIONSCOPE::LocalScope);
-        ItemWkrsNotification.SetData('WrksTemplate', WkrsTemplate);
-        ItemWkrsNotification.SetData('WrksName', WkrsName);
-        ItemWkrsNotification.AddAction(OpenCardLbl, Codeunit::"NPR BTF GetPriCat", ActionName);
-        ItemWkrsNotification.Send();
-    end;
-
-    local procedure GetItemWrksAlreadyCreatedNotificationId(): Guid
-    begin
-        exit('4bd34c29-4f15-4505-b69c-026e6a1d7594');
-    end;
-
-    local procedure GetItemWrksAlreadyPostedNotificationId(): Guid
-    begin
-        exit('5fc3dfd2-e681-438d-b7fb-6aab325da47b');
-    end;
-
-    local procedure GetItemWrksCreatedInLiveEnvNotificationId(): Guid
-    begin
-        exit('4203777e-b874-4b0e-b85d-b5e79d0c7784');
     end;
 
     procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
     begin
         exit("NPR Nc IL Update Handler"::B24GetPriCat);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessImportedContent(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var ItemWrks: Record "NPR Item Worksheet"; var ItemWrksLine: Record "NPR Item Worksheet Line"; var NextEndPointRequest: Codeunit "Temp Blob"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessImportedContentOffline(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var ItemWrks: Record "NPR Item Worksheet"; var ItemWrksLine: Record "NPR Item Worksheet Line"; var NewSystemId: Guid; var Handled: Boolean)
+    begin
     end;
 }
