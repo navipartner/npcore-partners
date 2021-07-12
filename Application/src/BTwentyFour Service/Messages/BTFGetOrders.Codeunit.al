@@ -7,12 +7,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         DefaultFileNameLbl: Label 'GetOrders_%1', Comment = '%1=Current Date and Time';
         OrderNotFoundInContentLbl: Label 'Order or it''s lines not found in the content';
         ErrorLogInfoLbl: Label 'Error encountered. Check out error log for more details.';
-        OrderNotDeliveredLbl: Label 'Order has been imported successfully under the %1 %2. However, due to offline import, this order is still available in a B24 queue under %3 %4 and has to be set as a delivered in B24 with messageId = %4.', Comment = '%1="Sales Header".FieldName("External Document No.");%2="Sales Header"."External Document No.";%3="Sales Header".FieldName("Your Reference");%4="Sales Header"."Your Reference"';
-        MessageIdNotFoundLbl: Label 'Message Id not found in Sales Order %1 under the %2.', Comment = '%1="Sales Header".No.;%2="Sales Header".FieldName("Your Reference")';
-        DocAlreadyCreatedLbl: Label 'Document you are trying to import has been already created.';
-        DocAlreadyPostedLbl: Label 'Document are trying to import has been already posted.';
-        DocCreatedInLiveEnvLbl: Label 'Since this is live environment, this document has to be removed from B24 queue by sending message id of this document to B24 portal. Message ID could be found under the %1 or under the property messageId in the original content downloaded from B24.', Comment = '%1="Sales Header".FieldName("Your Reference")';
-        OpenCardLbl: Label 'Open';
+        NextEndPointNotFoundLbl: Label 'Next Service EndPoint has not been connected to %1 or it is but it''s not enabled.', Comment = '%1=ServiceEndPoint."EndPoint ID"';
 
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
@@ -163,59 +158,40 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
     procedure ProcessImportedContent(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"): Boolean
     var
         TempSalesHeader: Record "Sales Header" temporary;
-        SalesHeader: Record "Sales Header";
         TempSalesLine: Record "Sales Line" temporary;
         NextServiceEndPoint: Record "NPR BTF Service EndPoint";
         ServiceSetup: Record "NPR BTF Service Setup";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        Request: Codeunit "Temp Blob";
+        NextEndPointRequest: Codeunit "Temp Blob";
         Response: Codeunit "Temp Blob";
         ServiceAPI: Codeunit "NPR BTF Service API";
         FormatResponse: Interface "NPR BTF IFormatResponse";
-        OutStr: OutStream;
         StatusCode: Integer;
-        MessageId: Text;
+        Handled: Boolean;
     begin
         FormatResponse := ServiceEndPoint.Accept;
-        FormatResponse.GetOrder(Content, TempSalesHeader, TempSalesLine);
-
-        if (not TempSalesHeader.Find()) or TempSalesLine.IsEmpty() then begin
-            FormatResponse.FormatInternalError('internal_business_central_error', OrderNotFoundInContentLbl, Response);
-            ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), SalesHeader.RecordId());
-            exit;
-        end;
-
-        if InvoicePosted(SalesInvoiceHeader, TempSalesHeader) then
+        if not FormatResponse.GetOrder(Content, TempSalesHeader, TempSalesLine) then
             exit;
 
-        if not DocumentCreated(SalesHeader, TempSalesHeader) then
-            CreateDocument(SalesHeader, TempSalesHeader, TempSalesLine);
-
-        MessageId := SalesHeader."Your Reference";
-
-        if MessageId = '' then begin
-            FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(MessageIdNotFoundLbl, SalesHeader."No.", SalesHeader.FieldName("Your Reference")), Response);
-            ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), SalesHeader.RecordId());
-            SalesHeader.Delete(true);
+        OnProcessImportedContent(Content, ServiceEndPoint, TempSalesHeader, TempSalesLine, NextEndPointRequest, Handled);
+        if not Handled then
             exit;
-        end;
+
+        ServiceSetup.Code := ServiceEndPoint."Service Code";
+        ServiceSetup.Find();
+        ServiceSetup.TestField(Enabled);
 
         NextServiceEndPoint."Service Code" := ServiceEndPoint."Service Code";
         NextServiceEndPoint."EndPoint ID" := ServiceEndPoint."Next EndPoint ID";
-        NextServiceEndPoint.Find();
-        NextServiceEndPoint.TestField(Enabled);
+        if (not NextServiceEndPoint.Find()) or (not NextServiceEndPoint.Enabled) then begin
+            FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(NextEndPointNotFoundLbl, ServiceEndPoint."EndPoint ID"), Response);
+            ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), TempSalesHeader.RecordId());
+            exit;
+        end;
 
-        ServiceSetup.Code := NextServiceEndPoint."Service Code";
-        ServiceSetup.Find();
-        ServiceSetup.TestField(Enabled);
-        Request.CreateOutStream(OutStr);
-        OutStr.WriteText(MessageId);
-
-        ServiceAPI.SendWebRequest(ServiceSetup, NextServiceEndPoint, Request, Response, StatusCode);
+        ServiceAPI.SendWebRequest(ServiceSetup, NextServiceEndPoint, NextEndPointRequest, Response, StatusCode);
         FormatResponse := NextServiceEndPoint.Accept;
         if FormatResponse.FoundErrorInResponse(Response, StatusCode) then begin
-            ServiceAPI.LogEndPointError(ServiceSetup, NextServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), SalesHeader.RecordId());
-            SalesHeader.Delete(true);
+            ServiceAPI.LogEndPointError(ServiceSetup, NextServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), TempSalesHeader.RecordId());
             exit;
         end;
         exit(true);
@@ -225,12 +201,13 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
     var
         TempSalesHeader: Record "Sales Header" temporary;
         SalesHeader: Record "Sales Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
         TempSalesLine: Record "Sales Line" temporary;
         ServiceSetup: Record "NPR BTF Service Setup";
         Response: Codeunit "Temp Blob";
         ServiceAPI: Codeunit "NPR BTF Service API";
         FormatResponse: Interface "NPR BTF IFormatResponse";
+        NewSystemId: Guid;
+        Handled: Boolean;
     begin
         ServiceSetup.Code := ServiceEndPoint."Service Code";
         ServiceSetup.Find();
@@ -246,92 +223,13 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
             exit;
         end;
 
-        if DocumentCreated(SalesHeader, TempSalesHeader) then begin
-            if ServiceSetup.Environment = ServiceSetup.Environment::production then begin
-                FormatResponse.FormatInternalError('internal_business_central_error', StrSubstNo(OrderNotDeliveredLbl, SalesHeader.FieldName("External Document No."), SalesHeader."External Document No.", SalesHeader.FieldName("Your Reference"), SalesHeader."Your Reference"), Response);
-                ServiceAPI.LogEndPointError(ServiceSetup, ServiceEndPoint, Response, '', FormatResponse.GetErrorDescription(Response), SalesHeader.RecordId());
-                SalesHeader.SetRecFilter();
-                Page.RunModal(Page::"Sales Order", SalesHeader);
-                SendDocumentNotification(GetDocumentCreatedInLiveEnvNotificationId(), DocAlreadyCreatedLbl + ' ' + DocCreatedInLiveEnvLbl, SalesHeader."No.", 'OpenOrder');
-            end else begin
-                SalesHeader.SetRecFilter();
-                Page.RunModal(Page::"Sales Order", SalesHeader);
-                SendDocumentNotification(GetDocumentAlreadyCreatedNotificationId(), DocAlreadyCreatedLbl, SalesHeader."No.", 'OpenOrder');
-            end;
+        OnProcessImportedContentOffline(Content, ServiceEndPoint, TempSalesHeader, TempSalesLine, NewSystemId, Handled);
+        if not Handled then
             exit;
-        end else begin
-            if InvoicePosted(SalesInvoiceHeader, TempSalesHeader) then begin
-                SalesInvoiceHeader.SetRecFilter();
-                Page.RunModal(Page::"Posted Sales Invoice", SalesInvoiceHeader);
-                SendDocumentNotification(GetDocumentAlreadyPostedNotificationId(), DocAlreadyPostedLbl, SalesInvoiceHeader."No.", 'OpenPostedInvoice');
-                exit;
-            end;
-        end;
 
-        CreateDocument(SalesHeader, TempSalesHeader, TempSalesLine);
-
+        SalesHeader.GetBySystemId(NewSystemId);
         SalesHeader.SetRecFilter();
         Page.Run(Page::"Sales Order", SalesHeader);
-    end;
-
-    local procedure CreateDocument(var SalesHeader: Record "Sales Header"; var TempSalesHeader: Record "Sales Header"; var TempSalesLine: Record "Sales Line")
-    var
-        SalesLine: Record "Sales Line";
-        NoSeriesMgt: codeunit NoSeriesManagement;
-    begin
-        SalesHeader."Document Type" := TempSalesHeader."Document Type";
-        if NoSeriesMgt.ManualNoAllowed(SalesHeader.GetNoSeriesCode()) then begin
-            SalesHeader.validate("No.", TempSalesHeader."No.");
-        end else begin
-            SalesHeader."No." := '';
-        end;
-        SalesHeader.Init();
-        SalesHeader.Insert(true);
-        SalesHeader.Validate("Sell-to Customer No.", TempSalesHeader."Sell-to Customer No.");
-        if TempSalesHeader."Posting Date" <> 0D then
-            SalesHeader.Validate("Posting Date", TempSalesHeader."Posting Date");
-        SalesHeader.Validate("Currency Code", TempSalesHeader."Currency Code");
-        SalesHeader.validate("External Document No.", TempSalesHeader."External Document No.");
-        SalesHeader."Your Reference" := TempSalesHeader."Your Reference";
-        SalesHeader.Modify();
-        if TempSalesLine.FindSet() then
-            repeat
-                SalesLine."Document Type" := SalesHeader."Document Type";
-                SalesLine."Document No." := SalesHeader."No.";
-                SalesLine."Line No." := TempSalesLine."Line No.";
-                SalesLine.Validate(Type, SalesLine.Type::Item);
-                SalesLine.Insert(true);
-                SalesLine.Validate("No.", TempSalesLine."No.");
-                SalesLine.validate("Unit of Measure Code", TempSalesLine."Unit of Measure Code");
-                SalesLine.Validate(Quantity, TempSalesLine.Quantity);
-                SalesLine.Validate("Item Reference Type", TempSalesLine."Item Reference Type");
-                SalesLine.Validate("Item Reference No.", TempSalesLine."Item Reference No.");
-                SalesLine.Validate("Unit Price", TempSalesLine."Unit Price");
-                SalesLine.Validate("Line Discount %", TempSalesLine."Line Discount %");
-                SalesLine.Modify();
-            until TempSalesLine.next() = 0;
-    end;
-
-    local procedure DocumentCreated(var SalesHeader: Record "Sales Header"; TempSalesHeader: Record "Sales Header"): Boolean
-    var
-        NoSeriesMgt: codeunit NoSeriesManagement;
-    begin
-        Clear(SalesHeader);
-        if NoSeriesMgt.ManualNoAllowed(SalesHeader.GetNoSeriesCode()) then begin
-            SalesHeader."Document Type" := TempSalesHeader."Document Type";
-            SalesHeader."No." := TempSalesHeader."No.";
-            exit(SalesHeader.Find());
-        end else begin
-            SalesHeader.SetRange("Document Type", TempSalesHeader."Document Type");
-            SalesHeader.SetRange("External Document No.", TempSalesHeader."External Document No.");
-            exit(SalesHeader.FindFirst());
-        end;
-    end;
-
-    local procedure InvoicePosted(var SalesInvoiceHeader: Record "Sales Invoice Header"; TempSalesHeader: Record "Sales Header"): Boolean
-    begin
-        SalesInvoiceHeader.SetRange("External Document No.", TempSalesHeader."External Document No.");
-        exit(SalesInvoiceHeader.FindFirst());
     end;
 
     procedure OpenOrder(DocNotification: Notification)
@@ -339,7 +237,7 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
         SalesHeader: Record "Sales Header";
     begin
         SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
-        SalesHeader."No." := DocNotification.GetData('DocNo');
+        SalesHeader."No." := CopyStr(DocNotification.GetData('DocNo'), 1, MaxStrLen(SalesHeader."No."));
         SalesHeader.SetRecFilter();
         Page.Run(Page::"Sales Order", SalesHeader);
     end;
@@ -348,41 +246,23 @@ codeunit 6014644 "NPR BTF GetOrders" implements "NPR BTF IEndPoint", "NPR Nc Imp
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
-        SalesInvoiceHeader."No." := DocNotification.GetData('DocNo');
+        SalesInvoiceHeader."No." := CopyStr(DocNotification.GetData('DocNo'), 1, MaxStrLen(SalesInvoiceHeader."No."));
         SalesInvoiceHeader.SetRecFilter();
         Page.Run(Page::"Posted Sales Invoice", SalesInvoiceHeader);
-    end;
-
-    local procedure SendDocumentNotification(DocNotificationId: Guid; Msg: Text; DocNo: Text; ActionName: Text)
-    var
-        DocNotification: Notification;
-    begin
-        DocNotification.Id := DocNotificationId;
-        DocNotification.Recall();
-        DocNotification.Message(Msg);
-        DocNotification.Scope(NOTIFICATIONSCOPE::LocalScope);
-        DocNotification.SetData('DocNo', DocNo);
-        DocNotification.AddAction(OpenCardLbl, Codeunit::"NPR BTF GetOrders", ActionName);
-        DocNotification.Send();
-    end;
-
-    local procedure GetDocumentAlreadyCreatedNotificationId(): Guid
-    begin
-        exit('2af25b7f-29a1-4880-850a-f8f1166196ec');
-    end;
-
-    local procedure GetDocumentAlreadyPostedNotificationId(): Guid
-    begin
-        exit('14368812-7387-4ea0-a684-4207b8581700');
-    end;
-
-    local procedure GetDocumentCreatedInLiveEnvNotificationId(): Guid
-    begin
-        exit('fced3743-2229-4bc6-9231-affd372ec9a0');
     end;
 
     procedure GetImportListUpdateHandler(): Enum "NPR Nc IL Update Handler"
     begin
         exit("NPR Nc IL Update Handler"::B24GetOrder);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessImportedContent(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var NextEndPointRequest: Codeunit "Temp Blob"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessImportedContentOffline(Content: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var NewSystemId: Guid; var Handled: Boolean)
+    begin
     end;
 }

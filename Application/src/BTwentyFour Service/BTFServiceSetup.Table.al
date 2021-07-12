@@ -111,7 +111,7 @@ table 6014522 "NPR BTF Service Setup"
         Error(RenameNotAllowedErr);
     end;
 
-    procedure RegisterService(NewCode: Code[10]; NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewEnabled: Boolean; NewPassword: Text)
+    procedure RegisterService(NewCode: Code[20]; NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewEnabled: Boolean; NewPassword: Text)
     begin
         Code := NewCode;
         if Find() then
@@ -125,14 +125,14 @@ table 6014522 "NPR BTF Service Setup"
 
     procedure InitService(NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewPassword: Text; NewEnabled: Boolean)
     begin
-        "Service URL" := NewServiceURL;
+        "Service URL" := CopyStr(NewServiceURL,1,MaxStrLen("Service URL"));
         Name := copystr(NewName, 1, MaxStrLen(Name));
-        "About API" := NewAboutAPI;
-        "Subscription-Key" := NewSubscriptionKey;
+        "About API" := CopyStr(NewAboutAPI,1,MaxStrLen("About API"));
+        "Subscription-Key" := CopyStr(NewSubscriptionKey,1,MaxStrLen("Subscription-Key"));
         Environment := NewEnvironment;
-        Username := NewUsername;
-        Portal := NewPortal;
-        Password := NewPassword;
+        Username := CopyStr(NewUsername,1,MaxStrLen(Username));
+        Portal := CopyStr(NewPortal,1,MaxStrLen(Portal));
+        Password := CopyStr(NewPassword,1,MaxStrLen(Password));
         Enabled := NewEnabled;
     end;
 
