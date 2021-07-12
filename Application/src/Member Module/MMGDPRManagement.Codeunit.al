@@ -236,7 +236,9 @@ codeunit 6151121 "NPR MM GDPR Management"
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
+#pragma warning disable AA0240
         DummyEMailAddressLbl: Label 'anonymous%1@nowhere.com', Locked = true;
+#pragma warning restore
     begin
 
         Member.Get(MemberEntryNo);
