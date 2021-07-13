@@ -2203,13 +2203,8 @@ table 6014406 "NPR POS Sale Line"
     end;
 
     local procedure TestPaymentMethod(POSPaymentMethod: Record "NPR POS Payment Method")
-    var
-        PaymentTypeErr: Label '%1 type %2 not supported.', Comment = '%1 = POS Payment Method table caption, %2 = Type Customer';
     begin
         POSPaymentMethod.TestField("Block POS Payment", false);
-
-        if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CUSTOMER then
-            Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
     end;
 
     local procedure CalcBaseQty(Qty: Decimal): Decimal

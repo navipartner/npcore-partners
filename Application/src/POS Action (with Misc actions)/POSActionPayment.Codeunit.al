@@ -11,7 +11,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         ReadingErr: Label 'reading in %1';
         VoucherNotValid: Label 'Voucher %1 is not valid.';
         VoucherNotFound: Label 'Voucher %1 is not found.';
-        PaymentTypeErr: Label '%1 type %2 not supported.', Comment = '%1 = POS Payment Method table caption, %2 = Type Customer';
 
     procedure ActionCode(): Text
     begin
@@ -121,12 +120,12 @@ codeunit 6150725 "NPR POS Action: Payment"
                     Handled := ConfigureCashWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
                 POSPaymentMethod."Processing Type"::VOUCHER:
                     Handled := ConfigureVoucherWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                POSPaymentMethod."Processing Type"::"FOREIGN VOUCHER":
+                    Handled := ConfigureForeignVoucherWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
                 POSPaymentMethod."Processing Type"::CHECK:
                     Handled := ConfigureCheckWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
                 POSPaymentMethod."Processing Type"::EFT:
                     Handled := ConfigureCashTerminalWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
-                POSPaymentMethod."Processing Type"::CUSTOMER:
-                    Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
                 POSPaymentMethod."Processing Type"::PAYOUT:
                     Handled := ConfigurePayoutWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
                 else                    // provide a resonable default
@@ -267,6 +266,14 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
+    local procedure ConfigureForeignVoucherWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    begin
+        Context.SetContext('capture_amount', true);
+        Context.SetContext('capture_voucher', true);
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
+        exit(true);
+    end;
+
     local procedure ConfigureCheckWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
@@ -339,10 +346,10 @@ codeunit 6150725 "NPR POS Action: Payment"
                     Handled := CaptureCashPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
                 POSPaymentMethod."Processing Type"::"Voucher":
                     Handled := CaptureVoucherPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod, VoucherNo, SalePOS, POSSession, FrontEnd);
+                POSPaymentMethod."Processing Type"::"FOREIGN VOUCHER":
+                    Handled := CaptureForeignVoucherPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod, VoucherNo, SalePOS, POSSession, FrontEnd);
                 POSPaymentMethod."Processing Type"::EFT:
                     Handled := CaptureEftPayment(AmountToCapture, POSSession, POSPaymentLine, POSLine, POSPaymentMethod, FrontEnd);
-                POSPaymentMethod."Processing Type"::CUSTOMER:
-                    Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
                 POSPaymentMethod."Processing Type"::PAYOUT:
                     Handled := CapturePayoutPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
                 POSPaymentMethod."Processing Type"::CHECK:
@@ -413,6 +420,28 @@ codeunit 6150725 "NPR POS Action: Payment"
 
         exit(true);
     end;
+
+    local procedure CaptureForeignVoucherPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"; VoucherNumber: Text; SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        VoucherTypeCode: Code[20];
+    begin
+        if AmountToCaptureLCY = 0 then
+            exit(true);
+
+        if not ValidateExternalVoucher(VoucherNumber) then
+            Error(VoucherNotValid, VoucherNumber);
+
+        NpRvVoucherType.SetRange("Payment Type", POSPaymentMethod.Code);
+        if NpRvVoucherType.FindFirst() then
+            VoucherTypeCode := NpRvVoucherType.Code;
+
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
+        ApplyForeignVoucherToPaymentLine(VoucherTypeCode, VoucherNumber, POSLine, AmountToCaptureLCY, SalePOS, POSSession, FrontEnd);
+
+        exit(true);
+    end;
+
 
 
     local procedure CaptureEftPayment(AmountToCapture: Decimal; POSSession: Codeunit "NPR POS Session"; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
@@ -586,6 +615,27 @@ codeunit 6150725 "NPR POS Action: Payment"
         AmountToCaptureLCY := POSLine."Amount Including VAT";
         AmountToCapture := AmountToCapture;
         exit(true);
+    end;
+
+    local procedure ApplyForeignVoucherToPaymentLine(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; AmountToCaptureLCY: Decimal; SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    var
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSLine: Record "NPR POS Sale Line";
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.GetPaymentLine(POSLine);
+
+        NpRvVoucherMgt.ApplyForeignVoucherPayment(VoucherTypeCode, VoucherNumber, PaymentLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine, AmountToCaptureLCY);
+
+        AmountToCaptureLCY := POSLine."Amount Including VAT";
+        exit(true);
+    end;
+
+
+    local procedure ValidateExternalVoucher(VoucherNumber: Text): Boolean
+    begin
+        exit(VoucherNumber <> ''); //TODO possible external validation
     end;
 
 
