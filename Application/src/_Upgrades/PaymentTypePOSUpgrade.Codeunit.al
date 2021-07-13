@@ -115,9 +115,7 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
             PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
                 POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::VOUCHER;
             PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
-                POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::VOUCHER;
-            PaymentTypePOS."Processing Type"::"Finance Agreement":
-                POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CUSTOMER;
+                POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::"FOREIGN VOUCHER";
             PaymentTypePOS."Processing Type"::Payout:
                 POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::PAYOUT;
             PaymentTypePOS."Processing Type"::"Foreign Currency":
@@ -132,10 +130,6 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
                 POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
             PaymentTypePOS."Processing Type"::"Other Credit Cards":
                 POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-            PaymentTypePOS."Processing Type"::"Debit sale":
-                POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CUSTOMER;
-            PaymentTypePOS."Processing Type"::Invoice:
-                POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::CUSTOMER;
             PaymentTypePOS."Processing Type"::DIBS:
                 POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
             PaymentTypePOS."Processing Type"::"Point Card":

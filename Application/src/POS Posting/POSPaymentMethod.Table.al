@@ -22,8 +22,8 @@ table 6150616 "NPR POS Payment Method"
         {
             Caption = 'Processing Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Cash,Voucher,Check,EFT,Customer - TBD,PayOut';
-            OptionMembers = CASH,VOUCHER,CHECK,EFT,CUSTOMER,PAYOUT;
+            OptionCaption = 'Cash,Voucher,Check,EFT,CUSTOMER,PayOut,Foreign Voucher';
+            OptionMembers = CASH,VOUCHER,CHECK,EFT,CUSTOMER,PAYOUT,"FOREIGN VOUCHER";
         }
         field(15; "Currency Code"; Code[10])
         {
@@ -236,11 +236,11 @@ table 6150616 "NPR POS Payment Method"
     }
 
     trigger OnModify()
-    var 
+    var
         MinGreaterThanMax: Label 'The minimum amount has to be less than the maximum amount';
-    begin 
+    begin
         if rec."Minimum Amount" > rec."Maximum Amount" then
-        error(MinGreaterThanMax);
+            error(MinGreaterThanMax);
     end;
 
     trigger OnDelete()
