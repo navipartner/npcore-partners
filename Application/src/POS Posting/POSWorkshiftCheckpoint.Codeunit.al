@@ -1098,7 +1098,6 @@
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         IsLCY: Boolean;
-        PaymentTypeErr: Label '%1 type %2 not supported.', Comment = '%1 = POS Payment Method table caption, %2 = Type Customer';
     begin
 
         POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code");
@@ -1117,13 +1116,11 @@
                     if (not IsLCY) then POSWorkshiftCheckpoint."Foreign Currency (LCY)" += POSPaymentLine."Amount (LCY)";
                 end;
 
-            POSPaymentMethod."Processing Type"::CUSTOMER:
-                Error(PaymentTypeErr, POSPaymentMethod.TableCaption(), POSPaymentMethod."Processing Type");
             POSPaymentMethod."Processing Type"::EFT:
                 POSWorkshiftCheckpoint."EFT (LCY)" += POSPaymentLine."Amount (LCY)";
             POSPaymentMethod."Processing Type"::PAYOUT:
                 ; // PAYOUT is recorded on Sales Line POSWorkshiftCheckpoint."GL Payment (LCY)" += "Amount (LCY)";
-            POSPaymentMethod."Processing Type"::VOUCHER:
+            POSPaymentMethod."Processing Type"::VOUCHER, POSPaymentMethod."Processing Type"::"FOREIGN VOUCHER":
                 POSWorkshiftCheckpoint."Redeemed Vouchers (LCY)" += POSPaymentLine."Amount (LCY)";
 
         end;
