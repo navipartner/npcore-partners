@@ -18,6 +18,8 @@ codeunit 6150783 "NPR Front-End: SetFormat" implements "NPR Front-End Async Requ
         NumberFormat: JsonObject;
         DateFormat: JsonObject;
         Token: JsonToken;
+        DayNamesAsJArray: JsonArray;
+        DayName: Text;
     begin
         _ready := false;
         _json := ViewProfile.GetLocalFormats();
@@ -53,8 +55,11 @@ codeunit 6150783 "NPR Front-End: SetFormat" implements "NPR Front-End Async Requ
             DateFormat.Add(LabelShortDatePattern, ViewProfile."Client Short Date Pattern");
         end;
         if ViewProfile."Client Day Names" <> '' then begin
+            foreach DayName in ViewProfile."Client Day Names".Split(',') do
+                if (DayName <> '') then
+                    DayNamesAsJArray.Add(DayName);
             DateFormat.Remove(LabelDayNames);
-            DateFormat.Add(LabelDayNames, ViewProfile."Client Day Names");
+            DateFormat.Add(LabelDayNames, DayNamesAsJArray);
         end;
 
         _ready := true;
