@@ -13,18 +13,21 @@ page 6150711 "NPR POS View Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             usercontrol(Editor; "NPR JsonEditor")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
                 trigger OnControlReady();
                 begin
                     CurrPage.Editor.Invoke('setJson', Rec.GetMarkup());

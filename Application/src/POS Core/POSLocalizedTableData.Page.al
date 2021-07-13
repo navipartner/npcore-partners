@@ -6,9 +6,10 @@ page 6150724 "NPR POS Localized Table Data"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Localized Caption";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,28 +19,31 @@ page 6150724 "NPR POS Localized Table Data"
             {
                 field(CaptionForThisField; CaptionForThisField)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Field';
                     Editable = false;
                     Style = Subordinate;
                     StyleExpr = Rec."From Original Table";
                     ToolTip = 'Specifies the value of the Field field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Subordinate;
                     StyleExpr = Rec."From Original Table";
                     ToolTip = 'Specifies the value of the Language Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("<Language Code>"; Rec.Caption)
                 {
-                    ApplicationArea = All;
+
                     Editable = NOT Rec."From Original Table";
                     Style = Subordinate;
                     StyleExpr = Rec."From Original Table";
                     ToolTip = 'Specifies the value of the Caption field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -57,8 +61,9 @@ page 6150724 "NPR POS Localized Table Data"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Insert Language action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -73,8 +78,9 @@ page 6150724 "NPR POS Localized Table Data"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Delete Localization action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -89,8 +95,9 @@ page 6150724 "NPR POS Localized Table Data"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Apply Localization action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

@@ -6,7 +6,8 @@ page 6150688 "NPR NPRE Kitchen Order List"
     PageType = List;
     SourceTable = "NPR NPRE Kitchen Order";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,28 +17,33 @@ page 6150688 "NPR NPRE Kitchen Order List"
             {
                 field("Order ID"; Rec."Order ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Order ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -46,12 +52,14 @@ page 6150688 "NPR NPRE Kitchen Order List"
             systempart(Control6014408; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -71,8 +79,9 @@ page 6150688 "NPR NPRE Kitchen Order List"
                 RunObject = Page "NPR NPRE Kitchen Req.";
                 RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Requests action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

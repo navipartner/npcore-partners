@@ -18,9 +18,10 @@ page 6014401 "NPR Debit sale info"
                     ShowCaption = false;
                     field("No."; Rec."No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the No. field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         begin
@@ -31,48 +32,57 @@ page 6014401 "NPR Debit sale info"
                     }
                     field("Sell-to Customer No."; Rec."Sell-to Customer No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to Customer No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to Customer Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sell-to Address"; Rec."Sell-to Address")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to Address field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sell-to Address 2"; Rec."Sell-to Address 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to Address 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sell-to Post Code"; Rec."Sell-to Post Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to Post Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sell-to City"; Rec."Sell-to City")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to City field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sell-to Contact"; Rec."Sell-to Contact")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sell-to Contact field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Your Reference"; Rec."Your Reference")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Your Reference field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150627)
@@ -80,19 +90,22 @@ page 6014401 "NPR Debit sale info"
                     ShowCaption = false;
                     field("Posting Date"; Rec."Posting Date")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Posting Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Document Date"; Rec."Document Date")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Document Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Salesperson Code"; Rec."Salesperson Code")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Salesperson Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -104,43 +117,51 @@ page 6014401 "NPR Debit sale info"
                     ShowCaption = false;
                     field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to Customer No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bill-to Name"; Rec."Bill-to Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bill-to Name 2"; Rec."Bill-to Name 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to Name 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bill-to Address"; Rec."Bill-to Address")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to Address field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bill-to Address 2"; Rec."Bill-to Address 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to Address 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bill-to Post Code"; Rec."Bill-to Post Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to Post Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bill-to City"; Rec."Bill-to City")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to City field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bill-to Contact"; Rec."Bill-to Contact")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bill-to Contact field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150642)
@@ -148,38 +169,45 @@ page 6014401 "NPR Debit sale info"
                     ShowCaption = false;
                     field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Payment Terms Code"; Rec."Payment Terms Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Payment Terms Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Due Date"; Rec."Due Date")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Due Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Payment Discount %"; Rec."Payment Discount %")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Payment Discount % field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Pmt. Discount Date"; Rec."Pmt. Discount Date")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Pmt. Discount Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Payment Method Code"; Rec."Payment Method Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Payment Method Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -191,43 +219,51 @@ page 6014401 "NPR Debit sale info"
                     ShowCaption = false;
                     field("Ship-to Code"; Rec."Ship-to Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ship-to Name"; Rec."Ship-to Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ship-to Name 2"; Rec."Ship-to Name 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to Name 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ship-to Address"; Rec."Ship-to Address")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to Address field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ship-to Address 2"; Rec."Ship-to Address 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to Address 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ship-to Post Code"; Rec."Ship-to Post Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to Post Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ship-to City"; Rec."Ship-to City")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to City field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ship-to Contact"; Rec."Ship-to Contact")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ship-to Contact field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150662)
@@ -235,28 +271,33 @@ page 6014401 "NPR Debit sale info"
                     ShowCaption = false;
                     field("Location Code"; Rec."Location Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Location Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Shipment Method Code"; Rec."Shipment Method Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Shipment Method Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Shipping Agent Code"; Rec."Shipping Agent Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Shipping Agent Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Package Tracking No."; Rec."Package Tracking No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Package Tracking No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Shipment Date"; Rec."Shipment Date")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Shipment Date field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

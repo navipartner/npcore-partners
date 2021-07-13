@@ -4,7 +4,7 @@ report 6014441 "NPR POS Item Sales with Dim."
     RDLCLayout = './src/_Reports/layouts/POS Item Sales with Dimensions.rdlc';
     Caption = 'POS Item Sales with Dimensions';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("POS Entry"; "NPR POS Entry")
@@ -222,8 +222,9 @@ report 6014441 "NPR POS Item Sales with Dim."
                     {
                         Caption = 'Show Dimensions';
                         Editable = false;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Dimensions field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         begin

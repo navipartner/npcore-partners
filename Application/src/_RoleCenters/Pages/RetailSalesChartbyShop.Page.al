@@ -11,22 +11,24 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
         {
             field("Date Range"; StatusText)
             {
-                ApplicationArea = Basic;
+
                 Caption = 'Date Range';
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;
                 ToolTip = 'Specifies the value of the Date Range field';
+                ApplicationArea = NPRRetail;
             }
             field(ChartType; ChartType)
             {
-                ApplicationArea = Basic;
+
                 Caption = 'Chart type';
                 OptionCaption = 'Dimension 1,Dimension 2';
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = true;
                 ToolTip = 'Specifies the value of the Chart type field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -36,7 +38,8 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea = Basic;
+                ApplicationArea = NPRRetail;
+
 
                 trigger AddInReady()
                 begin
@@ -57,10 +60,11 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 Image = Period;
                 action(Day)
                 {
-                    ApplicationArea = Basic;
+
                     Caption = 'Day';
                     Image = ChangeDate;
                     ToolTip = 'Executes the Day action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -71,10 +75,11 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 }
                 action(Week)
                 {
-                    ApplicationArea = Basic;
+
                     Caption = 'Week';
                     Image = ChangeDate;
                     ToolTip = 'Executes the Week action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -85,10 +90,11 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 }
                 action(Month)
                 {
-                    ApplicationArea = Basic;
+
                     Caption = 'Month';
                     Image = ChangeDate;
                     ToolTip = 'Executes the Month action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -99,10 +105,11 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 }
                 action(Quarter)
                 {
-                    ApplicationArea = Basic;
+
                     Caption = 'Quarter';
                     Image = ChangeDate;
                     ToolTip = 'Executes the Quarter action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -113,10 +120,11 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 }
                 action(Year)
                 {
-                    ApplicationArea = Basic;
+
                     Caption = 'Year';
                     Image = ChangeDate;
                     ToolTip = 'Executes the Year action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -128,10 +136,11 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
             }
             action(Previous)
             {
-                ApplicationArea = Basic;
+
                 Caption = 'Previous';
                 Image = PreviousRecord;
                 ToolTip = 'Executes the Previous action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -141,10 +150,11 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
             }
             action("Next")
             {
-                ApplicationArea = Basic;
+
                 Caption = 'Next';
                 Image = NextRecord;
                 ToolTip = 'Executes the Next action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

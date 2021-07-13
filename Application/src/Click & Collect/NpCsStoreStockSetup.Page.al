@@ -5,7 +5,8 @@ page 6151225 "NPR NpCs Store Stock Setup"
     PageType = Card;
     SourceTable = "NPR NpCs Store Stock Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,8 +16,9 @@ page 6151225 "NPR NpCs Store Stock Setup"
             {
                 field("Store Stock Enabled"; Rec."Store Stock Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Store Stock Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -35,7 +37,8 @@ page 6151225 "NPR NpCs Store Stock Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Init Store Stock Items action';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 var

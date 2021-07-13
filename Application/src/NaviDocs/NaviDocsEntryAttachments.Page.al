@@ -5,8 +5,9 @@ page 6059949 "NPR NaviDocs Entry Attachments"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NaviDocs Entry Attachment";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,24 +17,28 @@ page 6059949 "NPR NaviDocs Entry Attachments"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("File Extension"; Rec."File Extension")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the File Extension field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Data; Rec.Data.HasValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Has Data';
                     ToolTip = 'Specifies the value of the Data.HasValue() field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -47,8 +52,9 @@ page 6059949 "NPR NaviDocs Entry Attachments"
             {
                 Caption = 'Open Attachment';
                 Image = XMLFile;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Open Attachment action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

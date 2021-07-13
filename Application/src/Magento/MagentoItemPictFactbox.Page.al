@@ -1,4 +1,4 @@
-﻿page 6151447 "NPR Magento Item Pict. Factbox"
+page 6151447 "NPR Magento Item Pict. Factbox"
 {
     Caption = 'Picture';
     PageType = CardPart;
@@ -17,9 +17,10 @@
             // field("Magento Picture"; TempMagentoPicture.Image)
             field("Magento Picture"; TempMagentoPicture.Picture)
             {
-                ApplicationArea = All;
+
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the TempMagentoPicture.Picture field';
+                ApplicationArea = NPRRetail;
             }
         }
     }

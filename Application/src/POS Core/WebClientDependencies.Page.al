@@ -4,7 +4,8 @@ page 6014659 "NPR Web Client Dependencies"
     PageType = List;
     SourceTable = "NPR Web Client Dependency";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,24 +15,28 @@ page 6014659 "NPR Web Client Dependencies"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("BLOB Imported"; Rec.BLOB.HasValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'BLOB Imported';
                     ToolTip = 'Specifies the value of the BLOB Imported field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -49,8 +54,9 @@ page 6014659 "NPR Web Client Dependencies"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import File... action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -65,8 +71,9 @@ page 6014659 "NPR Web Client Dependencies"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Managed Dependency Manifest action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -83,8 +90,9 @@ page 6014659 "NPR Web Client Dependencies"
             {
                 Caption = 'Export File';
                 Image = ExportFile;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export File action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

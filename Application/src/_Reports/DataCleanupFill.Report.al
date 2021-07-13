@@ -3,7 +3,7 @@ report 6060100 "NPR Data Cleanup Fill"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Fill.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Data Cleanup Customer';
     dataset
     {
@@ -214,30 +214,34 @@ report 6060100 "NPR Data Cleanup Fill"
             {
                 field("Fill Table"; FillTable)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Insert Data In Table';
                     ToolTip = 'Specifies the value of the Insert Data In Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cleanup Action"; CleanupAction)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Cleanup Action';
                     OptionCaption = 'Delete,Rename';
                     ToolTip = 'Specifies the value of the Cleanup Action field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Option"; TableOption)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Table Option';
                     CaptionClass = 'Customer,Vendor,Item,GLAccount';
                     ToolTip = 'Specifies the value of the Table Option field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Rename Option"; ItemRenameOption)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Rename Option for Item';
                     OptionCaption = ' ,Vendor Item No.,Vendor + Vendor Item No.';
                     ToolTip = 'Specifies the value of the Rename Option for Item field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

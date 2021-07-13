@@ -1,7 +1,7 @@
 page 6014432 "NPR SMS Log"
 {
 
-    ApplicationArea = All;
+
     Caption = 'SMS Log';
     PageType = List;
     SourceTable = "NPR SMS Log";
@@ -9,6 +9,7 @@ page 6014432 "NPR SMS Log"
     InsertAllowed = false;
     ModifyAllowed = false;
     DeleteAllowed = false;
+    ApplicationArea = NPRRetail;
     layout
     {
         area(content)
@@ -17,48 +18,57 @@ page 6014432 "NPR SMS Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sender No."; Rec."Sender No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sender No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reciepient No."; Rec."Reciepient No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reciepient No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Time Sent"; Rec."Date Time Sent")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date Time Sent field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send on Date Time"; Rec."Send on Date Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send on Date Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send Attempts"; Rec."Send Attempts")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Attempts field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Send Attempt"; Rec."Last Send Attempt")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Send Attempt field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User Notified"; Rec."User Notified")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User NotifiedSend Attempts field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -70,9 +80,10 @@ page 6014432 "NPR SMS Log"
             action(Pending)
             {
                 Caption = 'Set Pending';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Set Pending action';
                 Image = CreateLinesFromTimesheet;
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     MessageLog: Record "NPR SMS Log";
@@ -85,9 +96,10 @@ page 6014432 "NPR SMS Log"
             action(Discard)
             {
                 Caption = 'Set Discard';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Set Discard action';
                 Image = Error;
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     MessageLog: Record "NPR SMS Log";
@@ -100,9 +112,10 @@ page 6014432 "NPR SMS Log"
             action(ShowMessage)
             {
                 Caption = 'Show Message';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Message action';
                 Image = Error;
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     MessageLog: Record "NPR SMS Log";
@@ -124,9 +137,10 @@ page 6014432 "NPR SMS Log"
             action(ShowErrorMessage)
             {
                 Caption = 'Show Error Message';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Error Message action';
                 Image = Error;
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     MessageLog: Record "NPR SMS Log";

@@ -6,70 +6,79 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             field("NPR Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Ship-to Name")
         {
             field("NPR Ship-to Name 2"; Rec."Ship-to Name 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Ship-to Name 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Bill-to Name")
         {
             field("NPR Bill-to Name 2"; Rec."Bill-to Name 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Bill-to Name 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(Control85)
         {
             field("NPR Bill-to Company"; Rec."NPR Bill-to Company")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Bill-to Company field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Bill-To Vendor No."; Rec."NPR Bill-To Vendor No.")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Bill-To Vendor No. field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Shipping Advice")
         {
             field("NPR Delivery Location"; Rec."NPR Delivery Location")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Delivery Location field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Delivery Instructions"; Rec."NPR Delivery Instructions")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Delivery Instructions field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Outbound Whse. Handling Time")
         {
             field("NPR Kolli"; Rec."NPR Kolli")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Kolli field';
+                ApplicationArea = NPRRetail;
             }
         }
         addlast("Invoice Details")
         {
             field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the sum of Payment Lines attached to the Sales Order';
             }
         }
@@ -86,8 +95,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'POS Entry';
                 Image = Entry;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Entry action';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(History)
@@ -99,8 +109,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Retail Vouchers';
                     Image = Certificate;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Retail Vouchers action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -119,8 +130,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Image = Import;
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import From Scanner action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -138,16 +150,18 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'Select Recommended Item';
                 Image = SuggestLines;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Select Recommended Item action';
+                ApplicationArea = NPRRetail;
             }
             action("NPR InsertLineItem ")
             {
                 Caption = 'Insert Line with Item';
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Insert Line with Item action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -210,8 +224,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Issue Voucher';
                     Image = PostedPayableVoucher;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Issue Voucher action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -224,7 +239,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Redeem Voucher';
                     Image = PostedReceivableVoucher;
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Redeem Voucher action';
 
                     trigger OnAction()
@@ -241,9 +256,10 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             action("NPR Consignor Label")
             {
                 Caption = 'Consignor Label';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Consignor Label action';
                 Image = Print;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -256,8 +272,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'Shipping Label';
                 Image = PrintCheck;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Shipping Label action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -278,8 +295,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Send SMS action';
+                    ApplicationArea = NPRRetail;
                     trigger OnAction()
                     var
                         SMSMgt: Codeunit "NPR SMS Management";
@@ -295,9 +313,10 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Variety';
                     ShortCutKey = 'Ctrl+Alt+V';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Variety action';
                     Image = Edit;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

@@ -3,7 +3,7 @@ report 6014611 "NPR Sales Stats w/ Variants"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Item - Sales Statistics';
     PreviewMode = PrintLayout;
     dataset
@@ -182,8 +182,9 @@ report 6014611 "NPR Sales Stats w/ Variants"
                     field(PrintPrintAlsoWithoutSale; PrintAlsoWithoutSale)
                     {
                         Caption = 'Print Also Without Sale';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Also Without Sale field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

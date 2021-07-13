@@ -5,7 +5,8 @@ page 6151550 "NPR NpXml Setup"
     InsertAllowed = false;
     SourceTable = "NPR NpXml Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,18 +16,21 @@ page 6151550 "NPR NpXml Setup"
             {
                 field("NpXml Enabled"; Rec."NpXml Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NpXml Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Version Prefix"; Rec."Template Version Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Version Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Version No."; Rec."Template Version No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Version No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

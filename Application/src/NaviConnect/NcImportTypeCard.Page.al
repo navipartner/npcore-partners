@@ -3,8 +3,8 @@ page 6151509 "NPR Nc Import Type Card"
     Caption = 'Import Type Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc Import Type";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -15,53 +15,63 @@ page 6151509 "NPR Nc Import Type Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import List Update Handler"; Rec."Import List Update Handler")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the update handler, which will be used for getting new entries into import list';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Keep Import Entries for"; Rec."Keep Import Entries for")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Keep Import Entries for field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Lookup Codeunit ID"; Rec."Lookup Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Lookup Codeunit ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Codeunit ID"; Rec."Import Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Codeunit ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Send e-mail on Error"; Rec."Send e-mail on Error")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send e-mail on Error field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("E-mail address on Error"; Rec."E-mail address on Error")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-mail address on Error field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Max. Retry Count"; Rec."Max. Retry Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max. Retry Count field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Delay between Retries"; Rec."Delay between Retries")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delay between Retries field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
             group(Transfer)
@@ -72,18 +82,21 @@ page 6151509 "NPR Nc Import Type Card"
                     Caption = 'API';
                     field("Webservice Enabled"; Rec."Webservice Enabled")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Webservice Enabled field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Webservice Codeunit ID"; Rec."Webservice Codeunit ID")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Webservice Codeunit ID field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Webservice Function"; Rec."Webservice Function")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Webservice Function field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                 }
                 group(Ftp)
@@ -94,58 +107,69 @@ page 6151509 "NPR Nc Import Type Card"
 
                     field("Ftp Enabled"; Rec."Ftp Enabled")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Enabled field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Sftp; Rec.Sftp)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sftp field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Host"; Rec."Ftp Host")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Host field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Port"; Rec."Ftp Port")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Port field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Binary"; Rec."Ftp Binary")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Binary field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp User"; Rec."Ftp User")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp User field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Password"; Rec."Ftp Password")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Password field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Passive"; Rec."Ftp Passive")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Passive field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Path"; Rec."Ftp Path")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Path field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Backup Path"; Rec."Ftp Backup Path")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Backup Path field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Filename"; Rec."Ftp Filename")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Filename field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                 }
             }
@@ -154,10 +178,11 @@ page 6151509 "NPR Nc Import Type Card"
                 Caption = 'XML Stylesheet';
                 field(XMLStylesheetData; XMLStylesheetData)
                 {
-                    ApplicationArea = All;
+
                     MultiLine = true;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the XMLStylesheetData field';
+                    ApplicationArea = NPRNaviConnect;
 
                     trigger OnValidate()
                     begin
@@ -191,8 +216,9 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Shows setup page for the update handler, which will be used for getting new entries into import list';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -212,8 +238,9 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Ftp Enabled";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download Ftp action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -231,8 +258,9 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = (Rec."Send E-mail on Error");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Send Test Error E-mail action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var

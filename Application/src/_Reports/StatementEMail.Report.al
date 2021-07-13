@@ -3,7 +3,7 @@ report 6014550 "NPR Statement E-Mail"
     Caption = 'Statement - Paper/E-Mail';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UseRequestPage = false;
     dataset
     {
@@ -113,15 +113,17 @@ report 6014550 "NPR Statement E-Mail"
                     field(ShowOverdueEntries; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Overdue Entries field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(IncludeAllCustomerswithLE; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include All Customers with Ledger Entries field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -133,8 +135,9 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include All Customers with a Balance field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -145,52 +148,60 @@ report 6014550 "NPR Statement E-Mail"
                     field(IncludeReversedEntries; PrintReversedEntries)
                     {
                         Caption = 'Include Reversed Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Reversed Entries field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(IncludeUnappliedEntries; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Unapplied Entries field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Include Aging Band"; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Aging Band field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(AgingBandPeriodLengt; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Aging Band Period Length field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(AgingBandby; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Aging Band by field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Log Interaction field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Start Date"; StartDate)
                     {
                         Caption = 'Start Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Start Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("End Date"; EndDate)
                     {
                         Caption = 'End Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the End Date field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group("Output Options")
@@ -200,8 +211,9 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Report Output';
                         OptionCaption = 'Send now,Send through NaviDocs';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Report Output field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -220,9 +232,10 @@ report 6014550 "NPR Statement E-Mail"
                         Visible = ShowNaviDocsOption;
                         field("Delay sending until"; NaviDocsDelayUntil)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Delay sending until';
                             ToolTip = 'Specifies the value of the NaviDocsDelayUntil field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }

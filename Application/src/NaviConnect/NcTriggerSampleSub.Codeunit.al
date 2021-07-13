@@ -51,9 +51,9 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
 
     local procedure GetTriggerDescription(): Text
     var
-        TextDescr: Label 'This is a sample Nc Trigger';
+        SampleTxt: Label 'This is a sample Nc Trigger';
     begin
-        exit(TextDescr);
+        exit(SampleTxt);
     end;
 }
 

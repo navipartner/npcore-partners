@@ -15,54 +15,64 @@ page 6151087 "NPR RIS Retail Inv. Set Sub."
             {
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Filter"; Rec."Location Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Filter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Url"; Rec."Api Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Url field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Username"; Rec."Api Username")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Username field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Password"; Rec."Api Password")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Password field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Domain"; Rec."Api Domain")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Domain field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Function"; Rec."Processing Function")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Function field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Codeunit ID"; Rec."Processing Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Processing Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Codeunit Name"; Rec."Processing Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -4,7 +4,7 @@ report 6014402 "NPR Discount Statistics"
     RDLCLayout = './src/_Reports/layouts/Discount Statistics.rdlc';
     Caption = 'Discount Statistics';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
     dataset
     {
@@ -223,8 +223,9 @@ report 6014402 "NPR Discount Statistics"
                     field("Show Item Ledger"; ShowItemLedger)
                     {
                         Caption = 'Show Value Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Value Entries field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

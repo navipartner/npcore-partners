@@ -14,7 +14,7 @@ page 6014462 "NPR Input Item"
                 ShowCaption = false;
                 field(ItemNo; ItemNo)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Item No.';
                     TableRelation = Item."No.";
                     ToolTip = 'Specifies the value of the Item No. field';
@@ -29,7 +29,7 @@ page 6014462 "NPR Input Item"
                 }
                 field(VariantCode; VariantCode)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Variant Code';
                     ToolTip = 'Specifies the value of the Variant Code field';
                     trigger OnLookup(var Text: Text): Boolean
@@ -55,7 +55,7 @@ page 6014462 "NPR Input Item"
                 }
                 field(ItemUOM; ItemUOM)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Item Unit of Measure';
                     ToolTip = 'Specifies the value of the Item Unit of Measure field';
                     trigger OnLookup(var Text: Text): Boolean

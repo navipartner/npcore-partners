@@ -16,23 +16,27 @@ page 6151435 "NPR Magento Attr. Set Values"
                 ShowCaption = false;
                 field("Attribute ID"; Rec."Attribute ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Position; Rec.Position)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Position field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Attribute Group ID"; Rec."Attribute Group ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Group ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

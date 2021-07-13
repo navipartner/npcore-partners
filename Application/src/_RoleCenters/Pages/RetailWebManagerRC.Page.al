@@ -12,29 +12,35 @@ page 6151244 "NPR Retail Web Manager RC"
 
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control21; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = R;
-                ApplicationArea = Suite;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control6014400; "NPR My Reports")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control6150616; "NPR Web Manager Activ.")
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1901377608; MyNotes)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
+
             }
             part(PowerBi; "Power BI Report Spinner Part")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -51,40 +57,45 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'Discount Statistics';
                     Image = "Report";
                     RunObject = Report "NPR Discount Statistics";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Discount Statistics action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Customer Analysis")
                 {
                     Caption = 'Customer Analysis';
                     Image = "Report";
                     RunObject = Report "NPR Customer Analysis";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Customer Analysis action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Sale Statistics per Vendor")
                 {
                     Caption = 'Sale Statistics per Vendor';
                     Image = "Report";
                     RunObject = Report "NPR Sale Statistics per Vendor";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Sale Statistics per Vendor action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Vendor/Salesperson")
                 {
                     Caption = 'Vendor/Salesperson';
                     Image = "Report";
                     RunObject = Report "NPR Vendor/Salesperson";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Vendor/Salesperson action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Item Group Overview")
                 {
                     Caption = 'Item Group Overview';
                     Image = "Report";
                     RunObject = Report "NPR Item Group Overview";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Group Overview action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -100,32 +111,36 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'Magento Setup';
                     Image = List;
                     RunObject = Page "NPR Magento Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Magento Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(Websites)
                 {
                     Caption = 'Websites';
                     Image = Setup;
                     RunObject = Page "NPR Magento Website List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Websites action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(Pictures)
                 {
                     Caption = 'Pictures';
                     Image = Setup;
                     RunObject = Page "NPR Magento Pictures";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Pictures action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Shipping Method Mapping")
                 {
                     Caption = 'Shipping Method Mapping';
                     Image = Setup;
                     RunObject = Page "NPR Magento Shipment Mapping";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Shipping Method Mapping action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action("Payment Method Mapping")
@@ -133,8 +148,9 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'Payment Method Mapping';
                     Image = Setup;
                     RunObject = page "NPR Magento Payment Mapping";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Payment Method Mapping action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action("Payment Gateways")
@@ -142,8 +158,9 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'Payment Gateways';
                     Image = Setup;
                     RunObject = page "NPR Magento Payment Gateways";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Payment Gateways action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action("VAT Business Posting Groups")
@@ -151,24 +168,27 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'VAT Business Posting Groups';
                     Image = Setup;
                     RunObject = page "VAT Business Posting Groups";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the VAT Business Posting Groups action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("VAT Product Posting Groups")
                 {
                     Caption = 'VAT Product Posting Groups';
                     Image = Setup;
                     RunObject = page "VAT Product Posting Groups";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the VAT Product Posting Groups action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Tax Classes")
                 {
                     Caption = 'Tax Classes';
                     Image = Setup;
                     RunObject = page "NPR Magento Tax Classes";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Tax Classes action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action(Webshops)
@@ -176,8 +196,9 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'Webshops';
                     Image = List;
                     RunObject = page "NPR Magento Store List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Webshops action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action("Customer Mapping")
@@ -185,8 +206,9 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'Magento Customer Mapping';
                     Image = List;
                     RunObject = page "NPR Magento Customer Mapping";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Magento Customer Mapping action';
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -202,56 +224,63 @@ page 6151244 "NPR Retail Web Manager RC"
                         Caption = 'Items';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Items action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(ItemGroups)
                     {
                         Caption = 'Items Groups';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Items Groups action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(Brands)
                     {
                         Caption = 'Brands';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Brands action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(CustomOptions)
                     {
                         Caption = 'Customer Options';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Customer Options action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(AttributeSets)
                     {
                         Caption = 'Attribute Sets';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Attribute Sets action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(AttributeGroup)
                     {
                         Caption = 'Attribute Group';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Attribute Group action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(Attributes)
                     {
                         Caption = 'Attributes';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Attributes action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
 
@@ -264,16 +293,18 @@ page 6151244 "NPR Retail Web Manager RC"
                         Caption = 'Display Group';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Display Group action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(DisplayConfig)
                     {
                         Caption = 'Display Config';
                         Image = List;
                         RunObject = page "Item List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Display Config action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -289,32 +320,36 @@ page 6151244 "NPR Retail Web Manager RC"
                         Caption = 'Contacts';
                         Image = List;
                         RunObject = page "Contact List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Contacts action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(Customersales)
                     {
                         Caption = 'Customers';
                         Image = List;
                         RunObject = page "Customer List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Customers action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(SalesOrders)
                     {
                         Caption = 'Sales Orders';
                         Image = List;
                         RunObject = page "Sales Order List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Sales Orders action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(PaymentLineList)
                     {
                         Caption = 'Payment Line List';
                         Image = List;
                         RunObject = page "NPR Magento Payment Line List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Payment Line List action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Tasks)
@@ -327,8 +362,9 @@ page 6151244 "NPR Retail Web Manager RC"
                         Image = List;
 
                         RunObject = page "NPR Nc Import List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Import List action';
+                        ApplicationArea = NPRRetail;
                     }
 
                     action("Task List")
@@ -336,8 +372,9 @@ page 6151244 "NPR Retail Web Manager RC"
                         Caption = 'Task List';
                         Image = List;
                         RunObject = page "Task List";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Task List action';
+                        ApplicationArea = NPRRetail;
                     }
 
                     action(UnProcessedImportList)
@@ -347,8 +384,9 @@ page 6151244 "NPR Retail Web Manager RC"
 
                         RunObject = page "NPR Nc Import List";
                         RunPageView = WHERE("Runtime Error" = const(true));
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Unprocessed Import List action';
+                        ApplicationArea = NPRRetail;
                     }
 
                     action("UnProcessedTask List")
@@ -357,8 +395,9 @@ page 6151244 "NPR Retail Web Manager RC"
                         Image = List;
                         RunObject = page "NPR Nc Task List";
                         RunPageView = WHERE("Process Error" = const(true));
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Unprocessed Task List action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Archive)
@@ -370,16 +409,18 @@ page 6151244 "NPR Retail Web Manager RC"
                         Caption = 'Posted Sales Invoices';
                         Image = List;
                         RunObject = page "Posted Sales Invoice";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Posted Sales Invoices action';
+                        ApplicationArea = NPRRetail;
                     }
                     action(PostedSalesShipments)
                     {
                         Caption = 'Posted Sales Shipments';
                         Image = List;
                         RunObject = page "Posted Sales Shipment";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Posted Sales Shipments action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -391,16 +432,18 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'NaviConnect Setup';
                     Image = Setup;
                     RunObject = page "NPR Nc Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the NaviConnect Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(NpXmlSetup)
                 {
                     Caption = 'NpXml Setup';
                     Image = Setup;
                     RunObject = page "NPR NpXml Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the NpXml Setup action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action(TaskProcessors)
@@ -408,31 +451,34 @@ page 6151244 "NPR Retail Web Manager RC"
                     Caption = 'Task Processors';
                     Image = List;
                     RunObject = page "NPR Nc Task Proces. List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Task Processors action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(TaskSetup)
                 {
                     Caption = 'Task Setup';
                     Image = Setup;
                     RunObject = page "NPR NpXml Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Task Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(ImportTypes)
                 {
                     Caption = 'Import Types';
                     Image = List;
                     RunObject = page "NPR Nc Import Types";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Import Types action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(DataLogSetup)
                 {
                     Caption = 'Data Log Setup';
                     Image = SetupLines;
                     RunObject = page "NPR Data Log Setup";
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Data Log Setup action';
                 }
 
@@ -444,22 +490,25 @@ page 6151244 "NPR Retail Web Manager RC"
             {
                 Caption = 'Item List';
                 RunObject = Page "Item List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Item List action';
+                ApplicationArea = NPRRetail;
             }
             action("Item Groups")
             {
                 Caption = 'Item Groups';
                 RunObject = Page "NPR Magento Categories";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Item Groups action';
+                ApplicationArea = NPRRetail;
             }
             action("Sale Orders")
             {
                 Caption = 'Sale Orders';
                 RunObject = Page "Sales Order List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Sale Orders action';
+                ApplicationArea = NPRRetail;
             }
 
 
@@ -467,30 +516,34 @@ page 6151244 "NPR Retail Web Manager RC"
             {
                 Caption = 'POS Entry List';
                 RunObject = Page "NPR POS Entry List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Entry List action';
+                ApplicationArea = NPRRetail;
             }
             action("Contacts ")
             {
                 Caption = 'Contact List';
                 RunObject = Page "Contact List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Contact List action';
+                ApplicationArea = NPRRetail;
             }
             action(Customers)
             {
                 Caption = 'Customer List';
                 RunObject = Page "Customer List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Customer List action';
+                ApplicationArea = NPRRetail;
             }
 
             action("Xml Templates")
             {
                 Caption = 'Xml Templates';
                 RunObject = Page "NPR NpXml Template List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Xml Templates action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

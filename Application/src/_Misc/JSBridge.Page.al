@@ -6,14 +6,16 @@ page 6014583 "NPR JS Bridge"
     InsertAllowed = false;
     ModifyAllowed = false;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
         {
             usercontrol(JSBridge; "NPR JSBridge")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger ControlAddInReady();
                 begin

@@ -15,10 +15,11 @@ page 6151337 "NPR Restaurant Headline RC"
                 Visible = UserGreetingVisible;
                 field(GreetingText; RCHeadlinesPageCommon.GetGreetingText())
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Greeting headline';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Greeting headline field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Control2)
@@ -27,11 +28,12 @@ page 6151337 "NPR Restaurant Headline RC"
                 Visible = DefaultFieldsVisible;
                 field(DocumentationText; RCHeadlinesPageCommon.GetDocumentationText())
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Documentation headline';
                     DrillDown = true;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Documentation headline field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

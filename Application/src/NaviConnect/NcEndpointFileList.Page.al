@@ -8,8 +8,8 @@ page 6151526 "NPR Nc Endpoint File List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint File";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -19,33 +19,39 @@ page 6151526 "NPR Nc Endpoint File List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Path; Rec.Path)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Path field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Client Path"; Rec."Client Path")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Path field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Filename; Rec.Filename)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filename field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -59,8 +65,9 @@ page 6151526 "NPR Nc Endpoint File List"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Trigger Links action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin

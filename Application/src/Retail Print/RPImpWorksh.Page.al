@@ -9,9 +9,10 @@ page 6014632 "NPR RP Imp. Worksh."
     LinksAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR RP Imp. Worksh.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,22 +22,25 @@ page 6014632 "NPR RP Imp. Worksh."
             {
                 field(Template; Rec.Template)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = Style;
                     Width = 80;
                     ToolTip = 'Specifies the value of the Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Template"; Rec."New Template")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action"; Rec.Action)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -45,39 +49,45 @@ page 6014632 "NPR RP Imp. Worksh."
                 }
                 field("Existing Version"; Rec."Existing Version")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Existing Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Existing Description"; Rec."Existing Description")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Existing Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Existing Last Modified At"; Rec."Existing Last Modified At")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Existing Last Modified At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Version"; Rec."New Version")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Description"; Rec."New Description")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Last Modified At"; Rec."New Last Modified At")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Last Modified At field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

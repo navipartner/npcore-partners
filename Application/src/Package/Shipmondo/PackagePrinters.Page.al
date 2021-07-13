@@ -5,7 +5,8 @@ page 6014575 "NPR Package Printers"
     SourceTable = "NPR Package Printers";
     caption = 'NPR Package Printers';
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -14,39 +15,46 @@ page 6014575 "NPR Package Printers"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the Name of Printer on shipmondo';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Host Name"; Rec."Host Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the Host Name of Server';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Printer; Rec.Printer)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the Name of Printer on server';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Label Format"; Rec."Label Format")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the Label format from external shipping service';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Location for which Printer to use';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the User that will use the Corresponding Printer';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User Name"; Rec."User Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the User Name that will use the Corresponding Printer';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -59,9 +67,10 @@ page 6014575 "NPR Package Printers"
             action(GetPrinter)
             {
                 Caption = 'Get printers';
-                ApplicationArea = All;
+
                 Image = PrintCover;
                 ToolTip = 'Executes the Get printers action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

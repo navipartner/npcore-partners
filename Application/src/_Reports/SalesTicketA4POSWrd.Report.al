@@ -3,7 +3,7 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Wrd.rdlc';
     WordLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Wrd.docx';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Sales Ticket A4 - POS Wrd';
     DefaultLayout = Word;
     PreviewMode = PrintLayout;

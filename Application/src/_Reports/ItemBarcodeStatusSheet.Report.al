@@ -5,7 +5,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
     RDLCLayout = './src/_Reports/layouts/Item Barcode Status Sheet.rdlc';
     Caption = 'Item Barcode Status Sheet';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Item; Item)
@@ -149,8 +149,9 @@ report 6014455 "NPR Item Barcode Status Sheet"
                 field("Show Inventory"; ShowInventory)
                 {
                     Caption = 'Show Inventory';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

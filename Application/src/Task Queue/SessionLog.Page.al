@@ -7,8 +7,9 @@ page 6059908 "NPR Session Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Session Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,43 +19,51 @@ page 6059908 "NPR Session Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Type"; Rec."Log Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Time"; Rec."Log Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Server Instance ID"; Rec."Server Instance ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Server Instance ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error Message"; Rec."Error Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Message field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

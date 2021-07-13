@@ -5,8 +5,8 @@ page 6151523 "NPR Nc Endpoint FTP Card"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint FTP";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -14,68 +14,82 @@ page 6151523 "NPR Nc Endpoint FTP Card"
         {
             group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
             group(FTP)
             {
+                Caption = 'FTP';
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Server; Rec.Server)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the FTP Server field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Username; Rec.Username)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the FTP Username field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Password; Rec.Password)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the FTP Password field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Port; Rec.Port)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the FTP Port field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Passive; Rec.Passive)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the FTP Passive field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Directory; Rec.Directory)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the FTP Directory field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Filename; Rec.Filename)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filename field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("File Encoding"; Rec."File Encoding")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the File Encoding field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -89,8 +103,8 @@ page 6151523 "NPR Nc Endpoint FTP Card"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
-                ApplicationArea = All;
                 ToolTip = 'Executes the Trigger Links action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin

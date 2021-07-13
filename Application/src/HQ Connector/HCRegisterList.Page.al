@@ -4,7 +4,8 @@ page 6150903 "NPR HC Register List"
     PageType = List;
     SourceTable = "NPR HC Register";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,68 +15,81 @@ page 6150903 "NPR HC Register List"
             {
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Opening Cash"; Rec."Opening Cash")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Opening Cash field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Account; Rec.Account)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Difference Account"; Rec."Difference Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Difference Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Balanced Type"; Rec."Balanced Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Balanced Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Balance Account"; Rec."Balance Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Balance Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Difference Account - Neg."; Rec."Difference Account - Neg.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Difference Account - Neg. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Rounding; Rec.Rounding)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register Change Account"; Rec."Register Change Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Change G/L Account No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -93,8 +107,9 @@ page 6150903 "NPR HC Register List"
                 RunPageLink = "BC Register No." = FIELD("Register No.");
                 RunPageView = SORTING("BC Payment Type POS No.", "BC Register No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Payment Posting Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Default Dimension")
             {
@@ -106,8 +121,9 @@ page 6150903 "NPR HC Register List"
                 RunObject = Page "Default Dimensions";
                 RunPageLink = "Table ID" = CONST(6150902),
                               "No." = FIELD("Register No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Default Dimension action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

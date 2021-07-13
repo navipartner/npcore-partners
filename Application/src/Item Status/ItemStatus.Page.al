@@ -6,8 +6,9 @@ page 6060056 "NPR Item Status"
     Caption = 'Item Status';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Item Status";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,63 +18,75 @@ page 6060056 "NPR Item Status"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Initial; Rec.Initial)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Initial field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Allowed"; Rec."Delete Allowed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Allowed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rename Allowed"; Rec."Rename Allowed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rename Allowed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Purchase Insert"; Rec."Purchase Insert")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Purchase Insert field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Purchase Release"; Rec."Purchase Release")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Purchase Release field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Purchase Post"; Rec."Purchase Post")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Purchase Post field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Insert"; Rec."Sales Insert")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Insert field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Release"; Rec."Sales Release")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Release field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Post"; Rec."Sales Post")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Post field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

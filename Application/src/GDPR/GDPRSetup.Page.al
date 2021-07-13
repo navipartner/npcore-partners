@@ -5,8 +5,9 @@ page 6151120 "NPR GDPR Setup"
     Caption = 'GDPR Setup';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR GDPR Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,8 +17,9 @@ page 6151120 "NPR GDPR Setup"
             {
                 field("Agreement Nos."; Rec."Agreement Nos.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Agreement Nos. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

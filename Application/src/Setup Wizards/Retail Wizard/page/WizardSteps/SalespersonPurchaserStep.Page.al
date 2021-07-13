@@ -13,16 +13,18 @@ page 6014689 "NPR Salesperson/Purchaser Step"
                 ShowCaption = false;
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Entry No.';
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code of the record.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -33,8 +35,8 @@ page 6014689 "NPR Salesperson/Purchaser Step"
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = Suite, RelationshipMgmt;
                     ToolTip = 'Specifies the name of the record.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿page 6151411 "NPR Magento Pictures"
+page 6151411 "NPR Magento Pictures"
 {
     Caption = 'Magento Pictures';
     InsertAllowed = false;
@@ -6,7 +6,8 @@
     PageType = List;
     SourceTable = "NPR Magento Picture";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,19 +20,22 @@
                 {
                     field(Type; Rec.Type)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Name; Rec.Name)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Count"; Counter)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Count';
                         ToolTip = 'Specifies the value of the Count field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -40,19 +44,22 @@
                     }
                     field("Last Date Modified"; Rec."Last Date Modified")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Last Date Modified field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Last Time Modified"; Rec."Last Time Modified")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Last Time Modified field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Size (kb)"; Rec."Size (kb)")
                     {
-                        ApplicationArea = All;
+
                         Visible = false;
                         ToolTip = 'Specifies the value of the Size (kb) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -65,7 +72,8 @@
                 ShowFilter = false;
                 SubPageLink = Type = FIELD(Type),
                               Name = FIELD(Name);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -82,8 +90,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Invalid Pictures action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

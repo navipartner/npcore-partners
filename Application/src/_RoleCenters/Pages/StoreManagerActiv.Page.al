@@ -13,15 +13,17 @@ page 6059983 "NPR Store Manager Activ."
             {
                 field("Open Sales Orders"; Rec."Open Sales Orders")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Sales Orders";
                     ToolTip = 'Specifies the value of the Open Sales Orders field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Open Purchase Orders"; Rec."Open Purchase Orders")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Purchase Orders";
                     ToolTip = 'Specifies the value of the Open Purchase Orders field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(Control6014404)
@@ -34,18 +36,20 @@ page 6059983 "NPR Store Manager Activ."
                         Caption = 'New Salesorder';
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileNew;
                         ToolTip = 'Executes the New Salesorder action';
+                        ApplicationArea = NPRRetail;
                     }
                     action("New Purchase Order")
                     {
                         Caption = 'New Purchase Order';
                         RunObject = Page "Purchase Order";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileNew;
                         ToolTip = 'Executes the New Purchase Order action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -53,15 +57,17 @@ page 6059983 "NPR Store Manager Activ."
             {
                 field("Posted Sales Invoices"; Rec."Posted Sales Invoices")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Posted Sales Invoices";
                     ToolTip = 'Specifies the value of the Posted Sales Invoices field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posted Purchase Orders"; Rec."Posted Purchase Orders")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Posted Purchase Invoices";
                     ToolTip = 'Specifies the value of the Posted Purchase Orders field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

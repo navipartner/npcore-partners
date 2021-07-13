@@ -5,8 +5,9 @@ page 6151556 "NPR NpXml Filters"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpXml Filter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,8 +17,9 @@ page 6151556 "NPR NpXml Filters"
             {
                 field("Filter Type"; Rec."Filter Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -26,34 +28,39 @@ page 6151556 "NPR NpXml Filters"
                 }
                 field("Parent Field No."; Rec."Parent Field No.")
                 {
-                    ApplicationArea = All;
+
                     Enabled = ParentFieldNoEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT ParentFieldNoEnabled;
                     ToolTip = 'Specifies the value of the Parent Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Parent Field Name"; Rec."Parent Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Parent Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Value"; Rec."Filter Value")
                 {
-                    ApplicationArea = All;
+
                     Enabled = FilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT FilterValueEnabled;
                     ToolTip = 'Specifies the value of the Filter Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

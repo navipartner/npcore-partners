@@ -13,35 +13,40 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                 Caption = 'General';
                 field(CommunityCode; CommunityCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Community Code';
                     Editable = IsEditable;
                     ToolTip = 'Specifies the value of the Community Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(SystemPrefix; FS_Prefix)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'System Prefix';
                     Editable = IsEditable;
                     ToolTip = 'Specifies the value of the System Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PaymentMethodCode; PaymentMethodCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Payment Method Code';
                     ToolTip = 'Specifies the value of the Payment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(GLAccount; GLAccount)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Payment G/L Account';
                     ToolTip = 'Specifies the value of the Payment G/L Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Server Communication")
@@ -49,21 +54,24 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                 Caption = 'Server Communication';
                 field(ServiceUser; ServiceUser)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Username';
                     ToolTip = 'Specifies the value of the Username field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ServicePassword; ServicePassword)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Password';
                     ToolTip = 'Specifies the value of the Password field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ServiceBaseURL; ServiceBaseURL)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Base URL';
                     ToolTip = 'Specifies the value of the Base URL field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -81,15 +89,17 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                 }
                 field(TenentName; TenentName)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Tenant';
                     ToolTip = 'Specifies the value of the Tenant field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(MembershipCode; MembershipCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Membership Code';
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Setup)
@@ -97,32 +107,36 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                 Caption = 'Setup';
                 field(LoyaltyCmpName; LoyaltyCmpName)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Server Company Name';
                     TableRelation = Company;
                     ToolTip = 'Specifies the value of the Server Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(LoyaltyAuth; LoyaltyAuth)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Loyalty Authorization Code';
                     ToolTip = 'Specifies the value of the Loyalty Authorization Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(EarnFactor; EarnRatio)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Earn Factor';
                     DecimalPlaces = 2 : 5;
                     MinValue = 0;
                     ToolTip = 'Specifies the value of the Earn Factor field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(BurnFactor; BurnRation)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Burn Factor';
                     DecimalPlaces = 2 : 5;
                     MinValue = 0;
                     ToolTip = 'Specifies the value of the Burn Factor field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

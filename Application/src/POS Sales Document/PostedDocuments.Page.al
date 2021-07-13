@@ -8,8 +8,9 @@ page 6014438 "NPR Posted Documents"
     LinksAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Posted Doc. Buffer";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,72 +20,85 @@ page 6014438 "NPR Posted Documents"
             {
                 field("Source Record ID"; Format(Rec."Source Record ID"))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Source Record ID';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Record ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Document No."; Rec."External Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Date"; Rec."Document Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sell-to/Buy-from No."; Rec."Sell-to/Buy-from No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sell-to/Buy-from No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sell-to/Buy-from Name"; Rec."Sell-to/Buy-from Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sell-to/Buy-from Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to/Pay-to No."; Rec."Bill-to/Pay-to No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Bill-to/Pay-to No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to/Pay-to Name"; Rec."Bill-to/Pay-to Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Bill-to/Pay-to Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -103,8 +117,9 @@ page 6014438 "NPR Posted Documents"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -119,8 +134,9 @@ page 6014438 "NPR Posted Documents"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Navigate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

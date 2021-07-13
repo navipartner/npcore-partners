@@ -1,13 +1,14 @@
-﻿page 6060166 "NPR Event Next 10 Events"
+page 6060166 "NPR Event Next 10 Events"
 {
     Caption = 'Next 10 Events';
     CardPageID = "NPR Event Card";
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Job;
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,42 +19,49 @@
                 ShowCaption = false;
                 field("GETFILTERS"; Rec.GetFilters)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Filters';
                     ToolTip = 'Specifies the value of the Filters field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             repeater(Group)
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Bill-to Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Status"; Rec."NPR Event Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Event Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Amount"; Rec."NPR Total Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Total Amount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -70,8 +78,9 @@
                 RunObject = Page "NPR Event Card";
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View action';
+                ApplicationArea = NPRRetail;
             }
             group("Select Filter")
             {
@@ -81,8 +90,9 @@
                 {
                     Caption = 'Select Responsible Person';
                     Image = JobResponsibility;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Select Responsible Person action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -101,8 +111,9 @@
             {
                 Caption = 'Clear Filter';
                 Image = ClearFilter;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Clear Filter action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

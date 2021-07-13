@@ -4,8 +4,9 @@ page 6151170 "NPR NpGp Det. POS S. Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpGp Det. POS Sales Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,58 +16,69 @@ page 6151170 "NPR NpGp Det. POS S. Entries"
             {
                 field("Entry Time"; Rec."Entry Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Quantity"; Rec."Remaining Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remaining Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Positive; Rec.Positive)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Positive field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closed by Entry No."; Rec."Closed by Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closed by Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Applies to Store Code"; Rec."Applies to Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Applies to Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cross Store Application"; Rec."Cross Store Application")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cross Store Application field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

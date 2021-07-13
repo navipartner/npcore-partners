@@ -84,7 +84,7 @@
                     AssignValue(FieldRefTemp, DataLogField."Field Value");
                 RecReftemp.Insert();
                 FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
-                if RecReftemp.IsEmpty then
+                if RecReftemp.IsEmpty() then
                     exit(false);
                 RecReftemp.Delete();
             until NcCollectorFilter.Next() = 0;
@@ -113,7 +113,7 @@
                 DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
                 DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");
                 DataLogField.SetRange("Field Value Changed", true);
-                if not DataLogField.IsEmpty then
+                if not DataLogField.IsEmpty() then
                     exit(true);
             until (NcCollectorFilter.Next() = 0);
             exit(false);

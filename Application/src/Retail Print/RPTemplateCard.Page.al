@@ -13,19 +13,22 @@ page 6014638 "NPR RP Template Card"
                 Editable = NOT Rec.Archived;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printer Type"; Rec."Printer Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printer Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printer Device"; Rec."Printer Device")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     ToolTip = 'Blank = Decide based on printername keyword match.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -34,21 +37,24 @@ page 6014638 "NPR RP Template Card"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comments field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Archived; Rec.Archived)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Archived field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     var
@@ -60,30 +66,35 @@ page 6014638 "NPR RP Template Card"
                 }
                 field("Version Comments"; Rec."Version Comments")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version Comments field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Modified At"; Rec."Last Modified At")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Modified At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Modified By"; Rec."Last Modified By")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Modified By field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Decimal Rounding"; Rec."Default Decimal Rounding")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Decimal Rounding field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Output"; Rec."Log Output")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Output field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Line Settings")
@@ -96,13 +107,15 @@ page 6014638 "NPR RP Template Card"
                     Caption = 'Two Column Distribution';
                     field("Two Column Width 1"; Rec."Two Column Width 1")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Two Column Width 1 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Two Column Width 2"; Rec."Two Column Width 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Two Column Width 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group("Three Column Distribution")
@@ -110,18 +123,21 @@ page 6014638 "NPR RP Template Card"
                     Caption = 'Three Column Distribution';
                     field("Three Column Width 1"; Rec."Three Column Width 1")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Three Column Width 1 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Three Column Width 2"; Rec."Three Column Width 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Three Column Width 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Three Column Width 3"; Rec."Three Column Width 3")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Three Column Width 3 field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group("Four Column Distribution")
@@ -129,23 +145,27 @@ page 6014638 "NPR RP Template Card"
                     Caption = 'Four Column Distribution';
                     field("Four Column Width 1"; Rec."Four Column Width 1")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Four Column Width 1 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Four Column Width 2"; Rec."Four Column Width 2")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Four Column Width 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Four Column Width 3"; Rec."Four Column Width 3")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Four Column Width 3 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Four Column Width 4"; Rec."Four Column Width 4")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Four Column Width 4 field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -155,23 +175,27 @@ page 6014638 "NPR RP Template Card"
                 Editable = NOT Rec.Archived;
                 field("Pre Processing Codeunit"; Rec."Pre Processing Codeunit")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pre Processing Codeunit field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Processing Object Type"; Rec."Print Processing Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Processing Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Processing Object ID"; Rec."Print Processing Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Processing Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Processing Codeunit"; Rec."Post Processing Codeunit")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Processing Codeunit field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Media)
@@ -181,9 +205,10 @@ page 6014638 "NPR RP Template Card"
                 // field("Media Roll Picture"; tmpMediaInfo.Image)
                 field("Media Roll Picture"; tmpMediaInfo.Picture)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Media Roll Picture';
                     ToolTip = 'Specifies the value of the Media Roll Picture field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -198,9 +223,10 @@ page 6014638 "NPR RP Template Card"
                 }
                 field("Media Roll URL"; tmpMediaInfo.URL)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Media Roll URL';
                     ToolTip = 'Specifies the value of the Media Roll URL field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -214,9 +240,10 @@ page 6014638 "NPR RP Template Card"
                 }
                 field("Media Roll Description"; tmpMediaInfo.Description)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Media Roll Description';
                     ToolTip = 'Specifies the value of the Media Roll Description field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -246,8 +273,9 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Data Items";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Edit Data Items action';
+                ApplicationArea = NPRRetail;
             }
             action("Edit Layout")
             {
@@ -259,8 +287,9 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Template Designer";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Edit Layout action';
+                ApplicationArea = NPRRetail;
             }
             action("Edit Device Settings")
             {
@@ -272,8 +301,9 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Device Settings";
                 RunPageLink = Template = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Edit Device Settings action';
+                ApplicationArea = NPRRetail;
             }
             action("New Version")
             {
@@ -283,8 +313,9 @@ page 6014638 "NPR RP Template Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the New Version action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -303,8 +334,9 @@ page 6014638 "NPR RP Template Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Archive action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -322,10 +354,11 @@ page 6014638 "NPR RP Template Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 RunObject = Page "NPR RP Template Output Log";
                 RunPageLink = "Template Name" = FIELD(Code);
                 ToolTip = 'Executes the Show Log action';
+                ApplicationArea = NPRRetail;
             }
             action("View Archived Versions")
             {
@@ -337,8 +370,9 @@ page 6014638 "NPR RP Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Template Archive List";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Archived Versions action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

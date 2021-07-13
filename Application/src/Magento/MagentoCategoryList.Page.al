@@ -6,9 +6,10 @@ page 6151415 "NPR Magento Category List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Category";
     SourceTableView = SORTING(Path);
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,18 +22,21 @@ page 6151415 "NPR Magento Category List"
                 ShowCaption = false;
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -51,8 +55,9 @@ page 6151415 "NPR Magento Category List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupCategories;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Categories action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -3,10 +3,11 @@ page 6014520 "NPR Website List WP"
     Caption = 'Websites';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Website";
     SourceTableTemporary = true;
     DelayedInsert = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,23 +17,27 @@ page 6014520 "NPR Website List WP"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Website"; Rec."Default Website")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Std. Website field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GlobalDimension1: Record "Dimension Value";
@@ -55,9 +60,10 @@ page 6014520 "NPR Website List WP"
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

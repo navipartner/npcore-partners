@@ -3,7 +3,7 @@ report 6059900 "NPR Analyse Task Queue Usg."
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Analyse Task Queue Usage';
     dataset
     {
@@ -246,23 +246,26 @@ report 6059900 "NPR Analyse Task Queue Usg."
             {
                 field("Group By"; GroupBy)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Group By:';
                     OptionCaption = 'Quarter,Hour,Day';
                     ToolTip = 'Specifies the value of the Group By: field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Lines"; ShowLines)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Lines';
                     OptionCaption = 'None,UtilizationPct,All';
                     ToolTip = 'Specifies the value of the Show Lines field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Warning Level"; WarningLevel)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Warning';
                     ToolTip = 'Specifies the value of the Show Warning field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

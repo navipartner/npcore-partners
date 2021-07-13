@@ -5,7 +5,8 @@ page 6150651 "NPR POS Period Register List"
     PageType = List;
     SourceTable = "NPR POS Period Register";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,43 +17,51 @@ page 6150651 "NPR POS Period Register List"
                 ShowCaption = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Opening Entry No."; Rec."Opening Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the From Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closing Entry No."; Rec."Closing Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the To Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Compression"; Rec."Posting Compression")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Compression field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -74,8 +83,9 @@ page 6150651 "NPR POS Period Register List"
                 RunPageLink = "POS Period Register No." = FIELD("No.");
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Entries action';
+                ApplicationArea = NPRRetail;
             }
             action("Sales Lines")
             {
@@ -83,8 +93,9 @@ page 6150651 "NPR POS Period Register List"
                 Image = Sales;
                 RunObject = Page "NPR POS Entry Sales Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Sales Lines action';
+                ApplicationArea = NPRRetail;
             }
             action("Payment Lines")
             {
@@ -92,8 +103,9 @@ page 6150651 "NPR POS Period Register List"
                 Image = Payment;
                 RunObject = Page "NPR POS Entry Pmt. Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Payment Lines action';
+                ApplicationArea = NPRRetail;
             }
             action("Balancing Line")
             {
@@ -101,8 +113,9 @@ page 6150651 "NPR POS Period Register List"
                 Image = Balance;
                 RunObject = Page "NPR POS Balancing Line";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Balancing Line action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -115,8 +128,9 @@ page 6150651 "NPR POS Period Register List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Post Ledger Register action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -136,8 +150,9 @@ page 6150651 "NPR POS Period Register List"
             {
                 Caption = 'Preview Post Ledger Register';
                 Image = ViewPostedOrder;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Preview Post Ledger Register action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -157,8 +172,9 @@ page 6150651 "NPR POS Period Register List"
             {
                 Caption = 'Compare Preview Ledger Register to Audit Roll Posting';
                 Image = CompareCOA;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Compare Preview Ledger Register to Audit Roll Posting action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -181,8 +197,9 @@ page 6150651 "NPR POS Period Register List"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Navigate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

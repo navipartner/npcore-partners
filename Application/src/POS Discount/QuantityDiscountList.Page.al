@@ -10,8 +10,9 @@ page 6014467 "NPR Quantity Discount List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Quantity Discount Header";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,44 +22,52 @@ page 6014467 "NPR Quantity Discount List"
             {
                 field("Main No."; Rec."Main No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Main no. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item no. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closing Date"; Rec."Closing Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closing Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Shortcut Dimension 1 Code';
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -76,8 +85,9 @@ page 6014467 "NPR Quantity Discount List"
                 RunPageLink = "Table ID" = CONST(6014439),
                               "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Dimensions action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

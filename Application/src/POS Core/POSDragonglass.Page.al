@@ -3,7 +3,8 @@ page 6150750 "NPR POS (Dragonglass)"
     Caption = 'POS';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -11,7 +12,8 @@ page 6150750 "NPR POS (Dragonglass)"
         {
             usercontrol(Framework; "NPR Dragonglass")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnFrameworkReady()
                 begin

@@ -1,12 +1,13 @@
-﻿page 6014614 "NPR Discount FactBox"
+page 6014614 "NPR Discount FactBox"
 {
 
     Caption = 'Discount FactBox';
     InsertAllowed = false;
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Item;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,9 +15,10 @@
         {
             field("Mix Discount"; MixDiscount)
             {
-                ApplicationArea = All;
+
                 Caption = 'Mix Discount';
                 ToolTip = 'Specifies the value of the Mix Discount field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAssistEdit()
                 var
@@ -32,9 +34,10 @@
             }
             field("Period Discount"; PeriodDiscount)
             {
-                ApplicationArea = All;
+
                 Caption = 'Period Discount';
                 ToolTip = 'Specifies the value of the Period Discount field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAssistEdit()
                 var
@@ -50,9 +53,10 @@
             }
             field("Multiple Unit Price"; MultipleUnitPrice)
             {
-                ApplicationArea = All;
+
                 Caption = 'Multiple Unit Price';
                 ToolTip = 'Specifies the value of the Multiple Unit Price field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAssistEdit()
                 var

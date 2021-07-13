@@ -4,8 +4,9 @@ page 6060077 "NPR MM Recur. Payment Setup"
     Caption = 'Recurring Payment Setup';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Recur. Paym. Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,51 +16,60 @@ page 6060077 "NPR MM Recur. Payment Setup"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Service Provider Code"; Rec."Payment Service Provider Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Service Provider Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("PSP Recurring Plan ID"; Rec."PSP Recurring Plan ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the PSP Recurring Plan ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Alignment"; Rec."Period Alignment")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Alignment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Size"; Rec."Period Size")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Size field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Posting)
             {
                 field("Gen. Journal Template Name"; Rec."Gen. Journal Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gen. Journal Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No. Series"; Rec."Document No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Terms Code"; Rec."Payment Terms Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Terms Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Revenue Account"; Rec."Revenue Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Revenue Account field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

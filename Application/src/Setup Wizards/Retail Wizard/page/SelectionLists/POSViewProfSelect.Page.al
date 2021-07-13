@@ -15,33 +15,39 @@ page 6014695 "NPR POS View Prof. Select"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client Decimal Separator"; Rec."Client Decimal Separator")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Decimal Separator field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client Thousands Separator"; Rec."Client Thousands Separator")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Thousands Separator field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client Date Separator"; Rec."Client Date Separator")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Date Separator field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Theme Code"; Rec."POS Theme Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Theme Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Order on Screen"; Rec."Line Order on Screen")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line Order on Screen field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

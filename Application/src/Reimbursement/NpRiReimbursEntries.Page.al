@@ -5,7 +5,8 @@ page 6151103 "NPR NpRi Reimburs. Entries"
     PageType = List;
     UsageCategory = Administration;
     SourceTable = "NPR NpRi Reimbursement Entry";
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -14,128 +15,152 @@ page 6151103 "NPR NpRi Reimburs. Entries"
             {
                 field("Party Type"; Rec."Party Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Party Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Party No."; Rec."Party No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Party No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Code"; Rec."Template Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Company Name"; Rec."Source Company Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Table No."; Rec."Source Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Table Name"; Rec."Source Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Record Position"; Rec."Source Record Position")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Record Position field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Entry No."; Rec."Source Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Positive; Rec.Positive)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Positive field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Amount"; Rec."Remaining Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remaining Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closed by Entry No."; Rec."Closed by Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closed by Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Account Type"; Rec."Account Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Account No."; Rec."Account No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reimbursement Amount"; Rec."Reimbursement Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reimbursement Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last modified by"; Rec."Last modified by")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last modified by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last modified at"; Rec."Last modified at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last modified at field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -151,8 +176,9 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Image = ApplyEntries;
                 Scope = Repeater;
                 ShortCutKey = 'Shift+F11';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Apply Entries action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -170,8 +196,9 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Ellipsis = true;
                 Image = UnApply;
                 Scope = Repeater;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Cancel Manual Application action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -195,8 +222,9 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Source action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -213,8 +241,9 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 Scope = Repeater;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Navigate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

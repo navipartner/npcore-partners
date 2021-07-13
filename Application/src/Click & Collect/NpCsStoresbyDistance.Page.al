@@ -6,10 +6,11 @@ page 6151208 "NPR NpCs Stores by Distance"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Store";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Distance (km)");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -23,11 +24,12 @@ page 6151208 "NPR NpCs Stores by Distance"
                     ShowCaption = false;
                     field(FromStoreCode; FromStoreCode)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'From Store Code';
                         TableRelation = "NPR NpCs Store";
                         Visible = (NOT ShowInventory);
                         ToolTip = 'Specifies the value of the From Store Code field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -48,10 +50,11 @@ page 6151208 "NPR NpCs Stores by Distance"
                     }
                     field("Show In Stock only"; InStockOnly)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Show In Stock only';
                         Visible = ShowInventory;
                         ToolTip = 'Specifies the value of the Show In Stock only field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -70,10 +73,11 @@ page 6151208 "NPR NpCs Stores by Distance"
                     ShowCaption = false;
                     field("''"; '')
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         Visible = ShowInventory;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -81,113 +85,128 @@ page 6151208 "NPR NpCs Stores by Distance"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("In Stock"; Rec."In Stock")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowInventory;
                     ToolTip = 'Specifies the value of the In Stock field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Requested Qty."; Rec."Requested Qty.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Requested Qty. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Fullfilled Qty."; Rec."Fullfilled Qty.")
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Fullfilled Qty. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distance (km)"; Rec."Distance (km)")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = TRUE;
                     ToolTip = 'Specifies the value of the Distance (km) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact Address"; Rec."Contact Address")
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact Post Code"; Rec."Contact Post Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact City"; Rec."Contact City")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact Country/Region Code"; Rec."Contact Country/Region Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Country/Region Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact Phone No."; Rec."Contact Phone No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact E-mail"; Rec."Contact E-mail")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Contact E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Geolocation Latitude"; Rec."Geolocation Latitude")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = (NOT ShowInventory);
                     ToolTip = 'Specifies the value of the Geolocation Latitude field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Geolocation Longitude"; Rec."Geolocation Longitude")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = (NOT ShowInventory);
                     ToolTip = 'Specifies the value of the Geolocation Longitude field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Lines; "NPR NpCs Store Inv. Buffer")
@@ -195,7 +214,8 @@ page 6151208 "NPR NpCs Stores by Distance"
                 Caption = 'Inventory';
                 SubPageLink = "Store Code" = FIELD(Code);
                 Visible = ShowInventory;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -211,8 +231,9 @@ page 6151208 "NPR NpCs Stores by Distance"
                 RunObject = Page "NPR NpCs Store Card";
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Card action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

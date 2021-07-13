@@ -15,36 +15,42 @@ page 6014443 "NPR EOD Denomination Count"
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
                     ToolTip = 'Specifies the value of the POS Payment Method Code field.';
-                    ApplicationArea = All;
+
                     Editable = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ToolTip = 'Specifies the value of the POS Unit No. field.';
-                    ApplicationArea = All;
+
                     Editable = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Denomination Type"; Rec."Denomination Type")
                 {
                     ToolTip = 'Specifies the value of the Denomination Type field.';
-                    ApplicationArea = All;
+
                     Editable = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field(Denomination; Rec.Denomination)
                 {
                     ToolTip = 'Specifies the value of the Denomination field.';
-                    ApplicationArea = All;
+
                     Editable = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
                     ToolTip = 'Specifies the value of the Quantity field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field(Amount; Rec.Amount)
                 {
                     ToolTip = 'Specifies the value of the Amount field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }

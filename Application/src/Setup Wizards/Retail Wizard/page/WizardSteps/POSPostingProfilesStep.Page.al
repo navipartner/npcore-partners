@@ -14,9 +14,10 @@ page 6014681 "NPR POS Posting Profiles Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -25,33 +26,39 @@ page 6014681 "NPR POS Posting Profiles Step"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max. POS Posting Diff. (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Posting Diff. Account2"; Rec."POS Posting Diff. Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Differences Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Sales Rounding Account"; Rec."POS Sales Rounding Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Sales Rounding Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Sales Amt. Rndng Precision"; Rec."POS Sales Amt. Rndng Precision")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Sales Amt. Rndng Precision field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Type"; Rec."Rounding Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

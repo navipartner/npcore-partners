@@ -5,9 +5,10 @@ page 6151053 "NPR Item Hierarchy Lines"
     Caption = 'Item Hiearachy Lines';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Item Hierarchy Line";
     SourceTableView = SORTING("Linked Table Key Value");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,49 +21,57 @@ page 6151053 "NPR Item Hierarchy Lines"
                 ShowAsTree = true;
                 field(Hierachy; Rec."Related Table Desc Field Value")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Hierachy';
                     ToolTip = 'Specifies the value of the Hierachy field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Hierarchy Level"; Rec."Item Hierarchy Level")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Level';
                     ToolTip = 'Specifies the value of the Level field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Hierachy Description"; Rec."Item Hierachy Description")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec."Item Desc.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Item Description';
                     ToolTip = 'Specifies the value of the Item Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Linked Table Key Value"; Rec."Linked Table Key Value")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Linked Table Key Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Related Table Key Field Value"; Rec."Related Table Key Field Value")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Related Table Key Field Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -76,8 +85,9 @@ page 6151053 "NPR Item Hierarchy Lines"
             {
                 Caption = 'Create Hierachy Lines';
                 Image = Item;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Hierachy Lines action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -95,8 +105,9 @@ page 6151053 "NPR Item Hierarchy Lines"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Add Hierachy Item action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

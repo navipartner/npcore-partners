@@ -15,23 +15,27 @@ page 6150684 "NPR NPRE Restaurant Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Service Flow Profile"; Rec."Service Flow Profile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Service Flow Profile field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Kitchen Integration")
@@ -39,21 +43,24 @@ page 6150684 "NPR NPRE Restaurant Card"
                 Caption = 'Kitchen Integration';
                 field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Resend All On New Lines"; Rec."Resend All On New Lines")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Resend All On New Lines field';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Print)
                 {
                     Caption = 'Print';
                     field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Kitchen Printing Active field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(KDS)
@@ -62,17 +69,19 @@ page 6150684 "NPR NPRE Restaurant Card"
                     Visible = ShowKDS;
                     field("KDS Active"; Rec."KDS Active")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the KDS Active field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Order ID Assign. Method field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Station Req. Handl. On Serving"; Rec."Station Req. Handl. On Serving")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies how kitchen station production requests should be handled, if product has been served prior to finishing production';
                     }
                 }
@@ -82,12 +91,14 @@ page 6150684 "NPR NPRE Restaurant Card"
         {
             systempart(Control6014412; Notes)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control6014413; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -109,8 +120,9 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Stations action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(KitchenStationSelection)
                 {
@@ -122,8 +134,9 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Station Selection Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(ShowKitchenRequests)
                 {
@@ -134,8 +147,9 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Scope = Repeater;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -156,8 +170,9 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Locations action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(Seatings)
                 {
@@ -168,8 +183,9 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Seatings action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

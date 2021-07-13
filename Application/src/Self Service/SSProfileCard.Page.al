@@ -14,18 +14,21 @@ page 6150699 "NPR SS Profile Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Kiosk Mode Unlock PIN"; Rec."Kiosk Mode Unlock PIN")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Kios Mode Unlock PIN field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

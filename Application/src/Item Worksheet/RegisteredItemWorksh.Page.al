@@ -5,7 +5,8 @@ page 6060046 "NPR Registered Item Worksh."
     PageType = List;
     SourceTable = "NPR Registered Item Works.";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,38 +16,45 @@ page 6060046 "NPR Registered Item Worksh."
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Worksheet Name"; Rec."Worksheet Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Worksheet Template"; Rec."Item Worksheet Template")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Worksheet Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Registered Date Time"; Rec."Registered Date Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Registered Date Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Registered by User ID"; Rec."Registered by User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Registered by User ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -58,7 +66,7 @@ page 6060046 "NPR Registered Item Worksh."
         {
             action("View Registered Item Worksheet")
             {
-                ApplicationArea = All;
+
                 Caption = 'View Registered Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
@@ -70,6 +78,7 @@ page 6060046 "NPR Registered Item Worksh."
                 RunPageView = SORTING("Registered Worksheet No.", "Line No.")
                               ORDER(Ascending);
                 ToolTip = 'Executes the View Registered Item Worksheet action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

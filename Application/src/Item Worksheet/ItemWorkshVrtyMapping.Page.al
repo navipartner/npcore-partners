@@ -4,7 +4,8 @@ page 6060060 "NPR Item Worksh. Vrty. Mapping"
     PageType = List;
     SourceTable = "NPR Item Worksh. Vrty Mapping";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -13,61 +14,72 @@ page 6060060 "NPR Item Worksh. Vrty. Mapping"
             {
                 field("Worksheet Template Name"; Rec."Worksheet Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Worksheet Template Name field.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Worksheet Name"; Rec."Worksheet Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Worksheet Name field.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor No. field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Wksh. Maping Field"; Rec."Item Wksh. Maping Field")
                 {
-                    ApplicationArea = All;
+
                     LookupPageID = "NPR Item Worksh. Field Setup";
                     ToolTip = 'Specifies the value of the Item Worksheet Mapipng Field field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Wksh. Maping Field Name"; Rec."Item Wksh. Maping Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Worksheet Mapping Field Name field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Wksh. Maping Field Value"; Rec."Item Wksh. Maping Field Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Worksheet Mapping Field Value field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor Variety Value"; Rec."Vendor Variety Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor Variey Value field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Variety; Rec.Variety)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety Table"; Rec."Variety Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety Table field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety Value"; Rec."Variety Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety Value field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety Value Description"; Rec."Variety Value Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety Value Description field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -14,13 +14,15 @@ page 6151419 "NPR Magento Brand Card"
                 ShowCaption = false;
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -33,10 +35,11 @@ page 6151419 "NPR Magento Brand Card"
                 }
                 field("Description"; Format(Rec.Description.HasValue))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     var
@@ -53,10 +56,11 @@ page 6151419 "NPR Magento Brand Card"
                 }
                 field("Short Description"; Format(Rec."Short Description".HasValue))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Short Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Short Description field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     var
@@ -73,33 +77,39 @@ page 6151419 "NPR Magento Brand Card"
                 }
                 field("Seo Link"; Rec."Seo Link")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Seo Link field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Meta Title"; Rec."Meta Title")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Meta Title field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Meta Description"; Rec."Meta Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Meta Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Picture; Rec.Picture)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Picture field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Logo Picture"; Rec."Logo Picture")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logo field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -112,7 +122,8 @@ page 6151419 "NPR Magento Brand Card"
                 ShowFilter = false;
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD(Picture);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(LogoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
@@ -121,7 +132,8 @@ page 6151419 "NPR Magento Brand Card"
                 ShowFilter = false;
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD("Logo Picture");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -136,16 +148,18 @@ page 6151419 "NPR Magento Brand Card"
                 Image = List;
                 RunObject = Page "NPR Magento Brands";
                 ShortCutKey = 'F5';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the List action';
+                ApplicationArea = NPRRetail;
             }
             action("Display Config")
             {
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Display Config action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

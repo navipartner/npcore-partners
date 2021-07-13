@@ -3,7 +3,7 @@ report 6014425 "NPR Event Overview"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Overview.rdl';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Event Overview';
     dataset
     {
@@ -133,14 +133,16 @@ report 6014425 "NPR Event Overview"
                     field("Period Start"; PeriodStart)
                     {
                         Caption = 'Period starts at';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Period starts at field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Period End"; PeriodEnd)
                     {
                         Caption = 'Period ends at';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Period ends at field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(JobPlanningType)
                     {
@@ -148,26 +150,30 @@ report 6014425 "NPR Event Overview"
                         field("Job Planning Type Resource"; JobPlanningTypeResource)
                         {
                             Caption = 'Resource';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Resource field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Job Planning Type Item"; JobPlanningTypeItem)
                         {
                             Caption = 'Item';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Item field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Job Planning Type GL Account"; JobPlanningTypeGLAccount)
                         {
                             Caption = 'G/L Account';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the G/L Account field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Job Planning Type Text"; JobPlanningTypeText)
                         {
                             Caption = 'Text';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Text field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }

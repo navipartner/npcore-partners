@@ -8,7 +8,8 @@ page 6014674 "NPR Endpoint List"
     PageType = List;
     SourceTable = "NPR Endpoint";
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,28 +19,33 @@ page 6014674 "NPR Endpoint List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -55,8 +61,9 @@ page 6014674 "NPR Endpoint List"
                 Image = XMLFile;
                 RunObject = Page "NPR Endpoint Request List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Requests action';
+                ApplicationArea = NPRRetail;
             }
             action("Request Batches")
             {
@@ -64,8 +71,9 @@ page 6014674 "NPR Endpoint List"
                 Image = XMLFileGroup;
                 RunObject = Page "NPR Endpoint Req. Batch List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Request Batches action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

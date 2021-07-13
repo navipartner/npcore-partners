@@ -17,8 +17,9 @@ page 6151437 "NPR Magento Item Attr. Values"
                 ShowCaption = false;
                 field(Selected; Rec.Selected)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Selected field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -39,8 +40,9 @@ page 6151437 "NPR Magento Item Attr. Values"
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

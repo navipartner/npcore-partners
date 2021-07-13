@@ -8,7 +8,8 @@ page 6184491 "NPR Pepper Config. List"
     PageType = List;
     SourceTable = "NPR Pepper Config.";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,23 +19,27 @@ page 6184491 "NPR Pepper Config. List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mode field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -52,8 +57,9 @@ page 6184491 "NPR Pepper Config. List"
                 RunPageLink = "Configuration Code" = FIELD(Code);
                 RunPageView = SORTING(ID)
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Instances action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -65,8 +71,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'License';
                     Image = ImportCodes;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -77,8 +84,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'Additional Parameters';
                     Image = Import;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -93,8 +101,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'License';
                     Image = ElectronicNumber;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -105,8 +114,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'Configuration XML';
                     Image = CreateXMLFile;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Configuration XML action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -117,8 +127,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -133,8 +144,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -145,8 +157,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -161,8 +174,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'License';
                     Image = Export;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -173,8 +187,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'Configuration XML';
                     Image = ExportElectronicDocument;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Configuration XML action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -185,8 +200,9 @@ page 6184491 "NPR Pepper Config. List"
                 {
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

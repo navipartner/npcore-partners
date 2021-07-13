@@ -1,4 +1,4 @@
-﻿page 6060074 "NPR MM Membership Print Jnl"
+page 6060074 "NPR MM Membership Print Jnl"
 {
 
     Caption = 'Membership Offline Print Journal';
@@ -9,7 +9,8 @@
     SourceTableView = SORTING("Entry No.")
                       WHERE("Source Type" = CONST(PRINT_JNL));
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,83 +20,98 @@
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Entry No"; Rec."Member Entry No")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Member Entry No field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Entry No."; Rec."Card Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Card Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Information Context"; Rec."Information Context")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Information Context field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Member No"; Rec."External Member No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Member No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("First Name"; Rec."First Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the First Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Card No."; Rec."External Card No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Card No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Card No. Last 4"; Rec."External Card No. Last 4")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Card No. Last 4 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -113,8 +129,9 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = "Report";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Member Account Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -138,8 +155,9 @@
                 PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Member Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -162,8 +180,9 @@
                 PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Card Owner action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -191,8 +210,9 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership action';
+                ApplicationArea = NPRRetail;
             }
             action(OpenMembershipSetup)
             {
@@ -201,8 +221,9 @@
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Setup";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the MembershipSetup action';
+                ApplicationArea = NPRRetail;
             }
             action(Shipment)
             {
@@ -212,8 +233,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Shipment action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

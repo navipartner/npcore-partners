@@ -1,4 +1,4 @@
-﻿page 6059769 "NPR NaviDocs Document List"
+page 6059769 "NPR NaviDocs Document List"
 {
     Caption = 'NaviDocs Document List';
     DeleteAllowed = false;
@@ -8,7 +8,8 @@
     PromotedActionCategories = 'New,Process,Report,Functions,Update,Change Status for Marked';
     SourceTable = "NPR NaviDocs Entry";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,104 +19,121 @@
             {
                 field("Document Description"; Rec."Document Description")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Order No."; Rec."Order No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Order No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Document No."; Rec."External Document No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. (Recipient)"; Rec."No. (Recipient)")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. (Recipient) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Name (Recipient)"; Rec."Name (Recipient)")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name (Recipient) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(StatusText; StatusText)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Status';
                     Editable = false;
                     OptionCaption = 'Unhandled,Error,Handled';
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Handling Profile"; Rec."Document Handling Profile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Handling Profile field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Handling"; Rec."Document Handling")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document Handling field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Report No."; Rec."Report No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Report No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-mail (Recipient)"; Rec."E-mail (Recipient)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-mail (Recipient) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Code"; Rec."Template Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printed Qty."; Rec."Printed Qty.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Printed Qty. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processed Qty."; Rec."Processed Qty.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Processed Qty. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delay sending until"; Rec."Delay sending until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delay sending until field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(NaviDocsCommentSubpage; "NPR NaviDocs Comment Subpage")
             {
                 Editable = false;
                 ShowFilter = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(NaviDocsAttachments; "NPR NaviDocs Entry Attachments")
             {
@@ -123,7 +141,8 @@
                 SubPageLink = "NaviDocs Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("NaviDocs Entry No.", "Line No.");
                 Visible = ShowAttachmentSubpage;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -145,8 +164,9 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Handle action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -163,8 +183,9 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Handle marked action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -185,8 +206,9 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+U';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Show unhandled action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -206,8 +228,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Update Status of Marked action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -224,8 +247,9 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category6;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set Status = Unhandled action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -241,8 +265,9 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category6;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set Status = Error action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -258,8 +283,9 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category6;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set Status = Handled action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -276,8 +302,9 @@
                 {
                     Caption = 'Change Handling Profile';
                     Image = SendToMultiple;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Change Handling Profile action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -298,8 +325,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Shift+F5';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Document Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -314,8 +342,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+F5';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Master Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -330,8 +359,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+M';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

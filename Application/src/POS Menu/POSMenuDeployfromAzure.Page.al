@@ -1,9 +1,10 @@
 page 6150709 "NPR POS Menu Deploy from Azure"
 {
     PageType = NavigatePage;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
     Caption = 'POS Menu Deploy from Azure';
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -11,10 +12,11 @@ page 6150709 "NPR POS Menu Deploy from Azure"
         {
             field("POS Menu"; PosMenu)
             {
-                ApplicationArea = All;
+
                 Caption = 'POS Menu';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the PosMenu field';
+                ApplicationArea = NPRRetail;
                 trigger OnLookup(var value: Text): Boolean
                 var
                     rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
@@ -54,11 +56,12 @@ page 6150709 "NPR POS Menu Deploy from Azure"
         {
             action(ActionFinish)
             {
-                ApplicationArea = All;
+
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
                 Image = Action;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

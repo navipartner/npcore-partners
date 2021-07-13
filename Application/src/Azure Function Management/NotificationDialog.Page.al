@@ -9,15 +9,17 @@ page 6151040 "NPR Notification Dialog"
         {
             field(TitleTxt; TitleTxt)
             {
-                ApplicationArea = All;
+
                 Caption = 'Title';
                 ToolTip = 'Specifies the value of the Title field';
+                ApplicationArea = NPRRetail;
             }
             field(MessageTxt; MessageTxt)
             {
-                ApplicationArea = All;
+
                 Caption = 'Message';
                 ToolTip = 'Specifies the value of the Message field';
+                ApplicationArea = NPRRetail;
             }
             group(Options)
             {
@@ -25,23 +27,26 @@ page 6151040 "NPR Notification Dialog"
                 Description = 'Options';
                 field(NotificationColor; NotificationColor)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Notification Color';
                     OptionCaption = 'Red,Green,Blue,Yellow,Dark';
                     ToolTip = 'Specifies the value of the Notification Color field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ActionType; ActionType)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Action Type';
                     OptionCaption = 'Message,Phone Call,Facetime Video,Facetime Audio';
                     ToolTip = 'Specifies the value of the Action Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ActionValue; ActionValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Action Value';
                     ToolTip = 'Specifies the value of the Action Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -1,13 +1,14 @@
-﻿page 6151582 "NPR Event Events by Attributes"
+page 6151582 "NPR Event Events by Attributes"
 {
     Caption = 'Events by Attributes';
     CardPageID = "NPR Event Card";
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SaveValues = true;
     SourceTable = Job;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,43 +19,50 @@
                 ShowCaption = false;
                 field(FilterDescription; FilterDescription)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Attributes Filter';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Attributes Filter field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             repeater(Group)
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Bill-to Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Status"; Rec."NPR Event Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Event Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Amount"; Rec."NPR Total Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Total Amount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -71,15 +79,17 @@
                 RunObject = Page "NPR Event Card";
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View action';
+                ApplicationArea = NPRRetail;
             }
             action(SelectAttributeFilter)
             {
                 Caption = 'Select Attribute Filter';
                 Image = "Filter";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Select Attribute Filter action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -107,8 +117,9 @@
             {
                 Caption = 'Clear Filter';
                 Image = ClearFilter;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Clear Filter action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

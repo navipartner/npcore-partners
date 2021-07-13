@@ -12,28 +12,33 @@ page 6059826 "NPR Trx Email Setup Card"
             {
                 field(Provider; Rec.Provider)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Provider field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Default; Rec.Default)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client ID"; Rec."Client ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("API Key"; Rec."API Key")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the API Key field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("API URL"; Rec."API URL")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the API URL field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -45,13 +50,14 @@ page 6059826 "NPR Trx Email Setup Card"
         {
             action(CheckConnection)
             {
-                ApplicationArea = All;
+
                 Caption = 'Test Connection';
                 Image = Link;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Test Connection action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

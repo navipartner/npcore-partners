@@ -3,7 +3,7 @@ report 6014533 "NPR Inventory - flow"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Inventory Flow';
     UseRequestPage = true;
     UseSystemPrinter = true;
@@ -309,26 +309,30 @@ report 6014533 "NPR Inventory - flow"
                     field("Skip No Sales"; SkipNoSales)
                     {
                         Caption = 'Hide Items With No Sales';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Hide Items With No Sales field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Skip Without Portfolio"; SkipWithoutPortfolio)
                     {
                         Caption = 'Hide Items With No Inventory';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Hide Items With No Inventory field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Only Total"; OnlyTotal)
                     {
                         Caption = 'Show Only Total';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Only Total field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Groups"; ShowGroups)
                     {
                         Caption = 'Show Groups';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Groups field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

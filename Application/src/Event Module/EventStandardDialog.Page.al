@@ -3,7 +3,8 @@ page 6060154 "NPR Event Standard Dialog"
     Caption = 'Event Standard Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -11,26 +12,29 @@ page 6060154 "NPR Event Standard Dialog"
         {
             field(MessageText; MessageText)
             {
-                ApplicationArea = All;
+
                 Caption = 'Message';
                 Visible = ShowMessage;
                 ToolTip = 'Specifies the value of the Message field';
+                ApplicationArea = NPRRetail;
             }
             field(Password; Password)
             {
-                ApplicationArea = All;
+
                 Caption = 'Password';
                 ExtendedDatatype = Masked;
                 Visible = ShowPassword;
                 ToolTip = 'Specifies the value of the Password field';
+                ApplicationArea = NPRRetail;
             }
             field(ConfirmPassword; ConfirmPassword)
             {
-                ApplicationArea = All;
+
                 Caption = 'Confirm Password';
                 ExtendedDatatype = Masked;
                 Visible = ShowPassword;
                 ToolTip = 'Specifies the value of the Confirm Password field';
+                ApplicationArea = NPRRetail;
             }
         }
     }

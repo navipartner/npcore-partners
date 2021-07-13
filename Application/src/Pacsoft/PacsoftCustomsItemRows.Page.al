@@ -6,9 +6,10 @@ page 6014422 "NPR Pacsoft Customs Item Rows"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Pacsoft Customs Item Rows";
     SourceTableView = SORTING("Shipment Document Entry No.", "Entry No.");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,38 +19,45 @@ page 6014422 "NPR Pacsoft Customs Item Rows"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Code"; Rec."Item Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Code (Stat No.) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Information"; Rec."Line Information")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line Information field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Copies; Rec.Copies)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Copies field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customs Value"; Rec."Customs Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customs Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Content"; Rec.Content)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Content field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Country of Origin"; Rec."Country of Origin")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Country of Origin field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

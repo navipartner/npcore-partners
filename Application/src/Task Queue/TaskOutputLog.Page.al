@@ -4,8 +4,9 @@ page 6059911 "NPR Task Output Log"
     Caption = 'Task Output Log';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Task Output Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,43 +16,51 @@ page 6059911 "NPR Task Output Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Log Entry No."; Rec."Task Log Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Log Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Journal Template Name"; Rec."Journal Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Journal Batch Name"; Rec."Journal Batch Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Batch Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Journal Line No."; Rec."Journal Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("File Name"; Rec."File Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the File Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Import DateTime"; Rec."Import DateTime")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import DateTime field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -65,8 +74,9 @@ page 6059911 "NPR Task Output Log"
             {
                 Caption = 'Show Document';
                 Image = ShowSelected;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Document action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

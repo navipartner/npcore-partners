@@ -1,4 +1,4 @@
-﻿page 6151412 "NPR Magento Pict. Link Subform"
+page 6151412 "NPR Magento Pict. Link Subform"
 {
     AutoSplitKey = true;
     Caption = 'Magento Picture Link Subform';
@@ -18,28 +18,33 @@
                 ShowCaption = false;
                 field("Picture Name"; Rec."Picture Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Picture Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Base Image"; Rec."Base Image")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Base Image field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Small Image"; Rec."Small Image")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Small Image field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Thumbnail; Rec.Thumbnail)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Thumbnail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Short Text"; Rec."Short Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Short Text field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -48,8 +53,9 @@
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

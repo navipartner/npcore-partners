@@ -1,4 +1,4 @@
-﻿page 6060067 "NPR Items by Loc.Overv. Matrix"
+page 6060067 "NPR Items by Loc.Overv. Matrix"
 {
     // NPR5.52/JAKUBV/20191022  CASE 370333 Transport NPR5.52 - 22 October 2019
 
@@ -7,8 +7,9 @@
     LinksAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Inv. Overview Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,33 +20,38 @@
                 ShowCaption = false;
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Description"; Rec."Item Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Description"; Rec."Variant Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Total Inventory';
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Total Inventory field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -54,13 +60,14 @@
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field1Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -69,13 +76,14 @@
                 }
                 field(Field2; MATRIX_CellData[2])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field2Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -84,13 +92,14 @@
                 }
                 field(Field3; MATRIX_CellData[3])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field3Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -99,13 +108,14 @@
                 }
                 field(Field4; MATRIX_CellData[4])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field4Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -114,13 +124,14 @@
                 }
                 field(Field5; MATRIX_CellData[5])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field5Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -129,13 +140,14 @@
                 }
                 field(Field6; MATRIX_CellData[6])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field6Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -144,13 +156,14 @@
                 }
                 field(Field7; MATRIX_CellData[7])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field7Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -159,13 +172,14 @@
                 }
                 field(Field8; MATRIX_CellData[8])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field8Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -174,13 +188,14 @@
                 }
                 field(Field9; MATRIX_CellData[9])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field9Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -189,13 +204,14 @@
                 }
                 field(Field10; MATRIX_CellData[10])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field10Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -204,13 +220,14 @@
                 }
                 field(Field11; MATRIX_CellData[11])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field11Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -219,13 +236,14 @@
                 }
                 field(Field12; MATRIX_CellData[12])
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field12Visible;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

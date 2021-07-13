@@ -9,41 +9,47 @@ page 6151241 "NPR Retail Manager Role Center"
         {
             part(Control6150616; "NPR Activities")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(NPRetailPOSEntryCue; "NPR POS Entry Cue")
             {
                 Caption = 'POS Activities';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(ControlPurchase; "NPR Acc. Payables Act")
             {
                 Caption = 'Purchase Activities';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
-                ApplicationArea = All;
+
                 Visible = false;
+                ApplicationArea = NPRRetail;
             }
             part(RetailSalesByShopChart; "NPR Retail Sales Chart by Shop")
             {
-                ApplicationArea = All;
+
                 Visible = false;
+                ApplicationArea = NPRRetail;
             }
             part("MyReports"; "NPR My Reports")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
             }
             part(MyjobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control21; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = R;
-                ApplicationArea = Suite;
+                ApplicationArea = NPRRetail;
             }
 
         }
@@ -61,8 +67,9 @@ page 6151241 "NPR Retail Manager Role Center"
                     Caption = 'S&tatement';
                     Image = "Report";
                     RunObject = Report Statement;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the S&tatement action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150667)
                 {
@@ -72,16 +79,18 @@ page 6151241 "NPR Retail Manager Role Center"
                     Caption = 'Customer - Order Su&mmary';
                     Image = "Report";
                     RunObject = Report "Customer - Order Summary";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Customer - Order Su&mmary action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Customer - T&op 10 List")
                 {
                     Caption = 'Customer - T&op 10 List';
                     Image = "Report";
                     RunObject = Report "Customer - Top 10 List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Customer - T&op 10 List action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150663)
                 {
@@ -94,8 +103,9 @@ page 6151241 "NPR Retail Manager Role Center"
                     Caption = 'Inventory - Sales &Back Orders';
                     Image = "Report";
                     RunObject = Report "Inventory - Sales Back Orders";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Inventory - Sales &Back Orders action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150658)
                 {
@@ -105,24 +115,27 @@ page 6151241 "NPR Retail Manager Role Center"
                     Caption = '&G/L Trial Balance';
                     Image = "Report";
                     RunObject = Report "Trial Balance";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &G/L Trial Balance action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Trial Balance by &Period")
                 {
                     Caption = 'Trial Balance by &Period';
                     Image = "Report";
                     RunObject = Report "Trial Balance by Period";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Trial Balance by &Period action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Closing T&rial Balance")
                 {
                     Caption = 'Closing T&rial Balance';
                     Image = "Report";
                     RunObject = Report "Closing Trial Balance";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Closing T&rial Balance action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150654)
                 {
@@ -132,24 +145,27 @@ page 6151241 "NPR Retail Manager Role Center"
                     Caption = 'Aged Ac&counts Receivable';
                     Image = "Report";
                     RunObject = Report "Aged Accounts Receivable";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Aged Ac&counts Receivable action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Aged Accounts Pa&yable")
                 {
                     Caption = 'Aged Accounts Pa&yable';
                     Image = "Report";
                     RunObject = Report "Aged Accounts Payable";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Aged Accounts Pa&yable action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Reconcile Cust. and &Vend. Accs")
                 {
                     Caption = 'Reconcile Cust. and &Vend. Accs';
                     Image = "Report";
                     RunObject = Report "Reconcile Cust. and Vend. Accs";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Reconcile Cust. and &Vend. Accs action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator6150650)
                 {
@@ -159,48 +175,54 @@ page 6151241 "NPR Retail Manager Role Center"
                     Caption = 'VAT Registration No. Chec&k';
                     Image = "Report";
                     RunObject = Report "VAT Registration No. Check";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the VAT Registration No. Chec&k action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("VAT E&xceptions")
                 {
                     Caption = 'VAT E&xceptions';
                     Image = "Report";
                     RunObject = Report "VAT Exceptions";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the VAT E&xceptions action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("V&AT Statement")
                 {
                     Caption = 'V&AT Statement';
                     Image = "Report";
                     RunObject = Report "VAT Statement";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the V&AT Statement action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("VAT-VIES Declaration Tax A&uth")
                 {
                     Caption = 'VAT - VIES Declaration Tax A&uth';
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Tax Auth";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the VAT - VIES Declaration Tax A&uth action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("VAT - VIES Declaration &Disk")
                 {
                     Caption = 'VAT - VIES Declaration &Disk';
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Disk";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the VAT - VIES Declaration &Disk action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("EC Sal&es List")
                 {
                     Caption = 'EC Sal&es List';
                     Image = "Report";
                     RunObject = Report "EC Sales List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the EC Sal&es List action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Reports)
@@ -219,32 +241,36 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Sales Person Top 20';
                             Image = Report2;
                             RunObject = Report "NPR Sales Person Top 20";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Sales Person Top 20 action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales code/Item group top")
                         {
                             Caption = 'NPR  Sales code/Item group top';
                             Image = Report2;
                             RunObject = Report "NPR Salesperson/Item Group Top";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR  Sales code/Item group top action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Sale Statistics per Vendor")
                         {
                             Caption = 'NPR Sale Statistics per Vendor';
                             Image = Report2;
                             RunObject = Report "NPR Sale Statistics per Vendor";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Sale Statistics per Vendor action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Statistics By Department")
                         {
                             Caption = 'NPR Sales Statistics By Department';
                             Image = Report2;
                             RunObject = Report "NPR Sales Statistics By Dept.";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Sales Statistics By Department action';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(History)
@@ -262,16 +288,18 @@ page 6151241 "NPR Retail Manager Role Center"
                                 Caption = 'Sales Ticket Statistics';
                                 Image = Report2;
                                 RunObject = page "NPR Sales Ticket Statistics";
-                                ApplicationArea = All;
+
                                 ToolTip = 'Executes the Sales Ticket Statistics action';
+                                ApplicationArea = NPRRetail;
                             }
                             action("Advanced Sales Statistics")
                             {
                                 Caption = 'Advanced Sales Statistics';
                                 Image = ListPage;
                                 RunObject = page "NPR Advanced Sales Stats";
-                                ApplicationArea = All;
+
                                 ToolTip = 'Executes the Advanced Sales Statistics action';
+                                ApplicationArea = NPRRetail;
                             }
                         }
                         group(HistoryReport)
@@ -283,16 +311,18 @@ page 6151241 "NPR Retail Manager Role Center"
                                 Caption = 'NPR Sales per week year/Last year';
                                 Image = Report2;
                                 RunObject = Report "NPR Sales per week year/Last";
-                                ApplicationArea = All;
+
                                 ToolTip = 'Executes the NPR Sales per week year/Last year action';
+                                ApplicationArea = NPRRetail;
                             }
                             action("NPR Discount Statistics")
                             {
                                 Caption = 'NPR Discount Statistics';
                                 Image = Report2;
                                 RunObject = Report "NPR Discount Statistics";
-                                ApplicationArea = All;
+
                                 ToolTip = 'Executes the NPR Discount Statistics action';
+                                ApplicationArea = NPRRetail;
                             }
                         }
                     }
@@ -311,32 +341,36 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Inventory by age';
                             Image = Report;
                             RunObject = report "NPR Inventory by age";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Inventory by age action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Inv. Sales Statistics")
                         {
                             Caption = 'NPR Inv. Sales Statistics';
                             Image = Report;
                             RunObject = report "NPR Item Sales Stats/Provider";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Inv. Sales Statistics action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Inventory per Date")
                         {
                             Caption = 'NPR Inventory per Date';
                             Image = Report;
                             RunObject = report "NPR Inventory per Date";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Inventory per Date action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Group Inventory Value")
                         {
                             Caption = 'NPR Item Group Inventory Value';
                             Image = Report;
                             RunObject = report "NPR Item Group Inv. Value";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Item Group Inventory Value action';
+                            ApplicationArea = NPRRetail;
                         }
 
                         action("NPR Statistic - Sales")
@@ -344,8 +378,9 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Statistic - Sales';
                             Image = Report;
                             RunObject = report "NPR Item Sales Postings";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Statistic - Sales action';
+                            ApplicationArea = NPRRetail;
                         }
 
                         action("NPR Low Sales")
@@ -353,8 +388,9 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Low Sales';
                             Image = Report;
                             RunObject = report "NPR Items With Low Sales";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Low Sales action';
+                            ApplicationArea = NPRRetail;
                         }
 
                         action("NPR Shrinkage")
@@ -362,8 +398,9 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Shrinkage';
                             Image = Report;
                             RunObject = report "NPR Item - Loss";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Shrinkage action';
+                            ApplicationArea = NPRRetail;
                         }
 
                         action("NPR Item Loss - Return Reason")
@@ -371,40 +408,45 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Item Loss - Return Reason';
                             Image = Report;
                             RunObject = report "NPR Item Loss - Ret. Reason";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Item Loss - Return Reason action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Statistics Variant")
                         {
                             Caption = 'NPR Sales Statistics Variant';
                             Image = Report;
                             RunObject = report "NPR Sales Stats Per Variety";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Sales Statistics Variant action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Inventory per Variant at date")
                         {
                             Caption = 'NPR Inventory per Variant at date';
                             Image = Report;
                             RunObject = report "NPR Inventory per Variant/date";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Inventory per Variant at date action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Barcode Sheet")
                         {
                             Caption = 'NPR Item Barcode Sheet';
                             Image = Report;
                             RunObject = report "NPR Item Barcode Status Sheet";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Item Barcode Sheet action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Return Reason Code Statistics")
                         {
                             Caption = 'NPR Return Reason Code Statistics';
                             Image = Report;
                             RunObject = report "NPR Return Reason Code Stat.";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Return Reason Code Statistics action';
+                            ApplicationArea = NPRRetail;
                         }
 
                         action("NPR Adjust Cost - Item Entries")
@@ -412,8 +454,9 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Adjust Cost - Item Entries';
                             Image = Report;
                             RunObject = report "NPR Adjust Cost: ItemEntriesTQ";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Adjust Cost - Item Entries action';
+                            ApplicationArea = NPRRetail;
                         }
 
                         action("NPR Item Sales Statistics")
@@ -421,16 +464,18 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Item Sales Statistics';
                             Image = Report;
                             RunObject = report "NPR Item Sales Statistics";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Item Sales Statistics action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Group Top")
                         {
                             Caption = 'NPR Item Group Top';
                             Image = Report;
                             RunObject = report "NPR Item Group Top";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Item Group Top action';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Lines)
@@ -443,32 +488,36 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Item Group Overview';
                             Image = Report;
                             RunObject = Report "NPR Item Group Overview";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Item Group Overview action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Vendor sales per line")
                         {
                             Caption = 'NPR Vendor sales per line';
                             Image = Report;
                             RunObject = report "NPR Vendor trx by Item group";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Vendor sales per line action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Person Trn. by Item Gr.")
                         {
                             Caption = 'NPR Sales Person Trn. by Item Gr.';
                             Image = Report;
                             RunObject = Report "NPR S.Person Trx by Item Gr.";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Sales Person Trn. by Item Gr. action';
+                            ApplicationArea = NPRRetail;
                         }
                         action("NPR Sales Stat/Analysis")
                         {
                             Caption = 'NPR Sales Stat/Analysis';
                             Image = Report;
                             RunObject = Report "NPR Sales Stat/Analysis";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Sales Stat/Analysis action';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Discount)
@@ -480,8 +529,9 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'NPR Period Discount Statistics';
                             Image = Report;
                             RunObject = report "NPR Period Discount Stat.";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the NPR Period Discount Statistics action';
+                            ApplicationArea = NPRRetail;
                         }
 
                         action("Inventory Campaign Stat.")
@@ -489,8 +539,9 @@ page 6151241 "NPR Retail Manager Role Center"
                             Caption = 'Inventory Campaign Stat.';
                             Image = Report;
                             RunObject = Report "NPR Inventory Campaign Stat.";
-                            ApplicationArea = All;
+
                             ToolTip = 'Executes the Inventory Campaign Stat. action';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -506,56 +557,62 @@ page 6151241 "NPR Retail Manager Role Center"
                 Image = ReferenceData;
                 action(Customers)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'Customers';
                     Image = Customer;
                     RunObject = Page "Customer List";
                     ToolTip = 'View or edit detailed information for the customers that you trade with. From each customer card, you can open related information, such as sales statistics and ongoing orders, and you can define special prices and line discounts that you grant if certain conditions are met.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action(Contact)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'Contact';
                     Image = Customer;
                     RunObject = Page "Contact List";
                     ToolTip = 'View or edit detailed information for the customers that you trade with. From each contact card, you can open related information, such as sales statistics and ongoing orders, and you can define special prices and line discounts that you grant if certain conditions are met.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(Vendors)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'Vendors';
                     Image = Vendor;
                     RunObject = Page "Vendor List";
                     ToolTip = 'View or edit detailed information for the vendors that you trade with. From each vendor card, you can open related information, such as purchase statistics and ongoing orders, and you can define special prices and line discounts that the vendor grants you if certain conditions are met.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action(MemberList)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'Member List';
                     Image = Customer;
                     RunObject = page "NPR MM Member Card List";
                     ToolTip = 'View Member List';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action(Membership)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'Memberships';
                     Image = Customer;
                     RunObject = page "NPR MM Memberships";
                     ToolTip = 'View Membership List';
+                    ApplicationArea = NPRRetail;
 
                 }
 
                 action(ShopperRecognition)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'EFT Shopper Recognition';
                     Image = Customer;
                     RunObject = page "NPR EFT Shopper Recognition";
                     ToolTip = 'View the shopper recognition details';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(ActionGroup6014513)
@@ -566,22 +623,25 @@ page 6151241 "NPR Retail Manager Role Center"
                 {
                     Caption = 'Retail Item List';
                     RunObject = Page "Item List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Retail Item List action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Item Categories")
                 {
                     Caption = 'Item Categories';
                     RunObject = Page "Item Categories";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Categories action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Stockkeeping Unit List")
                 {
                     Caption = 'Stockkeeping Unit List';
                     RunObject = Page "Stockkeeping Unit List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Stockkeeping Unit List action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Journals)
@@ -591,11 +651,12 @@ page 6151241 "NPR Retail Manager Role Center"
 
                 action(ItemJournalList)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'Item Journal List';
                     RunObject = page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(Item));
                     ToolTip = 'Executes the Item Journal List action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Physical Inventory Journals")
                 {
@@ -603,22 +664,25 @@ page 6151241 "NPR Retail Manager Role Center"
                     RunObject = Page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
                                          Recurring = CONST(false));
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Physical Inventory Journals action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Retail Journal List")
                 {
                     Caption = 'Retail Journal List';
                     RunObject = page "NPR Retail Journal List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Retail Journal List action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(ItemWorksheets)
                 {
-                    ApplicationArea = Warehouse;
+
                     Caption = 'Item Worksheets';
                     RunObject = page "NPR Item Worksheets";
                     ToolTip = 'Executes the Item Worksheets action';
+                    ApplicationArea = NPRRetail;
                 }
 
             }
@@ -636,7 +700,8 @@ page 6151241 "NPR Retail Manager Role Center"
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Entry List";
                     ToolTip = 'View POS Entry that have been done.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
 
                 action(POSQuotes)
@@ -648,7 +713,8 @@ page 6151241 "NPR Retail Manager Role Center"
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Saved Sales";
                     ToolTip = 'View POS Saved Sales that have been done.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
 
                 }
                 action("Posted Sales Invoices")
@@ -660,7 +726,8 @@ page 6151241 "NPR Retail Manager Role Center"
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Invoices";
                     ToolTip = 'View Sales Invoices that have been done.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
 
                 action("Posted Sales Shipment List")
@@ -672,7 +739,7 @@ page 6151241 "NPR Retail Manager Role Center"
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Shipments";
                     ToolTip = 'View Posted Sales Shipments that have been done.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                 }
 
                 action("Posted Sales Credit Memos List")
@@ -684,7 +751,8 @@ page 6151241 "NPR Retail Manager Role Center"
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Credit Memos";
                     ToolTip = 'View Sales Credit Memos that have been done.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
             group("Discount, Coupons & Vouchers")
@@ -693,30 +761,34 @@ page 6151241 "NPR Retail Manager Role Center"
                 {
                     Caption = 'Campaign Discount List';
                     RunObject = page "NPR Campaign Discount List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Campaign Discount List action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action("Mixed Discount List")
                 {
                     Caption = 'Mixed Discount List';
                     RunObject = page "NPR Mixed Discount List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Mixed Discount List action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Coupon List")
                 {
                     Caption = 'Coupon List';
                     RunObject = page "NPR NpDc Coupons";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Coupon List action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Voucher List")
                 {
                     Caption = 'Voucher List';
                     RunObject = page "NPR NpRv Vouchers";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Voucher List action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -729,8 +801,9 @@ page 6151241 "NPR Retail Manager Role Center"
                 Promoted = false;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Sales &Order action';
+                ApplicationArea = NPRRetail;
             }
             action("Sales &Return Order")
             {
@@ -738,8 +811,9 @@ page 6151241 "NPR Retail Manager Role Center"
                 Image = ReturnOrder;
                 RunObject = Page "Sales Return Order";
                 RunPageMode = Create;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Sales &Return Order action';
+                ApplicationArea = NPRRetail;
             }
             action("&Transfer Order")
             {
@@ -747,8 +821,9 @@ page 6151241 "NPR Retail Manager Role Center"
                 Image = TransferOrder;
                 RunObject = Page "Transfer Order";
                 RunPageMode = Create;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Transfer Order action';
+                ApplicationArea = NPRRetail;
             }
             action("&Purchase Order")
             {
@@ -757,16 +832,18 @@ page 6151241 "NPR Retail Manager Role Center"
                 Promoted = false;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Purchase Order action';
+                ApplicationArea = NPRRetail;
             }
             action("Purchase Return Order")
             {
                 Caption = 'Purchase Return Order';
                 Image = Document;
                 RunObject = Page "Purchase Return Order";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Purchase Return Order action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

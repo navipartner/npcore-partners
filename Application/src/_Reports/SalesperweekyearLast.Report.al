@@ -5,7 +5,7 @@ report 6014456 "NPR Sales per week year/Last"
     Caption = 'Sales Per Week Year/Last Year';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
     dataset
     {
@@ -181,27 +181,31 @@ report 6014456 "NPR Sales per week year/Last"
                     field("Month."; Month)
                     {
                         Caption = 'Month';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Month field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Year."; Year)
                     {
                         Caption = 'Year';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Year field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Department; "Dimension Value".Code)
                     {
                         Caption = 'Department';
                         TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Department field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Date Comparison"; DateComparison)
                     {
                         Caption = 'Date Comparison';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Date Comparison field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -212,8 +216,9 @@ report 6014456 "NPR Sales per week year/Last"
                     field("Near est"; Nearest)
                     {
                         Caption = 'Compare To Closest Week';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Compare To Closest Week field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -224,8 +229,9 @@ report 6014456 "NPR Sales per week year/Last"
                     field(Multiply; Multiplier)
                     {
                         Caption = 'Multiply With';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Multiply With field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

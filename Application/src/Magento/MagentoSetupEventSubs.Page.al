@@ -4,8 +4,9 @@ page 6151422 "NPR Magento Setup Event Subs."
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Setup Event Sub.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,28 +16,33 @@ page 6151422 "NPR Magento Setup Event Subs."
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Codeunit ID"; Rec."Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Function Name"; Rec."Function Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Function Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Codeunit Name"; Rec."Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -1,9 +1,9 @@
-﻿report 6014424 "NPR Ret. Jnl. - Import Items"
+report 6014424 "NPR Ret. Jnl. - Import Items"
 {
     Caption = 'Import Items';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Item; Item)
@@ -99,9 +99,10 @@
             {
                 field("Only Inventory"; OnlyInventory)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Only Inventory';
                     ToolTip = 'Specifies the value of the OnlyInventory field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

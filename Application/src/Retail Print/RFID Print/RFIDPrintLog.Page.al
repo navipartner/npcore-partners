@@ -10,8 +10,9 @@ page 6014550 "NPR RFID Print Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR RFID Print Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,43 +22,51 @@ page 6014550 "NPR RFID Print Log"
             {
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("RFID Tag Value"; Rec."RFID Tag Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the RFID Tag Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Barcode; Rec.Barcode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Barcode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Batch ID"; Rec."Batch ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Batch ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printed At"; Rec."Printed At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printed At field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

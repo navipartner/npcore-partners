@@ -4,7 +4,7 @@ report 6014540 "NPR Items With Low Sales"
     RDLCLayout = './src/_Reports/layouts/Items With Low Sales.rdlc';
     Caption = 'Items With Low Sales';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
 
     dataset
     {
@@ -178,26 +178,30 @@ report 6014540 "NPR Items With Low Sales"
                     field("Rank Qty"; RankQty)
                     {
                         Caption = 'Rank Quantity';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Rank Quantity field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Period Start Date"; PeriodStartDate)
                     {
                         Caption = 'Start Period';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Start Period field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Period End Date"; PeriodEndDate)
                     {
                         Caption = 'End Period';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the End Period field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Not Sold"; ShowNotSold)
                     {
                         Caption = 'Include Items Not On Inventory Or Not Sold';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Items Not On Inventory Or Not Sold field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

@@ -4,9 +4,10 @@ page 6151160 "NPR MM Loy. Store Setup Server"
     Caption = 'Loyalty Store Setup (Server)';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Loyalty Store Setup";
     SourceTableView = WHERE(Setup = CONST(SERVER));
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,88 +17,105 @@ page 6151160 "NPR MM Loy. Store Setup Server"
             {
                 field(Setup; Rec.Setup)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Setup field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client Company Name"; Rec."Client Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Code"; Rec."Unit Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Authorization Code"; Rec."Authorization Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Authorization Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Accept Client Transactions"; Rec."Accept Client Transactions")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Accept Client Transactions field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Model"; Rec."Posting Model")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Model field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Loyalty Setup Code"; Rec."Loyalty Setup Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Loyalty Setup Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Burn Points Currency Code"; Rec."Burn Points Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Burn Points LCY Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("G/L Account No."; Rec."G/L Account No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the G/L Account No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invoice No. Series"; Rec."Invoice No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Invoice No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reconciliation Period"; Rec."Reconciliation Period")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reconciliation Period field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Outstanding Earn Points"; Rec."Outstanding Earn Points")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Outstanding Earn Points field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Outstanding Burn Points"; Rec."Outstanding Burn Points")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Outstanding Burn Points field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -119,8 +137,9 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 RunPageLink = "Company Name" = FIELD("Client Company Name"),
                               "POS Store Code" = FIELD("Store Code"),
                               "POS Unit Code" = FIELD("Unit Code");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Transaction Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -133,8 +152,9 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reconcile All Stores action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -152,8 +172,9 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reconcile Selected Store action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

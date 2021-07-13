@@ -4,9 +4,10 @@ page 6014617 "NPR Display Config WP"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Display Config";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,8 +18,9 @@ page 6014617 "NPR Display Config WP"
                 ShowCaption = false;
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
                         Rec."No." := '';
@@ -26,8 +28,9 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Item: Record Item;
@@ -82,8 +85,9 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Type field';
+                    ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
                         Rec."Sales Code" := '';
@@ -91,8 +95,9 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("Sales Code"; Rec."Sales Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Customer: Record Customer;
@@ -132,28 +137,33 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("Is Visible"; Rec."Is Visible")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Is Visible field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

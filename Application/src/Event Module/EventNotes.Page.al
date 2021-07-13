@@ -4,9 +4,10 @@ page 6151575 "NPR Event Notes"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Record Link";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,27 +17,31 @@ page 6151575 "NPR Event Notes"
             {
                 field(URL1; Rec.URL1)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'From User';
                     ToolTip = 'Specifies the value of the From User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("To User ID"; Rec."To User ID")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'To User';
                     ToolTip = 'Specifies the value of the To User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Note';
                     ToolTip = 'Specifies the value of the Note field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -51,8 +56,9 @@ page 6151575 "NPR Event Notes"
                 Caption = 'View Event';
                 Image = View;
                 RunPageMode = View;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Event action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

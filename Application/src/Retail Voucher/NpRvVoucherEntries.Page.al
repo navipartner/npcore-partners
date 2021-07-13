@@ -4,8 +4,9 @@ page 6151016 "NPR NpRv Voucher Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpRv Voucher Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,83 +16,99 @@ page 6151016 "NPR NpRv Voucher Entries"
             {
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Amount"; Rec."Remaining Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remaining Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Positive; Rec.Positive)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Positive field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Register No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Document No."; Rec."External Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Partner Code"; Rec."Partner Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Partner Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closed by Entry No."; Rec."Closed by Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closed by Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closed by Partner Code"; Rec."Closed by Partner Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closed by Partner Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Partner Clearing"; Rec."Partner Clearing")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Partner Clearing field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -109,8 +126,9 @@ page 6151016 "NPR NpRv Voucher Entries"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Navi&gate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -6,7 +6,8 @@ page 6151215 "NPR NpCs Open. Hour Sets"
     PageType = List;
     SourceTable = "NPR NpCs Open. Hour Set";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,13 +17,15 @@ page 6151215 "NPR NpCs Open. Hour Sets"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -37,8 +40,9 @@ page 6151215 "NPR NpCs Open. Hour Sets"
                 Caption = 'Opening Hour Calendar';
                 Image = Calendar;
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Opening Hour Calendar action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

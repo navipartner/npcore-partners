@@ -12,8 +12,9 @@ page 6184474 "NPR EFT Auxiliary Operations"
     MultipleNewLines = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR EFT Aux Operation";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -23,13 +24,15 @@ page 6184474 "NPR EFT Auxiliary Operations"
             {
                 field("Auxiliary ID"; Rec."Auxiliary ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auxiliary ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

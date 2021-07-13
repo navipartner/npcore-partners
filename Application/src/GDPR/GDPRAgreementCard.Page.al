@@ -7,8 +7,9 @@ page 6151123 "NPR GDPR Agreement Card"
     DelayedInsert = true;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR GDPR Agreement";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,13 +19,15 @@ page 6151123 "NPR GDPR Agreement Card"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;;
                 }
             }
             group(Control6014407)
@@ -32,14 +35,16 @@ page 6151123 "NPR GDPR Agreement Card"
                 ShowCaption = false;
                 field("Anonymize After"; Rec."Anonymize After")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Anonymize After field';
+                    ApplicationArea = NPRRetail;;
                 }
             }
             part(Control6014404; "NPR GDPR Agreement Versions")
             {
                 SubPageLink = "No." = FIELD("No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;;
+
             }
         }
     }
@@ -56,8 +61,9 @@ page 6151123 "NPR GDPR Agreement Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Push Consent Request action';
+                ApplicationArea = NPRRetail;;
 
                 trigger OnAction()
                 begin

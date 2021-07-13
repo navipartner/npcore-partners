@@ -7,7 +7,8 @@ page 6150614 "NPR POS Store List"
     PageType = List;
     SourceTable = "NPR POS Store";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,53 +18,63 @@ page 6150614 "NPR POS Store List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Group Code"; Rec."Store Group Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Group Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Category Code"; Rec."Store Category Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Category Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Locality Code"; Rec."Store Locality Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Locality Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -88,16 +99,18 @@ page 6150614 "NPR POS Store List"
                         RunPageLink = "Table ID" = CONST(6150614),
                                       "No." = FIELD(Code);
                         ShortCutKey = 'Shift+Ctrl+D';
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Dimensions-Single action';
+                        ApplicationArea = NPRRetail;
                     }
                     action("Dimensions-&Multiple")
                     {
                         AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Dimensions-&Multiple action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -117,8 +130,9 @@ page 6150614 "NPR POS Store List"
                     Caption = 'POS Unit List';
                     Image = List;
                     RunObject = Page "NPR POS Unit List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the POS Unit List action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("POS Posting Setup")
                 {
@@ -130,8 +144,9 @@ page 6150614 "NPR POS Store List"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Posting Setup";
                     RunPageLink = "POS Store Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the POS Posting Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("POS Period Registers")
                 {
@@ -143,8 +158,9 @@ page 6150614 "NPR POS Store List"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
                     RunPageLink = "POS Store Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the POS Period Registers action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("POS Entries")
                 {
@@ -156,8 +172,9 @@ page 6150614 "NPR POS Store List"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry List";
                     RunPageLink = "POS Store Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the POS Entries action';
+                    ApplicationArea = NPRRetail;
                 }
             }
 

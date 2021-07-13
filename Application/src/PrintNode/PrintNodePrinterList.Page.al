@@ -5,8 +5,9 @@ page 6151221 "NPR PrintNode Printer List"
     Caption = 'PrintNode Printer List';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR PrintNode Printer";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,34 +17,40 @@ page 6151221 "NPR PrintNode Printer List"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object ID"; Rec."Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Settings; Rec.Settings.HasValue)
                 {
                     Caption = 'Settings Stored';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Settings Stored field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -56,13 +63,14 @@ page 6151221 "NPR PrintNode Printer List"
             action(ChangeSettings)
             {
                 Caption = 'Change Print Settings';
-                ApplicationArea = All;
+
 
                 Image = PrintAttachment;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Change Print Settings action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
@@ -74,9 +82,10 @@ page 6151221 "NPR PrintNode Printer List"
             action(PrinterInfo)
             {
                 Caption = 'View Printer Info';
-                ApplicationArea = All;
+
                 Image = PrintCheck;
                 ToolTip = 'Executes the View Printer Info action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
@@ -90,10 +99,11 @@ page 6151221 "NPR PrintNode Printer List"
             action(AccountSetup)
             {
                 Caption = 'Setup Account';
-                ApplicationArea = All;
+
                 Image = PrintAcknowledgement;
                 RunObject = Page "NPR PrintNode Setup";
                 ToolTip = 'Executes the Setup Account action';
+                ApplicationArea = NPRRetail;
             }
 
         }

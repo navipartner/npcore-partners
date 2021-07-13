@@ -5,7 +5,8 @@ page 6059958 "NPR MCS Person"
     PageType = List;
     SourceTable = "NPR MCS Person";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,28 +16,33 @@ page 6059958 "NPR MCS Person"
             {
                 field(PersonId; Rec.PersonId)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Person Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(UserData; Rec.UserData)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User Data field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PersonGroupId; Rec.PersonGroupId)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Person Group Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Faces; Rec.Faces)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Faces field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -4,7 +4,8 @@ report 6014499 "NPR Inventory Campaign Stat."
     RDLCLayout = './src/_Reports/layouts/Inventory Campaign Stat..rdlc';
     Caption = 'Inventory Campaign Stat.';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("Period Discount"; "NPR Period Discount")

@@ -5,7 +5,8 @@ page 6059810 "NPR POS Cross Ref. Setup"
     PageType = List;
     SourceTable = "NPR POS Cross Ref. Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,19 +20,21 @@ page 6059810 "NPR POS Cross Ref. Setup"
                     ShowCaption = false;
                     field(Control6014407; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Pattern Guide:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Pattern Guide:                                                                                                                                                                                                                                                                                 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Pattern Guide"; Rec."Pattern Guide")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Pattern Guide field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -39,14 +42,16 @@ page 6059810 "NPR POS Cross Ref. Setup"
             {
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference No. Pattern"; Rec."Reference No. Pattern")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Reference No. Pattern field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

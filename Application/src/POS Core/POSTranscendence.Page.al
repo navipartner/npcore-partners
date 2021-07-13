@@ -3,7 +3,8 @@ page 6150700 "NPR POS (Transcendence)"
     Caption = 'POS';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -11,7 +12,8 @@ page 6150700 "NPR POS (Transcendence)"
         {
             usercontrol(Framework; "NPR Transcendence")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnFrameworkReady()
                 begin

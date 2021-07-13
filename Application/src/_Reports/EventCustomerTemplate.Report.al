@@ -3,7 +3,7 @@ report 6060150 "NPR Event Customer Template"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Customer Template.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Event Customer Template';
     dataset
     {

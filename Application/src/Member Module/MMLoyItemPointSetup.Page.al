@@ -4,8 +4,9 @@ page 6060107 "NPR MM Loy. Item Point Setup"
     Caption = 'Loyalty Item Point Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Loy. Item Point Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,60 +16,71 @@ page 6060107 "NPR MM Loy. Item Point Setup"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Constraint; Rec.Constraint)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Constraint field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow On Discounted Sale"; Rec."Allow On Discounted Sale")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow On Discounted Sale field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Award; Rec.Award)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Award field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Points; Rec.Points)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Points field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Factor"; Rec."Amount Factor")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Factor field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

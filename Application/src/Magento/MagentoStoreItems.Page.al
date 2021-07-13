@@ -5,10 +5,11 @@ page 6151445 "NPR Magento Store Items"
     LinksAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR Magento Store Item";
     CardPageId = "NPR Magento Store Items Card";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,25 +19,29 @@ page 6151445 "NPR Magento Store Items"
             {
                 field(Webshop; Rec.Webshop)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Webshop field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Website Code"; Rec."Website Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Website Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -45,10 +50,11 @@ page 6151445 "NPR Magento Store Items"
                 }
                 field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Fields Enabled';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Fields Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

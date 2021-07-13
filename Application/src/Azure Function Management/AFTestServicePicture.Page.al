@@ -11,12 +11,12 @@ page 6151306 "NPR AF Test Service Picture"
     {
         area(content)
         {
-            // field(Picture; Rec.Picture)
             field(Picture; Rec.Image)
             {
-                ApplicationArea = Basic, Suite, Invoicing;
+
                 ShowCaption = false;
                 ToolTip = 'Specifies the picture that has been inserted for the item.';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -27,10 +27,11 @@ page 6151306 "NPR AF Test Service Picture"
         {
             action(ImportPicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a picture file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -60,7 +61,7 @@ page 6151306 "NPR AF Test Service Picture"
             }
             // action(ExportPicture)
             // {
-            //     ApplicationArea = Basic, Suite;
+            //     ApplicationArea = NPRRetail;
             //     Caption = 'Export';
             //     Enabled = DeleteExportEnabled;
             //     Image = Export;
@@ -83,11 +84,12 @@ page 6151306 "NPR AF Test Service Picture"
             // }
             action(DeletePicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Delete';
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
                 ToolTip = 'Delete the record.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

@@ -5,7 +5,8 @@ page 6151578 "NPR Event Exch. Int. Templates"
     PageType = List;
     SourceTable = "NPR Event Exch. Int. Template";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,13 +16,15 @@ page 6151578 "NPR Event Exch. Int. Templates"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -5,9 +5,10 @@ page 6151061 "NPR Distrib. Matrix"
     Caption = 'Distribution Matrix';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Item Hierarchy Line";
     SourceTableView = SORTING("Linked Table Key Value");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,38 +22,44 @@ page 6151061 "NPR Distrib. Matrix"
                 ShowCaption = false;
                 field("Item Hierachy Description"; Rec."Item Hierachy Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Hierachy Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Hierarchy Level"; Rec."Item Hierarchy Level")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Hierarchy Level field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Desc."; Rec."Item Desc.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Desciption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Total; TotalToDistribuate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Total';
                     ToolTip = 'Specifies the value of the Total field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[1];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -61,12 +68,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field2; MATRIX_CellData[2])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[2];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -75,12 +83,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field3; MATRIX_CellData[3])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[3];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -89,12 +98,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field4; MATRIX_CellData[4])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[4];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -103,12 +113,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field5; MATRIX_CellData[5])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[5];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -117,12 +128,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field6; MATRIX_CellData[6])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[6];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -136,12 +148,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field7; MATRIX_CellData[7])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[7];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -150,12 +163,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field8; MATRIX_CellData[8])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[8];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -164,12 +178,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field9; MATRIX_CellData[9])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[9];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -178,12 +193,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field10; MATRIX_CellData[10])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[10];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -192,12 +208,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field11; MATRIX_CellData[11])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[11];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -206,12 +223,13 @@ page 6151061 "NPR Distrib. Matrix"
                 }
                 field(Field12; MATRIX_CellData[12])
                 {
-                    ApplicationArea = All;
+
                     AutoFormatType = 10;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[12];
                     Style = Strong;
                     Visible = true;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

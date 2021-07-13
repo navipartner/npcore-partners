@@ -16,13 +16,13 @@ page 6014456 "NPR POS Info: Request Text"
                 CaptionClass = GenerateInstructions();
                 MultiLine = true;
                 ShowCaption = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
             }
             field(UserInputString; UserInputString)
             {
                 ShowCaption = false;
-                ApplicationArea = All;
                 ToolTip = 'Specifies additional information to be stored on the POS sale line';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -1,6 +1,6 @@
 report 6014409 "NPR Prices Upgrade"
 {
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Prices Upgrade';
     UsageCategory = Administration;
     ProcessingOnly = true;
@@ -18,14 +18,14 @@ report 6014409 "NPR Prices Upgrade"
             {
                 field(fUpgradePrices; UpgradePrices)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Upgrade Prices and Discounts';
                     ToolTip = 'Specifies the value of the Upgrade Prices and Discounts field.';
 
                 }
                 field(fDeleteOldPrices; DeleteOldPrices)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Caption = 'Delete Old Prices and Discounts';
                     ToolTip = 'Specifies the value of the Delete Old Prices and Discounts field.';
                 }

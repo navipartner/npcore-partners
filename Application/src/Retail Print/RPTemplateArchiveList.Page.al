@@ -6,8 +6,9 @@ page 6014631 "NPR RP Template Archive List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR RP Template Archive";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,34 +18,40 @@ page 6014631 "NPR RP Template Archive List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Archived at"; Rec."Archived at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Archived at field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Archived by"; Rec."Archived by")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Archived by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Version Comments"; Rec."Version Comments")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version Comments field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Archived Data"; Rec.Template.HasValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Archived Data';
                     ToolTip = 'Specifies the value of the Archived Data field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -62,8 +69,9 @@ page 6014631 "NPR RP Template Archive List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Restore Version action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -81,8 +89,9 @@ page 6014631 "NPR RP Template Archive List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Version action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

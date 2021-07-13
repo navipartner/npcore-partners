@@ -15,10 +15,11 @@ page 6014651 "NPR Retail Wizard"
                 Visible = TopBannerVisible and not FinishActionEnabled;
                 field(MediaResourcesStandard; MediaResourcesStandard."Media Reference")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(FinishedBanner)
@@ -28,10 +29,11 @@ page 6014651 "NPR Retail Wizard"
                 Visible = TopBannerVisible and FinishActionEnabled;
                 field(MediaResourcesDone; MediaResourcesDone."Media Reference")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -69,10 +71,11 @@ page 6014651 "NPR Retail Wizard"
                     Caption = 'Create Company';
                     field(EmptyVar; EmptyVar)
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         ToolTip = 'Specifies the value of the EmptyVar field';
                         Visible = false;
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(CompanyInfo)
@@ -80,8 +83,9 @@ page 6014651 "NPR Retail Wizard"
                     Caption = 'Company Info';
                     part(CompanyInformationPG; "NPR Comp. Inf. Step")
                     {
-                        ApplicationArea = All;
+
                         UpdatePropagation = Both;
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -98,15 +102,17 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         field(EmptyVar2; EmptyVar)
                         {
-                            ApplicationArea = All;
+
                             Caption = ' ';
                             ToolTip = 'Specifies the value of the EmptyVar field';
                             Visible = false;
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     part(POSStoreListPG; "NPR POS Store List Step")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -124,7 +130,8 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         part(POSAuditProfiles; "NPR POS Audit Profiles Step")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                     group(ViewProfile)
@@ -132,7 +139,8 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         part(POSViewProfiles; "NPR POS View Profiles Step")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                     group(EODProfile)
@@ -140,7 +148,8 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         part(POSEndOfDayProfiles; "NPR POS EOD Profiles Step")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                     group(PostingProfile)
@@ -148,7 +157,8 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         part(POSPostingProfiles; "NPR POS Posting Profiles Step")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                     group(EANBoxProfile)
@@ -156,7 +166,8 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         part(EANBoxSetups; "NPR Ean Box Setup Step")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                     group(SalWorkflowSetProfile)
@@ -164,7 +175,8 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         part(POSSalesWorkflowSets; "NPR POS Sales Wfl. Sets Step")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                     group(GlobalPOSSalesProfile)
@@ -172,7 +184,8 @@ page 6014651 "NPR Retail Wizard"
                         Caption = '';
                         part(GlobalPOSSalesSetups; "NPR Glob. POS Sal. Setup Step")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                 }
@@ -188,7 +201,8 @@ page 6014651 "NPR Retail Wizard"
                     Caption = 'Create POS Units';
                     part(POSUnitListPG; "NPR POS Unit List Step")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -202,7 +216,8 @@ page 6014651 "NPR Retail Wizard"
                     Caption = 'Create POS Payment Bins';
                     part(POSPaymentBinListPG; "NPR POS Payment Bins Step")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -217,7 +232,8 @@ page 6014651 "NPR Retail Wizard"
 
                     part(POSPaymentMethodsPG; "NPR POS Pmt. Method List Step")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -232,7 +248,8 @@ page 6014651 "NPR Retail Wizard"
 
                     part(POSPostingSetupPG; "NPR POS Posting Setup Step")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -246,7 +263,8 @@ page 6014651 "NPR Retail Wizard"
                     Caption = 'Create Salespeople';
                     part(SalespersonListPG; "NPR Salesperson/Purchaser Step")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -260,7 +278,8 @@ page 6014651 "NPR Retail Wizard"
                     Caption = 'User setup';
                     part(UserSetupPG; "NPR User Setup Step")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -288,7 +307,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = not CompanyInfoDataToCreate;
                             label(CompanyInfoLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Company Information';
                                 ToolTip = 'Specifies the value of the CompanyInfoLabel field';
 
@@ -301,7 +320,7 @@ page 6014651 "NPR Retail Wizard"
 
                             label(POSStoreLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Store';
                                 ToolTip = 'Specifies the value of the POSStoreLabel field';
 
@@ -313,7 +332,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = POSProfileDataMissing;
                             label(ProfilesLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Profiles: ';
                                 ToolTip = 'Specifies the value of the ProfilesLabel field';
 
@@ -324,7 +343,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = not POSAuditProfileDataToCreate;
                                 label(POSAuditProfileLabel)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS Audit Profile';
                                     ToolTip = 'Specifies the value of the POSAuditProfileLabel field';
 
@@ -336,7 +355,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = not POSViewProfileDataToCreate;
                                 label(POSViewProfileLabel)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS View Profile';
                                     ToolTip = 'Specifies the value of the POSViewProfileLabel field';
 
@@ -348,7 +367,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = not POSEndOfDayProfileDataToCreate;
                                 label(POSEndOfDayProfileLabel)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS End of Day Profile';
                                     ToolTip = 'Specifies the value of the POSEndOfDayProfileLabel field';
 
@@ -360,7 +379,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = not POSPostingProfileDataToCreate;
                                 label(POSPostingProfileLabel)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS Posting Profile';
                                     ToolTip = 'Specifies the value of the POSPostingProfileLabel field';
 
@@ -372,7 +391,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = not EanBoxSetupDataToCreate;
                                 label(EanBoxSalesSetupLabel)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- Ean Box Setup';
                                     ToolTip = 'Specifies the value of the EanBoxSetupLabel field';
 
@@ -384,7 +403,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = not POSSalesWorkflowSetDataToCreate;
                                 label(POSSalesWorkflowLabel)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS Sales Workflow Set';
                                     ToolTip = 'Specifies the value of the POSSalesWorkflowLabel field';
 
@@ -396,7 +415,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = not GlobalPOSSalesSetupDataToCreate;
                                 label(GlobalPOSSalesSetupLabel)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- Global POS Sales Setup';
                                     ToolTip = 'Specifies the value of the GlobalPOSSalesSetupLabel field';
 
@@ -409,7 +428,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = not POSUnitDataToCreate;
                             label(POSUnitLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Unit';
                                 ToolTip = 'Specifies the value of the POSUnitLabel field';
 
@@ -421,7 +440,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = not POSPaymentBinDataToCreate;
                             label(POSPaymentBinLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Payment Bin';
                                 ToolTip = 'Specifies the value of the POSPaymentBinLabel field';
 
@@ -433,7 +452,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = not POSPaymentMethodDataToCreate;
                             label(POSPaymentMethodLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Payment Method';
                                 ToolTip = 'Specifies the value of the POSPaymentMethodLabel field';
 
@@ -445,7 +464,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = not POSPostingSetupDataToCreate;
                             label(POSPostingSetupLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Posting Setup';
                                 ToolTip = 'Specifies the value of the POSPostingSetupLabel field';
 
@@ -457,7 +476,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = not SalespersonDataToCreate;
                             label(SalespersonLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Salespeople';
                                 ToolTip = 'Specifies the value of the SalespersonLabel field';
 
@@ -469,7 +488,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = not UserSetupDataToCreate;
                             label(UserSetupLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- User Setup';
                                 ToolTip = 'Specifies the value of the UserSetupLabel field';
 
@@ -496,7 +515,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = CompanyInfoDataToCreate;
                             label(CompanyInfoLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Company Information';
                                 ToolTip = 'Specifies the value of the CompanyInfoLabel field';
 
@@ -508,7 +527,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = POSStoreDataToCreate;
                             label(POSStoreLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Store';
                                 ToolTip = 'Specifies the value of the POSStoreLabel field';
                             }
@@ -519,7 +538,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = POSProfileDataToCreate;
                             label(ProfilesLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Profiles: ';
                                 ToolTip = 'Specifies the value of the ProfilesLabel field';
                             }
@@ -529,7 +548,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = POSAuditProfileDataToCreate;
                                 label(POSAuditProfileLabel1)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS Audit Profile';
                                     ToolTip = 'Specifies the value of the POSAuditProfileLabel field';
                                 }
@@ -540,7 +559,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = POSViewProfileDataToCreate;
                                 label(POSViewProfileLabel1)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS View Profile';
                                     ToolTip = 'Specifies the value of the POSViewProfileLabel field';
                                 }
@@ -551,7 +570,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = POSEndOfDayProfileDataToCreate;
                                 label(POSEndOfDayProfileLabel1)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS End of Day Profile';
                                     ToolTip = 'Specifies the value of the POSEndOfDayProfileLabel field';
                                 }
@@ -562,7 +581,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = POSPostingProfileDataToCreate;
                                 label(POSPostingProfileLabel1)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS Posting Profile';
                                     ToolTip = 'Specifies the value of the POSPostingProfileLabel field';
                                 }
@@ -573,7 +592,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = EanBoxSetupDataToCreate;
                                 label(EanBoxSalesSetupLabel1)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- Ean Box Setup';
                                     ToolTip = 'Specifies the value of the EanBoxSetupLabel field';
                                 }
@@ -584,7 +603,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = POSSalesWorkflowSetDataToCreate;
                                 label(POSSalesWorkflowLabel1)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- POS Sales Workflow Set';
                                     ToolTip = 'Specifies the value of the POSSalesWorkflowLabel field';
                                 }
@@ -595,7 +614,7 @@ page 6014651 "NPR Retail Wizard"
                                 Visible = GlobalPOSSalesSetupDataToCreate;
                                 label(GlobalPOSSalesSetupLabel1)
                                 {
-                                    ApplicationArea = All;
+                                    ApplicationArea = NPRRetail;
                                     Caption = '---- Global POS Sales Setup';
                                     ToolTip = 'Specifies the value of the GlobalPOSSalesSetupLabel field';
                                 }
@@ -607,7 +626,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = POSUnitDataToCreate;
                             label(POSUnitLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Unit';
                                 ToolTip = 'Specifies the value of the POSUnitLabel field';
                             }
@@ -618,7 +637,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = POSPaymentBinDataToCreate;
                             label(POSPaymentBinLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Payment Bin';
                                 ToolTip = 'Specifies the value of the POSPaymentBinLabel field';
                             }
@@ -629,7 +648,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = POSPaymentMethodDataToCreate;
                             label(POSPaymentMethodLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Payment Method';
                                 ToolTip = 'Specifies the value of the POSPaymentMethodLabel field';
                             }
@@ -640,7 +659,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = POSPostingSetupDataToCreate;
                             label(POSPostingSetupLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- POS Posting Setup';
                                 ToolTip = 'Specifies the value of the POSPostingSetupLabel field';
                             }
@@ -651,7 +670,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = SalespersonDataToCreate;
                             label(SalespersonLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Salespeople';
                                 ToolTip = 'Specifies the value of the SalespersonLabel field';
                             }
@@ -662,7 +681,7 @@ page 6014651 "NPR Retail Wizard"
                             Visible = UserSetupDataToCreate;
                             label(UserSetupLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- User Setup';
                                 ToolTip = 'Specifies the value of the UserSetupLabel field';
                             }
@@ -684,12 +703,13 @@ page 6014651 "NPR Retail Wizard"
         {
             action(ActionBack)
             {
-                ApplicationArea = All;
+
                 Caption = 'Back';
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(true);
@@ -697,12 +717,13 @@ page 6014651 "NPR Retail Wizard"
             }
             action(ActionNext)
             {
-                ApplicationArea = All;
+
                 Caption = 'Next';
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(false);
@@ -710,12 +731,13 @@ page 6014651 "NPR Retail Wizard"
             }
             action(ActionFinish)
             {
-                ApplicationArea = All;
+
                 Caption = 'Finish';
                 Enabled = FinishActionEnabled;
                 Image = Approve;
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     FinishAction();

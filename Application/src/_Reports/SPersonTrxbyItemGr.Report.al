@@ -4,7 +4,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
     RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Gr..rdlc';
     Caption = 'Sales Person Trn. By Item Gr.';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Item Category"; "Item Category")
@@ -223,29 +223,33 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                     Caption = 'Setting';
                     field("Show itemgroups with no sales"; ShowItemsGrpWithoutSale)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Show Item Groups With No Sales';
                         ToolTip = 'Specifies the value of the Show Item Groups With No Sales field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sort salespersons"; SortSalesPerson)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Sort Salespersons';
                         ToolTip = 'Specifies the value of the Sort Salespersons field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sort By"; SortBy)
                     {
-                        ApplicationArea = All;
+
                         Enabled = sortSalesPerson;
                         OptionCaption = 'Quantity,Turnover,DB';
                         ToolTip = 'Specifies the value of the SortBy field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Sort; SortOrder)
                     {
-                        ApplicationArea = All;
+
                         Editable = sortSalesPerson;
                         OptionCaption = 'Highest,Lowest';
                         ToolTip = 'Specifies the value of the Sort field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

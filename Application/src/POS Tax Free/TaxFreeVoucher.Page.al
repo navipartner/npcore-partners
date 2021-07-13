@@ -8,7 +8,8 @@ page 6014565 "NPR Tax Free Voucher"
     PageType = List;
     SourceTable = "NPR Tax Free Voucher";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -17,83 +18,99 @@ page 6014565 "NPR Tax Free Voucher"
             {
                 field("External Voucher No."; Rec."External Voucher No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Voucher No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Voucher Barcode"; Rec."External Voucher Barcode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Voucher Barcode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Issued Date"; Rec."Issued Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Issued Time"; Rec."Issued Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Issued By User"; Rec."Issued By User")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Issued By User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Amount Incl. VAT"; Rec."Total Amount Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Refund Amount"; Rec."Refund Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Refund Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handler ID Enum"; Rec."Handler ID Enum")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handler ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Service ID"; Rec."Service ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Service ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Void; Rec.Void)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voided field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voided By User"; Rec."Voided By User")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voided By User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voided Date"; Rec."Voided Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voided Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voided Time"; Rec."Voided Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voided Time field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -111,8 +128,9 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Void Voucher action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -132,8 +150,9 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Print Voucher action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -153,8 +172,9 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reissue Voucher action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -174,8 +194,9 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Search Sale Links action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

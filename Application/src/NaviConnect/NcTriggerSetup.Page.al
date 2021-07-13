@@ -4,7 +4,7 @@ page 6151521 "NPR Nc Trigger Setup"
     PageType = Card;
     SourceTable = "NPR Nc Trigger Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -12,15 +12,18 @@ page 6151521 "NPR Nc Trigger Setup"
         {
             group(General)
             {
+                Caption = 'General';
                 field("Task Template Name"; Rec."Task Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Template Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Task Batch Name"; Rec."Task Batch Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Batch Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }

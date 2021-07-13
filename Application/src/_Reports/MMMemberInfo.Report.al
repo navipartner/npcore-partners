@@ -4,7 +4,8 @@ report 6060134 "NPR MM Member Info"
     RDLCLayout = './src/_Reports/layouts/MM Member Info.rdlc';
     Caption = 'Member Info';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("MM Membership Entry"; "NPR MM Membership Entry")

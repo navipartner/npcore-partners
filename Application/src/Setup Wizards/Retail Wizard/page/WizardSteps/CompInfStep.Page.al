@@ -15,26 +15,30 @@ page 6014652 "NPR Comp. Inf. Step"
                 Caption = 'General';
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the company''s name and corporate form. For example, Inc. or Ltd.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the company''s address.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Address 2"; Rec."Address 2")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies additional address information.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the company''s city.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -57,15 +61,17 @@ page 6014652 "NPR Comp. Inf. Step"
                 }
                 field(County; Rec.County)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the state, province or county of the company''s address.';
                     Visible = CountyVisible;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the postal code.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -87,9 +93,10 @@ page 6014652 "NPR Comp. Inf. Step"
                 }
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the country/region of the address.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -110,24 +117,28 @@ page 6014652 "NPR Comp. Inf. Step"
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the company''s telephone number.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Registration No."; Rec."VAT Registration No.")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the company''s VAT registration number.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(GLN; Rec.GLN)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies your company in connection with electronic document exchange.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Industrial Classification"; Rec."Industrial Classification")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the company''s industrial classification code.';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Separator1)
                 {
@@ -145,15 +156,17 @@ page 6014652 "NPR Comp. Inf. Step"
                 Caption = 'Payments';
                 field("Bank Name"; Rec."Bank Name")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the name of the bank the company uses.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bank Branch No."; Rec."Bank Branch No.")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = IBANMissing;
                     ToolTip = 'Specifies the bank''s branch number.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -162,9 +175,10 @@ page 6014652 "NPR Comp. Inf. Step"
                 }
                 field("Bank Account No."; Rec."Bank Account No.")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = IBANMissing;
                     ToolTip = 'Specifies the company''s bank account number.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -173,13 +187,15 @@ page 6014652 "NPR Comp. Inf. Step"
                 }
                 field("Giro No."; Rec."Giro No.")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the company''s giro number.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("SWIFT Code"; Rec."SWIFT Code")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the SWIFT code (international bank identifier code) of your primary bank.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -205,9 +221,10 @@ page 6014652 "NPR Comp. Inf. Step"
                 }
                 field(IBAN; Rec.IBAN)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ShowMandatory = BankBranchNoOrAccountNoMissing;
                     ToolTip = 'Specifies the international bank account number of your primary bank account.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin

@@ -7,8 +7,9 @@ page 6150672 "NPR POS Entry Output Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Entry Output Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,43 +19,51 @@ page 6150672 "NPR POS Entry Output Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Output Timestamp"; Rec."Output Timestamp")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Output Timestamp field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Output Type"; Rec."Output Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Output Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Output Method"; Rec."Output Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Output Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Output Method Code"; Rec."Output Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Output Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

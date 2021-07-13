@@ -18,9 +18,10 @@ page 6014683 "NPR POS Unit List Step"
                 {
                     ShowMandatory = true;
                     Caption = 'POS Store Code';
-                    ApplicationArea = All;
+
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -48,8 +49,9 @@ page 6014683 "NPR POS Unit List Step"
                 field(NoOfPOSUnits; NoOfPOSUnitsToCreate)
                 {
                     Caption = 'Number of units to create';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Number of units to create field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -76,8 +78,9 @@ page 6014683 "NPR POS Unit List Step"
                 field(StartingNoUnit; StartingNoUnit)
                 {
                     Caption = 'Starting No.';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -97,25 +100,29 @@ page 6014683 "NPR POS Unit List Step"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimen 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -147,8 +154,9 @@ page 6014683 "NPR POS Unit List Step"
                 }
                 field("Global Dime 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -180,14 +188,16 @@ page 6014683 "NPR POS Unit List Step"
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Audit Profile"; Rec."POS Audit Profile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Audit Profile field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -209,8 +219,9 @@ page 6014683 "NPR POS Unit List Step"
                 }
                 field("POS View Profile"; Rec."POS View Profile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS View Profile field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -232,8 +243,9 @@ page 6014683 "NPR POS Unit List Step"
                 }
                 field("POS End of Day Profile"; Rec."POS End of Day Profile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS End of Day Profile field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -255,8 +267,9 @@ page 6014683 "NPR POS Unit List Step"
                 }
                 field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -278,8 +291,9 @@ page 6014683 "NPR POS Unit List Step"
                 }
                 field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Sales Workflow Set field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -301,8 +315,9 @@ page 6014683 "NPR POS Unit List Step"
                 }
                 field("Global POS Sales Setup"; Rec."Global POS Sales Setup")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global POS Sales Setup field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

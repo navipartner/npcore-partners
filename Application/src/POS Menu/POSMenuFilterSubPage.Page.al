@@ -4,8 +4,9 @@ page 6150717 "NPR POS Menu Filter SubPage"
     Caption = 'Filter Line';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Menu Filter Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,77 +16,91 @@ page 6150717 "NPR POS Menu Filter SubPage"
             {
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Id"; Rec."Object Id")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Object Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Code"; Rec."Filter Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Filter Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Name"; Rec."Object Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Object Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Value"; Rec."Filter Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Sale POS Field Id"; Rec."Filter Sale POS Field Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Sale POS Field Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Sale POS Field Name"; Rec."Filter Sale POS Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Sale POS Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Sale Line POS Field Id"; Rec."Filter Sale Line POS Field Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Sale Line POS Field Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Sale Line POS Field Nam"; Rec."Filter Sale Line POS Field Nam")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Sale Line POS Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

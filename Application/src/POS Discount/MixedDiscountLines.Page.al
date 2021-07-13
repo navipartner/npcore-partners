@@ -15,71 +15,83 @@ page 6014451 "NPR Mixed Discount Lines"
                 Visible = (MixType <> 1);
                 field("Disc. Grouping Type"; Rec."Disc. Grouping Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Disc. Grouping Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cross-Reference No."; Rec."Cross-Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the referenced item number.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Enabled = (Rec."Disc. Grouping Type" = Rec."Disc. Grouping Type"::Item);
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Enabled = Lot;
                     Visible = Lot;
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit cost"; Rec."Unit cost")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit price"; Rec."Unit price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit price incl. VAT"; Rec."Unit price incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(TotalAmount; TotalAmount)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Mix Discount Price';
                     ToolTip = 'Specifies the value of the Mix Discount Price field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -95,40 +107,45 @@ page 6014451 "NPR Mixed Discount Lines"
                 Visible = (MixType = 1);
                 field(NoCom; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Part Code';
                     Lookup = true;
                     LookupPageID = "NPR Mixed Discount Part List";
                     ToolTip = 'Specifies the value of the Part Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(DescriptionCom; GetDescription())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(MinQty; CalcMinQty())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Min. Qty.';
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = (MixType = 1);
                     ToolTip = 'Specifies the value of the Min. Qty. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(MinimumDiscount; CalcExpectedAmount(false))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Min. Expected Amount';
                     ToolTip = 'Specifies the value of the Min. Expected Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(MaximumDiscount; CalcExpectedAmount(true))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Max. Expected Amount';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Max. Expected Amount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -146,8 +163,9 @@ page 6014451 "NPR Mixed Discount Lines"
                 PromotedOnly = true;
                 PromotedIsBig = true;
                 Visible = (MixType = 1);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the New Part action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -177,8 +195,9 @@ page 6014451 "NPR Mixed Discount Lines"
                 RunObject = Page "NPR Mixed Discount";
                 RunPageLink = Code = FIELD("No.");
                 Visible = (MixType = 1);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Part Card action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

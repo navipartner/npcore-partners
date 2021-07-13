@@ -18,52 +18,60 @@ page 6059780 "NPR POS Units Select"
                 field("No."; Rec."No.")
                 {
                     Editable = false;
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
                     Visible = POSUnitMode;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                     Visible = POSUnitMode;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                     Visible = POSUnitMode;
+                    ApplicationArea = NPRRetail;
                 }
                 field(LocationCode; LocationCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Location Code';
                     ToolTip = 'Specifies the value of the LocationCode field';
                     Visible = POSUnitMode;
+                    ApplicationArea = NPRRetail;
                 }
                 field(OpeningCash; OpeningCash)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Opening Cash';
                     ToolTip = 'Specifies the value of the OpeningCash field';
                     Visible = POSUnitMode;
+                    ApplicationArea = NPRRetail;
                 }
                 field(ClosingCash; ClosingCash)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Closing Cash';
                     ToolTip = 'Specifies the value of the ClosingCash field';
                     Visible = POSUnitMode;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

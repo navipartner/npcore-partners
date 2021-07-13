@@ -14,71 +14,84 @@ page 6150639 "NPR POS Post. Profile Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default POS Posting Setup"; Rec."Default POS Posting Setup")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default POS Posting Setup field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Code"; Rec."Source Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax Area Code"; Rec."Tax Area Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Area Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax Liable"; Rec."Tax Liable")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Liable field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Period Register No. Series"; Rec."POS Period Register No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Period Register No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Customer No."; Rec."VAT Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Compression"; Rec."Posting Compression")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Compression field';
+                    ApplicationArea = NPRRetail;
                 }
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';
                     field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Max. POS Posting Diff. (LCY) field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("POS Posting Diff. Account"; Rec."POS Posting Diff. Account")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Differences Account field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Rounding)
@@ -86,18 +99,21 @@ page 6150639 "NPR POS Post. Profile Card"
                     Caption = 'Rounding';
                     field("POS Sales Rounding Account"; Rec."POS Sales Rounding Account")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the POS Sales Rounding Account field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("POS Sales Amt. Rndng Precision"; Rec."POS Sales Amt. Rndng Precision")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the POS Sales Amt. Rndng Precision field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Rounding Type"; Rec."Rounding Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Rounding Type field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

@@ -4,8 +4,8 @@ page 6151094 "NPR Nc RapidConnect Trg.Fields"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc RapidConnect Trig.Field";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -15,13 +15,15 @@ page 6151094 "NPR Nc RapidConnect Trg.Fields"
             {
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }

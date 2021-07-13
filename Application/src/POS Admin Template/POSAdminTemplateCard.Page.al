@@ -7,8 +7,9 @@ page 6150740 "NPR POS Admin. Template Card"
     DataCaptionFields = Id, Name;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Admin. Template";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,14 +19,16 @@ page 6150740 "NPR POS Admin. Template Card"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -34,18 +37,21 @@ page 6150740 "NPR POS Admin. Template Card"
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Persist on Client"; Rec."Persist on Client")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Persist on Client field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(MainMenu)
@@ -53,8 +59,9 @@ page 6150740 "NPR POS Admin. Template Card"
                 Caption = 'Main Menu';
                 field("Role Center"; Rec."Role Center")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Role Center field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -63,14 +70,16 @@ page 6150740 "NPR POS Admin. Template Card"
                 }
                 field("Role Center Password"; Rec."Role Center Password")
                 {
-                    ApplicationArea = All;
+
                     Editable = RoleCenterPasswordEditable;
                     ToolTip = 'Specifies the value of the Role Center Password field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Configuration; Rec.Configuration)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Configuration field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -79,9 +88,10 @@ page 6150740 "NPR POS Admin. Template Card"
                 }
                 field("Configuration Password"; Rec."Configuration Password")
                 {
-                    ApplicationArea = All;
+
                     Editable = ConfigurationPasswordEditable;
                     ToolTip = 'Specifies the value of the Configuration Password field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -101,8 +111,9 @@ page 6150740 "NPR POS Admin. Template Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Admin. Template Scopes";
                 RunPageLink = "POS Admin. Template Id" = FIELD(Id);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Scopes action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

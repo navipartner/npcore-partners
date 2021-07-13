@@ -9,8 +9,9 @@ page 6150674 "NPR POS Prepaym. Invoices"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Sales Invoice Header";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,8 +21,9 @@ page 6150674 "NPR POS Prepaym. Invoices"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -33,25 +35,29 @@ page 6150674 "NPR POS Prepaym. Invoices"
                 }
                 field("Due Date"; Rec."Due Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Due Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(FullyPaid; FullyPaid)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Fully Paid';
                     ToolTip = 'Specifies the value of the Fully Paid field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(RemainingAmount; RemainingAmount)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Remaining Payment';
                     ToolTip = 'Specifies the value of the Remaining Payment field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

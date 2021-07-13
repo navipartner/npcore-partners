@@ -7,7 +7,8 @@ page 6184482 "NPR Pepper EFT Trx Subtype"
     PageType = List;
     SourceTable = "NPR Pepper EFT Trx Subtype";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,23 +18,27 @@ page 6184482 "NPR Pepper EFT Trx Subtype"
             {
                 field("Integration Type Code"; Rec."Integration Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Integration Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Type Code"; Rec."Transaction Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

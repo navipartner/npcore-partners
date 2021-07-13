@@ -14,9 +14,10 @@ page 6151307 "NPR MCS Faces Image"
             // field(Picture; Rec.Image)
             field(Picture; Rec.Picture)
             {
-                ApplicationArea = Basic, Suite, Invoicing;
+
                 ShowCaption = false;
                 ToolTip = 'Specifies the Image that has been inserted for the item.';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -27,10 +28,11 @@ page 6151307 "NPR MCS Faces Image"
         {
             action(ImportPicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a image file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -60,7 +62,7 @@ page 6151307 "NPR MCS Faces Image"
             }
             // action(ExportPicture)
             // {
-            //     ApplicationArea = Basic, Suite;
+            //     ApplicationArea = NPRRetail;
             //     Caption = 'Export';
             //     Enabled = DeleteExportEnabled;
             //     Image = Export;
@@ -83,11 +85,12 @@ page 6151307 "NPR MCS Faces Image"
             // }
             action(DeletePicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Delete';
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
                 ToolTip = 'Delete the record.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

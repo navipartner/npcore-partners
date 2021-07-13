@@ -8,8 +8,8 @@ page 6151522 "NPR Nc Endpoint FTP List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint FTP";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -19,23 +19,23 @@ page 6151522 "NPR Nc Endpoint FTP List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Server; Rec.Server)
                 {
-                    ApplicationArea = All;
                     ToolTip = 'Specifies the value of the FTP Server field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -49,8 +49,8 @@ page 6151522 "NPR Nc Endpoint FTP List"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
-                ApplicationArea = All;
                 ToolTip = 'Executes the Trigger Links action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin

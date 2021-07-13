@@ -5,7 +5,7 @@ report 6014421 "NPR POS Menu Buttons/Actions"
     Caption = 'NPR POS Menu Buttons/Actions';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
 
     dataset
     {
@@ -91,8 +91,9 @@ report 6014421 "NPR POS Menu Buttons/Actions"
                     field("Show Parameters"; ShowParameters)
                     {
                         Caption = 'Show Parameters';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Parameters field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

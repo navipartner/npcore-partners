@@ -10,7 +10,8 @@ page 6184505 "NPR EFT Shopper Recognition"
     PageType = List;
     SourceTable = "NPR EFT Shopper Recognition";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -20,33 +21,39 @@ page 6184505 "NPR EFT Shopper Recognition"
             {
                 field("Integration Type"; Rec."Integration Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Integration Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shopper Reference"; Rec."Shopper Reference")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shopper Reference field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contract ID"; Rec."Contract ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Contract ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contract Type"; Rec."Contract Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Contract Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entity Type"; Rec."Entity Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entity Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entity Key"; Rec."Entity Key")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entity Key field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

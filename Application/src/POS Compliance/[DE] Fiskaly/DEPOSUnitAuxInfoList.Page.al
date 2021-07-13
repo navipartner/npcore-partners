@@ -13,37 +13,41 @@ page 6014427 "NPR DE POS Unit Aux. Info List"
             {
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of POS Unit No.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cash Register Brand"; Rec."Cash Register Brand")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of Cash Register Brand';
                 }
                 field("Cash Register Model"; Rec."Cash Register Model")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of Cash Register Model';
                 }
                 field("Serial Number"; Rec."Serial Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of Serial Number for DE Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field("TSS ID"; Rec."TSS ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of TSS ID for DE Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client ID"; Rec."Client ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of Client ID for DE Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cash Register Created"; Rec."Cash Register Created")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of Cash Registe for DE Fiskaly DSFINKV';
                 }
             }
@@ -62,8 +66,9 @@ page 6014427 "NPR DE POS Unit Aux. Info List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Creates TSS and Client ID on Fiskaly for DE fiscalization.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -87,7 +92,7 @@ page 6014427 "NPR DE POS Unit Aux. Info List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'Creates Cash Register on Fiskaly DSFINVK for DE fiscalization.';
 
                 trigger OnAction()

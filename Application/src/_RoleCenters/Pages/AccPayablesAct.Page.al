@@ -1,4 +1,4 @@
-﻿page 6151254 "NPR Acc. Payables Act"
+page 6151254 "NPR Acc. Payables Act"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -16,23 +16,24 @@
                 field("NP Purchase Quote"; Rec."NPR Purchase Quote")
                 {
                     Caption = 'Purchase Quote';
-                    ApplicationArea = Basic, Suite;
+
                     DrillDownPageID = "Purchase Quotes";
                     ToolTip = 'Specifies the number of purchase quotes.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NP Purchase Order"; Rec."NPR Purchase Order")
                 {
                     Caption = 'Purchase Order';
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = NPRRetail;
                     DrillDownPageID = "Purchase Order List";
                     ToolTip = 'Specifies the number of purchase orders.';
                 }
 
                 field("Purchase Return Orders"; Rec."Purchase Return Orders")
                 {
-                    ApplicationArea = PurchReturnOrder;
                     DrillDownPageID = "Purchase Return Order List";
                     ToolTip = 'Specifies the number of purchase return orders that are displayed in the Finance Cue on the Role Center. The documents are filtered by today''s date.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup("Document Approvals")
@@ -41,15 +42,17 @@
                 Visible = false;
                 field("POs Pending Approval"; Rec."POs Pending Approval")
                 {
-                    ApplicationArea = Suite;
+
                     DrillDownPageID = "Purchase Order List";
                     ToolTip = 'Specifies the number of purchase orders that are pending approval.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Approved Purchase Orders"; Rec."Approved Purchase Orders")
                 {
-                    ApplicationArea = Suite;
+
                     DrillDownPageID = "Purchase Order List";
                     ToolTip = 'Specifies the number of approved purchase orders.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup("My User Tasks")
@@ -58,10 +61,11 @@
                 Visible = false;
                 field("Pending User Tasks"; UserTaskManagement.GetMyPendingUserTasksCount())
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Pending User Tasks';
                     Image = Checklist;
                     ToolTip = 'Specifies the number of pending tasks that are assigned to you or to a group that you are a member of.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var

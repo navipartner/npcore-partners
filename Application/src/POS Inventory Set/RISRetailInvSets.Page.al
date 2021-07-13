@@ -6,7 +6,8 @@ page 6151085 "NPR RIS Retail Inv. Sets"
     PageType = List;
     SourceTable = "NPR RIS Retail Inv. Set";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,13 +17,15 @@ page 6151085 "NPR RIS Retail Inv. Sets"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -40,8 +43,9 @@ page 6151085 "NPR RIS Retail Inv. Sets"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Test Retail Inventory action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

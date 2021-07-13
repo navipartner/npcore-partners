@@ -15,28 +15,33 @@ page 6151417 "NPR Magento Child Categories"
                 ShowCaption = false;
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Picture; Rec.Picture)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Picture field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Count"; Rec."Item Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Count field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

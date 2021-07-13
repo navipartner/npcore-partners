@@ -3,8 +3,9 @@ page 6151581 "NPR Event Attr. Temp. Filters"
     Caption = 'Event Attribute Temp. Filters';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Event Attr. Temp. Filter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,13 +15,15 @@ page 6151581 "NPR Event Attr. Temp. Filters"
             {
                 field("Filter Name"; Rec."Filter Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -37,8 +40,9 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Values action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -57,8 +61,9 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Events in Attribute Filter action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

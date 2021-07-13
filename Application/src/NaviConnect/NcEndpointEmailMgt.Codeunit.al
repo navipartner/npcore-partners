@@ -60,7 +60,7 @@
         NewTask: Record "NPR Nc Task";
         TempNcEndPointEmail: Record "NPR Nc Endpoint E-mail" temporary;
         RecRef: RecordRef;
-        TextTaskInserted: Label 'Email Task inserted for Nc Endpoint FTP %1 %2, email: %3. Nc Task Entry No. %4.';
+        TextTaskInsertedLbl: Label 'Email Task inserted for Nc Endpoint FTP %1 %2, email: %3. Nc Task Entry No. %4.', Comment = '%1=NcEndpointEmail.Code;%2=NcEndpointEmail.Description;%3=NcEndpointEmail."Recipient E-Mail Address";%4=NewTask."Entry No."';
         TaskEntryNo: BigInteger;
     begin
         RecRef.Get(NcEndpointEmail.RecordId);
@@ -76,19 +76,19 @@
         if Body <> '' then
             TempNcEndPointEmail."Body Text" := Body;
         NcTriggerSyncMgt.FillFields(NewTask, TempNcEndPointEmail);
-        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInserted, NcEndpointEmail.Code, NcEndpointEmail.Description, NcEndpointEmail."Recipient E-Mail Address", NewTask."Entry No."));
+        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInsertedLbl, NcEndpointEmail.Code, NcEndpointEmail.Description, NcEndpointEmail."Recipient E-Mail Address", NewTask."Entry No."));
     end;
 
     local procedure ProcessEndPointTask(var NcEndpointEmail: Record "NPR Nc Endpoint E-mail"; var NcTask: Record "NPR Nc Task"; Output: Text; Filename: Text; Subject: Text; Body: Text)
     var
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
-        TextNoOutput: Label 'FTP Task not executed because there was no output to send.';
+        TextNoOutputErr: Label 'FTP Task not executed because there was no output to send.';
         RecRef: RecordRef;
         FldRef: FieldRef;
     begin
         NcTaskMgt.RestoreRecord(NcTask."Entry No.", RecRef);
         if Output = '' then
-            Error(TextNoOutput);
+            Error(TextNoOutputErr);
         FldRef := RecRef.Field(NcEndpointEmail.FieldNo("Filename Attachment"));
         if Format(FldRef.Value) <> '' then
             Filename := Format(FldRef.Value);
@@ -103,8 +103,8 @@
 
     local procedure EmailProcess(var NcTask: Record "NPR Nc Task"; NcEndpointEmail: Record "NPR Nc Endpoint E-mail"; OutputText: Text; Filename: Text; Subject: Text; Body: Text)
     var
-        TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
-        TextEmailSuccess: Label 'File emailed to %1.';
+        TextEmailFailedErr: Label 'File could not be emailed to %1. STMP returned error: %2.', Comment = '"NPR Nc Endpoint E-mail"."Recipient E-Mail Address";%2=Smtp.ErrorMessage';
+        TextEmailSuccessLbl: Label 'File emailed to %1.';
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
         TempEmailItem: Record "Email Item" temporary;
         IStream: InStream;
@@ -137,16 +137,16 @@
         end;
 
         if EmailSendingHandler.Send(TempEmailItem) then
-            NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccess, NcEndpointEmail."Recipient E-Mail Address"))
+            NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextEmailSuccessLbl, NcEndpointEmail."Recipient E-Mail Address"))
         else begin
             EmailSendingHandler.GetLastError(ErrorMessage);
-            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
+            Error(TextEmailFailedErr, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
         end;
     end;
 
     local procedure EmailProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointEmail: Record "NPR Nc Endpoint E-mail")
     var
-        TextEmailFailed: Label 'File could not be emailed to %1. STMP returned error: %2.';
+        TextEmailFailedErr: Label 'File could not be emailed to %1. STMP returned error: %2.';
         TempEmailItem: Record "Email Item" temporary;
         InStream: InStream;
         Recipients: List of [Text];
@@ -178,7 +178,7 @@
 
         if not EmailSendingHandler.Send(TempEmailItem) then begin
             EmailSendingHandler.GetLastError(ErrorMessage);
-            Error(TextEmailFailed, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
+            Error(TextEmailFailedErr, NcEndpointEmail."Recipient E-Mail Address", ErrorMessage);
         end;
     end;
 

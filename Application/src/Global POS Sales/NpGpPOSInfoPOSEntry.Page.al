@@ -14,58 +14,69 @@ page 6151173 "NPR NpGp POS Info POS Entry"
             {
                 field("POS Info Code"; Rec."POS Info Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Info Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Info"; Rec."POS Info")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Info field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Price; Rec.Price)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Net Amount"; Rec."Net Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Net Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gross Amount"; Rec."Gross Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gross Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Line No."; Rec."Sales Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

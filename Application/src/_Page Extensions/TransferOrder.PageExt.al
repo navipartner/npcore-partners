@@ -16,8 +16,9 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Retail Print action';
+                ApplicationArea = NPRRetail;
             }
             action("NPR PriceLabel")
             {
@@ -27,8 +28,9 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Price Label action';
+                ApplicationArea = NPRRetail;
             }
         }
         addfirst("F&unctions")
@@ -39,8 +41,9 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Image = Import;
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import From Scanner File action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -60,9 +63,10 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Read from scanner action';
                 Image = Add;
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(PostAndPrint)
@@ -77,8 +81,9 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F9';
                 Visible = PostingVisibilityPOS;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Post and &Print action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

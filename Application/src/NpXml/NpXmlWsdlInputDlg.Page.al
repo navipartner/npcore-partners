@@ -3,7 +3,8 @@ page 6151565 "NPR NpXml Wsdl Input Dlg"
     Caption = 'WSDL Input Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,26 +15,29 @@ page 6151565 "NPR NpXml Wsdl Input Dlg"
                 Caption = 'Import WSDL';
                 field(Wsdl; Wsdl)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'WSDL (url or file path)';
                     ExtendedDatatype = URL;
                     ToolTip = 'Specifies the value of the WSDL (url or file path) field';
+                    ApplicationArea = NPRRetail;
                 }
                 group("When using NTLM username and password are reqired.")
                 {
                     Caption = 'When using NTLM username and password are reqired.';
                     field(Username; Username)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Username';
                         ToolTip = 'Specifies the value of the Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Password; Password)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Password';
                         ExtendedDatatype = Masked;
                         ToolTip = 'Specifies the value of the Password field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

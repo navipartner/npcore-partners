@@ -19,8 +19,9 @@ page 6059948 "NPR Tax Free GB I2 Serv. Sel."
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

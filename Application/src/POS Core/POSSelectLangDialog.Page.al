@@ -6,7 +6,8 @@ page 6150725 "NPR POS Select Lang. Dialog"
     Caption = 'POS Select Language Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,10 +15,11 @@ page 6150725 "NPR POS Select Lang. Dialog"
         {
             field(LanguageCode; LanguageCode)
             {
-                ApplicationArea = All;
+
                 Caption = 'Select Language';
                 TableRelation = Language;
                 ToolTip = 'Specifies the value of the Select Language field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 var

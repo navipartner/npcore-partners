@@ -4,7 +4,8 @@ report 6060052 "NPR Item Wise Sales Figures"
     RDLCLayout = './src/_Reports/layouts/Item Wise Sales Figures.rdlc';
     Caption = 'Item Wise Sales Figures';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("Sales Line"; "Sales Line")
@@ -87,14 +88,16 @@ report 6060052 "NPR Item Wise Sales Figures"
                 field("From Date"; FromDate)
                 {
                     Caption = 'From Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the From Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("To Date"; ToDate)
                 {
                     Caption = 'To Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the To Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

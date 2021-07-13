@@ -16,13 +16,14 @@ page 6150645 "NPR POS Info Look. Field Setup"
                 Caption = 'Group';
                 field("Map To"; Rec."Map To")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Map To field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -31,8 +32,9 @@ page 6150645 "NPR POS Info Look. Field Setup"
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

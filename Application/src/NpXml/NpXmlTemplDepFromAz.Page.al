@@ -1,9 +1,10 @@
 page 6151554 "NPR NpXml Templ. Dep. From Az."
 {
     PageType = NavigatePage;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
     Caption = 'XML Template Deploy from Azure';
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -11,10 +12,11 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
         {
             field("XML Template"; XmlTemplates)
             {
-                ApplicationArea = All;
+
                 Caption = 'XML Template';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the XmlTemplate field';
+                ApplicationArea = NPRRetail;
                 trigger OnLookup(var SelectedValues: Text): Boolean
                 var
                     rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
@@ -66,11 +68,12 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
         {
             action(ActionFinish)
             {
-                ApplicationArea = All;
+
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
                 Image = Action;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -4,8 +4,9 @@ page 6014492 "NPR Retail Comments"
     Caption = 'NPR Comment Sheet';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail Comment";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,43 +17,51 @@ page 6014492 "NPR Retail Comments"
                 ShowCaption = false;
                 field("Date"; Rec.Date)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Person Code"; Rec."Sales Person Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Person Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Long Comment"; Rec."Long Comment")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Long comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Hide on printout"; Rec."Hide on printout")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Hide on printout field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Start Date"; Rec."Start Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End Date"; Rec."End Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

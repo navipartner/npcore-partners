@@ -1,4 +1,4 @@
-﻿page 6014468 "NPR Sales Ticket Statistics"
+page 6014468 "NPR Sales Ticket Statistics"
 {
     // NPR700.000    2201.13   TS : Added to replace Period Button which were previously on the forms.
     // NPR4.10/MMV/20150611 CASE 215921 Added code from latest 6.2 release
@@ -11,7 +11,8 @@
     PageType = List;
     SourceTable = Date;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -22,26 +23,30 @@
                 ShowCaption = false;
                 field("Period Start"; Rec."Period Start")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Name"; Rec."Period Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Name field';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field(totalCount; totalCount)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Number of Exp.';
                     ToolTip = 'Specifies the value of the Number of Exp. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(CalculatedAverage; CalcAverage())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Stay Expedition';
                     ToolTip = 'Specifies the value of the Stay Expedition field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Control6150623)
@@ -49,26 +54,29 @@
                 ShowCaption = false;
                 field(Dim1Filter; Dim1Filter)
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,1';
                     Caption = 'Dept. Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                     ToolTip = 'Specifies the value of the Dept. Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Dim2Filter; Dim2Filter)
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,2';
                     Caption = 'Project Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
                     ToolTip = 'Specifies the value of the Project Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PeriodType; PeriodType)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Year';
                     ToolTip = 'Specifies the value of the Period Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin

@@ -1,4 +1,4 @@
-﻿page 6151340 "NPR SO Processor Act"
+page 6151340 "NPR SO Processor Act"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -15,9 +15,10 @@
                 CueGroupLayout = Wide;
                 field("NPRC Sales This Month"; Rec."NPR Sales This Month")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the sum of sales in the current month.';
                     Caption = 'Sales This Month';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -26,9 +27,10 @@
                 }
                 field("NPRC Sales This Month Lst Year"; Rec."NPR Sales This Month Lst Year")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the sum of sales in the current month of last year.';
                     Caption = 'Sales This Month Last Year';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -45,10 +47,11 @@
         {
             action("Set Up Cues")
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Set Up Cues';
                 Image = Setup;
                 ToolTip = 'Set up the cues (status tiles) related to the role.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

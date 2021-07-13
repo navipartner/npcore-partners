@@ -3,8 +3,9 @@ page 6151439 "NPR Magento Store Item List"
     Caption = 'Webshops';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Store Item";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -24,30 +25,35 @@ page 6151439 "NPR Magento Store Item List"
                         {
                             field("Item No."; Rec."Item No.")
                             {
-                                ApplicationArea = All;
+
                                 ToolTip = 'Specifies the value of the Item No. field';
+                                ApplicationArea = NPRRetail;
                             }
                             field(Webshop; Rec.Webshop)
                             {
-                                ApplicationArea = All;
+
                                 ToolTip = 'Specifies the value of the Webshop field';
+                                ApplicationArea = NPRRetail;
                             }
                             field("Store Code"; Rec."Store Code")
                             {
-                                ApplicationArea = All;
+
                                 Editable = false;
                                 ToolTip = 'Specifies the value of the Store Code field';
+                                ApplicationArea = NPRRetail;
                             }
                             field("Website Code"; Rec."Website Code")
                             {
-                                ApplicationArea = All;
+
                                 Editable = false;
                                 ToolTip = 'Specifies the value of the Website Code field';
+                                ApplicationArea = NPRRetail;
                             }
                             field(Enabled; Rec.Enabled)
                             {
-                                ApplicationArea = All;
+
                                 ToolTip = 'Specifies the value of the Enabled field';
+                                ApplicationArea = NPRRetail;
 
                                 trigger OnValidate()
                                 begin
@@ -56,10 +62,11 @@ page 6151439 "NPR Magento Store Item List"
                             }
                             field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption())
                             {
-                                ApplicationArea = All;
+
                                 Caption = 'Fields Enabled';
                                 Editable = false;
                                 ToolTip = 'Specifies the value of the Fields Enabled field';
+                                ApplicationArea = NPRRetail;
                             }
                         }
                         group(Control6150653)
@@ -74,7 +81,8 @@ page 6151439 "NPR Magento Store Item List"
                         {
                             Caption = 'Magento Category Links';
                             SubPageLink = "Item No." = FIELD("Item No.");
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
+
                         }
                     }
                     group(Control6150693)
@@ -94,8 +102,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Unit Price"; Rec."Unit Price")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Unit Price field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150687)
@@ -103,9 +112,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Unit Price Enabled"; Rec."Unit Price Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Unit Price Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -117,8 +127,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Product New From"; Rec."Product New From")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Product New From field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150684)
@@ -126,9 +137,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Product New From Enabled"; Rec."Product New From Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Product New From Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -140,8 +152,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Product New To"; Rec."Product New To")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Product New To field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150677)
@@ -149,9 +162,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Product New To Enabled"; Rec."Product New To Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Product New To Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -163,8 +177,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Special Price"; Rec."Special Price")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Special Price field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150674)
@@ -172,9 +187,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Special Price Enabled"; Rec."Special Price Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Special Price Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -186,8 +202,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Special Price From"; Rec."Special Price From")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Special Price From field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150667)
@@ -195,9 +212,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Special Price From Enabled"; Rec."Special Price From Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Special Price From Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -209,8 +227,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Special Price To"; Rec."Special Price To")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Special Price To field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150664)
@@ -218,9 +237,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Special Price To Enabled"; Rec."Special Price To Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Special Price To Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -240,9 +260,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Webshop Name"; Rec."Webshop Name")
                                         {
-                                            ApplicationArea = All;
+
                                             Caption = 'Name';
                                             ToolTip = 'Specifies the value of the Name field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150655)
@@ -250,9 +271,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Webshop Name Enabled"; Rec."Webshop Name Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Webshop Name Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -264,9 +286,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Webshop Description"; Format(Rec."Webshop Description".HasValue))
                                         {
-                                            ApplicationArea = All;
+
                                             Caption = 'Description';
                                             ToolTip = 'Specifies the value of the Description field';
+                                            ApplicationArea = NPRRetail;
 
                                             trigger OnAssistEdit()
                                             var
@@ -288,9 +311,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Webshop Description Enabled"; Rec."Webshop Description Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Webshop Description Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -302,9 +326,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Webshop Short Description"; Format(Rec."Webshop Short Desc.".HasValue))
                                         {
-                                            ApplicationArea = All;
+
                                             Caption = 'Short Description';
                                             ToolTip = 'Specifies the value of the Short Description field';
+                                            ApplicationArea = NPRRetail;
 
                                             trigger OnAssistEdit()
                                             var
@@ -326,9 +351,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Webshop Short Desc. Enabled"; Rec."Webshop Short Desc. Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Webshop Short Description Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -340,8 +366,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field(Visibility; Rec.Visibility)
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Visibility field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -353,8 +380,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Display Only"; Rec."Display Only")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Display Only field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150640)
@@ -362,9 +390,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Display Only Enabled"; Rec."Display Only Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Display Only Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -376,8 +405,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Seo Link"; Rec."Seo Link")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Seo Link field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150633)
@@ -385,9 +415,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Seo Link Enabled"; Rec."Seo Link Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Seo Link Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -399,8 +430,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Meta Title"; Rec."Meta Title")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Meta Title field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150630)
@@ -408,9 +440,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Meta Title Enabled"; Rec."Meta Title Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Meta Title Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }
@@ -422,8 +455,9 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Meta Description"; Rec."Meta Description")
                                         {
-                                            ApplicationArea = All;
+
                                             ToolTip = 'Specifies the value of the Meta Description field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                     group(Control6150616)
@@ -431,9 +465,10 @@ page 6151439 "NPR Magento Store Item List"
                                         ShowCaption = false;
                                         field("Meta Description Enabled"; Rec."Meta Description Enabled")
                                         {
-                                            ApplicationArea = All;
+
                                             ShowCaption = false;
                                             ToolTip = 'Specifies the value of the Meta Description Enabled field';
+                                            ApplicationArea = NPRRetail;
                                         }
                                     }
                                 }

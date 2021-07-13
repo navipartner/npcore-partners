@@ -4,8 +4,9 @@ page 6150658 "NPR POS Posting Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Posting Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,43 +16,51 @@ page 6150658 "NPR POS Posting Log"
             {
                 field("Posting Timestamp"; Rec."Posting Timestamp")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Timestamp field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Duration"; Rec."Posting Duration")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Duration field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("With Error"; Rec."With Error")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the With Error field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error Description"; Rec."Error Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Entry View"; Rec."POS Entry View")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry View field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last POS Entry No. at Posting"; Rec."Last POS Entry No. at Posting")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last POS Entry No. at Posting field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of POS Entries"; Rec."No. of POS Entries")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of POS Entries field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -60,7 +69,8 @@ page 6150658 "NPR POS Posting Log"
             part(Control6014412; "NPR POS Posting Log Parameters")
             {
                 SubPageLink = "Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -76,8 +86,9 @@ page 6150658 "NPR POS Posting Log"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Repost action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -100,8 +111,9 @@ page 6150658 "NPR POS Posting Log"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";
                 RunPageLink = "POS Posting Log Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

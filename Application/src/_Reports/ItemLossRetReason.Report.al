@@ -4,7 +4,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
     RDLCLayout = './src/_Reports/layouts/Item Loss - Return Reason.rdlc';
     Caption = 'Item Loss - Return Reason';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Item; Item)
@@ -205,8 +205,9 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                     {
                         Caption = 'Source Code Filter';
                         TableRelation = "Source Code";
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Source Code Filter field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

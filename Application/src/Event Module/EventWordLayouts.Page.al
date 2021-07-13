@@ -3,8 +3,9 @@ page 6060157 "NPR Event Word Layouts"
     Caption = 'Event Word Layouts';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Event Word Layout";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,35 +15,41 @@ page 6060157 "NPR Event Word Layouts"
             {
                 field(Usage; Rec.Usage)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the audience to receive the document.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies a description of the report layout.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Basic Layout Code"; Rec."Basic Layout Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies basic layout code on which potential specific layout changes will be based on.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Basic Layout Description"; Rec."Basic Layout Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies a description of basic layout.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(HasLayout; Rec.Layout.HasValue)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if current layout is loaded either by inheriting from basic layout or by manually importing it.';
                     Caption = 'Has Layout';
                     Editable = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use Req. Page Parameters"; Rec."Use Req. Page Parameters")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if layout has any filters set. You can set filters by clicking in this field or by using action Request Page.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -58,8 +65,9 @@ page 6060157 "NPR Event Word Layouts"
                 Image = CopyDocument;
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Make a copy of a layout.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -76,8 +84,9 @@ page 6060157 "NPR Event Word Layouts"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Import a layout Word file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -91,8 +100,9 @@ page 6060157 "NPR Event Word Layouts"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Export a layout to a Word file. Then you can Edit it in Word, save the changes to the file, and chose Import Layout action to import it back to BC.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -103,8 +113,9 @@ page 6060157 "NPR Event Word Layouts"
             {
                 Caption = 'Update Layout';
                 Image = UpdateXML;
-                ApplicationArea = All;
+
                 ToolTip = 'Update specific report layouts or all custom report layouts that might be affected by dataset changes.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -124,8 +135,9 @@ page 6060157 "NPR Event Word Layouts"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = "Report";
-                ApplicationArea = All;
+
                 ToolTip = 'Preview the report as pdf.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -139,8 +151,9 @@ page 6060157 "NPR Event Word Layouts"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = "Report";
-                ApplicationArea = All;
+
                 ToolTip = 'View or set filters to be applied to the report.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

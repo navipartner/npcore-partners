@@ -17,23 +17,27 @@ page 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
                     ShowCaption = false;
                     field("Discount %"; Rec."Discount %")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Discount % field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bal. Account No."; Rec."Bal. Account No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bal. Account No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bal. Gen. Prod. Posting Group"; Rec."Bal. Gen. Prod. Posting Group")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bal. Gen. Prod. Posting Group field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bal. VAT Prod. Posting Group"; Rec."Bal. VAT Prod. Posting Group")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Bal. VAT Prod. Posting Group field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

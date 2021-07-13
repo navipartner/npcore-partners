@@ -6,7 +6,8 @@ page 6184496 "NPR Pepper Version List"
     PageType = List;
     SourceTable = "NPR Pepper Version";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,26 +17,30 @@ page 6184496 "NPR Pepper Version List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Zip File"; HasInstallFile)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Zip File';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasInstallFile field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pepper DLL Version"; Rec."Pepper DLL Version")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Pepper DLL Version field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -50,8 +55,9 @@ page 6184496 "NPR Pepper Version List"
                 Caption = 'Configurations';
                 Image = Setup;
                 RunObject = Page "NPR Pepper Config. List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Configurations action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -62,8 +68,9 @@ page 6184496 "NPR Pepper Version List"
                 {
                     Caption = 'Zip';
                     Image = Import;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Zip action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -78,8 +85,9 @@ page 6184496 "NPR Pepper Version List"
                 {
                     Caption = 'Zip';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Zip action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -94,8 +102,9 @@ page 6184496 "NPR Pepper Version List"
                 {
                     Caption = 'Zip';
                     Image = Export;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Zip action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

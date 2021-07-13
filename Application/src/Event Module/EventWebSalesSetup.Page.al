@@ -4,7 +4,8 @@ page 6060158 "NPR Event Web Sales Setup"
     PageType = List;
     SourceTable = "NPR Event Web Sales Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,13 +15,15 @@ page 6060158 "NPR Event Web Sales Setup"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -54,8 +57,9 @@ page 6060158 "NPR Event Web Sales Setup"
                 }
                 field("Event No."; Rec."Event No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

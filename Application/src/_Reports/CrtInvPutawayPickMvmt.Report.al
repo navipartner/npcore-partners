@@ -3,7 +3,8 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
     Caption = 'Create Invt. Put-away/Pick/Movement';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("Warehouse Request"; "Warehouse Request")
@@ -148,16 +149,18 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                     field(CreateInventorytPutAway; CreatePutAway)
                     {
                         Caption = 'Create Invt. Put-Away';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Create Invt. Put-Away field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(CInvtPick; CreatePick)
                     {
                         Caption = 'Create Invt. Pick';
                         Editable = CreatePickEditable;
                         Enabled = CreatePickEditable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Create Invt. Pick field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -171,8 +174,9 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                         Caption = 'Create Invt. Movement';
                         Editable = CreateMovementEditable;
                         Enabled = CreateMovementEditable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Create Invt. Movement field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -184,14 +188,16 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                     field("Print Document"; PrintDocument)
                     {
                         Caption = 'Print Document';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Document field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Error"; ShowError)
                     {
                         Caption = 'Show Error';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Error field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

@@ -14,10 +14,11 @@ page 6060133 "NPR MM Member Card Card"
             {
                 field("External Card No."; Rec."External Card No.")
                 {
-                    ApplicationArea = All;
+
                     NotBlank = true;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the External Card No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -40,56 +41,66 @@ page 6060133 "NPR MM Member Card Card"
                 }
                 field("External Card No. Last 4"; Rec."External Card No. Last 4")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Card No. Last 4 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pin Code"; Rec."Pin Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pin Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid Until field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Is Temporary"; Rec."Card Is Temporary")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Is Temporary field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Block Reason"; Rec."Block Reason")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Block Reason field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Entry No."; Rec."Member Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Member Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document ID"; Rec."Document ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

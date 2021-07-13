@@ -2,9 +2,10 @@ page 6150693 "NPR NPRE Color Table"
 {
     Caption = 'Color Table';
     PageType = List;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
     SourceTable = "NPR NPRE Color Table";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,13 +15,15 @@ page 6150693 "NPR NPRE Color Table"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("RGB Color Code (Hex)"; Rec."RGB Color Code (Hex)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the RGB Color Code (Hex) field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

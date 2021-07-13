@@ -5,8 +5,9 @@ page 6151056 "NPR Distrib. Group"
     Caption = 'Distribution Group';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Distrib. Group";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,34 +17,40 @@ page 6151056 "NPR Distrib. Group"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Warehouse Location"; Rec."Warehouse Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Warehouse Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Warehouse Overhead Pct."; Rec."Warehouse Overhead Pct.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Warehouse Overhead Pct. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control10; "NPR Distrib. Grp Memb Listpart")
             {
                 SubPageLink = "Distribution Group" = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -61,8 +68,9 @@ page 6151056 "NPR Distrib. Group"
                 PromotedOnly = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Distribution Group" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Distribution setup action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

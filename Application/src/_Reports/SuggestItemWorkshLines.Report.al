@@ -1,9 +1,9 @@
-﻿report 6060040 "NPR Suggest Item Worksh. Lines"
+report 6060040 "NPR Suggest Item Worksh. Lines"
 {
     Caption = 'Suggest Item Worksheet Lines';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")
@@ -77,15 +77,17 @@
             {
                 field(Variants; OptVariants)
                 {
-                    ApplicationArea = All;
+
                     OptionCaption = 'None,Variants,Varieties Without Variants,All';
                     ToolTip = 'Specifies the value of the OptVariants field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Defaults; OptDefaultAction)
                 {
-                    ApplicationArea = All;
+
                     OptionCaption = 'Skip,Create New,Update Only,Update and Create Variants';
                     ToolTip = 'Specifies the value of the OptDefaultAction field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -13,35 +13,41 @@ page 6150619 "NPR POS Payment Method Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Code of selected POS Payment Method.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Description of selected POS Payment Method.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Type field. Possible values are Cash,Voucher,Check,EFT,Customer,PayOut. Use Cash for bills and coins in all currencies. Voucher is used for gift cards, coupons and vouchers. Check is used for checks. EFT for credit and debit card payments. Customer is currently not supported. Payout is used for cash movements, for example Payin/Payout to/from the POS.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Return Payment Method Code"; Rec."Return Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Return Payment Method Code field. Return Payment Method will be used for return of overpaid amount.';
                     ShowMandatory = true;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Block POS Payment"; Rec."Block POS Payment")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if selected POS Payment Method is blocked for use in POS Transaction.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Open Drawer"; Rec."Open Drawer")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if drawer will open after POS Transaction ends if selected POS Payment Mehod is used in transaction.';
+                    ApplicationArea = NPRRetail;
                 }
 
             }
@@ -51,71 +57,84 @@ page 6150619 "NPR POS Payment Method Card"
 
                 field("Bin for Virtual-Count"; Rec."Bin for Virtual-Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies which Payment Bin will be used for Auto Count.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Include In Counting"; Rec."Include In Counting")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if selected POS Payment Mehod will be included in counting.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies which Payment Method is connected to selected POS Payment Mehod. Payment Method Code is used when converting POS Sale to Sales Order.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Here you can specify Currency code if POS Payment Method is for foreign currency.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Fixed Rate"; Rec."Fixed Rate")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'You can specify the Fixed Rate which will be used to convert 100 units of foreign currency into local currency. For example 1 FCY = 6.15 LCY , hence the value to be inserted = 100 x 6.15 = 615 instead of 6.15.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Condensed"; Rec."Post Condensed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if POS Payment line will be posted uncompressed, per POS Entry or per POS Period Register';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Condensed Posting Description"; Rec."Condensed Posting Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Posting Description for condensed POS Payment lines %1 = POS Unit Code, %2 = POS Store Code, %3 = Posting Date, %4 = POS Period Register No, %5 = POS Payment Date';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Zero as Default on Popup"; Rec."Zero as Default on Popup")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if Payment input popup for selected POS Payment Method defaults to zero.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Auto End Sale"; Rec."Auto End Sale")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if POS Transaction automatically ends when POS Payment method is selected.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Forced Amount"; Rec."Forced Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if amount is forced when using selected POS Payment Method in transaction or you can enter the amount yourself. Works on POS Payment Methods type EFT.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Match Sales Amount"; Rec."Match Sales Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if EFT Terminal matches amount of POS Transaction.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reverse Unrealized VAT"; Rec."Reverse Unrealized VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if Unrealized VAT will be reversed when posting Payment line.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("No Min Amount on Web Orders"; Rec."No Min Amount on Web Orders")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if there is limit for Minimum Amount for selected POS Payment Method on Web Orders.';
+                    ApplicationArea = NPRRetail;
                 }
 
 
@@ -125,23 +144,27 @@ page 6150619 "NPR POS Payment Method Card"
                 Caption = 'Rounding';
                 field("Rounding Precision"; Rec."Rounding Precision")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding Precision field. Field should represent lowest denomination used for selected POS Payment Method.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Type"; Rec."Rounding Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding Type field. Possible roudings are Nearest, Up or Down';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Gains Account"; Rec."Rounding Gains Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies G/L Account No. which will be used for rounding gains.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Losses Account"; Rec."Rounding Losses Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies G/L Account No. which will be used for rounding losses.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Options)
@@ -149,28 +172,33 @@ page 6150619 "NPR POS Payment Method Card"
                 Caption = 'Option';
                 field("Minimum Amount"; Rec."Minimum Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Minimum Amout that can be paid using selected POS Payment Method.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Maximum Amount"; Rec."Maximum Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Maximum Amout that can be paid using selected POS Payment Method.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Refund"; Rec."Allow Refund")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if refund is allowed for selected POS Payment Method.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("EFT Surcharge Service Item No."; Rec."EFT Surcharge Service Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies which Service Item will be used for EFT Surcharge.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("EFT Tip Service Item No."; Rec."EFT Tip Service Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies which Service Item will be used for EFT Tip.';
+                    ApplicationArea = NPRRetail;
                 }
 
             }
@@ -191,8 +219,9 @@ page 6150619 "NPR POS Payment Method Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Payment Method Code" = field(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Action opens POS Posting Setup for selected POS Payment Method';
+                ApplicationArea = NPRRetail;
             }
             Action(Denominations)
             {
@@ -204,8 +233,9 @@ page 6150619 "NPR POS Payment Method Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Payment Method Denom";
                 RunPageLink = "POS Payment Method Code" = field(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Denominations action';
+                ApplicationArea = NPRRetail;
             }
             group(History)
             {
@@ -220,8 +250,9 @@ page 6150619 "NPR POS Payment Method Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Pmt. Line List";
                     RunPageLink = "POS Payment Method Code" = field(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Action opens POS Payment Lines for selected POS Payment Method.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

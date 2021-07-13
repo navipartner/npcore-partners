@@ -3,9 +3,10 @@ page 6151572 "NPR AF Test Services"
     Caption = 'AF Test Services';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR AF Args: Spire Barcode";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,48 +17,57 @@ page 6151572 "NPR AF Test Services"
                 Caption = 'Spire Barcode';
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Checksum"; Rec."Show Checksum")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Checksum field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Barcode Height"; Rec."Barcode Height")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Barcode Height field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Barcode Size"; Rec."Barcode Size")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Barcode Size field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Include Text"; Rec."Include Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Include Text field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Border; Rec.Border)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Border field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reverse Colors"; Rec."Reverse Colors")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reverse Colors field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Image Type"; Rec."Image Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Image Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("MSG Service")
@@ -65,22 +75,25 @@ page 6151572 "NPR AF Test Services"
                 Caption = 'MSG Service';
                 field(MSGSender; MSGSender)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Sender';
                     ToolTip = 'Specifies the value of the Sender field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(MSGPhoneNumber; MSGPhoneNumber)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Phone Number';
                     ToolTip = 'Specifies the value of the Phone Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(MSGInvoiceNo; MSGInvoiceNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Invoice No.';
                     TableRelation = "Sales Invoice Header";
                     ToolTip = 'Specifies the value of the Invoice No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -88,9 +101,10 @@ page 6151572 "NPR AF Test Services"
         {
             part(AFTestServicePicture; "NPR AF Test Service Picture")
             {
-                ApplicationArea = All;
+
                 Caption = 'Picture';
                 SubPageLink = "Primary Key" = field("Primary Key");
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -111,9 +125,10 @@ page 6151572 "NPR AF Test Services"
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     RunObject = Page "NPR AF Notification Hub List";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Notifications action';
                     Image = View;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

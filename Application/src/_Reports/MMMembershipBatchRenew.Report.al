@@ -3,7 +3,7 @@ report 6060137 "NPR MM Membership Batch Renew"
     Caption = 'Membership Batch Renew';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(ReportMembership; "NPR MM Membership")
@@ -113,8 +113,9 @@ report 6060137 "NPR MM Membership Batch Renew"
                 {
                     Caption = 'Membership Code';
                     ShowMandatory = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -139,22 +140,25 @@ report 6060137 "NPR MM Membership Batch Renew"
                 {
                     Caption = 'Active On Date';
                     ShowMandatory = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active On Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Type Of Active"; TypeOfActive)
                 {
                     Caption = 'Active Type';
                     OptionCaption = 'Active,Last Period';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Renew Using Item"; RenewUsingItem)
                 {
                     Caption = 'Renew Using Item';
                     ShowMandatory = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Renew Using Item field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -182,8 +186,9 @@ report 6060137 "NPR MM Membership Batch Renew"
                 field(Verbose; ShowVerbose)
                 {
                     Caption = 'Verbose';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Verbose field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

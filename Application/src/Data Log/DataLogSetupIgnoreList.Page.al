@@ -17,27 +17,30 @@ page 6059895 "NPR Data Log Setup Ignore List"
                 ShowCaption = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'No.';
                     Editable = false;
                     Lookup = false;
                     ToolTip = 'Specifies the number of the field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Field Caption';
                     DrillDown = false;
                     Editable = false;
                     ToolTip = 'Specifies the caption of the field, that is, the name that will be shown in the user interface.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ignore Modification"; IgnoreMod)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Ignore Modification';
                     ToolTip = 'Specifies whether changes made to this field will trigger the data log creation.';
                     Editable = PageIsEditable;
                     Enabled = PageIsEditable;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -50,13 +53,13 @@ page 6059895 "NPR Data Log Setup Ignore List"
         {
             systempart(Control1900383207; Links)
             {
-                ApplicationArea = RecordLinks;
                 Visible = false;
+                ApplicationArea = NPRRetail;
             }
             systempart(Control1905767507; Notes)
             {
-                ApplicationArea = Notes;
                 Visible = false;
+                ApplicationArea = NPRRetail;
             }
         }
     }

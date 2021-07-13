@@ -7,9 +7,10 @@ page 6014676 "NPR Endpoint Filters"
     MultipleNewLines = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PopulateAllFields = true;
     SourceTable = "NPR Endpoint Filter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,18 +20,21 @@ page 6014676 "NPR Endpoint Filters"
             {
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Text"; Rec."Filter Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Text field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -5,11 +5,12 @@ page 6151486 "NPR M2 Value Buffer List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PopulateAllFields = true;
     SourceTable = "NPR M2 Value Buffer";
     SourceTableTemporary = true;
     SourceTableView = SORTING(Position);
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,21 +20,24 @@ page 6151486 "NPR M2 Value Buffer List"
             {
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowValue;
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Label"; Rec.Label)
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowLabel;
                     ToolTip = 'Specifies the value of the Label field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Position; Rec.Position)
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowPosition;
                     ToolTip = 'Specifies the value of the Position field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

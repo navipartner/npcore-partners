@@ -6,7 +6,7 @@ page 6151505 "NPR Nc Import Types"
     PageType = List;
     SourceTable = "NPR Nc Import Type";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -17,59 +17,70 @@ page 6151505 "NPR Nc Import Types"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import List Update Handler"; Rec."Import List Update Handler")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the update handler, which will be used for getting new entries into import list';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Keep Import Entries for"; Rec."Keep Import Entries for")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Keep Import Entries for field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Codeunit ID"; Rec."Import Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Codeunit ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Lookup Codeunit ID"; Rec."Lookup Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Lookup Codeunit ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Webservice Enabled"; Rec."Webservice Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Webservice Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Webservice Codeunit ID"; Rec."Webservice Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Webservice Codeunit ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Ftp Enabled"; Rec."Ftp Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ftp Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Sftp; Rec.Sftp)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sftp field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Ftp Host"; Rec."Ftp Host")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ftp Host field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -88,8 +99,9 @@ page 6151505 "NPR Nc Import Types"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Ftp Enabled";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download Ftp action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -107,8 +119,9 @@ page 6151505 "NPR Nc Import Types"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = (Rec."Send E-mail on Error");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Send Test Error E-mail action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -125,8 +138,9 @@ page 6151505 "NPR Nc Import Types"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Shows setup page for the update handler, which will be used for getting new entries into import list';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -144,8 +158,9 @@ page 6151505 "NPR Nc Import Types"
             {
                 Caption = 'Show Error Log';
                 Image = ErrorLog;
-                ApplicationArea = All;
+
                 ToolTip = 'View error log entries for selected impor type entry.';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var

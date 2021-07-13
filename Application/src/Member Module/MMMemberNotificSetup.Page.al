@@ -4,8 +4,9 @@ page 6060142 "NPR MM Member Notific. Setup"
     Caption = 'Member Notification Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Member Notific. Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,110 +16,131 @@ page 6060142 "NPR MM Member Notific. Setup"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Days Before"; Rec."Days Before")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Days Before field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Days Past"; Rec."Days Past")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Days Past field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cancel Overdue Notif. (Days)"; Rec."Cancel Overdue Notif. (Days)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cancel Overdue Notif. (Days) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Method"; Rec."Processing Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Filter Value"; Rec."Template Filter Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Filter Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Community Code"; Rec."Community Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Community Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Next Notification Code"; Rec."Next Notification Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Next Notification Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Member Role"; Rec."Target Member Role")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Member Role field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Include NP Pass"; Rec."Include NP Pass")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Include NP Pass field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NP Pass Server Base URL"; Rec."NP Pass Server Base URL")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NP Pass Server Base URL field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pass Notification Method"; Rec."Pass Notification Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pass Notification Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Passes API"; Rec."Passes API")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Passes API field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("PUT Passes Template"; Rec."PUT Passes Template".HasValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Have Template';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Have Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pass Token"; Rec."Pass Token")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pass Token field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pass Type Code"; Rec."Pass Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pass Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Generate Magento PW URL"; Rec."Generate Magento PW URL")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Generate Magento PW URL field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Fallback Magento PW URL"; Rec."Fallback Magento PW URL")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Fallback Magento PW URL field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -138,8 +160,9 @@ page 6060142 "NPR MM Member Notific. Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060139));
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the E-Mail Templates action';
+                ApplicationArea = NPRRetail;
             }
             action(SMSTemplate)
             {
@@ -150,8 +173,9 @@ page 6060142 "NPR MM Member Notific. Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060139));
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the SMS Template action';
+                ApplicationArea = NPRRetail;
             }
 
             action(RenewNotificationsList)
@@ -164,8 +188,9 @@ page 6060142 "NPR MM Member Notific. Setup"
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Notification Trigger" = CONST(RENEWAL);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Renewal Notification List action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -176,7 +201,8 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'Export Wallet Template File';
                 ToolTip = 'Exports the default or current template used to send information to wallet.';
                 Image = ExportAttachment;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 var
@@ -210,7 +236,8 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'Import Wallet Template File';
                 ToolTip = 'Define information sent to wallet.';
                 Image = ImportCodes;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 var
@@ -240,8 +267,9 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Refresh Renew Notification action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

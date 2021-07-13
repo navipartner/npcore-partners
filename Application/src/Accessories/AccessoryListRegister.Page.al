@@ -6,8 +6,9 @@ page 6014509 "NPR Accessory List - Register"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Accessory/Spare Part";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,33 +19,39 @@ page 6014509 "NPR Accessory List - Register"
                 ShowCaption = false;
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Vendor; Rec.Vendor)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Buy-from Vendor field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Buy-from Vendor Name"; Rec."Buy-from Vendor Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Buy-from Vendor Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

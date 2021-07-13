@@ -6,19 +6,22 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         {
             field("NPR To Anonymize On"; Rec."NPR To Anonymize On")
             {
-                ApplicationArea = All;
+
                 Editable = ToAnonymizeEditable;
                 ToolTip = 'Specifies the value of the NPR To Anonymize On field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Anonymized"; Rec."NPR Anonymized")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Anonymized field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Anonymized Date"; Rec."NPR Anonymized Date")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Anonymized Date field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Address & Contact")
@@ -28,26 +31,30 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 Caption = 'Magento';
                 field("NPR Magento Display Group"; Rec."NPR Magento Display Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Magento Display Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Magento Store Code"; Rec."NPR Magento Store Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'Specifies the value of the NPR Magento Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Magento Shipping Group"; Rec."NPR Magento Shipping Group")
                 {
-                    ApplicationArea = All;
+
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'Specifies the value of the NPR Magento Shipping Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Magento Payment Group"; Rec."NPR Magento Payment Group")
                 {
-                    ApplicationArea = All;
+
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'Specifies the value of the NPR Magento Payment Group field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -69,15 +76,17 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedOnly = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Alternative No. action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("NPR PrintShippingLabel")
                 {
                     Caption = 'Shipping Label';
                     Image = PrintCheck;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Shipping Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -102,8 +111,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 RunObject = Page "NPR POS Info Links";
                 RunPageLink = "Table ID" = CONST(18),
                               "Primary Key" = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Info action';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Item &Tracking Entries")
@@ -112,8 +122,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             {
                 Caption = 'POS Entries';
                 Image = Entries;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(Documents)
@@ -125,8 +136,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Send SMS action';
+                    ApplicationArea = NPRRetail;
                     trigger OnAction()
                     var
                         SMSMgt: Codeunit "NPR SMS Management";
@@ -143,8 +155,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 Caption = 'Customer Anonymization';
                 Ellipsis = true;
                 Image = AbsenceCategory;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Customer Anonymization action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

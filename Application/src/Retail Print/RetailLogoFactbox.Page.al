@@ -7,8 +7,8 @@ page 6014567 "NPR Retail Logo Factbox"
     ModifyAllowed = false;
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Retail Logo";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,13 +16,15 @@ page 6014567 "NPR Retail Logo Factbox"
         {
             field(Width; Rec.Width)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Width field';
+                ApplicationArea = NPRRetail;
             }
             field(Height; Rec.Height)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Height field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -32,10 +34,11 @@ page 6014567 "NPR Retail Logo Factbox"
         {
             action(ImportPicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a picture file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -65,7 +68,7 @@ page 6014567 "NPR Retail Logo Factbox"
             }
             // action(ExportPicture)
             // {
-            //     ApplicationArea = Basic, Suite;
+            //     ApplicationArea = NPRRetail;
             //     Caption = 'Export';
             //     Enabled = DeleteExportEnabled;
             //     Image = Export;
@@ -88,11 +91,12 @@ page 6014567 "NPR Retail Logo Factbox"
             // }
             action(DeletePicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Delete';
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
                 ToolTip = 'Delete the record.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

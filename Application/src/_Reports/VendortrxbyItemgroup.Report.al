@@ -4,7 +4,7 @@ report 6014449 "NPR Vendor trx by Item group"
     RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item group.rdlc';
     Caption = 'Vendor Trn. By Item Group';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
     dataset
     {
@@ -226,8 +226,9 @@ report 6014449 "NPR Vendor trx by Item group"
                     field("visuden salg"; visudensalg)
                     {
                         Caption = 'Display Item Groups With No Sales';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Display Item Groups With No Sales field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

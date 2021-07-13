@@ -1,4 +1,4 @@
-﻿page 6151251 "NPR Retail Enter. Act: Others"
+page 6151251 "NPR Retail Enter. Act: Others"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -15,18 +15,21 @@
                 Caption = 'Master Data';
                 field(Items; Rec.Items)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Items field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Contacts; Rec.Contacts)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Contacts field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Customers; Rec.Customers)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customers field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

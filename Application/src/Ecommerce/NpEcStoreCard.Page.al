@@ -4,7 +4,8 @@ page 6151301 "NPR NpEc Store Card"
     PageType = Card;
     SourceTable = "NPR NpEc Store";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -13,55 +14,65 @@ page 6151301 "NPR NpEc Store Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the code of the record.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the name of the record.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson/Purchaser Code"; Rec."Salesperson/Purchaser Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the name of the salesperson who is assigned to the e-commerce store.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the location of the e-commerce store.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code for the first dimension, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code for the second dimension, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Mapping"; Rec."Customer Mapping")
                 {
-                    ApplicationArea = All;
+
                     ShowCaption = false;
                     ToolTip = 'Specifies way for searching customer while creating or updating sales order.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code of the customer configuration template.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Create Customers"; Rec."Allow Create Customers")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if customer will be created for current e-commerce store. Customer will be created if it''s not found when order is imported.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Update Customers from S. Order"; Rec."Update Customers from S. Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if customer will be updated for current e-commerce store. Customer will be updated if it''s found when order is imported.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -77,8 +88,9 @@ page 6151301 "NPR NpEc Store Card"
                 Image = List;
                 RunObject = Page "NPR NpEc Customer Mapping";
                 RunPageLink = "Store Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'View or edit customer mapping.';
+                ApplicationArea = NPRRetail;
             }
         }
     }

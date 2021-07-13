@@ -10,7 +10,8 @@ page 6151151 "NPR Customer GDPR Log Entries"
     PageType = List;
     SourceTable = "NPR Customer GDPR Log Entries";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -20,48 +21,57 @@ page 6151151 "NPR Customer GDPR Log Entries"
             {
                 field("Entry No"; Rec."Entry No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No"; Rec."Customer No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Open Sales Documents"; Rec."Open Sales Documents")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open Sales Documents field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Open Cust. Ledger Entry"; Rec."Open Cust. Ledger Entry")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open Cust. Ledger Entry field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Has transactions"; Rec."Has transactions")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Has transactions field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer is a Member"; Rec."Customer is a Member")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer is a Member field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Open Journal Entries/Statement"; Rec."Open Journal Entries/Statement")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open Journal Entries/Statement field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Entry Date Time"; Rec."Log Entry Date Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Entry Date Time field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

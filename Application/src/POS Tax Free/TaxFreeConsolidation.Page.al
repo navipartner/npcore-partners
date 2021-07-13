@@ -18,13 +18,15 @@ page 6014571 "NPR Tax Free Consolidation"
                 InstructionalText = 'Use add/remove actions to specify which sales receipts should be consolidated.';
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sale Date"; Rec."Sale Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sale Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -42,8 +44,9 @@ page 6014571 "NPR Tax Free Consolidation"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Add Receipt action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -85,8 +88,9 @@ page 6014571 "NPR Tax Free Consolidation"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Remove Receipt action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -102,8 +106,9 @@ page 6014571 "NPR Tax Free Consolidation"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Consolidate Receipts action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

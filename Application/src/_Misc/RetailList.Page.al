@@ -5,9 +5,10 @@ page 6014579 "NPR Retail List"
     InsertAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail List";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,25 +19,28 @@ page 6014579 "NPR Retail List"
                 ShowCaption = false;
                 field(Choice; Rec.Choice)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Choice field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Chosen; Rec.Chosen)
                 {
-                    ApplicationArea = All;
+
                     ColumnSpan = 2;
                     Enabled = MultipleChoice;
                     Visible = MultipleChoice;
                     ToolTip = 'Specifies the value of the Chosen field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Enabled = ShowValue;
                     Visible = ShowValue;
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

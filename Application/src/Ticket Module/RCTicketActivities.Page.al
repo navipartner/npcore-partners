@@ -1,10 +1,11 @@
-﻿page 6060108 "NPR RC Ticket Activities"
+page 6060108 "NPR RC Ticket Activities"
 {
     Caption = 'Ticket Activities';
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR RC Ticket Cues";
+    ApplicationArea = NPRRetail;
 
     layout
     {

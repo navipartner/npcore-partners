@@ -5,7 +5,8 @@ page 6151167 "NPR NpGp POS Sales Entries"
     PageType = List;
     SourceTable = "NPR NpGp POS Sales Entry";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,105 +16,125 @@ page 6151167 "NPR NpGp POS Sales Entries"
             {
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Fiscal No."; Rec."Fiscal No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Fiscal No. field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Currency Factor"; Rec."Currency Factor")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Factor field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Sales Amount"; Rec."Sales Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Amount field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Amount field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Sales Quantity"; Rec."Sales Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Quantity field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Return Sales Quantity"; Rec."Return Sales Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Return Sales Quantity field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Total Amount"; Rec."Total Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total Amount field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Total Tax Amount"; Rec."Total Tax Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total Tax Amount field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Total Amount Incl. Tax"; Rec."Total Amount Incl. Tax")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total Amount Incl. Tax field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Entry Time"; Rec."Entry Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Time field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("System Id"; Rec.SystemId)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the System Id field';
+                    ApplicationArea = NPRRetail;;
                 }
             }
             part("POS Sales Lines"; "NPR NpGp POSSalesEntry Subpage")
             {
                 Caption = 'POS Sales Lines';
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;;
+
             }
         }
     }
@@ -127,8 +148,9 @@ page 6151167 "NPR NpGp POS Sales Entries"
                 Caption = 'POS Info';
                 Image = List;
                 RunObject = Page "NPR NpGp POS Info POS Entry";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Info action';
+                ApplicationArea = NPRRetail;;
                 //RunPageLink = "POS Entry No."=FIELD("Entry No.");
             }
         }

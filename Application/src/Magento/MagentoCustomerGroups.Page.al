@@ -3,8 +3,9 @@ page 6151440 "NPR Magento Customer Groups"
     Caption = 'Customer Groups';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Customer Group";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,13 +15,15 @@ page 6151440 "NPR Magento Customer Groups"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Magento Tax Class"; Rec."Magento Tax Class")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Magento Tax Class field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -38,8 +41,9 @@ page 6151440 "NPR Magento Customer Groups"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Customer Groups action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

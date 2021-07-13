@@ -5,8 +5,9 @@ page 6151069 "NPR Distrib. Group Member List"
     Caption = 'Distribution Group Member List';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Distrib. Group Members";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,33 +17,39 @@ page 6151069 "NPR Distrib. Group Member List"
             {
                 field("Distribution Member Id"; Rec."Distribution Member Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Member Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Group"; Rec."Distribution Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Location; Rec.Location)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Store; Rec.Store)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Share Pct."; Rec."Distribution Share Pct.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Share Pct. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -61,8 +68,9 @@ page 6151069 "NPR Distrib. Group Member List"
                 PromotedOnly = true;
                 RunObject = Page "NPR Retail Replenish. SKU List";
                 RunPageLink = "Location Code" = FIELD(Location);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Distribution Items action';
+                ApplicationArea = NPRRetail;
             }
             action("Distribution Lines")
             {
@@ -72,8 +80,9 @@ page 6151069 "NPR Distrib. Group Member List"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 RunObject = Page "NPR Distribution Lines";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Distribution Lines action';
+                ApplicationArea = NPRRetail;
                 //RunPageLink = "Distribution Group Member"=FIELD("Distribution Member Id"),
                 //              "Distribution Item"=FILTER(<>'');
             }
@@ -86,8 +95,9 @@ page 6151069 "NPR Distrib. Group Member List"
                 PromotedOnly = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Location Code" = FIELD(Location);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Demand Lines action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

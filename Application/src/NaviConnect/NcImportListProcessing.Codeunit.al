@@ -14,9 +14,9 @@ codeunit 6151509 "NPR Nc Import List Processing"
     end;
 
     var
-        Text000: Label 'Download Ftp';
-        Text002: Label 'Process Import List';
-        Text003: Label 'All';
+        DownloadFtpTxt: Label 'Download Ftp';
+        ProcessImportListTxt: Label 'Process Import List';
+        AllTxt: Label 'All';
 
     local procedure UpdateImportList(JobQueueEntry: Record "Job Queue Entry"; ImportTypeCode: Code[20])
     var
@@ -147,15 +147,15 @@ codeunit 6151509 "NPR Nc Import List Processing"
 
         FindImportType(Rec, NcImportType);
         if NcImportType.Code = '' then
-            Description := '{' + Text003 + '}'
+            Description := '{' + AllTxt + '}'
         else
             Description := NcImportType.Code;
 
         if HasParameter(Rec, ParamDownloadFtp()) then
-            Description += ' | ' + Text000;
+            Description += ' | ' + DownloadFtpTxt;
 
         if HasParameter(Rec, ParamProcessImport()) then
-            Description += ' | ' + Text002;
+            Description += ' | ' + ProcessImportListTxt;
 
         Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
     end;

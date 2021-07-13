@@ -1,11 +1,12 @@
-﻿page 6151153 "NPR GDPR Anonymization Req."
+page 6151153 "NPR GDPR Anonymization Req."
 {
     Caption = 'GDPR Anonymization Request';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR GDPR Anonymization Request";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,43 +16,51 @@
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact No."; Rec."Contact No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Contact No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Received"; Rec."Request Received")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request Received field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processed At"; Rec."Processed At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processed At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Count"; Rec."Log Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Count field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Reason; Rec.Reason)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reason field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -71,8 +80,9 @@
                 PromotedCategory = "Report";
                 RunObject = Page "NPR Customer GDPR Log Entries";
                 RunPageLink = "Customer No" = FIELD("Customer No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Anonymization Log action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -84,8 +94,9 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Anonymize action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -5,7 +5,8 @@ page 6151305 "NPR NpEc Customer Mapping"
     PageType = List;
     SourceTable = "NPR NpEc Customer Mapping";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,34 +16,40 @@ page 6151305 "NPR NpEc Customer Mapping"
             {
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies E-Commerce Store Code.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the customer''s country/region.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the postal code.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Config. Template Code"; Rec."Config. Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Configuration Template Code.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Country/Region Name"; Rec."Country/Region Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the country or region name.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the city of the customer.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

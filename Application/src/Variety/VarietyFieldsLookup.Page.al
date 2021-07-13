@@ -7,10 +7,11 @@ page 6059979 "NPR Variety Fields Lookup"
     Caption = 'Variety Fields Lookup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Variety Field Setup";
     SourceTableView = SORTING("Sort Order")
                       WHERE(Disabled = CONST(false));
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,44 +21,51 @@ page 6059979 "NPR Variety Fields Lookup"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Secondary Type"; Rec."Secondary Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Secondary Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Secondary Field No."; Rec."Secondary Field No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Secondary Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Secondary Description"; Rec."Secondary Description")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Secondary Field Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

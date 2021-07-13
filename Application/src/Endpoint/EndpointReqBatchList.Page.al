@@ -7,7 +7,8 @@ page 6014677 "NPR Endpoint Req. Batch List"
     PageType = List;
     SourceTable = "NPR Endpoint Request Batch";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,33 +18,39 @@ page 6014677 "NPR Endpoint Req. Batch List"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Endpoint Code"; Rec."Endpoint Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Endpoint Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Creation Date"; Rec."Creation Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Creation Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of Requests"; Rec."No. of Requests")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Requests field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -59,8 +66,9 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 Image = XMLFile;
                 RunObject = Page "NPR Endpoint Request List";
                 RunPageLink = "Request Batch No." = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Requests action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -72,8 +80,9 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 {
                     Caption = 'Set to Collecting';
                     Image = Add;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set to Collecting action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -85,8 +94,9 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 {
                     Caption = 'Set to Ready to Send';
                     Image = Approve;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set to Ready to Send action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -98,8 +108,9 @@ page 6014677 "NPR Endpoint Req. Batch List"
                 {
                     Caption = 'Set to Sent';
                     Image = SendApprovalRequest;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set to Sent action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

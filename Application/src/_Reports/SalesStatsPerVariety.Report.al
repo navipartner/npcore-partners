@@ -4,7 +4,7 @@ report 6014615 "NPR Sales Stats Per Variety"
     RDLCLayout = './src/_Reports/layouts/Sales Statistics Per Variety.rdlc';
     Caption = 'Sales Statistics Variant';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Item; Item)
@@ -190,14 +190,16 @@ report 6014615 "NPR Sales Stats Per Variety"
                 field("Print Also Without Sale"; PrintAlsoWithoutSale)
                 {
                     Caption = 'Include Items Not Sold';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Include Items Not Sold field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PrintTotals; PrintTotal)
                 {
                     Caption = 'Print Totals';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Totals field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

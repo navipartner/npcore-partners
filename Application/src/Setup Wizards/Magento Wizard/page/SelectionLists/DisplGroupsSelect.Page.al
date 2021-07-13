@@ -3,10 +3,11 @@ page 6014626 "NPR Displ Groups Select"
     Caption = 'Display Groups';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Display Group";
     SourceTableTemporary = true;
     Editable = false;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,13 +17,15 @@ page 6014626 "NPR Displ Groups Select"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

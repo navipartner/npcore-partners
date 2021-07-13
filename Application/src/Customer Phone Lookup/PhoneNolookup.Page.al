@@ -3,9 +3,10 @@ page 6014412 "NPR Phone No lookup"
     Caption = 'Phone No lookup';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Phone Lookup Buffer";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,9 +16,10 @@ page 6014412 "NPR Phone No lookup"
             {
                 field(PhoneNo; PhoneNo)
                 {
-                    ApplicationArea = All;
+
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the PhoneNo field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -27,44 +29,52 @@ page 6014412 "NPR Phone No lookup"
                 }
                 field(ID; Rec.ID)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail"; Rec."E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Home Page"; Rec."Home Page")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Home Page field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(NewContact; NewContact)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Create Contact';
                     ToolTip = 'Specifies the value of the Create Contact field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -79,9 +89,10 @@ page 6014412 "NPR Phone No lookup"
                 }
                 field(NewCust; NewCust)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Create Customer';
                     ToolTip = 'Specifies the value of the Create Customer field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -96,9 +107,10 @@ page 6014412 "NPR Phone No lookup"
                 }
                 field(NewVendor; NewVendor)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Create Vendor';
                     ToolTip = 'Specifies the value of the Create Vendor field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -128,8 +140,9 @@ page 6014412 "NPR Phone No lookup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F6';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Lookup Phone action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -145,8 +158,9 @@ page 6014412 "NPR Phone No lookup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F3';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

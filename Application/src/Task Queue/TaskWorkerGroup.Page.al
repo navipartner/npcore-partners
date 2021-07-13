@@ -6,7 +6,8 @@ page 6059906 "NPR Task Worker Group"
     PageType = List;
     SourceTable = "NPR Task Worker Group";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,38 +17,45 @@ page 6059906 "NPR Task Worker Group"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language ID"; Rec."Language ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Abbreviated Name"; Rec."Abbreviated Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Abbreviated Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Min Interval Between Check"; Rec."Min Interval Between Check")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Min Interval Between Check field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max Interval Between Check"; Rec."Max Interval Between Check")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max Interval Between Check field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Default; Rec.Default)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Standard field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

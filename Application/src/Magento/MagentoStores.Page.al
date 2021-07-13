@@ -4,8 +4,9 @@ page 6151406 "NPR Magento Stores"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Store";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,18 +16,21 @@ page 6151406 "NPR Magento Stores"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

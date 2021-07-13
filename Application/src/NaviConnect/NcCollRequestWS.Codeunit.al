@@ -1,7 +1,7 @@
 codeunit 6151532 "NPR Nc Coll.  Request WS"
 {
     var
-        SETUP_MISSING: Label 'Setup is missing for %1';
+        ImportTypeMissingErr: Label 'Setup is missing for %1. Unknown value for %2 in %3', Comment = '%1="NPR Nc Import Entry"."Webservice Function";%2="NPR Nc Import Entry".TableCaption();%3="NPR Nc Import Entry".FieldCaption"Import Type"';
 
     procedure Createcollectorrequest(var CollectorRequestWebImport: XMLport "NPR Collector Req. Web Imp.")
     var
@@ -54,7 +54,7 @@ codeunit 6151532 "NPR Nc Coll.  Request WS"
             CollectorIntegrationSetup();
             ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR Nc Coll.  Request WS", WebserviceFunction);
             if (ImportEntry."Import Type" = '') then
-                Error(SETUP_MISSING, WebserviceFunction);
+                Error(ImportTypeMissingErr, WebserviceFunction, ImportEntry.TableCaption(), ImportEntry.FieldCaption("Import Type"));
         end;
 
         ImportEntry.Date := CurrentDateTime;

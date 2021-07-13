@@ -6,8 +6,9 @@ page 6184484 "NPR Pepper Terminal Type Card"
     Caption = 'Pepper Terminal Type Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Pepper Terminal Type";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,36 +18,42 @@ page 6184484 "NPR Pepper Terminal Type Card"
             {
                 field(ID; Rec.ID)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Force Fixed Currency Check"; Rec."Force Fixed Currency Check")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Force Fixed Currency Check field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Deprecated; Rec.Deprecated)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Deprecated field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(ATOS)
             {
                 field(Overtender; Rec.Overtender)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Overtender field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

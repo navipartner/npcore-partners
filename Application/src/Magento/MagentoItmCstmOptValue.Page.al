@@ -1,4 +1,4 @@
-﻿page 6151429 "NPR Magento Itm Cstm Opt.Value"
+page 6151429 "NPR Magento Itm Cstm Opt.Value"
 {
     Caption = 'Magento Item Custom Option Value';
     DeleteAllowed = false;
@@ -16,38 +16,45 @@
             {
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Custom Option No."; Rec."Custom Option No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Custom Option No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Custom Option Value Line No."; Rec."Custom Option Value Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Custom Option Value Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Price; Rec.Price)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Price Type"; Rec."Price Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

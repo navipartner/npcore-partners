@@ -8,7 +8,8 @@ page 6150689 "NPR NPRE Kitchen Req."
     SourceTable = "NPR NPRE Kitchen Request";
     SourceTableView = SORTING("Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time");
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -20,100 +21,116 @@ page 6150689 "NPR NPRE Kitchen Req."
                 IndentationColumn = 0;
                 field("Request No."; Rec."Request No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Order ID"; Rec."Order ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Order ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. Changed"; Rec."Qty. Changed")
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     ToolTip = 'Specifies the value of the Qty. Changed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serving Step field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Requested Date-Time"; Rec."Serving Requested Date-Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serving Requested Date-Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Status"; Rec."Line Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Production Status"; Rec."Production Status")
                 {
-                    ApplicationArea = All;
                     Visible = IsExpediteMode;
                     ToolTip = 'Specifies the value of the Production Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Station Production Status"; Rec."Station Production Status")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Visible = not IsExpediteMode;
                     ToolTip = 'Specifies the value of the Station Production Status field';
                     DrillDown = false;
                 }
                 field("No. of Kitchen Stations"; Rec."No. of Kitchen Stations")
                 {
-                    ApplicationArea = All;
+
                     Visible = IsExpediteMode;
                     ToolTip = 'Specifies the value of the No. of Kitchen Stations field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(SeatingCode; Rec.SeatingCode())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Seating Code';
                     ToolTip = 'Specifies the value of the Seating Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part("Kitchen Stations"; "NPR NPRE Kitchen Req. Subpage")
@@ -123,11 +140,12 @@ page 6150689 "NPR NPRE Kitchen Req."
                               "Production Restaurant Code" = field("Production Restaurant Filter"),
                               "Kitchen Station" = field("Kitchen Station Filter");
                 Visible = IsExpediteMode;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             usercontrol(TimerControl; "NPR TimerControl")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
 
                 trigger ControlAddInReady()
                 begin
@@ -161,8 +179,9 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set Served action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -182,8 +201,9 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Start Production action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -199,8 +219,9 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the End Production action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -220,8 +241,9 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Accept Qty. Change action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -241,8 +263,9 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Show/Hide Finished action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -265,8 +288,9 @@ page 6150689 "NPR NPRE Kitchen Req."
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Show/Hide Served action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

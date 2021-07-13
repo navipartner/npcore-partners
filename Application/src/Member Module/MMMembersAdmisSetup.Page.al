@@ -4,8 +4,9 @@ page 6060135 "NPR MM Members. Admis. Setup"
     Caption = 'Membership Admission Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Members. Admis. Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,38 +16,45 @@ page 6060135 "NPR MM Members. Admis. Setup"
             {
                 field("Membership  Code"; Rec."Membership  Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership  Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Admission Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket No. Type"; Rec."Ticket No. Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket No. Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket No."; Rec."Ticket No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cardinality Type"; Rec."Cardinality Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cardinality Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max Cardinality"; Rec."Max Cardinality")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max Cardinality field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

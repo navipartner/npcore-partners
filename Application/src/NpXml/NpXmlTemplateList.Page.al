@@ -6,7 +6,8 @@ page 6151552 "NPR NpXml Template List"
     PageType = List;
     SourceTable = "NPR NpXml Template";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,61 +20,71 @@ page 6151552 "NPR NpXml Template List"
                 {
                     field("Code"; Rec.Code)
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Task Processor Code"; Rec."Task Processor Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Task Processor Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Xml Root Name"; Rec."Xml Root Name")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Xml Root Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Table No."; Rec."Table No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Table No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Template Version"; Rec."Template Version")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Version field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Transaction Task"; Rec."Transaction Task")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Transaction Task field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Batch Task"; Rec."Batch Task")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Batch Task field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("File Transfer"; Rec."File Transfer")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the File Transfer field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Transfer"; Rec."FTP Transfer")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the FTP Transfer field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Transfer"; Rec."API Transfer")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the API Transfer field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 part(Control6150623; "NPR NpXml Templ. Trigger List")
@@ -81,7 +92,8 @@ page 6151552 "NPR NpXml Template List"
                     Editable = false;
                     ShowFilter = false;
                     SubPageLink = "Xml Template Code" = FIELD(Code);
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }
@@ -102,8 +114,9 @@ page 6151552 "NPR NpXml Template List"
                 RunObject = Page "NPR NpXml Elements";
                 RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Edit Field Mapping action';
+                ApplicationArea = NPRRetail;
             }
             action("View Field Mapping")
             {
@@ -116,8 +129,9 @@ page 6151552 "NPR NpXml Template List"
                 RunObject = Page "NPR NpXml Elements";
                 RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Field Mapping action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -129,8 +143,9 @@ page 6151552 "NPR NpXml Template List"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Run Batch action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -141,8 +156,9 @@ page 6151552 "NPR NpXml Template List"
             {
                 Caption = 'Export Xml Template';
                 Image = Export;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Xml Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -153,8 +169,9 @@ page 6151552 "NPR NpXml Template List"
             {
                 Caption = 'Import Template';
                 Image = Import;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -165,16 +182,18 @@ page 6151552 "NPR NpXml Template List"
             {
                 Caption = 'Import Template From Blob Storage';
                 Image = ImportDatabase;
-                ApplicationArea = All;
+
                 RunObject = page "NPR NpXml Templ. Dep. From Az.";
                 ToolTip = 'Executes the Import Template action from Azure Blob storage';
+                ApplicationArea = NPRRetail;
             }
             action("Delete Selected Templates")
             {
                 Caption = 'Delete Selected Templates';
                 Image = DeleteXML;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Delete Selected Templates action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

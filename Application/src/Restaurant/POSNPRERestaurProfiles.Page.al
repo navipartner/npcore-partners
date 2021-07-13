@@ -2,11 +2,12 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
 {
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS NPRE Rest. Profile";
     Caption = 'POS Restaur. Profiles';
     CardPageId = "NPR POS Restaur. Profile Card";
     Editable = false;
+    ApplicationArea = NPRRetail;
     layout
     {
         area(content)
@@ -15,18 +16,21 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -35,12 +39,14 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
             systempart(Control6014406; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

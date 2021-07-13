@@ -8,8 +8,9 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
             {
                 Caption = 'POS Entries';
                 Image = Entries;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -114,7 +114,7 @@ table 6151528 "NPR Nc Collection Line"
 
     trigger OnInsert()
     begin
-        "Date Created" := CurrentDateTime;
+        "Date Created" := CurrentDateTime();
     end;
 }
 

@@ -7,7 +7,8 @@ page 6184511 "NPR EFT BIN Group List"
     PageType = List;
     SourceTable = "NPR EFT BIN Group";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,23 +18,27 @@ page 6184511 "NPR EFT BIN Group List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Issuer ID"; Rec."Card Issuer ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Issuer ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -52,16 +57,18 @@ page 6184511 "NPR EFT BIN Group List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = XMLport "NPR EFT BIN Import";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import File action';
+                ApplicationArea = NPRRetail;
             }
             action(ShowAllRanges)
             {
                 Caption = 'Show All Ranges';
                 Image = List;
                 RunObject = Page "NPR EFT BIN Ranges";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show All Ranges action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

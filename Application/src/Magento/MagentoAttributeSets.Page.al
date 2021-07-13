@@ -6,7 +6,8 @@ page 6151434 "NPR Magento Attribute Sets"
     PageType = List;
     SourceTable = "NPR Magento Attribute Set";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -23,13 +24,15 @@ page 6151434 "NPR Magento Attribute Sets"
                         ShowCaption = false;
                         field(Description; Rec.Description)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Description field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Used by Items"; Rec."Used by Items")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Used by Items field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -39,9 +42,10 @@ page 6151434 "NPR Magento Attribute Sets"
                     }
                     field(WidthControl; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = '                                                                                                                                                             ';
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6151400)
@@ -50,7 +54,8 @@ page 6151434 "NPR Magento Attribute Sets"
                     part(Control6151401; "NPR Magento Attribute Group")
                     {
                         SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID");
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
                 group(Control6150619)
@@ -62,7 +67,8 @@ page 6151434 "NPR Magento Attribute Sets"
                         Provider = Control6151401;
                         SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID"),
                                       "Attribute Group ID" = FIELD("Attribute Group ID");
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }

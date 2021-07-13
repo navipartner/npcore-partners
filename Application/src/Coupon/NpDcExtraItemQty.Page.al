@@ -4,8 +4,9 @@ page 6151606 "NPR NpDc Extra Item Qty."
     Caption = 'Extra Coupon Item';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpDc Extra Coupon Item";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,13 +19,15 @@ page 6151606 "NPR NpDc Extra Item Qty."
                     ShowCaption = false;
                     field("Item No."; Rec."Item No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Item No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Discount Type"; Rec."Discount Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Discount Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(Control6014411)
                     {
@@ -32,10 +35,11 @@ page 6151606 "NPR NpDc Extra Item Qty."
                         Visible = (Rec."Discount Type" = 0);
                         field("Discount Amount"; Rec."Discount Amount")
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Discount Amount per Item';
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the Discount Amount per Item field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control6014409)
@@ -44,16 +48,18 @@ page 6151606 "NPR NpDc Extra Item Qty."
                         Visible = (Rec."Discount Type" = 1);
                         field("Discount %"; Rec."Discount %")
                         {
-                            ApplicationArea = All;
+
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the Discount % field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     field(LotValidation; LotValidation)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Extra Item per Lot';
                         ToolTip = 'Specifies the value of the Extra Item per Lot field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -67,10 +73,11 @@ page 6151606 "NPR NpDc Extra Item Qty."
                         Visible = (NOT LotValidation);
                         field(TotalValidQty; ValidQty)
                         {
-                            ApplicationArea = All;
+
                             BlankZero = true;
                             Caption = 'Extra Item per Qty.';
                             ToolTip = 'Specifies the value of the Extra Item per Qty. field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -80,12 +87,13 @@ page 6151606 "NPR NpDc Extra Item Qty."
                     }
                     field(TotalMaxQty; MaxQty)
                     {
-                        ApplicationArea = All;
+
                         BlankZero = true;
                         Caption = 'Max. Extra Item Qty. per Coupon';
                         DecimalPlaces = 0 : 5;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Max. Extra Item Qty. per Coupon field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -98,25 +106,29 @@ page 6151606 "NPR NpDc Extra Item Qty."
                     ShowCaption = false;
                     field("Item Description"; Rec."Item Description")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Item Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Unit Price"; Rec."Unit Price")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Unit Price field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Profit %"; Rec."Profit %")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Profit % field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
             part(NpDcExtraItemQtySubform; "NPR NpDc ExtraItemQty. Subform")
             {
                 SubPageLink = "Coupon Type" = FIELD("Coupon Type");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

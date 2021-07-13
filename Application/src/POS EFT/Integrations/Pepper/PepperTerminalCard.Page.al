@@ -9,8 +9,9 @@ page 6184493 "NPR Pepper Terminal Card"
     Caption = 'Pepper Terminal Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Pepper Terminal";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,178 +21,211 @@ page 6184493 "NPR Pepper Terminal Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Instance ID"; Rec."Instance ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Instance ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Configuration Code"; Rec."Configuration Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Configuration Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Language; Rec.Language)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pepper Receipt Encoding"; Rec."Pepper Receipt Encoding")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pepper Receipt Encoding field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NAV Receipt Encoding"; Rec."NAV Receipt Encoding")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NAV Receipt Encoding field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Com Port"; Rec."Com Port")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Com Port field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("IP Address"; Rec."IP Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the IP Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal Type Code"; Rec."Terminal Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt Format"; Rec."Receipt Format")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Receipt Format field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Fixed Currency Code"; Rec."Fixed Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Fixed Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Open Automatically"; Rec."Open Automatically")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open Automatically field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Close Automatically"; Rec."Close Automatically")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Close Automatically field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cancel at Wrong Signature"; Rec."Cancel at Wrong Signature")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cancel at Wrong Signature field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer ID"; Rec."Customer ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("License ID"; Rec."License ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the License ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(License; HasLicense)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'License';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasLicense field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Additional Parameters"; HasAdditionalParameters)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Additional Parameters';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasAdditionalParameters field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Matchbox)
             {
                 field("Matchbox Files"; Rec."Matchbox Files")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Matchbox Files field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Matchbox Company ID"; Rec."Matchbox Company ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Matchbox Company ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Matchbox Shop ID"; Rec."Matchbox Shop ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Matchbox Shop ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Matchbox POS ID"; Rec."Matchbox POS ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Matchbox POS ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Matchbox File Name"; Rec."Matchbox File Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Matchbox File Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Print Files")
             {
                 field("Print File Open"; Rec."Print File Open")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print File Close"; Rec."Print File Close")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File Close field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print File Transaction"; Rec."Print File Transaction")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File Transaction field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print File CC Transaction"; Rec."Print File CC Transaction")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File CC Transaction field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print File Difference"; Rec."Print File Difference")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File Difference field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print File End of Day"; Rec."Print File End of Day")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File End of Day field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print File Journal"; Rec."Print File Journal")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File Journal field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print File Initialisation"; Rec."Print File Initialisation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print File Initialisation field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -207,8 +241,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = ImportCodes;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -220,8 +255,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = Import;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -236,8 +272,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = ElectronicNumber;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -249,8 +286,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -264,8 +302,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -277,8 +316,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -293,8 +333,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'License';
                     Image = Export;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -305,8 +346,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -325,8 +367,9 @@ page 6184493 "NPR Pepper Terminal Card"
                 RunPageLink = "Pepper Terminal Code" = FIELD(Code);
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Transaction Requests action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -7,8 +7,9 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR DE POS Audit Log Aux. Info";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,48 +19,57 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
             {
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Version"; Rec."NPR Version")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("TSS ID"; Rec."TSS ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the TSS ID on Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client ID"; Rec."Client ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client ID on Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction ID"; Rec."Transaction ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction ID on Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Start Time"; Rec."Start Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start DateTime of transaction on Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Finish Time"; Rec."Finish Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Finish DateTime of transaction on Fiskaly';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Fiscalized; Rec."Fiscalization Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if receipt is loged on TSS system';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error"; Rec."Has Error")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Message if receipt is not loged on TSS system';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -77,8 +87,9 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Send record to Fiskaly if not fiskalized.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -115,8 +126,9 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Get transaction data from Fiskaly.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -145,8 +157,9 @@ page 6014426 "NPR DE POS Audit Log Aux. Info"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Show Error Message.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

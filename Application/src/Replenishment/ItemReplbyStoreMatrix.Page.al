@@ -1,4 +1,4 @@
-﻿page 6014592 "NPR Item Repl. by Store Matrix"
+page 6014592 "NPR Item Repl. by Store Matrix"
 {
     Caption = 'Item Replen. by Stores Matrix';
     DeleteAllowed = false;
@@ -7,7 +7,8 @@
     SourceTable = "NPR Item Repl. by Store";
     SourceTableTemporary = true;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,9 +19,10 @@
                 Caption = 'Options';
                 field(ShowField; ShowField)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Field';
                     ToolTip = 'Specifies the value of the Show Field field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -50,45 +52,51 @@
                 }
                 field(FieldCap; FieldCap)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the FieldCap field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             repeater(Group)
             {
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Description"; Rec."Item Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Description"; Rec."Variant Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Field1; MatrixData[1])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[1];
                     Editable = Field1Editable;
                     Style = Strong;
                     StyleExpr = Emphasize1;
                     Visible = Field1Visible;
                     ToolTip = 'Specifies the value of the MatrixData[1] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -102,13 +110,14 @@
                 }
                 field(Field2; MatrixData[2])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[2];
                     Editable = Field2Editable;
                     Style = Strong;
                     StyleExpr = Emphasize2;
                     Visible = Field2Visible;
                     ToolTip = 'Specifies the value of the MatrixData[2] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -122,13 +131,14 @@
                 }
                 field(Field3; MatrixData[3])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[3];
                     Editable = Field3Editable;
                     Style = Strong;
                     StyleExpr = Emphasize3;
                     Visible = Field3Visible;
                     ToolTip = 'Specifies the value of the MatrixData[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -142,13 +152,14 @@
                 }
                 field(Field4; MatrixData[4])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[4];
                     Editable = Field4Editable;
                     Style = Strong;
                     StyleExpr = Emphasize4;
                     Visible = Field4Visible;
                     ToolTip = 'Specifies the value of the MatrixData[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -162,13 +173,14 @@
                 }
                 field(Field5; MatrixData[5])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[5];
                     Editable = Field5Editable;
                     Style = Strong;
                     StyleExpr = Emphasize5;
                     Visible = Field5Visible;
                     ToolTip = 'Specifies the value of the MatrixData[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -182,13 +194,14 @@
                 }
                 field(Field6; MatrixData[6])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[6];
                     Editable = Field6Editable;
                     Style = Strong;
                     StyleExpr = Emphasize6;
                     Visible = Field6Visible;
                     ToolTip = 'Specifies the value of the MatrixData[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -202,13 +215,14 @@
                 }
                 field(Field7; MatrixData[7])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[7];
                     Editable = Field7Editable;
                     Style = Strong;
                     StyleExpr = Emphasize7;
                     Visible = Field7Visible;
                     ToolTip = 'Specifies the value of the MatrixData[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -222,13 +236,14 @@
                 }
                 field(Field8; MatrixData[8])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[8];
                     Editable = Field8Editable;
                     Style = Strong;
                     StyleExpr = Emphasize8;
                     Visible = Field8Visible;
                     ToolTip = 'Specifies the value of the MatrixData[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -242,13 +257,14 @@
                 }
                 field(Field9; MatrixData[9])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[9];
                     Editable = Field9Editable;
                     Style = Strong;
                     StyleExpr = Emphasize9;
                     Visible = Field9Visible;
                     ToolTip = 'Specifies the value of the MatrixData[9] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -262,13 +278,14 @@
                 }
                 field(Field10; MatrixData[10])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MatrixColumnCaptions[10];
                     Editable = Field10Editable;
                     Style = Strong;
                     StyleExpr = Emphasize10;
                     Visible = Field10Visible;
                     ToolTip = 'Specifies the value of the MatrixData[10] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -298,8 +315,9 @@
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
                 Visible = false;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Variety action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

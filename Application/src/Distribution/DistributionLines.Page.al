@@ -6,8 +6,9 @@ page 6151059 "NPR Distribution Lines"
     Caption = 'Distribution Lines';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Distribution Lines";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,69 +18,82 @@ page 6151059 "NPR Distribution Lines"
             {
                 field("Distribution Line"; Rec."Distribution Line")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Line field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Item"; Rec."Distribution Item")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Item field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Variant"; Rec."Item Variant")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Variant field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Location; Rec.Location)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Group Member"; Rec."Distribution Group Member")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Group Member field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Required"; Rec."Action Required")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Action Required field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Quantity"; Rec."Distribution Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Avaliable Quantity"; Rec."Avaliable Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Avaliable Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Demanded Quantity"; Rec."Demanded Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Demanded Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Org. Distribution Quantity"; Rec."Org. Distribution Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Org. Distribution Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Cost Value (LCY)"; Rec."Distribution Cost Value (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Cost Value (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Created"; Rec."Date Created")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date Created field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

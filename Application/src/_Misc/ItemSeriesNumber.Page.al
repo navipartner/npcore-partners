@@ -4,8 +4,9 @@ page 6014442 "NPR Item - Series Number"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Item Ledger Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,28 +17,33 @@ page 6014442 "NPR Item - Series Number"
                 ShowCaption = false;
                 field("Serial No."; Rec."Serial No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serial No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Expiration Date"; Rec."Expiration Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Expiration Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

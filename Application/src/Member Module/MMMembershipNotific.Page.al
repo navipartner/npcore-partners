@@ -5,8 +5,9 @@ page 6060143 "NPR MM Membership Notific."
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Membership Notific.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,85 +17,101 @@ page 6060143 "NPR MM Membership Notific."
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Code"; Rec."Notification Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date To Notify"; Rec."Date To Notify")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date To Notify field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Status"; Rec."Notification Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Processed At"; Rec."Notification Processed At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Processed At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Processed By User"; Rec."Notification Processed By User")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Processed By User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked By User"; Rec."Blocked By User")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked By User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Trigger"; Rec."Notification Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Filter Value"; Rec."Template Filter Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Filter Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Member Role"; Rec."Target Member Role")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Member Role field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Include NP Pass"; Rec."Include NP Pass")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Include NP Pass field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Method"; Rec."Processing Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Method field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -114,8 +131,9 @@ page 6060143 "NPR MM Membership Notific."
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Notific. Entry";
                 RunPageLink = "Notification Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Members Notified action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -127,8 +145,9 @@ page 6060143 "NPR MM Membership Notific."
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Send Notifications action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

@@ -1,4 +1,4 @@
-﻿page 6151451 "NPR Magento DragDropPic. Addin"
+page 6151451 "NPR Magento DragDropPic. Addin"
 {
     Caption = ' ';
     InsertAllowed = false;
@@ -14,7 +14,8 @@
         {
             usercontrol(DragDropAddin; "NPR DragDrop")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger AddInReady();
                 begin

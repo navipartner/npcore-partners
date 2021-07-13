@@ -57,9 +57,9 @@ table 6151533 "NPR Nc Endpoint"
 
     trigger OnRename()
     var
-        TextRenameNotAllowed: Label 'Renaming %1 is not allowed.';
+        RenamingNotAllwedErr: Label 'Renaming %1 is not allowed.', Comment = '%1="NPR Nc Endpoint"."TableCaption()"';
     begin
-        Error(TextRenameNotAllowed, TableCaption);
+        Error(RenamingNotAllwedErr, TableCaption());
     end;
 
     procedure SetupEndpoint()
@@ -85,13 +85,13 @@ table 6151533 "NPR Nc Endpoint"
     local procedure OpenEndpointSetup()
     var
         Handled: Boolean;
-        TextNoSetup: Label 'No setup is associated with %1 %2.';
+        TextNoSetupErr: Label 'No setup is associated with %1 %2.', Comment = '%1=Rec.FieldCaption("Endpoint Type");%2=Rec."Endpoint Type"';
     begin
         TestField("Endpoint Type");
         Handled := false;
         OnOpenEndpointSetup(Handled);
         if not Handled then
-            Error(TextNoSetup, FieldCaption("Endpoint Type"), "Endpoint Type");
+            Error(TextNoSetupErr, Rec.FieldCaption("Endpoint Type"), Rec."Endpoint Type");
     end;
 
     [IntegrationEvent(TRUE, false)]

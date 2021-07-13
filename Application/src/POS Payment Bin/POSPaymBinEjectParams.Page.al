@@ -8,8 +8,9 @@ page 6150622 "NPR POS Paym. Bin Eject Params"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Paym. Bin Eject Param.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,29 +20,33 @@ page 6150622 "NPR POS Paym. Bin Eject Params"
             {
                 field(ParameterName; ParameterName)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Name';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ParameterDescription; ParameterDescription)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ParameterValue; ParameterValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Value';
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin

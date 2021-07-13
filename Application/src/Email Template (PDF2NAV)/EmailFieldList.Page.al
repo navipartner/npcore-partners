@@ -20,15 +20,17 @@ page 6059792 "NPR E-mail Field List"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Field Name';
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

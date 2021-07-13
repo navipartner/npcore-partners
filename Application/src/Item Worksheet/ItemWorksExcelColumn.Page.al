@@ -4,7 +4,8 @@ page 6060053 "NPR Item Works. Excel Column"
     PageType = List;
     SourceTable = "NPR Item Worksh. Excel Column";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -13,41 +14,48 @@ page 6060053 "NPR Item Works. Excel Column"
             {
                 field("Excel Column"; Rec."Excel Column")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Excel Column field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Excel Header Text"; Rec."Excel Header Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Excel Header Text field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sample Data Row 1"; Rec."Sample Data Row 1")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Sample Data Row 1 field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sample Data Row 2"; Rec."Sample Data Row 2")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Sample Data Row 2 field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sample Data Row 3"; Rec."Sample Data Row 3")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Sample Data Row 3 field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Process as"; Rec."Process as")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Process as field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Map to Caption"; Rec."Map to Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Map to Caption field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -59,7 +67,7 @@ page 6060053 "NPR Item Works. Excel Column"
         {
             action("Select Excel to Map")
             {
-                ApplicationArea = All;
+
                 Caption = 'Select Excel to Map';
                 Image = ImportExcel;
                 Promoted = true;
@@ -67,6 +75,7 @@ page 6060053 "NPR Item Works. Excel Column"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Select Excel to Map action.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -76,10 +85,11 @@ page 6060053 "NPR Item Works. Excel Column"
             }
             action(InsertMappedFields)
             {
-                ApplicationArea = All;
+
                 Caption = 'Insert all Mapped fields in Excel Mapping';
                 Image = Add;
                 ToolTip = 'Executes the Insert all Mapped fields in Excel Mapping action.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -3,8 +3,7 @@ report 6014420 "NPR Item Group Top"
     RDLCLayout = './src/_Reports/layouts/Item Group Top.rdlc';
     Caption = 'Item Group Top';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
-
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Dimension Value"; "Dimension Value")
@@ -246,21 +245,24 @@ report 6014420 "NPR Item Group Top"
                     {
                         Caption = 'Show Type';
                         OptionCaption = 'Quantity,Sale(LCY),Contribution Margin,Contribution Ratio';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Qty"; ShowQty)
                     {
                         Caption = 'Show Quantity';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Quantity field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sorting"; SortOrder)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sort By field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

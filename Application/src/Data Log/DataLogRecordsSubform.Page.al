@@ -7,8 +7,9 @@ page 6059899 "NPR Data Log Records Subform"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Data Log Field";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,28 +19,33 @@ page 6059899 "NPR Data Log Records Subform"
             {
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Previous Field Value"; Rec."Previous Field Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Previous Field Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Value Changed"; Rec."Field Value Changed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Value Changed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Value"; Rec."Field Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
