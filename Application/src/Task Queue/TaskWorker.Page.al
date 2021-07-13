@@ -4,7 +4,8 @@ page 6059907 "NPR Task Worker"
     PageType = List;
     SourceTable = "NPR Task Worker";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -12,7 +13,8 @@ page 6059907 "NPR Task Worker"
         {
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger AddInReady()
                 begin
@@ -29,88 +31,105 @@ page 6059907 "NPR Task Worker"
             {
                 field("Server Instance ID"; Rec."Server Instance ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Server Instance ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Session ID"; Rec."Session ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Session ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Login Time"; Rec."Login Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Login Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Company"; Rec."Current Company")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Company field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last HeartBeat (When Idle)"; Rec."Last HeartBeat (When Idle)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last HeartBeat (When Idle) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Check Interval"; Rec."Current Check Interval")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Check Interval field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Task Company"; Rec."Current Task Company")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Task Company field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Task Template"; Rec."Current Task Template")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Task Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Task Batch"; Rec."Current Task Batch")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Task Batch field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Task Line No."; Rec."Current Task Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Task Line no. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Language ID"; Rec."Current Language ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Language ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Application Name"; Rec."Application Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Application Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("DB Name"; Rec."DB Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Database Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Host Name"; Rec."Host Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Host Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

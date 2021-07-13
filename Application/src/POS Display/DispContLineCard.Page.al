@@ -14,33 +14,37 @@ page 6059999 "NPR Disp. Cont. Line Card"
             {
                 field(Url; Rec.Url)
                 {
-                    ApplicationArea = All;
+
                     Visible = UrlIsVisible;
                     ToolTip = 'Specifies the value of the Url field';
+                    ApplicationArea = NPRRetail;
                 }
                 // field(Image; Rec.Picture)
                 field(Image; Rec.Image)
                 {
-                    ApplicationArea = All;
+
                     Visible = ImageIsVisible;
                     ToolTip = 'Specifies the value of the Image field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6014404; "NPR Disp. Content Lines Img")
             {
                 SubPageLink = "Content Code" = FIELD("Content Code"),
                               "Line No." = FIELD("Line No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
         {
             part(DispContentLinesImg; "NPR Disp. Content Lines Img")
             {
-                ApplicationArea = All;
+
                 Caption = 'Picture';
                 SubPageLink = "Content Code" = field("Content Code"),
                               "Line No." = field("Line No.");
+                ApplicationArea = NPRRetail;
             }
         }
     }

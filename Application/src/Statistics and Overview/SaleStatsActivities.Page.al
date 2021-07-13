@@ -3,8 +3,8 @@ page 6059988 "NPR Sale Stats Activities"
     Caption = 'Sale Statistics';
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "Business Chart Buffer";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -12,7 +12,8 @@ page 6059988 "NPR Sale Stats Activities"
         {
             usercontrol(SalesChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger AddInReady()
                 begin
@@ -20,21 +21,22 @@ page 6059988 "NPR Sale Stats Activities"
             }
             field("Period Start Filter"; Date.GetFilter("Period Start"))
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the Period Start filter';
             }
             field("Figure to display"; SelectStr(FigureToDisplay + 1, Text0001))
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ShowCaption = false;
                 ToolTip = 'Specifies Figure to display';
             }
             field("Period Type"; Date."Period Type")
             {
-                ApplicationArea = All;
+
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the Date.Period Type field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -46,9 +48,10 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 1")
             {
                 Caption = 'Day';
-                ApplicationArea = All;
+
                 ToolTip = 'Filters by day';
                 Image = Calendar;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -59,9 +62,10 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 7")
             {
                 Caption = 'Week';
-                ApplicationArea = All;
+
                 ToolTip = 'Filters by week';
                 Image = Calendar;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -72,9 +76,10 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 31")
             {
                 Caption = 'Month';
-                ApplicationArea = All;
+
                 ToolTip = 'Filters by month';
                 Image = Calendar;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -85,9 +90,10 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 3")
             {
                 Caption = 'Quarter';
-                ApplicationArea = All;
+
                 ToolTip = 'Filters by quarter';
                 Image = Calendar;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -98,9 +104,10 @@ page 6059988 "NPR Sale Stats Activities"
             action("NPR 12")
             {
                 Caption = 'Year';
-                ApplicationArea = All;
+
                 ToolTip = 'Filters by year';
                 Image = Calendar;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -112,8 +119,9 @@ page 6059988 "NPR Sale Stats Activities"
             {
                 Caption = 'Prev';
                 Image = PreviousSet;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Prev action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -124,8 +132,9 @@ page 6059988 "NPR Sale Stats Activities"
             {
                 Caption = 'Next';
                 Image = NextSet;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Next action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -139,8 +148,9 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Sale (Qty.)';
                     Image = Sales;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Sale (Qty.) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -151,8 +161,9 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Sale (LCY)';
                     Image = SalesPrices;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Sale (LCY) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -163,8 +174,9 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Profit (LCY)';
                     Image = Turnover;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Profit (LCY) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -175,8 +187,9 @@ page 6059988 "NPR Sale Stats Activities"
                 {
                     Caption = 'Profit (Pct.)';
                     Image = Percentage;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Profit (Pct.) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -190,9 +203,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Point)
                 {
                     Caption = 'Point';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a point chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -202,9 +216,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Bubble)
                 {
                     Caption = 'Bubble';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a bubble chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -214,9 +229,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Line)
                 {
                     Caption = 'Line';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a line chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -226,9 +242,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StepLine)
                 {
                     Caption = 'StepLine';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a stepline chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -238,9 +255,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Column)
                 {
                     Caption = 'Column';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a column chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -250,9 +268,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedColumn)
                 {
                     Caption = 'StackedColumn';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a stackedColumn chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -262,9 +281,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedColumn100)
                 {
                     Caption = 'StackedColumn100';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a stackedColumn100 chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -274,9 +294,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action("Area")
                 {
                     Caption = 'Area';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates an area chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -286,9 +307,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedArea)
                 {
                     Caption = 'StackedArea';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a stackedArea chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -298,9 +320,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(StackedArea100)
                 {
                     Caption = 'StackedArea100';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a stackedArea100 chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -310,9 +333,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Pie)
                 {
                     Caption = 'Pie';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a pie chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -322,9 +346,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Doughnut)
                 {
                     Caption = 'Doughnut';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a doughnut chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -334,9 +359,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Range)
                 {
                     Caption = 'Range';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a range chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -346,9 +372,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Radar)
                 {
                     Caption = 'Radar';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a radar chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -358,9 +385,10 @@ page 6059988 "NPR Sale Stats Activities"
                 action(Funnel)
                 {
                     Caption = 'Funnel';
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates a funnel chart';
                     Image = SelectChart;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

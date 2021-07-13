@@ -4,8 +4,9 @@ page 6060163 "NPR Event Attr. Row Values"
     Caption = 'Attribute Row Values';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Event Attr. Row Value";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,28 +16,32 @@ page 6060163 "NPR Event Attr. Row Values"
             {
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = FormulaLookupMode;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Visible = NOT FormulaLookupMode;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Formula; Rec.Formula)
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Visible = NOT FormulaLookupMode;
                     ToolTip = 'Specifies the value of the Formula field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -45,9 +50,10 @@ page 6060163 "NPR Event Attr. Row Values"
                 }
                 field(Promote; Rec.Promote)
                 {
-                    ApplicationArea = All;
+
                     Visible = NOT FormulaLookupMode;
                     ToolTip = 'Specifies the value of the Promote field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

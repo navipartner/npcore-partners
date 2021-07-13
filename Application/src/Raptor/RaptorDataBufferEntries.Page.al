@@ -19,36 +19,42 @@ page 6151492 "NPR Raptor Data Buffer Entries"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date-Time Created"; Rec."Date-Time Created")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowCreatedDateTime;
                     ToolTip = 'Specifies the value of the Date-Time Created field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Description"; Rec."Item Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowPriority;
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -67,8 +73,9 @@ page 6151492 "NPR Raptor Data Buffer Entries"
                 PromotedCategory = Process;
                 RunObject = Page "Item Card";
                 RunPageLink = "No." = FIELD("Item No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Item Card action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -5,8 +5,9 @@ page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Unit Rcpt.Txt Profile";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,20 +17,23 @@ page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(IsReceiptTextSet; IsReceiptTextSet)
                 {
                     Editable = false;
                     Caption = 'Is Receipt Text Set';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the value of the Sales Ticket Receipt Text field is set. Sales Ticket Receipt Text field is available on the card.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

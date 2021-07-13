@@ -6,8 +6,9 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Member Info Capture";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,34 +18,40 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response Status"; Rec."Response Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Response Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response Message"; Rec."Response Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Response Message field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -64,8 +71,9 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

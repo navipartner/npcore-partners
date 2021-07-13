@@ -9,7 +9,8 @@ page 6184489 "NPR Pepper EFT Result Codes"
     PageType = List;
     SourceTable = "NPR Pepper EFT Result Code";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,43 +20,51 @@ page 6184489 "NPR Pepper EFT Result Codes"
             {
                 field("Integration Type"; Rec."Integration Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Integration Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Type Code"; Rec."Transaction Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Subtype Code"; Rec."Transaction Subtype Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Subtype Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Successful; Rec.Successful)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Successful field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Long Description"; Rec."Long Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Long Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Open Terminal and Retry"; Rec."Open Terminal and Retry")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open Terminal and Retry field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -4,9 +4,10 @@ page 6151559 "NPR NpXml Templ. Trigger List"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR NpXml Template Trigger";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,39 +19,45 @@ page 6151559 "NPR NpXml Templ. Trigger List"
                 IndentationControls = "Table Name";
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Insert Trigger"; Rec."Insert Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Insert Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Modify Trigger"; Rec."Modify Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Modify Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Trigger"; Rec."Delete Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

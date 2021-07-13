@@ -1,4 +1,4 @@
-﻿page 6151253 "NPR Activities 2"
+page 6151253 "NPR Activities 2"
 {
 
     Caption = 'Retail Activities';
@@ -16,20 +16,23 @@
 
                 field("Pending Inc. Documents"; Rec."Pending Inc. Documents")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pending Inc. Documents field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processed Error Tasks"; Rec."Processed Error Tasks")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "NPR Nc Task List";
                     ToolTip = 'Specifies the value of the Processed Error Tasks field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Failed Webshop Payments"; Rec."Failed Webshop Payments")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "NPR Magento Payment Line List";
                     ToolTip = 'Specifies the value of the Failed Webshop Payments field';
+                    ApplicationArea = NPRRetail;
                 }
 
             }

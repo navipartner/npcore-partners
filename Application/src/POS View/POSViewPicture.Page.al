@@ -13,9 +13,10 @@ page 6014406 "NPR POS View Picture"
         {
             field(Image; Rec.Image)
             {
-                ApplicationArea = All;
+
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the Picture field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -26,10 +27,11 @@ page 6014406 "NPR POS View Picture"
         {
             action(ImportPicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a picture file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -60,11 +62,12 @@ page 6014406 "NPR POS View Picture"
             }
             action(ExportPicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Export';
                 Enabled = DeleteExportEnabled;
                 Image = Export;
                 ToolTip = 'Export the picture to a file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -83,11 +86,12 @@ page 6014406 "NPR POS View Picture"
             }
             action(DeletePicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Delete';
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
                 ToolTip = 'Delete the record.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

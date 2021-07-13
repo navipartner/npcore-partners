@@ -10,9 +10,10 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
     MultipleNewLines = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR POS Entry Sales Doc. Link";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -22,13 +23,15 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
             {
                 field("Sales Document Type"; Rec."Sales Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Document No"; Rec."Sales Document No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Document No field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -44,8 +47,9 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
                 }
                 field("POS Entry Reference Type"; Rec."POS Entry Reference Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry Reference Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

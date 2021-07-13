@@ -8,7 +8,8 @@ page 6150681 "NPR NPRE Item Routing Profiles"
     PageType = List;
     SourceTable = "NPR NPRE Item Routing Profile";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,20 +19,23 @@ page 6150681 "NPR NPRE Item Routing Profiles"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(AssignedFlowStatuses; Rec.AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Serving Steps';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Serving Steps field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -40,10 +44,11 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsString())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -69,8 +74,9 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Serving Steps action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -88,8 +94,9 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Print/Prod. Categories action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

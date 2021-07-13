@@ -8,7 +8,7 @@
     end;
 
     var
-        Text000: Label 'Test Error E-mail sent to:\  %1';
+        TestEmailMsg: Label 'Test Error E-mail sent to:\  %1', Comment = '%1=NcImportType."E-mail address on Error"';
 
     procedure InsertImportEntries(ImportType: Code[10]; documents: XMLport "NPR Nc Import Entry"; var NewImportEntry: Record "NPR Nc Import Entry" temporary)
     var
@@ -226,7 +226,7 @@
         NcImportEntry.Insert();
 
         SendErrorMail(NcImportEntry);
-        Message(Text000, NcImportType."E-mail address on Error");
+        Message(TestEmailMsg, NcImportType."E-mail address on Error");
     end;
 }
 

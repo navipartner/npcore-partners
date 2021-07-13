@@ -8,7 +8,8 @@ page 6151416 "NPR Magento Categories"
     SourceTable = "NPR Magento Category";
     SourceTableView = SORTING(Path);
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -21,30 +22,35 @@ page 6151416 "NPR Magento Categories"
                 ShowAsTree = true;
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Parent Category Id"; Rec."Parent Category Id")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Parent Category Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Picture; Rec.Picture)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Picture field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -63,8 +69,9 @@ page 6151416 "NPR Magento Categories"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupCategories;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Categories action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -82,8 +89,9 @@ page 6151416 "NPR Magento Categories"
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Display Config action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -99,8 +107,9 @@ page 6151416 "NPR Magento Categories"
             {
                 Caption = 'Items';
                 Image = Item;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Items action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

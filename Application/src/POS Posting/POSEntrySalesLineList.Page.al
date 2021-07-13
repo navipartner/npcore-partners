@@ -4,9 +4,10 @@ page 6150655 "NPR POS Entry Sales Line List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PromotedActionCategories = 'New,Process,Report,POS Entry';
     SourceTable = "NPR POS Entry Sales Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,114 +17,136 @@ page 6150655 "NPR POS Entry Sales Line List"
             {
                 field("Entry Date"; Rec."Entry Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Period Register No."; Rec."POS Period Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Period Register No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Discount %"; Rec."Line Discount %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Excl. VAT"; Rec."Amount Excl. VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Excl. VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. VAT"; Rec."Amount Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Incl. VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Withhold Item"; Rec."Withhold Item")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Withhold Item field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Authorised by"; Rec."Discount Authorised by")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount Authorised by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -146,8 +169,9 @@ page 6150655 "NPR POS Entry Sales Line List"
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the POS Entry Card action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

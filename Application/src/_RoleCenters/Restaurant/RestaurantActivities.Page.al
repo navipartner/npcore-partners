@@ -1,4 +1,4 @@
-﻿page 6151335 "NPR Restaurant Activities"
+page 6151335 "NPR Restaurant Activities"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -16,19 +16,22 @@
                 CuegroupLayout = Wide;
                 field("Waiter Pads - Open"; Rec."Waiter Pads - Open")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Waiter Pads - Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Kitchen Requests - Open"; Rec."Kitchen Requests - Open")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Kitchen Requests - Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pending Reservations"; Rec."Pending Reservations")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Pending Reservations';
                     ToolTip = 'Specifies the value of the Pending Reservations field';
+                    ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     begin
                         DrillDownPendingReservations();
@@ -40,23 +43,27 @@
                 Caption = 'Current Table Status';
                 field("Seatings: Ready"; Rec."Seatings: Ready")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Available field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Occupied"; Rec."Seatings: Occupied")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Occupied field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Reserved"; Rec."Seatings: Reserved")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reserved field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Cleaning Required"; Rec."Seatings: Cleaning Required")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cleaning Required field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(SeatStatus)
@@ -64,13 +71,15 @@
                 Caption = 'Seats';
                 field("Available seats"; Rec."Available seats")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Available Seats field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Inhouse Guests"; Rec."Inhouse Guests")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Inhouse Guests field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup("My User Tasks")
@@ -78,10 +87,11 @@
                 Caption = 'My User Tasks';
                 field("Pending User Tasks"; UserTaskManagement.GetMyPendingUserTasksCount())
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Pending User Tasks';
                     Image = Checklist;
                     ToolTip = 'Specifies the number of pending tasks that are assigned to you or to a group that you are a member of.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -97,8 +107,9 @@
                 Caption = 'Today''s Summary';
                 field("Turnover (LCY)"; Rec."Turnover (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Turnover field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -107,8 +118,9 @@
                 }
                 field("No. of Sales"; Rec."No. of Sales")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Sales field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -117,18 +129,21 @@
                 }
                 field("Total No. of Guests"; Rec."Total No. of Guests")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total No. of Guests field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Average per Sale (LCY)"; Rec."Average per Sale (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Average per Sale field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Average per Guest (LCY)"; Rec."Average per Guest (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Average per Guest field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(Reservations)
@@ -136,18 +151,21 @@
                 Caption = 'Reservations';
                 field("Completed Reservations"; Rec."Completed Reservations")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Completed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No-Shows"; Rec."No-Shows")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No-Shows field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cancelled Reservations"; Rec."Cancelled Reservations")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cancelled field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -159,10 +177,11 @@
         {
             action("Set Up Cues")
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Set Up Cues';
                 Image = Setup;
                 ToolTip = 'Set up the cues (status tiles) related to the role.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -174,10 +193,11 @@
             }
             action("Select Restaurant")
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Select Restaurant';
                 Image = NewBranch;
                 ToolTip = 'Select active restaurant for the cue calculations.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

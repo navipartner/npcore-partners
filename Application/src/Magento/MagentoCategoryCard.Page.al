@@ -19,13 +19,15 @@ page 6151414 "NPR Magento Category Card"
                     ShowCaption = false;
                     field(Id; Rec.Id)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Id field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Name; Rec.Name)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -37,10 +39,11 @@ page 6151414 "NPR Magento Category Card"
                     }
                     field("Description"; Format(Rec.Description.HasValue))
                     {
-                        ApplicationArea = All;
+
                         AssistEdit = true;
                         Caption = 'Description';
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -57,9 +60,10 @@ page 6151414 "NPR Magento Category Card"
                     }
                     field("Short Description"; Format(Rec."Short Description".HasValue))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Short Description';
                         ToolTip = 'Specifies the value of the Short Description field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -76,8 +80,9 @@ page 6151414 "NPR Magento Category Card"
                     }
                     field(Picture; Rec.Picture)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Picture field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150620)
@@ -86,48 +91,57 @@ page 6151414 "NPR Magento Category Card"
                     ShowCaption = false;
                     field("Is Active"; Rec."Is Active")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Is Active field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Is Anchor"; Rec."Is Anchor")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Is Anchor field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show In Navigation Menu"; Rec."Show In Navigation Menu")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show In Navigation Menu field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Seo Link"; Rec."Seo Link")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Seo Link field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Meta Title"; Rec."Meta Title")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Meta Title field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Meta Keywords"; Rec."Meta Keywords")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Meta Keywords field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Meta Description"; Rec."Meta Description")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Meta Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sorting"; Rec.Sorting)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sorting field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Icon; Rec.Icon)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Icon field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -137,7 +151,8 @@ page 6151414 "NPR Magento Category Card"
                 ShowFilter = false;
                 SubPageLink = "Parent Category Id" = FIELD(FILTER(Id));
                 Visible = MagentoItemGroupSubformVisible;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
@@ -147,7 +162,8 @@ page 6151414 "NPR Magento Category Card"
                 SubPageLink = Type = CONST("Item Group"),
                               Name = FIELD(Picture);
                 Visible = (NOT HasSetupCategories);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(IconPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
@@ -157,7 +173,8 @@ page 6151414 "NPR Magento Category Card"
                 SubPageLink = Type = CONST("Item Group"),
                               Name = FIELD(Icon);
                 Visible = (NOT HasSetupCategories);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -171,8 +188,9 @@ page 6151414 "NPR Magento Category Card"
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Display Config action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

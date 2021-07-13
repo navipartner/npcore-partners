@@ -2,7 +2,7 @@ report 6014494 "NPR MM Member Evaluation"
 {
     Caption = 'Member Evaluation';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM_MemberEvaluation.rdl';
 
@@ -212,20 +212,23 @@ report 6014494 "NPR MM Member Evaluation"
                     field(StartDate; LowDate)
                     {
                         Caption = 'From Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Select memberships that was active after this date.';
+                        ApplicationArea = NPRRetail;
                     }
                     field(EndDate; HighDate)
                     {
                         Caption = 'Until Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Select memberships that was active before this date.';
+                        ApplicationArea = NPRRetail;
                     }
                     field(CompleteHistory; FullHistory)
                     {
                         Caption = 'Include Full History';
-                        ApplicationArea = All;
+
                         ToolTip = 'Ignore dates when calculating metrics for member activity.';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

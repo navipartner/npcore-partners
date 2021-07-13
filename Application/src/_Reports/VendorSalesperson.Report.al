@@ -4,7 +4,7 @@ report 6014529 "NPR Vendor/Salesperson"
     RDLCLayout = './src/_Reports/layouts/VendorSalesperson.rdlc';
     Caption = 'Vendor/Salesperson';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Vendor; Vendor)

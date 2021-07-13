@@ -9,7 +9,8 @@ page 6150642 "NPR POS Info List"
     PageType = List;
     SourceTable = "NPR POS Info";
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -20,38 +21,45 @@ page 6150642 "NPR POS Info List"
                 Caption = 'Group';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Message"; Rec.Message)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Input Type"; Rec."Input Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Input Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Input Mandatory"; Rec."Input Mandatory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Input Mandatory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Copy from Header"; Rec."Copy from Header")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Copy from Header field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

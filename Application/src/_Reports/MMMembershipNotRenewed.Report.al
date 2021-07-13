@@ -4,7 +4,7 @@ report 6060136 "NPR MM Membership Not Renewed"
     RDLCLayout = './src/_Reports/layouts/MM Membership Not Renewed.rdlc';
     Caption = 'Membership Not Renewed';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("MM Membership Setup"; "NPR MM Membership Setup")
@@ -222,29 +222,33 @@ report 6060136 "NPR MM Membership Not Renewed"
                     ShowCaption = false;
                     field("Reference Date"; ReferenceDate)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Reference Date 1';
                         ToolTip = 'Specifies the value of the Reference Date 1 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Membership Status"; MembershipStatus)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Membership Status (Reference Date 1)';
                         OptionCaption = 'Active,Not Active,New,Renew,Upgrade,Extend';
                         ToolTip = 'Specifies the value of the Membership Status (Reference Date 1) field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Reference Date 2"; ReferenceDate2)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Reference Date 2';
                         ToolTip = 'Specifies the value of the Reference Date 2 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Membership Status 2"; MembershipStatus2)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Membership Status (Reference Date 2)';
                         OptionCaption = ' ,Active,Not Active,New,Renew,Upgrade,Extend';
                         ToolTip = 'Specifies the value of the Membership Status (Reference Date 2) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

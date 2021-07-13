@@ -7,8 +7,9 @@ pageextension 6014421 "NPR Chart of Accounts" extends "Chart of Accounts"
             field(NPRRetailPayment; NPRAuxGLAccount."Retail Payment")
             {
                 Caption = 'Retail Payment';
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Retail Payment field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin

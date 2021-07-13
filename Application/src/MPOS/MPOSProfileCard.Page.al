@@ -14,18 +14,21 @@ page 6150698 "NPR MPOS Profile Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Admission Web Url"; Rec."Ticket Admission Web Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Admission Web Url field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

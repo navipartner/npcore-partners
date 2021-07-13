@@ -14,9 +14,10 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
             {
                 field(LineIsMarked; LineIsMarked)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Select';
                     ToolTip = 'Specifies the value of the Select field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -25,207 +26,237 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                 }
                 field("Waiter Pad No."; Rec."Waiter Pad No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Waiter Pad No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Start Date"; Rec."Start Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Start Time"; Rec."Start Time")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Start Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Billed Quantity"; Rec."Billed Quantity")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Billed Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sale Type"; Rec."Sale Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sale Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Order No. from Web"; Rec."Order No. from Web")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Order No. from Web field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Order Line No. from Web"; Rec."Order Line No. from Web")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Order Line No. from Web field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Code"; Rec."Discount Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Invoice Discount"; Rec."Allow Invoice Discount")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Allow Invoice Discount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Line Discount"; Rec."Allow Line Discount")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Allow Line Discount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invoice Discount Amount"; Rec."Invoice Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Invoice Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Excl. VAT"; Rec."Amount Excl. VAT")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount Excl. VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. VAT"; Rec."Amount Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount Incl. VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Status"; Rec."Line Status")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Status Description"; Rec."Line Status Description")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line Status Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(AssignedFlowStatuses; Rec.AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Serving Steps';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Serving Steps field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -234,11 +265,12 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsString())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -247,13 +279,15 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                 }
                 field("Kitchen Order Sent"; Rec."Kitchen Order Sent")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Kitchen Order Sent field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Requested"; Rec."Serving Requested")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serving Requested field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -267,9 +301,10 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
             {
                 Enabled = false;
                 Visible = false;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Change Quantiy action';
                 Image = ChangeTo;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -280,9 +315,10 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
             {
                 Enabled = false;
                 Visible = false;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Delete Line action';
                 Image = DeleteRow;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

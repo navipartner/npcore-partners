@@ -16,14 +16,16 @@ page 6151436 "NPR Magento Item Attr."
                 ShowCaption = false;
                 field("Attribute Description"; Rec."Attribute Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; GetValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Value';
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6150617; "NPR Magento Item Attr. Values")
@@ -31,7 +33,8 @@ page 6151436 "NPR Magento Item Attr."
                 SubPageLink = "Attribute ID" = FIELD("Attribute ID"),
                               "Item No." = FIELD("Item No."),
                               "Variant Code" = FIELD("Variant Code");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

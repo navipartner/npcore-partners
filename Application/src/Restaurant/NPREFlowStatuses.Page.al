@@ -7,7 +7,8 @@ page 6150679 "NPR NPRE Flow Statuses"
     SourceTable = "NPR NPRE Flow Status";
     SourceTableView = SORTING("Status Object", "Flow Order");
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,38 +18,44 @@ page 6150679 "NPR NPRE Flow Statuses"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Status Object"; Rec."Status Object")
                 {
-                    ApplicationArea = All;
+
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                     ToolTip = 'Specifies the value of the Status Object field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Flow Order"; Rec."Flow Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Flow Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Waiter Pad Status Code"; Rec."Waiter Pad Status Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = IsServingSteps;
                     ToolTip = 'Specifies the value of the Waiter Pad Status Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Print/Prod. Categories';
                     Visible = ShowPrintCategories;
                     ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -57,22 +64,22 @@ page 6150679 "NPR NPRE Flow Statuses"
                 }
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether this status will be visible in restaurant view';
                 }
                 field(Color; Rec.Color)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the color of the status in restaurant view';
                 }
                 field("Status Color Priority"; Rec."Status Color Priority")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the priority this status''s color will take, when defining table colors in restaurant view. Higher number means higher priority';
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the icon of the status in restaurant view';
                 }
             }
@@ -95,8 +102,9 @@ page 6150679 "NPR NPRE Flow Statuses"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Print/Prod. Categories action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

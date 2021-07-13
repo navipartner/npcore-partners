@@ -6,8 +6,9 @@ page 6059901 "NPR Task Batch"
     Caption = 'Task Batch';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Task Batch";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,53 +18,63 @@ page 6059901 "NPR Task Batch"
             {
                 field("Journal Template Name"; Rec."Journal Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Common Companies"; Rec."Common Companies")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Common Companies field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Master Company"; Rec."Master Company")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Master Company field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mail From Address"; Rec."Mail From Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mail From Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mail From Name"; Rec."Mail From Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mail From Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Type"; Rec."Template Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Log After"; Rec."Delete Log After")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Log After field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

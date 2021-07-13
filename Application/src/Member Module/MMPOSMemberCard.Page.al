@@ -1,8 +1,5 @@
 page 6060140 "NPR MM POS Member Card"
 {
-
-    //                                     - Controls moved to the tab: Picture, Gender, Birthday, "E-Mail News Letter"
-
     UsageCategory = None;
     Caption = 'Member Details';
     DataCaptionExpression = Rec."External Member No." + ' - ' + Rec."Display Name";
@@ -20,45 +17,52 @@ page 6060140 "NPR MM POS Member Card"
             {
                 field("External Member No."; Rec."External Member No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Member No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Display Name"; Rec."Display Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Display Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("GDPR Approval"; MembershipRoleDisplay."GDPR Approval")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'GDPR Approval';
                     Editable = false;
                     ToolTip = 'Specifies the value of the GDPR Approval field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(CRM)
@@ -66,30 +70,35 @@ page 6060140 "NPR MM POS Member Card"
                 // field(Picture; Rec.Image)
                 field(Picture; Rec.Picture)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Picture field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Gender; Rec.Gender)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gender field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Birthday; Rec.Birthday)
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = IsBirthday;
                     ToolTip = 'Specifies the value of the Birthday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Method"; Rec."Notification Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Method field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Membership)
@@ -100,54 +109,61 @@ page 6060140 "NPR MM POS Member Card"
                 //GridLayout = Columns;
                 field("External Membership No."; Membership."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'External Membership No.';
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Membership."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Membership Code';
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Membership."Company Name")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Company Name';
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Control6014407)
                 {
                     ShowCaption = false;
                     field("Remaining Points"; RemainingPoints)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Remaining Points';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Remaining Points field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Valid From Date"; ValidFromDate)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Valid From Date';
                         Visible = false;
                         ToolTip = 'Specifies the value of the Valid From Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Valid Until Date"; ValidUntilDate)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Valid Until Date';
                         Style = Unfavorable;
                         StyleExpr = UntilDateAttentionAccent;
                         ToolTip = 'Specifies the value of the Valid Until Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Remaining Amount Text"; RemainingAmountText)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Open / Due Amount.';
                         Style = Unfavorable;
                         StyleExpr = AccentuateDueAmount;
                         ToolTip = 'Specifies the value of the Open / Due Amount. field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -157,21 +173,24 @@ page 6060140 "NPR MM POS Member Card"
                 SubPageView = SORTING("Membership Entry No.", "Relative Period") ORDER(Descending);
                 ShowFilter = false;
                 UpdatePropagation = Both;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
 
             part("Member Cards Subpage"; "NPR MM Member Cards ListPart")
             {
                 SubPageLink = "Member Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.") ORDER(Descending);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
         {
             systempart(Control6014400; Notes)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -190,8 +209,9 @@ page 6060140 "NPR MM POS Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Member Card action';
+                ApplicationArea = NPRRetail;
             }
             action("Register Arrival")
             {
@@ -201,8 +221,9 @@ page 6060140 "NPR MM POS Member Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Register Arrival action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -225,8 +246,9 @@ page 6060140 "NPR MM POS Member Card"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Activate Membership action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -243,8 +265,9 @@ page 6060140 "NPR MM POS Member Card"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Add Guardian action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -258,8 +281,9 @@ page 6060140 "NPR MM POS Member Card"
                 Image = Answers;
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Profiles action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -275,8 +299,9 @@ page 6060140 "NPR MM POS Member Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Print Member Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -305,7 +330,7 @@ page 6060140 "NPR MM POS Member Card"
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Ledger Entries action';
 
                     trigger OnAction()
@@ -334,8 +359,9 @@ page 6060140 "NPR MM POS Member Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Ledger Entries action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -364,8 +390,9 @@ page 6060140 "NPR MM POS Member Card"
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Statistics action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -396,8 +423,9 @@ page 6060140 "NPR MM POS Member Card"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Browsing History action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -421,8 +449,9 @@ page 6060140 "NPR MM POS Member Card"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Recommendations action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

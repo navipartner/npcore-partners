@@ -3,7 +3,7 @@ report 6150614 "NPR Posting Overview POS"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Posting Overview POS.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Posting Overview POS';
     PreviewMode = PrintLayout;
     dataset
@@ -308,8 +308,9 @@ report 6150614 "NPR Posting Overview POS"
                     field("Include Credit Card Transaction"; IncludeCreditCardTransaction)
                     {
                         Caption = 'Include Credit Card Transaction';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Credit Card Transaction field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

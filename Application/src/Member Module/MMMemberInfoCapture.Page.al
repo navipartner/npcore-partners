@@ -16,11 +16,12 @@ page 6060134 "NPR MM Member Info Capture"
                 Visible = ShowAddToMembershipSection;
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Add Member to Membership';
                     Editable = ExternalMembershipNoEditable;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Add Member to Membership field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -61,11 +62,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Member Count';
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Member Count field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(AddMemberCard)
@@ -74,10 +76,11 @@ page 6060134 "NPR MM Member Info Capture"
                 Visible = ShowAddMemberCardSection;
                 field("External Member No"; Rec."External Member No")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Add Card for Member';
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Add Card for Member field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -128,9 +131,10 @@ page 6060134 "NPR MM Member Info Capture"
                 Visible = SetAddGuardianMode;
                 field(AddGuardianToExistingMembership; Rec."Guardian External Member No.")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = GuardianMandatory;
                     ToolTip = 'Specifies the value of the Guardian External Member No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -139,12 +143,13 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(GuardianGDPRApproval; Rec."GDPR Approval")
                 {
-                    ApplicationArea = All;
+
                     OptionCaption = 'Not Selected,Pending,Accepted,Rejected';
                     ShowMandatory = GDPRMandatory;
                     Style = Attention;
                     StyleExpr = NOT GDPRSelected;
                     ToolTip = 'Specifies the value of the GDPR Approval field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(ReplaceMemberCard)
@@ -153,10 +158,11 @@ page 6060134 "NPR MM Member Info Capture"
                 Visible = ShowReplaceCardSection;
                 field(ReplaceMemberNoCard; Rec."External Member No")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Replace Card for Member';
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Replace Card for Member field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -170,9 +176,10 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field("Replace External Card No."; Rec."Replace External Card No.")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Replace External Card No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -203,22 +210,25 @@ page 6060134 "NPR MM Member Info Capture"
 
                 field(FirstName2; Rec."First Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the First Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(LastName2; Rec."Last Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(EmailAddress2; Rec."E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ShowMandatory = EmailMandatory;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -232,64 +242,75 @@ page 6060134 "NPR MM Member Info Capture"
                 Visible = ShowNewMemberSection;
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("First Name"; Rec."First Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the First Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Middle Name"; Rec."Middle Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Middle Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = phonenomandatory;
                     ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Social Security No."; Rec."Social Security No.")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ShowMandatory = SSNMandatory;
                     ToolTip = 'Specifies the value of the Social Security No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code Code"; Rec."Post Code Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Country Code"; Rec."Country Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Country Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Enable Auto-Renew"; Rec."Enable Auto-Renew")
                 {
-                    ApplicationArea = All;
+
                     Editable = ShowAutoRenew;
                     Importance = Additional;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Enable Auto-Renew field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -301,10 +322,11 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field("Auto-Renew Payment Method Code"; Rec."Auto-Renew Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ShowMandatory = AutoRenewPaymentMethodMandatory;
                     ToolTip = 'Specifies the value of the Auto-Renew Payment Method Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -321,15 +343,17 @@ page 6060134 "NPR MM Member Info Capture"
 
                 field(Gender; Rec.Gender)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gender field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Birthday; Rec.Birthday)
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ShowMandatory = BirthDateMandatory;
                     ToolTip = 'Specifies the value of the Birthday field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -367,9 +391,10 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = EmailMandatory;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -378,14 +403,16 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Guardian External Member No."; Rec."Guardian External Member No.")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = GuardianMandatory;
                     ToolTip = 'Specifies the value of the Guardian External Member No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -449,45 +476,51 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field("News Letter"; Rec."News Letter")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the News Letter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("GDPR Approval"; Rec."GDPR Approval")
                 {
-                    ApplicationArea = All;
+
                     Editable = gdprmandatory;
                     OptionCaption = 'Not Selected,Pending,Accepted,Rejected';
                     ShowMandatory = GDPRMandatory;
                     Style = Attention;
                     StyleExpr = NOT GDPRSelected;
                     ToolTip = 'Specifies the value of the GDPR Approval field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Method"; Rec."Notification Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User Logon ID"; Rec."User Logon ID")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the User Logon ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Password SHA1"; Rec."Password SHA1")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Password field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Date"; Rec."Document Date")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Activation Date';
                     Editable = ActivationDateEditable;
                     Importance = Additional;
                     ShowMandatory = ActivationDateMandatory;
                     ToolTip = 'Specifies the value of the Activation Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -529,30 +562,34 @@ page 6060134 "NPR MM Member Info Capture"
                 Visible = ShowNewCardSection;
                 field("External Card No."; Rec."External Card No.")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = ExternalCardNoMandatory;
                     ToolTip = 'Specifies the value of the External Card No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pin Code"; Rec."Pin Code")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Pin Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
-                    ApplicationArea = All;
+
                     Editable = CardValidUntilMandatory;
                     Importance = Additional;
                     ShowMandatory = CardValidUntilMandatory;
                     ToolTip = 'Specifies the value of the Valid Until field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Card Type"; Rec."Member Card Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = EditMemberCardType;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Member Card Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Attributes)
@@ -561,11 +598,12 @@ page 6060134 "NPR MM Member Info Capture"
                 Visible = ShowAttributesSection;
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -579,11 +617,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -597,11 +636,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -615,11 +655,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -633,11 +674,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -651,11 +693,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -669,11 +712,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -687,11 +731,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -705,11 +750,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -723,11 +769,12 @@ page 6060134 "NPR MM Member Info Capture"
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -745,9 +792,10 @@ page 6060134 "NPR MM Member Info Capture"
         {
             part(MMMemberInfoCapturePicture; "NPR MM Member Info Picture")
             {
-                ApplicationArea = All;
+
                 Caption = 'Picture';
                 SubPageLink = "Entry No." = field("Entry No.");
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -764,8 +812,9 @@ page 6060134 "NPR MM Member Info Capture"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Take Picture action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

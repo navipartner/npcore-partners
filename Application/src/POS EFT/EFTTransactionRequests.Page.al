@@ -24,7 +24,8 @@ page 6184498 "NPR EFT Transaction Requests"
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -35,315 +36,375 @@ page 6184498 "NPR EFT Transaction Requests"
                 InstructionalText = 'Blue: Recovered & in sync\Yellow: Recovered but on different receipt number\Red: Unfinished, no external result or unposted amount';
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = Style;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Integration Type"; Rec."Integration Type")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = Style;
                     ToolTip = 'Specifies the value of the Integration Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = Style;
                     ToolTip = 'Specifies the value of the Processing Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auxiliary Operation Desc."; Rec."Auxiliary Operation Desc.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auxiliary Operation Desc. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Started; Rec.Started)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Started field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Finished; Rec.Finished)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Finished field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(TransDuration; TransDuration)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Duration';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Duration field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Result Amount"; Rec."Result Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Result Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Successful; Rec.Successful)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Successful field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Result Known"; Rec."External Result Known")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Result Known field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Result Processed"; Rec."Result Processed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Result Processed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Force Closed"; Rec."Force Closed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Force Closed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Reversed; Rec.Reversed)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reversed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Recovered; Rec.Recovered)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recovered field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Result Display Text"; Rec."Result Display Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Result Display Text field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NST Error"; Rec."NST Error")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NST Error field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client Error"; Rec."Client Error")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Error field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Result Code"; Rec."Result Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Result Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Result Description"; Rec."Result Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Result Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Type"; Rec."Card Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Name"; Rec."Card Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number"; Rec."Card Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Expiry Date"; Rec."Card Expiry Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Expiry Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference Number Input"; Rec."Reference Number Input")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference Number Input field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference Number Output"; Rec."Reference Number Output")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference Number Output field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Authorisation Number"; Rec."Authorisation Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Authorisation Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auxiliary Operation ID"; Rec."Auxiliary Operation ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auxiliary Operation ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Offline mode"; Rec."Offline mode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Offline mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Integration Version Code"; Rec."Integration Version Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Integration Version Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client Assembly Version"; Rec."Client Assembly Version")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Assembly Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pepper Terminal Code"; Rec."Pepper Terminal Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Pepper Terminal Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pepper Transaction Type Code"; Rec."Pepper Transaction Type Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Pepper Transaction Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pepper Trans. Subtype Code"; Rec."Pepper Trans. Subtype Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Pepper Transaction Subtype Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Transaction ID"; Rec."External Transaction ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Transaction ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Customer ID"; Rec."External Customer ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Customer ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Hardware ID"; Rec."Hardware ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Hardware ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Date"; Rec."Transaction Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Time"; Rec."Transaction Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Authentication Method"; Rec."Authentication Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Authentication Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bookkeeping Period"; Rec."Bookkeeping Period")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Bookkeeping Period field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Input"; Rec."Amount Input")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Input field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Output"; Rec."Amount Output")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Output field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cashback Amount"; Rec."Cashback Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cashback Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Fee Amount"; Rec."Fee Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Fee Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Financial Impact"; Rec."Financial Impact")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Financial Impact field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processed Entry No."; Rec."Processed Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processed Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reversed by Entry No."; Rec."Reversed by Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reversed by Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recovered by Entry No."; Rec."Recovered by Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recovered by Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Initiated from Entry No."; Rec."Initiated from Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Initiated from Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt 1"; Rec."Receipt 1".HasValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Receipt 1';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Receipt 1.HasValue() field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt 2"; Rec."Receipt 2".HasValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Receipt 2';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Receipt 2.HasValue() field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of Reprints"; Rec."No. of Reprints")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Reprints field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Token; Rec.Token)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Token field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Number of Attempts"; Rec."Number of Attempts")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Number of Attempts field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("FF Moved to POS Entry"; Rec."FF Moved to POS Entry")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Moved to POS Entry field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -354,12 +415,14 @@ page 6184498 "NPR EFT Transaction Requests"
                 SubPageLink = "Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control6014410; "NPR EFT Trx Log Factbox")
             {
                 SubPageLink = "Transaction Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -376,8 +439,9 @@ page 6184498 "NPR EFT Transaction Requests"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Receipt 1 action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -398,8 +462,9 @@ page 6184498 "NPR EFT Transaction Requests"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Receipt 2 action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -420,8 +485,9 @@ page 6184498 "NPR EFT Transaction Requests"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reprint action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -434,8 +500,9 @@ page 6184498 "NPR EFT Transaction Requests"
             {
                 Caption = 'Download Logs';
                 Image = CreateXMLFile;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download Logs action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

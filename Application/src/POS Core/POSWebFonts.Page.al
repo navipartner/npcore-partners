@@ -4,7 +4,8 @@ page 6014622 "NPR POS Web Fonts"
     PageType = List;
     SourceTable = "NPR POS Web Font";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,42 +15,49 @@ page 6014622 "NPR POS Web Fonts"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Font Face"; Rec."Font Face")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Font Face field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Prefix; Rec.Prefix)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Woff Exists"; Format(WoffHasValue))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Woff Exists';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Woff Exists field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Css Exists"; Format(CssHasValue))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Css Exists';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Css Exists field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -70,8 +78,9 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Import Font action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -87,8 +96,9 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Export Font action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -104,8 +114,9 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Remove Font action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -124,8 +135,9 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Import Stylesheet action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -141,8 +153,9 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Export Stylesheet action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -158,8 +171,9 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Remove Stylesheet action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -174,11 +188,12 @@ page 6014622 "NPR POS Web Fonts"
                 {
                     Caption = 'Export Font Configuration';
                     Image = Export;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Export Font Configuration action';
                     PromotedCategory = Process;
                     Promoted = true;
                     PromotedOnly = true;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -189,11 +204,12 @@ page 6014622 "NPR POS Web Fonts"
                 {
                     Caption = 'Import Font Configuration';
                     Image = Import;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Import Font Configuration action';
                     PromotedCategory = Process;
                     Promoted = true;
                     PromotedOnly = true;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -208,8 +224,9 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Export Managed Dependency Manifest action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

@@ -12,13 +12,15 @@ page 6060147 "NPR RC Members. Burndown Setup"
             {
                 field("Use Work Date as Base"; Rec."Use Work Date as Base")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Use Work Date as Base field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("StartDate Offset"; Rec."StartDate Offset")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the StartDate Offset field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

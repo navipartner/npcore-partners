@@ -7,7 +7,8 @@ page 6059795 "NPR E-mail Templates"
     PageType = List;
     SourceTable = "NPR E-mail Template Header";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,23 +18,27 @@ page 6059795 "NPR E-mail Templates"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Report ID"; Rec."Report ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Report ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -48,8 +53,9 @@ page 6059795 "NPR E-mail Templates"
                 Caption = 'View HTML Template';
                 Image = View;
                 Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View HTML Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -63,8 +69,9 @@ page 6059795 "NPR E-mail Templates"
                 Caption = 'Import HTML Template';
                 Image = Import;
                 Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import HTML Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -79,8 +86,9 @@ page 6059795 "NPR E-mail Templates"
                 Caption = 'Export HTML Template';
                 Image = Export;
                 Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export HTML Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -94,8 +102,9 @@ page 6059795 "NPR E-mail Templates"
                 Caption = 'Copy From E-Mail Template';
                 Image = Copy;
                 Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Copy From E-Mail Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -109,8 +118,9 @@ page 6059795 "NPR E-mail Templates"
                 Caption = 'Delete HTML Template';
                 Image = Delete;
                 Visible = (Rec."Transactional E-mail" = 0) OR (Rec."Transactional E-mail Code" = '');
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Delete HTML Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -129,8 +139,9 @@ page 6059795 "NPR E-mail Templates"
                 RunObject = Page "NPR E-mail Log";
                 RunPageLink = "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the E-mail Log action';
+                ApplicationArea = NPRRetail;
             }
             action(EmailTemplateFilters)
             {
@@ -140,15 +151,17 @@ page 6059795 "NPR E-mail Templates"
                 RunPageLink = "E-mail Template Code" = FIELD(Code),
                               "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("E-mail Template Code", "Table No.", "Line No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Email Template Filters action';
+                ApplicationArea = NPRRetail;
             }
             action(AttachedFiles)
             {
                 Caption = 'Attached Files';
                 Image = MailAttachment;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Attached Files action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -168,8 +181,9 @@ page 6059795 "NPR E-mail Templates"
                 Image = "Report";
                 RunObject = Page "NPR E-mail Templ. Reports";
                 RunPageLink = "E-mail Template Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Additional Reports action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

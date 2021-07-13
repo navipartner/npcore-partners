@@ -8,7 +8,8 @@ page 6059825 "NPR Trx Email Log"
     PageType = List;
     SourceTable = "NPR Trx Email Log";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,58 +19,69 @@ page 6059825 "NPR Trx Email Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Provider; Rec.Provider)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Provider field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Message ID"; Rec."Message ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Message ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Status Message"; Rec."Status Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Recipient; Rec.Recipient)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recipient field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Subject; Rec.Subject)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Subject field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Smart Email ID"; Rec."Smart Email ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Smart Email ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sent At"; Rec."Sent At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sent At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Opens"; Rec."Total Opens")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total Opens field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Clicks"; Rec."Total Clicks")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total Clicks field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -86,8 +98,9 @@ page 6059825 "NPR Trx Email Log"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Update Details action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

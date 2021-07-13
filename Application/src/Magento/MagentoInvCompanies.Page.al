@@ -14,25 +14,29 @@ page 6151402 "NPR Magento Inv. Companies"
             {
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Filter"; Rec."Location Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Filter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Username"; Rec."Api Username")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Username field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Password; Password)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Api Password';
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Password field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -42,14 +46,16 @@ page 6151402 "NPR Magento Inv. Companies"
                 }
                 field("Api Url"; Rec."Api Url")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Api Url field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Domain"; Rec."Api Domain")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Domain field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -67,8 +73,9 @@ page 6151402 "NPR Magento Inv. Companies"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Test Api Url action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

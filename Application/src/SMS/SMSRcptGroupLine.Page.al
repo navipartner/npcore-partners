@@ -14,13 +14,15 @@ page 6014430 "NPR SMS Rcpt. Group Line"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mobile Phone No."; Rec."Mobile Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mobile Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

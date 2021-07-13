@@ -8,7 +8,8 @@ page 6060124 "NPR MM Membership Setup"
     PageType = List;
     SourceTable = "NPR MM Membership Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,252 +20,301 @@ page 6060124 "NPR MM Membership Setup"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Type"; Rec."Membership Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Loyalty Card"; Rec."Loyalty Card")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Loyalty Card field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Loyalty Code"; Rec."Loyalty Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Loyalty Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Config. Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Contact Config. Template Code"; Rec."Contact Config. Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Contact Config. Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Customer No."; Rec."Membership Customer No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Information"; Rec."Member Information")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Information field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Perpetual; Rec.Perpetual)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Perpetual field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Role Assignment"; Rec."Member Role Assignment")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Role Assignment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Welcome Notification"; Rec."Create Welcome Notification")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Welcome Notification field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Renewal Notifications"; Rec."Create Renewal Notifications")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Renewal Notifications field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Member Cardinality"; Rec."Membership Member Cardinality")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Member Cardinality field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Anonymous Member Cardinality"; Rec."Anonymous Member Cardinality")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Anonymous Member Cardinality field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Community Code"; Rec."Community Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Community Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Membership Delete"; Rec."Allow Membership Delete")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Membership Delete field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Confirm Member On Card Scan"; Rec."Confirm Member On Card Scan")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Confirm Member On Card Scan field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Web Service Print Action"; Rec."Web Service Print Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Web Service Print Action field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Print Action"; Rec."POS Print Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Print Action field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Account Print Object Type"; Rec."Account Print Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account Print Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Account Print Template Code"; Rec."Account Print Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account Print Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Account Print Object ID"; Rec."Account Print Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account Print Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt Print Object Type"; Rec."Receipt Print Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Receipt Print Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt Print Template Code"; Rec."Receipt Print Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Receipt Print Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt Print Object ID"; Rec."Receipt Print Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Receipt Print Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number Scheme"; Rec."Card Number Scheme")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Number Scheme field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number Prefix"; Rec."Card Number Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Number Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number Length"; Rec."Card Number Length")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Number Length field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number Validation"; Rec."Card Number Validation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Number Validation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number No. Series"; Rec."Card Number No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Number No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number Valid Until"; Rec."Card Number Valid Until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Number Valid Until field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Number Pattern"; Rec."Card Number Pattern")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = '<any text><[MA|MS|NS|N*x|A*x|X*x]><[...]><...>';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Print Object Type"; Rec."Card Print Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Print Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Print Template Code"; Rec."Card Print Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Print Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Print Object ID"; Rec."Card Print Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Print Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Expire Date Calculation"; Rec."Card Expire Date Calculation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Expire Date Calculation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Item Barcode"; Rec."Ticket Item Barcode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Item Barcode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Print Model"; Rec."Ticket Print Model")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Print Model field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Print Object Type"; Rec."Ticket Print Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Print Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Print Object ID"; Rec."Ticket Print Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Print Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Print Template Code"; Rec."Ticket Print Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Print Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("GDPR Mode"; Rec."GDPR Mode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the GDPR Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("GDPR Agreement No."; Rec."GDPR Agreement No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the GDPR Agreement No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Enable NP Pass Integration"; Rec."Enable NP Pass Integration")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enable NP Pass Integration field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Enable Age Verification"; Rec."Enable Age Verification")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Enable Age Verification field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Validate Age Against"; Rec."Validate Age Against")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Validate Age Against field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -279,8 +329,9 @@ page 6060124 "NPR MM Membership Setup"
                 Caption = 'Community';
                 Image = Group;
                 RunObject = Page "NPR MM Member Community";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Community action';
+                ApplicationArea = NPRRetail;
             }
             action("Membership Sales Setup")
             {
@@ -290,8 +341,9 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedOnly = true;
                 RunObject = Page "NPR MM Membership Sales Setup";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Sales Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Membership Alteration")
             {
@@ -301,8 +353,9 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedOnly = true;
                 RunObject = Page "NPR MM Membership Alter.";
                 RunPageLink = "From Membership Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Alteration action';
+                ApplicationArea = NPRRetail;
             }
             action("Member Communication Setup")
             {
@@ -314,8 +367,9 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Comm. Setup";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Member Communication Setup action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6014404)
             {
@@ -326,8 +380,9 @@ page 6060124 "NPR MM Membership Setup"
                 Image = SetupLines;
                 RunObject = Page "NPR MM Members. Admis. Setup";
                 RunPageLink = "Membership  Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Admission Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Membership Limitation Setup")
             {
@@ -340,8 +395,9 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Lim. Setup";
                 RunPageLink = "Membership  Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Limitation Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Sponsorship Ticket Setup")
             {
@@ -352,8 +408,9 @@ page 6060124 "NPR MM Membership Setup"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR MM Sponsors. Ticket Setup";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Sponsorship Ticket Setup action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6014405)
             {
@@ -364,16 +421,18 @@ page 6060124 "NPR MM Membership Setup"
                 Image = List;
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Membership Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Memberships action';
+                ApplicationArea = NPRRetail;
             }
             action("Item List")
             {
                 Caption = 'Item List';
                 Image = List;
                 RunObject = Page "Item List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Item List action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6014416)
             {
@@ -388,8 +447,9 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Admission Service Setup";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Turnstile Setup action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(Processing)
@@ -403,8 +463,9 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'This action will create a wallet notification and send it (when notification is inline) for members not having a wallet.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -421,8 +482,9 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = ' This action will create a wallets notification, and send it when notification is inline.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -438,9 +500,10 @@ page 6060124 "NPR MM Membership Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 RunObject = page "NPR MM Membership Rapid Pckg.";
                 ToolTip = 'Executes the Deploy Rapidstart Package for Member module From Azure Blob Storage';
+                ApplicationArea = NPRRetail;
             }
         }
     }

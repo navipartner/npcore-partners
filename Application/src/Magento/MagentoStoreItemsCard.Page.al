@@ -2,12 +2,13 @@ page 6014425 "NPR Magento Store Items Card"
 {
     Caption = 'Magento Store Items Card';
     PageType = Card;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
     SourceTable = "NPR Magento Store Item";
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,25 +18,29 @@ page 6014425 "NPR Magento Store Items Card"
             {
                 field(Webshop; Rec.Webshop)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Webshop field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Website Code"; Rec."Website Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Website Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -44,10 +49,11 @@ page 6014425 "NPR Magento Store Items Card"
                 }
                 field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Fields Enabled';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Fields Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
 
             }
@@ -59,14 +65,16 @@ page 6014425 "NPR Magento Store Items Card"
                 {
                     field("Unit Price"; Rec."Unit Price")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Unit Price field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Unit Price Enabled"; Rec."Unit Price Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Unit Price Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(ProductNewGroup)
@@ -76,28 +84,32 @@ page 6014425 "NPR Magento Store Items Card"
                     {
                         field("Product New From"; Rec."Product New From")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Product New From field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Product New From Enabled"; Rec."Product New From Enabled")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Product New From Enabled field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     grid(ProductNewToGrid)
                     {
                         field("Product New To"; Rec."Product New To")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Product New To field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Product New To Enabled"; Rec."Product New To Enabled")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Product New To Enabled field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -109,42 +121,48 @@ page 6014425 "NPR Magento Store Items Card"
                     {
                         field("Special Price"; Rec."Special Price")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Special Price field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Special Price Enabled"; Rec."Special Price Enabled")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Special Price Enabled field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     grid(SpecialPriceFromGrid)
                     {
                         field("Special Price From"; Rec."Special Price From")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Special Price From field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Special Price From Enabled"; Rec."Special Price From Enabled")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Special Price From Enabled field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     grid(SpecialPriceToGrid)
                     {
                         field("Special Price To"; Rec."Special Price To")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Special Price To field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Special Price To Enabled"; Rec."Special Price To Enabled")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Special Price To Enabled field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -157,24 +175,27 @@ page 6014425 "NPR Magento Store Items Card"
                 {
                     field("Webshop Name"; Rec."Webshop Name")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Name';
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Webshop Name Enabled"; Rec."Webshop Name Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Webshop Name Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 grid(WebshopDescriptionGrid)
                 {
                     field("Webshop Description"; Format(Rec."Webshop Description".HasValue()))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Description';
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -193,9 +214,10 @@ page 6014425 "NPR Magento Store Items Card"
 
                     field("Webshop Description Enabled"; Rec."Webshop Description Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Webshop Description Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
 
@@ -203,9 +225,10 @@ page 6014425 "NPR Magento Store Items Card"
                 {
                     field("Webshop Short Description"; Format(Rec."Webshop Short Desc.".HasValue()))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Short Description';
                         ToolTip = 'Specifies the value of the Short Description field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -223,78 +246,89 @@ page 6014425 "NPR Magento Store Items Card"
                     }
                     field("Webshop Short Desc. Enabled"; Rec."Webshop Short Desc. Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Webshop Short Description Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 field(Visibility; Rec.Visibility)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Visibility field';
+                    ApplicationArea = NPRRetail;
                 }
                 grid(DisplayOnlyGrid)
                 {
                     field("Display Only"; Rec."Display Only")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Display Only field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Display Only Enabled"; Rec."Display Only Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Display Only Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 grid(DisplayOnlyTextGrid)
                 {
                     field("Display Only Text"; Rec."Display Only Text")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Display Only Text field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 grid(SeoLinkGrid)
                 {
                     field("Seo Link"; Rec."Seo Link")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Seo Link field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Seo Link Enabled"; Rec."Seo Link Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Seo Link Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 grid(MetaTitleGrid)
                 {
                     field("Meta Title"; Rec."Meta Title")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Meta Title field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Meta Title Enabled"; Rec."Meta Title Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Meta Title Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 grid(MetaDescriptionGrid)
                 {
                     field("Meta Description"; Rec."Meta Description")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Meta Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Meta Description Enabled"; Rec."Meta Description Enabled")
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Meta Description Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -304,7 +338,8 @@ page 6014425 "NPR Magento Store Items Card"
                 part(MagentoItemGroupLinks; "NPR Magento Category Links")
                 {
                     SubPageLink = "Item No." = FIELD("Item No.");
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }

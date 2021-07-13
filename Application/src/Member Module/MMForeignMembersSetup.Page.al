@@ -4,8 +4,9 @@ page 6060146 "NPR MM Foreign Members. Setup"
     Caption = 'Foreign Membership Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Foreign Members. Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,48 +16,57 @@ page 6060146 "NPR MM Foreign Members. Setup"
             {
                 field("Community Code"; Rec."Community Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Community Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Manager Code"; Rec."Manager Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Manager Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invokation Priority"; Rec."Invokation Priority")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Invokation Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Disabled; Rec.Disabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Disabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Append Local Prefix"; Rec."Append Local Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Append Local Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remove Local Prefix"; Rec."Remove Local Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remove Local Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Append Local Suffix"; Rec."Append Local Suffix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Append Local Suffix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remove Local Suffix"; Rec."Remove Local Suffix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remove Local Suffix field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -74,8 +84,9 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Setup action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -91,8 +102,9 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Dashboard action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

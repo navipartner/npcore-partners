@@ -6,8 +6,9 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NPRE Print/Prod. Cat.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,11 +18,12 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
             {
                 field(Selected; Selected)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
                     ToolTip = 'Specifies the value of the Selected field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -30,30 +32,34 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Tag"; Rec."Print Tag")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = ShowPrintTags;
                     ToolTip = 'Specifies the value of the Print Tag field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(AssignedServingSteps; AssignedServingStepsAsString())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Appl. Only for Serving Steps';
                     Editable = false;
                     Visible = ShowApplOnServingStep;
                     ToolTip = 'Specifies the value of the Appl. Only for Serving Steps field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

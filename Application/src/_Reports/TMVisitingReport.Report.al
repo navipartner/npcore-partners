@@ -5,7 +5,7 @@ report 6060125 "NPR TM Visiting Report"
     Caption = 'TM Visiting Report';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("TM Admission Schedule Entry"; "NPR TM Admis. Schedule Entry")

@@ -4,8 +4,9 @@ page 6150649 "NPR POS Entity Groups"
     DataCaptionExpression = GetFormCaption();
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Entity Group";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,18 +16,21 @@ page 6150649 "NPR POS Entity Groups"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

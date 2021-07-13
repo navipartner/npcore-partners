@@ -4,8 +4,9 @@ page 6150706 "NPR POS Action Workflow"
     Caption = 'POS Action Workflow';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Action Workflow";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,18 +16,21 @@ page 6150706 "NPR POS Action Workflow"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Code"; Rec."Action Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Condition Type"; Rec."Condition Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Condition Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

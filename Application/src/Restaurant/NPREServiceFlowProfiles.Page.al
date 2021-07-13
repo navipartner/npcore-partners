@@ -6,7 +6,8 @@ page 6150694 "NPR NPRE Service Flow Profiles"
     PageType = List;
     SourceTable = "NPR NPRE Serv.Flow Profile";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,13 +17,15 @@ page 6150694 "NPR NPRE Service Flow Profiles"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -31,12 +34,14 @@ page 6150694 "NPR NPRE Service Flow Profiles"
             systempart(Control6014405; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control6014406; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

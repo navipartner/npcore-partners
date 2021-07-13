@@ -101,7 +101,7 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
     }
 
     var
-        Text000: Label 'Table ID %1 is not included in Config. Package %2';
+        TableNotIncludedInConfigPackageErr: Label 'Table ID %1 is not included in Config. Package %2', Comment = '%1=Rec."Table ID";%2=Rec."Package Code"';
 
     local procedure TestTableID()
     var
@@ -111,7 +111,7 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
             exit;
 
         CalcFields("Package Code");
-        Error(Text000, "Table ID", "Package Code");
+        Error(TableNotIncludedInConfigPackageErr, Rec."Table ID", Rec."Package Code");
     end;
 }
 

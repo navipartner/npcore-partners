@@ -5,8 +5,9 @@ page 6014629 "NPR RP Template Media Factbox"
     InsertAllowed = false;
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR RP Template Media Info";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,21 +15,24 @@ page 6014629 "NPR RP Template Media Factbox"
         {
             field(URL; Rec.URL)
             {
-                ApplicationArea = All;
+
                 ExtendedDatatype = URL;
                 ToolTip = 'Specifies the value of the URL field';
+                ApplicationArea = NPRRetail;
             }
             field(Description; Rec.Description)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Description field';
+                ApplicationArea = NPRRetail;
             }
             // field(Picture; Rec.Image)
             field(Picture; Rec.Picture)
             {
-                ApplicationArea = Basic, Suite, Invoicing;
+
                 ShowCaption = false;
                 ToolTip = 'Specifies the picture that has been inserted for the item.';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -38,10 +42,11 @@ page 6014629 "NPR RP Template Media Factbox"
         {
             action(ImportPicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a picture file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -71,7 +76,7 @@ page 6014629 "NPR RP Template Media Factbox"
             }
             // action(ExportPicture)
             // {
-            //     ApplicationArea = Basic, Suite;
+            //     ApplicationArea = NPRRetail;
             //     Caption = 'Export';
             //     Enabled = DeleteExportEnabled;
             //     Image = Export;
@@ -94,11 +99,12 @@ page 6014629 "NPR RP Template Media Factbox"
             // }
             action(DeletePicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Delete';
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
                 ToolTip = 'Delete the record.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

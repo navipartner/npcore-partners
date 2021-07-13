@@ -5,7 +5,8 @@ page 6151199 "NPR NpCs Workflow Modules"
     PageType = List;
     SourceTable = "NPR NpCs Workflow Module";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,28 +16,33 @@ page 6151199 "NPR NpCs Workflow Modules"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit ID"; Rec."Event Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit Name"; Rec."Event Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

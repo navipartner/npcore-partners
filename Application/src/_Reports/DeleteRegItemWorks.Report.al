@@ -3,7 +3,7 @@ report 6060041 "NPR Delete Reg. Item Works."
     Caption = 'Delete Reg. Item Worksheets';
     ProcessingOnly = true;
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Registered Item Worksheet"; "NPR Registered Item Works.")

@@ -4,9 +4,10 @@ page 6151564 "NPR NpXml Namespaces"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR NpXml Namespace";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,13 +17,15 @@ page 6151564 "NPR NpXml Namespaces"
             {
                 field(Alias; Rec.Alias)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Alias field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Namespace; Rec.Namespace)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Namespace field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -1,9 +1,9 @@
-﻿report 6014545 "NPR Acc. Statement w FIK-Card"
+report 6014545 "NPR Acc. Statement w FIK-Card"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Acc. Statement w FIK-Card';
 
     dataset
@@ -674,15 +674,17 @@
                     field("Print Entries Due"; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Overdue Entries field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print All Having Entry"; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include All Customers with Ledger Entries field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -694,8 +696,9 @@
                     {
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include All Customers with a Balance field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -706,46 +709,53 @@
                     field("Print Reversed Entries"; PrintReversedEntries)
                     {
                         Caption = 'Include Reversed Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Reversed Entries field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Unapplied Entries"; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Unapplied Entries field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Include Aging Band"; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Aging Band field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Period Length"; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Aging Band Period Length field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Date Choice"; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Aging Band by field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Log Interaction field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FIK No"; FIKNo)
                     {
                         Caption = 'FIK No.';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the FIK No. field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group("Output Options")
@@ -755,8 +765,9 @@
                     {
                         Caption = 'Report Output';
                         OptionCaption = 'Print,Preview,PDF,Email,Excel,XML';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Report Output field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         var
@@ -784,8 +795,9 @@
                     {
                         Caption = 'Chosen Output';
                         Visible = false;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Chosen Output field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(EmailOptions)
                     {
@@ -794,8 +806,9 @@
                         field(PrintMissingAddresses; PrintRemaining)
                         {
                             Caption = 'Print remaining statements';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Print remaining statements field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }

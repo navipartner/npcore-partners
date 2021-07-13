@@ -5,8 +5,9 @@ page 6014608 "NPR Attribute Values"
     Caption = 'Client Attribute Values';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Attribute Value Set";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,31 +17,36 @@ page 6014608 "NPR Attribute Values"
             {
                 field("Attribute Code"; Rec."Attribute Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Text Value"; Rec."Text Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Text Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Datetime Value"; Rec."Datetime Value")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Datetime Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Numeric Value"; Rec."Numeric Value")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Numeric Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Boolean Value"; Rec."Boolean Value")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Boolean Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

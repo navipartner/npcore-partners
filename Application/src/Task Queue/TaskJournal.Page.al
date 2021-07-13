@@ -15,7 +15,8 @@ page 6059902 "NPR Task Journal"
     SaveValues = true;
     SourceTable = "NPR Task Line";
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -23,10 +24,11 @@ page 6059902 "NPR Task Journal"
         {
             field(CurrentJnlBatchName; CurrentJnlBatchName)
             {
-                ApplicationArea = All;
+
                 Caption = 'Batch Name';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the Batch Name field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
@@ -48,34 +50,40 @@ page 6059902 "NPR Task Journal"
                 ShowCaption = false;
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object No."; Rec."Object No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Report Name"; Rec."Report Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Report Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(NextExecutionTime; NextExecutionTime)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Next Execution Time';
                     ToolTip = 'Specifies the value of the NextExecutionTime field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -87,38 +95,44 @@ page 6059902 "NPR Task Journal"
                 }
                 field("Call Object With Task Record"; Rec."Call Object With Task Record")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Call Object With Task Record field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Recurrence; Rec.Recurrence)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recurrence Interval"; Rec."Recurrence Interval")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence Interval field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dependence Type"; Rec."Dependence Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dependence Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(LastStatus; LastStatus)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Last Status';
                     Editable = false;
                     OptionCaption = ' ,Started,Error,Succes,Message';
                     ToolTip = 'Specifies the value of the Last Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(LastExecutionTime; LastExecutionTime)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Last Execution Time';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Execution Time field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Control73)
@@ -132,10 +146,11 @@ page 6059902 "NPR Task Journal"
                         Caption = 'Job Description';
                         field(JobDescription; JobDescription)
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the JobDescription field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group("Account Name")
@@ -143,10 +158,11 @@ page 6059902 "NPR Task Journal"
                         Caption = 'Account Name';
                         field(AccName; AccName)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Account Name';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Account Name field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -157,12 +173,14 @@ page 6059902 "NPR Task Journal"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -186,8 +204,9 @@ page 6059902 "NPR Task Journal"
                                   "Journal Batch Name" = FIELD("Journal Batch Name"),
                                   "Line No." = FIELD("Line No.");
                     ShortCutKey = 'Shift+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Card action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Task Log")
                 {
@@ -203,8 +222,9 @@ page 6059902 "NPR Task Journal"
                                   "Line No." = FIELD("Line No.");
                     RunPageView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Task Log action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -221,8 +241,9 @@ page 6059902 "NPR Task Journal"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Decrease action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -239,8 +260,9 @@ page 6059902 "NPR Task Journal"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Increase action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -261,8 +283,9 @@ page 6059902 "NPR Task Journal"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Run Task action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

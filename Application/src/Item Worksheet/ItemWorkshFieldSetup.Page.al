@@ -4,7 +4,8 @@ page 6060054 "NPR Item Worksh. Field Setup"
     PageType = List;
     SourceTable = "NPR Item Worksh. Field Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,78 +15,93 @@ page 6060054 "NPR Item Worksh. Field Setup"
             {
                 field("Worksheet Template Name"; Rec."Worksheet Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Template Name field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Worksheet Name"; Rec."Worksheet Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Number"; Rec."Field Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Number field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Caption field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Field Number Create"; Rec."Target Field Number Create")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Field Number Create field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Field Name Create"; Rec."Target Field Name Create")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Field Name Create field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Field Caption Create"; Rec."Target Field Caption Create")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Field Caption Create field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Field Number Update"; Rec."Target Field Number Update")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Field Number Update field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Field Name Update"; Rec."Target Field Name Update")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Field Name Update field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Field Caption Update"; Rec."Target Field Caption Update")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Field Caption Update field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Process Create"; Rec."Process Create")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Process Create field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Process Update"; Rec."Process Update")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Process Update field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Value for Create"; Rec."Default Value for Create")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Value for Create field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mapped Values"; Rec."Mapped Values")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mapped Values field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -97,7 +113,7 @@ page 6060054 "NPR Item Worksh. Field Setup"
         {
             action("Field Value Map")
             {
-                ApplicationArea = All;
+
                 Caption = 'Field Value Map';
                 Image = MapDimensions;
                 Promoted = true;
@@ -112,6 +128,7 @@ page 6060054 "NPR Item Worksh. Field Setup"
                 RunPageView = SORTING("Worksheet Template Name", "Worksheet Name", "Table No.", "Field Number", "Source Value")
                               ORDER(Ascending);
                 ToolTip = 'Executes the Field Value Map action.';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -11,8 +11,9 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import From Scanner File action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

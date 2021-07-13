@@ -5,7 +5,7 @@ page 6151501 "NPR Nc Task Setup"
     SourceTable = "NPR Nc Task Setup";
     SourceTableView = SORTING("Table No.");
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -16,28 +16,33 @@ page 6151501 "NPR Nc Task Setup"
                 ShowCaption = false;
                 field("Task Processor Code"; Rec."Task Processor Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Processor Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Codeunit ID"; Rec."Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Codeunit ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Codeunit Name"; Rec."Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Codeunit Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }

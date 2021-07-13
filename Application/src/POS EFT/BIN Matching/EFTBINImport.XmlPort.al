@@ -1,4 +1,4 @@
-﻿xmlport 6184500 "NPR EFT BIN Import"
+xmlport 6184500 "NPR EFT BIN Import"
 {
     Caption = 'Teller BIN Import';
     Direction = Import;
@@ -49,14 +49,16 @@
                 field("Delete Ranges"; DeleteRanges)
                 {
                     Caption = 'Delete existing BIN ranges';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete existing BIN ranges field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Groups"; DeleteGroups)
                 {
                     Caption = 'Delete existing BIN groups';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete existing BIN groups field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

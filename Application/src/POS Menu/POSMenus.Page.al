@@ -4,7 +4,8 @@ page 6150701 "NPR POS Menus"
     PageType = List;
     SourceTable = "NPR POS Menu";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,33 +15,39 @@ page 6150701 "NPR POS Menus"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Caption; Rec.Caption)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Caption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register Type"; Rec."Register Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS View Profile field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -60,15 +67,17 @@ page 6150701 "NPR POS Menus"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Menu Buttons";
                 RunPageLink = "Menu Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Buttons action';
+                ApplicationArea = NPRRetail;
             }
             action(ExportPackageSelected)
             {
                 Caption = 'Export Package (Selected)';
                 Image = Export;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Package (Selected) action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -83,8 +92,9 @@ page 6150701 "NPR POS Menus"
             {
                 Caption = 'Export Package (All)';
                 Image = Export;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Package (All) action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -98,8 +108,9 @@ page 6150701 "NPR POS Menus"
             {
                 Caption = 'Import Package From File';
                 Image = Import;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Package From File action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -112,9 +123,10 @@ page 6150701 "NPR POS Menus"
             {
                 Caption = 'Download Template Data';
                 Image = ImportDatabase;
-                ApplicationArea = All;
+
                 RunObject = page "NPR POS Menu Deploy from Azure";
                 ToolTip = 'Downloads template data.';
+                ApplicationArea = NPRRetail;
             }
         }
     }

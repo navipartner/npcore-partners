@@ -6,7 +6,8 @@ page 6184492 "NPR Pepper Instances"
     PageType = List;
     SourceTable = "NPR Pepper Instance";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,18 +17,21 @@ page 6184492 "NPR Pepper Instances"
             {
                 field(ID; Rec.ID)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Configuration Code"; Rec."Configuration Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Configuration Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -45,8 +49,9 @@ page 6184492 "NPR Pepper Instances"
                 RunPageLink = "Instance ID" = FIELD(ID);
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Terminals action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

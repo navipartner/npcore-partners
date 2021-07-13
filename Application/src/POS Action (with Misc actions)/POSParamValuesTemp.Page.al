@@ -6,9 +6,10 @@ page 6150727 "NPR POS Param. Values Temp."
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Parameter Value";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,24 +19,27 @@ page 6150727 "NPR POS Param. Values Temp."
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -53,8 +57,9 @@ page 6150727 "NPR POS Param. Values Temp."
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reset Values action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

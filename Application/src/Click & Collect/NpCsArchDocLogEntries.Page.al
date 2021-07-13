@@ -4,8 +4,9 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Arch. Doc. Log Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -13,7 +14,8 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
         {
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger AddInReady()
                 begin
@@ -34,49 +36,58 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
             {
                 field("Log Date"; Rec."Log Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Workflow Type"; Rec."Workflow Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Workflow Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Workflow Module"; Rec."Workflow Module")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Workflow Module field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Message"; Rec."Log Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error Entry"; Rec."Error Entry")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Entry field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ErrorMessage; Rec.GetErrorMessage())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Error Message';
                     ToolTip = 'Specifies the value of the Error Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -90,8 +101,9 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
             {
                 Caption = 'View Error Message';
                 Image = Log;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Error Message action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -3,8 +3,9 @@ page 6014618 "NPR My Reports"
     Caption = 'My Reports';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR My Report";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,9 +15,10 @@ page 6014618 "NPR My Reports"
             {
                 field("Report No."; Rec."Report No.")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     ToolTip = 'Specifies the value of the Report No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -30,10 +32,11 @@ page 6014618 "NPR My Reports"
                 }
                 field(ReportName; AllObjwithCap."Object Caption")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Caption = 'Name';
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -52,8 +55,9 @@ page 6014618 "NPR My Reports"
             {
                 Caption = 'Run Report';
                 Image = Report2;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Run Report action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

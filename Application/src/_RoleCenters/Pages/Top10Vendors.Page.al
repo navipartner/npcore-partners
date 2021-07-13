@@ -18,9 +18,10 @@ page 6151258 "NPR Top 10 Vendors"
                 ShowCaption = false;
                 field(StartDate; StartDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Start Date';
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -29,9 +30,10 @@ page 6151258 "NPR Top 10 Vendors"
                 }
                 field(Enddate; Enddate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'End date';
                     ToolTip = 'Specifies the value of the End date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -46,9 +48,10 @@ page 6151258 "NPR Top 10 Vendors"
                 {
                     field("No."; Rec."No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the No. field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -58,23 +61,26 @@ page 6151258 "NPR Top 10 Vendors"
                     }
                     field(Name; Rec.Name)
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Phone No."; Rec."Phone No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Phone No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                     {
-                        ApplicationArea = All;
+
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -93,9 +99,10 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by day';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -106,9 +113,10 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by week';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -119,9 +127,10 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by month';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -132,9 +141,10 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by quarter';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -145,9 +155,10 @@ page 6151258 "NPR Top 10 Vendors"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by year';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

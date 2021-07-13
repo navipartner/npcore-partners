@@ -1,4 +1,4 @@
-﻿page 6151431 "NPR Magento Attributes"
+page 6151431 "NPR Magento Attributes"
 {
     AutoSplitKey = true;
     Caption = 'Attributes';
@@ -6,7 +6,8 @@
     PageType = List;
     SourceTable = "NPR Magento Attribute";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -23,34 +24,40 @@
                         ShowCaption = false;
                         field(Description; Rec.Description)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Description field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Type; Rec.Type)
                         {
-                            ApplicationArea = All;
+
                             Editable = TypeEditable;
                             ToolTip = 'Specifies the value of the Type field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Position; Rec.Position)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Position field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Filterable; Rec.Filterable)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Filterable field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Use in Product Listing"; Rec."Use in Product Listing")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Use in Product Listing field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Used by Attribute Set"; Rec."Used by Attribute Set")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Used by Attribute Set field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -59,8 +66,9 @@
                         }
                         field("Used by Items"; Rec."Used by Items")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Used by Items field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -69,15 +77,17 @@
                         }
                         field(Visible; Rec.Visible)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Visible field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     field(WidthControl; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = '                                                                                                                                                             ';
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150623)
@@ -88,7 +98,8 @@
                         Caption = 'Labels';
                         ShowFilter = false;
                         SubPageLink = "Attribute ID" = FIELD("Attribute ID");
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }

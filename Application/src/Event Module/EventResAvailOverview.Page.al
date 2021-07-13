@@ -11,7 +11,8 @@ page 6059833 "NPR Event Res. Avail. Overview"
     SourceTable = "NPR Event Plan. Line Buffer";
     SourceTableTemporary = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -21,40 +22,46 @@ page 6059833 "NPR Event Res. Avail. Overview"
             {
                 field(ResourceNoFilter; ResourceNoFilter)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Resource No. Filter';
                     TableRelation = Resource;
                     ToolTip = 'Specifies the value of the Resource No. Filter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(StartingDate; StartingDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Starting Date';
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(EndingDate; EndingDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Ending Date';
                     ToolTip = 'Specifies the value of the Ending Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(StartingTime; StartingTime)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Starting Time';
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(EndingTime; EndingTime)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Ending Time';
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(TimeInterval; TimeInterval)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Time Interval';
                     ToolTip = 'Duration in which time intervals should be shown in, for example, 1h=1 hour, 30m=30 minutes';
+                    ApplicationArea = NPRRetail;
                 }
             }
             repeater(Control6014405)
@@ -67,115 +74,130 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 ShowCaption = false;
                 field(ResNoAndDesc; ResNoAndDesc)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[1]"; MatrixDataHolder[1])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[1];
                     ShowCaption = false;
                     StyleExpr = StyleExpr1;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[1] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[2]"; MatrixDataHolder[2])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[2];
                     ShowCaption = false;
                     StyleExpr = StyleExpr2;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[2] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[3]"; MatrixDataHolder[3])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[3];
                     ShowCaption = false;
                     StyleExpr = StyleExpr3;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[3] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[4]"; MatrixDataHolder[4])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[4];
                     ShowCaption = false;
                     StyleExpr = StyleExpr4;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[4] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[5]"; MatrixDataHolder[5])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[5];
                     ShowCaption = false;
                     StyleExpr = StyleExpr5;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[5] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[6]"; MatrixDataHolder[6])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[6];
                     ShowCaption = false;
                     StyleExpr = StyleExpr6;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[6] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[7]"; MatrixDataHolder[7])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[7];
                     ShowCaption = false;
                     StyleExpr = StyleExpr7;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[7] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[8]"; MatrixDataHolder[8])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[8];
                     ShowCaption = false;
                     StyleExpr = StyleExpr8;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[8] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[9]"; MatrixDataHolder[9])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[9];
                     ShowCaption = false;
                     StyleExpr = StyleExpr9;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[9] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[10]"; MatrixDataHolder[10])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[10];
                     ShowCaption = false;
                     StyleExpr = StyleExpr10;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[10] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[11]"; MatrixDataHolder[11])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[11];
                     ShowCaption = false;
                     StyleExpr = StyleExpr11;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[11] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("MatrixDataHolder[12]"; MatrixDataHolder[12])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + DateColumnCaption[12];
                     ShowCaption = false;
                     StyleExpr = StyleExpr12;
                     ToolTip = 'Specifies the value of the MatrixDataHolder[12] field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -193,8 +215,9 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -210,8 +233,9 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Previous Set action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -227,8 +251,9 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Next Set action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

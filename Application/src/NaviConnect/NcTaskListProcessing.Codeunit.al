@@ -23,8 +23,8 @@ codeunit 6151508 "NPR Nc Task List Processing"
     end;
 
     var
-        Text000: Label 'Update Task List';
-        Text001: Label 'Process Task List';
+        UpdateTaskListTxt: Label 'Update Task List';
+        ProcessTaskListTxt: Label 'Process Task List';
 
     local procedure FindTaskProcessorCode(var JobQueueEntry: Record "Job Queue Entry"; var NcTaskProcessor: Record "NPR Nc Task Processor")
     var
@@ -161,10 +161,10 @@ codeunit 6151508 "NPR Nc Task List Processing"
         FindTaskProcessorCode(Rec, NcTaskProcessor);
         Description := NcTaskProcessor.Code;
         if HasParameter(Rec, ParamUpdateTaskList()) then
-            Description += ' | ' + Text000;
+            Description += ' | ' + UpdateTaskListTxt;
 
         if HasParameter(Rec, ParamProcessTaskList()) then
-            Description += ' | ' + Text001;
+            Description += ' | ' + ProcessTaskListTxt;
 
         Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
     end;

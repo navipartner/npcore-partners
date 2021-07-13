@@ -8,7 +8,8 @@ page 6014414 "NPR Pacsoft Shipm. Doc. Serv."
     SourceTable = "NPR Pacsoft Shipm. Doc. Serv.";
     SourceTableView = SORTING("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,13 +19,15 @@ page 6014414 "NPR Pacsoft Shipm. Doc. Serv."
             {
                 field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

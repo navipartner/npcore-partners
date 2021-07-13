@@ -6,7 +6,8 @@ page 6150902 "NPR HC Retail Setup"
     PageType = Card;
     SourceTable = "NPR HC Retail Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,73 +17,87 @@ page 6150902 "NPR HC Retail Setup"
             {
                 field("Amount Rounding Precision"; Rec."Amount Rounding Precision")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Rounding Precision field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Source Code"; Rec."Posting Source Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Source Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting No. Management"; Rec."Posting No. Management")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting No. Management field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Selection No. Series"; Rec."Selection No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Selection nos. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Balancing Posting Type"; Rec."Balancing Posting Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Balancing field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vat Bus. Posting Group"; Rec."Vat Bus. Posting Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post registers compressed"; Rec."Post registers compressed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post registers compressed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Appendix no. eq Sales Ticket"; Rec."Appendix no. eq Sales Ticket")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Appendix no. equals sales ticket no. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Compress G/L Entries"; Rec."Compress G/L Entries")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Compress G/L Entries field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gen. Journal Template"; Rec."Gen. Journal Template")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gen. Journal Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gen. Journal Batch"; Rec."Gen. Journal Batch")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gen. Journal Batch field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Journal Template"; Rec."Item Journal Template")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Journal Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Journal Batch"; Rec."Item Journal Batch")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Journal Batch field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dimensions Posting Type"; Rec."Dimensions Posting Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dimensions Posting Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

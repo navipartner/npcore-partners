@@ -6,7 +6,8 @@ page 6014566 "NPR Retail Logo Setup"
     PageType = List;
     SourceTable = "NPR Retail Logo";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,7 +15,8 @@ page 6014566 "NPR Retail Logo Setup"
         {
             usercontrol("NPR ResizeImage"; "NPR ResizeImage")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
                 trigger OnCtrlReady()
                 begin
                     RetailLogoMgtCtrl.InitializeResizeImage(CurrPage."NPR ResizeImage");
@@ -38,35 +40,41 @@ page 6014566 "NPR Retail Logo Setup"
             {
                 field(Sequence; Rec.Sequence)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sequence field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Keyword; Rec.Keyword)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Keyword field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Start Date"; Rec."Start Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End Date"; Rec."End Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Boca Compatible"; Rec.OneBitLogo.HasValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Boca Compatible';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Boca Compatible field';
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -76,7 +84,8 @@ page 6014566 "NPR Retail Logo Setup"
             part(Control6150624; "NPR Retail Logo Factbox")
             {
                 SubPageLink = Sequence = FIELD(Sequence);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -93,8 +102,9 @@ page 6014566 "NPR Retail Logo Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Logo action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -112,8 +122,9 @@ page 6014566 "NPR Retail Logo Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Logo action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

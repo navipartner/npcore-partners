@@ -12,11 +12,13 @@ page 6060165 "NPR Event Role Center"
                 ShowCaption = false;
                 part(Control6014402; "NPR Event Activities")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 part(Control6014413; "NPR Event Events by Attributes")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
             group(Control6014409)
@@ -24,19 +26,23 @@ page 6060165 "NPR Event Role Center"
                 ShowCaption = false;
                 part(Control6014410; "NPR Event Next 10 Events")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 part(Control6014411; "NPR Event Notes")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 part(Control6014412; "NPR Event Resource Overview")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 systempart(Control6014417; MyNotes)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }
@@ -50,58 +56,66 @@ page 6060165 "NPR Event Role Center"
             {
                 Caption = 'Event List';
                 RunObject = Page "NPR Event List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Event List action';
+                ApplicationArea = NPRRetail;
             }
             action(CustomerList)
             {
                 Caption = 'Customer List';
                 RunObject = Page "Customer List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Customer List action';
+                ApplicationArea = NPRRetail;
             }
             action(PlanningLines)
             {
                 Caption = 'Planning Lines';
                 RunObject = Page "NPR Event Planning Line List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Planning Lines action';
+                ApplicationArea = NPRRetail;
             }
             action(ResourceList)
             {
                 Caption = 'Resource List';
                 RunObject = Page "Resource List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Resource List action';
+                ApplicationArea = NPRRetail;
             }
             action(AttributeTemplates)
             {
                 Caption = 'Attribute Templates';
                 RunObject = Page "NPR Event Attribute Templ.";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Attribute Templates action';
+                ApplicationArea = NPRRetail;
             }
             action(ExchIntTemplates)
             {
                 Caption = 'Exch. Int. Templates';
                 RunObject = Page "NPR Event Exch. Int. Templates";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Exch. Int. Templates action';
+                ApplicationArea = NPRRetail;
             }
             action(ExchIntEmails)
             {
                 Caption = 'Exch. Int. E-mails';
                 RunObject = Page "NPR Event Exch. Int. E-Mails";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Exch. Int. E-mails action';
+                ApplicationArea = NPRRetail;
             }
             action("Event Analysis")
             {
                 Caption = 'Event Resource Avail.';
                 Image = AnalysisView;
                 RunObject = Page "NPR Event Res. Avail. Overview";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Event Resource Availability Overview';
+                ApplicationArea = NPRRetail;
             }
 
             action("Event Overview")
@@ -109,8 +123,9 @@ page 6060165 "NPR Event Role Center"
                 Caption = 'Event Overview';
                 Image = AnalysisView;
                 RunObject = report "NPR Event Overview";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Event Overview';
+                ApplicationArea = NPRRetail;
             }
         }
     }

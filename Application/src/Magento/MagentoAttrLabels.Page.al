@@ -17,16 +17,18 @@ page 6151432 "NPR Magento Attr. Labels"
                 ShowCaption = false;
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Text Field"; Format(Rec."Text Field".HasValue))
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Caption = 'Text Field';
                     Visible = TextFieldVisible;
                     ToolTip = 'Specifies the value of the Text Field field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     var
@@ -43,8 +45,9 @@ page 6151432 "NPR Magento Attr. Labels"
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

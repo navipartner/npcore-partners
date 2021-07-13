@@ -5,8 +5,9 @@ page 6184507 "NPR EFT Verifone Unit Param."
     Caption = 'EFT Verifone Unit Parameters';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR EFT Verifone Unit Param.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,68 +17,81 @@ page 6184507 "NPR EFT Verifone Unit Param."
             {
                 field("Terminal Serial Number"; Rec."Terminal Serial Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Serial Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal LAN Address"; Rec."Terminal LAN Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal LAN Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal LAN Port"; Rec."Terminal LAN Port")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal LAN Port field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal Connection Mode"; Rec."Terminal Connection Mode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Connection Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal Log Location"; Rec."Terminal Log Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Log Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal Log Level"; Rec."Terminal Log Level")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Log Level field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal Listening Port"; Rec."Terminal Listening Port")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Listening Port field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal Connection Type"; Rec."Terminal Connection Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Connection Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Terminal Default Language"; Rec."Terminal Default Language")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal Default Language field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto Close Terminal on EOD"; Rec."Auto Close Terminal on EOD")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Close Terminal on EOD field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto Open on Transaction"; Rec."Auto Open on Transaction")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Open on Transaction field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto Login After Reconnect"; Rec."Auto Login After Reconnect")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Login After Reconnect field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto Reconcile on Close"; Rec."Auto Reconcile on Close")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Reconcile on Close field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

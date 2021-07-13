@@ -6,7 +6,8 @@ page 6151026 "NPR NpRv Partners"
     PageType = List;
     SourceTable = "NPR NpRv Partner";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,28 +17,33 @@ page 6151026 "NPR NpRv Partners"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Service Url"; Rec."Service Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Service Url field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Service Username"; Rec."Service Username")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Service Username field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Service Password"; Rec."Service Password")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Service Password field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -53,8 +59,9 @@ page 6151026 "NPR NpRv Partners"
                 Image = UserCertificate;
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Partner Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Partner Relations action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

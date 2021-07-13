@@ -17,13 +17,14 @@ page 6059800 "NPR Salespers/PurchSelect"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code of the record.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = Suite, RelationshipMgmt;
                     ToolTip = 'Specifies the name of the record.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

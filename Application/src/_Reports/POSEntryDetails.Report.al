@@ -4,7 +4,7 @@ report 6014458 "NPR POS Entry Details"
     Caption = 'POS Entry Details';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = all;
+    ApplicationArea = NPRRetail;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/POSEntryDetails.rdlc';
 

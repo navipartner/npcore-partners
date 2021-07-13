@@ -6,7 +6,8 @@ page 6060097 "NPR POS Input Box Events"
     PageType = List;
     SourceTable = "NPR Ean Box Event";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,41 +17,48 @@ page 6060097 "NPR POS Input Box Events"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Module Name"; Rec."Module Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Module Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Code"; Rec."Action Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Action Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Description"; Rec."Action Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS View"; Rec."POS View")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS View field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit"; Rec."Event Codeunit")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event Codeunit field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -64,8 +72,9 @@ page 6060097 "NPR POS Input Box Events"
             {
                 Caption = 'Parameters';
                 Image = List;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Parameters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

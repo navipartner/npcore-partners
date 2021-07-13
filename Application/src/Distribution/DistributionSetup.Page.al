@@ -3,8 +3,9 @@ page 6151062 "NPR Distribution Setup"
     Caption = 'Distribution Setup';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Distribution Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,39 +15,46 @@ page 6151062 "NPR Distribution Setup"
             {
                 field("Distribution Group"; Rec."Distribution Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Hiearachy"; Rec."Item Hiearachy")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Hiearachy field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Type"; Rec."Distribution Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Distribution Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Required Delivery Date"; Rec."Required Delivery Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Required Delivery Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Replenishment Grace Period"; Rec."Replenishment Grace Period")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Replenishment Grace Period field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create SKU Per Location"; Rec."Create SKU Per Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create SKU Per Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default SKU Repl. Setup"; Rec."Default SKU Repl. Setup")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default SKU Repl. Setup field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -63,8 +71,9 @@ page 6151062 "NPR Distribution Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create SKUs action';
+                ApplicationArea = NPRRetail;
             }
             action("Create Demands")
             {
@@ -73,8 +82,9 @@ page 6151062 "NPR Distribution Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Demands action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -94,8 +104,9 @@ page 6151062 "NPR Distribution Setup"
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD("Item Hiearachy"),
                               "Distribution Group" = FIELD("Distribution Group");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Demand Lines action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

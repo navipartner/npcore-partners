@@ -8,7 +8,8 @@ page 6184481 "NPR EFT Setup"
     PageType = List;
     SourceTable = "NPR EFT Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,18 +19,21 @@ page 6184481 "NPR EFT Setup"
             {
                 field("Payment Type POS"; Rec."Payment Type POS")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Type POS field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("EFT Integration Type"; Rec."EFT Integration Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the EFT Integration Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -47,8 +51,9 @@ page 6184481 "NPR EFT Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Unit Parameters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -65,8 +70,9 @@ page 6184481 "NPR EFT Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Payment Type Parameters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

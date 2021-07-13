@@ -3,7 +3,7 @@ report 6060151 "NPR Event Team Template"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Team Template.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Event Team Template';
     dataset
     {

@@ -6,7 +6,8 @@ page 6059940 "NPR SMS Template List"
     PageType = List;
     SourceTable = "NPR SMS Template Header";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,35 +17,41 @@ page 6059940 "NPR SMS Template List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Caption"; Rec."Table Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Caption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Filters"; Rec."Table Filters".HasValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Filters on Table';
                     ToolTip = 'Specifies the value of the Filters on Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Report ID"; Rec."Report ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Report ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

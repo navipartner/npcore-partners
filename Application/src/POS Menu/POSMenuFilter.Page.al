@@ -4,8 +4,9 @@ page 6150718 "NPR POS Menu Filter"
     DelayedInsert = true;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Menu Filter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,19 +17,22 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'General';
                 field("Filter Code"; Rec."Filter Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Run object")
@@ -36,8 +40,9 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Run object';
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -46,8 +51,9 @@ page 6150718 "NPR POS Menu Filter"
                 }
                 field("Object Id"; Rec."Object Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Id field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -56,14 +62,16 @@ page 6150718 "NPR POS Menu Filter"
                 }
                 field("Object Name"; Rec."Object Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Object Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run Modal"; Rec."Run Modal")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run Modal field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Filter record")
@@ -71,8 +79,9 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Filter record';
                 field("Send Sale POS"; Rec."Send Sale POS")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Sale POS field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -81,8 +90,9 @@ page 6150718 "NPR POS Menu Filter"
                 }
                 field("Send Sale Line POS"; Rec."Send Sale Line POS")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Sale Line POS field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -91,8 +101,9 @@ page 6150718 "NPR POS Menu Filter"
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -101,17 +112,19 @@ page 6150718 "NPR POS Menu Filter"
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 group("Implied Filters")
                 {
                     Caption = 'Implied Filters';
                     field("Current POS Register / Unit"; Rec."Current POS Register / Unit")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Current POS Register / Unit field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -130,8 +143,9 @@ page 6150718 "NPR POS Menu Filter"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Test & Activate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -146,8 +160,9 @@ page 6150718 "NPR POS Menu Filter"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Deactivate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -163,8 +178,9 @@ page 6150718 "NPR POS Menu Filter"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = false;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Table Filter action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -179,15 +195,17 @@ page 6150718 "NPR POS Menu Filter"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Generic Filter action';
+                ApplicationArea = NPRRetail;
             }
             action(DisplayFilter)
             {
                 Caption = 'Display Filter';
                 Image = "Filter";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Display Filter action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

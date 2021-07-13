@@ -4,7 +4,8 @@ page 6151407 "NPR Magento Tax Classes"
     PageType = List;
     SourceTable = "NPR Magento Tax Class";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,19 +15,22 @@ page 6151407 "NPR Magento Tax Classes"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
-                    ApplicationArea = All;
+
                     Enabled = Rec."Type" = Rec."Type"::Customer;
                     ToolTip = 'Specifies the value of the Customer Config. Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -44,8 +48,9 @@ page 6151407 "NPR Magento Tax Classes"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Tax Classes action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

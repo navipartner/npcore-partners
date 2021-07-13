@@ -1,10 +1,10 @@
-﻿report 6014405 "NPR Salesperson/Item Group Top"
+report 6014405 "NPR Salesperson/Item Group Top"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/SalespersonItem Group Top.rdlc';
     Caption = 'Salesperson/Item Group Top';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
@@ -289,8 +289,9 @@
                     {
                         Caption = 'Show Only Mainfigures';
                         Visible = ShowMainTotalVisible;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Only Mainfigures field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -304,8 +305,9 @@
                     {
                         Caption = 'Sort Salespersons';
                         Visible = SortSalesPersonVisible;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sort Salespersons field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -324,8 +326,9 @@
                     {
                         Caption = 'Show Amounts';
                         Visible = ShowQtyVisible;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Amounts field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

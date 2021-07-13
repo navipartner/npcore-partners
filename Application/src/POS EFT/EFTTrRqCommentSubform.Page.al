@@ -12,11 +12,12 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
         {
             field(Receipt1Text; Receipt1Text)
             {
-                ApplicationArea = All;
+
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the Receipt1Text field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnDrillDown()
                 var
@@ -30,11 +31,12 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
             }
             field(Receipt2Text; Receipt2Text)
             {
-                ApplicationArea = All;
+
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the Receipt2Text field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnDrillDown()
                 var
@@ -50,8 +52,9 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
             {
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

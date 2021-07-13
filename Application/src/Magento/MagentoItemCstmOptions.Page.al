@@ -1,4 +1,4 @@
-﻿page 6151428 "NPR Magento Item Cstm Options"
+page 6151428 "NPR Magento Item Cstm Options"
 {
     Caption = 'Magento Item Custom Options';
     DeleteAllowed = false;
@@ -14,57 +14,67 @@
         {
             field("Item No."; Rec."Item No.")
             {
-                ApplicationArea = All;
+
                 Caption = 'Item No.';
                 ToolTip = 'Specifies the value of the Item No. field';
+                ApplicationArea = NPRRetail;
             }
             group("Custom Options")
             {
                 Caption = 'Custom Options';
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Custom Option No."; Rec."Custom Option No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Custom Option No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Required; Rec.Required)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Required field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max Length"; Rec."Max Length")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max Length field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Position; Rec.Position)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Position field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Price; Rec.Price)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Price Type"; Rec."Price Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(OptionValues; "NPR Magento Itm Cstm Opt.Value")
@@ -72,7 +82,8 @@
                 Caption = 'Values';
                 SubPageLink = "Item No." = FIELD("Item No."),
                               "Custom Option No." = FIELD("Custom Option No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

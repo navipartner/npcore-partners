@@ -6,17 +6,19 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
         {
             field("NPR NPPostingDescription1"; Rec."Posting Description")
             {
-                ApplicationArea = All;
+
                 Visible = false;
                 ToolTip = 'Specifies the value of the Posting Description field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(Control174)
         {
             field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -28,8 +30,9 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
             {
                 Caption = 'POS Entry';
                 Image = Entry;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Entry action';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("&Invoice")
@@ -41,8 +44,9 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 {
                     Caption = 'Retail Vouchers';
                     Image = Certificate;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Retail Vouchers action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -61,8 +65,9 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 Image = Import;
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import from scanner action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -82,8 +87,9 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 {
                     Caption = 'Issue Voucher';
                     Image = PostedPayableVoucher;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Issue Voucher action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

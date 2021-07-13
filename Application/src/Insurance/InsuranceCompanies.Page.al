@@ -3,8 +3,9 @@ page 6014538 "NPR Insurance Companies"
     Caption = 'Insurance - Companies';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Insurance Companies";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,8 +16,9 @@ page 6014538 "NPR Insurance Companies"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

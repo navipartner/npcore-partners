@@ -4,7 +4,8 @@ page 6151448 "NPR Magento Payment Mapping"
     PageType = List;
     SourceTable = "NPR Magento Payment Mapping";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,33 +15,39 @@ page 6151448 "NPR Magento Payment Mapping"
             {
                 field("External Payment Method Code"; Rec."External Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Payment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Payment Type"; Rec."External Payment Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Payment Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Adjust Payment Amount"; Rec."Allow Adjust Payment Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Adjust Payment Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Gateway Code"; Rec."Payment Gateway Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Gateway Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Captured Externally"; Rec."Captured Externally")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Captured Externally field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -58,8 +65,9 @@ page 6151448 "NPR Magento Payment Mapping"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Payment Methods action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

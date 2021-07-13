@@ -14,7 +14,7 @@
                 'Createcollectorrequest':
                     CreateCollectorRequests(XmlDoc);
                 else
-                    Error(MISSING_CASE, Rec."Import Type", FunctionName);
+                    Error(UnknownHandlerErr, Rec."Import Type", FunctionName);
             end;
 
         end;
@@ -23,7 +23,7 @@
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Initialized: Boolean;
-        MISSING_CASE: Label 'No handler for %1 [%2].';
+        UnknownHandlerErr: Label 'No handler for %1 [%2].', Comment = '%1="NPR Nc Import Entry"."Import Type";%2="NPR Nc Import Type"."webservice Function"';
 
     local procedure CreateCollectorRequests(XmlDoc: XmlDocument)
     var

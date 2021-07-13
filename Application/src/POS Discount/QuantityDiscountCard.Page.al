@@ -1,4 +1,4 @@
-﻿page 6014466 "NPR Quantity Discount Card"
+page 6014466 "NPR Quantity Discount Card"
 {
     UsageCategory = None;
     Caption = 'Multiple Price Header';
@@ -12,57 +12,67 @@
             {
                 field("Main No."; Rec."Main No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Main no. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Modified Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Block Custom Discount"; Rec."Block Custom Discount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Block Custom Discount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Description"; Rec."Item Description")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Conditions)
             {
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closing Date"; Rec."Closing Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closing Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Closing Time"; Rec."Closing Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closing Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 grid(Control6150629)
                 {
@@ -70,13 +80,15 @@
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(QuantityDiscountLine1; "NPR Quantity Discount Line")
@@ -86,7 +98,8 @@
                 Visible = ActionVisible;
                 Editable = DynamicEditable;
                 Enabled = Rec."Main no." <> '';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
@@ -94,7 +107,8 @@
             part(Control6150634; "Item Invoicing FactBox")
             {
                 SubPageLink = "No." = FIELD("Item No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -111,8 +125,9 @@
                 RunPageLink = "Table ID" = CONST(6014439),
                               "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Dimensions action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -127,8 +142,9 @@
                 Image = List;
                 RunObject = Page "NPR Quantity Discount List";
                 RunPageLink = "Item No." = field("Item No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the List action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6150623)
             {
@@ -137,8 +153,9 @@
             {
                 Caption = 'Send to Retail Journal';
                 Image = SendTo;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Send to Retail Journal action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -151,8 +168,9 @@
             {
                 Caption = 'Copy Multiple Price Discount';
                 Image = CopyDocument;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Copy Multiple Price Discount action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

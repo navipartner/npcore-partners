@@ -177,9 +177,9 @@ table 6151522 "NPR Nc Endpoint FTP"
 
     local procedure BuildSetupSummary(): Text
     var
-        TextSetupSummary: Label 'FTP Server: %1, Username %2, Directory %3';
+        TextSetupSummaryLbl: Label 'FTP Server: %1, Username %2, Directory %3', Comment = '%1=Server;%2=Username;%3=Directory';
     begin
-        exit(StrSubstNo(TextSetupSummary, Server, Username, Directory));
+        exit(StrSubstNo(TextSetupSummaryLbl, Server, Username, Directory));
     end;
 }
 

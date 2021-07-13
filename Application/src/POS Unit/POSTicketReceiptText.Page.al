@@ -15,21 +15,23 @@ page 6150749 "NPR POS Ticket Rcpt. Text"
             {
                 field("Rcpt. Txt. Profile Code"; Rec."Rcpt. Txt. Profile Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies POS Unit Sales Receipt Text Profile Code';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies line number of sales receipt text';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt Text"; Rec."Receipt Text")
                 {
                     Caption = 'Sales Ticket Receipt - Preview';
-                    ApplicationArea = All;
                     ToolTip = 'Specifies Receipt Text';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

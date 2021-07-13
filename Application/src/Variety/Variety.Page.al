@@ -7,7 +7,8 @@ page 6059971 "NPR Variety"
     PageType = List;
     SourceTable = "NPR Variety";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,28 +18,33 @@ page 6059971 "NPR Variety"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use in Variant Description"; Rec."Use in Variant Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Use in Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pre tag In Variant Description"; Rec."Pre tag In Variant Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pre tag In Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use Description field"; Rec."Use Description field")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Use Description field field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -59,8 +65,9 @@ page 6059971 "NPR Variety"
                 RunObject = Page "NPR Variety Table";
                 RunPageLink = Type = FIELD(Code);
                 RunPageView = SORTING(Type, Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Variety Tabel action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

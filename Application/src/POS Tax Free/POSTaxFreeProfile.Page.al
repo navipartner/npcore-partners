@@ -14,44 +14,52 @@ page 6059966 "NPR POS Tax Free Profile"
                 Caption = 'General';
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handler ID Enum"; Rec."Handler ID Enum")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handler ID field';
                     ValuesAllowed = PREMIER_PI, GLOBALBLUE_I2;
+                    ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Level"; Rec."Log Level")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Level field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Check POS Terminal IIN"; Rec."Check POS Terminal IIN")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Check POS Terminal IIN field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Timeout (ms)"; Rec."Request Timeout (ms)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request Timeout (ms) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Voucher Prints"; Rec."Store Voucher Prints")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Voucher Prints field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -69,8 +77,9 @@ page 6059966 "NPR POS Tax Free Profile"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Set Parameters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -87,8 +96,9 @@ page 6059966 "NPR POS Tax Free Profile"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Test Connection action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -105,8 +115,9 @@ page 6059966 "NPR POS Tax Free Profile"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Auto Configure action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -125,8 +136,9 @@ page 6059966 "NPR POS Tax Free Profile"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free Requests";
                 RunPageLink = "POS Unit No." = FIELD("POS Unit No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Log action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

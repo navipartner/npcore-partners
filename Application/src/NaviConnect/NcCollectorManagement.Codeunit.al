@@ -160,8 +160,8 @@
 
     procedure SetCollectionStatus(NcCollection: Record "NPR Nc Collection"; NewStatus: Option Collecting,"Ready to Send",Sent)
     var
-        TxtCollectionWillNotbeSent: Label '%1 %2 be marked as sent without being sent.';
-        TxtCollectionWillBeResentSent: Label '%1 %2 be marked unsent and %3 requests will be resent.';
+        CollectionWillNotbeSentQst: Label '%1 %2 be marked as sent without being sent.', Comment = '%1="NPR Nc Collection".TableCaption();%2="NPR Nc Collection"."No."';
+        CollectionWillBeResentSentQst: Label '%1 %2 be marked unsent and %3 requests will be resent.', Comment = '%1="NPR Nc Collection".TableCaption();%2="NPR Nc Collection"."No.";%3="NPR Nc Collection"."No. of Lines"';
     begin
         if NewStatus = NcCollection.Status then
             exit;
@@ -178,7 +178,7 @@
                             end;
                         NewStatus::Sent:
                             begin
-                                if Confirm(StrSubstNo(TxtCollectionWillNotbeSent, NcCollection.TableCaption, NcCollection."No.")) then begin
+                                if Confirm(CollectionWillNotbeSentQst, false, NcCollection.TableCaption(), NcCollection."No.") then begin
                                     NcCollection.Validate(Status, NewStatus);
                                     NcCollection.Modify(true);
                                 end;
@@ -195,7 +195,7 @@
                             end;
                         NewStatus::Sent:
                             begin
-                                if Confirm(StrSubstNo(TxtCollectionWillNotbeSent, NcCollection.TableCaption, NcCollection."No.")) then begin
+                                if Confirm(CollectionWillNotbeSentQst, false, NcCollection.TableCaption(), NcCollection."No.") then begin
                                     NcCollection.Validate(Status, NewStatus);
                                     NcCollection."Sent Date" := 0DT;
                                     NcCollection.Modify(true);
@@ -210,7 +210,7 @@
                         NcCollection.Validate(Status, NewStatus);
                         NcCollection.Modify(true);
                     end else begin
-                        if Confirm(StrSubstNo(TxtCollectionWillBeResentSent, NcCollection.TableCaption, NcCollection."No.", NcCollection."No. of Lines")) then begin
+                        if Confirm(CollectionWillBeResentSentQst, false, NcCollection.TableCaption(), NcCollection."No.", NcCollection."No. of Lines") then begin
                             NcCollection.Validate(Status, NewStatus);
                             if NewStatus = NewStatus::Collecting then
                                 NcCollection."Ready to Send Date" := 0DT;
@@ -224,14 +224,14 @@
 
     procedure CreateOutboundCollectorRequest(RequestName: Text[30]; RecordToRequest: Variant; OnlyNewAndModified: Boolean)
     var
-        TextOnlyRecords: Label 'You can only create Requests for Records.';
+        TextOnlyRecordsErr: Label 'You can only create Requests for Records.';
         RecRef: RecordRef;
         RecRef2: RecordRef;
         NcCollectorRequest: Record "NPR Nc Collector Request";
         DataLogMgt: Codeunit "NPR Data Log Management";
     begin
-        if not RecordToRequest.IsRecord then
-            Error(TextOnlyRecords);
+        if not RecordToRequest.IsRecord() then
+            Error(TextOnlyRecordsErr);
 
         NcCollectorRequest.Init();
         NcCollectorRequest.Validate(Direction, NcCollectorRequest.Direction::Outgoing);

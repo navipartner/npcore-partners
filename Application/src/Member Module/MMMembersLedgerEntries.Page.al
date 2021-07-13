@@ -7,8 +7,9 @@ page 6060129 "NPR MM Members. Ledger Entries"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Membership Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,80 +20,94 @@ page 6060129 "NPR MM Members. Ledger Entries"
                 Editable = false;
                 field("Activate On First Use"; Rec."Activate On First Use")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Activate On First Use field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid From Date"; Rec."Valid From Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid From Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Until Date"; Rec."Valid Until Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid Until Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created At"; Rec."Created At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Context; Rec.Context)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Context field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt No."; Rec."Receipt No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Receipt No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto-Renew Entry No."; Rec."Auto-Renew Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Auto-Renew Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(RemainingAmountLCY; RemainingAmountLCY)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Remaining Amount (LCY)';
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = AccentuateAmount;
                     ToolTip = 'Specifies the value of the Remaining Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked By"; Rec."Blocked By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked By field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

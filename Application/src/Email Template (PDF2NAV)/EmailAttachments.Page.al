@@ -4,11 +4,12 @@ page 6059797 "NPR E-mail Attachments"
     Caption = 'E-mail Attachments';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "NPR E-mail Attachment";
     SourceTableView = SORTING("Table No.", "Primary Key", "Line No.");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,14 +20,16 @@ page 6059797 "NPR E-mail Attachments"
                 Caption = 'Files';
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

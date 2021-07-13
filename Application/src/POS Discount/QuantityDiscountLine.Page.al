@@ -3,8 +3,9 @@ page 6014444 "NPR Quantity Discount Line"
     Caption = 'Multiple Unit Price';
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Quantity Discount Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,18 +15,21 @@ page 6014444 "NPR Quantity Discount Line"
             {
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Total; Rec.Total)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

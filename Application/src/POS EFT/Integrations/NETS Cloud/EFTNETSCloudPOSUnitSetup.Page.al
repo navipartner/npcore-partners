@@ -13,8 +13,9 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
             {
                 field("Terminal ID"; Rec."Terminal ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Terminal ID field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -37,8 +38,9 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
             {
                 Caption = 'Show Terminal Settings';
                 Image = Setup;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Terminal Settings action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

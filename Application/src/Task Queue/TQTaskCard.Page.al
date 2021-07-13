@@ -10,8 +10,9 @@ page 6059903 "NPR TQ Task Card"
     Caption = 'Task Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Task Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,73 +22,87 @@ page 6059903 "NPR TQ Task Card"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object No."; Rec."Object No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Call Object With Task Record"; Rec."Call Object With Task Record")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Call Object With Task Record field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Indentation; Rec.Indentation)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Indentation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dependence Type"; Rec."Dependence Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dependence Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Type Of Output"; Rec."Type Of Output")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type Of Output field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printer Name"; Rec."Printer Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printer Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("File Path"; Rec."File Path")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the File Path field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("File Name"; Rec."File Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the File Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language ID"; Rec."Language ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language ID field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -96,182 +111,216 @@ page 6059903 "NPR TQ Task Card"
                 }
                 field("Abbreviated Name"; Rec."Abbreviated Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Abbreviated Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Log After"; Rec."Delete Log After")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Log After field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Repetition)
             {
                 field(Recurrence; Rec.Recurrence)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recurrence Interval"; Rec."Recurrence Interval")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence Interval field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run on Monday"; Rec."Run on Monday")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run on Monday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run on Tuesday"; Rec."Run on Tuesday")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run on Tuesday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run on Wednesday"; Rec."Run on Wednesday")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run on Wednesday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run on Thursday"; Rec."Run on Thursday")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run on Thursday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run on Friday"; Rec."Run on Friday")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run on Friday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run on Saturday"; Rec."Run on Saturday")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run on Saturday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Run on Sunday"; Rec."Run on Sunday")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Run on Sunday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid After"; Rec."Valid After")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid After field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid Until field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recurrence Method"; Rec."Recurrence Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recurrence Calc. Interval"; Rec."Recurrence Calc. Interval")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence Calculation Interval field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recurrence Formula"; Rec."Recurrence Formula")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence Formula field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recurrence Time"; Rec."Recurrence Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurrence Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Retry Interval (On Error)"; Rec."Retry Interval (On Error)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Retry Interval (On Error) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max No. Of Retries (On Error)"; Rec."Max No. Of Retries (On Error)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max No. Of Retries (On Error) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action After Max. No. of Retri"; Rec."Action After Max. No. of Retri")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action After Max. No. of Retri field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("E-Mail")
             {
                 field("Send E-Mail (On Start)"; Rec."Send E-Mail (On Start)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Email On Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of E-Mail (On Start)"; Rec."No. of E-Mail (On Start)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Email On Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send E-Mail (On Error)"; Rec."Send E-Mail (On Error)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Email On Error field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of E-Mail (On Error)"; Rec."No. of E-Mail (On Error)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Email On Error field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("First E-Mail After Error No."; Rec."First E-Mail After Error No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the First E-Mail After Error No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last E-Mail After Error No."; Rec."Last E-Mail After Error No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last E-Mail After Error No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send E-Mail (On Success)"; Rec."Send E-Mail (On Success)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Email On Success field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of E-Mail (On Success)"; Rec."No. of E-Mail (On Success)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Email On Success field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Parameters)
             {
                 field("Table 1 No."; Rec."Table 1 No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table 1 No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table 1 Filter"; Rec."Table 1 Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table 1 Filter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Parameters"; Rec."Task Parameters")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Parameters field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of E-Mail (On Run)"; Rec."No. of E-Mail (On Run)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of E-Mail (On Run) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of E-Mail CC (On Run)"; Rec."No. of E-Mail CC (On Run)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of E-Mail CC (On Run) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of E-Mail BCC (On Run)"; Rec."No. of E-Mail BCC (On Run)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of E-Mail BCC (On Run) field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -299,8 +348,9 @@ page 6059903 "NPR TQ Task Card"
                     RunPageView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.")
                                   ORDER(Descending);
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Task Log action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -318,8 +368,9 @@ page 6059903 "NPR TQ Task Card"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Run Task action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -342,8 +393,9 @@ page 6059903 "NPR TQ Task Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = "Report";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Report Request Page action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

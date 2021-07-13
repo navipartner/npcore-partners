@@ -3,7 +3,7 @@ report 6014616 "NPR Retail Campaign Items"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Campaign Items.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Retail Campaign Items';
     dataset
     {

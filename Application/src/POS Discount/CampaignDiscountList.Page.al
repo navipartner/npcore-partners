@@ -15,7 +15,8 @@ page 6014455 "NPR Campaign Discount List"
     SourceTable = "NPR Period Discount";
     SourceTableView = SORTING("Starting Date", "Starting Time", "Ending Date", "Ending Time");
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -26,63 +27,73 @@ page 6014455 "NPR Campaign Discount List"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Closing Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Type"; Rec."Period Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Period Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Description"; Rec."Period Description")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Period Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date"; Rec."Created Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Modified Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -100,8 +111,9 @@ page 6014455 "NPR Campaign Discount List"
                 RunPageLink = "Table ID" = CONST(6014413),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Dimensions action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

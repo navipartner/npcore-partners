@@ -4,7 +4,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
     RDLCLayout = './src/_Reports/layouts/Item Sales StatisticsProvider.rdlc';
     Caption = 'Item Sales Statistics/Provider';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Integer"; "Integer")
@@ -244,34 +244,39 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     Caption = 'Setting';
                     field("Value Date"; ValueDate)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Value Date';
                         ToolTip = 'Specifies the value of the Value Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Item With Sales"; ShowItemWithSales)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Only Items With Sale';
                         ToolTip = 'Specifies the value of the Only Items With Sale field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Item"; ShowItem)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'View Items';
                         ToolTip = 'Specifies the value of the View Items field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Item Group"; ShowItemGroup)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Show Item Groups';
                         ToolTip = 'Specifies the value of the Show Item Groups field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(InventoryValueIsBasedOn; ValueMethod)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Inventory Value Is Based On:';
                         OptionCaption = 'sidste koebspris,kostpris (gns.)';
                         ToolTip = 'Specifies the value of the Inventory Value Is Based On: field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

@@ -13,18 +13,21 @@ page 6014556 "NPR Popup Dim. Filter"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

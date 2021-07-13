@@ -163,9 +163,9 @@ table 6151523 "NPR Nc Endpoint E-mail"
 
     local procedure BuildSetupSummary(): Text
     var
-        TextSetupSummary: Label 'E-Mail Recipient %1, subject %2.';
+        TextSetupSummaryLbl: Label 'E-Mail Recipient %1, subject %2.', Comment = '%1="NPR Nc Endpoint E-mail"."Recipient E-Mail Address";%2="NPR Nc Endpoint E-mail"."Subject Text"';
     begin
-        exit(StrSubstNo(TextSetupSummary, "Recipient E-Mail Address", "Subject Text"));
+        exit(StrSubstNo(TextSetupSummaryLbl, "Recipient E-Mail Address", "Subject Text"));
     end;
 }
 

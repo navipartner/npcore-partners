@@ -4,9 +4,10 @@ page 6151408 "NPR Magento Store Subform"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR Magento Store";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,18 +17,21 @@ page 6151408 "NPR Magento Store Subform"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

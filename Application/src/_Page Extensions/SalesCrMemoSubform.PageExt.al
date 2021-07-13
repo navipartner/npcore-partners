@@ -9,8 +9,9 @@ pageextension 6014491 "NPR Sales Cr. Memo Subform" extends "Sales Cr. Memo Subfo
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Variety action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

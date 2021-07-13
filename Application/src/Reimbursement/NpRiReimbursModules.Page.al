@@ -5,7 +5,8 @@ page 6151100 "NPR NpRi Reimburs. Modules"
     PageType = List;
     SourceTable = "NPR NpRi Reimbursement Module";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -14,31 +15,36 @@ page 6151100 "NPR NpRi Reimburs. Modules"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Subscriber Codeunit ID"; Rec."Subscriber Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Subscriber Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Subscriber Codeunit Name"; Rec."Subscriber Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Subscriber Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

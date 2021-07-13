@@ -5,7 +5,7 @@ report 6014457 "NPR Sales Stat/Analysis"
     Caption = 'Sales Stat/Analysis';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(ItemCategoryHeader; "Item Category")
@@ -683,20 +683,23 @@ report 6014457 "NPR Sales Stat/Analysis"
                     field("Show Item"; ShowItem)
                     {
                         Caption = 'Print Items';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Items field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Only Sales"; OnlySales)
                     {
                         Caption = 'Only Sales';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Only Sales field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Levels Count"; LevelsCount)
                     {
                         Caption = 'Levels';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Levels field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

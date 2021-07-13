@@ -3,8 +3,9 @@ page 6151027 "NPR NpRv Partner Card"
     Caption = 'Retail Voucher Partner';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpRv Partner";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,14 +18,16 @@ page 6151027 "NPR NpRv Partner Card"
                     ShowCaption = false;
                     field("Code"; Rec.Code)
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Name; Rec.Name)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014408)
@@ -32,21 +35,24 @@ page 6151027 "NPR NpRv Partner Card"
                     ShowCaption = false;
                     field("Service Url"; Rec."Service Url")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Service Url field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Service Username"; Rec."Service Username")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Service Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Service Password"; Rec."Service Password")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Service Password field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -65,8 +71,9 @@ page 6151027 "NPR NpRv Partner Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Validate Partner Setup action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

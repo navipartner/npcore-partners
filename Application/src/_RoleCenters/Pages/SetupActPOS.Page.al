@@ -1,4 +1,4 @@
-﻿page 6151248 "NPR Setup Act - POS"
+page 6151248 "NPR Setup Act - POS"
 {
     Caption = 'NP Retail Setup - POS';
     PageType = CardPart;
@@ -15,14 +15,16 @@
                 Caption = 'Salespersons';
                 field("User Setups"; Rec."User Setups")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User Setups field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Salespersons; Rec.Salespersons)
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Salespersons/Purchasers";
                     ToolTip = 'Specifies the value of the Salespersons field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(stores)
@@ -30,13 +32,15 @@
                 Caption = 'Stores';
                 field("POS Stores"; Rec."POS Stores")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Stores field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Units"; Rec."POS Units")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Units field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(payments)
@@ -44,13 +48,15 @@
                 Caption = 'Payments';
                 field("POS Payment Methods"; Rec."POS Payment Methods")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Payment Methods field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bins"; Rec."POS Payment Bins")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Payment Bins field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(Downloads)
@@ -61,9 +67,10 @@
                     action("Download Major Tom")
                     {
                         Caption = 'Download Major Tom';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies download URL for Major Tom Setup';
                         Image = TileCloud;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -73,9 +80,10 @@
                     action("Download HW Connector")
                     {
                         Caption = 'Download HW Connector';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies download URL for Hardware Connector Setup';
                         Image = TileCloud;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -85,7 +93,7 @@
                     action("Download Template Data")
                     {
                         Caption = 'Download Template Data';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies download URL for Template Data Setup';
                         Image = TileCloud;
 

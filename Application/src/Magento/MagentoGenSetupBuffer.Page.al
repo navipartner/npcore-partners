@@ -6,9 +6,10 @@ page 6151400 "NPR Magento Gen. Setup Buffer"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Gen. Setup Buffer";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,23 +22,26 @@ page 6151400 "NPR Magento Gen. Setup Buffer"
                 ShowAsTree = true;
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     Enabled = false;
                     Style = Strong;
                     StyleExpr = Rec.Container;
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     Enabled = NOT Rec.Container;
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     Enabled = false;
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -6,8 +6,9 @@ page 6014685 "NPR Sales Price Maint. Setup"
     Caption = 'Sales Price Maintenance Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Sales Price Maint. Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,53 +18,63 @@ page 6014685 "NPR Sales Price Maint. Setup"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Code"; Rec."Sales Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Prices Including VAT"; Rec."Prices Including VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Prices Including VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Bus. Posting Gr. (Price)"; Rec."VAT Bus. Posting Gr. (Price)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Bus. Posting Gr. (Price) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Invoice Disc."; Rec."Allow Invoice Disc.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Invoice Disc. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Line Disc."; Rec."Allow Line Disc.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Line Disc. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Internal Unit Price"; Rec."Internal Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Internal Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Factor; Rec.Factor)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Factor field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -4,8 +4,9 @@ page 6151005 "NPR POS Saved Sale Lines"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Saved Sale Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,21 +20,24 @@ page 6151005 "NPR POS Saved Sale Lines"
                     ShowCaption = false;
                     field("Sales Ticket No"; POSQuoteEntry."Sales Ticket No.")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Sales Ticket No.';
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Register No"; POSQuoteEntry."Register No.")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Register No.';
                         ToolTip = 'Specifies the value of the Register No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Salesperson Code"; POSQuoteEntry."Salesperson Code")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Salesperson Code';
                         ToolTip = 'Specifies the value of the Salesperson Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014423)
@@ -41,21 +45,24 @@ page 6151005 "NPR POS Saved Sale Lines"
                     ShowCaption = false;
                     field("Created at"; POSQuoteEntry."Created at")
                     {
-                        ApplicationArea = All;
+
                         Caption = '"Created at"';
                         ToolTip = 'Specifies the value of the "Created at" field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Amount; POSQuoteEntry.Amount)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Amount';
                         ToolTip = 'Specifies the value of the Amount field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Amount Including VAT"; POSQuoteEntry."Amount Including VAT")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Amount Including VAT';
                         ToolTip = 'Specifies the value of the Amount Including VAT field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014419)
@@ -63,39 +70,45 @@ page 6151005 "NPR POS Saved Sale Lines"
                     ShowCaption = false;
                     field("Customer Type"; POSQuoteEntry."Customer Type")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Customer Type';
                         ToolTip = 'Specifies the value of the Customer Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer No."; POSQuoteEntry."Customer No.")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Customer No.';
                         ToolTip = 'Specifies the value of the Customer No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer Price Group"; POSQuoteEntry."Customer Price Group")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Customer Price Group';
                         ToolTip = 'Specifies the value of the Customer Price Group field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer Discount Group"; POSQuoteEntry."Customer Disc. Group")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Customer Disc. Group';
                         ToolTip = 'Specifies the value of the Customer Disc. Group field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Attention; POSQuoteEntry.Attention)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Attention';
                         ToolTip = 'Specifies the value of the Attention field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Reference; POSQuoteEntry.Reference)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Reference';
                         ToolTip = 'Specifies the value of the Reference field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -103,98 +116,117 @@ page 6151005 "NPR POS Saved Sale Lines"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. VAT"; Rec."Amount Including VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Price Includes VAT"; Rec."Price Includes VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount value"; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Code"; Rec."Discount Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Authorised by"; Rec."Discount Authorised by")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Authorised by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Price Group value"; Rec."Customer Price Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Price Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("EFT Approved"; Rec."EFT Approved")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Electronic Funds Transfer Approved field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

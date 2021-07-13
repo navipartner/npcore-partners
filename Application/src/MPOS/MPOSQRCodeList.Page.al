@@ -3,9 +3,10 @@ page 6059964 "NPR MPOS QR Code List"
     Caption = 'MPOS QR Code List';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR MPOS QR Code";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,49 +16,58 @@ page 6059964 "NPR MPOS QR Code List"
             {
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Password; Rec.Password)
                 {
-                    ApplicationArea = All;
+
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Password field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Client Type"; Rec."Client Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Client Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Company; Rec.Company)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Tenant; Rec.Tenant)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tenant field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Gateway"; Rec."Payment Gateway")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Gateway field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cash Register Id"; Rec."Cash Register Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Url; Rec.Url)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Url field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Webservice Url"; Rec."Webservice Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Webservice Url field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -68,7 +78,8 @@ page 6059964 "NPR MPOS QR Code List"
                 SubPageLink = "User ID" = FIELD("User ID"),
                               Company = FIELD(Company),
                               "Cash Register Id" = FIELD("Cash Register Id");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -85,8 +96,9 @@ page 6059964 "NPR MPOS QR Code List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Set Defaults action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -101,8 +113,9 @@ page 6059964 "NPR MPOS QR Code List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create QR Code action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

@@ -1,11 +1,11 @@
-﻿page 6151500 "NPR Nc Setup"
+page 6151500 "NPR Nc Setup"
 {
     Caption = 'NaviConnect Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     SourceTable = "NPR Nc Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -13,16 +13,18 @@
         {
             field("Keep Tasks for"; Rec."Keep Tasks for")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Keep Tasks for field';
+                ApplicationArea = NPRNaviConnect;
             }
             group(General)
             {
-                Caption = 'Order Import';
+                Caption = 'General';
                 field("Max Task Count per Batch"; Rec."Max Task Count per Batch")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max Task Count per batch field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
             group("Task Queue")
@@ -30,13 +32,15 @@
                 Caption = 'Task Queue';
                 field("Task Queue Enabled"; Rec."Task Queue Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Queue Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -54,8 +58,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Task Queue action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var

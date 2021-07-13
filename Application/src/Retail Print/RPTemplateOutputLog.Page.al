@@ -20,23 +20,27 @@ page 6014513 "NPR RP Template Output Log"
                 field("Entry No.";
                 Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Name"; Rec."Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printed At"; Rec."Printed At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printed At field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -52,8 +56,9 @@ page 6014513 "NPR RP Template Output Log"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download Output action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     IStream: InStream;

@@ -5,9 +5,10 @@ page 6059951 "NPR Display Content"
     Caption = 'Display Content';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     RefreshOnActivate = true;
     SourceTable = "NPR Display Content";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,18 +18,21 @@ page 6059951 "NPR Display Content"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Content Lines"; Rec."Content Lines")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Content Lines field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -6,7 +6,8 @@ page 6151105 "NPR NpRi Parties"
     PageType = List;
     SourceTable = "NPR NpRi Party";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -15,28 +16,33 @@ page 6151105 "NPR NpRi Parties"
             {
                 field("Party Type"; Rec."Party Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Party Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reimburse every"; Rec."Reimburse every")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reimburse every field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Next Posting Date Calculation"; Rec."Next Posting Date Calculation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Next Posting Date Calculation field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -53,8 +59,9 @@ page 6151105 "NPR NpRi Parties"
                 RunObject = Page "NPR NpRi Reimbursements";
                 RunPageLink = "Party Type" = FIELD("Party Type"),
                               "Party No." = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reimbursements action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

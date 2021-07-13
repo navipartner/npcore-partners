@@ -15,33 +15,39 @@ page 6151427 "NPR Magento Custom Opt.Subform"
                 ShowCaption = false;
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Price; Rec.Price)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Price Type"; Rec."Price Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales No."; Rec."Sales No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Price Includes VAT"; Rec."Price Includes VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

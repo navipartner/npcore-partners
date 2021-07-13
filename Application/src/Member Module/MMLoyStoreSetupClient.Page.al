@@ -4,9 +4,10 @@ page 6151162 "NPR MM Loy. Store Setup Client"
     Caption = 'Loyalty Store Setup (Server)';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Loyalty Store Setup";
     SourceTableView = WHERE(Setup = CONST(CLIENT));
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,43 +17,51 @@ page 6151162 "NPR MM Loy. Store Setup Client"
             {
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Code"; Rec."Unit Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Setup; Rec.Setup)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Setup field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Authorization Code"; Rec."Authorization Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Authorization Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Accept Client Transactions"; Rec."Accept Client Transactions")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Accept Client Transactions field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Payment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Endpoint Code"; Rec."Store Endpoint Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Endpoint Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -72,8 +81,9 @@ page 6151162 "NPR MM Loy. Store Setup Client"
                 //PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Server Trx Log";
                 RunPageLink = "POS Store Code" = FIELD("Store Code");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Transaction Log action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

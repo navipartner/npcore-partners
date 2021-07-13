@@ -4,9 +4,9 @@ page 6151510 "NPR Nc Task Output List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,Navigate,NaviPartner';
     SourceTable = "NPR Nc Task Output";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -16,23 +16,27 @@ page 6151510 "NPR Nc Task Output List"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Modified at"; Rec."Last Modified at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Modified at field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Process Count"; Rec."Process Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Process Count field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
             grid(Control6151411)
@@ -43,84 +47,93 @@ page 6151510 "NPR Nc Task Output List"
                     ShowCaption = false;
                     field(" "; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151420; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151419; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151418; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151417; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151416; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151415; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151414; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(Control6151413; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the '''' field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                 }
                 group(Control6151410)
@@ -128,19 +141,21 @@ page 6151510 "NPR Nc Task Output List"
                     ShowCaption = false;
                     field(Control6151409; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Response:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Response:                                                                                                                                                                                                                                                                                 field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(ResponseText; ResponseText)
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the ResponseText field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                 }
             }
@@ -159,8 +174,9 @@ page 6151510 "NPR Nc Task Output List"
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Output action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -176,7 +192,7 @@ page 6151510 "NPR Nc Task Output List"
     end;
 
     var
-        Text000: Label 'No Output';
+        NoOutputMsg: Label 'No Output';
         ResponseText: Text;
 
     local procedure ShowOutput()
@@ -187,7 +203,7 @@ page 6151510 "NPR Nc Task Output List"
     begin
         Rec.CalcFields(Data);
         if not Rec.Data.HasValue() then begin
-            Message(Text000);
+            Message(NoOutputMsg);
             exit;
         end;
 

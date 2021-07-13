@@ -5,8 +5,9 @@ page 6151603 "NPR NpDc Valid Time Interv."
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpDc Valid Time Interval";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -22,24 +23,28 @@ page 6151603 "NPR NpDc Valid Time Interv."
                     {
                         field("Start Time"; Rec."Start Time")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Start Time field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("End Time"; Rec."End Time")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the End Time field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Period Type"; Rec."Period Type")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Period Type field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Period Description"; Rec."Period Description")
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ToolTip = 'Specifies the value of the Period Description field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -52,38 +57,45 @@ page 6151603 "NPR NpDc Valid Time Interv."
                         Visible = (Rec."Period Type" = 1);
                         field(Monday; Rec.Monday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Monday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Tuesday; Rec.Tuesday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Tuesday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Wednesday; Rec.Wednesday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Wednesday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Thursday; Rec.Thursday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Thursday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Friday; Rec.Friday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Friday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Saturday; Rec.Saturday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Saturday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Sunday; Rec.Sunday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Sunday field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }

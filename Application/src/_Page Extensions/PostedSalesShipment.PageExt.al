@@ -6,43 +6,48 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
         {
             field("NPR Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Ship-to Name")
         {
             field("NPR Ship-to Name 2"; Rec."Ship-to Name 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Ship-to Name 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Ship-to Contact")
         {
             field("NPR Kolli"; Rec."NPR Kolli")
             {
-                ApplicationArea = All;
+
                 Editable = false;
                 Importance = Promoted;
                 ToolTip = 'Specifies the value of the NPR Kolli field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Shipment Date")
         {
             field("NPR Delivery Location"; Rec."NPR Delivery Location")
             {
-                ApplicationArea = All;
+
                 Editable = false;
                 ToolTip = 'Specifies the value of the NPR Delivery Location field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Bill-to Name")
         {
             field("NPR Bill-to Name 2"; Rec."Bill-to Name 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Bill-to Name 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -53,9 +58,10 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             action("NPR Consignor Label")
             {
                 Caption = 'Consignor Label';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Consignor Label action';
                 Image = Print;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -70,9 +76,10 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 action("NPR CreatePacsoftDocument")
                 {
                     Caption = 'Create Pacsoft Shipment Document';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Create Pacsoft Shipment Document action';
                     Image = CreateDocument;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -86,9 +93,10 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 action("NPR PrintShipmentDocument")
                 {
                     Caption = 'Print Shipment Document';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Print Shipment Document action';
                     Image = Print;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

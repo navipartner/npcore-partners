@@ -7,8 +7,9 @@ pageextension 6014422 "NPR G/L Account Card" extends "G/L Account Card"
             field("NPR Retail Payment"; NPRAuxGLAccount."Retail Payment")
             {
                 Caption = 'Retail Payment';
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Is Retail Payment field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin

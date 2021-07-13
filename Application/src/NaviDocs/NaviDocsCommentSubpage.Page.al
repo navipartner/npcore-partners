@@ -7,11 +7,12 @@ page 6059770 "NPR NaviDocs Comment Subpage"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     RefreshOnActivate = true;
     SourceTable = "Activity Log";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Activity Date");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,29 +22,34 @@ page 6059770 "NPR NaviDocs Comment Subpage"
             {
                 field("Activity Date"; Rec."Activity Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Activity Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Activity Message"; Rec."Activity Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Activity Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

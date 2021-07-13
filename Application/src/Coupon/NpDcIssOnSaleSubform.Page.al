@@ -5,8 +5,9 @@ page 6151605 "NPR NpDc Iss.OnSale Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpDc Iss.OnSale Setup Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,42 +17,49 @@ page 6151605 "NPR NpDc Iss.OnSale Subform"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Lot Quantity"; Rec."Lot Quantity")
                 {
-                    ApplicationArea = All;
+
                     Visible = LotQtyVisible;
                     ToolTip = 'Specifies the value of the Lot Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Profit %"; Rec."Profit %")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Profit % field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

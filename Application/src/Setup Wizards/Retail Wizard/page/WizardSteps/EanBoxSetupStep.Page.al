@@ -14,9 +14,10 @@ page 6014673 "NPR Ean Box Setup Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -25,13 +26,15 @@ page 6014673 "NPR Ean Box Setup Step"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS View"; Rec."POS View")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS View field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

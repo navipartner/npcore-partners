@@ -4,7 +4,7 @@ page 6151533 "NPR Nc Collector Req. Lines"
     PageType = List;
     SourceTable = "NPR Nc Collector Request";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -14,88 +14,105 @@ page 6151533 "NPR Nc Collector Req. Lines"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Direction; Rec.Direction)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Direction field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Collector Code"; Rec."Collector Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Collector Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Creation Date"; Rec."Creation Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Creation Date field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Processed Date"; Rec."Processed Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processed Date field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Database Name"; Rec."Database Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Database Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Processing Comment"; Rec."Processing Comment")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Comment field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("External No."; Rec."External No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Only New and Modified Records"; Rec."Only New and Modified Records")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Only New and Modified Records field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table View"; Rec."Table View")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table View field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table Filter"; Rec."Table Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Filter field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -106,7 +123,8 @@ page 6151533 "NPR Nc Collector Req. Lines"
                 SubPageLink = "Nc Collector Request No." = FIELD("No.");
                 SubPageView = SORTING("Nc Collector Request No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
+                ApplicationArea = NPRNaviConnect;
+
             }
         }
     }

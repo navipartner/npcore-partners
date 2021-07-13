@@ -4,8 +4,9 @@ page 6151209 "NPR NpCs Store Card POSRelat."
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Store POS Relation";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,19 +16,22 @@ page 6151209 "NPR NpCs Store Card POSRelat."
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

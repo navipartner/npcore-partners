@@ -15,11 +15,12 @@ page 6151257 "NPR Retail Headline EFT RC"
                 Visible = UserGreetingVisible;
                 field(GreetingText; GreetingText)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Greeting headline';
                     Editable = false;
                     Visible = UserGreetingVisible;
                     ToolTip = 'Specifies the value of the Greeting headline field';
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -29,12 +30,13 @@ page 6151257 "NPR Retail Headline EFT RC"
                 Visible = DefaultFieldsVisible;
                 field(DocumentationText; DocumentationText)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Documentation headline';
                     DrillDown = true;
                     Editable = false;
                     Visible = DefaultFieldsVisible;
                     ToolTip = 'Specifies the value of the Documentation headline field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -49,10 +51,11 @@ page 6151257 "NPR Retail Headline EFT RC"
                 ShowCaption = false;
                 field(MyPickText; MyPickText)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'My Pick Text';
                     Editable = false;
                     ToolTip = 'Specifies the value of the My Pick Text field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Control3)
@@ -60,10 +63,11 @@ page 6151257 "NPR Retail Headline EFT RC"
                 ShowCaption = false;
                 field(AwayPickText; AwayPickText)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Away Pick Text';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Away Pick Text field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

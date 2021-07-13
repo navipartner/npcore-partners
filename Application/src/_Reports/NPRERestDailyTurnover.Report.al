@@ -1,10 +1,10 @@
-﻿report 6150660 "NPR NPRE: Rest. Daily Turnover"
+report 6150660 "NPR NPRE: Rest. Daily Turnover"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NPRE - Rest. Daily Turnover.rdlc';
     Caption = 'Restaurant Daily Turnover';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("POS Entry"; "NPR POS Entry")
@@ -221,8 +221,9 @@
                     {
                         Caption = 'Show Dimensions';
                         Editable = false;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Dimensions field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         begin
@@ -232,8 +233,9 @@
                     field("Show Table No"; ShowTableNo)
                     {
                         Caption = 'Show Seating Code';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Seating Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

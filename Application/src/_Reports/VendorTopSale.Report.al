@@ -4,7 +4,7 @@ report 6014426 "NPR Vendor Top/Sale"
     RDLCLayout = './src/_Reports/layouts/Vendor TopSale.rdlc';
     Caption = 'Vendor Top/Sale';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -347,21 +347,24 @@ report 6014426 "NPR Vendor Top/Sale"
                 {
                     Caption = 'Show Type';
                     OptionCaption = 'Item Sales,,Gains,Margin';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; SortOrder)
                 {
                     Caption = 'Sorting';
                     OptionCaption = 'Show the highest first,Show the lowest first';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Quantity"; ShowQty)
                 {
                     Caption = 'Show Quantity';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

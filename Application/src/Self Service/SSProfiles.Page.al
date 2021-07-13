@@ -2,11 +2,12 @@ page 6150678 "NPR SS Profiles"
 {
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR SS Profile";
     Caption = 'POS Self Service Profiles';
     Editable = false;
     CardPAgeID = "NPR SS Profile Card";
+    ApplicationArea = NPRRetail;
     layout
     {
         area(content)
@@ -15,18 +16,21 @@ page 6150678 "NPR SS Profiles"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Kiosk Mode Unlock PIN"; Rec."Kiosk Mode Unlock PIN")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Kios Mode Unlock PIN field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -3,10 +3,11 @@ page 6014522 "NPR Stores WP"
     Caption = 'Stores';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Store";
     SourceTableTemporary = true;
     DelayedInsert = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,9 +17,10 @@ page 6014522 "NPR Stores WP"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -27,8 +29,9 @@ page 6014522 "NPR Stores WP"
                 }
                 field("Website Code"; Rec."Website Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Website Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         MagentoWebsites: Page "NPR Websites Select";
@@ -50,13 +53,15 @@ page 6014522 "NPR Stores WP"
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Language: Record "Language";

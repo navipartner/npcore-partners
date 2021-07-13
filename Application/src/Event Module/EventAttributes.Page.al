@@ -3,8 +3,9 @@ page 6151583 "NPR Event Attributes"
     Caption = 'Event Attributes';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Event Attribute";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,13 +15,15 @@ page 6151583 "NPR Event Attributes"
             {
                 field("Template Name"; Rec."Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Promote; Rec.Promote)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Promote field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -38,8 +41,9 @@ page 6151583 "NPR Event Attributes"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Attributes Matrix action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -1,4 +1,4 @@
-﻿page 6151413 "NPR Magento Item Pict. List"
+page 6151413 "NPR Magento Item Pict. List"
 {
     Caption = 'Item Pictures';
     DeleteAllowed = false;
@@ -23,15 +23,17 @@
                     {
                         field("Item No."; Rec."Item No.")
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ToolTip = 'Specifies the value of the Item No. field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Description; Rec.Description)
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ToolTip = 'Specifies the value of the Description field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -39,7 +41,8 @@
                 {
                     Caption = 'Pictures';
                     ShowFilter = false;
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
             part(MagentoPictureLinkSubform2; "NPR Magento Pict. Link Subform")
@@ -47,7 +50,8 @@
                 Caption = 'Pictures';
                 ShowFilter = false;
                 Visible = (NOT HasVariants);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
@@ -55,7 +59,8 @@
             part(MagentoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
                 Caption = 'Magento Picture';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

@@ -7,7 +7,8 @@ page 6060078 "NPR MM Membership Kiosk"
     Caption = 'Membership Kiosk';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,7 +16,8 @@ page 6060078 "NPR MM Membership Kiosk"
         {
             usercontrol(Bridge; "NPR Bridge")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnFrameworkReady()
                 begin

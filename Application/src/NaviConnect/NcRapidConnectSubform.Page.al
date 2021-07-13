@@ -4,9 +4,9 @@ page 6151092 "NPR Nc RapidConnect Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Nc RapidConnect Trig.Table";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -16,30 +16,35 @@ page 6151092 "NPR Nc RapidConnect Subform"
             {
                 field("Table ID"; Rec."Table ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Insert Trigger"; Rec."Insert Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Insert Trigger field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Modify Trigger"; Rec."Modify Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Modify Trigger field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Control6151408; Rec."Trigger Fields")
                 {
-                    ApplicationArea = All;
+
                     HideValue = (Rec."Modify Trigger" <> 2);
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Trigger Fields field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -56,8 +61,9 @@ page 6151092 "NPR Nc RapidConnect Subform"
                 RunPageLink = "Setup Code" = FIELD("Setup Code"),
                               "Table ID" = FIELD("Table ID");
                 Visible = (Rec."Modify Trigger" = 2);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Trigger Fields action';
+                ApplicationArea = NPRNaviConnect;
             }
         }
     }

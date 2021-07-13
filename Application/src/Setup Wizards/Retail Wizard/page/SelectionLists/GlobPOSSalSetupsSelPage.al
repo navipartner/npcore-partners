@@ -14,18 +14,21 @@ page 6059778 "NPR Glob. POS Sal. Setups Sel."
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Service Url"; Rec."Service Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Service Url field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

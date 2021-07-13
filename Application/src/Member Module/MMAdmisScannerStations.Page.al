@@ -5,8 +5,9 @@ page 6060069 "NPR MM Admis. Scanner Stations"
     PageType = ListPart;
     CardPageId = "NPR Admis. Scanner Stat. Card";
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Admis. Scanner Stations";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,33 +17,39 @@ page 6060069 "NPR MM Admis. Scanner Stations"
             {
                 field("Scanner Station Id"; Rec."Scanner Station Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Guest Avatar"; Rec."Guest Avatar Image")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Guest Avatar field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Turnstile Default Image"; Rec."Default Turnstile Image")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Turnstile Default Image field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Turnstile Error Image"; Rec."Error Image of Turnstile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Turnstile Error Image field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Admission Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Activated; Rec.Activated)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Activated field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

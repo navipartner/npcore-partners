@@ -5,8 +5,9 @@ page 6060104 "NPR MM Members. Point Entry"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Members. Points Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,98 +17,117 @@ page 6060104 "NPR MM Members. Point Entry"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Point Constraint"; Rec."Point Constraint")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Point Constraint field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Value Entry No."; Rec."Value Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Loyalty Code"; Rec."Loyalty Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Loyalty Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Loyalty Item Point Line No."; Rec."Loyalty Item Point Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Loyalty Item Point Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount (LCY)"; Rec."Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Awarded Amount (LCY)"; Rec."Awarded Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Awarded Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Awarded Points"; Rec."Awarded Points")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Awarded Points field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Redeemed Points"; Rec."Redeemed Points")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Redeemed Points field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Points; Rec.Points)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Points field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Start"; Rec."Period Start")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period End"; Rec."Period End")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period End field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -124,8 +144,9 @@ page 6060104 "NPR MM Members. Point Entry"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Navigate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -6,8 +6,9 @@ page 6151057 "NPR Distribution Header"
     Caption = 'Distribution Group Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Distribution Headers";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,23 +18,27 @@ page 6151057 "NPR Distribution Header"
             {
                 field("Distribution Group"; Rec."Distribution Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Hiearachy"; Rec."Item Hiearachy")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Hiearachy field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Type"; Rec."Distribution Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -52,8 +57,9 @@ page 6151057 "NPR Distribution Header"
                 PromotedOnly = true;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Distribution Lines action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

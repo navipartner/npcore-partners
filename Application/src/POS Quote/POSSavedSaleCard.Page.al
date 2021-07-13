@@ -17,18 +17,21 @@ page 6151003 "NPR POS Saved Sale Card"
                     ShowCaption = false;
                     field("Sales Ticket No."; Rec."Sales Ticket No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Register No."; Rec."Register No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the POS Unit No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Entry No."; Rec."Entry No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Entry No. field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014408)
@@ -36,28 +39,33 @@ page 6151003 "NPR POS Saved Sale Card"
                     ShowCaption = false;
                     field("Created at"; Rec."Created at")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Created at field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Salesperson Code"; Rec."Salesperson Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Salesperson Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Amount; Rec.Amount)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Amount field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Amount Including VAT"; Rec."Amount Including VAT")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Amount Including VAT field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Contains EFT Approval"; Rec."Contains EFT Approval")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Contains EFT Approval field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014409)
@@ -65,33 +73,39 @@ page 6151003 "NPR POS Saved Sale Card"
                     ShowCaption = false;
                     field("Customer Type"; Rec."Customer Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Customer Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer No."; Rec."Customer No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Customer No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer Price Group"; Rec."Customer Price Group")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Customer Price Group field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer Disc. Group"; Rec."Customer Disc. Group")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Customer Disc. Group field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Attention; Rec.Attention)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Attention field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Reference; Rec.Reference)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Reference field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -99,7 +113,8 @@ page 6151003 "NPR POS Saved Sale Card"
             {
                 Caption = 'Lines';
                 SubPageLink = "Quote Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -112,8 +127,9 @@ page 6151003 "NPR POS Saved Sale Card"
             {
                 Caption = 'View POS Sales Data';
                 Image = XMLFile;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View POS Sales Data action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

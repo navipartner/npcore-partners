@@ -18,8 +18,9 @@ page 6151484 "NPR Magento Top10 Items by Qty"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -29,15 +30,17 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales (Qty.)"; Rec."Sales (Qty.)")
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     Caption = 'Sales (Qty.)';
                     ToolTip = 'Specifies the value of the Sales (Qty.) field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -55,9 +58,10 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by day';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
@@ -67,9 +71,10 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by week';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -80,9 +85,10 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by month';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -93,9 +99,10 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by quarter';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -106,9 +113,10 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by year';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

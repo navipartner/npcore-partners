@@ -18,107 +18,120 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                 ShowCaption = false;
                 field("Passport Number"; Rec."Passport Number")
                 {
-                    ApplicationArea = All;
+
                     Editable = PassportNumberEditable;
                     ShowMandatory = PassportNumberMandatory;
                     Visible = PassportNumberMode <> PassportNumberMode::Hide;
                     ToolTip = 'Specifies the value of the Passport Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("First Name"; Rec."First Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = FirstNameEditable;
                     ShowMandatory = FirstNameMandatory;
                     Visible = FirstNameMode <> FirstNameMode::Hide;
                     ToolTip = 'Specifies the value of the First Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = LastNameEditable;
                     ShowMandatory = LastNameMandatory;
                     Visible = LastNameMode <> LastNameMode::Hide;
                     ToolTip = 'Specifies the value of the Last Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Street; Rec.Street)
                 {
-                    ApplicationArea = All;
+
                     Editable = StreetEditable;
                     ShowMandatory = StreetMandatory;
                     Visible = StreetMode <> StreetMode::Hide;
                     ToolTip = 'Specifies the value of the Street field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Postal Code"; Rec."Postal Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = PostalCodeEditable;
                     ShowMandatory = PostalCodeMandatory;
                     Visible = PostalCodeMode <> PostalCodeMode::Hide;
                     ToolTip = 'Specifies the value of the Postal Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Town; Rec.Town)
                 {
-                    ApplicationArea = All;
+
                     Editable = TownEditable;
                     ShowMandatory = TownMandatory;
                     Visible = TownMode <> TownMode::Hide;
                     ToolTip = 'Specifies the value of the Town field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-mail"; Rec."E-mail")
                 {
-                    ApplicationArea = All;
+
                     Editable = EmailEditable;
                     ShowMandatory = EmailMandatory;
                     Visible = EmailMode <> EmailMode::Hide;
                     ToolTip = 'Specifies the value of the E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Country Of Residence"; Rec."Country Of Residence")
                 {
-                    ApplicationArea = All;
+
                     Editable = CountryCodeEditable;
                     ShowMandatory = CountryCodeMandatory;
                     Visible = CountryCodeMode <> CountryCodeMode::Hide;
                     ToolTip = 'Specifies the value of the Country Of Residence field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Passport Country"; Rec."Passport Country")
                 {
-                    ApplicationArea = All;
+
                     Editable = PassportCountryCodeEditable;
                     ShowMandatory = PassportCountryCodeMandatory;
                     Visible = PassportCountryCodeMode <> PassportCountryCodeMode::Hide;
                     ToolTip = 'Specifies the value of the Passport Country field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Of Birth"; Rec."Date Of Birth")
                 {
-                    ApplicationArea = All;
+
                     Editable = DateOfBirthEditable;
                     ShowMandatory = DateOfBirthMandatory;
                     Visible = DateOfBirthMode <> DateOfBirthMode::Hide;
                     ToolTip = 'Specifies the value of the Date Of Birth field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Departure Date"; Rec."Departure Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = DepartureEditable;
                     ShowMandatory = DepartureMandatory;
                     Visible = DepartureDateMode <> DepartureDateMode::Hide;
                     ToolTip = 'Specifies the value of the Departure Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Arrival Date"; Rec."Arrival Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = ArrivalEditable;
                     ShowMandatory = ArrivalMandatory;
                     Visible = ArrivalDateMode <> ArrivalDateMode::Hide;
                     ToolTip = 'Specifies the value of the Arrival Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Final Destination Country"; Rec."Final Destination Country")
                 {
-                    ApplicationArea = All;
+
                     Editable = FinalDestinationCountryCodeEditable;
                     ShowMandatory = FinalDestinationCountryCodeMandatory;
                     Visible = FinalDestinationCountryCodeMode <> FinalDestinationCountryCodeMode::Hide;
                     ToolTip = 'Specifies the value of the Final Destination Country field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Mobile Phone")
@@ -127,26 +140,29 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                 Visible = MobileNumberMode <> MobileNumberMode::Hide;
                 field("Mobile No. Country"; Rec."Mobile No. Country")
                 {
-                    ApplicationArea = All;
+
                     Editable = MobileNumberEditable;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
                     ToolTip = 'Specifies the value of the Mobile No. Country field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mobile No. Prefix Formatted"; Rec."Mobile No. Prefix Formatted")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Phone Prefix';
                     Editable = false;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
                     ToolTip = 'Specifies the value of the Phone Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mobile No."; Rec."Mobile No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = MobileNumberEditable;
                     ShowMandatory = MobileNumberMandatory;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
                     ToolTip = 'Specifies the value of the Mobile No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -9,7 +9,8 @@ page 6014480 "NPR Object List"
                       ORDER(Ascending)
                       WHERE("Object Type" = FILTER(<> TableData));
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -20,18 +21,21 @@ page 6014480 "NPR Object List"
                 ShowCaption = false;
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object ID"; Rec."Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Name"; Rec."Object Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -51,8 +55,9 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+b';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Table action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -66,8 +71,9 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+c';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the CodeUnit action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -81,8 +87,9 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+p';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Report action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -96,8 +103,9 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+g';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Page action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -111,8 +119,9 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+x';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the XMLPort action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -126,8 +135,9 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+a';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the All action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -144,8 +154,9 @@ page 6014480 "NPR Object List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+r';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Run action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

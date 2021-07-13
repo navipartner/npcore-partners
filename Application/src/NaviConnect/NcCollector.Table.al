@@ -30,8 +30,8 @@ table 6151525 "NPR Nc Collector"
             begin
                 if "Table No." <> xRec."Table No." then begin
                     NcCollectorFilter.SetRange("Collector Code", Code);
-                    if not NcCollectorFilter.IsEmpty then
-                        Error(TxtRemoveFilters);
+                    if not NcCollectorFilter.IsEmpty() then
+                        Error(RemoveFiltersErr);
                 end;
             end;
         }
@@ -144,20 +144,20 @@ table 6151525 "NPR Nc Collector"
     begin
         NcCollection.SetRange("Collector Code", Code);
         if not NcCollection.IsEmpty then
-            Error(TxtCannotDelete, TableCaption, Code, NcCollection.TableCaption);
+            Error(CannotDeleteErr, TableCaption, Code, NcCollection.TableCaption);
         NcCollectorFilter.SetRange("Collector Code", Code);
         NcCollectorFilter.DeleteAll(true);
     end;
 
     var
-        TxtRemoveFilters: Label 'Please remove filters first.';
-        TxtCannotDelete: Label 'You cannot delete %1 %2 because there are %3 records for this record.';
-        TxtActivationNotAllowed: Label 'Collector %1 must have a value in field %2 and-or field %3 to be active. ';
+        RemoveFiltersErr: Label 'Please remove filters first.';
+        CannotDeleteErr: Label 'You cannot delete %1 %2 because there are %3 records for this record.';
+        ActivationNotAllowedErr: Label 'Collector %1 must have a value in field %2 and-or field %3 to be active. ';
 
     local procedure CheckCriteriaActiveCollector()
     begin
         if Active and ("Wait to Send" = 0) and ("Max. Lines per Collection" = 0) then
-            Error(TxtActivationNotAllowed, Code, FieldCaption("Wait to Send"), FieldCaption("Max. Lines per Collection"));
+            Error(ActivationNotAllowedErr, Code, FieldCaption("Wait to Send"), FieldCaption("Max. Lines per Collection"));
     end;
 }
 

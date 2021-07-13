@@ -11,7 +11,8 @@ page 6059896 "NPR Data Log Subscribers"
     PageType = List;
     SourceTable = "NPR Data Log Subscriber";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -21,64 +22,76 @@ page 6059896 "NPR Data Log Subscribers"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table ID"; Rec."Table ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Log Entry No."; Rec."Last Log Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Log Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Direct Data Processing"; Rec."Direct Data Processing")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Direct Data Processing field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Processing Codeunit ID"; Rec."Data Processing Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Processing Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Processing Codeunit Name"; Rec."Data Processing Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Processing Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Date Modified field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delayed Data Processing (sec)"; Rec."Delayed Data Processing (sec)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the number of seconds for Delayed Data Processing';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Failure Codeunit ID"; Rec."Failure Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies ID of Failure Codeunit';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Failure Codeunit Caption"; Rec."Failure Codeunit Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the Caption of Failure Codeunit';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

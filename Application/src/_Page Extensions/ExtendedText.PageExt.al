@@ -9,8 +9,9 @@ pageextension 6014435 "NPR Extended Text" extends "Extended Text"
                 Caption = 'Jobs';
                 field("NPR Event"; Rec."NPR Event")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Event field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

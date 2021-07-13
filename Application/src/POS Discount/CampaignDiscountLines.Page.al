@@ -4,8 +4,9 @@ page 6014454 "NPR Campaign Discount Lines"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Period Discount Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,8 +17,9 @@ page 6014454 "NPR Campaign Discount Lines"
                 ShowCaption = false;
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -40,94 +42,110 @@ page 6014454 "NPR Campaign Discount Lines"
                 }
                 field("Cross-Reference No."; Rec."Cross-Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Campaign Unit Price"; Rec."Campaign Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Campaign Profit"; Rec."Campaign Profit")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Campaign Profit field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Control1160330002; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Comment';
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Inventory';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity On Purchase Order"; Rec."Quantity On Purchase Order")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Quantity in Purchase Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Campaign Unit Cost"; Rec."Campaign Unit Cost")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Profit; Rec.Profit)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Revenue of period';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Revenue of period field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Closing Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price Incl. VAT"; Rec."Unit Price Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -145,8 +163,9 @@ page 6014454 "NPR Campaign Discount Lines"
                 RunPageLink = "Table ID" = CONST(6014414),
                               "No." = FIELD(Code),
                               "No. 2" = FIELD("Item No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Comment action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

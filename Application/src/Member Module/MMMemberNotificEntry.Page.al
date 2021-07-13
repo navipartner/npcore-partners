@@ -5,8 +5,9 @@ page 6060144 "NPR MM Member Notific. Entry"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Member Notific. Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,214 +17,254 @@ page 6060144 "NPR MM Member Notific. Entry"
             {
                 field("Notification Trigger"; Rec."Notification Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Method"; Rec."Notification Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date To Notify"; Rec."Date To Notify")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date To Notify field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Sent By User"; Rec."Notification Sent By User")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Notification Sent By User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Sent At"; Rec."Notification Sent At")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Notification Sent At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Send Status"; Rec."Notification Send Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Send Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Member No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("First Name"; Rec."First Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the First Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Middle Name"; Rec."Middle Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Middle Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Display Name"; Rec."Display Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Display Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code Code"; Rec."Post Code Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the ZIP Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Country Code"; Rec."Country Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Country Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Country; Rec.Country)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Country field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Birthday; Rec.Birthday)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Birthday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Community Code"; Rec."Community Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Community Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Valid From"; Rec."Membership Valid From")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Valid From field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Valid Until"; Rec."Membership Valid Until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Valid Until field';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Membership Consecutive From"; Rec."Membership Consecutive From")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Consecutive From field';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Membership Consecutive Until"; Rec."Membership Consecutive Until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Consecutive Until field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Member Role"; Rec."Target Member Role")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Member Role field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Filter Value"; Rec."Template Filter Value")
                 {
-                    ApplicationArea = All;
+
                     Enabled = false;
                     ToolTip = 'Specifies the value of the Template Filter Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Include NP Pass"; Rec."Include NP Pass")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Include NP Pass field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Wallet Pass Id"; Rec."Wallet Pass Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Wallet Pass Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Wallet Pass Default URL"; Rec."Wallet Pass Default URL")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Wallet Pass Default URL field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Wallet Pass Andriod URL"; Rec."Wallet Pass Andriod URL")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Wallet Pass Andriod URL field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked By User"; Rec."Blocked By User")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Blocked By User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Code"; Rec."Notification Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Notification Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Entry No."; Rec."Member Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Member Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Entry No."; Rec."Notification Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Notification Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Failed With Message"; Rec."Failed With Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Failed With Message field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

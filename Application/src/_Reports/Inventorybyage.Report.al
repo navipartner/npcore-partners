@@ -4,7 +4,8 @@ report 6014400 "NPR Inventory by age"
     RDLCLayout = './src/_Reports/layouts/Inventory by age.rdlc';
     Caption = 'Inventory By Age';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem(ItemCategoryHeader; "Item Category")
@@ -695,34 +696,39 @@ report 6014400 "NPR Inventory by age"
                     field("PeriodStartDato[2]"; PeriodStartDato[2])
                     {
                         Caption = 'Start Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Start Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Period Length"; PeriodLength)
                     {
                         Caption = 'Period Length';
                         DateFormula = true;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Period Length field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Item"; ShowItem)
                     {
                         Caption = 'Show Items';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Items field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Zero Lines"; ShowZeroLines)
                     {
                         Caption = 'Show Zero Item Lines';
                         Editable = ShowItem;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Zero Item Lines field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Item Grp Level"; ItemGrpLevel)
                     {
                         Caption = 'Level';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Level field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

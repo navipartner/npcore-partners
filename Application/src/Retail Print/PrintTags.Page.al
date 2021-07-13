@@ -5,8 +5,9 @@ page 6014417 "NPR Print Tags"
     Caption = 'Print Tags';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Print Tags";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,14 +17,16 @@ page 6014417 "NPR Print Tags"
             {
                 field("Print Tag"; Rec."Print Tag")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Tag field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Pick; Pick)
                 {
-                    ApplicationArea = All;
+
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Pick field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin

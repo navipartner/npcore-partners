@@ -2,7 +2,8 @@ page 6060045 "NPR Item Search Page"
 {
     Caption = 'Item Search Page';
     UsageCategory = Documents;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -11,59 +12,67 @@ page 6060045 "NPR Item Search Page"
             {
                 field(ExternalItemNo; ExternalItemNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'External Item No';
                     ToolTip = 'Specifies the value of the External Item No field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ExternalType; ExternalType)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'External Type';
                     OptionCaption = 'All,VendorItemNo,Barcode,CrossReference,AlternativeNo';
                     ToolTip = 'Specifies the value of the External Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(VendorNo; VendorNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Vendor No.';
                     TableRelation = Vendor."No.";
                     ToolTip = 'Specifies the value of the Vendor No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(UnitOfMeasure; UnitOfMeasure)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Unit Of Measure';
                     TableRelation = "Unit of Measure";
                     ToolTip = 'Specifies the value of the Unit Of Measure field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ItemNo; ItemNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Item No.';
                     Editable = false;
                     TableRelation = Item."No.";
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(VariantCode; VariantCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variant Code';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(FoundItem; FoundItem)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Found Item';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Found Item field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(SearchTime; Searchtime)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Search time (seconds)';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Search time (seconds) field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -81,8 +90,9 @@ page 6060045 "NPR Item Search Page"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Search action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

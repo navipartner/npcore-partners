@@ -14,11 +14,12 @@ page 6014690 "NPR User Setup Step"
             {
                 field("User ID"; UserId)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'User Id';
                     ToolTip = 'Specifies the ID of the user who posted the entry, to be used, for example, in the change log.';
 
                     Lookup = true;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -30,26 +31,30 @@ page 6014690 "NPR User Setup Step"
                 }
                 field("Allow Posting From"; Rec."Allow Posting From")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the earliest date on which the user is allowed to post to the company.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Posting To"; Rec."Allow Posting To")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the last date on which the user is allowed to post to the company.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit Time"; Rec."Register Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies whether to register the user''s time usage defined as the time spent from when the user logs in to when the user logs out. Unexpected interruptions, such as idle session timeout, terminal server idle session timeout, or a client crash are not recorded.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salespers./Purch. Code"; SalespersonCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Salesperson Code';
                     ToolTip = 'Specifies the code for the salesperson or purchaser for the user.';
 
                     Lookup = true;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -61,8 +66,9 @@ page 6014690 "NPR User Setup Step"
                 }
                 field("Sales Resp. Ctr. Filter"; Rec."Sales Resp. Ctr. Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code for the responsibility center to which you want to assign the user.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -78,8 +84,9 @@ page 6014690 "NPR User Setup Step"
 
                 field("Purchase Resp. Ctr. Filter"; Rec."Purchase Resp. Ctr. Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code for the responsibility center to which you want to assign the user.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -94,8 +101,9 @@ page 6014690 "NPR User Setup Step"
                 }
                 field("Service Resp. Ctr. Filter"; Rec."Service Resp. Ctr. Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the code for the responsibility center you want to assign to the user. The user will only be able to see service documents for the responsibility center specified in the field. This responsibility center will also be the default responsibility center when the user creates new service documents.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -110,13 +118,15 @@ page 6014690 "NPR User Setup Step"
                 }
                 field("Time Sheet Admin."; Rec."Time Sheet Admin.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if a user is a time sheet administrator. A time sheet administrator can access any time sheet and then edit, change, or delete it.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR POS Unit No."; Rec."NPR POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Backoffice POS Unit No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -139,23 +149,27 @@ page 6014690 "NPR User Setup Step"
                 }
                 field("Allow POS Unit Switch"; Rec."NPR Allow Register Switch")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Allow POS Unit Switch field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit Switch Filter"; Rec."NPR Register Switch Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR POS Unit Switch Filter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Email; Rec."E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the user''s email address.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Anonymize Customers"; Rec."NPR Anonymize Customers")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Anonymize Customers field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

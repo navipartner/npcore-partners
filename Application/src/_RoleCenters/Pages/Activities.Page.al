@@ -1,4 +1,4 @@
-﻿page 6151255 "NPR Activities"
+page 6151255 "NPR Activities"
 
 {
     Caption = 'Retail Activities';
@@ -16,18 +16,20 @@
                 ShowCaption = false;
                 field("Import Pending"; Rec."Import Pending")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Import Unprocessed';
                     DrillDownPageID = "NPR Nc Import List";
                     ToolTip = 'Specifies the value of the Import Unprocessed field';
+                    ApplicationArea = NPRRetail;
 
                 }
                 field("Task List"; Rec."Task List")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Task List';
                     DrillDownPageId = "NPR Nc Task List";
                     ToolTip = 'Specifies the value of the Task List field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(Control6150624)
@@ -36,29 +38,32 @@
                 ShowCaption = true;
                 field("Daily Sales Orders"; Rec."Daily Sales Orders")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the value of the Daily Sales Orders field';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Sales Orders"; Rec."Sales Orders")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the value of the Sales Orders field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipped Sales Orders"; Rec."Shipped Sales Orders")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Shipped Sales Orders';
                     ShowCaption = true;
                     DrillDownPageId = "Sales Order List";
                     ToolTip = 'Specifies the value of the Shipped Sales Orders field';
+                    ApplicationArea = NPRRetail;
 
                 }
                 field("Sales Return Orders"; Rec."Sales Return Orders")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     DrillDownPageID = "Sales Return Order List";
                     ToolTip = 'Specifies the value of the Sales Return Orders field';
                 }

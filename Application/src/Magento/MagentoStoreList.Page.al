@@ -6,7 +6,8 @@ page 6151438 "NPR Magento Store List"
     PromotedActionCategories = 'New,Process,Reports,Manage';
     SourceTable = "NPR Magento Store";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,23 +17,27 @@ page 6151438 "NPR Magento Store List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Website Code"; Rec."Website Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Website Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -53,8 +58,9 @@ page 6151438 "NPR Magento Store List"
                 RunObject = Page "NPR Magento Store Item List";
                 RunPageLink = "Store Code" = FIELD(Code);
                 Visible = MultiStore;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Items action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

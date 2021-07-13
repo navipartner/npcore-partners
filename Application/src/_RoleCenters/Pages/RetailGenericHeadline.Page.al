@@ -15,20 +15,22 @@ page 6014511 "NPR generic retail Headline"
                 Visible = UserGreetingVisible;
                 field(GreetingText; GreetingText)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Greetings headline';
                     Editable = false;
                     ToolTip = 'Greeting txt';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(LearnMoreAndVersionNr)
             {
                 field(LearnMore; NPRetailTxt)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Learn more about NP Retail headline';
                     Editable = false;
                     ToolTip = 'Learn more about NP Retail';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -41,10 +43,11 @@ page 6014511 "NPR generic retail Headline"
                 }
                 field(NPRVersionNumber; NPRVersion)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'NPR Version';
                     Editable = false;
                     ToolTip = 'NPR Version';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

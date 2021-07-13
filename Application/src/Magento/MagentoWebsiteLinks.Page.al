@@ -17,13 +17,15 @@ page 6151405 "NPR Magento Website Links"
                 ShowCaption = false;
                 field("Website Code"; Rec."Website Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Website Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Website Name"; Rec."Website Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Website Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

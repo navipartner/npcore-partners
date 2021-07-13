@@ -4,7 +4,8 @@ page 6151453 "NPR Magento Payment Gateways"
     PageType = List;
     SourceTable = "NPR Magento Payment Gateway";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,30 +15,35 @@ page 6151453 "NPR Magento Payment Gateways"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Url"; Rec."Api Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Url field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Token; Rec.Token)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Token';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Api Username"; Rec."Api Username")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Api Username field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Password; Password)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Api Password';
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Password field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -47,33 +53,39 @@ page 6151453 "NPR Magento Payment Gateways"
                 }
                 field("Merchant ID"; Rec."Merchant ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Merchant Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Merchant Name"; Rec."Merchant Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Merchant Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Capture Codeunit Id"; Rec."Capture Codeunit Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Capture codeunit-id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Refund Codeunit Id"; Rec."Refund Codeunit Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Refund codeunit-id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cancel Codeunit Id"; Rec."Cancel Codeunit Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cancel Codeunit Id field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

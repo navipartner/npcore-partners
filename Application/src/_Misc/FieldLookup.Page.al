@@ -4,8 +4,9 @@ page 6014547 "NPR Field Lookup"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Field";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,15 +17,17 @@ page 6014547 "NPR Field Lookup"
                 ShowCaption = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Field Caption';
                     ToolTip = 'Specifies the value of the Field Caption field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

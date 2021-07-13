@@ -6,8 +6,9 @@ page 6150742 "NPR POS Admin. Template Scopes"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Admin. Template Scope";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,13 +18,15 @@ page 6150742 "NPR POS Admin. Template Scopes"
             {
                 field("Applies To"; Rec."Applies To")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Applies To field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Applies To Code"; Rec."Applies To Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Applies To Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

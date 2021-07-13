@@ -15,18 +15,21 @@ page 6014699 "NPR Ean Box Setups Select"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS View"; Rec."POS View")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS View field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

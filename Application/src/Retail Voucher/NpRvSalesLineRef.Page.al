@@ -6,9 +6,10 @@ page 6151020 "NPR NpRv Sales Line Ref."
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpRv Sales Line Ref.";
     SourceTableView = SORTING("Sales Line Id", "Voucher No.", "Reference No.");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,8 +19,9 @@ page 6151020 "NPR NpRv Sales Line Ref."
             {
                 field("Reference No."; Rec."Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -1,8 +1,9 @@
 page 6014615 "NPR RapidStart Base Data Imp."
 {
     PageType = NavigatePage;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,10 +16,11 @@ page 6014615 "NPR RapidStart Base Data Imp."
 
             field("Package Name"; package)
             {
-                ApplicationArea = All;
+
                 Caption = 'Package Name';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the package field';
+                ApplicationArea = NPRRetail;
                 trigger OnLookup(var value: Text): Boolean
                 var
                     TempRetailList: Record "NPR Retail List" temporary;
@@ -50,9 +52,10 @@ page 6014615 "NPR RapidStart Base Data Imp."
             }
             field("Adjust Table Names"; AdjustTableNames)
             {
-                ApplicationArea = All;
+
                 Caption = 'Adjust Table Names';
                 ToolTip = 'Specifies whether table names in the package should be adjusted. The option should be enabled if the package contains NPRetail tables, and it was created in NAV/BC version prior to BC16';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -63,9 +66,10 @@ page 6014615 "NPR RapidStart Base Data Imp."
         {
             action(ActionName)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the ActionName action';
                 Image = Action;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -75,29 +79,32 @@ page 6014615 "NPR RapidStart Base Data Imp."
 
             action(ActionBack)
             {
-                ApplicationArea = All;
+
                 Caption = 'Back';
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
                 Image = PreviousRecord;
+                ApplicationArea = NPRRetail;
             }
 
             action(ActionNext)
             {
-                ApplicationArea = All;
+
                 Caption = 'Next';
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
                 Image = NextRecord;
+                ApplicationArea = NPRRetail;
             }
 
             action(ActionFinish)
             {
-                ApplicationArea = All;
+
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
                 Image = Action;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

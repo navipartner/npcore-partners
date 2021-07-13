@@ -5,7 +5,8 @@ page 6151454 "NPR Magento Payment Line List"
     PageType = List;
     SourceTable = "NPR Magento Payment Line";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,88 +16,104 @@ page 6151454 "NPR Magento Payment Line List"
             {
                 field("Document Table No."; Rec."Document Table No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Type"; Rec."Payment Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Account Type"; Rec."Account Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Account No."; Rec."Account No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Adjust Amount"; Rec."Allow Adjust Amount")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Allow Adjust Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Posted; Rec.Posted)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posted field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Gateway Code"; Rec."Payment Gateway Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Payment Gateway Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Reference No."; Rec."External Reference No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Captured"; Rec."Date Captured")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date Captured field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Charge ID"; Rec."Charge ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Charge ID';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Refunded"; Rec."Date Refunded")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Date Refunded field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -104,7 +121,8 @@ page 6151454 "NPR Magento Payment Line List"
         {
             systempart(Control50000; Notes)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -122,8 +140,9 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = CaptureEnabled;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Capture Payment action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -154,8 +173,9 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = RefundEnabled;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Refund Payment action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -186,8 +206,9 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = (Rec."Document Table No." = 112) AND (Rec."Account No." <> '') AND (NOT Rec.Posted);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Post Payment action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -210,8 +231,9 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = (Rec."Document Table No." = 112) OR (Rec."Document Table No." = 114);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Navigate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -229,8 +251,9 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Document Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

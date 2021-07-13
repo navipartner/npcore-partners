@@ -6,8 +6,9 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
         {
             field("NPR PostingDescription"; Rec."Posting Description")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Posting Description field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(Control1906949207)
@@ -16,7 +17,8 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             {
                 Provider = PurchLines;
                 SubPageLink = "No." = FIELD("No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -27,9 +29,10 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             action("NPR Show Imported File")
             {
                 Caption = 'Show Imported File';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Imported File action';
                 Image = View;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -53,8 +56,9 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Retail Print action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("NPR PriceLabel")
                 {
@@ -64,8 +68,9 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Price Label action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

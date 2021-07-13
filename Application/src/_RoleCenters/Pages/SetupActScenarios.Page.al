@@ -1,4 +1,4 @@
-﻿page 6151247 "NPR Setup Act - Scenarios"
+page 6151247 "NPR Setup Act - Scenarios"
 {
     Caption = 'NP Retail - POS Scenarios Setups';
     PageType = CardPart;
@@ -15,10 +15,11 @@
                 Caption = 'Pos Scenarios';
                 field("NPR POS Scenarios"; Rec."NPR POS Sales Workflow")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'POS Scenarios';
                     ShowCaption = true;
                     ToolTip = 'Specifies the value of the POS Sales Scenarios field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup("Product Videos")
@@ -30,11 +31,12 @@
                 {
                     action(ProductVideos)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Product Videos';
                         Image = TileVideo;
                         RunObject = Page "Product Videos";
                         ToolTip = 'Open a list of videos that showcase some of the product capabilities.';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -44,10 +46,11 @@
                 {
                     action(GetStartedVideo)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Replay Getting Started';
                         Image = TileVideo;
                         Tooltip = 'Show the Getting Started guide again';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin

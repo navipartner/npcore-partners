@@ -5,8 +5,9 @@ page 6150697 "NPR NPRE Kitchen Req.Src.Links"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NPRE Kitchen Req.Src. Link";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,60 +17,71 @@ page 6150697 "NPR NPRE Kitchen Req.Src.Links"
             {
                 field("Request No."; Rec."Request No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Document Type"; Rec."Source Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Document Subtype"; Rec."Source Document Subtype")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Document Subtype field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Document Line No."; Rec."Source Document Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Document Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity (Base)"; Rec."Quantity (Base)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity (Base) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Context; Rec.Context)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Context field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Serving Step field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

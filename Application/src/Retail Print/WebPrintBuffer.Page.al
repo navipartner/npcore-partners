@@ -6,8 +6,9 @@ page 6014581 "NPR Web Print Buffer"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Web Print Buffer";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,23 +18,27 @@ page 6014581 "NPR Web Print Buffer"
             {
                 field("Printjob ID"; Rec."Printjob ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printjob ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printer ID"; Rec."Printer ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printer ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Time Created"; Rec."Time Created")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Time Created field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Printed; Rec.Printed)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printed field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -5,8 +5,9 @@ page 6014549 "NPR Event Planning Lines"
     DataCaptionExpression = Rec.Caption();
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Job Planning Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,9 +18,10 @@ page 6014549 "NPR Event Planning Lines"
                 ShowCaption = false;
                 field("Job Task No."; Rec."Job Task No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = "Job Task No.Visible";
                     ToolTip = 'Specifies the value of the Job Task No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -39,14 +41,16 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Line Type"; Rec."Line Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Usage Link"; Rec."Usage Link")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Usage Link field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -55,9 +59,10 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Planning Date"; Rec."Planning Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Planning DateEditable";
                     ToolTip = 'Specifies the value of the Planning Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -66,67 +71,78 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Starting Time"; Rec."NPR Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."NPR Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Meeting Req. Exists"; Rec."NPR Calendar Item ID" <> '')
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Meeting Req. Exists';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Meeting Req. Exists field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Calendar Item Status"; Rec."NPR Calendar Item Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Calendar Item Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Meeting Request Response"; Rec."NPR Meeting Request Response")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the NPR Meeting Request Response field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mail Item Status"; Rec."NPR Mail Item Status")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the NPR Mail Item Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Planned Delivery Date"; Rec."Planned Delivery Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Planned Delivery Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Date"; Rec."Currency Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Currency DateEditable";
                     Visible = false;
                     ToolTip = 'Specifies the value of the Currency Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Document No.Editable";
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Editable = TypeEditable;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -135,9 +151,10 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = "No.Editable";
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -146,44 +163,51 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = DescriptionEditable;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Resource E-Mail"; Rec."NPR Resource E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Resource E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Status"; Rec."NPR Ticket Status")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the NPR Ticket Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Collect Status"; Rec."NPR Ticket Collect Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Ticket Collect Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Variant CodeEditable";
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -192,9 +216,10 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Location CodeEditable";
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -203,16 +228,18 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Work Type CodeEditable";
                     Visible = false;
                     ToolTip = 'Specifies the value of the Work Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Unit of Measure CodeEditable";
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -221,10 +248,11 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field(Control5; Rec.Reserve)
                 {
-                    ApplicationArea = All;
+
                     ShowCaption = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reserve field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -233,8 +261,9 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -243,160 +272,187 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Reserved Quantity"; Rec."Reserved Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reserved Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity (Base)"; Rec."Quantity (Base)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Quantity (Base) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Qty."; Rec."Remaining Qty.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Remaining Qty. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Direct Unit Cost (LCY)"; Rec."Direct Unit Cost (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Direct Unit Cost (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Cost"; Rec."Unit Cost")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Unit CostEditable";
                     ToolTip = 'Specifies the value of the Unit Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Cost (LCY)"; Rec."Unit Cost (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Cost (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Cost"; Rec."Total Cost")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Total Cost"; Rec."Remaining Total Cost")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Remaining Total Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Cost (LCY)"; Rec."Total Cost (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Total Cost (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Total Cost (LCY)"; Rec."Remaining Total Cost (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Remaining Total Cost (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Unit PriceEditable";
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price (LCY)"; Rec."Unit Price (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit Price (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Amount"; Rec."Line Amount")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Line AmountEditable";
                     ToolTip = 'Specifies the value of the Line Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Line Amount"; Rec."Remaining Line Amount")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Remaining Line Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Amount (LCY)"; Rec."Line Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Line Amount (LCY)"; Rec."Remaining Line Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Remaining Line Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Discount Amount"; Rec."Line Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Line Discount AmountEditable";
                     ToolTip = 'Specifies the value of the Line Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Discount %"; Rec."Line Discount %")
                 {
-                    ApplicationArea = All;
+
                     Editable = "Line Discount %Editable";
                     ToolTip = 'Specifies the value of the Line Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Price"; Rec."Total Price")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Total Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Price (LCY)"; Rec."Total Price (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Total Price (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. Posted"; Rec."Qty. Posted")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. Posted field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. to Transfer to Journal"; Rec."Qty. to Transfer to Journal")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Qty. to Transfer to Journal field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posted Total Cost"; Rec."Posted Total Cost")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Posted Total Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posted Total Cost (LCY)"; Rec."Posted Total Cost (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Posted Total Cost (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posted Line Amount"; Rec."Posted Line Amount")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Posted Line Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posted Line Amount (LCY)"; Rec."Posted Line Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Posted Line Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. Transferred to Invoice"; Rec."Qty. Transferred to Invoice")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Qty. Transferred to Invoice field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -405,13 +461,15 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Qty. to Transfer to Invoice"; Rec."Qty. to Transfer to Invoice")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Qty. to Transfer to Invoice field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. Invoiced"; Rec."Qty. Invoiced")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Qty. Invoiced field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -420,14 +478,16 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Qty. to Invoice"; Rec."Qty. to Invoice")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Qty. to Invoice field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invoiced Amount (LCY)"; Rec."Invoiced Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Invoiced Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -436,9 +496,10 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("Invoiced Cost Amount (LCY)"; Rec."Invoiced Cost Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Invoiced Cost Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -447,65 +508,75 @@ page 6014549 "NPR Event Planning Lines"
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serial No."; Rec."Serial No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Serial No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Lot No."; Rec."Lot No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Lot No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Job Contract Entry No."; Rec."Job Contract Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Job Contract Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ledger Entry Type"; Rec."Ledger Entry Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Ledger Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ledger Entry No."; Rec."Ledger Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Ledger Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("System-Created Entry"; Rec."System-Created Entry")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the System-Created Entry field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Overdue; Rec.Overdue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Overdue';
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Overdue field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Est. Unit Price Incl. VAT"; Rec."NPR Est. Unit Price Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the NPR Est. Unit Price Incl. VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Est. Line Amount Incl. VAT"; Rec."NPR Est. Line Amount Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the NPR Est. Line Amount Incl. VAT field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -531,8 +602,9 @@ page 6014549 "NPR Event Planning Lines"
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'Shift+Ctrl+T';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Event &Task Lines action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator6014408)
                 {
@@ -542,8 +614,9 @@ page 6014549 "NPR Event Planning Lines"
                     Caption = 'Linked Job Ledger E&ntries';
                     Image = JobLedger;
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Linked Job Ledger E&ntries action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -569,8 +642,9 @@ page 6014549 "NPR Event Planning Lines"
                     AccessByPermission = TableData Item = R;
                     Caption = '&Reservation Entries';
                     Image = ReservationLedger;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &Reservation Entries action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -584,8 +658,9 @@ page 6014549 "NPR Event Planning Lines"
                 {
                     Caption = 'Order &Promising';
                     Image = OrderPromising;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Order &Promising action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -599,8 +674,9 @@ page 6014549 "NPR Event Planning Lines"
                     {
                         Caption = 'Send';
                         Image = Calendar;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Send action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -612,8 +688,9 @@ page 6014549 "NPR Event Planning Lines"
                     {
                         Caption = 'Remove';
                         Image = RemoveContacts;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Remove action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -625,8 +702,9 @@ page 6014549 "NPR Event Planning Lines"
                     {
                         Caption = 'Get Attendee Response';
                         Image = Answers;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Get Attendee Response action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -639,8 +717,9 @@ page 6014549 "NPR Event Planning Lines"
                 {
                     Caption = 'Send E-Mail';
                     Image = SendMail;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Send E-Mail action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -656,8 +735,9 @@ page 6014549 "NPR Event Planning Lines"
                         Caption = 'Edit Reservation and Issue';
                         Ellipsis = true;
                         Image = Edit;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Edit Reservation and Issue action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -670,8 +750,9 @@ page 6014549 "NPR Event Planning Lines"
                         Caption = 'Edit Holder';
                         Ellipsis = true;
                         Image = EditCustomer;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Edit Holder action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -687,8 +768,9 @@ page 6014549 "NPR Event Planning Lines"
                         Caption = 'Register';
                         Ellipsis = true;
                         Image = CreateDocument;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Register action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -706,8 +788,9 @@ page 6014549 "NPR Event Planning Lines"
                         Ellipsis = true;
                         Image = CancelLine;
                         Visible = false;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Revoke action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -724,8 +807,9 @@ page 6014549 "NPR Event Planning Lines"
                         Caption = 'Issue';
                         Ellipsis = true;
                         Image = PostDocument;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Issue action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -742,8 +826,9 @@ page 6014549 "NPR Event Planning Lines"
                         Caption = 'Confirm';
                         Ellipsis = true;
                         Image = ContractPayment;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Confirm action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -762,8 +847,9 @@ page 6014549 "NPR Event Planning Lines"
                     {
                         Caption = 'Collect Ticket';
                         Image = GetSourceDoc;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Collect Ticket action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -775,8 +861,9 @@ page 6014549 "NPR Event Planning Lines"
                     {
                         Caption = 'Show Ticket Printout';
                         Image = PreviewChecks;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Show Ticket Printout action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -797,8 +884,9 @@ page 6014549 "NPR Event Planning Lines"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Create Job &Journal Lines action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -833,8 +921,9 @@ page 6014549 "NPR Event Planning Lines"
                     RunObject = Page "Job Journal";
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &Open Job Journal action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator16)
                 {
@@ -848,8 +937,9 @@ page 6014549 "NPR Event Planning Lines"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Create &Sales Invoice action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -864,8 +954,9 @@ page 6014549 "NPR Event Planning Lines"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Create Sales &Credit Memo action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -880,8 +971,9 @@ page 6014549 "NPR Event Planning Lines"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Sales &Documents action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -896,8 +988,9 @@ page 6014549 "NPR Event Planning Lines"
                     Caption = '&Reservation';
                     Ellipsis = true;
                     Image = Reserve;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &Reservation action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -908,8 +1001,9 @@ page 6014549 "NPR Event Planning Lines"
                 {
                     Caption = 'Order &Tracking';
                     Image = OrderTracking;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Order &Tracking action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -923,8 +1017,9 @@ page 6014549 "NPR Event Planning Lines"
                 {
                     Caption = '&Demand Overview';
                     Image = Forecast;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &Demand Overview action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -941,8 +1036,9 @@ page 6014549 "NPR Event Planning Lines"
                     AccessByPermission = TableData "Extended Text Header" = R;
                     Caption = 'Insert &Ext. Texts';
                     Image = Text;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Insert &Ext. Texts action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -957,8 +1053,9 @@ page 6014549 "NPR Event Planning Lines"
                 {
                     Caption = 'Issued Tickets';
                     Image = ViewPostedOrder;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Issued Tickets action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -969,8 +1066,9 @@ page 6014549 "NPR Event Planning Lines"
                 {
                     Caption = 'Activity Log';
                     Image = Log;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Activity Log action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

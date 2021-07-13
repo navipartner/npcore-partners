@@ -1,12 +1,13 @@
-﻿page 6060066 "NPR Items by Location Overview"
+page 6060066 "NPR Items by Location Overview"
 {
     // NPR5.52/JAKUBV/20191022  CASE 370333 Transport NPR5.52 - 22 October 2019
 
     Caption = 'Items by Location Overview';
     PageType = ListPlus;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SaveValues = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,17 +18,19 @@
                 Caption = 'General';
                 field(ShowItems; ShowItems)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Items';
                     OptionCaption = 'On Inventory,Not on Inventory,All';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Show Items field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ShowInTransit; ShowInTransit)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Items in Transit';
                     ToolTip = 'Specifies the value of the Show Items in Transit field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -36,9 +39,10 @@
                 }
                 field(ShowColumnName; ShowColumnName)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Column Name';
                     ToolTip = 'Specifies the value of the Show Column Name field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -48,16 +52,18 @@
             }
             part(MATRIX; "NPR Items by Loc.Overv. Matrix")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             group(Filters)
             {
                 Caption = 'Filters';
                 field(ItemFilter; ItemFilter)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Item Filter';
                     ToolTip = 'Specifies the value of the Item Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -86,9 +92,10 @@
                 }
                 field(VariantFilter; VariantFilter)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variant Filter';
                     ToolTip = 'Specifies the value of the Variant Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -97,9 +104,10 @@
                 }
                 field("VarietyValueFilter[1]"; VarietyValueFilter[1])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 1 Value Filter';
                     ToolTip = 'Specifies the value of the Variety 1 Value Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -108,9 +116,10 @@
                 }
                 field("VarietyValueFilter[2]"; VarietyValueFilter[2])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 2 Value Filter';
                     ToolTip = 'Specifies the value of the Variety 2 Value Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -119,9 +128,10 @@
                 }
                 field("VarietyValueFilter[3]"; VarietyValueFilter[3])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 3 Value Filter';
                     ToolTip = 'Specifies the value of the Variety 3 Value Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -130,9 +140,10 @@
                 }
                 field("VarietyValueFilter[4]"; VarietyValueFilter[4])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 4 Value Filter';
                     ToolTip = 'Specifies the value of the Variety 4 Value Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -156,7 +167,8 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 begin
@@ -172,7 +184,8 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 begin
@@ -188,7 +201,8 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 begin
@@ -204,7 +218,8 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 begin

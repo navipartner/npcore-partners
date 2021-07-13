@@ -4,7 +4,8 @@ page 6060044 "NPR Item Worksh.Vrty. Values"
     PageType = List;
     SourceTable = "NPR Item Worksh. Variety Value";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,18 +15,21 @@ page 6060044 "NPR Item Worksh.Vrty. Values"
             {
                 field("Table"; Rec.Table)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sort Order"; Rec."Sort Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sort Order field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -4,8 +4,9 @@ page 6059794 "NPR E-mail Templ. Filters"
     Caption = 'E-mail Template Filters';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR E-mail Template Filter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,18 +16,21 @@ page 6059794 "NPR E-mail Templ. Filters"
             {
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

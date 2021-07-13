@@ -6,8 +6,9 @@ page 6150736 "NPR POS Theme Dependencies"
     Caption = 'POS Theme Dependencies';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Theme Dependency";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,8 +18,9 @@ page 6150736 "NPR POS Theme Dependencies"
             {
                 field("Target Type"; Rec."Target Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -27,30 +29,35 @@ page 6150736 "NPR POS Theme Dependencies"
                 }
                 field("Target Code"; Rec."Target Code")
                 {
-                    ApplicationArea = All;
+
                     Enabled = TargetCodeEditable;
                     ToolTip = 'Specifies the value of the Target Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target View Type"; Rec."Target View Type")
                 {
-                    ApplicationArea = All;
+
                     Enabled = TargetViewTypeEditable;
                     ToolTip = 'Specifies the value of the Target View Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dependency Type"; Rec."Dependency Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dependency Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dependency Code"; Rec."Dependency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dependency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

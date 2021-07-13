@@ -7,7 +7,8 @@ page 6151458 "NPR Magento Attr. Group List"
     SourceTableView = SORTING("Attribute Group ID")
                       ORDER(Ascending);
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,23 +18,27 @@ page 6151458 "NPR Magento Attr. Group List"
             {
                 field("Attribute Group ID"; Rec."Attribute Group ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Group ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Attribute Set ID"; Rec."Attribute Set ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Set ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sort Order"; Rec."Sort Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sort Order field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

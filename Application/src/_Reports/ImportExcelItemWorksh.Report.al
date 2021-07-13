@@ -3,7 +3,7 @@ report 6060042 "NPR Import Excel Item Worksh."
     Caption = 'Import Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")
@@ -65,34 +65,39 @@ report 6060042 "NPR Import Excel Item Worksh."
                 {
                     Caption = 'Option';
                     OptionCaption = 'Replace lines,Add lines';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Option field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Set Items To Skip"; SetItemsToSkip)
                 {
                     Caption = 'Set all items to SKIP';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Set all items to SKIP field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action If Variant Unknown"; ActionIfVariantUnknown)
                 {
                     Caption = 'If the Variant does not exist, but the Variety does';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the If the Variant does not exist, but the Variety does field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action If Variety Unknown"; ActionIfVarietyUnknown)
                 {
                     Caption = 'If the Variant and Variety do not exist';
                     OptionCaption = 'Set Variety Worksheet Line to <Skip>,Set Variety Worksheet Line to <Create>';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the If the Variant and Variety do not exist field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Combine Varieties"; CombineVarieties)
                 {
                     Caption = 'Combine Varieties';
                     ToolTip = 'Automatically try to combine all imported lines to item/variety combinations after import.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }

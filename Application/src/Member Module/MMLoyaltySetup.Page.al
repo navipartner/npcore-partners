@@ -4,8 +4,9 @@ page 6060105 "NPR MM Loyalty Setup"
     Caption = 'Loyalty Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Loyalty Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,18 +16,21 @@ page 6060105 "NPR MM Loyalty Setup"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Collection Period"; Rec."Collection Period")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Collection Period field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -37,10 +41,11 @@ page 6060105 "NPR MM Loyalty Setup"
                 }
                 field("Fixed Period Start"; Rec."Fixed Period Start")
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
                     ToolTip = 'Specifies the value of the Fixed Period Start field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -51,10 +56,11 @@ page 6060105 "NPR MM Loyalty Setup"
                 }
                 field("Collection Period Length"; Rec."Collection Period Length")
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
                     ToolTip = 'Specifies the value of the Collection Period Length field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -65,8 +71,9 @@ page 6060105 "NPR MM Loyalty Setup"
                 }
                 field("Expire Uncollected Points"; Rec."Expire Uncollected Points")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Expire Uncollected Points field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -77,8 +84,9 @@ page 6060105 "NPR MM Loyalty Setup"
                 }
                 field("Expire Uncollected After"; Rec."Expire Uncollected After")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Expire Uncollected After field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -89,10 +97,11 @@ page 6060105 "NPR MM Loyalty Setup"
                 }
                 field(TestDate; TestDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Period Test Date';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Period Test Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -106,84 +115,97 @@ page 6060105 "NPR MM Loyalty Setup"
                 }
                 field(CollectionPeriodStart; CollectionPeriodStart)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Earn Period Start';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Earn Period Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(CollectionPeriodEnd; CollectionPeriodEnd)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Earn Period End';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Earn Period End field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ExpirePointsAt; ExpirePointsAt)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Expire Points At';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Expire Points At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voucher Point Source"; Rec."Voucher Point Source")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voucher Point Source field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voucher Point Threshold"; Rec."Voucher Point Threshold")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voucher Point Threshold field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voucher Creation"; Rec."Voucher Creation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voucher Creation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Point Base"; Rec."Point Base")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Point Base field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Base"; Rec."Amount Base")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Base field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Points On Discounted Sales"; Rec."Points On Discounted Sales")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Points On Discounted Sales field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Factor"; Rec."Amount Factor")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Factor field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding on Earning"; Rec."Rounding on Earning")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies how the price * amount factor is rounded when earning points.';
                 }
                 field("Point Rate"; Rec."Point Rate")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Point Rate field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto Upgrade Point Source"; Rec."Auto Upgrade Point Source")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Upgrade Point Source field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ReasonText; ReasonText)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'ReasonText';
                     Editable = false;
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
                     Visible = false;
                     ToolTip = 'Specifies the value of the ReasonText field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -203,8 +225,9 @@ page 6060105 "NPR MM Loyalty Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Point Setup";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Points to Amount Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Item Points Setup")
             {
@@ -216,8 +239,9 @@ page 6060105 "NPR MM Loyalty Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loy. Item Point Setup";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Item Points Setup action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6014432)
             {
@@ -231,8 +255,9 @@ page 6060105 "NPR MM Loyalty Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Alter Members.";
                 RunPageLink = "Loyalty Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Auto Upgrade Threshold action';
+                ApplicationArea = NPRRetail;
             }
             group("Cross Company Loyalty")
             {
@@ -242,24 +267,27 @@ page 6060105 "NPR MM Loyalty Setup"
                     Caption = '(Server) Loyalty Server - Store Setup';
                     Image = Server;
                     RunObject = Page "NPR MM Loy. Store Setup Server";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the (Server) Loyalty Server - Store Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("(Client) Loyalty Server Endpoints")
                 {
                     Caption = '(Client) Loyalty Server Endpoints';
                     Image = Server;
                     RunObject = Page "NPR MM NPR Endpoint Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the (Client) Loyalty Server Endpoints action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("(Client) Loyalty Server - Store Setup")
                 {
                     Caption = '(Client) Loyalty Server - Store Setup';
                     Image = NumberSetup;
                     RunObject = Page "NPR MM Loy. Store Setup Client";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the (Client) Loyalty Server - Store Setup action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -270,8 +298,9 @@ page 6060105 "NPR MM Loyalty Setup"
                 Caption = 'Expire Points';
                 Ellipsis = true;
                 Image = Excise;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Expire Points action';
+                ApplicationArea = NPRRetail;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'

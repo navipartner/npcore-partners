@@ -7,9 +7,9 @@ page 6151502 "NPR Nc Task List"
     ShowFilter = true;
     SourceTable = "NPR Nc Task";
     UsageCategory = Tasks;
-    ApplicationArea = All;
     SourceTableView = SORTING("Log Date")
                       ORDER(Descending);
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -24,17 +24,19 @@ page 6151502 "NPR Nc Task List"
                     Caption = 'Filters';
                     field("COUNT"; Rec.Count)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Quantity';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Quantity field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(TaskProcessorFilter; TaskProcessorFilter)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Task Processor';
                         TableRelation = "NPR Nc Task Processor";
                         ToolTip = 'Specifies the value of the Task Processor field';
+                        ApplicationArea = NPRNaviConnect;
 
                         trigger OnValidate()
                         begin
@@ -43,9 +45,10 @@ page 6151502 "NPR Nc Task List"
                     }
                     field("Show Exported"; ShowProcessed)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Show Processed';
                         ToolTip = 'Specifies the value of the Show Processed field';
+                        ApplicationArea = NPRNaviConnect;
 
                         trigger OnValidate()
                         begin
@@ -58,19 +61,21 @@ page 6151502 "NPR Nc Task List"
                     ShowCaption = false;
                     field(Control6150656; '')
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Response:                                                                                                                                                                                                                                                                               _';
                         HideValue = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Response:                                                                                                                                                                                                                                                                               _ field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field(ResponseText; ResponseText)
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the ResponseText field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                 }
             }
@@ -79,82 +84,96 @@ page 6151502 "NPR Nc Task List"
                 ShowCaption = false;
                 field("Task Processor Code"; Rec."Task Processor Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Processor Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Processed; Rec.Processed)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processed field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Process Error"; Rec."Process Error")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Error field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Record Value"; Rec."Record Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Record Value field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Record Position"; Rec."Record Position")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Record Position field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Log Date"; Rec."Log Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Log Date field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Checked1"; Rec."Last Processing Started at")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Processing Started at field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Processing Completed at"; Rec."Last Processing Completed at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Processing Completed at field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Processing Duration"; Rec."Last Processing Duration")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Processing Duration (sec.) field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Process Count"; Rec."Process Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Process Count field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -173,8 +192,9 @@ page 6151502 "NPR Nc Task List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F5';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import new Tasks action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -190,8 +210,9 @@ page 6151502 "NPR Nc Task List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Process Manually action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -203,8 +224,9 @@ page 6151502 "NPR Nc Task List"
                 Caption = 'Reschedule for Processing';
                 Image = UpdateXML;
                 ShortCutKey = 'F9';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reschedule for Processing action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -220,8 +242,9 @@ page 6151502 "NPR Nc Task List"
                 Image = List;
                 RunObject = Page "NPR Nc Task Fields";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Fields action';
+                ApplicationArea = NPRNaviConnect;
             }
             action("Show Output")
             {
@@ -231,8 +254,9 @@ page 6151502 "NPR Nc Task List"
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Output action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -248,8 +272,9 @@ page 6151502 "NPR Nc Task List"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Source Card action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -266,8 +291,9 @@ page 6151502 "NPR Nc Task List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Task Output List";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Output action';
+                ApplicationArea = NPRNaviConnect;
             }
         }
     }
@@ -285,12 +311,12 @@ page 6151502 "NPR Nc Task List"
 
     var
         SyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        Text001: Label 'No Output';
+        NoOutputMsg: Label 'No Output';
         TaskMgt: Codeunit "NPR Nc Task Mgt.";
         ResponseText: Text;
-        Text002: Label 'The %1 selected Task(s) will be scheduled for re-export\Continue?';
+        ScheduleForReexportQst: Label 'The %1 selected Task(s) will be scheduled for re-export\Continue?';
         ShowProcessed: Boolean;
-        Text003: Label 'Updating: #1#############\Total: #2###############';
+        OpenWindowTxt: Label 'Updating: #1#############\Total: #2###############';
         TaskProcessorFilter: Code[20];
 
     local procedure IsWebClient(): Boolean
@@ -359,7 +385,7 @@ page 6151502 "NPR Nc Task List"
         Window: Dialog;
     begin
         CurrPage.SetSelectionFilter(Task);
-        Window.Open(Text003);
+        Window.Open(OpenWindowTxt);
         Window.Update(2, Task.Count());
         if Task.FindSet() then
             repeat
@@ -376,7 +402,7 @@ page 6151502 "NPR Nc Task List"
         Task: Record "NPR Nc Task";
     begin
         CurrPage.SetSelectionFilter(Task);
-        if Confirm(StrSubstNo(Text002, Task.Count), true) then begin
+        if Confirm(ScheduleForReexportQst, true, Task.Count()) then begin
             Task.ModifyAll("Process Error", false, true);
             CurrPage.Update(false);
         end;
@@ -402,13 +428,13 @@ page 6151502 "NPR Nc Task List"
                 HyperLink(Path);
                 exit;
             end;
-            Message(Text001);
+            Message(NoOutputMsg);
             exit;
         end;
         Rec."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
         if IsWebClient() then begin
             BufferText := '';
-            while not InStr.EOS do begin
+            while not InStr.EOS() do begin
                 InStr.ReadText(BufferText);
                 Content += BufferText;
             end;

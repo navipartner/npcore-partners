@@ -3,7 +3,7 @@
     var
         FTPClient: Codeunit "NPR AF FTP Client";
         SFTPClient: Codeunit "NPR AF SFTP Client";
-        AuthorizationFailedErrorText: Label 'Authorization failed. Wrong FTP username/password.';
+        AuthorizationFailedErrorErr: Label 'Authorization failed. Wrong FTP username/password.';
 
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; Filename: Text; var NcTask: Record "NPR Nc Task")
     var
@@ -65,7 +65,7 @@
         NewTask: Record "NPR Nc Task";
         TempNcEndPointFTP: Record "NPR Nc Endpoint FTP" temporary;
         RecRef: RecordRef;
-        TextTaskInserted: Label 'FTP Task inserted for Nc Endpoint FTP %1 %2, server: %3. Nc Task Entry No. %4.';
+        TextTaskInsertedLbl: Label 'FTP Task inserted for Nc Endpoint FTP %1 %2, server: %3. Nc Task Entry No. %4.', Comment = '%1=NcEndpointFTP.Code;%2=NcEndpointFTP.Description;%3=NcEndpointFTP.Server;%4=NewTask."Entry No."';
         TaskEntryNo: BigInteger;
     begin
         RecRef.Get(NcEndpointFTP.RecordId);
@@ -76,7 +76,7 @@
         TempNcEndPointFTP."Output Nc Task Entry No." := NcTask."Entry No.";
         TempNcEndPointFTP.Filename := Filename;
         NcTriggerSyncMgt.FillFields(NewTask, TempNcEndPointFTP);
-        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInserted, NcEndpointFTP.Code, NcEndpointFTP.Description, NcEndpointFTP.Server, NewTask."Entry No."));
+        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInsertedLbl, NcEndpointFTP.Code, NcEndpointFTP.Description, NcEndpointFTP.Server, NewTask."Entry No."));
     end;
 
     local procedure ProcessEndPointTask(var NcEndpointFTP: Record "NPR Nc Endpoint FTP"; var NcTask: Record "NPR Nc Task"; Output: Text; Filename: Text)
@@ -84,11 +84,11 @@
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         RecRef: RecordRef;
         FldRef: FieldRef;
-        TextNoOutput: Label 'FTP Task not executed because there was no output to send.';
+        TextNoOutputErr: Label 'FTP Task not executed because there was no output to send.';
     begin
         NcTaskMgt.RestoreRecord(NcTask."Entry No.", RecRef);
         if Output = '' then
-            Error(TextNoOutput);
+            Error(TextNoOutputErr);
         FldRef := RecRef.Field(NcEndpointFTP.FieldNo(Filename));
         if Format(FldRef.Value) <> '' then
             Filename := Format(FldRef.Value);
@@ -100,25 +100,25 @@
         ResponseDescriptionText: Text;
         ResponseCodeText: Text;
         ConnectionString: Text;
-        TextFTPServerResponseFail: Label 'File could not be uploaded. FTP server %1 returned error status %2 %3.';
-        TextFTPServerResponseSuccess: Label 'The file %1 (%2 bytes) was successfully uploaded to the FTP server %3. Server returned status %4 %5.';
+        TextFTPServerResponseFailErr: Label 'File could not be uploaded. FTP server %1 returned error status %2 %3.', Comment = '%1=NcEndpointFTP.Server;%2=ResponseCodeText;%3=ResponseDescriptionText';
+        TextFTPServerResponseSuccessLbl: Label 'The file %1 (%2 bytes) was successfully uploaded to the FTP server %3. Server returned status %4 %5.', Comment = '%1=ConnectionString;%2=StrLen(OutputText);%3=NcEndpointFTP.Server;%4=ResponseCodeText;%5=ResponseDescriptionText';
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
-        TextCouldnotFTP: Label 'File could not be uploaded. No error received from server.';
+        TextCouldnotFTPErr: Label 'File could not be uploaded. No error received from server.';
     begin
         if SendFtp(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText, ConnectionString) then begin
             case (CopyStr(ResponseDescriptionText, 1, 1)) of
                 '1', '2', '3':
                     begin
                         //Positive Response
-                        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextFTPServerResponseSuccess, ConnectionString, StrLen(OutputText), NcEndpointFTP.Server, ResponseCodeText, ResponseDescriptionText));
+                        NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextFTPServerResponseSuccessLbl, ConnectionString, StrLen(OutputText), NcEndpointFTP.Server, ResponseCodeText, ResponseDescriptionText));
                     end;
                 else begin
                         //Negative Response
-                        Error(TextFTPServerResponseFail, NcEndpointFTP.Server, ResponseCodeText, ResponseDescriptionText);
+                        Error(TextFTPServerResponseFailErr, NcEndpointFTP.Server, ResponseCodeText, ResponseDescriptionText);
                     end;
             end;
         end else
-            Error(TextCouldnotFTP);
+            Error(TextCouldnotFTPErr);
     end;
 
     local procedure SendFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
@@ -197,7 +197,7 @@
                     exit(true);
                 end;
             '401':
-                ResponseDescriptionText := AuthorizationFailedErrorText;
+                ResponseDescriptionText := AuthorizationFailedErrorErr;
             else begin
                     FTPResponse.Get('Error', JToken);
                     ResponseDescriptionText := JToken.AsValue().AsText();
@@ -262,7 +262,7 @@
                     exit(true);
                 end;
             '401':
-                ResponseDescriptionText := AuthorizationFailedErrorText;
+                ResponseDescriptionText := AuthorizationFailedErrorErr;
             else begin
                     FTPResponse.Get('Error', JToken);
                     ResponseDescriptionText := JToken.AsValue().AsText();
@@ -401,7 +401,7 @@
             '200':
                 exit;
             '401':
-                Error(AuthorizationFailedErrorText);
+                Error(AuthorizationFailedErrorErr);
             else begin
                     FTPResponse.Get('Error', JToken);
                     Error(JToken.AsValue().AsText());
@@ -442,7 +442,7 @@
                     end;
                 end;
             '401':
-                Error(AuthorizationFailedErrorText);
+                Error(AuthorizationFailedErrorErr);
             else begin
                     FTPResponse.Get('Error', JToken);
                     Error(JToken.AsValue().AsText());

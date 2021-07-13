@@ -19,9 +19,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 ShowCaption = false;
                 field(StartDate; StartDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Start Date';
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -30,9 +31,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 }
                 field(Enddate; Enddate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'End date';
                     ToolTip = 'Specifies the value of the End date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -47,9 +49,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     field("No."; Rec."No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the No. field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -59,23 +62,26 @@ page 6059814 "NPR Retail Top 10 Customers"
                     }
                     field(Name; Rec.Name)
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Phone No."; Rec."Phone No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Phone No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales (LCY)"; Rec."Sales (LCY)")
                     {
-                        ApplicationArea = All;
+
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -94,9 +100,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Day action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -107,9 +114,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Week action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -120,9 +128,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Month action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -133,9 +142,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Quarter action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -146,9 +156,10 @@ page 6059814 "NPR Retail Top 10 Customers"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Year action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

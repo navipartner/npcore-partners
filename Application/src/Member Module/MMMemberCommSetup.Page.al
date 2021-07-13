@@ -4,8 +4,9 @@ page 6151187 "NPR MM Member Comm. Setup"
     Caption = 'Member Communication Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Member Comm. Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,23 +16,27 @@ page 6151187 "NPR MM Member Comm. Setup"
             {
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Message Type"; Rec."Message Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Message Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Preferred Method"; Rec."Preferred Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Preferred Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Engine"; Rec."Notification Engine")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Engine field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -47,7 +52,8 @@ page 6151187 "NPR MM Member Comm. Setup"
                 Caption = 'Export Sender Template File';
                 ToolTip = 'Exports the default or current template used to send information to wallet.';
                 Image = ExportAttachment;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 var
@@ -89,7 +95,8 @@ page 6151187 "NPR MM Member Comm. Setup"
                 Caption = 'Import Sender Template File';
                 ToolTip = 'Define information sent to wallet.';
                 Image = ImportCodes;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 var

@@ -3,7 +3,7 @@ report 6014490 "NPR Advanced Sales Stat."
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Advanced Sales Statistics';
     UseSystemPrinter = true;
 
@@ -202,22 +202,25 @@ report 6014490 "NPR Advanced Sales Stat."
             {
                 field("Periode start"; Periodestart)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Period Start';
                     ToolTip = 'Specifies the value of the Period Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sort By"; SortBy)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Sort by';
                     OptionCaption = 'No.,Description,Period Start,Sales qty.,Sales qty. last year,Sales LCY,Sales LCY last year,Profit LCY,Profit LCY last year,Profit %,Profit % last year';
                     ToolTip = 'Specifies the value of the Sort by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Lines field"; Lines)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Lines';
                     ToolTip = 'Specifies the value of the Lines field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

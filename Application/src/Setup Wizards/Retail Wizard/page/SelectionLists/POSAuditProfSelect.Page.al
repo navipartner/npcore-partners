@@ -16,62 +16,74 @@ page 6059779 "NPR POS Audit Prof. Select"
                 field("Code"; Rec.Code)
                 {
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Sale Fiscal No. Series"; Rec."Sale Fiscal No. Series")
                 {
                     ToolTip = 'Specifies the value of the Sale Fiscal No. Series field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Credit Sale Fiscal No. Series"; Rec."Credit Sale Fiscal No. Series")
                 {
                     ToolTip = 'Specifies the value of the Credit Sale Fiscal No. Series field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Balancing Fiscal No. Series"; Rec."Balancing Fiscal No. Series")
                 {
                     ToolTip = 'Specifies the value of the Balancing Fiscal No. Series field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Fill Sale Fiscal No. On"; Rec."Fill Sale Fiscal No. On")
                 {
                     ToolTip = 'Specifies the value of the Fill Sale Fiscal No. On field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Sales Ticket No. Series"; Rec."Sales Ticket No. Series")
                 {
                     ToolTip = 'Specifies the value of the Sales Ticket No. Series field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Audit Log Enabled"; Rec."Audit Log Enabled")
                 {
                     ToolTip = 'Specifies the value of the Audit Log Enabled field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Audit Handler"; Rec."Audit Handler")
                 {
                     ToolTip = 'Specifies the value of the Audit Handler field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")
                 {
                     ToolTip = 'Specifies the value of the Allow Zero Amount Sales field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Print Receipt On Sale Cancel"; Rec."Print Receipt On Sale Cancel")
                 {
                     ToolTip = 'Specifies the value of the Print Receipt On Sale Cancel field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
                 {
                     ToolTip = 'Specifies the value of the Do Not Print Receipt on Sale field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {
                     ToolTip = 'Specifies the value of the Allow Printing Receipt Copy field';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }

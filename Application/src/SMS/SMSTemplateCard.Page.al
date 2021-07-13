@@ -13,23 +13,27 @@ page 6059941 "NPR SMS Template Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Alt. Sender"; Rec."Alt. Sender")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Alt. Sender field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -39,14 +43,16 @@ page 6059941 "NPR SMS Template Card"
                 }
                 field("Table Caption"; Rec."Table Caption")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Table Caption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recipient Type"; Rec."Recipient Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recipient Type field';
+                    ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
                         SetRecipientType()
@@ -58,9 +64,10 @@ page 6059941 "NPR SMS Template Card"
                     ShowCaption = false;
                     field(Recipient; Rec.Recipient)
                     {
-                        ApplicationArea = All;
+
                         Lookup = true;
                         ToolTip = 'Specifies the value of the Recipient field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(RecipientGrp)
@@ -69,23 +76,26 @@ page 6059941 "NPR SMS Template Card"
                     ShowCaption = false;
                     field("Recipient Group"; Rec."Recipient Group")
                     {
-                        ApplicationArea = All;
+
                         Lookup = true;
                         ToolTip = 'Specifies the value of the Recipient Group field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 field("Filters on Table"; Rec."Table Filters".HasValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Filters on Table';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Filters on Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Report ID"; Rec."Report ID")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Report ID field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -100,7 +110,8 @@ page 6059941 "NPR SMS Template Card"
                 SubPageLink = "Template Code" = FIELD(Code);
                 SubPageView = SORTING("Template Code", "Line No.");
                 UpdatePropagation = Both;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
@@ -111,7 +122,8 @@ page 6059941 "NPR SMS Template Card"
                 SubPageLink = TableNo = FIELD("Table No.");
                 SubPageView = SORTING(TableNo, "No.");
                 UpdatePropagation = Both;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -130,8 +142,9 @@ page 6059941 "NPR SMS Template Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Send SMS action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -144,8 +157,9 @@ page 6059941 "NPR SMS Template Card"
                 {
                     Caption = 'Send Batch SMS';
                     Image = SendToMultiple;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Send Batch SMS action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -166,8 +180,9 @@ page 6059941 "NPR SMS Template Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Table Filters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

@@ -15,37 +15,43 @@ page 6150696 "NPR NPRE Kitchen Order Card"
             {
                 field("Order ID"; Rec."Order ID")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Order ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("On Hold"; Rec."On Hold")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the On Hold field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -54,12 +60,14 @@ page 6150696 "NPR NPRE Kitchen Order Card"
             systempart(Control6014409; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control6014408; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -79,8 +87,9 @@ page 6150696 "NPR NPRE Kitchen Order Card"
                 RunObject = Page "NPR NPRE Kitchen Req.";
                 RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Requests action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

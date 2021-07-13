@@ -5,8 +5,9 @@ page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
     InsertAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpIa Item AddOn Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,42 +15,48 @@ page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
         {
             field(Control6014406; '')
             {
-                ApplicationArea = All;
+
                 CaptionClass = Format(GenerateInstructions());
                 Editable = false;
                 MultiLine = true;
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the '''' field';
+                ApplicationArea = NPRRetail;
             }
             repeater(Group)
             {
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the number of an item.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies a description of the entry of the product transferred from item add-on line option.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the variant of the item on the line.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies an additional description of the entry of the product.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies how many units are being sold.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

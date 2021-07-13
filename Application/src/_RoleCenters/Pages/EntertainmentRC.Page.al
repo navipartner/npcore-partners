@@ -11,42 +11,51 @@ page 6151249 "NPR Entertainment RC"
 
             part(Control7; "NPR Retail Ent Headline")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control2; "NPR Retail Enter. Act - Ticket")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control20; "NPR RC Ticket Activities")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(RCMembershipBurndownChart; "NPR RC Members. Burndown Chart")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
             }
             part(RetailActivities; "NPR Retail Activities")
             {
                 Caption = 'ACTIVITIES';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(MyJobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(MyReports; "NPR My Reports")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(PowerBi; "Power BI Report Spinner Part")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
             }
         }
@@ -62,66 +71,75 @@ page 6151249 "NPR Entertainment RC"
                 Image = Journals;
                 action("Member Community")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Member Community';
                     RunObject = Page "NPR MM Member Community";
                     ToolTip = 'Executes the Member Community action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Membership Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Membership Setup';
                     RunObject = Page "NPR MM Membership Setup";
                     ToolTip = 'Executes the Membership Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Membership Sales Setup")
                 {
                     Caption = 'Membership Sales Setup';
                     RunObject = Page "NPR MM Membership Sales Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Membership Sales Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Membership Alteration")
                 {
                     Caption = 'Membership Alteration';
                     RunObject = Page "NPR MM Membership Alter.";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Membership Alteration action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Member Notification Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Member Notification Setup';
                     RunObject = Page "NPR MM Member Notific. Setup";
                     ToolTip = 'Executes the Member Notification Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Membership Limitation Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Membership Limitation Setup';
                     RunObject = Page "NPR MM Membership Lim. Setup";
                     ToolTip = 'Executes the Membership Limitation Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Membership Admission Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Membership Admission Setup';
                     RunObject = Page "NPR MM Members. Admis. Setup";
                     ToolTip = 'Executes the Membership Admission Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("MCS Person Groups")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'MCS Person Groups';
                     RunObject = Page "NPR MCS Person Groups";
                     ToolTip = 'Executes the MCS Person Groups action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("MCS Person Group Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'MCS Person Group Setup';
                     RunObject = Page "NPR MCS Person Group Setup";
                     ToolTip = 'Executes the MCS Person Group Setup action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Loyalty)
@@ -129,52 +147,59 @@ page 6151249 "NPR Entertainment RC"
                 Caption = 'Loyalty';
                 action("Loyalty Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Loyalty Setup';
                     RunObject = Page "NPR MM Loyalty Setup";
                     ToolTip = 'Executes the Loyalty Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Points Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Loyalty Points Setup';
                     RunObject = Page "NPR MM Loyalty Point Setup";
                     ToolTip = 'Executes the Loyalty Points Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Item Point Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Loyalty Item Point Setup';
                     RunObject = Page "NPR MM Loy. Item Point Setup";
                     ToolTip = 'Executes the Loyalty Item Point Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Store Setup Server")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Loyalty Store Setup Server';
                     RunObject = Page "NPR MM Loy. Store Setup Server";
                     ToolTip = 'Executes the Loyalty Store Setup Server action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Loyalty Store Setup Client")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Loyalty Store Setup Client';
                     RunObject = Page "NPR MM Loy. Store Setup Client";
                     ToolTip = 'Executes the Loyalty Store Setup Client action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Foreign Membership Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Foreign Membership Setup';
                     RunObject = Page "NPR MM Foreign Members. Setup";
                     ToolTip = 'Executes the Foreign Membership Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("NPR Endpoint Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'NPR Endpoint Setup';
                     RunObject = Page "NPR MM NPR Endpoint Setup";
                     ToolTip = 'Executes the NPR Endpoint Setup action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Ticket)
@@ -182,38 +207,43 @@ page 6151249 "NPR Entertainment RC"
                 Caption = 'Ticket';
                 action("Ticket Type")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Ticket Type';
                     RunObject = Page "NPR TM Ticket Type";
                     ToolTip = 'Executes the Ticket Type action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Ticket BOM")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Ticket BOM';
                     RunObject = Page "NPR TM Ticket BOM";
                     ToolTip = 'Executes the Ticket BOM action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Ticket Schedules")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Ticket Schedules';
                     RunObject = Page "NPR TM Ticket Schedules";
                     ToolTip = 'Executes the Ticket Schedules action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Ticket Admissions")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Ticket Admissions';
                     RunObject = Page "NPR TM Ticket Admissions";
                     ToolTip = 'Executes the Ticket Admissions action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Admission Schedule Lines")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Admission Schedule Lines';
                     RunObject = Page "NPR TM Admis. Schedule Lines";
                     ToolTip = 'Executes the Admission Schedule Lines action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Restaurant)
@@ -221,24 +251,27 @@ page 6151249 "NPR Entertainment RC"
                 Caption = 'Restaurant';
                 action("Seating Location")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Seating Location';
                     RunObject = Page "NPR NPRE Seating Location";
                     ToolTip = 'Executes the Seating Location action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Seating List")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Seating List';
                     RunObject = Page "NPR NPRE Seating List";
                     ToolTip = 'Executes the Seating List action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Flow Status")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Flow Status';
                     RunObject = Page "NPR NPRE Select Flow Status";
                     ToolTip = 'Executes the Flow Status action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -251,17 +284,19 @@ page 6151249 "NPR Entertainment RC"
                 {
                     Caption = 'Ticket Setup';
                     RunObject = Page "NPR TM Ticket Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Ticket Setup action';
                     Image = Setup;
+                    ApplicationArea = NPRRetail;
                 }
                 action("Ticket Access Statistics Matrix")
                 {
                     Caption = 'Ticket Access Statistics Matrix';
                     RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Ticket Access Statistics Matrix action';
                     Image = ShowMatrix;
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(ActionGroup18)
@@ -269,19 +304,21 @@ page 6151249 "NPR Entertainment RC"
                 Caption = 'Member';
                 action("GDPR Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'GDPR Setup';
                     RunObject = Page "NPR GDPR Setup";
                     ToolTip = 'Executes the GDPR Setup action';
                     Image = Setup;
+                    ApplicationArea = NPRRetail;
                 }
                 action("Recurring Payment Setup")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Recurring Payment Setup';
                     RunObject = Page "NPR MM Recur. Payment Setup";
                     ToolTip = 'Executes the Recurring Payment Setup action';
                     Image = SetupPayment;
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(ActionGroup14)
@@ -291,9 +328,10 @@ page 6151249 "NPR Entertainment RC"
                 {
                     Caption = 'Restaurant Setup';
                     RunObject = Page "NPR NPRE Restaurant Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Restaurant Setup action';
                     Image = Setup;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -303,8 +341,9 @@ page 6151249 "NPR Entertainment RC"
             {
                 Caption = 'Import List';
                 RunObject = Page "NPR Nc Import List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import List action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -5,9 +5,10 @@ page 6151174 "NPR NpGp User Sale Return"
     InsertAllowed = false;
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpGp POS Sales Line";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,75 +19,85 @@ page 6151174 "NPR NpGp User Sale Return"
                 ShowCaption = false;
                 field("Original Company Name"; TempNpGpPOSSalesEntry."Original Company")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Original Company Name';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Original Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; TempNpGpPOSSalesEntry."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'POS Store Code';
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; TempNpGpPOSSalesEntry."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'POS Unit No.';
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; TempNpGpPOSSalesEntry."Document No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Document No.';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; TempNpGpPOSSalesEntry."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     Caption = ' Posting Date';
                     Editable = false;
                     ToolTip = 'Specifies the value of the  Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             repeater(Group)
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(OriginalQuantity; OriginalQuantity)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Original Quantity';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Original Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(QuantityReturned; QuantityReturned)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Quantity Already Returned';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Quantity Already Returned field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(QuantityToReturn; QuantityToReturn)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Quantity to Return';
                     Importance = Promoted;
                     MinValue = 0;
                     ToolTip = 'Specifies the value of the Quantity to Return field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -98,9 +109,10 @@ page 6151174 "NPR NpGp User Sale Return"
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

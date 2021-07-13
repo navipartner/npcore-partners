@@ -9,7 +9,8 @@ page 6014610 "NPR Retail Campaigns"
     PageType = List;
     SourceTable = "NPR Retail Campaign Header";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,19 +20,22 @@ page 6014610 "NPR Retail Campaigns"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Magento Category Id"; Rec."Magento Category Id")
                 {
-                    ApplicationArea = All;
+
                     Visible = MagentoEnabled;
                     ToolTip = 'Specifies the value of the Magento Category Id field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

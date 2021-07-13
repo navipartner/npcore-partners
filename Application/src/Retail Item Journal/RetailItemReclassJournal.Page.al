@@ -6,9 +6,10 @@ page 6014403 "NPR Retail ItemReclass.Journal"
     DelayedInsert = true;
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SaveValues = true;
     SourceTable = "Item Journal Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,10 +17,11 @@ page 6014403 "NPR Retail ItemReclass.Journal"
         {
             field(CurrentJnlBatchName; CurrentJnlBatchName)
             {
-                ApplicationArea = All;
+
                 Caption = 'Batch Name';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the Batch Name field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
@@ -39,24 +41,28 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 ShowCaption = false;
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Date"; Rec."Document Date")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -67,48 +73,55 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cross-Reference No."; Rec."Item Reference No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Shortcut Dimension 1 Code"; Rec."New Shortcut Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Shortcut Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Shortcut Dimension 2 Code"; Rec."New Shortcut Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Shortcut Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("ShortcutDimCode[3]"; ShortcutDimCode[3])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,3';
                     ShowCaption = false;
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
@@ -116,6 +129,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   Blocked = CONST(false));
                     Visible = false;
                     ToolTip = 'Specifies the value of the ShortcutDimCode[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -124,11 +138,12 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("NewShortcutDimCode[3]"; NewShortcutDimCode[3])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Text000;
                     ShowCaption = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the NewShortcutDimCode[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -143,7 +158,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,4';
                     ShowCaption = false;
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
@@ -151,6 +166,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   Blocked = CONST(false));
                     Visible = false;
                     ToolTip = 'Specifies the value of the ShortcutDimCode[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -159,11 +175,12 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("NewShortcutDimCode[4]"; NewShortcutDimCode[4])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Text001;
                     ShowCaption = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the NewShortcutDimCode[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -178,7 +195,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,5';
                     ShowCaption = false;
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
@@ -186,6 +203,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   Blocked = CONST(false));
                     Visible = false;
                     ToolTip = 'Specifies the value of the ShortcutDimCode[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -194,11 +212,12 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("NewShortcutDimCode[5]"; NewShortcutDimCode[5])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Text002;
                     ShowCaption = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the NewShortcutDimCode[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -213,7 +232,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,6';
                     ShowCaption = false;
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
@@ -221,6 +240,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   Blocked = CONST(false));
                     Visible = false;
                     ToolTip = 'Specifies the value of the ShortcutDimCode[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -229,11 +249,12 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("NewShortcutDimCode[6]"; NewShortcutDimCode[6])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Text003;
                     ShowCaption = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the NewShortcutDimCode[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -248,7 +269,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,7';
                     ShowCaption = false;
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
@@ -256,6 +277,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   Blocked = CONST(false));
                     Visible = false;
                     ToolTip = 'Specifies the value of the ShortcutDimCode[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -264,11 +286,12 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("NewShortcutDimCode[7]"; NewShortcutDimCode[7])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Text004;
                     ShowCaption = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the NewShortcutDimCode[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -283,7 +306,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '1,2,8';
                     ShowCaption = false;
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
@@ -291,6 +314,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   Blocked = CONST(false));
                     Visible = false;
                     ToolTip = 'Specifies the value of the ShortcutDimCode[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -299,11 +323,12 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("NewShortcutDimCode[8]"; NewShortcutDimCode[8])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Text005;
                     ShowCaption = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the NewShortcutDimCode[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -318,9 +343,10 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = true;
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -331,15 +357,17 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("Bin Code"; Rec."Bin Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Bin Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Location Code"; Rec."New Location Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Location Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -350,72 +378,84 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 }
                 field("New Bin Code"; Rec."New Bin Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Bin Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salespers./Purch. Code"; Rec."Salespers./Purch. Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Salespers./Purch. Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Amount"; Rec."Unit Amount")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Indirect Cost %"; Rec."Indirect Cost %")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Indirect Cost % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Cost"; Rec."Unit Cost")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Applies-to Entry"; Rec."Applies-to Entry")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Applies-to Entry field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reason Code"; Rec."Reason Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reason Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Control22)
@@ -429,10 +469,11 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         Caption = 'Item Description';
                         field(ItemDescription; ItemDescription)
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ItemDescription field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -443,12 +484,14 @@ page 6014403 "NPR Retail ItemReclass.Journal"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -467,8 +510,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Dimensions action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -481,8 +525,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
                     ShortCutKey = 'Shift+Ctrl+I';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item &Tracking Lines action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -498,8 +543,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                   "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD("Variant Code");
                     RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Bin Contents action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("&Item")
@@ -513,8 +559,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     RunObject = Page "Item Card";
                     RunPageLink = "No." = FIELD("Item No.");
                     ShortCutKey = 'Shift+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Card action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Ledger E&ntries")
                 {
@@ -527,8 +574,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     RunPageLink = "Item No." = FIELD("Item No.");
                     RunPageView = SORTING("Item No.");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Ledger E&ntries action';
+                    ApplicationArea = NPRRetail;
                 }
                 group("Item Availability by")
                 {
@@ -538,8 +586,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'Event';
                         Image = "Event";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Event action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -550,8 +599,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'Period';
                         Image = Period;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Period action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -562,8 +612,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Variant action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -575,8 +626,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         AccessByPermission = TableData Location = R;
                         Caption = 'Location';
                         Image = Warehouse;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Location action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -587,8 +639,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the BOM Level action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -609,8 +662,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'E&xplode BOM';
                     Image = ExplodeBOM;
                     RunObject = Codeunit "Item Jnl.-Explode BOM";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the E&xplode BOM action';
+                    ApplicationArea = NPRRetail;
                 }
                 separator(Separator52)
                 {
@@ -621,8 +675,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Get Bin Content';
                     Ellipsis = true;
                     Image = GetBinContent;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Get Bin Content action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -646,8 +701,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Test Report';
                     Ellipsis = true;
                     Image = TestReport;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Test Report action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -663,8 +719,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the P&ost action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -682,8 +739,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Post and &Print action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -701,8 +759,9 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Print action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

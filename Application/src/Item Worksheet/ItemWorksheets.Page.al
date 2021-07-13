@@ -4,7 +4,8 @@ page 6060041 "NPR Item Worksheets"
     PageType = List;
     SourceTable = "NPR Item Worksheet";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,38 +15,45 @@ page 6060041 "NPR Item Worksheets"
             {
                 field("Item Template Name"; Rec."Item Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Template Name field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor No. field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Prefix Code"; Rec."Prefix Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Prefix Code field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. Series field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Group"; Rec."Item Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Group field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -57,7 +65,7 @@ page 6060041 "NPR Item Worksheets"
         {
             action("Edit Item Worksheet")
             {
-                ApplicationArea = All;
+
                 Caption = 'Edit Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
@@ -65,6 +73,7 @@ page 6060041 "NPR Item Worksheets"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Edit Item Worksheet action.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -73,7 +82,7 @@ page 6060041 "NPR Item Worksheets"
             }
             action("Registered Worksheets")
             {
-                ApplicationArea = All;
+
                 Caption = 'Registered Worksheets';
                 Image = Registered;
                 RunObject = Page "NPR Registered Item Worksh.";
@@ -82,16 +91,18 @@ page 6060041 "NPR Item Worksheets"
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
                 ToolTip = 'Executes the Registered Worksheets action.';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
         {
             action("Field Setup")
             {
-                ApplicationArea = All;
+
                 Caption = 'Field Setup';
                 Image = MapAccounts;
                 ToolTip = 'Executes the Field Setup action.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

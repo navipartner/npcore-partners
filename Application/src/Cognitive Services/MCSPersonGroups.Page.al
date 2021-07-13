@@ -4,7 +4,8 @@ page 6059957 "NPR MCS Person Groups"
     PageType = List;
     SourceTable = "NPR MCS Person Groups";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,13 +15,15 @@ page 6059957 "NPR MCS Person Groups"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PersonGroupId; Rec.PersonGroupId)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Person Group Id field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -34,11 +37,12 @@ page 6059957 "NPR MCS Person Groups"
             {
                 Caption = 'Get Person Groups';
                 Image = Refresh;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Get Person Groups action';
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 Promoted = true;
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 begin
                     MCSFaceServiceAPI.GetPersonGroups();

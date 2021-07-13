@@ -9,8 +9,9 @@ page 6014448 "NPR Mixed Disc. Time Interv."
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Mixed Disc. Time Interv.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,60 +21,70 @@ page 6014448 "NPR Mixed Disc. Time Interv."
             {
                 field("Start Time"; Rec."Start Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End Time"; Rec."End Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Type"; Rec."Period Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Monday; Rec.Monday)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Monday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Tuesday; Rec.Tuesday)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Tuesday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Wednesday; Rec.Wednesday)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Wednesday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Thursday; Rec.Thursday)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Thursday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Friday; Rec.Friday)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Friday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Saturday; Rec.Saturday)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Saturday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Sunday; Rec.Sunday)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Period Type" = 1;
                     ToolTip = 'Specifies the value of the Sunday field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

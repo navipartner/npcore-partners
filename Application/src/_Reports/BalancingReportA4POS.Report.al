@@ -3,7 +3,7 @@ report 6014459 "NPR Balancing Report A4 POS"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Balancing Report -A4 - POS';
 
     dataset
@@ -696,32 +696,37 @@ report 6014459 "NPR Balancing Report A4 POS"
                     field("Print Sales"; PrintSales)
                     {
                         Caption = 'Print Sales';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Sales field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Receipts"; PrintReceipts)
                     {
                         Caption = 'Print Receipts';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Receipts field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Terminals"; PrintTerminals)
                     {
                         Caption = 'Print Terminals';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Terminals field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Vouchers"; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Vouchers field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Turn Over"; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print TurnOver field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(PrintDiscount)
                     {
@@ -729,53 +734,61 @@ report 6014459 "NPR Balancing Report A4 POS"
                         field("Print Discount Amt"; PrintDiscountAmt)
                         {
                             Caption = '        Print Discount Amount';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the         Print Discount Amount field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Print Discount Perc"; PrintDiscountPerc)
                         {
                             Caption = '        Print Discount %';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the         Print Discount % field';
+                            ApplicationArea = NPRRetail;
 
                         }
                         field("Print Discount Total"; PrintDiscountTotal)
                         {
                             Caption = '        Print Discount Total';
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the         Print Discount Total field';
+                            ApplicationArea = NPRRetail;
 
                         }
                     }
                     field("Print Counting"; PrintCounting)
                     {
                         Caption = 'Print Counting';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Counting field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Closing field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print VAT"; PrintVAT)
                     {
                         Caption = 'Print VAT';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print VAT field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Attached Bins"; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Attached Bins field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Empty Lines"; PrintEmptyLines)
                     {
                         Caption = 'Print Lines where Value is Zero.';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print Lines where Value is Zero. field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

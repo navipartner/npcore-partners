@@ -6,7 +6,8 @@ page 6150680 "NPR NPRE Print/Prod. Categ."
     PageType = List;
     SourceTable = "NPR NPRE Print/Prod. Cat.";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,19 +17,22 @@ page 6150680 "NPR NPRE Print/Prod. Categ."
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Tag"; Rec."Print Tag")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowPrintTags;
                     ToolTip = 'Specifies the value of the Print Tag field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

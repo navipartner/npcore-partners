@@ -1,4 +1,4 @@
-﻿page 6151333 "NPR O365 Activities Ext"
+page 6151333 "NPR O365 Activities Ext"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -17,8 +17,9 @@
                 ShowCaption = false;
                 field("Sales This Month"; Rec."NPR Sales This Month ILE")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the sum of sales in the current month.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -34,8 +35,9 @@
                 ShowCaption = false;
                 field("Sales This Month Last Year"; Rec."NPR Sales CM Last Year")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     ToolTip = 'Specifies the sum of sales in the current month of last year.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -54,10 +56,11 @@
         {
             action(RefreshData)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Refresh Data';
                 Image = Refresh;
                 ToolTip = 'Refreshes the data needed to make complex calculations.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -70,10 +73,11 @@
             }
             action("Set Up Cues")
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Set Up Cues';
                 Image = Setup;
                 ToolTip = 'Set up the cues (status tiles) related to the role.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

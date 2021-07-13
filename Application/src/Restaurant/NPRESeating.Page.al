@@ -1,4 +1,4 @@
-﻿page 6150665 "NPR NPRE Seating"
+page 6150665 "NPR NPRE Seating"
 {
     Caption = 'Seating';
     PageType = Card;
@@ -15,28 +15,33 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Seating Location"; Rec."Seating Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Seating Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocking Reason"; Rec."Blocking Reason")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocking Reason field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Capasity Tab")
@@ -44,13 +49,15 @@
                 Caption = 'Capasity';
                 field("Fixed Capasity"; Rec."Fixed Capasity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Fixed Capasity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Capacity; Rec.Capacity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Capacity field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(StatusGr)
@@ -58,7 +65,7 @@
                 Caption = 'Status';
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Status field';
 
                     trigger OnValidate()
@@ -68,10 +75,11 @@
                 }
                 field("Status Description FF"; Rec."Status Description FF")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     DrillDown = false;
                     ToolTip = 'Specifies the value of the Status Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Current Acvtivity")
@@ -79,15 +87,17 @@
                 Caption = 'Current Acvtivity';
                 field("Current Waiter Pad FF"; Rec."Current Waiter Pad FF")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Current Waiter Pad field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Multiple Waiter Pad FF"; Rec."Multiple Waiter Pad FF")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Multiple Waiter Pad field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -108,8 +118,9 @@
                     RunPageLink = "Table ID" = CONST(6150665),
                                   "No." = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Dimensions action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

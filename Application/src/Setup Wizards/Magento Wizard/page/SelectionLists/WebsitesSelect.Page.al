@@ -3,9 +3,10 @@ page 6014620 "NPR Websites Select"
     Caption = 'Websites';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Website";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,28 +16,33 @@ page 6014620 "NPR Websites Select"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Website"; Rec."Default Website")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Std. Website field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

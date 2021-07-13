@@ -3,8 +3,9 @@ page 6151571 "NPR AF Test Objects"
     Caption = 'AF Test Objects';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR AF Test Objects";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,18 +15,21 @@ page 6151571 "NPR AF Test Objects"
             {
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object ID"; Rec."Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Name"; Rec."Object Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -43,8 +47,9 @@ page 6151571 "NPR AF Test Objects"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Run Test action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

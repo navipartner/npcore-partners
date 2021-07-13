@@ -5,8 +5,9 @@ page 6059786 "NPR TM Ticket AccessEntry List"
     PageType = List;
     SourceTable = "NPR TM Ticket Access Entry";
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+
     PromotedActionCategories = 'New,Process,Report,Navigate';
+    ApplicationArea = NPRRetail;
     layout
     {
         area(content)

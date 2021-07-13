@@ -7,8 +7,9 @@ page 6059898 "NPR Data Log Records"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Data Log Record";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,46 +19,54 @@ page 6059898 "NPR Data Log Records"
             {
                 field("Log Date"; Rec."Log Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table ID"; Rec."Table ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("RecordId"; Format(Rec."Record ID"))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Record ID';
                     ToolTip = 'Specifies the value of the Record ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Old Record ID"; Rec."Old Record ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Old Record ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Type of Change"; Rec."Type of Change")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type of Change field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6150622; "NPR Data Log Records Subform")
             {
                 SubPageLink = "Data Log Record Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

@@ -6,7 +6,7 @@ page 6151528 "NPR Nc Collector List"
     PageType = List;
     SourceTable = "NPR Nc Collector";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -16,28 +16,33 @@ page 6151528 "NPR Nc Collector List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -53,8 +58,9 @@ page 6151528 "NPR Nc Collector List"
                 Image = XMLFile;
                 RunObject = Page "NPR Nc Collection Lines";
                 RunPageLink = "Collector Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Collection Lines action';
+                ApplicationArea = NPRNaviConnect;
             }
             action(Collections)
             {
@@ -62,8 +68,9 @@ page 6151528 "NPR Nc Collector List"
                 Image = XMLFileGroup;
                 RunObject = Page "NPR Nc Collection List";
                 RunPageLink = "Collector Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Collections action';
+                ApplicationArea = NPRNaviConnect;
             }
         }
     }

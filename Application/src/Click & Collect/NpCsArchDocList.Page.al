@@ -5,7 +5,8 @@ page 6151211 "NPR NpCs Arch. Doc. List"
     PageType = List;
     SourceTable = "NPR NpCs Arch. Document";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,163 +16,195 @@ page 6151211 "NPR NpCs Arch. Doc. List"
             {
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Inserted at"; Rec."Inserted at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Inserted at field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sell-to Customer Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Archived at"; Rec."Archived at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Archived at field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Workflow Code"; Rec."Workflow Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Workflow Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Next Workflow Step"; Rec."Next Workflow Step")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Next Workflow Step field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("From Document No."; Rec."From Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the From Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("From Store Code"; Rec."From Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the From Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("To Document Type"; Rec."To Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the To Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("To Document No."; Rec."To Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the To Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("To Store Code"; Rec."To Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the To Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Status"; Rec."Processing Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing updated at"; Rec."Processing updated at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing updated at field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing updated by"; Rec."Processing updated by")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing updated by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer E-mail"; Rec."Customer E-mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Phone No."; Rec."Customer Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send Notification from Store"; Rec."Send Notification from Store")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Notification from Store field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notify Customer via E-mail"; Rec."Notify Customer via E-mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notify Customer via E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notify Customer via Sms"; Rec."Notify Customer via Sms")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notify Customer via Sms field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery Status"; Rec."Delivery Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery updated at"; Rec."Delivery updated at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery updated at field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery updated by"; Rec."Delivery updated by")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery updated by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Stock"; Rec."Store Stock")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Stock field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Prepaid Amount"; Rec."Prepaid Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Prepaid Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Prepayment Account No."; Rec."Prepayment Account No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Prepayment Account No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery Document Type"; Rec."Delivery Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery Document No."; Rec."Delivery Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Archive on Delivery"; Rec."Archive on Delivery")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Archive on Delivery field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -190,8 +223,9 @@ page 6151211 "NPR NpCs Arch. Doc. List"
                 RunPageView = SORTING("Entry No.")
                               ORDER(Descending);
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Log Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -4,7 +4,8 @@ page 6150726 "NPR POS Action Sequences"
     PageType = List;
     SourceTable = "NPR POS Action Sequence";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,50 +15,56 @@ page 6150726 "NPR POS Action Sequences"
             {
                 field("Reference Type"; Rec."Reference Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Reference Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference POS Action Code"; Rec."Reference POS Action Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Reference POS Action Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Action Code"; Rec."POS Action Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the POS Action Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Type"; Rec."Source Type")
                 {
-                    ApplicationArea = All;
+
                     Style = Subordinate;
                     StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Source Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sequence No."; Rec."Sequence No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Sequence No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Source Type" = Rec."Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = Rec."Source Type" = Rec."Source Type"::Discovery;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -75,8 +82,9 @@ page 6150726 "NPR POS Action Sequences"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Discover Sequences action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

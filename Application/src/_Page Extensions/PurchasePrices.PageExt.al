@@ -16,8 +16,9 @@ pageextension 6014476 "NPR Purchase Prices" extends "Purchase Prices"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Alt+V';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Variety action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

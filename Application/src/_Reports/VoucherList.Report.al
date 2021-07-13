@@ -3,7 +3,7 @@ report 6014401 "NPR Voucher List"
     Caption = 'Voucher List';
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Voucher List.rdlc';
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UsageCategory = ReportsAndAnalysis;
 
     dataset
@@ -120,7 +120,7 @@ report 6014401 "NPR Voucher List"
                     field("Show Summary"; ShowSummary)
                     {
                         Caption = 'Show Summary';
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Show Summary field';
                     }
                 }

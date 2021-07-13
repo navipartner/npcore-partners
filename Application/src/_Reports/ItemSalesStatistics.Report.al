@@ -5,7 +5,7 @@ report 6014414 "NPR Item Sales Statistics"
     Caption = 'Item Sales Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(RunOnce; "Integer")
@@ -120,8 +120,9 @@ report 6014414 "NPR Item Sales Statistics"
                     field("Inventory Posting Group Filter"; InventoryPostingGroupFilter)
                     {
                         Caption = 'Item Posting Group Filter:';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Item Posting Group Filter: field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -134,8 +135,9 @@ report 6014414 "NPR Item Sales Statistics"
                     field("Vendor Item No Filter"; VendorItemNoFilter)
                     {
                         Caption = 'Vendor Item No. Filter:';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Vendor Item No. Filter: field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

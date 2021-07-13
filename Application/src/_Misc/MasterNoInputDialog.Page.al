@@ -9,10 +9,11 @@ page 6014420 "NPR Master No. Input Dialog"
         {
             field("InputNo."; "InputNo.")
             {
-                ApplicationArea = All;
+
                 CaptionClass = Captions;
                 Caption = 'Input No.';
                 ToolTip = 'Specifies the value of the Input No. field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin

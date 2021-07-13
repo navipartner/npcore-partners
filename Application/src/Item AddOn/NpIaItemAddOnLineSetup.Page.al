@@ -13,8 +13,9 @@ page 6151129 "NPR NpIa ItemAddOn Line Setup"
             {
                 field("Unit Price % from Master"; Rec."Unit Price % from Master")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the percentage which will be applied to the ratio of total amount and quantity before creating POS entry.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

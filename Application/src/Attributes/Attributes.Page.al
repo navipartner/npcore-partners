@@ -9,7 +9,8 @@ page 6014605 "NPR Attributes"
     PageType = List;
     SourceTable = "NPR Attribute";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,13 +20,15 @@ page 6014605 "NPR Attributes"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -43,8 +46,9 @@ page 6014605 "NPR Attributes"
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Attribute ID action';
+                ApplicationArea = NPRRetail;
             }
             action(Translations)
             {
@@ -53,8 +57,9 @@ page 6014605 "NPR Attributes"
                 RunObject = Page "NPR Attribute Translations";
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code", "Language ID");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Translations action';
+                ApplicationArea = NPRRetail;
             }
             action(Values)
             {
@@ -63,8 +68,9 @@ page 6014605 "NPR Attributes"
                 RunObject = Page "NPR Attribute Value Lookup";
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Values action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

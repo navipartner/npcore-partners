@@ -5,8 +5,9 @@ page 6014607 "NPR Attribute IDs"
     Caption = 'Client Attribute IDs';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Attribute ID";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,23 +17,27 @@ page 6014607 "NPR Attribute IDs"
             {
                 field("Table ID"; Rec."Table ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Attribute Code"; Rec."Attribute Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Attribute ID"; Rec."Shortcut Attribute ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shortcut Attribute ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entity Attribute ID"; Rec."Entity Attribute ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entity Attribute ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

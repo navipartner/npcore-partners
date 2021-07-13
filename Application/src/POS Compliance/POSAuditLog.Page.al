@@ -7,8 +7,9 @@ page 6150673 "NPR POS Audit Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Audit Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,142 +19,168 @@ page 6150673 "NPR POS Audit Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(FormattedRecordID; FormattedRecordID)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Record ID';
                     ToolTip = 'Specifies the value of the Record ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Type"; Rec."Action Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Custom Subtype"; Rec."Action Custom Subtype")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action Custom Subtype field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Acted on POS Entry No."; Rec."Acted on POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Acted on POS Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Acted on POS Entry Fiscal No."; Rec."Acted on POS Entry Fiscal No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Acted on POS Entry Fiscal No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Active POS Unit No."; Rec."Active POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Active Salesperson Code"; Rec."Active Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Timestamp"; Rec."Log Timestamp")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Timestamp field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Type"; Rec."External Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External ID"; Rec."External ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Code"; Rec."External Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Description"; Rec."External Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Additional Information"; Rec."Additional Information")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Additional Information field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(BaseValue; BaseValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Signature Base Value';
                     ToolTip = 'Specifies the value of the Signature Base Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Signature Base Hash"; Rec."Signature Base Hash")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Signature Base Hash field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Signature; Signature)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Signature';
                     ToolTip = 'Specifies the value of the Signature field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PreviousSignature; PreviousSignature)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Previous Signature';
                     ToolTip = 'Specifies the value of the Previous Signature field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Certificate Thumbprint"; Rec."Certificate Thumbprint")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Certificate Thumbprint field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Certificate Implementation"; Rec."Certificate Implementation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Certificate Implementation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Implementation"; Rec."External Implementation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Implementation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handled by External Impl."; Rec."Handled by External Impl.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled by External Impl. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Active POS Sale SystemId"; Rec."Active POS Sale SystemId")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'SystemID of the active POS sale header. Is transferred to POS Entry header SystemID when sale is completed';
                 }
                 field("Acted on POS Unit No."; Rec."Acted on POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Acted on POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Uploaded; Rec.Uploaded)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Uploaded field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -167,8 +194,9 @@ page 6150673 "NPR POS Audit Log"
             {
                 Caption = 'Validate Log';
                 Image = Approval;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Validate Log action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -1,11 +1,12 @@
 page 6014534 "NPR TouchScreen: Ret. Reasons"
 {
     UsageCategory = Lists;
-    ApplicationArea = All;
+
     Caption = 'Return reasons';
     SourceTable = "Return Reason";
     Editable = false;
     PageType = List;
+    ApplicationArea = NPRRetail;
     layout
     {
         area(content)
@@ -15,24 +16,28 @@ page 6014534 "NPR TouchScreen: Ret. Reasons"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Location Code"; Rec."Default Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Inventory Value Zero"; Rec."Inventory Value Zero")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Inventory Value Zero field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

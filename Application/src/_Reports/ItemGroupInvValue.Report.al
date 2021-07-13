@@ -4,7 +4,8 @@ report 6014448 "NPR Item Group Inv. Value"
     RDLCLayout = './src/_Reports/layouts/Item Group Inventory Value.rdlc';
     Caption = 'Item Group Inventory Value';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("Item Category"; "Item Category")

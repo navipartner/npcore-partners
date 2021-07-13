@@ -4,9 +4,10 @@ page 6151210 "NPR NpCs Store Inv. Buffer"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Store Inv. Buffer";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,41 +17,47 @@ page 6151210 "NPR NpCs Store Inv. Buffer"
             {
                 field(Sku; Rec.Sku)
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Sku field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-                    ApplicationArea = All;
+
                     Style = Favorable;
                     StyleExpr = Rec."In Stock";
                     ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("In Stock"; Rec."In Stock")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the In Stock field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

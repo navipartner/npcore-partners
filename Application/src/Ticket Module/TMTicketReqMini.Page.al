@@ -1,4 +1,4 @@
-﻿page 6060101 "NPR TM Ticket Req. Mini"
+page 6060101 "NPR TM Ticket Req. Mini"
 {
     Caption = 'Ticket Request Mini';
     InsertAllowed = false;
@@ -7,7 +7,8 @@
     SourceTable = "NPR TM Ticket Reservation Req.";
     SourceTableTemporary = true;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {

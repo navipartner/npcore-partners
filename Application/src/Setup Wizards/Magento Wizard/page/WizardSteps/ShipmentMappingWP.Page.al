@@ -3,10 +3,11 @@ page 6014551 "NPR Shipment Mapping WP"
     Caption = 'Shipment Method Mapping';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Shipment Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,14 +17,16 @@ page 6014551 "NPR Shipment Mapping WP"
             {
                 field("External Shipment Method Code"; Rec."External Shipment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the External Shipment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShipmentMethod: Record "Shipment Method";
@@ -43,8 +46,9 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgent: Record "Shipping Agent";
@@ -64,8 +68,9 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgentServices: Record "Shipping Agent Services";
@@ -87,8 +92,9 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipment Fee Type"; Rec."Shipment Fee Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipment Fee Type field';
+                    ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
                         Rec."Shipment Fee No." := '';
@@ -96,8 +102,9 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipment Fee No."; Rec."Shipment Fee No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipment Fee No. field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GLAccount: Record "G/L Account";

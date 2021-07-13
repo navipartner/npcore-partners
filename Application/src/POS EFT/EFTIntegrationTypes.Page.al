@@ -12,7 +12,8 @@ page 6184483 "NPR EFT Integration Types"
     SourceTable = "NPR EFT Integration Type";
     SourceTableTemporary = true;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -22,18 +23,21 @@ page 6184483 "NPR EFT Integration Types"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Codeunit ID"; Rec."Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -13,8 +13,9 @@ pageextension 6014449 "NPR Sales Invioce Subform" extends "Sales Invoice Subform
                 PromotedOnly = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Variety action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

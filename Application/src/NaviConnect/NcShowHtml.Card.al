@@ -1,11 +1,11 @@
 page 6014441 "NPR Nc Show Html"
 {
     PageType = Card;
-    ApplicationArea = All;
     UsageCategory = Administration;
     Editable = false;
     DeleteAllowed = false;
     InsertAllowed = false;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -13,7 +13,8 @@ page 6014441 "NPR Nc Show Html"
         {
             usercontrol("HtmlViewController"; "NPR HtmlViewerControl")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRNaviConnect;
+
                 trigger Ready()
                 begin
                     CurrPage.HtmlViewController.XSLT(xslt, xml);

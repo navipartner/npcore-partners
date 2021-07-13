@@ -4,7 +4,8 @@ page 6060160 "NPR Event Attribute Templ."
     PageType = List;
     SourceTable = "NPR Event Attribute Template";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,23 +15,27 @@ page 6060160 "NPR Event Attribute Templ."
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Row Template Name"; Rec."Row Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Row Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Column Template Name"; Rec."Column Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Column Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -48,8 +53,9 @@ page 6060160 "NPR Event Attribute Templ."
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Default Values action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -69,8 +75,9 @@ page 6060160 "NPR Event Attribute Templ."
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Temp. Filters";
                 RunPageLink = "Template Name" = FIELD(Name);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Template Filters action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

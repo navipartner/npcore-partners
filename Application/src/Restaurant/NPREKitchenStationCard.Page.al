@@ -13,23 +13,27 @@ page 6150686 "NPR NPRE Kitchen Station Card"
             {
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -37,12 +41,14 @@ page 6150686 "NPR NPRE Kitchen Station Card"
         {
             systempart(Control6014407; Notes)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control6014408; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -62,8 +68,9 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 RunObject = Page "NPR NPRE Kitchen Station Slct.";
                 RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
                               "Kitchen Station" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Station Selection Setup action';
+                ApplicationArea = NPRRetail;
             }
             action(ShowKitchenRequests)
             {
@@ -74,8 +81,9 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Kitchen Requests action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

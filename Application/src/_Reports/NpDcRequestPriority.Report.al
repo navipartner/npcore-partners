@@ -3,7 +3,7 @@ report 6151597 "NPR NpDc Request Priority"
     Caption = 'Request Priority';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     requestpage
     {
 
@@ -17,8 +17,9 @@ report 6151597 "NPR NpDc Request Priority"
                     {
                         Caption = 'Priority';
                         MinValue = 0;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Priority field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

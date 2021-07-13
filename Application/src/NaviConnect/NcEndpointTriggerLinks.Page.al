@@ -3,8 +3,8 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
     Caption = 'Nc Endpoint Trigger Links';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint Trigger Link";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -14,13 +14,15 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
             {
                 field("Endpoint Code"; Rec."Endpoint Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Endpoint Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Trigger Code"; Rec."Trigger Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Trigger Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -34,8 +36,8 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
             {
                 Caption = 'Endpoint Setup';
                 Image = InteractionTemplateSetup;
-                ApplicationArea = All;
                 ToolTip = 'Executes the Endpoint Setup action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var

@@ -3,9 +3,10 @@ page 6059963 "NPR MPOS QR Code FactBox"
     Caption = 'MPOS QR Code FactBox';
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR MPOS QR Code";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,9 +15,10 @@ page 6059963 "NPR MPOS QR Code FactBox"
             // field("QR code"; Rec."QR Image")
             field("QR code"; Rec."QR code")
             {
-                ApplicationArea = All;
+
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the QR code field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -29,9 +31,10 @@ page 6059963 "NPR MPOS QR Code FactBox"
             {
                 Caption = 'Save To Disk';
                 ShortCutKey = 'Return';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Save To Disk action';
                 Image = Save;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

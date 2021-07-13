@@ -6,8 +6,9 @@ page 6059900 "NPR Task Template"
     Caption = 'Task Template';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Task Template";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,53 +18,63 @@ page 6059900 "NPR Task Template"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Test Report ID"; Rec."Test Report ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Test Report ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Page ID"; Rec."Page ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Form ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mail From Address"; Rec."Mail From Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mail From Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mail From Name"; Rec."Mail From Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mail From Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Test Report Name"; Rec."Test Report Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Test Report Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Page Name"; Rec."Page Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Form Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -83,8 +94,9 @@ page 6059900 "NPR Task Template"
                     Image = Description;
                     RunObject = Page "NPR Task Batch";
                     RunPageLink = "Journal Template Name" = FIELD(Name);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Batches action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

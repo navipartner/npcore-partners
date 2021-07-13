@@ -4,7 +4,7 @@ page 6151539 "NPR Nc Endpoints"
     PageType = List;
     SourceTable = "NPR Nc Endpoint";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -14,33 +14,39 @@ page 6151539 "NPR Nc Endpoints"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Endpoint Type"; Rec."Endpoint Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Endpoint Type field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Setup Summary"; Rec."Setup Summary")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Setup Summary field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Linked Endpoints"; Rec."Linked Endpoints")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Linked Endpoints field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -58,8 +64,8 @@ page 6151539 "NPR Nc Endpoints"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
                 ToolTip = 'Executes the Setup action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -78,8 +84,9 @@ page 6151539 "NPR Nc Endpoints"
                 RunPageLink = "Endpoint Code" = FIELD(Code);
                 RunPageView = SORTING("Endpoint Code", "Trigger Code")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Trigger Links action';
+                ApplicationArea = NPRNaviConnect;
             }
             action("Init Endpoint")
             {
@@ -90,8 +97,9 @@ page 6151539 "NPR Nc Endpoints"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = EndpointHasInit;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Init Endpoint action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var

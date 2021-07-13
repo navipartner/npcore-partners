@@ -4,8 +4,9 @@ report 6014432 "NPR Customer Analysis"
     RDLCLayout = './src/_Reports/layouts/Customer Analysis.rdlc';
     Caption = 'Customer Analysis';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
+
     dataset
     {
         dataitem(Customer; Customer)
@@ -471,21 +472,24 @@ report 6014432 "NPR Customer Analysis"
                     {
                         Caption = 'Show Type';
                         OptionCaption = 'Sales,Balance,Margin';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sort Order"; SortOrder)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sort By field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Qty"; ShowQty)
                     {
                         Caption = 'Quantity';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Quantity field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

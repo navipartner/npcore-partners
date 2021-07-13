@@ -186,10 +186,10 @@ table 6151529 "NPR Nc Collector Request"
     begin
         case Status of
             Status::Processed:
-                "Processed Date" := CurrentDateTime;
+                "Processed Date" := CurrentDateTime();
             Status::Rejected:
                 if "Processed Date" = 0DT then
-                    "Processed Date" := CurrentDateTime;
+                    "Processed Date" := CurrentDateTime();
         end;
     end;
 }

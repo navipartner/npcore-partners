@@ -1,4 +1,4 @@
-﻿page 6151481 "NPR Magento Retail Activities"
+page 6151481 "NPR Magento Retail Activities"
 {
     Caption = 'NaviConnect Activities';
     PageType = CardPart;
@@ -20,27 +20,30 @@
                         Caption = 'New Sales Order';
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileNew;
                         ToolTip = 'Executes the New Sales Order action';
+                        ApplicationArea = NPRRetail;
                     }
                     action("New Sales Quote")
                     {
                         Caption = 'New Sales Quote';
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileBrickNew;
                         ToolTip = 'Executes the New Sales Quote action';
+                        ApplicationArea = NPRRetail;
                     }
                     action("New Sales Return Order")
                     {
                         Caption = 'New Sales Return Order';
                         RunObject = Page "Sales Return Order";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileBrickNearBy;
                         ToolTip = 'Executes the New Sales Return Order action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -55,22 +58,25 @@
                         ShowCaption = false;
                         field("Sales Orders"; Rec."Sales Orders")
                         {
-                            ApplicationArea = All;
+
                             DrillDownPageID = "Sales Order List";
                             ToolTip = 'Specifies the value of the Sales Orders field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Sales Quotes"; Rec."Sales Quotes")
                         {
-                            ApplicationArea = All;
+
                             DrillDownPageID = "Sales Quotes";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Sales Quotes field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Sales Return Orders"; Rec."Sales Return Orders")
                         {
-                            ApplicationArea = All;
+
                             DrillDownPageID = "Sales Return Order List";
                             ToolTip = 'Specifies the value of the Sales Return Orders field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -86,18 +92,20 @@
                         ShowCaption = false;
                         field("Magento Orders"; Rec."Magento Orders")
                         {
-                            ApplicationArea = All;
+
                             DrillDownPageID = "Sales Order List";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Magento Orders field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Daily Sales Invoices"; Rec."Daily Sales Invoices")
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Daily Sales Invoices';
                             DrillDownPageID = "Posted Sales Invoices";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Daily Sales Invoices field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -113,22 +121,25 @@
                         ShowCaption = false;
                         field("Import Pending"; Rec."Import Pending")
                         {
-                            ApplicationArea = All;
+
                             DrillDownPageID = "NPR Nc Import List";
                             ToolTip = 'Specifies the value of the Import Unprocessed field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Tasks Unprocessed"; Rec."Tasks Unprocessed")
                         {
-                            ApplicationArea = All;
+
                             DrillDownPageID = "NPR Nc Task List";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Tasks Unprocessed field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Daily Sales Orders"; Rec."Daily Sales Orders")
                         {
-                            ApplicationArea = All;
+
                             DrillDownPageID = "Sales Order List";
                             ToolTip = 'Specifies the value of the Daily Sales Orders field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }

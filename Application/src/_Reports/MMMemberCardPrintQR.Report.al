@@ -5,7 +5,8 @@ report 6060127 "NPR MM Member Card Print QR"
     RDLCLayout = './src/_Reports/layouts/MM Member Card Print QR.rdlc';
     Caption = 'Member Card Print';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("MM Member Card"; "NPR MM Member Card")

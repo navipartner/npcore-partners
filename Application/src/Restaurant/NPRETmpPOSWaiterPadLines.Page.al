@@ -5,10 +5,11 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR NPRE Waiter Pad Line";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,65 +20,74 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                 ShowCaption = false;
                 field(Marked; Rec.Marked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Marked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Waiter Pad No."; Rec."Waiter Pad No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Waiter Pad No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = StyleTxt;
                     Visible = false;
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quanity; Rec.RemainingQtyToBill())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Quantity';
                     DecimalPlaces = 0 : 5;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Marked Qty"; Rec."Marked Qty")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Qty. to ticket field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = StyleTxt;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -98,8 +108,9 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the OK action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

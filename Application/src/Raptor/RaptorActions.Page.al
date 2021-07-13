@@ -7,8 +7,9 @@ page 6151493 "NPR Raptor Actions"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Raptor Action";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,50 +19,59 @@ page 6151493 "NPR Raptor Actions"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Raptor Module Code"; Rec."Raptor Module Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Raptor Module Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Raptor Module API Req. String"; Rec."Raptor Module API Req. String")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Raptor Module API Req. String field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type Description"; Rec."Data Type Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Type Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Number of Entries to Return"; Rec."Number of Entries to Return")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Number of Entries to Return field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User Identifier Param. Name"; Rec."User Identifier Param. Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the User Identifier Param. Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Date-Time Created"; Rec."Show Date-Time Created")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Date-Time Created field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Priority"; Rec."Show Priority")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Priority field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -69,7 +79,8 @@ page 6151493 "NPR Raptor Actions"
         {
             systempart(Control6014407; Notes)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -86,8 +97,9 @@ page 6151493 "NPR Raptor Actions"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Add Default Actions action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

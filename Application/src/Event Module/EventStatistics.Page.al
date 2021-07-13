@@ -5,8 +5,9 @@ page 6151585 "NPR Event Statistics"
     LinksAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Job;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -24,132 +25,152 @@ page 6151585 "NPR Event Statistics"
                         Editable = false;
                         field(PriceLCYText; PriceLCYText)
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the PriceLCYText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleText; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(UsageText; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ContractText; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(InvoicedText; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(CostLCYText; CostLCYText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the CostLCYText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014410; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014409; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014408; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014407; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ProfitLCYText; ProfitLCYText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the ProfitLCYText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014415; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014414; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014413; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014412; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ProfitPctLCYText; ProfitPctLCYText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the ProfitPctLCYText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014420; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014419; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014418; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014417; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Resource)
@@ -157,19 +178,21 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'Resource';
                         field(Text000; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Price LCY';
                             Style = Strong;
                             StyleExpr = TRUE;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Price LCY field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePriceLCY; PL[1])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -178,10 +201,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePriceLCY; PL[5])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -190,10 +214,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPriceLCY; PL[9])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -202,10 +227,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPriceLCY; PL[13])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -214,19 +240,21 @@ page 6151585 "NPR Event Statistics"
                         }
                         field("Cost LCY"; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Cost LCY';
                             Style = Strong;
                             StyleExpr = TRUE;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Cost LCY field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCostLCY; CL[1])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -235,10 +263,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCostLCY; CL[5])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -247,10 +276,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCostLCY; CL[9])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -259,10 +289,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCostLCY; CL[13])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -271,17 +302,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field("Profit LCY"; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Profit LCY';
                             Visible = false;
                             ToolTip = 'Specifies the value of the Profit LCY field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitLCY; PL[1] - CL[1])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -290,10 +323,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitLCY; PL[5] - CL[5])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -302,10 +336,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitLCY; PL[9] - CL[9])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -314,10 +349,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitLCY; PL[13] - CL[13])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -326,17 +362,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field("Profit % LCY"; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Profit % LCY';
                             Visible = false;
                             ToolTip = 'Specifies the value of the Profit % LCY field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPctLCY; CalculateProfitPct(PL[1], CL[1]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -345,10 +383,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPctLCY; CalculateProfitPct(PL[5], CL[5]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -357,10 +396,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPctLCY; CalculateProfitPct(PL[9], CL[9]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -369,10 +409,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPctLCY; CalculateProfitPct(PL[13], CL[13]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -385,17 +426,19 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'Item';
                         field(Control5; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePriceLCYItem; PL[2])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Price LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Price LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -404,10 +447,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePriceLCYItem; PL[6])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Price LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Price LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -416,10 +460,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPriceLCYItem; PL[10])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Price LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Price LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -428,10 +473,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPriceLCYItem; PL[14])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Price LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Price LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -440,17 +486,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control129; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCostLCYItem; CL[2])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Cost LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Cost LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -459,10 +507,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCostLCYItem; CL[6])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Cost LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Cost LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -471,10 +520,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCostLCYItem; CL[10])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Cost LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Cost LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -483,10 +533,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCostLCYItem; CL[14])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Cost LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Cost LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -495,17 +546,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control148; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitLCYItem; PL[2] - CL[2])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -514,10 +567,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitLCYItem; PL[6] - CL[6])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -526,10 +580,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitLCYItem; PL[10] - CL[10])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -538,10 +593,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitLCYItem; PL[14] - CL[14])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -550,17 +606,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control6014430; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPctLCYItem; CalculateProfitPct(PL[2], CL[2]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit % LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit % LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -569,10 +627,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPctLCYItem; CalculateProfitPct(PL[6], CL[6]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit % LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit % LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -581,10 +640,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPctLCYItem; CalculateProfitPct(PL[10], CL[10]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit % LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit % LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -593,10 +653,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPctLCYItem; CalculateProfitPct(PL[14], CL[14]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit % LCY (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit % LCY (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -609,17 +670,19 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'G/L Account';
                         field(Control6; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePriceLCYGLAcc; PL[3])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Price LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Price LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -628,10 +691,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePriceLCYGLAcc; PL[7])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Price LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Price LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -640,10 +704,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPriceLCYGLAcc; PL[11])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Price LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Price LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -652,10 +717,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPriceLCYGLAcc; PL[15])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Price LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Price LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -664,17 +730,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control145; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCostLCYGLAcc; CL[3])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Cost LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Cost LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -683,10 +751,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCostLCYGLAcc; CL[7])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Cost LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Cost LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -695,10 +764,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCostLCYGLAcc; CL[11])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Cost LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Cost LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -707,10 +777,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCostLCYGLAcc; CL[15])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Cost LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Cost LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -719,17 +790,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control149; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitLCYGLAcc; PL[3] - CL[3])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -738,10 +811,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitLCYGLAcc; PL[7] - CL[7])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -750,10 +824,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitLCYGLAcc; PL[11] - CL[11])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -762,10 +837,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitLCYGLAcc; PL[15] - CL[15])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -774,17 +850,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control6014435; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPctLCYGLAcc; CalculateProfitPct(PL[3], CL[3]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit % LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit % LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnAssistEdit()
                             begin
@@ -793,10 +871,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPctLCYGLAcc; CalculateProfitPct(PL[7], CL[7]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit % LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit % LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -805,10 +884,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPctLCYGLAcc; CalculateProfitPct(PL[11], CL[11]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit % LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit % LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -817,10 +897,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPctLCYGLAcc; CalculateProfitPct(PL[15], CL[15]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit % LCY (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit % LCY (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -833,17 +914,19 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'Total';
                         field(Control88; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePriceLCYTotal; PL[4])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Price LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Price LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -852,10 +935,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePriceLCYTotal; PL[8])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Price LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Price LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -864,10 +948,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPriceLCYTotal; PL[12])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Price LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Price LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -876,10 +961,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPriceLCYTotal; PL[16])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Price LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Price LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -888,17 +974,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control146; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCostLCYTotal; CL[4])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Cost LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Cost LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -907,10 +995,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCostLCYTotal; CL[8])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Cost LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Cost LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -919,10 +1008,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCostLCYTotal; CL[12])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Cost LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Cost LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -931,10 +1021,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCostLCYTotal; CL[16])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Cost LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Cost LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -943,17 +1034,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control150; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitLCYTotal; PL[4] - CL[4])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -962,10 +1055,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitLCYTotal; PL[8] - CL[8])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -974,10 +1068,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitLCYTotal; PL[12] - CL[12])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -986,10 +1081,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitLCYTotal; PL[16] - CL[16])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -998,17 +1094,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control6014440; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPctLCYTotal; CalculateProfitPct(PL[4], CL[4]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit % LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit % LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1017,10 +1115,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPctLCYTotal; CalculateProfitPct(PL[8], CL[8]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit % LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit % LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1029,10 +1128,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPctLCYTotal; CalculateProfitPct(PL[12], CL[12]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit % LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit % LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1041,10 +1141,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPctLCYTotal; CalculateProfitPct(PL[16], CL[16]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit % LCY (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit % LCY (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1066,131 +1167,151 @@ page 6151585 "NPR Event Statistics"
                         Editable = false;
                         field(PriceText; PriceText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the PriceText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014459; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014458; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014457; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014456; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(CostText; CostText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the CostText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014454; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014453; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014452; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014451; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ProfitText; ProfitText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the ProfitText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014449; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014448; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014447; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014446; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ProfitPcttext; ProfitPcttext)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the value of the ProfitPcttext field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014444; ScheduleText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ScheduleText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014443; UsageText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the UsageText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014442; ContractText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the ContractText field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Control6014441; InvoicedText)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the InvoicedText field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control1903193001)
@@ -1198,17 +1319,19 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'Resource';
                         field(Price; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Price';
                             Visible = false;
                             ToolTip = 'Specifies the value of the Price field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePrice; P[1])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1217,10 +1340,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePrice; P[5])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1229,10 +1353,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPrice; P[9])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1241,10 +1366,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPrice; P[13])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1253,17 +1379,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Cost; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Cost';
                             Visible = false;
                             ToolTip = 'Specifies the value of the Cost field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCost; C[1])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1272,10 +1400,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCost; C[5])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1284,10 +1413,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCost; C[9])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1296,10 +1426,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCost; C[13])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1308,17 +1439,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Profit; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Profit';
                             Visible = false;
                             ToolTip = 'Specifies the value of the Profit field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfit; P[1] - C[1])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1327,10 +1460,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfit; P[5] - C[5])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1339,10 +1473,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfit; P[9] - C[9])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1351,10 +1486,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfit; P[13] - C[13])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1363,17 +1499,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field("Profit %"; Text000)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Profit %';
                             Visible = false;
                             ToolTip = 'Specifies the value of the Profit % field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPct; CalculateProfitPct(P[1], C[1]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1382,10 +1520,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPct; CalculateProfitPct(P[5], C[5]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1394,10 +1533,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPct; CalculateProfitPct(P[9], C[9]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1406,10 +1546,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPct; CalculateProfitPct(P[13], C[13]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1422,17 +1563,19 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'Item';
                         field(Control152; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePriceItem; P[2])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Price (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Price (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1441,10 +1584,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePriceItem; P[6])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Price (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Price (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1453,10 +1597,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPriceItem; P[10])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Price (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Price (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1465,10 +1610,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPriceItem; P[14])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Price (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Price (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1477,17 +1623,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control156; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCostItem; C[2])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Cost (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Cost (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1496,10 +1644,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCostItem; C[6])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Cost (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Cost (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1508,10 +1657,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCostItem; C[10])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Cost (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Cost (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1520,10 +1670,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCostItem; C[14])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Cost (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Cost (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1532,17 +1683,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control160; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitItem; P[2] - C[2])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1551,10 +1704,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitItem; P[6] - C[6])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1563,10 +1717,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitItem; P[10] - C[10])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1575,10 +1730,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitItem; P[14] - C[14])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1587,17 +1743,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control6014471; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPctItem; CalculateProfitPct(P[2], C[2]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit % (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit % (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1606,10 +1764,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPctItem; CalculateProfitPct(P[6], C[6]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit % (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit % (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1618,10 +1777,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPctItem; CalculateProfitPct(P[10], C[10]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit % (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit % (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1630,10 +1790,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPctItem; CalculateProfitPct(P[14], C[14]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit % (Item)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit % (Item) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1646,17 +1807,19 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'G/L Account';
                         field(Control153; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePriceGLAcc; P[3])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Price (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Price (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1665,10 +1828,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePriceGLAcc; P[7])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Price (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Price (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1677,10 +1841,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPriceGLAcc; P[11])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Price (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Price (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1689,10 +1854,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPriceGLAcc; P[15])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Price (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Price (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1701,17 +1867,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control157; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCostGLAcc; C[3])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Cost (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Cost (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1720,10 +1888,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCostGLAcc; C[7])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Cost (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Cost (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1732,10 +1901,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCostGLAcc; C[11])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Cost (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Cost (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1744,10 +1914,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCostGLAcc; C[15])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Cost (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Cost (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1756,17 +1927,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control161; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitGLAcc; P[3] - C[3])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1775,10 +1948,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitGLAcc; P[7] - C[7])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1787,10 +1961,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitGLAcc; P[11] - C[11])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1799,10 +1974,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitGLAcc; P[15] - C[15])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1811,17 +1987,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control6014476; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPctGLAcc; CalculateProfitPct(P[3], C[3]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit % (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit % (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnAssistEdit()
                             begin
@@ -1830,10 +2008,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPctGLAcc; CalculateProfitPct(P[7], C[7]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit % (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit % (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1842,10 +2021,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPctGLAcc; CalculateProfitPct(P[11], C[11]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit % (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit % (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1854,10 +2034,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPctGLAcc; CalculateProfitPct(P[15], C[15]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit % (G/L Acc.)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit % (G/L Acc.) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1870,17 +2051,19 @@ page 6151585 "NPR Event Statistics"
                         Caption = 'Total';
                         field(Control154; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SchedulePriceTotal; P[4])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Price (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Price (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1889,10 +2072,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsagePriceTotal; P[8])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Price (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Price (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1901,10 +2085,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractPriceTotal; P[12])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Price (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Price (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1913,10 +2098,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedPriceTotal; P[16])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Price (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Price (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1925,17 +2111,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control158; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleCostTotal; C[4])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Cost (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Cost (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1944,10 +2132,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageCostTotal; C[8])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Cost (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Cost (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1956,10 +2145,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractCostTotal; C[12])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Cost (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Cost (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1968,10 +2158,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedCostTotal; C[16])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Cost (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Cost (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1980,17 +2171,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control162; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitTotal; P[4] - C[4])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -1999,10 +2192,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitTotal; P[8] - C[8])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -2011,10 +2205,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitTotal; P[12] - C[12])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -2023,10 +2218,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitTotal; P[16] - C[16])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -2035,17 +2231,19 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(Control6014481; Text000)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             Visible = false;
                             ToolTip = 'Specifies the value of the Text000 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(ScheduleProfitPctTotal; CalculateProfitPct(P[4], C[4]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Schedule Profit % (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Schedule Profit % (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -2054,10 +2252,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(UsageProfitPctTotal; CalculateProfitPct(P[8], C[8]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Usage Profit % (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Usage Profit % (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -2066,10 +2265,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(ContractProfitPctTotal; CalculateProfitPct(P[12], C[12]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Contract Profit % (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Contract Profit % (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin
@@ -2078,10 +2278,11 @@ page 6151585 "NPR Event Statistics"
                         }
                         field(InvoicedProfitPctTotal; CalculateProfitPct(P[16], C[16]))
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Invoiced Profit % (Total)';
                             Editable = false;
                             ToolTip = 'Specifies the value of the Invoiced Profit % (Total) field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             begin

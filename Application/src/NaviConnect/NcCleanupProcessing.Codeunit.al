@@ -14,8 +14,8 @@ codeunit 6151510 "NPR Nc Cleanup Processing"
     end;
 
     var
-        ResetTaskCountText: Label 'Reset Retry Count';
-        CleanupImportText: Label 'Cleanup Import';
+        ResetTaskCountTxt: Label 'Reset Retry Count';
+        CleanupImportTxt: Label 'Cleanup Import';
 
     local procedure HasParameter(JobQueueEntry: Record "Job Queue Entry"; ParameterName: Text): Boolean
     var
@@ -25,7 +25,7 @@ codeunit 6151510 "NPR Nc Cleanup Processing"
         exit(Position > 0);
     end;
 
-    [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         ParameterString: Text;
@@ -41,10 +41,10 @@ codeunit 6151510 "NPR Nc Cleanup Processing"
         Rec.Validate("Parameter String", CopyStr(ParameterString, 1, MaxStrLen(Rec."Parameter String")));
     end;
 
-    [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Parameter String', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Parameter String', true, true)]
     local procedure OnValidateJobQueueEntryParameterString(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
-        Description: Text;
+        Desc: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then
             exit;
@@ -52,12 +52,12 @@ codeunit 6151510 "NPR Nc Cleanup Processing"
             exit;
 
         if HasParameter(Rec, ResetTaskCountParameter()) then
-            Description := ResetTaskCountText;
+            Desc := ResetTaskCountTxt;
 
         if HasParameter(Rec, CleanupImportParameter()) then
-            Description += ' | ' + CleanupImportText;
+            Desc += ' | ' + CleanupImportTxt;
 
-        Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
+        Rec.Description := CopyStr(Desc, 1, MaxStrLen(Rec.Description));
     end;
 
     local procedure CurrCodeunitId(): Integer

@@ -14,22 +14,25 @@ page 6150640 "NPR POS Info Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Message"; Rec.Message)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Once per Transaction"; Rec."Once per Transaction")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Once per Transaction field';
 
                     trigger OnValidate()
@@ -46,24 +49,26 @@ page 6150640 "NPR POS Info Card"
 
                     field("Copy from Header"; Rec."Copy from Header")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Copy from Header field';
                     }
                     field("Set POS Sale Line Color to Red"; Rec."Set POS Sale Line Color to Red")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Set POS Sale Line Color to Red field';
                     }
                 }
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Available in Front-End field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -79,12 +84,12 @@ page 6150640 "NPR POS Info Card"
 
                     field("Input Mandatory"; Rec."Input Mandatory")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Input Mandatory field';
                     }
                     field("Input Type"; Rec."Input Type")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Input Type field';
 
                         trigger OnValidate()
@@ -101,7 +106,7 @@ page 6150640 "NPR POS Info Card"
 
                         field("Table No."; Rec."Table No.")
                         {
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the value of the Table No. field';
                         }
                     }
@@ -111,7 +116,7 @@ page 6150640 "NPR POS Info Card"
             {
                 Caption = 'POS Info SubCodes';
                 SubPageLink = Code = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 Visible = IsInputTypeSubcode;
             }
         }
@@ -125,8 +130,9 @@ page 6150640 "NPR POS Info Card"
             {
                 Caption = 'Field Mapping';
                 Image = "Action";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Field Mapping action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

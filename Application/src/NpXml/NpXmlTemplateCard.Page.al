@@ -1,4 +1,4 @@
-﻿page 6151551 "NPR NpXml Template Card"
+page 6151551 "NPR NpXml Template Card"
 {
     UsageCategory = None;
     Caption = 'Xml Template';
@@ -15,13 +15,15 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Xml Root Name"; Rec."Xml Root Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Xml Root Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Control6151403)
                 {
@@ -29,14 +31,16 @@
                     Visible = Rec."Namespaces Enabled";
                     field("Xml Root Namespace"; Rec."Xml Root Namespace")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Xml Root Namespace field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -48,15 +52,17 @@
                     ShowCaption = false;
                     field(Archived; Rec.Archived)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Archived field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Template Version"; Rec."Template Version")
                     {
-                        ApplicationArea = All;
+
                         AssistEdit = true;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Version field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -73,14 +79,16 @@
                     }
                     field("Last Modified at"; Rec."Last Modified at")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Last Modified at field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Version Description"; Rec."Version Description")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Version Description field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -90,8 +98,9 @@
                 }
                 field("Root Element Attr. Enabled"; Rec."Root Element Attr. Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if Attributes from Xml Root should be visible.';
+                    ApplicationArea = NPRRetail;
                 }
                 group(ControlXmlRootAttributes)
                 {
@@ -99,43 +108,50 @@
                     Visible = Rec."Root Element Attr. Enabled";
                     field("Root Element Attr. 1 Name"; Rec."Root Element Attr. 1 Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the Name of 1st Xml Root Attribute';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Root Element Attr. 1 Value"; Rec."Root Element Attr. 1 Value")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the Value of 1st Xml Root Attribute';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Root Element Attr. 2 Name"; Rec."Root Element Attr. 2 Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the Name of 2nd Xml Root Attribute';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Root Element Attr. 2 Value"; Rec."Root Element Attr. 2 Value")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the Value of 2nd Xml Root Attribute';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 field("Custom Namespace for XMLNS"; Rec."Custom Namespace for XMLNS")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the custom URI for default prefix/alias (xmlns).';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Control6150677)
                 {
                     ShowCaption = false;
                     field("Namespaces Enabled"; Rec."Namespaces Enabled")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Namespaces Enabled field';
+                        ApplicationArea = NPRRetail;
                     }
                     part(Namespaces; "NPR NpXml Namespaces")
                     {
                         SubPageLink = "Xml Template Code" = FIELD(Code);
                         Visible = Rec."Namespaces Enabled";
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -144,27 +160,31 @@
                 Caption = 'Transaction';
                 field("Transaction Task"; Rec."Transaction Task")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Transaction Task field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Processor Code"; Rec."Task Processor Code")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Task Processor Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Disable Auto Task Setup"; Rec."Disable Auto Task Setup")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Disable Auto Task Setup field';
+                    ApplicationArea = NPRRetail;
                 }
                 part(NpXmlTemplateTriggers; "NPR NpXml Template Triggers")
                 {
                     ShowFilter = false;
                     SubPageLink = "Xml Template Code" = FIELD(Code);
                     Visible = NpXmlTemplateTriggersVisible;
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
             group(Batch)
@@ -172,32 +192,37 @@
                 Caption = 'Batch';
                 field("Batch Task"; Rec."Batch Task")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Batch Task field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max Records per File"; Rec."Max Records per File")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max qty. records per XML File field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Batch Last Run"; Rec."Batch Last Run")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Batch Last Run field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Runtime Error"; Rec."Runtime Error")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Runtime Error field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Error Message"; Rec."Last Error Message")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Error Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 part(NpXmlBatchFilters; "NPR NpXml Batch Filters")
                 {
@@ -205,7 +230,8 @@
                     SubPageLink = "Xml Template Code" = FIELD(Code),
                                   "Xml Element Line No." = CONST(-1);
                     Visible = NpXmlBatchFiltersVisible;
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
             group(Transfer)
@@ -213,93 +239,107 @@
                 Caption = 'Transfer';
                 field("Before Transfer Codeunit ID"; Rec."Before Transfer Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Before Transfer Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Before Transfer Codeunit Name"; Rec."Before Transfer Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Before Transfer Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Before Transfer Function"; Rec."Before Transfer Function")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Before Transfer Function field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Do Not Add Comment Line"; Rec."Do Not Add Comment Line")
                 {
-                    ApplicationArea = All;
+
                     Importance = Additional;
                     ToolTip = 'Specifies whether a comment line should be added to the output file before transferring it to the destination resource';
+                    ApplicationArea = NPRRetail;
                 }
                 group("File")
                 {
                     Caption = 'File';
                     field("File Transfer"; Rec."File Transfer")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the File Transfer field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("File Path"; Rec."File Path")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the File Path field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(FTP)
                 {
                     field("FTP Transfer"; Rec."FTP Transfer")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the FTP Transfer field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Server"; Rec."FTP Server")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the FTP Server field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Username"; Rec."FTP Username")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the FTP Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Password"; Rec."FTP Password")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the FTP Password field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Port"; Rec."FTP Port")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the FTP Port field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Passive"; Rec."FTP Passive")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the FTP Passive field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Directory"; Rec."FTP Directory")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the FTP Directory field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Filename (Fixed)"; Rec."FTP Filename (Fixed)")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the FTP Filename (Fixed) field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("FTP Files temporrary extension"; Rec."FTP Files temporrary extension")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         Importance = Additional;
                         ToolTip = 'Specifies temporrary file extension. If it is entered, file will be uploaded with this extension and then renamed to real (target) one.';
                     }
@@ -308,20 +348,23 @@
                 {
                     field("API Transfer"; Rec."API Transfer")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the API Transfer field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Type"; Rec."API Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the API Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Url"; Rec."API Url")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the API Url field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(Control6151411)
                     {
@@ -329,9 +372,10 @@
                         Visible = Rec."API Type" <> Rec."API Type"::SOAP;
                         field("API Method"; Rec."API Method")
                         {
-                            ApplicationArea = All;
+
                             Importance = Promoted;
                             ToolTip = 'Specifies the value of the API Method field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control6150679)
@@ -340,51 +384,59 @@
                         Visible = Rec."API Type" = Rec."API Type"::SOAP;
                         field("API SOAP Action"; Rec."API SOAP Action")
                         {
-                            ApplicationArea = All;
+
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the API SOAP Action field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     field("API Username Type"; Rec."API Username Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the API Username Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Username"; Rec."API Username")
                     {
-                        ApplicationArea = All;
+
                         Enabled = Rec."API Username Type" = Rec."API Username Type"::Custom;
                         ToolTip = 'Specifies the value of the API Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Password"; Rec."API Password")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the API Password field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Content-Type"; Rec."API Content-Type")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the API Content-Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Authorization"; Rec."API Authorization")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the API Authorization field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Accept"; Rec."API Accept")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the API Accept field';
+                        ApplicationArea = NPRRetail;
                     }
                     part("Api Headers"; "NPR NpXml Api Headers")
                     {
                         Caption = 'Api Headers';
                         ShowFilter = false;
                         SubPageLink = "Xml Template Code" = FIELD(Code);
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                     group(Control6151410)
                     {
@@ -392,22 +444,25 @@
                         Visible = Rec."API Type" <> Rec."API Type"::"REST (Json)";
                         field("API Response Path"; Rec."API Response Path")
                         {
-                            ApplicationArea = All;
+
                             Importance = Additional;
                             ToolTip = 'Specifies the value of the API Response Path field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     field("API Response Success Path"; Rec."API Response Success Path")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the API Response Success Path field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Response Success Value"; Rec."API Response Success Value")
                     {
-                        ApplicationArea = All;
+
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the API Response Success Value field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(Control6150623)
                     {
@@ -415,14 +470,16 @@
                         Visible = Rec."API Type" = Rec."API Type"::"REST (Json)";
                         field("JSON Root is Array"; Rec."JSON Root is Array")
                         {
-                            ApplicationArea = All;
+
                             Importance = Additional;
                             ToolTip = 'Specifies the value of the JSON Root is Array field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Use JSON Numbers"; Rec."Use JSON Numbers")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Use JSON Numbers field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -445,8 +502,9 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Elements";
                 RunPageLink = "Xml Template Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Edit Field Mapping action';
+                ApplicationArea = NPRRetail;
             }
             action("Preview Xml")
             {
@@ -456,8 +514,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Preview Xml action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -476,8 +535,9 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Templ. Chng. History";
                 RunPageLink = "Template Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Template History action';
+                ApplicationArea = NPRRetail;
             }
             action("Archived Versions")
             {
@@ -489,8 +549,9 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Templ. Arch. List";
                 RunPageLink = Code = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Archived Versions action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -503,8 +564,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Init New Version action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -515,8 +577,9 @@
             {
                 Caption = 'Export Xml Template';
                 Image = Export;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Xml Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -527,8 +590,9 @@
             {
                 Caption = 'Import Template';
                 Image = Import;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -540,9 +604,10 @@
             {
                 Caption = 'Import Template From Blob Storage';
                 Image = ImportDatabase;
-                ApplicationArea = All;
+
                 RunObject = page "NPR NpXml Templ. Dep. From Az.";
                 ToolTip = 'Executes the Import Template action from Azure Blob storage';
+                ApplicationArea = NPRRetail;
             }
 
             action("Run Batch")
@@ -552,8 +617,9 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Run Batch action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -564,8 +630,9 @@
             {
                 Caption = 'Schedule Batch Task';
                 Image = NewToDo;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Schedule Batch Task action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -588,8 +655,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Archive Template action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

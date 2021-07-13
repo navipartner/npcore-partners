@@ -3,8 +3,9 @@ page 6151561 "NPR NpXml Field Value Buffer"
     Caption = 'NpXml Field Value Buffer';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpXml Field Val. Buffer";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,8 +15,9 @@ page 6151561 "NPR NpXml Field Value Buffer"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

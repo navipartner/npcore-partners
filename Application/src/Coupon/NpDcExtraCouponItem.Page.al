@@ -4,8 +4,9 @@ page 6151596 "NPR NpDc Extra Coupon Item"
     Caption = 'Extra Coupon Item';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpDc Extra Coupon Item";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,13 +19,15 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                     ShowCaption = false;
                     field("Item No."; Rec."Item No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Item No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Discount Type"; Rec."Discount Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Discount Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(Control6014411)
                     {
@@ -32,9 +35,10 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                         Visible = (Rec."Discount Type" = 0);
                         field("Discount Amount"; Rec."Discount Amount")
                         {
-                            ApplicationArea = All;
+
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the Discount Amount field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control6014409)
@@ -43,14 +47,16 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                         Visible = (Rec."Discount Type" = 1);
                         field("Discount %"; Rec."Discount %")
                         {
-                            ApplicationArea = All;
+
                             ShowMandatory = true;
                             ToolTip = 'Specifies the value of the Discount % field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Max. Discount Amount"; Rec."Max. Discount Amount")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Max. Discount Amount per Sale';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -59,18 +65,21 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                     ShowCaption = false;
                     field("Item Description"; Rec."Item Description")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Item Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Unit Price"; Rec."Unit Price")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Unit Price field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Profit %"; Rec."Profit %")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Profit % field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

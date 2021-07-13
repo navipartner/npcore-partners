@@ -5,7 +5,7 @@ report 6060123 "NPR MM Member Card Std Print"
     RDLCLayout = './src/_Reports/layouts/MM Member Card Std PrintV18.rdl';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
 
     dataset
     {

@@ -6,8 +6,9 @@ page 6150621 "NPR POS Unit to Bin Relation"
     Caption = 'POS Unit to Bin Relation';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Unit to Bin Relation";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,34 +18,39 @@ page 6150621 "NPR POS Unit to Bin Relation"
             {
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit Status"; Rec."POS Unit Status")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowUnitInfo;
                     ToolTip = 'Specifies the value of the POS Unit Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit Name"; Rec."POS Unit Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowUnitInfo;
                     ToolTip = 'Specifies the value of the POS Unit Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin No."; Rec."POS Payment Bin No.")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     Visible = ShowBinInfo;
                     ToolTip = 'Specifies the value of the POS Payment Bin No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin Status"; Rec."POS Payment Bin Status")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowBinInfo;
                     ToolTip = 'Specifies the value of the POS Payment Bin Status field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

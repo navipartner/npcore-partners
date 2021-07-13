@@ -7,7 +7,8 @@ page 6059905 "NPR Task Queue"
     PageType = List;
     SourceTable = "NPR Task Queue";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,7 +16,8 @@ page 6059905 "NPR Task Queue"
         {
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger AddInReady()
                 begin
@@ -32,70 +34,82 @@ page 6059905 "NPR Task Queue"
             {
                 field(Company; Rec.Company)
                 {
-                    ApplicationArea = All;
+
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Company field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Template"; Rec."Task Template")
                 {
-                    ApplicationArea = All;
+
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Task Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Batch"; Rec."Task Batch")
                 {
-                    ApplicationArea = All;
+
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Task Batch field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Line No."; Rec."Task Line No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Task Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Next Run time"; Rec."Next Run time")
                 {
-                    ApplicationArea = All;
+
                     Editable = SetEditable;
                     ToolTip = 'Specifies the value of the Next Run time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Assigned To User"; Rec."Assigned To User")
                 {
-                    ApplicationArea = All;
+
                     DrillDown = false;
                     Lookup = false;
                     ToolTip = 'Specifies the value of the Assigned To User field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Assigned Time"; Rec."Assigned Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Assigned Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Started Time"; Rec."Started Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Started Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Estimated Duration"; Rec."Estimated Duration")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Estimated Duration field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

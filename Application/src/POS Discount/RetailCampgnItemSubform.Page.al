@@ -8,9 +8,10 @@ page 6014613 "NPR Retail Campgn.Item Subform"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail Campaign Items";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,244 +21,289 @@ page 6014613 "NPR Retail Campgn.Item Subform"
             {
                 field("Disc. Type"; Rec."Disc. Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Disc. Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Disc. Code"; Rec."Disc. Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Disc. Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Campaign Unit Price"; Rec."Campaign Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Cost"; Rec."Unit Cost")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Unit Cost';
                     ToolTip = 'Specifies the value of the Unit Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Campaign Unit Cost"; Rec."Campaign Unit Cost")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Purchase Price"; Rec."Unit Purchase Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Purchase Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Closing Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price Incl. VAT"; Rec."Unit Price Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mix Discount Type"; Rec."Mix Discount Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Mix Type"; Rec."Mix Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mix Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Discount %"; Rec."Item Discount %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Discount Qty."; Rec."Item Discount Qty.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Discount Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Item"; Rec."Distribution Item")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Distributionitem field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor Item No."; Rec."Vendor Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Units per Parcel"; Rec."Units per Parcel")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Units per Parcel field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Inventory Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity On Purchase Order"; Rec."Quantity On Purchase Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity in Purchase Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Page no. in advert"; Rec."Page no. in advert")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Page no. in advert field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Priority 2"; Rec."Priority 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Photo; Rec.Photo)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Photo field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cross-Reference No."; Rec."Cross-Reference No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Disc. Grouping Type"; Rec."Disc. Grouping Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Disc. Grouping Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Profit; Rec.Profit)
                 {
-                    ApplicationArea = All;
+
                     Visible = true;
                     ToolTip = 'Specifies the value of the Revenue % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Group"; Rec."Item Group")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Turnover; Rec.Turnover)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Turnover field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity Sold"; Rec."Quantity Sold")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sold Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Internet Special Id"; Rec."Internet Special Id")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Internet Special ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Campaign Profit"; Rec."Campaign Profit")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Campaign Profit field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Date Modified field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Closing Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Comment 2"; Rec."Comment 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comments field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

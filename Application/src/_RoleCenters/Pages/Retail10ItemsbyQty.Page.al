@@ -20,9 +20,10 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 ShowCaption = false;
                 field(StartDate; StartDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Start Date';
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -31,9 +32,10 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 }
                 field(Enddate; Enddate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'End date';
                     ToolTip = 'Specifies the value of the End date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -48,8 +50,9 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 {
                     field("No."; Rec."No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the No. field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -59,15 +62,17 @@ page 6059815 "NPR Retail 10 Items by Qty."
                     }
                     field(Description; Rec.Description)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales (Qty.)"; Rec."Sales (Qty.)")
                     {
-                        ApplicationArea = All;
+
                         BlankZero = true;
                         Caption = 'Sales (Qty.)';
                         ToolTip = 'Specifies the value of the Sales (Qty.) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -86,9 +91,10 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Day action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -99,9 +105,10 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Week action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -112,9 +119,10 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Month action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -125,9 +133,10 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Quarter action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -138,9 +147,10 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Year action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

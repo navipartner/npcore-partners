@@ -5,9 +5,10 @@ page 6014560 "NPR RP Template Designer"
     DeleteAllowed = false;
     PageType = Document;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PromotedActionCategories = 'New,Process,Prints,Data';
     SourceTable = "NPR RP Template Header";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,7 +20,8 @@ page 6014560 "NPR RP Template Designer"
                 ShowFilter = false;
                 SubPageLink = "Template Code" = FIELD(Code);
                 Visible = MatrixVisible;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(LineDesigner; "NPR RP Templ. Line Designer")
             {
@@ -27,7 +29,8 @@ page 6014560 "NPR RP Template Designer"
                 ShowFilter = false;
                 SubPageLink = "Template Code" = FIELD(Code);
                 Visible = LineVisible;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -45,8 +48,9 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Unindent action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -62,8 +66,9 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Indent action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -79,8 +84,9 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F8';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Test Print action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -115,8 +121,9 @@ page 6014560 "NPR RP Template Designer"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Set Test Print Filter action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

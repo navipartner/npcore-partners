@@ -8,8 +8,9 @@ page 6014675 "NPR Endpoint Card"
     Caption = 'Endpoint Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Endpoint";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,105 +20,124 @@ page 6014675 "NPR Endpoint Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max. Requests per Batch"; Rec."Max. Requests per Batch")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max. Requests per Batch field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Wait to Send"; Rec."Wait to Send")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Wait to Send field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Obsolete Requests"; Rec."Delete Obsolete Requests")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Obsolete Requests field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Sent Requests After"; Rec."Delete Sent Requests After")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Sent Requests After field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Changes)
             {
                 field("Trigger on Modify"; Rec."Trigger on Modify")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Modify field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Trigger on Insert"; Rec."Trigger on Insert")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Insert field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Trigger on Delete"; Rec."Trigger on Delete")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Trigger on Rename"; Rec."Trigger on Rename")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rename field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Queries)
             {
                 field("Query Name"; Rec."Query Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Query Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max. Requests per Query"; Rec."Max. Requests per Query")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max. Requests per Query field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Query from Database"; Rec."Allow Query from Database")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Query from Database field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Query from Company Name"; Rec."Allow Query from Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Query from Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Query from User ID"; Rec."Allow Query from User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Query from User ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6150625; "NPR Endpoint Filters")
             {
                 SubPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -132,8 +152,9 @@ page 6014675 "NPR Endpoint Card"
                 Image = XMLFile;
                 RunObject = Page "NPR Endpoint Request List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Requests action';
+                ApplicationArea = NPRRetail;
             }
             action("Request Batches")
             {
@@ -141,8 +162,9 @@ page 6014675 "NPR Endpoint Card"
                 Image = XMLFileGroup;
                 RunObject = Page "NPR Endpoint Req. Batch List";
                 RunPageLink = "Endpoint Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Request Batches action';
+                ApplicationArea = NPRRetail;
             }
             action("Query")
             {
@@ -152,8 +174,9 @@ page 6014675 "NPR Endpoint Card"
                 RunPageLink = "Endpoint Code" = FIELD(Code);
                 RunPageView = SORTING("Endpoint Code", "No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Query action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -162,8 +185,9 @@ page 6014675 "NPR Endpoint Card"
             {
                 Caption = 'Send All Records As Modify';
                 Image = BulletList;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Send All Records As Modify action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

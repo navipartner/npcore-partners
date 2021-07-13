@@ -1,10 +1,11 @@
-﻿page 6014670 "NPR Dependency Mgt. Setup"
+page 6014670 "NPR Dependency Mgt. Setup"
 {
     Caption = 'Dependency Management Setup';
     PageType = Card;
     SourceTable = "NPR Dependency Mgt. Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,8 +18,9 @@
                     Caption = 'Configuration';
                     field("Disable Deployment"; Rec."Disable Deployment")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Disable Deployment field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Filtering)
@@ -26,8 +28,9 @@
                     Caption = 'Filtering';
                     field("Accept Statuses"; Rec."Accept Statuses")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Accept Dependency Statuses field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -45,8 +48,9 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download Managed Dependencies action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -3,8 +3,9 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
     Caption = 'Collect Store Opening Hour Set Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Open. Hour Set";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,20 +15,23 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part("Opening Hours"; "NPR NpCs Open.Hour Set S.page")
             {
                 Caption = 'Opening Hours';
                 SubPageLink = "Set Code" = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -41,8 +45,9 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
                 Caption = 'Opening Hour Calendar';
                 Image = Calendar;
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Opening Hour Calendar action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

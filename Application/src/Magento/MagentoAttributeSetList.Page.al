@@ -6,8 +6,9 @@ page 6151433 "NPR Magento Attribute Set List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Attribute Set";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,13 +19,15 @@ page 6151433 "NPR Magento Attribute Set List"
                 ShowCaption = false;
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Used by Items"; Rec."Used by Items")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Used by Items field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

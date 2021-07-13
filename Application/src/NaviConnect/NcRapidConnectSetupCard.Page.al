@@ -10,22 +10,26 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
         {
             group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Package Code"; Rec."Package Code")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Package Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
             group(Export)
@@ -36,20 +40,23 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     ShowCaption = false;
                     field("Export Enabled"; Rec."Export Enabled")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Export Enabled field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Task Processor Code"; Rec."Task Processor Code")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Task Processor Code field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Export File Type"; Rec."Export File Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Export File Type field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                 }
                 group(Control6151414)
@@ -58,12 +65,14 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     part(Control6151411; "NPR Nc RapidConnect Subform")
                     {
                         SubPageLink = "Setup Code" = FIELD(Code);
-                        ApplicationArea = All;
+                        ApplicationArea = NPRNaviConnect;
+
                     }
                     part(Control6151416; "NPR Nc RapidConnect Endp. Sub.")
                     {
                         SubPageLink = "Setup Code" = FIELD(Code);
-                        ApplicationArea = All;
+                        ApplicationArea = NPRNaviConnect;
+
                     }
                 }
             }
@@ -72,73 +81,86 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                 Caption = 'Import';
                 field("Import Enabled"; Rec."Import Enabled")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Import Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Type"; Rec."Import Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Type field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Validate Package"; Rec."Validate Package")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Validate Package field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Apply Package"; Rec."Apply Package")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Apply Package field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Disable Data Log on Import"; Rec."Disable Data Log on Import")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Disable Data Log on Import field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 group("Download from")
                 {
                     Caption = 'Download from';
                     field("Ftp Host"; Rec."Ftp Host")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Ftp Host field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Port"; Rec."Ftp Port")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Port field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp User"; Rec."Ftp User")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp User field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Password"; Rec."Ftp Password")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Password field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Passive"; Rec."Ftp Passive")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Passive field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Binary"; Rec."Ftp Binary")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Binary field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Path"; Rec."Ftp Path")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Path field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                     field("Ftp Backup Path"; Rec."Ftp Backup Path")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Ftp Backup Path field';
+                        ApplicationArea = NPRNaviConnect;
                     }
                 }
             }
@@ -156,8 +178,9 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                 {
                     Caption = 'Init Export Triggers';
                     Image = "Action";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Init Export Triggers action';
+                    ApplicationArea = NPRNaviConnect;
 
                     trigger OnAction()
                     var
@@ -175,8 +198,9 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     Caption = 'Download Ftp';
                     Image = Delegate;
                     Visible = Rec."Import Enabled";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Download Ftp action';
+                    ApplicationArea = NPRNaviConnect;
 
                     trigger OnAction()
                     var

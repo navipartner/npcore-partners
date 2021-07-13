@@ -3,7 +3,7 @@ report 6014474 "NPR Item/Sales Person Top"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Item/Sales Person Top';
 
     dataset
@@ -157,8 +157,9 @@ report 6014474 "NPR Item/Sales Person Top"
                     field("Sorting"; SortOrder)
                     {
                         Caption = 'Sorting';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sorting field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -171,23 +172,26 @@ report 6014474 "NPR Item/Sales Person Top"
                         Caption = 'Sort By';
                         Enabled = ShowSort;
                         OptionCaption = 'Qty.,Turnover';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sort By field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Key"; SortingStigende)
                     {
                         Caption = 'Key';
                         Enabled = ShowSort;
                         OptionCaption = 'Biggest,Smallest';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Key field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Qty"; ShowQty)
                     {
                         Caption = 'Show Qty.';
                         Enabled = ShowSort;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Qty. field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

@@ -13,7 +13,7 @@ page 6150746 "NPR Unfinished POS Sale"
         {
             label(AddInstructionLbl)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 CaptionClass = GenerateInstructions();
                 MultiLine = true;
                 ShowCaption = false;
@@ -22,43 +22,51 @@ page 6150746 "NPR Unfinished POS Sale"
             {
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date"; Rec.Date)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Start Time"; Rec."Start Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -67,8 +75,9 @@ page 6150746 "NPR Unfinished POS Sale"
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -77,8 +86,9 @@ page 6150746 "NPR Unfinished POS Sale"
                 }
                 field("Payment Amount"; Rec."Payment Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Amount field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

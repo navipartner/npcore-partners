@@ -1,9 +1,9 @@
 ﻿codeunit 6151505 "NPR Nc Sync. Mgt."
 {
     var
-        Text000: Label 'NaviConnect Default';
-        Text001: Label 'Error during Ftp Backup (%1):\\%2';
-        FileIsNotValidErr: Label 'File %1 is not valid';
+        NaviConnectDefaultTxt: Label 'NaviConnect Default';
+        FtpBackupErr: Label 'Error during Ftp Backup (%1):\\%2', Comment = '%1=Filename;%2=GetLastErrorText()';
+        FileIsNotValidErr: Label 'File %1 is not valid', Comment = '%1=FileName';
         SyncEndTime: DateTime;
         AuthorizationFailedErrorText: Label 'Authorization failed. Wrong FTP username/password.';
         FTPClient: Codeunit "NPR AF FTP Client";
@@ -101,14 +101,14 @@
 
         if ImportType."Ftp Backup Path" = '' then begin
             if not DeleteFtpFile(SourceUri + Filename) then
-                Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
+                Error(FtpBackupErr, Filename, GetLastErrorText());
         end else begin
             TargetUri := ManagePathSlashes(ImportType."Ftp Backup Path");
             if not CheckFtpUrlExists(TargetUri) then
                 if MakeFtpUrl(TargetUri) then;
 
             if not RenameFtpFile(ManagePathSlashes(SourceUri) + Filename, ManagePathSlashes(ImportType."Ftp Backup Path") + Filename) then
-                Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
+                Error(FtpBackupErr, Filename, GetLastErrorText());
         end;
 
         TempImportEntry.Insert();
@@ -322,7 +322,7 @@
         if TaskProcessor.Code in ['', 'NC'] then begin
             TaskProcessor.Init();
             TaskProcessor.Code := 'NC';
-            TaskProcessor.Description := Text000;
+            TaskProcessor.Description := CopyStr(NaviConnectDefaultTxt, 1, MaxStrLen(TaskProcessor.Description));
             TaskProcessor.Insert(true);
         end;
     end;

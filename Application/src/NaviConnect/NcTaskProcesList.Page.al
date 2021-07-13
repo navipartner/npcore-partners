@@ -6,7 +6,7 @@ page 6151508 "NPR Nc Task Proces. List"
     PageType = List;
     SourceTable = "NPR Nc Task Processor";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -16,13 +16,15 @@ page 6151508 "NPR Nc Task Proces. List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }

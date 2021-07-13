@@ -5,8 +5,9 @@ page 6060138 "NPR MM Member Members.ListPart"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Membership Role";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,15 +17,17 @@ page 6060138 "NPR MM Member Members.ListPart"
             {
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "NPR MM Membership Card";
                     LookupPageID = "NPR MM Membership Card";
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("GDPR Approval"; Rec."GDPR Approval")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the GDPR Approval field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -41,45 +44,52 @@ page 6060138 "NPR MM Member Members.ListPart"
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "NPR MM Membership Setup";
                     LookupPageID = "NPR MM Membership Setup";
                     TableRelation = "NPR MM Membership Setup".Code;
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User Logon ID"; Rec."User Logon ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User Logon ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Password Hash"; Rec."Password Hash")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Password field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("GDPR Agreement No."; Rec."GDPR Agreement No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the GDPR Agreement No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("GDPR Data Subject Id"; Rec."GDPR Data Subject Id")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the GDPR Data Subject Id field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

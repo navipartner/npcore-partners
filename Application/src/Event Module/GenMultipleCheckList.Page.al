@@ -4,150 +4,171 @@ page 6014650 "NPR Gen. Multiple Check List"
     LinksAllowed = false;
     ShowFilter = false;
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
         {
             field("BooleanArr[1]"; BooleanArr[1])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[1];
                 Visible = BooleanVisible1;
                 ToolTip = 'Specifies the value of the BooleanArr[1] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[2]"; BooleanArr[2])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[2];
                 Visible = BooleanVisible2;
                 ToolTip = 'Specifies the value of the BooleanArr[2] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[3]"; BooleanArr[3])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[3];
                 Visible = BooleanVisible3;
                 ToolTip = 'Specifies the value of the BooleanArr[3] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[4]"; BooleanArr[4])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[4];
                 Visible = BooleanVisible4;
                 ToolTip = 'Specifies the value of the BooleanArr[4] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[5]"; BooleanArr[5])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[5];
                 Visible = BooleanVisible5;
                 ToolTip = 'Specifies the value of the BooleanArr[5] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[6]"; BooleanArr[6])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[6];
                 Visible = BooleanVisible6;
                 ToolTip = 'Specifies the value of the BooleanArr[6] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[7]"; BooleanArr[7])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[7];
                 Visible = BooleanVisible7;
                 ToolTip = 'Specifies the value of the BooleanArr[7] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[8]"; BooleanArr[8])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[8];
                 Visible = BooleanVisible8;
                 ToolTip = 'Specifies the value of the BooleanArr[8] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[9]"; BooleanArr[9])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[9];
                 Visible = BooleanVisible9;
                 ToolTip = 'Specifies the value of the BooleanArr[9] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[10]"; BooleanArr[10])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[10];
                 Visible = BooleanVisible10;
                 ToolTip = 'Specifies the value of the BooleanArr[10] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[11]"; BooleanArr[11])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[11];
                 Visible = BooleanVisible11;
                 ToolTip = 'Specifies the value of the BooleanArr[11] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[12]"; BooleanArr[12])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[12];
                 Visible = BooleanVisible12;
                 ToolTip = 'Specifies the value of the BooleanArr[12] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[13]"; BooleanArr[13])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[13];
                 Visible = BooleanVisible13;
                 ToolTip = 'Specifies the value of the BooleanArr[13] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[14]"; BooleanArr[14])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[14];
                 Visible = BooleanVisible14;
                 ToolTip = 'Specifies the value of the BooleanArr[14] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[15]"; BooleanArr[15])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[15];
                 Visible = BooleanVisible15;
                 ToolTip = 'Specifies the value of the BooleanArr[15] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[16]"; BooleanArr[16])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[16];
                 Visible = BooleanVisible16;
                 ToolTip = 'Specifies the value of the BooleanArr[16] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[17]"; BooleanArr[17])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[17];
                 Visible = BooleanVisible17;
                 ToolTip = 'Specifies the value of the BooleanArr[17] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[18]"; BooleanArr[18])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[18];
                 Visible = BooleanVisible18;
                 ToolTip = 'Specifies the value of the BooleanArr[18] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[19]"; BooleanArr[19])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[19];
                 Visible = BooleanVisible19;
                 ToolTip = 'Specifies the value of the BooleanArr[19] field';
+                ApplicationArea = NPRRetail;
             }
             field("BooleanArr[20]"; BooleanArr[20])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '3,' + BooleanCaptionArr[20];
                 Visible = BooleanVisible20;
                 ToolTip = 'Specifies the value of the BooleanArr[20] field';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -7,9 +7,10 @@ page 6060152 "NPR Event List"
     SourceTableView = WHERE("NPR Event" = CONST(true));
     PromotedActionCategories = 'New,Process,Report,Navigate,Job';
     UsageCategory = Lists;
-    ApplicationArea = All;
+
     InsertAllowed = false;
     ModifyAllowed = false;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,100 +21,117 @@ page 6060152 "NPR Event List"
                 ShowCaption = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies a short description of the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the number of the customer who pays for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Name"; Rec."Bill-to Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the name of the customer who pays for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Status"; Rec."NPR Event Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies a status for the current event. You can change the status for the event as it progresses. Final calculations can be made on completed events.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specified starting date of the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Person Responsible"; Rec."Person Responsible")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the number of the person responsible for the event. You can select a number from the list of resources available in the Resource List window. The number is copied from the No. field in the Resource table. You can choose the field to see a list of resources.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Next Invoice Date"; Rec."Next Invoice Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the next invoice date for the job.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Job Posting Group"; Rec."Job Posting Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies a job posting group code for a job. To see the available codes, choose the field.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Search Description"; Rec."Search Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the additional name for the job. The field is used for searching purposes.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Amount"; Rec."NPR Total Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the sum of "Line Amount (LCY)" of all the planning lines on this event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Est. Total Amount Incl. VAT"; Rec."NPR Est. Total Amt. Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the sum of "Est. Total Amount Incl. VAT" of all the planning lines on this event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Person Responsible Name"; Rec."NPR Person Responsible Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the number of the person responsible for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("% of Overdue Planning Lines"; Rec.PercentOverdue())
                 {
-                    ApplicationArea = All;
+
                     Caption = '% of Overdue Planning Lines';
                     Editable = false;
                     ToolTip = 'Specifies the percent of planning lines that are overdue for this event.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("% Completed"; Rec.PercentCompleted())
                 {
-                    ApplicationArea = All;
+
                     Caption = '% Completed';
                     Editable = false;
                     ToolTip = 'Specifies the completion percentage for this event.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("% Invoiced"; Rec.PercentInvoiced())
                 {
-                    ApplicationArea = All;
+
                     Caption = '% Invoiced';
                     Editable = false;
                     ToolTip = 'Specifies the invoiced percentage for this event.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Creation Date"; Rec."Creation Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies a date when event was created.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -123,29 +141,34 @@ page 6060152 "NPR Event List"
             {
                 SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control1905650007; "Job WIP/Recognition FactBox")
             {
                 SubPageLink = "No." = FIELD("No.");
                 Visible = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -169,8 +192,9 @@ page 6060152 "NPR Event List"
                     RunObject = Page "NPR Event Task Lines";
                     RunPageLink = "Job No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+T';
-                    ApplicationArea = All;
+
                     ToolTip = 'Plan how you want to set up your planning information. In this window you can specify the tasks involved in an event. To start planning an event or to post usage for an event, you must set up at least one event task.';
+                    ApplicationArea = NPRRetail;
                 }
                 group("&Dimensions")
                 {
@@ -185,16 +209,18 @@ page 6060152 "NPR Event List"
                         RunPageLink = "Table ID" = CONST(167),
                                       "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
-                        ApplicationArea = All;
+
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
+                        ApplicationArea = NPRRetail;
                     }
                     action("Dimensions-&Multiple")
                     {
                         AccessByPermission = TableData Dimension = R;
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
-                        ApplicationArea = All;
+
                         ToolTip = 'View or edit dimensions for a group of records. You can assign dimension codes to transactions to distribute costs and analyze historical information.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -217,8 +243,9 @@ page 6060152 "NPR Event List"
                     RunObject = Page "NPR Event Statistics";
                     RunPageLink = "No." = FIELD("No.");
                     ShortCutKey = 'F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'View this event''s statistics.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(SalesDocuments)
                 {
@@ -227,8 +254,9 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View sales documents that are related to the selected event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -245,8 +273,9 @@ page 6060152 "NPR Event List"
                     RunObject = Page "Comment Sheet";
                     RunPageLink = "Table Name" = CONST(Job),
                                   "No." = FIELD("No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add comments for the record.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(ActivityLog)
                 {
@@ -255,8 +284,9 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View more details about potential errors/actions that occur on this event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -274,8 +304,9 @@ page 6060152 "NPR Event List"
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Attributes";
                     RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add attributes which will be associated with this event. Attributes are custom made labels that let you track different statistics per event or can be used as a set of multiple cross-labels for which you can define values.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(WordLayouts)
                 {
@@ -284,8 +315,9 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add a word document with specific layout/data for this event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -303,8 +335,9 @@ page 6060152 "NPR Event List"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add different templates to be used for Microsoft Exchange integration. These include e-mails, meeting requests and appointments.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -323,8 +356,9 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View a summary that shows a nice overview of who the sender and receipients are when using Microsoft Exchange integration. Removes the uncertainty of not knowing to whom the e-mail or a meeting request will be send to.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -339,7 +373,7 @@ page 6060152 "NPR Event List"
                 Visible = ExtendedPriceEnabled;
                 action(SalesPriceLists)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Sales Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
@@ -347,6 +381,7 @@ page 6060152 "NPR Event List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you sell to the customer. A product price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -359,7 +394,7 @@ page 6060152 "NPR Event List"
                 }
                 action(SalesPriceListsDiscounts)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Sales Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
@@ -367,6 +402,7 @@ page 6060152 "NPR Event List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -379,7 +415,7 @@ page 6060152 "NPR Event List"
                 }
                 action(PurchasePriceLists)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Purchase Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
@@ -387,6 +423,7 @@ page 6060152 "NPR Event List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you buy from the vendor. An product price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -399,7 +436,7 @@ page 6060152 "NPR Event List"
                 }
                 action(PurchasePriceListsDiscounts)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Purchase Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
@@ -407,6 +444,7 @@ page 6060152 "NPR Event List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you buy from the vendor. An product discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -427,16 +465,18 @@ page 6060152 "NPR Event List"
                     Caption = 'Resource &Allocated per Job';
                     Image = ViewJob;
                     RunObject = Page "Resource Allocated per Job";
-                    ApplicationArea = All;
+
                     ToolTip = 'View this event''s resource allocation.';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Res. Group All&ocated per Job")
                 {
                     Caption = 'Res. Group All&ocated per Job';
                     Image = ViewJob;
                     RunObject = Page "Res. Gr. Allocated per Job";
-                    ApplicationArea = All;
+
                     ToolTip = 'View the event''s resource group allocation.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(History)
@@ -454,8 +494,9 @@ page 6060152 "NPR Event List"
                     RunPageLink = "Job No." = FIELD("No.");
                     RunPageView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -468,8 +509,9 @@ page 6060152 "NPR Event List"
                 {
                     Caption = 'Collect Ticket Printouts';
                     Image = GetSourceDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Collects tickets printouts for all issued tickets. Used for tickets which have a layout defined in Magento.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -490,8 +532,9 @@ page 6060152 "NPR Event List"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Copy an event and its event tasks, planning lines, and prices.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -515,8 +558,9 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'Use a batch job to help you create event sales invoices for the involved event planning lines.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -537,8 +581,9 @@ page 6060152 "NPR Event List"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Copy attributes from one event to another.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -557,8 +602,9 @@ page 6060152 "NPR Event List"
                     Caption = 'Send to Calendar';
                     Ellipsis = true;
                     Image = Calendar;
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates an exchange calendar item. This can be either an appointment or a meeting request. Calendar item will be created in the senders calendar. You can use Exch. Int. E-mail Summary action to check who the sender is.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -571,8 +617,9 @@ page 6060152 "NPR Event List"
                     Caption = 'Remove from Calendar';
                     Ellipsis = true;
                     Image = RemoveContacts;
-                    ApplicationArea = All;
+
                     ToolTip = 'Removes an exchange calendar created by Send to Calendar action. You''ll be prompted to select which one (if multiple) and to specify a reson for removal.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -584,8 +631,9 @@ page 6060152 "NPR Event List"
                 {
                     Caption = 'Get Attendee Response';
                     Image = Answers;
-                    ApplicationArea = All;
+
                     ToolTip = 'Checks for the attendee response on the meeting request previously sent. Response from each resource is checked and status is updated in the lines.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -602,8 +650,9 @@ page 6060152 "NPR Event List"
                         Caption = 'Customer';
                         Ellipsis = true;
                         Image = Customer;
-                        ApplicationArea = All;
+
                         ToolTip = 'Sends an e-mail to the customer who is paying for the event. E-mail sent is fully customizable. Use Exch. Int. Templates action to define subject and body of the e-mail, Word Layouts action to set attachment and Exch. Int. E-mail Summary to check who the sender/receipient is before sending it.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -616,8 +665,9 @@ page 6060152 "NPR Event List"
                         Caption = 'Team';
                         Ellipsis = true;
                         Image = TeamSales;
-                        ApplicationArea = All;
+
                         ToolTip = 'Sends an e-mail to the team responsible to prepare the event. E-mail sent is fully customizable. Use Exch. Int. Templates action to define subject and body of the e-mail, Word Layouts action to set attachment and Exch. Int. E-mail Summary to check who the sender/receipient is before sending it.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -636,8 +686,9 @@ page 6060152 "NPR Event List"
                 Image = "Report";
                 Promoted = false;
                 RunObject = Report "Items per Job";
-                ApplicationArea = All;
+
                 ToolTip = 'View which items are used for a specific event.';
+                ApplicationArea = NPRRetail;
             }
             action("Jobs per Item")
             {
@@ -645,8 +696,9 @@ page 6060152 "NPR Event List"
                 Image = "Report";
                 Promoted = false;
                 RunObject = Report "Jobs per Item";
-                ApplicationArea = All;
+
                 ToolTip = 'Run the Jobs per item report.';
+                ApplicationArea = NPRRetail;
             }
             group("Financial Management")
             {
@@ -658,8 +710,9 @@ page 6060152 "NPR Event List"
                     Image = "Report";
                     Promoted = false;
                     RunObject = Report "Job WIP To G/L";
-                    ApplicationArea = All;
+
                     ToolTip = 'View the value of work in process on the events that you select compared to the amount that has been posted in the general ledger.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(ActionGroup23)
@@ -672,8 +725,9 @@ page 6060152 "NPR Event List"
                     Image = "Report";
                     Promoted = false;
                     RunObject = Report "Job Register";
-                    ApplicationArea = All;
+
                     ToolTip = 'View one or more selected job registers. By using a filter, you can select only those register entries that you want to see. If you do not set a filter, the report can be impractical because it can contain a large amount of information. On the job journal template, you can indicate that you want the report to print when you post.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

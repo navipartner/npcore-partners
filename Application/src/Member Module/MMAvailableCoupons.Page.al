@@ -17,35 +17,41 @@ page 6014557 "NPR MM Available Coupons"
 
                 field("Coupon Type Code"; Rec."Coupon Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Points Threshold"; Rec."Points Threshold")
                 {
                     Caption = 'Points to Deduct';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Points to Deduct field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount LCY"; Rec."Amount LCY")
                 {
                     Caption = 'Discount';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

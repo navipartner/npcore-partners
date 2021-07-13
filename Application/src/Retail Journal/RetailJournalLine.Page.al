@@ -1,4 +1,4 @@
-﻿page 6014472 "NPR Retail Journal Line"
+page 6014472 "NPR Retail Journal Line"
 {
     // //- NE 08/07-05
     //   Rettet import tilbage til at bruge forms.
@@ -34,9 +34,10 @@
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail Journal Line";
     SourceTableView = SORTING("No.", "Line No.");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -47,11 +48,12 @@
                 ShowCaption = false;
                 field(ItemNo; ItemNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Item No.';
                     Lookup = true;
                     TableRelation = Item;
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -64,19 +66,22 @@
                 }
                 field("Calculation Date"; Rec."Calculation Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Calculation Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity to Print"; Rec."Quantity to Print")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity to Print field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Print; Print)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Print';
                     ToolTip = 'Specifies the value of the Print field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -88,202 +93,238 @@
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor Item No."; Rec."Vendor Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Barcode; Rec.Barcode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Barcode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ItemUnitPrice; Item."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Unit price(Item Card)';
                     Editable = false;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Unit price(Item Card) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Direct Cost"; Rec."Last Direct Cost")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Direct Cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Cost"; Item."Unit Cost")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Unit cost';
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit cost field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Profit % (new)"; Rec."Profit % (new)")
                 {
-                    ApplicationArea = All;
+
                     Visible = true;
                     ToolTip = 'Specifies the value of the Profit % (new) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Price Group"; Rec."Customer Price Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Price Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Disc. Group"; Rec."Customer Disc. Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Disc. Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("New Item No."; Rec."New Item No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serial No."; Rec."Serial No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serial No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Base Unit of measure"; Rec."Base Unit of measure")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Base Unit of measure field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Purch. Unit of measure"; Rec."Purch. Unit of measure")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Purch. Unit of measure field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Unit of measure"; Rec."Sales Unit of measure")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sales Unit of measure field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity for Discount Calc"; Rec."Quantity for Discount Calc")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity for Discount Calculation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Code"; Rec."Discount Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code 2"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Pct."; Rec."Discount Pct.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Price Incl. Vat"; Rec."Discount Price Incl. Vat")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Price Incl. Vat field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Price Excl. VAT"; Rec."Discount Price Excl. VAT")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Discount Price Excl. VAT field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit List Price"; Rec."Unit List Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit List Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT %"; Rec."VAT %")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the VAT % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item group Field"; Rec."Item group")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Vendor No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor Name"; Rec."Vendor Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Vendor Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Net Change"; Rec."Net Change")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Net Change field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Purchases (Qty.)"; Rec."Purchases (Qty.)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Purchases (Qty.) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales (Qty.)"; Rec."Sales (Qty.)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales (Qty.) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cannot edit unit price"; Rec."Cannot edit unit price")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Can''t edit unit price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Exchange Label"; Rec."Exchange Label")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Exchange Label field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -294,9 +335,10 @@
                 }
                 field("RFID Tag Value"; Rec."RFID Tag Value")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the RFID Tag Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

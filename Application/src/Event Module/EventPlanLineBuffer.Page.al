@@ -4,8 +4,9 @@ page 6059832 "NPR Event Plan. Line Buffer"
     Caption = 'Event Planning Line Buffer';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Event Plan. Line Buffer";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,14 +16,16 @@ page 6059832 "NPR Event Plan. Line Buffer"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Planning Date"; Rec."Planning Date")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Planning Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -31,9 +34,10 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -42,9 +46,10 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -53,9 +58,10 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -64,21 +70,24 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Status Checked"; Rec."Status Checked")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status Checked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Type"; Rec."Action Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -87,17 +96,19 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 }
                 field("Status Type"; Rec."Status Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Status Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Status Text"; Rec."Status Text")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = GlobalStyle;
                     ToolTip = 'Specifies the value of the Status Text field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -115,8 +126,9 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Check Capacity/Availability action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

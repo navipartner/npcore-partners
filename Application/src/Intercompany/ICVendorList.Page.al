@@ -3,8 +3,9 @@ page 6014595 "NPR IC Vendor List"
     Caption = 'Vendor List';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Vendor;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,33 +16,39 @@ page 6014595 "NPR IC Vendor List"
                 ShowCaption = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -8,7 +8,8 @@ page 6150741 "NPR POS Admin. Template List"
     PageType = List;
     SourceTable = "NPR POS Admin. Template";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,29 +19,34 @@ page 6150741 "NPR POS Admin. Template List"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Persist on Client"; Rec."Persist on Client")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Persist on Client field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -60,8 +66,9 @@ page 6150741 "NPR POS Admin. Template List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Admin. Template Scopes";
                 RunPageLink = "POS Admin. Template Id" = FIELD(Id);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Scopes action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

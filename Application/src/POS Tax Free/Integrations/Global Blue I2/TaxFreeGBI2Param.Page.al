@@ -14,121 +14,144 @@ page 6014647 "NPR Tax Free GB I2 Param."
                 {
                     field("Shop ID"; Rec."Shop ID")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Shop ID field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Desk ID"; Rec."Desk ID")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Desk ID field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Username; Rec.Username)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Password; Rec.Password)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Password field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Consolidation Allowed"; Rec."Consolidation Allowed")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Consolidation Allowed field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Consolidation Separate Limits"; Rec."Consolidation Separate Limits")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Consolidation Separate Limits field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Voucher Issue Date Limit"; Rec."Voucher Issue Date Limit")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Voucher Issue Date Limit field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Services Eligible"; Rec."Services Eligible")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Services Eligible field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Count Zero VAT Goods For Limit"; Rec."Count Zero VAT Goods For Limit")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Count Zero VAT Goods For Limit field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group("Dialog")
                 {
                     field("(Dialog) Passport Number"; Rec."(Dialog) Passport Number")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Passport Number field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) First Name"; Rec."(Dialog) First Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the First Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Last Name"; Rec."(Dialog) Last Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Last Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Street"; Rec."(Dialog) Street")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Street field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Postal Code"; Rec."(Dialog) Postal Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Postal Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Town"; Rec."(Dialog) Town")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Town field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Country Code"; Rec."(Dialog) Country Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Country Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Email"; Rec."(Dialog) Email")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Email field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Mobile No."; Rec."(Dialog) Mobile No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Mobile No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Passport Country Code"; Rec."(Dialog) Passport Country Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Passport Country Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Date Of Birth"; Rec."(Dialog) Date Of Birth")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Date Of Birth field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Departure Date"; Rec."(Dialog) Departure Date")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Departure Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Arrival Date"; Rec."(Dialog) Arrival Date")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Arrival Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("(Dialog) Dest. Country Code"; Rec."(Dialog) Dest. Country Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Dest. Country Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -137,13 +160,15 @@ page 6014647 "NPR Tax Free GB I2 Param."
                 Editable = false;
                 field("Shop Country Code"; Rec."Shop Country Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shop Country Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Last Auto Configured"; Rec."Date Last Auto Configured")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date Last Auto Configured field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -163,8 +188,9 @@ page 6014647 "NPR Tax Free GB I2 Param."
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free GB I2 Serv. List";
                 RunPageLink = "Tax Free Unit" = FIELD("Tax Free Unit");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Services action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -4,8 +4,9 @@ page 6151452 "NPR Magento Order Status"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Order Status";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,23 +16,27 @@ page 6151452 "NPR Magento Order Status"
             {
                 field("Order No."; Rec."Order No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Order No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Order No."; Rec."External Order No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Order No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Modified Date"; Rec."Last Modified Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Modified Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

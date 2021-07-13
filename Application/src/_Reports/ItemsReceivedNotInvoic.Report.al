@@ -4,7 +4,7 @@ report 6014450 "NPR Items Received&Not Invoic."
     RDLCLayout = './src/_Reports/layouts/Items Received&Not Invoiced NP.rdlc';
     Caption = 'Items Received & Not Invoiced';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Purchase Header"; "Purchase Header")

@@ -5,8 +5,9 @@ page 6060092 "NPR MM Admission Service Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Admis. Service Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,93 +17,111 @@ page 6060092 "NPR MM Admission Service Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action"; Rec.Action)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date"; Rec."Created Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Token; Rec.Token)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Token field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Key"; Rec.Key)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Key field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Scanner Station Id"; Rec."Scanner Station Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Barcode"; Rec."Request Barcode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request Barcode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Scanner Station Id"; Rec."Request Scanner Station Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request Scanner Station Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request No"; Rec."Request No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request No field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Token"; Rec."Request Token")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request Token field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response No"; Rec."Response No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Response No field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response Token"; Rec."Response Token")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Response Token field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response Name"; Rec."Response Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Response Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response PictureBase64"; Rec."Response PictureBase64")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Response PictureBase64 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error Number"; Rec."Error Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error Description"; Rec."Error Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Return Value"; Rec."Return Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Return Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -120,8 +139,9 @@ page 6060092 "NPR MM Admission Service Log"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Test action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

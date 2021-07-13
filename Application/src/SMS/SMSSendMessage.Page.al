@@ -20,10 +20,11 @@ page 6059944 "NPR SMS Send Message"
                     Visible = Mode < 2;
                     field(RecipientType; RecipientType)
                     {
-                        ApplicationArea = All;
+
                         Visible = RecTypeVisible;
                         Caption = 'Recipient Type';
                         ToolTip = 'Specifies the value of the Recipient Type field';
+                        ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
                             SetRecGroupVisible();
@@ -35,10 +36,11 @@ page 6059944 "NPR SMS Send Message"
                         Visible = RecGroupVisible;
                         field(GroupCode; GroupCode)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Group Code';
                             ToolTip = 'Specifies the value of the Group Code field';
                             TableRelation = "NPR SMS Recipient Group";
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(PhoneNoGrp)
@@ -47,16 +49,18 @@ page 6059944 "NPR SMS Send Message"
                         Visible = not RecGroupVisible;
                         field(PhoneNo; PhoneNo)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Phone No';
                             ToolTip = 'Specifies the value of the Phone No field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     field(SenderText; SenderText)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Sender';
                         ToolTip = 'Specifies the value of the Sender field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group("Merge Template with")
@@ -65,10 +69,11 @@ page 6059944 "NPR SMS Send Message"
                     Visible = ShowRecordSelection;
                     field(RecordInfo; RecordInfo)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Record';
                         Visible = ShowRecordSelection;
                         ToolTip = 'Specifies the value of the Record field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
@@ -90,11 +95,12 @@ page 6059944 "NPR SMS Send Message"
                     Visible = InfoText <> '';
                     field(InfoText; InfoText)
                     {
-                        ApplicationArea = All;
+
                         ShowCaption = false;
                         Style = Strong;
                         StyleExpr = TRUE;
                         ToolTip = 'Specifies the value of the InfoText field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group("Message")
@@ -102,10 +108,11 @@ page 6059944 "NPR SMS Send Message"
                     Caption = 'Message';
                     field(SMSMessageText; SMSMessageText)
                     {
-                        ApplicationArea = All;
+
                         MultiLine = true;
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the SMSMessageText field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150621)
@@ -117,9 +124,10 @@ page 6059944 "NPR SMS Send Message"
                         ShowCaption = false;
                         field(DelayUntil; DelayUntil)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Delay Until';
                             ToolTip = 'Specifies the value of the Delay Until field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }

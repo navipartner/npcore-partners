@@ -16,19 +16,22 @@ page 6184473 "NPR EFT Trx Log Factbox"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Logged At"; Rec."Logged At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logged At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Has Log File"; Rec.Log.HasValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Has Log File';
                     ToolTip = 'Specifies the value of the Has Log File field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -46,8 +49,9 @@ page 6184473 "NPR EFT Trx Log Factbox"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -4,8 +4,8 @@ page 6151503 "NPR Nc Task Fields"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc Task Field";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -16,18 +16,21 @@ page 6151503 "NPR Nc Task Fields"
                 ShowCaption = false;
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Previous Value"; Rec."Previous Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Previous Value field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("New Value"; Rec."New Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the New Value field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }

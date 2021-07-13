@@ -7,11 +7,12 @@ page 6059943 "NPR SMS Field List"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Field";
     SourceTableView = SORTING(TableNo, "No.");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,15 +22,17 @@ page 6059943 "NPR SMS Field List"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Field Name';
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -4,7 +4,7 @@ report 6014406 "NPR Sales Person Top 20"
     RDLCLayout = './src/_Reports/layouts/Sales Person Top 20.rdlc';
     Caption = 'Sales Person Top 20';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
     dataset
     {
@@ -198,27 +198,31 @@ report 6014406 "NPR Sales Person Top 20"
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Turnover,Discount,Contribution Margin,Contribution Ratio';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sort By field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sorting"; SortOrder)
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sort By field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Qty"; ShowQty)
                     {
                         Caption = 'Quantity';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Quantity field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Only Sales"; OnlySales)
                     {
                         Caption = 'Only Salespersons With Sale';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Only Salespersons With Sale field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

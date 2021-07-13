@@ -4,7 +4,7 @@ report 6014428 "NPR Shelf Labels"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Shelf Labels';
     PreviewMode = PrintLayout;
     UseSystemPrinter = true;
@@ -158,8 +158,9 @@ report 6014428 "NPR Shelf Labels"
                 {
                     Caption = 'Unit Price';
                     OptionCaption = 'Use Retail Journal Line Prices,Use Item Card Unit Prices,Use Campaign Unit Prices';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

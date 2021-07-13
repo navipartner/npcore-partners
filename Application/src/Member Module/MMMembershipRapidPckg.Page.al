@@ -1,9 +1,10 @@
 page 6060063 "NPR MM Membership Rapid Pckg."
 {
     PageType = NavigatePage;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
     Caption = 'Membership Rapid Packages Deploy from Azure';
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,9 +18,10 @@ page 6060063 "NPR MM Membership Rapid Pckg."
             field("Package Name"; packages)
             {
                 Caption = 'Package File';
-                ApplicationArea = All;
+
                 Lookup = true;
                 ToolTip = 'Specifies the value of the package field';
+                ApplicationArea = NPRRetail;
                 trigger OnLookup(var SelectedValues: Text): Boolean
                 var
                     TempRetailList: Record "NPR Retail List" temporary;
@@ -75,15 +77,17 @@ page 6060063 "NPR MM Membership Rapid Pckg."
             field("Configuration Package Name"; PackageNamesFromFileNames)
             {
                 Enabled = false;
-                ApplicationArea = All;
+
                 Caption = 'Configuration Package name';
                 ToolTip = 'Specifies Configuration Package name(s) which will be used. It is generated from the file name(s) from Azure Blob storage. If filename containis sufix "_ver" then it will be truncated, else it will be the same as file name.';
+                ApplicationArea = NPRRetail;
             }
             field("Adjust Table Names"; AdjustTableNames)
             {
-                ApplicationArea = All;
+
                 Caption = 'Adjust Table Names';
                 ToolTip = 'Specifies whether table names in the package should be adjusted. The option should be enabled if the package contains NPRetail tables, and it was created in NAV/BC version prior to BC16';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -94,9 +98,10 @@ page 6060063 "NPR MM Membership Rapid Pckg."
         {
             action(ActionName)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the ActionName action';
                 Image = Action;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -106,29 +111,32 @@ page 6060063 "NPR MM Membership Rapid Pckg."
 
             action(ActionBack)
             {
-                ApplicationArea = All;
+
                 Caption = 'Back';
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
                 Image = PreviousRecord;
+                ApplicationArea = NPRRetail;
             }
 
             action(ActionNext)
             {
-                ApplicationArea = All;
+
                 Caption = 'Next';
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
                 Image = NextRecord;
+                ApplicationArea = NPRRetail;
             }
 
             action(ActionFinish)
             {
-                ApplicationArea = All;
+
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
                 Image = Action;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

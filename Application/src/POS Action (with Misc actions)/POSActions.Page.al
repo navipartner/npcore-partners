@@ -6,7 +6,8 @@ page 6150703 "NPR POS Actions"
     PageType = List;
     SourceTable = "NPR POS Action";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,56 +17,66 @@ page 6150703 "NPR POS Actions"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Workflow Defined"; Rec.Workflow.HasValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Workflow Defined';
                     ToolTip = 'Specifies the value of the Workflow Defined field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Source Name"; Rec."Data Source Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Source Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocking UI"; Rec."Blocking UI")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Blocking UI field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("<Blocking UI>"; Rec."Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Secure Method Code"; Rec."Secure Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Secure Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -83,8 +94,9 @@ page 6150703 "NPR POS Actions"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Refresh Workflow action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -104,8 +116,9 @@ page 6150703 "NPR POS Actions"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Param.";
                 RunPageLink = "POS Action Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Parameters action';
+                ApplicationArea = NPRRetail;
             }
             action(Workflow)
             {
@@ -118,8 +131,9 @@ page 6150703 "NPR POS Actions"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Workflow";
                 RunPageLink = "POS Action Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Workflow action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

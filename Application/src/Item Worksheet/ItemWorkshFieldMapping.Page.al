@@ -5,7 +5,8 @@ page 6060057 "NPR Item Worksh. Field Mapping"
     PopulateAllFields = true;
     SourceTable = "NPR Item Worksh. Field Mapping";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,23 +16,27 @@ page 6060057 "NPR Item Worksh. Field Mapping"
             {
                 field(Matching; Rec.Matching)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Matching field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Case Sensitive"; Rec."Case Sensitive")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Case Sensitive field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Value"; Rec."Source Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Value field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Target Value"; Rec."Target Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Target Value field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

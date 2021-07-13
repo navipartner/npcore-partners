@@ -17,36 +17,37 @@ page 6014457 "NPR MM Member Capture List"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("R_PhoneNo"; Rec."Phone No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("R_FirstName"; Rec."First Name")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the First Name field';
                 }
                 field("R_LastName"; Rec."Last Name")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Last Name field';
+
                 }
                 field("R_Email"; Rec."E-Mail Address")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
                 field("R_ExternalCardNo"; Rec."External Card No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the External Card No. field';
                 }
             }
@@ -66,8 +67,9 @@ page 6014457 "NPR MM Member Capture List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ShowImportMemberAction;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Members action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

@@ -12,8 +12,9 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Retail Print action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     LabelLibrarySubMgt: Codeunit "NPR Label Library Sub. Mgt.";
@@ -30,8 +31,9 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Price Label action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
                     LabelLibrarySubMgt: Codeunit "NPR Label Library Sub. Mgt.";

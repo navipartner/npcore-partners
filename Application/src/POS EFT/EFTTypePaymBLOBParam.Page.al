@@ -17,24 +17,27 @@ page 6184476 "NPR EFT Type Paym. BLOB Param."
             {
                 field(ParameterName; ParameterName)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Name';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ParameterDescription; ParameterDescription)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("FORMAT(Value.HASVALUE)"; Format(Rec.Value.HasValue()))
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Caption = 'Value';
                     Editable = Rec."User Configurable";
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin

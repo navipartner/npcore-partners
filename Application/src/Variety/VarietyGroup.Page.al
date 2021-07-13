@@ -6,7 +6,8 @@ page 6059977 "NPR Variety Group"
     PageType = List;
     SourceTable = "NPR Variety Group";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,149 +17,178 @@ page 6059977 "NPR Variety Group"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cross Variety No."; Rec."Cross Variety No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cross Variety No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 1"; Rec."Variety 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 1 Table"; Rec."Variety 1 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 1 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 1 Table"; Rec."Create Copy of Variety 1 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Copy of Variety 1 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 1"; Rec."Copy Naming Variety 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Copy Naming Variety 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 2"; Rec."Variety 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 2 Table"; Rec."Variety 2 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 2 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 2 Table"; Rec."Create Copy of Variety 2 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Copy of Variety 2 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 2"; Rec."Copy Naming Variety 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Copy Naming Variety 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 3"; Rec."Variety 3")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 3 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 3 Table"; Rec."Variety 3 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 3 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 3 Table"; Rec."Create Copy of Variety 3 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Copy of Variety 3 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 3"; Rec."Copy Naming Variety 3")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Copy Naming Variety 3 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 4"; Rec."Variety 4")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 4 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 4 Table"; Rec."Variety 4 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety 4 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Copy of Variety 4 Table"; Rec."Create Copy of Variety 4 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Copy of Variety 4 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Copy Naming Variety 4"; Rec."Copy Naming Variety 4")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Copy Naming Variety 4 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Part 1"; Rec."Variant Code Part 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Part 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Part 1 Length"; Rec."Variant Code Part 1 Length")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Part 1 Length field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Seperator 1"; Rec."Variant Code Seperator 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Seperator 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Part 2"; Rec."Variant Code Part 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Part 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Part 2 Length"; Rec."Variant Code Part 2 Length")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Part 2 Length field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Seperator 2"; Rec."Variant Code Seperator 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Seperator 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Part 3"; Rec."Variant Code Part 3")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Part 3 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code Part 3 Length"; Rec."Variant Code Part 3 Length")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code Part 3 Length field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(GetVariantCodeExample; Rec.GetVariantCodeExample())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Example';
                     ToolTip = 'Specifies the value of the Example field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

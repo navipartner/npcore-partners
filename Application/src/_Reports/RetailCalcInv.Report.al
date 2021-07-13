@@ -3,7 +3,7 @@ report 6014663 "NPR Retail Calc. Inv."
     Caption = 'Retail Calculate Inventory';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Item; Item)
@@ -173,9 +173,10 @@ report 6014663 "NPR Retail Calc. Inv."
                     Caption = 'Options';
                     field("Posting Date"; PostingDate)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Posting Date';
                         ToolTip = 'Specifies the date for the posting of this batch job. By default, the working date is entered, but you can change it.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -184,15 +185,17 @@ report 6014663 "NPR Retail Calc. Inv."
                     }
                     field(DocumentNo; NextDocNo)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Document No.';
                         ToolTip = 'Specifies the number of the document that is processed by the report or batch job.';
+                        ApplicationArea = NPRRetail;
                     }
                     field(ItemsNotOnInventory; ZeroQty)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Items Not on Inventory.';
                         ToolTip = 'Specifies if journal lines should be created for items that are not on inventory, that is, items where the value in the Qty. (Calculated) field is 0.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -202,9 +205,10 @@ report 6014663 "NPR Retail Calc. Inv."
                     }
                     field("Include Item With No Transaction"; IncludeItemWithNoTransaction)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Include Item without Transactions';
                         ToolTip = 'Specifies if journal lines should be created for items that are not on inventory and are not used in any transactions.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -216,10 +220,11 @@ report 6014663 "NPR Retail Calc. Inv."
                     }
                     field(ByDimensions; ColumnDim)
                     {
-                        ApplicationArea = Suite;
+
                         Caption = 'By Dimensions';
                         Editable = false;
                         ToolTip = 'Specifies the dimensions that you want the batch job to consider.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         begin

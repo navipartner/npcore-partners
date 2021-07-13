@@ -8,7 +8,8 @@ page 6184495 "NPR Pepper Terminal Types"
     PageType = List;
     SourceTable = "NPR Pepper Terminal Type";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,23 +19,27 @@ page 6184495 "NPR Pepper Terminal Types"
             {
                 field(ID; Rec.ID)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Deprecated; Rec.Deprecated)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Deprecated field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

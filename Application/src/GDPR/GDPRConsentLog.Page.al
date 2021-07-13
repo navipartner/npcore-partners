@@ -7,8 +7,9 @@ page 6151124 "NPR GDPR Consent Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR GDPR Consent Log";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,44 +19,52 @@ page 6151124 "NPR GDPR Consent Log"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Approval State"; Rec."Entry Approval State")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Approval State field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("State Change"; Rec."State Change")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the State Change field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid From Date"; Rec."Valid From Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid From Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Agreement No."; Rec."Agreement No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Agreement No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Agreement Version"; Rec."Agreement Version")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Agreement Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Subject Id"; Rec."Data Subject Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Subject Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Changed By"; Rec."Last Changed By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Changed By field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -73,8 +82,9 @@ page 6151124 "NPR GDPR Consent Log"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Accept action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -97,8 +107,9 @@ page 6151124 "NPR GDPR Consent Log"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reject action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -122,8 +133,9 @@ page 6151124 "NPR GDPR Consent Log"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Pending action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

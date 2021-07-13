@@ -9,11 +9,12 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
         {
             field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,1,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field.';
                 Visible = NPRAttrVisible01;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -24,21 +25,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_01; NPRExItemAttrTextArray[1])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[1];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[1] field.';
                 Visible = NPRAttrVisible01;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,2,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field.';
                 Visible = NPRAttrVisible02;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -49,21 +52,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_02; NPRExItemAttrTextArray[2])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[2];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[2] field.';
                 Visible = NPRAttrVisible02;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,3,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field.';
                 Visible = NPRAttrVisible03;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -74,21 +79,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_03; NPRExItemAttrTextArray[3])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[3];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[3] field.';
                 Visible = NPRAttrVisible03;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,4,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field.';
                 Visible = NPRAttrVisible04;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -99,21 +106,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_04; NPRExItemAttrTextArray[4])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[4];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[4] field.';
                 Visible = NPRAttrVisible04;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,5,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field.';
                 Visible = NPRAttrVisible05;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -124,21 +133,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_05; NPRExItemAttrTextArray[5])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[5];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[5] field.';
                 Visible = NPRAttrVisible05;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_06; NPRAttrTextArray[6])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,6,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field.';
                 Visible = NPRAttrVisible06;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -149,21 +160,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_06; NPRExItemAttrTextArray[6])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[6];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[6] field.';
                 Visible = NPRAttrVisible06;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_07; NPRAttrTextArray[7])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,7,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field.';
                 Visible = NPRAttrVisible07;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -174,21 +187,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_07; NPRExItemAttrTextArray[7])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[7];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[7] field.';
                 Visible = NPRAttrVisible07;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_08; NPRAttrTextArray[8])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,8,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field.';
                 Visible = NPRAttrVisible08;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -199,21 +214,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_08; NPRExItemAttrTextArray[8])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[8];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[8] field.';
                 Visible = NPRAttrVisible08;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_09; NPRAttrTextArray[9])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,9,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field.';
                 Visible = NPRAttrVisible09;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -224,21 +241,23 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_09; NPRExItemAttrTextArray[9])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[9];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[9] field.';
                 Visible = NPRAttrVisible09;
+                ApplicationArea = NPRRetail;
             }
             field(NPRAttrTextArray_10; NPRAttrTextArray[10])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,10,2';
                 Editable = NPRAttrEditable;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field.';
                 Visible = NPRAttrVisible10;
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -249,13 +268,14 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
             }
             field(NPRExItemAttrTextArray_10; NPRExItemAttrTextArray[10])
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemCaptionDim[10];
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[10] field.';
                 Visible = NPRAttrVisible10;
+                ApplicationArea = NPRRetail;
             }
         }
     }

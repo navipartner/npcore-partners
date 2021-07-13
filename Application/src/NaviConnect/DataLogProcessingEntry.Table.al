@@ -79,7 +79,7 @@ table 6059894 "NPR Data Log Processing Entry"
         CalcFields("Error Message");
         "Error Message".CreateInStream(InStr, TEXTENCODING::UTF8);
         BufferText := '';
-        while not InStr.EOS do begin
+        while not InStr.EOS() do begin
             InStr.ReadText(BufferText);
             ErrorMessage += BufferText;
         end;

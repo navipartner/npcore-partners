@@ -6,8 +6,9 @@ page 6151041 "NPR Notification List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR AF Notification Hub";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,23 +18,27 @@ page 6151041 "NPR Notification List"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Title; Rec.Title)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Title field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Handled; Rec.Handled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handled By"; Rec."Handled By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled By field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -51,8 +56,9 @@ page 6151041 "NPR Notification List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Complete action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -68,8 +74,9 @@ page 6151041 "NPR Notification List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Cancel action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

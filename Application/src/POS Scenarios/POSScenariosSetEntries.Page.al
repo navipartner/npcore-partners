@@ -4,8 +4,9 @@ page 6150734 "NPR POS Scenarios Set Entries"
     Caption = 'POS Scenarios Set Entries';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Sales WF Set Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,19 +16,22 @@ page 6150734 "NPR POS Scenarios Set Entries"
             {
                 field("Workflow Code"; Rec."Workflow Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Workflow Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Workflow Description"; Rec."Workflow Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Workflow Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Control6014406; Rec."Workflow Steps")
                 {
-                    ApplicationArea = All;
+
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Workflow Steps field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -48,8 +52,9 @@ page 6150734 "NPR POS Scenarios Set Entries"
                 RunObject = Page "NPR POS Scenarios Steps";
                 RunPageLink = "Set Code" = FIELD("Set Code"),
                               "Workflow Code" = FIELD("Workflow Code");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Workflow Steps action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -3,8 +3,9 @@ page 6059973 "NPR Variety Value"
     Caption = 'Variety Value';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Variety Value";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,30 +15,35 @@ page 6059973 "NPR Variety Value"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table"; Rec.Table)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sort Order"; Rec."Sort Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sort Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

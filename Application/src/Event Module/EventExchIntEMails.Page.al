@@ -6,7 +6,8 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
     SourceTable = "NPR Event Exch. Int. E-Mail";
     SourceTableView = SORTING("Search E-Mail");
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,35 +17,41 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
             {
                 field("E-Mail"; Rec."E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PasswordSet; Rec.Password.HasValue())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Password Set';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Password Set field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Organizer E-Mail"; Rec."Default Organizer E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Organizer E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Time Zone No."; Rec."Time Zone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Time Zone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Time Zone Display Name"; Rec."Time Zone Display Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Time Zone Display Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Time Zone Custom Offset (Min)"; Rec."Time Zone Custom Offset (Min)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Time Zone Custom Offset (Min) field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -63,8 +70,9 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Set Password action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -79,8 +87,9 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Test Server Connection action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

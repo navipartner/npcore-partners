@@ -6,7 +6,8 @@ page 6150687 "NPR NPRE Kitchen Station Slct."
     PageType = List;
     SourceTable = "NPR NPRE Kitchen Station Slct.";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,33 +17,39 @@ page 6150687 "NPR NPRE Kitchen Station Slct."
             {
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Seating Location"; Rec."Seating Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Seating Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serving Step field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Category Code"; Rec."Print Category Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Category Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Production Restaurant Code"; Rec."Production Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Production Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Kitchen Station"; Rec."Kitchen Station")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Kitchen Station field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -51,12 +58,14 @@ page 6150687 "NPR NPRE Kitchen Station Slct."
             systempart(Control6014409; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control6014410; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

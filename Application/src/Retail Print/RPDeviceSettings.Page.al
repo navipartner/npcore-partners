@@ -4,9 +4,10 @@ page 6014628 "NPR RP Device Settings"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR RP Device Settings";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,19 +17,22 @@ page 6014628 "NPR RP Device Settings"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

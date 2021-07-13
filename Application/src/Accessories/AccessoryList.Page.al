@@ -5,8 +5,9 @@ page 6014510 "NPR Accessory List"
     Caption = 'Accessories List';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Accessory/Spare Part";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,68 +18,81 @@ page 6014510 "NPR Accessory List"
                 ShowCaption = false;
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Vendor; Rec.Vendor)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Buy-from Vendor field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Buy-from Vendor Name"; Rec."Buy-from Vendor Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Buy-from Vendor Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Per unit"; Rec."Per unit")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Per unit field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Add Extra Line Automatically"; Rec."Add Extra Line Automatically")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Add Extra Line Automatically field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use Alt. Price"; Rec."Use Alt. Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Use Alt. Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity in Dialogue"; Rec."Quantity in Dialogue")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity in Dialogue field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Discount"; Rec."Show Discount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Discount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Alt. Price"; Rec."Alt. Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Alt. Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unfold in Worksheet"; Rec."Unfold in Worksheet")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unfold in Worksheet field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

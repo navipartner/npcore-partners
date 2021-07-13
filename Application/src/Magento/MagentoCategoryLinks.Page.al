@@ -5,9 +5,10 @@ page 6151418 "NPR Magento Category Links"
     LinksAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR Magento Category Link";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,8 +19,9 @@ page 6151418 "NPR Magento Category Links"
                 ShowCaption = false;
                 field("Category Id"; Rec."Category Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Category Id field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -37,13 +39,15 @@ page 6151418 "NPR Magento Category Links"
                 }
                 field("Category Name"; Rec."Category Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Category Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Position; Rec.Position)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Position field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

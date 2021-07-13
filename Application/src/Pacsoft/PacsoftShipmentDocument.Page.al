@@ -7,8 +7,9 @@ page 6014486 "NPR Pacsoft Shipment Document"
     ModifyAllowed = true;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Pacsoft Shipment Document";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,100 +19,119 @@ page 6014486 "NPR Pacsoft Shipment Document"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receiver ID"; Rec."Receiver ID")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Receiver ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Address 2"; Rec."Address 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Address 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(County; Rec.County)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the County field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Country/Region Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Contact; Rec.Contact)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Contact field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Fax No."; Rec."Fax No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Fax No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Registration No."; Rec."VAT Registration No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Registration No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail"; Rec."E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("SMS No."; Rec."SMS No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the SMS No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Reference; Rec.Reference)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Free Text"; Rec."Free Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Free Text field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipment Date"; Rec."Shipment Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipment Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -120,13 +140,15 @@ page 6014486 "NPR Pacsoft Shipment Document"
                 }
                 field("Package Code"; Rec."Package Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Package Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Parcel Qty."; Rec."Parcel Qty.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Parcel Qty. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -135,8 +157,9 @@ page 6014486 "NPR Pacsoft Shipment Document"
                 }
                 field("Parcel Weight"; Rec."Parcel Weight")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Parcel Weight field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -145,9 +168,10 @@ page 6014486 "NPR Pacsoft Shipment Document"
                 }
                 field(TotalWeight; Rec."Total Weight")
                 {
-                    ApplicationArea = All;
+
                     Editable = TotalWeightEditable;
                     ToolTip = 'Specifies the value of the Total Weight field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -156,118 +180,140 @@ page 6014486 "NPR Pacsoft Shipment Document"
                 }
                 field("Print Return Label"; Rec."Print Return Label")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Return Label field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Return Shipping Agent Code"; Rec."Return Shipping Agent Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Return Shipping Agent Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Undeliverable; Rec.Undeliverable)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the If Nondeliverable field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send Link To Print"; Rec."Send Link To Print")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Link To Print field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request XML Name"; Rec."Request XML Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery Location"; Rec."Delivery Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to Name"; Rec."Ship-to Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to Address"; Rec."Ship-to Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to Address 2"; Rec."Ship-to Address 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to Address 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to Post Code"; Rec."Ship-to Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to City"; Rec."Ship-to City")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to County"; Rec."Ship-to County")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to County field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to Country/Region Code"; Rec."Ship-to Country/Region Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to Country/Region Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Marking; Rec.Marking)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Marking field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Volume; Rec.Volume)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Volume field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Contents; Rec.Contents)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Contents field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Return Label Both"; Rec."Return Label Both")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Return Label Both field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Return Label"; Rec."Return Label")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Return Label field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Customs Documentation")
             {
                 field("Customs Document"; Rec."Customs Document")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customs Document field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customs Currency"; Rec."Customs Currency")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customs Currency field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sender VAT Reg. No"; Rec."Sender VAT Reg. No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sender VAT Reg. No field';
+                    ApplicationArea = NPRRetail;
                 }
                 part(Control6150661; "NPR Pacsoft Customs Item Rows")
                 {
                     SubPageLink = "Shipment Document Entry No." = FIELD("Entry No.");
                     SubPageView = SORTING("Shipment Document Entry No.", "Entry No.");
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
             group(Control6150659)
@@ -278,7 +324,8 @@ page 6014486 "NPR Pacsoft Shipment Document"
                     SubPageLink = "Entry No." = FIELD("Entry No."),
                                   "Shipping Agent Code" = FIELD("Shipping Agent Code");
                     SubPageView = SORTING("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }
@@ -292,8 +339,9 @@ page 6014486 "NPR Pacsoft Shipment Document"
             {
                 Caption = '&OK';
                 Image = Approve;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &OK action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

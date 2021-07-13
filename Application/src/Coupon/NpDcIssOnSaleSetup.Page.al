@@ -3,8 +3,9 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
     Caption = 'Issue On-Sale Setup';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpDc Iss.OnSale Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,8 +18,9 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
                     ShowCaption = false;
                     field(Type; Rec.Type)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = '- Item Sales Amount: Discount Coupons will be issued for POS Sales per defined Item Sales Amount  - Item Sales Qty.: Discount Coupons will be issued for POS Sales per defined Item Sales Qty.  - Lot: Discount Coupons will be issued for POS Sales per exact Lot Quantity on On-Sale Items';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -31,8 +33,9 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
                         Visible = (Rec.Type = 0);
                         field("Item Sales Amount"; Rec."Item Sales Amount")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Discount Coupons will be issued for POS Sales per defined Item Sales Amount';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control6014407)
@@ -41,8 +44,9 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
                         Visible = (Rec.Type = 1);
                         field("Item Sales Qty."; Rec."Item Sales Qty.")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Discount Coupons will be issued for POS Sales per defined Item Sales Qty.';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -51,8 +55,9 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
                     ShowCaption = false;
                     field("Max. Allowed Issues per Sale"; Rec."Max. Allowed Issues per Sale")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'The Max. Qty. of Coupons that can be issued for a single Sale';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -60,7 +65,8 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
             {
                 Caption = 'On-Sale Items';
                 SubPageLink = "Coupon Type" = FIELD("Coupon Type");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

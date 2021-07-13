@@ -1,4 +1,4 @@
-﻿page 6151252 "NPR Activities 1"
+page 6151252 "NPR Activities 1"
 {
 
     Caption = 'Retail Activities';
@@ -16,21 +16,24 @@
                 ShowCaption = false;
                 field("Sales Orders"; Rec."Sales Orders")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the value of the Sales Orders field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Daily Sales Orders"; Rec."Daily Sales Orders")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the value of the Daily Sales Orders field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Import Pending"; Rec."Import Pending")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "NPR Nc Import List";
                     ToolTip = 'Specifies the value of the Import Unprocessed field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

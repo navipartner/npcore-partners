@@ -1,9 +1,9 @@
-﻿report 6060112 "NPR Check Duplicate Contacts"
+report 6060112 "NPR Check Duplicate Contacts"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Check Duplicate Contacts';
     dataset
     {
@@ -110,20 +110,23 @@
                 field("Check Name"; CheckName)
                 {
                     Caption = 'Name';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Check Addr"; CheckAddr)
                 {
                     Caption = 'Address';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Check Phone"; CheckPhone)
                 {
                     Caption = 'Phone No.';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

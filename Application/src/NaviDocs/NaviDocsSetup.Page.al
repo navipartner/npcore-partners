@@ -1,11 +1,12 @@
-﻿page 6059767 "NPR NaviDocs Setup"
+page 6059767 "NPR NaviDocs Setup"
 {
     Caption = 'NaviDocs Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     SourceTable = "NPR NaviDocs Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,8 +17,9 @@
                 Caption = 'General';
                 field("Enable NaviDocs"; Rec."Enable NaviDocs")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enable NaviDocs field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Processing)
@@ -25,33 +27,38 @@
                 Caption = 'Processing';
                 field("Max Retry Qty"; Rec."Max Retry Qty")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max Retry Qty field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send Warming E-mail"; Rec."Send Warming E-mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Warming E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Warning E-mail"; Rec."Warning E-mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Warning E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Integration)
             {
                 field("Pdf2Nav Send pdf"; Rec."Pdf2Nav Send pdf")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Pdf2Nav send via NaviDocs';
                     ToolTip = 'Specifies the value of the Pdf2Nav send via NaviDocs field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pdf2Nav Table Filter"; Rec."Pdf2Nav Table Filter")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Tablefilter';
                     ToolTip = 'Specifies the value of the Tablefilter field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Logging)
@@ -59,15 +66,17 @@
                 Caption = 'Logging';
                 field("Log to Activity Log"; Rec."Log to Activity Log")
                 {
-                    ApplicationArea = All;
+
                     Editable = ShowLogToActivityLog;
                     Visible = ShowLogToActivityLog;
                     ToolTip = 'Specifies the value of the Log to Activity Log field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Keep Log for"; Rec."Keep Log for")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Keep Log for field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

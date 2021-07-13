@@ -19,9 +19,10 @@ page 6059817 "NPR Retail Top 10 S.person"
                 ShowCaption = false;
                 field(StartDate; StartDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Start Date';
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -30,9 +31,10 @@ page 6059817 "NPR Retail Top 10 S.person"
                 }
                 field(Enddate; Enddate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'End date';
                     ToolTip = 'Specifies the value of the End date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -47,8 +49,9 @@ page 6059817 "NPR Retail Top 10 S.person"
                 {
                     field("Code"; Rec.Code)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Code field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -58,20 +61,23 @@ page 6059817 "NPR Retail Top 10 S.person"
                     }
                     field(Name; Rec.Name)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                     {
-                        ApplicationArea = All;
+
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -90,9 +96,10 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Day action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -103,9 +110,10 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Week action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -116,9 +124,10 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Month action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -129,9 +138,10 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Quarter action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -142,9 +152,10 @@ page 6059817 "NPR Retail Top 10 S.person"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Year action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

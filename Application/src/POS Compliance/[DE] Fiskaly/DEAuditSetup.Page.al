@@ -5,8 +5,9 @@ page 6014421 "NPR DE Audit Setup"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR DE Audit Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,8 +17,9 @@ page 6014421 "NPR DE Audit Setup"
             {
                 field("Api URL"; Rec."Api URL")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies URL of the API';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -28,17 +30,18 @@ page 6014421 "NPR DE Audit Setup"
 
                 field("DSFINVK Api URL"; Rec."DSFINVK Api URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies URL of the DSFINVK API';
                 }
 
                 field(ApiKeyField; ApiKeyField)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Api Key';
                     Importance = Additional;
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Key field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -52,11 +55,12 @@ page 6014421 "NPR DE Audit Setup"
                 }
                 field(ApiSecretField; ApiSecretField)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Api Secret';
                     Importance = Additional;
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Secret field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -84,9 +88,10 @@ page 6014421 "NPR DE Audit Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 RunObject = page "NPR DE POS Unit Aux. Info List";
                 ToolTip = 'Sets additional information for POS Unit based od DE Fiskaly.';
+                ApplicationArea = NPRRetail;
             }
         }
     }

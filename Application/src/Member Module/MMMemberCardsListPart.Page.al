@@ -7,8 +7,9 @@ page 6060131 "NPR MM Member Cards ListPart"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Member Card";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,62 +19,73 @@ page 6060131 "NPR MM Member Cards ListPart"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Card No."; Rec."External Card No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Card No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Card No. Last 4"; Rec."External Card No. Last 4")
                 {
-                    ApplicationArea = All;
+
                     Enabled = false;
                     ToolTip = 'Specifies the value of the External Card No. Last 4 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pin Code"; Rec."Pin Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pin Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid Until field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Is Temporary"; Rec."Card Is Temporary")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Is Temporary field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Block Reason"; Rec."Block Reason")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Block Reason field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document ID"; Rec."Document ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -90,8 +102,9 @@ page 6060131 "NPR MM Member Cards ListPart"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Print Card action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -110,8 +123,9 @@ page 6060131 "NPR MM Member Cards ListPart"
                 RunObject = Page "NPR MM Member Card Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Card Card action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

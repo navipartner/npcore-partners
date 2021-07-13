@@ -5,8 +5,9 @@ page 6060091 "NPR MM Admis. Service Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Admis. Service Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,113 +17,135 @@ page 6060091 "NPR MM Admis. Service Entries"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date"; Rec."Created Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Modify Date"; Rec."Modify Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Modify Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Token; Rec.Token)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Token field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Key"; Rec.Key)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Key field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Scanner Station Id"; Rec."Scanner Station Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Arrived; Rec.Arrived)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Arrived field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Admission Is Valid"; Rec."Admission Is Valid")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Admission Is Valid field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Entry No."; Rec."Card Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Entry No."; Rec."Member Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Card No."; Rec."External Card No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Card No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Member No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Entry No."; Rec."Ticket Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Ticket No."; Rec."External Ticket No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Ticket No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Message"; Rec.Message)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Type Code"; Rec."Ticket Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket Type Description"; Rec."Ticket Type Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Type Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Description"; Rec."Membership Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -144,8 +167,9 @@ page 6060091 "NPR MM Admis. Service Entries"
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Admission Service Log";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Log action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

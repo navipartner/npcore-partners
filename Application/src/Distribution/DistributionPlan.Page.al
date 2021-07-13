@@ -6,8 +6,9 @@ page 6151060 "NPR Distribution Plan"
     Caption = 'Distribution Plan';
     PageType = ListPlus;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Distribution Headers";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,42 +18,49 @@ page 6151060 "NPR Distribution Plan"
             {
                 field("Distribution Group"; Rec."Distribution Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Hiearachy"; Rec."Item Hiearachy")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Hiearachy field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Type"; Rec."Distribution Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(View; View)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'View';
                     OptionCaption = 'Distributions,Demands,Inventory';
                     Visible = false;
                     ToolTip = 'Specifies the value of the View field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Required Date"; Rec."Required Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Required Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(DistMatrix; "NPR Distrib. Matrix")
             {
                 SubPageLink = "Item Hierarchy Code" = FIELD("Item Hiearachy");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -67,8 +75,9 @@ page 6151060 "NPR Distribution Plan"
                 Image = CalculateInventory;
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Distribution action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -87,8 +96,9 @@ page 6151060 "NPR Distribution Plan"
                 Image = CreateDocument;
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Distribution Orders action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -113,8 +123,9 @@ page 6151060 "NPR Distribution Plan"
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id"),
                               "Distribution Item" = CONST('<>'''),
                               "Distribution Quantity" = FILTER(> 0);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Documents action';
+                ApplicationArea = NPRRetail;
             }
             action("Import Demands")
             {
@@ -123,8 +134,9 @@ page 6151060 "NPR Distribution Plan"
                 Promoted = true;
                 PromotedOnly = true;
                 Visible = false;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Demands action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -145,7 +157,8 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
 
                     trigger OnAction()
                     var
@@ -170,7 +183,8 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
 
                     trigger OnAction()
                     var
@@ -195,7 +209,8 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
 
                     trigger OnAction()
                     var
@@ -222,7 +237,8 @@ page 6151060 "NPR Distribution Plan"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
 
                     trigger OnAction()
                     var

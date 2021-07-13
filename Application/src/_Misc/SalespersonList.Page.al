@@ -5,9 +5,10 @@ page 6151490 "NPR Salesperson List"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,11 +18,12 @@ page 6151490 "NPR Salesperson List"
             {
                 field(Selected; Selected)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
                     ToolTip = 'Specifies the value of the Selected field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -30,15 +32,17 @@ page 6151490 "NPR Salesperson List"
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -6,8 +6,9 @@ page 6060099 "NPR POS Input Box Parameters"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Ean Box Parameter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,55 +18,63 @@ page 6060099 "NPR POS Input Box Parameters"
             {
                 field("Event Code"; Rec."Event Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Event Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Code"; Rec."Action Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Action Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     Style = Subordinate;
                     StyleExpr = Rec."Non Editable";
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ean Box Value"; Rec."Ean Box Value")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Ean Box Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Non Editable"; Rec."Non Editable")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Non Editable field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     Enabled = (NOT Rec."Ean Box Value") AND (NOT Rec."Non Editable");
                     HideValue = Rec."Ean Box Value";
                     Style = Subordinate;
                     StyleExpr = Rec."Non Editable";
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(OptionValueInteger; Rec.OptionValueInteger)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the OptionValueInteger field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

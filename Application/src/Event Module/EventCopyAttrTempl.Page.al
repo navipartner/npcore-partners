@@ -4,7 +4,8 @@ page 6060156 "NPR Event Copy Attr./Templ."
     DataCaptionExpression = PageCaption;
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,17 +16,19 @@ page 6060156 "NPR Event Copy Attr./Templ."
                 Caption = 'Options';
                 field(FromEventNo; FromEventNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'From Event No.';
                     TableRelation = Job."No." WHERE("NPR Event" = CONST(true));
                     ToolTip = 'Specifies the value of the From Event No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ToEventNo; ToEventNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'To Event No.';
                     TableRelation = Job."No." WHERE("NPR Event" = CONST(true));
                     ToolTip = 'Specifies the value of the To Event No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

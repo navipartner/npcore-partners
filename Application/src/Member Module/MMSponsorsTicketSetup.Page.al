@@ -5,8 +5,9 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Sponsors. Ticket Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,65 +17,77 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
             {
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Type"; Rec."Event Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery Method"; Rec."Delivery Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Mode"; Rec."Distribution Mode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Once Per Period (On Demand)"; Rec."Once Per Period (On Demand)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Once Per Period (On Demand) field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -95,8 +108,9 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6151186));
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the E-Mail Templates action';
+                ApplicationArea = NPRRetail;
             }
             action("SMS Template")
             {
@@ -109,8 +123,9 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6151186));
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the SMS Template action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -124,8 +139,9 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Send Pending Notifications action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

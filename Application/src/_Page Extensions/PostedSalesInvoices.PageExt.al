@@ -6,10 +6,11 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
         {
             field("NPR Magento Coupon"; Rec."NPR Magento Coupon")
             {
-                ApplicationArea = All;
+
                 Editable = false;
                 Visible = false;
                 ToolTip = 'Specifies the value of the NPR Magento Coupon field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -24,15 +25,17 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                 {
                     Caption = 'Export';
                     Image = ExportFile;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Export action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Update Status action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

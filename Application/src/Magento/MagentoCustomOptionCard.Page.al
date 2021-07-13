@@ -13,8 +13,9 @@ page 6151425 "NPR Magento Custom Option Card"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -23,13 +24,15 @@ page 6151425 "NPR Magento Custom Option Card"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -38,54 +41,63 @@ page 6151425 "NPR Magento Custom Option Card"
                 }
                 field(Required; Rec.Required)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Required field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Position; Rec.Position)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Position field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max Length"; Rec."Max Length")
                 {
-                    ApplicationArea = All;
+
                     Editable = MaxLengthEditable;
                     ToolTip = 'Specifies the value of the Max Length field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Price; Rec.Price)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Price';
                     Editable = PriceEditable;
                     ToolTip = 'Specifies the value of the Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Price Type"; Rec."Price Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = PriceTypeEditable;
                     ToolTip = 'Specifies the value of the Price Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = SalesTypeEditable;
                     ToolTip = 'Specifies the value of the Sales Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales No."; Rec."Sales No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = SalesNoEditable;
                     ToolTip = 'Specifies the value of the Sales No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Count"; Rec."Item Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Count field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Price Includes VAT"; Rec."Price Includes VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6150628; "NPR Magento Custom Opt.Subform")
@@ -93,7 +105,8 @@ page 6151425 "NPR Magento Custom Option Card"
                 ShowFilter = false;
                 SubPageLink = "Custom Option No." = FIELD("No.");
                 Visible = CustomOptionValuesVisible;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

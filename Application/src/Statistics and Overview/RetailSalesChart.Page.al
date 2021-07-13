@@ -11,16 +11,18 @@ page 6059813 "NPR Retail Sales Chart"
         {
             field("Date Range"; StatusText)
             {
-                ApplicationArea = All;
+
                 Caption = 'Date Range';
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the StatusText field';
+                ApplicationArea = NPRRetail;
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
@@ -41,9 +43,10 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filter by day';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -55,9 +58,10 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filter by week';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -69,9 +73,10 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filter by month';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -83,9 +88,10 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filter by quarter';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -97,9 +103,10 @@ page 6059813 "NPR Retail Sales Chart"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filter by year';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -113,8 +120,9 @@ page 6059813 "NPR Retail Sales Chart"
             {
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Previous action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -126,8 +134,9 @@ page 6059813 "NPR Retail Sales Chart"
             {
                 Caption = 'Next';
                 Image = NextRecord;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Next action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

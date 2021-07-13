@@ -4,8 +4,9 @@ page 6150901 "NPR HC Audit Roll Stats"
     Editable = false;
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR HC Audit Roll";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,55 +20,64 @@ page 6150901 "NPR HC Audit Roll Stats"
                     ShowCaption = false;
                     field("Register No."; Rec."Register No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Cash Register No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales Ticket No."; Rec."Sales Ticket No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Salgspris+Rabat"; Salgspris + Rabat)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Amount';
                         ToolTip = 'Specifies the value of the Amount field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Rabat; Rabat)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Rabat';
                         ToolTip = 'Specifies the value of the Rabat field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Salgspris; Salgspris)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Tax Liability';
                         ToolTip = 'Specifies the value of the Tax Liability field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("<Control61506231>"; Netto)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Net Price';
                         ToolTip = 'Specifies the value of the Net Price field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(CalcKostpris; CalcKostpris)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Cost';
                         ToolTip = 'Specifies the value of the Cost field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(DB; DB)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Margin';
                         ToolTip = 'Specifies the value of the Margin field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(DG; DG)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Coverage';
                         ToolTip = 'Specifies the value of the Coverage field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

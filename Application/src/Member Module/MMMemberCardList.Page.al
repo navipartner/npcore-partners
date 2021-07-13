@@ -8,7 +8,8 @@ page 6060130 "NPR MM Member Card List"
     PageType = List;
     SourceTable = "NPR MM Member Card";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,63 +20,75 @@ page 6060130 "NPR MM Member Card List"
                 Editable = false;
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Card No."; Rec."External Card No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Card No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Member No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Display Name"; Rec."Display Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Display Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-Mail Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid Until field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Blocked"; Rec."Member Blocked")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Blocked"; Rec."Membership Blocked")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Is Temporary"; Rec."Card Is Temporary")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Is Temporary field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -96,8 +109,9 @@ page 6060130 "NPR MM Member Card List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership action';
+                ApplicationArea = NPRRetail;
             }
             action(Members)
             {
@@ -110,8 +124,9 @@ page 6060130 "NPR MM Member Card List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Card";
                 RunPageLink = "Entry No." = FIELD("Member Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Members action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6014401)
             {
@@ -127,8 +142,9 @@ page 6060130 "NPR MM Member Card List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Card No." = FIELD("External Card No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Arrival Log action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -8,7 +8,8 @@ page 6150633 "NPR NPRE Select Flow Status"
     SourceTable = "NPR NPRE Flow Status";
     SourceTableView = SORTING("Status Object", "Flow Order");
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,11 +19,12 @@ page 6150633 "NPR NPRE Select Flow Status"
             {
                 field(Selected; Selected)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
                     ToolTip = 'Specifies the value of the Selected field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -31,37 +33,42 @@ page 6150633 "NPR NPRE Select Flow Status"
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Status Object"; Rec."Status Object")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                     ToolTip = 'Specifies the value of the Status Object field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Flow Order"; Rec."Flow Order")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Flow Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = ShowPrintCategories;
                     ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -70,14 +77,14 @@ page 6150633 "NPR NPRE Select Flow Status"
                 }
                 field(Color; Rec.Color)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the color of the status in restaurant view';
                     Editable = false;
                     Visible = false;
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the icon of the status in restaurant view';
                     Editable = false;
                     Visible = false;
@@ -102,8 +109,9 @@ page 6150633 "NPR NPRE Select Flow Status"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Print/Prod. Categories action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

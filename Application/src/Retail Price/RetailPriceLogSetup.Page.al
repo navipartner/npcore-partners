@@ -1,4 +1,4 @@
-﻿page 6014474 "NPR Retail Price Log Setup"
+page 6014474 "NPR Retail Price Log Setup"
 {
     // NPR5.40/MHA /20180316  CASE 304031 Object created
     // NPR5.48/MHA /20181102  CASE 334573 Insert with trigger in OnOpenPage()
@@ -9,7 +9,8 @@
     InsertAllowed = false;
     SourceTable = "NPR Retail Price Log Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,41 +20,48 @@
             {
                 field("Price Log Activated"; Rec."Price Log Activated")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Price Log Activated field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Queue Activated"; Rec."Task Queue Activated")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Queue Activated field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Price Log Entries after"; Rec."Delete Price Log Entries after")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Price Log Entries after field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Logging)
             {
                 field("Item Unit Price"; Rec."Item Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Price"; Rec."Sales Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Line Discount"; Rec."Sales Line Discount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Line Discount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Discount"; Rec."Period Discount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Discount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -72,8 +80,9 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Price Log Activated";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Activate Price Log action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

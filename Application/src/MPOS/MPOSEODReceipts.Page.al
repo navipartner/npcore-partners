@@ -4,8 +4,9 @@ page 6059962 "NPR MPOS EOD Receipts"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MPOS EOD Recipts";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,33 +16,39 @@ page 6059962 "NPR MPOS EOD Receipts"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created By"; Rec."Created By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created By field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Created; Rec.Created)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Callback Timestamp"; Rec."Callback Timestamp")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Callback Timestamp field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Callback Device Id"; Rec."Callback Device Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Callback Device Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Callback Register No."; Rec."Callback Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Callback Register No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -59,8 +66,9 @@ page 6059962 "NPR MPOS EOD Receipts"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Receipt action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -83,8 +91,9 @@ page 6059962 "NPR MPOS EOD Receipts"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Response action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

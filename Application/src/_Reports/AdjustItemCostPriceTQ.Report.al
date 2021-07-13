@@ -3,7 +3,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
     Caption = 'Adjust Item Costs/Prices';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
 
     dataset
     {
@@ -154,8 +154,9 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                     {
                         Caption = 'Adjust';
                         OptionCaption = 'Item Card,Stockkeeping Unit Card';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Adjust field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -166,8 +167,9 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                     {
                         Caption = 'Adjust Field';
                         OptionCaption = 'Unit Price,Profit %,Indirect Cost %,Last Direct Cost,Standard Cost';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Adjust Field field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -184,15 +186,17 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                         Caption = 'Adjustment Factor';
                         DecimalPlaces = 0 : 5;
                         MinValue = 0;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Adjustment Factor field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Rounding Method"; RoundingMethod.Code)
                     {
                         Caption = 'Rounding Method';
                         TableRelation = "Rounding Method";
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Rounding Method field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

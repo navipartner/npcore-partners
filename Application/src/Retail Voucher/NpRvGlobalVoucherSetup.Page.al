@@ -16,25 +16,29 @@ page 6151024 "NPR NpRv Global Voucher Setup"
                     ShowCaption = false;
                     field("Service Company Name"; Rec."Service Company Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Service Company Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Service Url"; Rec."Service Url")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Service Url field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Service Username"; Rec."Service Username")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Service Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Service Password"; Rec."Service Password")
                     {
-                        ApplicationArea = All;
+
                         ExtendedDatatype = Masked;
                         ToolTip = 'Specifies the value of the Service Password field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -53,8 +57,9 @@ page 6151024 "NPR NpRv Global Voucher Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Validate Global Voucher Setup action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

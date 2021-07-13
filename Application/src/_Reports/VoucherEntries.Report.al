@@ -4,9 +4,7 @@ report 6014407 "NPR Voucher Entries"
     Caption = 'Voucher Entries';
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Voucher Entries.rdlc';
-
-
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UsageCategory = ReportsAndAnalysis;
 
     dataset

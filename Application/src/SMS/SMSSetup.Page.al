@@ -1,4 +1,4 @@
-﻿page 6014404 "NPR SMS Setup"
+page 6014404 "NPR SMS Setup"
 {
     Caption = 'SMS Setup';
     PageType = Card;
@@ -6,9 +6,10 @@
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     RefreshOnActivate = true;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     DeleteAllowed = false;
     InsertAllowed = false;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,8 +20,9 @@
                 Caption = ' General';
                 field("Message Provider"; Rec."SMS Provider")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the SMS Provider field';
+                    ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
                         SetVisible()
@@ -28,18 +30,21 @@
                 }
                 field("Discard Msg. Older Than [Hrs]"; Rec."Discard Msg. Older Than [Hrs]")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discard Msg. Older Than [Hrs] field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Job Queue Category Code"; Rec."Job Queue Category Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Job Queue Category Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto Send Attempts"; Rec."Auto Send Attempts")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Send Attempts field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Navipartner)
@@ -48,18 +53,21 @@
                 Visible = NaviVisisble;
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Sender No."; Rec."Default Sender No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Sender No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Domestic Phone Prefix"; Rec."Domestic Phone Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Domestic Phone Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Endpoint)
@@ -68,23 +76,27 @@
                 Visible = EndpointVisible;
                 field("SMS Endpoint"; Rec."SMS Endpoint")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the SMS Endpoint field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("SMS-Address Postfix"; Rec."SMS-Address Postfix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the SMS-Address Postfix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Local E-Mail Address"; Rec."Local E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Local E-Mail Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Local SMTP Pickup Library"; Rec."Local SMTP Pickup Library")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Local SMTP Pickup Library field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -101,7 +113,8 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
                 trigger OnAction()
                 var
                     MessageJOBHandler: Codeunit "NPR Send SMS Job Handler";
@@ -117,8 +130,9 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 RunObject = page "NPR SMS Log";
+                ApplicationArea = NPRRetail;
 
             }
         }

@@ -1,10 +1,11 @@
-﻿page 6060153 "NPR Event Activities"
+page 6060153 "NPR Event Activities"
 {
     Caption = 'Activities';
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Event Cue";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,18 +22,20 @@
                         Caption = 'New Event';
                         RunObject = Page "NPR Event Card";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileNew;
                         ToolTip = 'Creates a new event';
+                        ApplicationArea = NPRRetail;
                     }
                     action("New Customer")
                     {
                         Caption = 'New Customer';
                         RunObject = Page "Customer Card";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TilePeople;
                         ToolTip = 'Creates a new customer';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -41,8 +44,9 @@
                 ShowCaption = false;
                 field("Upcoming Events"; Rec."Upcoming Events")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Upcoming Events field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -51,8 +55,9 @@
                 }
                 field("Completed Events"; Rec."Completed Events")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Completed Events field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -61,8 +66,9 @@
                 }
                 field("Cancelled Events"; Rec."Cancelled Events")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cancelled Events field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

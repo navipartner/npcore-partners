@@ -17,8 +17,9 @@ pageextension 6014475 "NPR Price List Line Review" extends "Price List Line Revi
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'Executes the Variety action';
+
                 trigger OnAction()
                 var
                     VRTWrapper: Codeunit "NPR Variety Wrapper";

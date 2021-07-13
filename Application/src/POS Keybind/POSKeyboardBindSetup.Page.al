@@ -6,7 +6,8 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
     PageType = List;
     SourceTable = "NPR POS Keyboard Bind. Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,31 +17,36 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
             {
                 field("Action Code"; Rec."Action Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Action Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Key Bind"; Rec."Key Bind")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Key Bind field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Key Bind"; Rec."Default Key Bind")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Default Key Bind field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -59,8 +65,9 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Restore Default Key Bind action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

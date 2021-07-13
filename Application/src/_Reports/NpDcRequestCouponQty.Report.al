@@ -3,7 +3,7 @@ report 6151590 "NPR NpDc Request Coupon Qty."
     Caption = 'Request Coupon Qty.';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     requestpage
     {
 
@@ -18,8 +18,9 @@ report 6151590 "NPR NpDc Request Coupon Qty."
                     {
                         Caption = 'Issue Coupon Qty.';
                         MinValue = 0;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Issue Coupon Qty. field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

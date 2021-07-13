@@ -5,8 +5,9 @@ page 6151459 "NPR Magento Cont. ShipTo List"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Contact ShipToAdr.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,30 +17,35 @@ page 6151459 "NPR Magento Cont. ShipTo List"
             {
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created By Contact No."; Rec."Created By Contact No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created By Contact No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ship-to Code"; Rec."Ship-to Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ship-to Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created At"; Rec."Created At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Visibility; Rec.Visibility)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Visibility field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

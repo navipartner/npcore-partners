@@ -1,9 +1,10 @@
 page 6014437 "NPR MobilePayV10 Payment Setup"
 {
     PageType = Card;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
     SourceTable = "NPR MobilePayV10 Payment Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -13,19 +14,22 @@ page 6014437 "NPR MobilePayV10 Payment Setup"
             {
                 field(Environment; Rec.Environment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Environment field';
+                    ApplicationArea = NPRRetail;
 
                 }
                 field("Merchant VAT Number"; Rec."Merchant VAT Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Merchant VAT Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Level"; Rec."Log Level")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Level field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

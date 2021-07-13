@@ -8,8 +8,9 @@ page 6014604 "NPR Attribute Card"
     Caption = 'Client Attribute Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Attribute";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,95 +20,113 @@ page 6014604 "NPR Attribute Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code Caption"; Rec."Code Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code Caption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Caption"; Rec."Filter Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Caption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Global; Rec.Global)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Value Datatype"; Rec."Value Datatype")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value Datatype field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("On Validate"; Rec."On Validate")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the On Validate field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("On Format"; Rec."On Format")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the On Format field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LookUp Table"; Rec."LookUp Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'LookUp Table overide manual set lookup value.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LookUp Table Id"; Rec."LookUp Table Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the LookUp Table Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LookUp Table Name"; Rec."LookUp Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the LookUp Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LookUp Value Field Id"; Rec."LookUp Value Field Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the LookUp Value Field Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LookUp Value Field Name"; Rec."LookUp Value Field Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the LookUp Value Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LookUp Description Field Id"; Rec."LookUp Description Field Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the LookUp Description Field Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LookUp Description Field Name"; Rec."LookUp Description Field Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the LookUp Description Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Import File Column No."; Rec."Import File Column No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import File Column No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -125,8 +144,9 @@ page 6014604 "NPR Attribute Card"
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Attribute ID action';
+                ApplicationArea = NPRRetail;
             }
             action(Translations)
             {
@@ -135,8 +155,9 @@ page 6014604 "NPR Attribute Card"
                 RunObject = Page "NPR Attribute Translations";
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code", "Language ID");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Translations action';
+                ApplicationArea = NPRRetail;
             }
             action(Values)
             {
@@ -145,8 +166,9 @@ page 6014604 "NPR Attribute Card"
                 RunObject = Page "NPR Attribute Value Lookup";
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Values action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

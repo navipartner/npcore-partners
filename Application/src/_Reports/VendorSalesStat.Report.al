@@ -5,7 +5,7 @@ report 6014419 "NPR Vendor Sales Stat"
     Caption = 'Vendor Sales Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -198,14 +198,16 @@ report 6014419 "NPR Vendor Sales Stat"
                 field("Start Date"; StartDate)
                 {
                     Caption = 'Start Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End Date"; EndDate)
                 {
                     Caption = 'End Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

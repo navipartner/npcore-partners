@@ -150,9 +150,9 @@ table 6151524 "NPR Nc Endpoint File"
 
     local procedure BuildSetupSummary(): Text
     var
-        TextSetupSummary: Label 'File Export Path %1, Namename %2.';
+        TextSetupSummaryLbl: Label 'File Export Path %1, Namename %2.', Comment = '%1=Path;%2=Filename';
     begin
-        exit(StrSubstNo(TextSetupSummary, Path, Filename));
+        exit(StrSubstNo(TextSetupSummaryLbl, Path, Filename));
     end;
 }
 

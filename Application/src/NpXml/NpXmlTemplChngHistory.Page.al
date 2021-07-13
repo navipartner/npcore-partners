@@ -4,8 +4,9 @@ page 6151563 "NPR NpXml Templ. Chng. History"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpXml Template History";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,37 +16,43 @@ page 6151563 "NPR NpXml Templ. Chng. History"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Version Description"; Rec."Version Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Version No."; Rec."Template Version No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Template Version No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Type"; Rec."Event Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Changed by"; Rec."Changed by")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Changed by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Change at"; Rec."Change at")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Change at field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

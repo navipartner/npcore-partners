@@ -4,7 +4,8 @@ page 6014627 "NPR Hardware Connector"
     Editable = false;
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -12,15 +13,17 @@ page 6014627 "NPR Hardware Connector"
         {
             field(PageCaption; PageCaption)
             {
-                ApplicationArea = All;
+
                 Caption = 'Page Caption';
                 Style = Strong;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the PageCaption field';
+                ApplicationArea = NPRRetail;
             }
             usercontrol(Bridge; "NPR Bridge")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnFrameworkReady()
                 begin

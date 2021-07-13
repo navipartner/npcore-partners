@@ -7,8 +7,9 @@ page 6014602 "NPR Item Variants"
     DataCaptionFields = "Item No.";
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Item Variant";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,39 +20,45 @@ page 6014602 "NPR Item Variants"
                 ShowCaption = false;
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     Visible = true;
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Inventory)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Inventory';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(NetChange; NetChange)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Net Change';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Net Change field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -60,12 +67,14 @@ page 6014602 "NPR Item Variants"
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -85,8 +94,9 @@ page 6014602 "NPR Item Variants"
                     RunObject = Page "Item Translations";
                     RunPageLink = "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Translations action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

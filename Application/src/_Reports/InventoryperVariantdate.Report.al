@@ -1,4 +1,4 @@
-﻿report 6014612 "NPR Inventory per Variant/date"
+report 6014612 "NPR Inventory per Variant/date"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Variant at date.rdlc';
@@ -6,7 +6,7 @@
     Description = 'Inventory per Variant at date';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(ReportHdr; "Integer")
@@ -377,44 +377,51 @@
                 field("Varer med beholdning"; Varermedbeholdning)
                 {
                     Caption = 'Show Only Items With Inventory';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Only Items With Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("View Sales Price"; ViewSalesPrice)
                 {
                     Caption = 'View Sales Prices';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the View Sales Prices field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Negativ beh"; Negativbeh)
                 {
                     Caption = 'Hide Items With Negative Inventory';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Hide Items With Negative Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Negativ Volume Show"; NegativVolumeShow)
                 {
                     Caption = 'Show Only Items With Negative Inventory';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Only Items With Negative Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show No Inventory"; ShowNoInventory)
                 {
                     Caption = 'Do Not Show Inventory';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Do Not Show Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Location"; ShowLocation)
                 {
                     Caption = 'Show Location';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Blank Location"; ShowBlankLocation)
                 {
                     Caption = 'Show Blank Location';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Blank Location field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -17,10 +17,11 @@ page 6151332 "NPR Retail Ent Headline"
 
                 field(GreetingText; GreetingText)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Greeting headline';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Greeting headline field';
+                    ApplicationArea = NPRRetail;
 
                 }
             }
@@ -29,10 +30,11 @@ page 6151332 "NPR Retail Ent Headline"
                 ShowCaption = false;
                 field("Issued Tickets"; IssuedTicketText)
                 {
-                    ApplicationArea = All;
+
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the IssuedTicketText field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Control3)
@@ -40,10 +42,11 @@ page 6151332 "NPR Retail Ent Headline"
                 ShowCaption = false;
                 field("Ticket Admissions"; TicketAdmission)
                 {
-                    ApplicationArea = All;
+
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the TicketAdmission field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Control6)
@@ -51,10 +54,11 @@ page 6151332 "NPR Retail Ent Headline"
                 ShowCaption = false;
                 field(Members; MembersCreated)
                 {
-                    ApplicationArea = All;
+
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the MembersCreated field';
+                    ApplicationArea = NPRRetail;
                 }
             }
 

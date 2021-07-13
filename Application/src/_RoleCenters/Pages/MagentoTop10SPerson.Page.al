@@ -19,8 +19,9 @@ page 6151485 "NPR Magento Top 10 S.Person"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -30,25 +31,29 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     Caption = 'Sales Amount (Actual)';
                     ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Search E-Mail"; Rec."Search E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Search E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -66,9 +71,10 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by day';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -79,9 +85,10 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by week';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -92,9 +99,10 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by month';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -105,9 +113,10 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by quarter';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -118,9 +127,10 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by year';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

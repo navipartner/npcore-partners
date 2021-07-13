@@ -3,10 +3,11 @@ page 6014552 "NPR Brands WP"
     Caption = 'Brands';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Brand";
     SourceTableTemporary = true;
     DelayedInsert = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,9 +18,10 @@ page 6014552 "NPR Brands WP"
                 ShowCaption = false;
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -28,18 +30,21 @@ page 6014552 "NPR Brands WP"
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Picture; Rec.Picture)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Picture field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

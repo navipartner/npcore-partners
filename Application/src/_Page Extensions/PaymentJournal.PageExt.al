@@ -7,7 +7,7 @@ pageextension 6014407 "NPR Payment Journal" extends "Payment Journal"
             field("NPR Account Name"; AccountName)
             {
                 Caption = 'Account Name';
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = NPRRetail;
                 Visible = false;
                 ToolTip = 'Specifies the name of the account.';
             }

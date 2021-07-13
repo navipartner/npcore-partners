@@ -3,8 +3,9 @@ page 6014540 "NPR Insurrance Combination"
     Caption = 'Insurance - Combination';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Insurance Combination";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,43 +16,51 @@ page 6014540 "NPR Insurrance Combination"
                 ShowCaption = false;
                 field(Company; Rec.Company)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount From"; Rec."Amount From")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount From field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("To Amount"; Rec."To Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the To Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Insurance Amount"; Rec."Insurance Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Insurance Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Profit %"; Rec."Profit %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Profit % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount as Percentage"; Rec."Amount as Percentage")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount as percentage of value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ticket tekst"; Rec."Ticket tekst")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket tekst field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

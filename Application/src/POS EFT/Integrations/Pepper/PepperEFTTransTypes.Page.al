@@ -9,7 +9,8 @@ page 6184488 "NPR Pepper EFT Trans. Types"
     PageType = List;
     SourceTable = "NPR Pepper EFT Trx Type";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,38 +20,45 @@ page 6184488 "NPR Pepper EFT Trans. Types"
             {
                 field("Integration Type"; Rec."Integration Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Integration Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Timeout (Seconds)"; Rec."POS Timeout (Seconds)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Timeout (Seconds) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Allow Test Modes"; Rec."Allow Test Modes")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Test Modes field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Suppress Receipt Print"; Rec."Suppress Receipt Print")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Suppress Receipt Print field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -68,8 +76,9 @@ page 6184488 "NPR Pepper EFT Trans. Types"
                 RunPageLink = "Transaction Type Code" = FIELD(Code);
                 RunPageView = SORTING("Transaction Type Code")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Result Codes action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

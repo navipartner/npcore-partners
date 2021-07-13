@@ -6,8 +6,9 @@ page 6151562 "NPR NpXml Templ. Arch. List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpXml Template Arch.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,24 +18,28 @@ page 6151562 "NPR NpXml Templ. Arch. List"
             {
                 field("Template Version No."; Rec."Template Version No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Version No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Version Description"; Rec."Version Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Archived by"; Rec."Archived by")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Archived by field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Archived at"; Rec."Archived at")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Archived At';
                     ToolTip = 'Specifies the value of the Archived At field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -52,8 +57,9 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Restore Template Version action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -78,8 +84,9 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Template Version action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

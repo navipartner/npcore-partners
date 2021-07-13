@@ -1,4 +1,4 @@
-﻿page 6014450 "NPR Mixed Discount"
+page 6014450 "NPR Mixed Discount"
 {
     Caption = 'Mix Discount';
     PageType = Card;
@@ -24,8 +24,9 @@
                             ShowCaption = false;
                             field("Code"; Rec.Code)
                             {
-                                ApplicationArea = All;
+
                                 ToolTip = 'Specifies the value of the Code field';
+                                ApplicationArea = NPRRetail;
 
                                 trigger OnAssistEdit()
                                 begin
@@ -35,9 +36,10 @@
                             }
                             field(Description; Rec.Description)
                             {
-                                ApplicationArea = All;
+
                                 Importance = Promoted;
                                 ToolTip = 'Specifies the value of the Description field';
+                                ApplicationArea = NPRRetail;
                             }
                             group(Control6014409)
                             {
@@ -45,9 +47,10 @@
                                 Visible = (Rec."Mix Type" <> 2);
                                 field("Mix Type"; Rec."Mix Type")
                                 {
-                                    ApplicationArea = All;
+
                                     OptionCaption = 'Standard,Combination';
                                     ToolTip = 'Specifies the value of the Mix Type field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -66,8 +69,9 @@
                                     Visible = (Rec."Discount Type" <> Rec."Discount Type"::"Multiple Discount Levels");
                                     field(Lot; Rec.Lot)
                                     {
-                                        ApplicationArea = All;
+
                                         ToolTip = 'Define Quantity on Lines - All items and quantity on lines must be bought';
+                                        ApplicationArea = NPRRetail;
 
                                         trigger OnValidate()
                                         begin
@@ -82,8 +86,9 @@
                                     Visible = (NOT Rec.Lot);
                                     field("Min. Quantity"; Rec."Min. Quantity")
                                     {
-                                        ApplicationArea = All;
+
                                         ToolTip = 'Specifies the value of the Min. Quantity field';
+                                        ApplicationArea = NPRRetail;
 
                                         trigger OnValidate()
                                         begin
@@ -92,8 +97,9 @@
                                     }
                                     field("Max. Quantity"; Rec."Max. Quantity")
                                     {
-                                        ApplicationArea = All;
+
                                         ToolTip = 'Specifies the value of the Max. Quantity field';
+                                        ApplicationArea = NPRRetail;
                                     }
                                 }
                             }
@@ -104,10 +110,11 @@
                                 Visible = (Rec."Mix Type" = 1) OR (Rec.Lot);
                                 field(ItemQtyPerLot; Rec.CalcMinQty())
                                 {
-                                    ApplicationArea = All;
+
                                     Caption = 'Item Qty. per Lot';
                                     DecimalPlaces = 0 : 5;
                                     ToolTip = 'Specifies the value of the Item Qty. per Lot field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -121,16 +128,18 @@
                                 Visible = (Rec."Discount Type" <> Rec."Discount Type"::"Total Discount Amt. per Min. Qty.") AND (Rec."Discount Type" <> Rec."Discount Type"::"Multiple Discount Levels") AND (NOT Rec."Lot");
                                 field(MinimumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, false))
                                 {
-                                    ApplicationArea = All;
+
                                     Caption = 'Min. Discount Amount';
                                     ToolTip = 'Specifies the value of the Min. Discount Amount field';
+                                    ApplicationArea = NPRRetail;
                                 }
                                 field(MaximumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                                 {
-                                    ApplicationArea = All;
+
                                     Caption = 'Max. Discount Amount';
                                     Editable = false;
                                     ToolTip = 'Specifies the value of the Max. Discount Amount field';
+                                    ApplicationArea = NPRRetail;
                                 }
                             }
                             group(Control6014417)
@@ -139,10 +148,11 @@
                                 Visible = (Rec."Discount Type" <> Rec."Discount Type"::"Total Discount Amt. per Min. Qty.") AND (Rec."Lot");
                                 field(Discount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                                 {
-                                    ApplicationArea = All;
+
                                     Caption = 'Discount Amount';
                                     Editable = false;
                                     ToolTip = 'Specifies the value of the Discount Amount field';
+                                    ApplicationArea = NPRRetail;
                                 }
                             }
                         }
@@ -157,13 +167,15 @@
 
                             field(Status; Rec.Status)
                             {
-                                ApplicationArea = All;
+
                                 ToolTip = 'Specifies the value of the Status field';
+                                ApplicationArea = NPRRetail;
                             }
                             field("Discount Type"; Rec."Discount Type")
                             {
-                                ApplicationArea = All;
+
                                 ToolTip = 'Specifies the value of the Discount Type field';
+                                ApplicationArea = NPRRetail;
 
                                 trigger OnValidate()
                                 begin
@@ -177,8 +189,9 @@
                                 Visible = (Rec."Discount Type" = Rec."Discount Type"::"Total Amount per Min. Qty.");
                                 field("Total Amount"; Rec."Total Amount")
                                 {
-                                    ApplicationArea = All;
+
                                     ToolTip = 'Specifies the value of the Total Amount field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -187,8 +200,9 @@
                                 }
                                 field("Total Amount Excl. VAT"; Rec."Total Amount Excl. VAT")
                                 {
-                                    ApplicationArea = All;
+
                                     ToolTip = 'Specifies the value of the Total Amount Excl. VAT field';
+                                    ApplicationArea = NPRRetail;
                                 }
                             }
                             group(Control6014426)
@@ -197,9 +211,10 @@
                                 Visible = (Rec."Discount Type" = Rec."Discount Type"::"Multiple Discount Levels");
                                 field(DiscAmountExclVAT; Rec."Total Amount Excl. VAT")
                                 {
-                                    ApplicationArea = All;
+
                                     Caption = 'Discount Amount Excl. VAT';
                                     ToolTip = 'Specifies the value of the Discount Amount Excl. VAT field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -213,8 +228,9 @@
                                 Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount %";
                                 field("Total Discount %"; Rec."Total Discount %")
                                 {
-                                    ApplicationArea = All;
+
                                     ToolTip = 'Specifies the value of the Total Discount % field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -228,8 +244,9 @@
                                 Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount Amt. per Min. Qty.";
                                 field("Total Discount Amount"; Rec."Total Discount Amount")
                                 {
-                                    ApplicationArea = All;
+
                                     ToolTip = 'Specifies the value of the Total Discount Amount field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -243,8 +260,9 @@
                                 Visible = Rec."Discount Type" = Rec."Discount Type"::"Priority Discount per Min. Qty";
                                 field("Item Discount Qty."; Rec."Item Discount Qty.")
                                 {
-                                    ApplicationArea = All;
+
                                     ToolTip = 'Specifies the value of the Item Discount Quantity field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -253,8 +271,9 @@
                                 }
                                 field("Item Discount %"; Rec."Item Discount %")
                                 {
-                                    ApplicationArea = All;
+
                                     ToolTip = 'Specifies the value of the Item Discount % field';
+                                    ApplicationArea = NPRRetail;
 
                                     trigger OnValidate()
                                     begin
@@ -271,21 +290,24 @@
                             Visible = Rec."Mix Type" <> 2;
                             field("Block Custom Discount"; Rec."Block Custom Discount")
                             {
-                                ApplicationArea = All;
+
                                 ToolTip = 'Specifies the value of the Block Custom Discount field';
+                                ApplicationArea = NPRRetail;
                             }
                         }
                         field("Created the"; Rec."Created the")
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ToolTip = 'Specifies the value of the Created Date field';
+                            ApplicationArea = NPRRetail;
                         }
                         field("Last Date Modified"; Rec."Last Date Modified")
                         {
-                            ApplicationArea = All;
+
                             Editable = false;
                             ToolTip = 'Specifies the value of the Last Date Modified field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }
@@ -299,33 +321,38 @@
                     ShowCaption = false;
                     field("Starting date"; Rec."Starting date")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Start Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ending date"; Rec."Ending date")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the End Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Starting time"; Rec."Starting time")
                     {
-                        ApplicationArea = All;
+
                         Visible = false;
                         ToolTip = 'Specifies the value of the Start Time field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Ending time"; Rec."Ending time")
                     {
-                        ApplicationArea = All;
+
                         Visible = false;
                         ToolTip = 'Specifies the value of the End Time field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer Disc. Group Filter"; Rec."Customer Disc. Group Filter")
                     {
-                        ApplicationArea = All;
+
                         AssistEdit = false;
                         ToolTip = 'Specifies the value of the Customer Disc. Group Filter field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         begin
@@ -339,21 +366,24 @@
             part(Control6014425; "NPR Mixed Disc. Time Interv.")
             {
                 SubPageLink = "Mix Code" = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
 
             part(DiscountLevels; "NPR Mixed Discount Levels")
             {
                 SubPageLink = "Mixed Discount Code" = FIELD(Code);
                 Visible = DiscountLevelsApplicable;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(SubForm; "NPR Mixed Discount Lines")
             {
                 ShowFilter = false;
                 SubPageLink = Code = FIELD(Code);
                 UpdatePropagation = Both;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -370,8 +400,9 @@
                 RunPageLink = "Table ID" = CONST(6014411),
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Dimensions action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -387,8 +418,9 @@
                     {
                         Caption = 'Transfer Item';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Transfer Item action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -408,8 +440,9 @@
                     {
                         Caption = 'Transfer Item Category';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Transfer Item Category action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -430,8 +463,9 @@
                     {
                         Caption = 'Transfer Vendor';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Transfer Vendor action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -452,8 +486,9 @@
                     {
                         Caption = 'Transfer All Items';
                         Image = TransferToLines;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Transfer All Items action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -468,8 +503,9 @@
                     {
                         Caption = 'Compress to Item Disc. Group';
                         Image = "Action";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Compress to Item Disc. Group action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -485,8 +521,9 @@
                 {
                     Caption = 'Send to Retail Journal';
                     Image = SendTo;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Send to Retail Journal action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -499,16 +536,18 @@
                 {
                     Caption = 'Copy campaign to Department Code';
                     Image = "Action";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Copy campaign to Department Code action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Copy Mixed Discount")
                 {
                     Caption = 'Copy Mixed Discount';
                     Image = CopyDocument;
-                    ApplicationArea = All;
+
                     Enabled = Rec.Code <> '';
                     ToolTip = 'Executes the Copy Mixed Discount action. To copy Mixed Discount lines, Mixed Discount must be created.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

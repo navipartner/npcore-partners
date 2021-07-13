@@ -4,8 +4,9 @@ page 6150748 "NPR POS Sale Lines Subpage"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Sale Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,48 +16,57 @@ page 6150748 "NPR POS Sale Lines Subpage"
             {
                 field("Sale Type"; Rec."Sale Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sale Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -74,8 +84,9 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Document action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -93,8 +104,9 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Show sales tax calculation for active sale line.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

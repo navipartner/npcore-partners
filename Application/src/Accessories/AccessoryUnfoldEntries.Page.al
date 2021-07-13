@@ -7,7 +7,8 @@ page 6014505 "NPR Accessory Unfold Entries"
     PageType = List;
     SourceTable = "NPR Accessory Unfold Entry";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,98 +18,117 @@ page 6014505 "NPR Accessory Unfold Entries"
             {
                 field("Accessory Item No."; Rec."Accessory Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Accessory Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Ledger Entry No."; Rec."Item Ledger Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Ledger Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Type"; Rec."Source Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source No."; Rec."Source No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Source No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Line No."; Rec."Document Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cash Register No."; Rec."Cash Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Time"; Rec."Document Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unfold Item Ledger Entry No."; Rec."Unfold Item Ledger Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unfold Item Ledger Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -125,8 +145,9 @@ page 6014505 "NPR Accessory Unfold Entries"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Navigate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

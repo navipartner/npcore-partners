@@ -11,7 +11,8 @@ page 6014424 "NPR Getting Started"
 
             usercontrol(WelcomeWizard; "NPR Get Started Wizard")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
                 trigger Ready()
                 begin
                     CurrPage.WelcomeWizard.createlayout(TitleTxt, SubTitleTxt, ExplanationTxt, IntroTxt, IntroDescTxt, GetStartedTxt, GetStartedDescTxt, FindHelpTxt, FindHelpDescTxt);
@@ -43,13 +44,14 @@ page 6014424 "NPR Getting Started"
         {
             action("Done")
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Done!';
                 InFooterBar = True;
                 Promoted = true;
                 PromotedOnly = true;
                 Image = Completed;
                 ToolTip = 'Executes the Done! action';
+                ApplicationArea = NPRRetail;
                 trigger OnAction()
                 begin
                     CurrPage.Close();

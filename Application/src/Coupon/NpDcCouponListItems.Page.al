@@ -1,14 +1,15 @@
-﻿page 6151597 "NPR NpDc Coupon List Items"
+page 6151597 "NPR NpDc Coupon List Items"
 {
     AutoSplitKey = true;
     Caption = 'Coupon List Items';
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpDc Coupon List Item";
     SourceTableView = SORTING("Coupon Type", "Line No.")
                       WHERE("Line No." = FILTER(>= 0));
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,13 +20,14 @@
                 Caption = 'Total';
                 field(TotalMaxQty; MaxQty)
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     Caption = 'Max. Quantity per Coupon';
                     DecimalPlaces = 0 : 5;
                     Importance = Promoted;
                     Visible = (NOT ValidationView);
                     ToolTip = 'Specifies the value of the Max. Quantity per Coupon field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -36,10 +38,11 @@
                 }
                 field(LotValidation; LotValidation)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Lot Validation';
                     Visible = ValidationView;
                     ToolTip = 'Specifies the value of the Lot Validation field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -54,11 +57,12 @@
                     Visible = (NOT LotValidation);
                     field(TotalValidQty; ValidQty)
                     {
-                        ApplicationArea = All;
+
                         BlankZero = true;
                         Caption = 'Validation Quantity';
                         Visible = (ValidationView);
                         ToolTip = 'Specifies the value of the Validation Quantity field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -73,54 +77,63 @@
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Profit %"; Rec."Profit %")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Profit % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max. Discount Amount"; Rec."Max. Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     Visible = (NOT ValidationView);
                     ToolTip = 'Specifies the value of the Max. Discount Amount per Coupon field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max. Quantity"; Rec."Max. Quantity")
                 {
-                    ApplicationArea = All;
+
                     Visible = (NOT ValidationView);
                     ToolTip = 'Specifies the value of the Max. Quantity per Coupon field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Validation Quantity"; Rec."Validation Quantity")
                 {
-                    ApplicationArea = All;
+
                     Visible = (LotValidation);
                     ToolTip = 'Specifies the value of the Validation Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -138,8 +151,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Add Items action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -156,8 +170,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Set Priorities action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

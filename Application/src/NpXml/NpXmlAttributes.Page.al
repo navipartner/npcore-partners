@@ -5,8 +5,9 @@ page 6151555 "NPR NpXml Attributes"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpXml Attribute";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,39 +17,46 @@ page 6151555 "NPR NpXml Attributes"
             {
                 field("Attribute Name"; Rec."Attribute Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Namespace; Rec.Namespace)
                 {
-                    ApplicationArea = All;
+
                     Visible = NamespacesEnabled;
                     ToolTip = 'Specifies the value of the Namespace field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Attribute Field No."; Rec."Attribute Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Attribute Field Name"; Rec."Attribute Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attribute Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Value"; Rec."Default Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Only with Value"; Rec."Only with Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Only with Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Field Type"; Rec."Default Field Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Field Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -11,8 +11,9 @@ page 6184490 "NPR Pepper Config. Card"
     Caption = 'Pepper Configuration Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Pepper Config.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -22,28 +23,33 @@ page 6184490 "NPR Pepper Config. Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recovery Retry Attempts"; Rec."Recovery Retry Attempts")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recovery Retry Attempts field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mode field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -52,192 +58,226 @@ page 6184490 "NPR Pepper Config. Card"
                 }
                 field("Header and Footer Handling"; Rec."Header and Footer Handling")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Header and Footer Handling field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(License; HasLicense)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'License';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasLicense field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Additional Parameters"; HasAdditionalParameters)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Additional Parameters';
                     Editable = false;
                     ToolTip = 'Specifies the value of the HasAdditionalParameters field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default POS Timeout (Seconds)"; Rec."Default POS Timeout (Seconds)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default POS Timeout (Seconds) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Detailed Error Messages"; Rec."Show Detailed Error Messages")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Detailed Error Messages field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Offline mode"; Rec."Offline mode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Offline mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Min. Length Authorisation No."; Rec."Min. Length Authorisation No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Min. Length Authorisation No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Max. Length Authorisation No."; Rec."Max. Length Authorisation No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Max. Length Authorisation No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer ID"; Rec."Customer ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("License ID"; Rec."License ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the License ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Logging)
             {
                 field("Logging Target"; Rec."Logging Target")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logging Target field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Logging Level"; Rec."Logging Level")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logging Level field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Logging Max. File Size (MB)"; Rec."Logging Max. File Size (MB)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logging Max. File Size (MB) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Logging Directory"; Rec."Logging Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logging Directory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Logging Archive Directory"; Rec."Logging Archive Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logging Archive Directory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Logging Archive Max. Age Days"; Rec."Logging Archive Max. Age Days")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Logging Archive Max. Age Days field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Files)
             {
                 field("Card Type File Full Path"; Rec."Card Type File Full Path")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Type File Full Path field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("License File Full Path"; Rec."License File Full Path")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the License File Full Path field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Directories)
             {
                 field("Ticket Directory"; Rec."Ticket Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ticket Directory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Journal Directory"; Rec."Journal Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Directory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Matchbox Directory"; Rec."Matchbox Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Matchbox Directory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Messages Directory"; Rec."Messages Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Messages Directory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Persistance Directory"; Rec."Persistance Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Persistance Directory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Working Directory"; Rec."Working Directory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Working Directory field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Transaction Types")
             {
                 field(Open; Rec."Transaction Type Open Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Open Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Payment; Rec."Transaction Type Payment Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Payment Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Close; Rec."Transaction Type Close Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Close Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Refund; Rec."Transaction Type Refund Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Refund Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Recover; Rec."Transaction Type Recover Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Recover Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Type Auxilary Code"; Rec."Transaction Type Auxilary Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Auxilary Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Type Install Code"; Rec."Transaction Type Install Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Type Install Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Closing)
             {
                 field("End of Day on Close"; Rec."End of Day on Close")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End of Day on Close field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unload Library on Close"; Rec."Unload Library on Close")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unload Library on Close field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End of Day Receipt Mandatory"; Rec."End of Day Receipt Mandatory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End of Day Receipt Mandatory field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -255,8 +295,9 @@ page 6184490 "NPR Pepper Config. Card"
                 RunPageLink = "Configuration Code" = FIELD(Code);
                 RunPageView = SORTING(ID)
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Instances action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -268,8 +309,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = ImportCodes;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -281,8 +323,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = Import;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -298,8 +341,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = ElectronicNumber;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -311,8 +355,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Configuration XML';
                     Image = CreateXMLFile;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Configuration XML action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -324,8 +369,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -340,8 +386,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -353,8 +400,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -370,8 +418,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'License';
                     Image = Export;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the License action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -382,8 +431,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Configuration XML';
                     Image = ExportElectronicDocument;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Configuration XML action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -394,8 +444,9 @@ page 6184490 "NPR Pepper Config. Card"
                 {
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Additional Parameters action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

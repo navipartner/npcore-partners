@@ -2,7 +2,7 @@ report 6014601 "NPR Update Barcodes"
 {
     DefaultLayout = RDLC;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Update Barcodes';
     ProcessingOnly = true;
     dataset

@@ -3,7 +3,7 @@
     Caption = 'Export Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UseRequestPage = false;
 
     dataset

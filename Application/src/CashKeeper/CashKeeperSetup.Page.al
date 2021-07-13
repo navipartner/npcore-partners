@@ -7,8 +7,9 @@ page 6059945 "NPR CashKeeper Setup"
     Caption = 'CashKeeper Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR CashKeeper Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,23 +19,27 @@ page 6059945 "NPR CashKeeper Setup"
             {
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Type"; Rec."Payment Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("CashKeeper IP"; Rec."CashKeeper IP")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the CashKeeper IP field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Debug Mode"; Rec."Debug Mode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Debug Mode field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -50,8 +55,9 @@ page 6059945 "NPR CashKeeper Setup"
                 Image = View;
                 RunObject = Page "NPR CashKeeper Transaction";
                 RunPageLink = "Register No." = FIELD("Register No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the CashKeeper Transaction action';
+                ApplicationArea = NPRRetail;
             }
             action("CashKeeper Overview")
             {
@@ -59,8 +65,9 @@ page 6059945 "NPR CashKeeper Setup"
                 Image = View;
                 RunObject = Page "NPR CashKeeper Overview";
                 RunPageLink = "Register No." = FIELD("Register No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the CashKeeper Overview action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

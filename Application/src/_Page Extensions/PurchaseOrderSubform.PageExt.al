@@ -6,26 +6,29 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
         {
             field("NPR Vendor Item No."; Rec."Vendor Item No.")
             {
-                ApplicationArea = All;
+
                 Visible = false;
                 ToolTip = 'Specifies the value of the Vendor Item No. field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(Description)
         {
             field("NPR Description 2"; Rec."Description 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Description 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter("Line No.")
         {
             field("NPR Exchange Label"; ExchangeLabelTableMap.Barcode)
             {
-                ApplicationArea = All;
+
                 Visible = false;
                 ToolTip = 'Specifies the value of the NPR Exchange Label field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 var
@@ -99,8 +102,9 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 Caption = 'Variety';
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Variety action';
+                ApplicationArea = NPRRetail;
             }
         }
         addafter(OrderTracking)
@@ -110,8 +114,9 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 AccessByPermission = TableData "Nonstock Item" = R;
                 Caption = 'Nonstoc&k Items';
                 Image = NonStockItem;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Nonstoc&k Items action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -15,13 +15,15 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                     ShowCaption = false;
                     field("Customer No."; Rec."Customer No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Customer No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Salesperson Code"; Rec."Salesperson Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Salesperson Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014408)
@@ -29,8 +31,9 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                     ShowCaption = false;
                     field("Invoice per"; Rec."Invoice per")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Invoice per field';
+                        ApplicationArea = NPRRetail;
                     }
                     group(Control6014406)
                     {
@@ -38,14 +41,16 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                         Visible = Rec."Invoice per" = Rec."Invoice per"::Document;
                         field("Invoice Posting Date"; Rec."Invoice Posting Date")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Invoice Posting Date field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     field("Post Immediately"; Rec."Post Immediately")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Post Immediately field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -53,7 +58,8 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
             {
                 Caption = 'Lines';
                 SubPageLink = "Template Code" = FIELD("Template Code");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

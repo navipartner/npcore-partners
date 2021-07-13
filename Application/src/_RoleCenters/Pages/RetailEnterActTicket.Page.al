@@ -1,4 +1,4 @@
-﻿page 6151250 "NPR Retail Enter. Act - Ticket"
+page 6151250 "NPR Retail Enter. Act - Ticket"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -14,7 +14,7 @@
                 Caption = 'Tickets';
                 field("Issued Tickets"; IssuedTicketsCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Issued Tickets field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Issued Tickets';
@@ -25,7 +25,7 @@
                 }
                 field("Ticket Requests"; TicketRequestsCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket Requests field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Ticket Requests';
@@ -36,7 +36,7 @@
                 }
                 field("Ticket Types"; TicketTypesCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket Type field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Ticket Types';
@@ -47,7 +47,7 @@
                 }
                 field("Ticket Admission BOM"; TicketAdmissionBOMCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket BOM field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Ticket BOM';
@@ -58,7 +58,7 @@
                 }
                 field("Ticket Schedules"; TicketSchedulesCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket Schedules field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Ticket Schedules';
@@ -69,7 +69,7 @@
                 }
                 field("Ticket Admissions"; TicketAdmissionsCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     DrillDownPageID = "NPR TM Ticket Admissions";
                     ToolTip = 'Specifies the value of the Ticket Admissions field';
                     DecimalPlaces = 0 : 0;
@@ -85,7 +85,7 @@
                 Caption = 'Members';
                 field(Control6; MembersCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Members field';
                     DecimalPlaces = 0 : 0;
@@ -97,7 +97,7 @@
                 }
                 field(Memberships; MembershipsCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Memberships field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Memberships';
@@ -108,7 +108,7 @@
                 }
                 field(Membercards; MembercardsCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Membercards field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Member Cards';
@@ -124,7 +124,7 @@
                 Caption = 'Master';
                 field(Items; ItemCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Items field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Items';
@@ -136,7 +136,7 @@
 
                 field(Contacts; ContactCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Contacts field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Contacts';
@@ -148,7 +148,7 @@
                 }
                 field(Customers; CustomerCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Customers field';
                     DecimalPlaces = 0 : 0;
                     Caption = 'Customers';

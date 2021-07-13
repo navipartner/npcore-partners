@@ -16,8 +16,9 @@ page 6014653 "NPR POS Store List Step"
                 field(NoOfPOSStoresToCreate; NoOfPOSStoresToCreate)
                 {
                     Caption = 'Number of stores to create: ';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Number of stores to create:  field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -45,8 +46,9 @@ page 6014653 "NPR POS Store List Step"
                 field(StartingNo; StartingNoStore)
                 {
                     Caption = 'Starting No.: ';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting No.:  field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -67,19 +69,22 @@ page 6014653 "NPR POS Store List Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -101,8 +106,9 @@ page 6014653 "NPR POS Store List Step"
                 }
                 field(City; Rec.City)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -124,8 +130,9 @@ page 6014653 "NPR POS Store List Step"
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -156,8 +163,9 @@ page 6014653 "NPR POS Store List Step"
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

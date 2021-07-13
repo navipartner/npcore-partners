@@ -6,8 +6,9 @@ page 6014553 "NPR Mixed Discount Levels"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Mixed Discount Level";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,29 +18,34 @@ page 6014553 "NPR Mixed Discount Levels"
             {
                 field("Mixed Discount Code"; Rec."Mixed Discount Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Mixed Discount Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Multiple Of"; Rec."Multiple Of")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Multiple Of field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount % field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

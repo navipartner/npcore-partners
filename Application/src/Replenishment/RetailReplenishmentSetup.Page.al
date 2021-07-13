@@ -4,7 +4,8 @@ page 6151073 "NPR Retail Replenishment Setup"
     PageType = Card;
     SourceTable = "NPR Retail Replenishment Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,14 +15,16 @@ page 6151073 "NPR Retail Replenishment Setup"
             {
                 field("Item Demand Calc. Codeunit"; Rec."Item Demand Calc. Codeunit")
                 {
-                    ApplicationArea = All;
+
                     TableRelation = AllObjWithCaption."Object ID" where("Object Type" = FILTER(Codeunit));
                     ToolTip = 'Specifies the value of the Item Demand Calc. Codeunit field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Transit Location"; Rec."Default Transit Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Transit Location field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

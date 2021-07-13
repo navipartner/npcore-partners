@@ -5,8 +5,9 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Open. Hour Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,31 +20,36 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                 {
                     field("Entry Type"; Rec."Entry Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Opening Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Start Time"; Rec."Start Time")
                     {
-                        ApplicationArea = All;
+
                         Editable = Rec."Entry Type" = 0;
                         ToolTip = 'Specifies the value of the Start Time field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("End Time"; Rec."End Time")
                     {
-                        ApplicationArea = All;
+
                         Editable = Rec."Entry Type" = 0;
                         ToolTip = 'Specifies the value of the End Time field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Period Type"; Rec."Period Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Period Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Period Description"; Rec."Period Description")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Period Description field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Period)
@@ -55,38 +61,45 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                         Visible = (Rec."Period Type" = 1);
                         field(Monday; Rec.Monday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Monday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Tuesday; Rec.Tuesday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Tuesday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Wednesday; Rec.Wednesday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Wednesday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Thursday; Rec.Thursday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Thursday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Friday; Rec.Friday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Friday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Saturday; Rec.Saturday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Saturday field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Sunday; Rec.Sunday)
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Sunday field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control6014420)
@@ -95,8 +108,9 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                         Visible = (Rec."Period Type" = 2) OR (Rec."Period Type" = 3);
                         field("Entry Date"; Rec."Entry Date")
                         {
-                            ApplicationArea = All;
+
                             ToolTip = 'Specifies the value of the Entry Date field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                 }

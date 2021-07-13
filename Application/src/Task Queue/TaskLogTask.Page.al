@@ -11,7 +11,8 @@ page 6059904 "NPR Task Log (Task)"
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -21,93 +22,111 @@ page 6059904 "NPR Task Log (Task)"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Journal Template Name"; Rec."Journal Template Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Template Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Journal Batch Name"; Rec."Journal Batch Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Journal Batch Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Expected Ending Time"; Rec."Expected Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Expected Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Duration"; Rec."Task Duration")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Duration field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Error Message"; Rec."Last Error Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Error Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Server Instance ID"; Rec."Server Instance ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Server Instance ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Session ID"; Rec."Session ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Session ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Task Worker Group"; Rec."Task Worker Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Task Worker Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object No."; Rec."Object No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of Output Log Entries"; Rec."No. of Output Log Entries")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Output Log Entries field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

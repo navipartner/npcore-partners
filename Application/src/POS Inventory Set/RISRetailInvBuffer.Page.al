@@ -1,4 +1,4 @@
-﻿page 6151088 "NPR RIS Retail Inv. Buffer"
+page 6151088 "NPR RIS Retail Inv. Buffer"
 {
     Caption = 'Retail Inventory';
     DeleteAllowed = false;
@@ -7,8 +7,9 @@
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR RIS Retail Inv. Buffer";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,28 +19,32 @@
             {
                 field(Inventory; Rec.Inventory)
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = Rec."Processing Error";
                     ToolTip = 'Specifies the value of the Inventory field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = Rec."Processing Error";
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Filter"; Rec."Location Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Filter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Error Message"; Rec."Processing Error Message")
                 {
-                    ApplicationArea = All;
+
                     Visible = ProcessingErrorExists;
                     ToolTip = 'Specifies the value of the Processing Error Message field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

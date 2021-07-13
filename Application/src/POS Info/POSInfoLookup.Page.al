@@ -1,4 +1,4 @@
-﻿page 6150646 "NPR POS Info Lookup"
+page 6150646 "NPR POS Info Lookup"
 {
     Caption = 'POS Info Lookup';
     PageType = List;
@@ -15,45 +15,45 @@
                 Caption = 'Group';
                 field("Field 1"; Rec."Field 1")
                 {
-                    ApplicationArea = All;
                     CaptionClass = ColumnCaption[1];
                     Visible = Column1Visible;
                     ToolTip = 'Specifies the value of the Field 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field 2"; Rec."Field 2")
                 {
-                    ApplicationArea = All;
                     CaptionClass = ColumnCaption[2];
                     Visible = Column2Visible;
                     ToolTip = 'Specifies the value of the Field 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field 3"; Rec."Field 3")
                 {
-                    ApplicationArea = All;
                     CaptionClass = ColumnCaption[3];
                     Visible = Column3Visible;
                     ToolTip = 'Specifies the value of the Field 3 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field 4"; Rec."Field 4")
                 {
-                    ApplicationArea = All;
                     CaptionClass = ColumnCaption[4];
                     Visible = Column4Visible;
                     ToolTip = 'Specifies the value of the Field 4 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field 5"; Rec."Field 5")
                 {
-                    ApplicationArea = All;
                     CaptionClass = ColumnCaption[5];
                     Visible = Column5Visible;
                     ToolTip = 'Specifies the value of the Field 5 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field 6"; Rec."Field 6")
                 {
-                    ApplicationArea = All;
                     CaptionClass = ColumnCaption[6];
                     Visible = Column6Visible;
                     ToolTip = 'Specifies the value of the Field 6 field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

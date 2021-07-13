@@ -3,7 +3,7 @@ report 6014510 "NPR Purch Return Order"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Purch Return Order NP.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Return Order';
     PreviewMode = PrintLayout;
     dataset
@@ -769,21 +769,24 @@ report 6014510 "NPR Purch Return Order"
                     field("No Of Copies"; NoOfCopies)
                     {
                         Caption = 'No. of Copies';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the No. of Copies field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Internal Info"; ShowInternalInfo)
                     {
                         Caption = 'Show Internal Information';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Internal Information field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Log Interaction field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

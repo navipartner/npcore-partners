@@ -286,9 +286,10 @@ page 6060079 "NPR TM Ticket Setup"
             {
                 Caption = 'Deploy Rapid Package From Azure';
                 Image = ImportDatabase;
-                ApplicationArea = All;
+
                 RunObject = page "NPR TM Ticket Rapid Packages";
                 ToolTip = 'Executes the Deploy Rapidstart Package for Ticket module From Azure Blob Storage';
+                ApplicationArea = NPRTicketAdvanced;
             }
         }
     }

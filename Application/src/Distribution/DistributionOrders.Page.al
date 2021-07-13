@@ -5,8 +5,9 @@ page 6151067 "NPR Distribution Orders"
     Caption = 'Distribution Orders';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Distribution Lines";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,50 +17,59 @@ page 6151067 "NPR Distribution Orders"
             {
                 field("Distribution Item"; Rec."Distribution Item")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Item field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Location; Rec.Location)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Variant"; Rec."Item Variant")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Variant field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Quantity"; Rec."Distribution Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Avaliable Quantity"; Rec."Avaliable Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Avaliable Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Demanded Quantity"; Rec."Demanded Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Demanded Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty On PO"; Rec."Qty On PO")
                 {
-                    ApplicationArea = All;
+
                     Caption = '<Qty On Purchase Orders>';
                     ToolTip = 'Specifies the value of the <Qty On Purchase Orders> field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty On Transfer"; Rec."Qty On Transfer")
                 {
-                    ApplicationArea = All;
+
                     Caption = '<Qty On Transfer Orders>';
                     ToolTip = 'Specifies the value of the <Qty On Transfer Orders> field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -17,78 +17,93 @@ page 6151574 "NPR AF Notification Hub Card"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Title; Rec.Title)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Title field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Body; Rec.Body)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Body field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Platform; Rec.Platform)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Platform field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Color"; Rec."Notification Color")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Color field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("From POS Unit No."; Rec."From POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the From POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("To POS Unit No."; Rec."To POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the To POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Type"; Rec."Action Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Value"; Rec."Action Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Created; Rec.Created)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created By"; Rec."Created By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created By field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notification Delivered to Hub"; Rec."Notification Delivered to Hub")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notification Delivered to Hub field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Handled; Rec.Handled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handled By"; Rec."Handled By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled By field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handled Pos Unit No."; Rec."Handled Pos Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled Pos Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Data)
@@ -96,19 +111,21 @@ page 6151574 "NPR AF Notification Hub Card"
                 Caption = 'Data';
                 field(Request; RequestData)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Request';
                     Editable = false;
                     MultiLine = true;
                     ToolTip = 'Specifies the value of the Request field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Response; ResponseData)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Response';
                     Editable = false;
                     MultiLine = true;
                     ToolTip = 'Specifies the value of the Response field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -126,8 +143,9 @@ page 6151574 "NPR AF Notification Hub Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Re-Send Messages action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

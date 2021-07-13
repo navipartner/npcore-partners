@@ -4,9 +4,10 @@ page 6150676 "NPR POS Entry Tax Line List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PromotedActionCategories = 'New,Process,Report,POS Entry';
     SourceTable = "NPR POS Entry Tax Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,83 +17,98 @@ page 6150676 "NPR POS Entry Tax Line List"
             {
                 field("Entry Date"; Rec."Entry Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Tax Base Amount"; Rec."Tax Base Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Base Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax %"; Rec."Tax %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax Amount"; Rec."Tax Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Including Tax"; Rec."Amount Including Tax")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount Including Tax field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Identifier"; Rec."VAT Identifier")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Identifier field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax Calculation Type"; Rec."Tax Calculation Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Calculation Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax Jurisdiction Code"; Rec."Tax Jurisdiction Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Jurisdiction Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax Area Code"; Rec."Tax Area Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Area Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Tax Group Code"; Rec."Tax Group Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tax Group Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use Tax"; Rec."Use Tax")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Use Tax field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -115,8 +131,9 @@ page 6150676 "NPR POS Entry Tax Line List"
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");
                     RunPageView = SORTING("Entry No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the POS Entry Card action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

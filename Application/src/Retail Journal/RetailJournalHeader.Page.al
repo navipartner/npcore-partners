@@ -1,10 +1,11 @@
-﻿page 6014490 "NPR Retail Journal Header"
+page 6014490 "NPR Retail Journal Header"
 {
     Caption = 'Retail Journal';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail Journal Header";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,26 +19,28 @@
                     ShowCaption = false;
                     field("No."; Rec."No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Code field';
+                        ApplicationArea = NPRRetail;
 
                     }
                     field(Description; Rec.Description)
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
 
                     field("Customer Price Group"; Rec."Customer Price Group")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Customer Price Group field';
                     }
 
                     field("Customer Disc. Group"; Rec."Customer Disc. Group")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Customer Disc. Group field';
                     }
 
@@ -47,18 +50,21 @@
                     ShowCaption = false;
                     field("Date of creation"; Rec."Date of creation")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Salesperson Code"; Rec."Salesperson Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Salesperson field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Location Code"; Rec."Location Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Location Code field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -67,8 +73,9 @@
                     }
                     field("Register No."; Rec."Register No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the POS Unit No. field';
+                        ApplicationArea = NPRRetail;
                     }
 
 
@@ -82,13 +89,15 @@
                     ShowCaption = false;
                     field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -106,10 +115,11 @@
                         //GridLayout = Rows;
                         field(VendorFilter; VendorFilter)
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             TableRelation = Vendor;
                             ToolTip = 'Specifies the value of the VendorFilter field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -125,11 +135,12 @@
                         Caption = 'Item Category';
                         field(ItemCategoryFilter; ItemCategoryFilter)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Item Category';
                             ShowCaption = false;
                             TableRelation = "Item Category";
                             ToolTip = 'Specifies the value of the Item Category field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -143,11 +154,12 @@
                         Caption = 'Unknown Item No.';
                         field(ShowUnknown; ShowUnknown)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Unknown Item No.';
                             OptionCaption = 'All,Only existing items,Only unknown items';
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Unknown Item No. field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -162,11 +174,12 @@
                         Caption = 'New Item';
                         field(ShowNew; ShowNew)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'New Item';
                             OptionCaption = 'All,Only existing items,Only new items';
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the New Item field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -181,11 +194,12 @@
                         Caption = 'Inventory Status';
                         field(ShowInventory; ShowInventory)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Inventory Status';
                             OptionCaption = 'All,In stock,Not in stock';
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Inventory Status field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -202,7 +216,8 @@
                 SubPageLink = "No." = FIELD("No."),
                               "Location Filter" = FIELD("Location Code");
                 SubPageView = SORTING("No.", "Line No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
@@ -211,13 +226,15 @@
             {
                 Provider = SubLine;
                 SubPageLink = "No." = FIELD("Item No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control6150645; "NPR NP Attributes FactBox")
             {
                 Provider = SubLine;
                 SubPageLink = "No." = FIELD("Item No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -236,8 +253,9 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = "Report";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Shelf Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -254,8 +272,9 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Price Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -271,8 +290,9 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = "Report";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Sign Print action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -288,8 +308,9 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = "Report";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Invert selection action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -300,8 +321,9 @@
                 {
                     Caption = 'Set Print Qty to Inventory';
                     Image = AddAction;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set Print Qty to Inventory action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -320,8 +342,9 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = "Report";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the List action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -339,8 +362,9 @@
                 {
                     Caption = 'Get from Item Card';
                     Image = Card;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Get from Item Card action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -368,8 +392,9 @@
                 {
                     Caption = 'Items';
                     Image = ItemLines;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Items action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -383,8 +408,9 @@
                 {
                     Caption = 'Period Discounts';
                     Image = PeriodEntries;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Period Discounts action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -407,8 +433,9 @@
                     Enabled = false;
                     Image = Discount;
                     Visible = false;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Mixed Discounts action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -425,8 +452,9 @@
                 {
                     Caption = 'Transfer Order';
                     Image = PeriodEntries;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Transfer Order action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -442,8 +470,9 @@
                 {
                     Caption = 'Transfer Shipment';
                     Image = PeriodEntries;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Transfer Shipment action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -459,8 +488,9 @@
                 {
                     Caption = 'Transfer Receipt';
                     Image = PeriodEntries;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Transfer Receipt action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -476,8 +506,9 @@
                 {
                     Caption = 'Retail Price Log';
                     Image = ImportLog;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Retail Price Log action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -499,8 +530,9 @@
                     Enabled = false;
                     Image = Card;
                     Visible = false;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Export to Item Card action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -514,8 +546,9 @@
                 {
                     Caption = 'Other Retail Journal';
                     Image = Journal;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Other Retail Journal action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -529,8 +562,9 @@
                 {
                     Caption = 'Period Discount';
                     Image = Campaign;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Period Discount action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -544,8 +578,9 @@
                 {
                     Caption = 'Item Journal';
                     Image = ItemLines;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Journal action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -559,8 +594,9 @@
                 {
                     Caption = 'Requisition Worksheet';
                     Image = Worksheet;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Requisition Worksheet action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -574,8 +610,9 @@
                 {
                     Caption = 'File';
                     Image = MakeDiskette;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the File action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -594,8 +631,9 @@
                     Caption = 'Find Item';
                     Image = Find;
                     ShortCutKey = 'Ctrl+F';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Find Item action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -612,8 +650,9 @@
                     Caption = 'Item Card';
                     Image = Card;
                     ShortCutKey = 'Shift+F5';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Card action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -636,8 +675,9 @@
                 {
                     Caption = 'Validate Lines';
                     Image = CheckList;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Validate Lines action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -678,8 +718,9 @@
                 {
                     Caption = 'Change Price on Selected Items';
                     Image = PriceAdjustment;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Change Price on Selected Items action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Create)
@@ -692,8 +733,9 @@
                 {
                     Caption = 'Update Count Code/Type';
                     Image = Discount;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Update Count Code/Type action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -709,8 +751,9 @@
                 Caption = 'Retail Price Log Entries';
                 Image = Log;
                 RunObject = Page "NPR Retail Price Log Entries";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Retail Price Log Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

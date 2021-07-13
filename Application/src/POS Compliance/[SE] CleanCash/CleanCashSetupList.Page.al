@@ -4,8 +4,9 @@ page 6184500 "NPR CleanCash Setup List"
     PageType = List;
     SourceTable = "NPR CleanCash Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     AdditionalSearchTerms = 'Clean Cash,Swedish Compliance,Audit Handler';
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,34 +17,39 @@ page 6184500 "NPR CleanCash Setup List"
                 field(Register; Rec.Register)
                 {
                     Caption = 'POS Unit No.';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the CleanCash setup associated with this POS Unit.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Connection String"; Rec."Connection String")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies CleanCash connection string. Example: http://<username>:<password>@online.cleancash.se:8081/xccsp';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Organization ID"; Rec."Organization ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the dealer "Organisation Number" (10 digits).';
+                    ApplicationArea = NPRRetail;
                 }
                 field("CleanCash Register No."; Rec."CleanCash Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the POS Terminal Id registered with CleanCash server.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("CleanCash No. Series"; Rec."CleanCash No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the numberseries used for CleanCash receipt number.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Last Z Report Time"; Rec."Last Z Report Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     Visible = false;
                     Description = 'Unknow or unclear usage.';
                     ToolTip = 'Specifies the value of the Last Report Time field';
@@ -51,13 +57,15 @@ page 6184500 "NPR CleanCash Setup List"
 
                 field(Training; Rec.Training)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies that the POS is in training mode. This will send receipts to CleanCash, but they will be ignored in an audit. "CleanCash Training Mode" will be printed on the receipt.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Show Error Message"; Rec."Show Error Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies that CleanCash problems will be show as messages when they occur.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -72,9 +80,10 @@ page 6184500 "NPR CleanCash Setup List"
                 Caption = 'Get CleanCash Identity';
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Request the CleanCash Unit Identity from CleanCash Server. This will also confirm that your setup is correct.';
                 Image = Start;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -91,9 +100,10 @@ page 6184500 "NPR CleanCash Setup List"
                 Caption = 'Get CleanCash Status';
                 Promoted = true;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Request the CleanCash Status from CleanCash Server. This will also confirm that your setup is correct.';
                 Image = Start;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -10,7 +10,8 @@ page 6014580 "NPR Object Output Selection"
     PromotedActionCategories = 'New,Process,Reports,Google Cloud Print';
     SourceTable = "NPR Object Output Selection";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -21,38 +22,45 @@ page 6014580 "NPR Object Output Selection"
                 ShowCaption = false;
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object ID"; Rec."Object ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Name"; Rec."Object Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Template"; Rec."Print Template")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Output Type"; Rec."Output Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Output Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Output Path"; Rec."Output Path")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Output Path field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

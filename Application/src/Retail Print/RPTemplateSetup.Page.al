@@ -1,9 +1,10 @@
-﻿page 6014640 "NPR RP Template Setup"
+page 6014640 "NPR RP Template Setup"
 {
     Caption = 'Template Setup';
     SourceTable = "NPR RP Template Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,13 +15,15 @@
                 Caption = 'Settings';
                 field("Version Major Number"; Rec."Version Major Number")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version Major Number field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Version Prefix"; Rec."Version Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

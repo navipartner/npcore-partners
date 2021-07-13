@@ -3,8 +3,9 @@ page 6151608 "NPR NpDc Ext. Coupon Reserv."
     Caption = 'External Coupon Reservations';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpDc Ext. Coupon Reserv.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,43 +15,51 @@ page 6151608 "NPR NpDc Ext. Coupon Reserv."
             {
                 field("External Document No."; Rec."External Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Inserted at"; Rec."Inserted at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Inserted at field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Coupon Type"; Rec."Coupon Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Coupon No."; Rec."Coupon No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
