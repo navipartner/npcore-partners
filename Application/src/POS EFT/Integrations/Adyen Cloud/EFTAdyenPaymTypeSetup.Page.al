@@ -18,63 +18,75 @@ page 6184504 "NPR EFT Adyen Paym. Type Setup"
             {
                 field("Merchant Account"; Rec."Merchant Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Merchant Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("API Key"; Rec."API Key")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the API Key field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Environment; Rec.Environment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Environment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transaction Condition"; Rec."Transaction Condition")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Transaction Condition field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Recurring Contract"; Rec."Create Recurring Contract")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Recurring Contract field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Acquire Card First"; Rec."Acquire Card First")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Acquire Card First field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Log Level"; Rec."Log Level")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Log Level field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Silent Discount Allowed"; Rec."Silent Discount Allowed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Silent Discount Allowed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Capture Delay Hours"; Rec."Capture Delay Hours")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Capture Delay Hours field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Cashback Allowed"; Rec."Cashback Allowed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Cashback Allowed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Recurring API URL Prefix"; Rec."Recurring API URL Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recurring API URL Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Unattended; Rec.Unattended)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unattended field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

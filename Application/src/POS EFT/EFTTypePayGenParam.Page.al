@@ -17,29 +17,33 @@ page 6184478 "NPR EFT Type Pay. Gen. Param."
             {
                 field(ParameterName; ParameterName)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Name';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ParameterDescription; ParameterDescription)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ParameterValue; ParameterValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Value';
                     Editable = Rec."User Configurable";
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin

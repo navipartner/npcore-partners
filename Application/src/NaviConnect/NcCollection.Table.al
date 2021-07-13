@@ -80,7 +80,7 @@ table 6151527 "NPR Nc Collection"
 
     trigger OnInsert()
     begin
-        "Creation Date" := CurrentDateTime;
+        "Creation Date" := CurrentDateTime();
     end;
 
     trigger OnModify()
@@ -88,11 +88,18 @@ table 6151527 "NPR Nc Collection"
         case Status of
             Status::"Ready to Send":
                 if "Ready to Send Date" = 0DT then
-                    "Ready to Send Date" := CurrentDateTime;
+                    "Ready to Send Date" := CurrentDateTime();
             Status::Sent:
                 if "Sent Date" = 0DT then
-                    "Sent Date" := CurrentDateTime;
+                    "Sent Date" := CurrentDateTime();
+            else
+                OnModifyRec(Rec, xRec);
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnModifyRec(var CurrRec: Record "NPR Nc Collection"; var xCurrRec: Record "NPR Nc Collection")
+    begin
     end;
 }
 

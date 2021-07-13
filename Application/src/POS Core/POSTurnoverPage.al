@@ -1,13 +1,14 @@
 page 6014409 "NPR POS Turnover"
 {
     PageType = Worksheet;
-    ApplicationArea = All;
+
     UsageCategory = ReportsAndAnalysis;
     SourceTable = "NPR POS Turnover Calc. Buffer";
     Caption = 'POS Turnover Info';
     InsertAllowed = false;
     DeleteAllowed = false;
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,23 +19,26 @@ page 6014409 "NPR POS Turnover"
                 field(BaseCalculationDate; BaseCalculationDate)
                 {
                     Caption = 'Calculation Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Calculation Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(POSStoreCodeFilter; POSStoreCodeFilter)
                 {
                     Caption = 'POS Store Code';
-                    ApplicationArea = All;
+
                     TableRelation = "NPR POS Store";
                     Editable = POSStoreCodeEditable;
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(POSUnitNoFilter; POSUnitNoFilter)
                 {
                     Caption = 'POS Unit No.';
-                    ApplicationArea = All;
+
                     Editable = POSUnitNoFilterEditable;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -57,38 +61,43 @@ page 6014409 "NPR POS Turnover"
                     ShowAsTree = true;
                     field(Description; Rec.Description)
                     {
-                        ApplicationArea = All;
+
                         StyleExpr = RowStyle1;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("This Year"; Rec."This Year")
                     {
-                        ApplicationArea = All;
+
                         StyleExpr = RowStyle2;
                         Editable = false;
                         ToolTip = 'Specifies the value of the This Year field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Last Year"; Rec."Last Year")
                     {
-                        ApplicationArea = All;
+
                         StyleExpr = RowStyle2;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Last Year field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Difference; Rec.Difference)
                     {
-                        ApplicationArea = All;
+
                         StyleExpr = RowStyle2;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Difference field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Difference %"; Rec."Difference %")
                     {
-                        ApplicationArea = All;
+
                         StyleExpr = RowStyle2;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Difference % field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -101,13 +110,14 @@ page 6014409 "NPR POS Turnover"
         {
             action(Recalculate)
             {
-                ApplicationArea = All;
+
                 Caption = 'Recalculate';
                 Image = Recalculate;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Recalculate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

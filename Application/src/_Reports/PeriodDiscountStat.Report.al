@@ -5,7 +5,7 @@ report 6014443 "NPR Period Discount Stat."
     Caption = 'Period Discount Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Period Discount"; "NPR Period Discount")
@@ -165,8 +165,9 @@ report 6014443 "NPR Period Discount Stat."
                     field("Only Item With Sales"; OnlyItemWithSales)
                     {
                         Caption = 'Only Items With Sale';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Only Items With Sale field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

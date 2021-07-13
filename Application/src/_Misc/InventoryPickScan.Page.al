@@ -1,12 +1,13 @@
-﻿page 6014460 "NPR Inventory Pick Scan"
+page 6014460 "NPR Inventory Pick Scan"
 {
     Caption = 'Inventory Pick';
     PageType = Document;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     RefreshOnActivate = true;
     SourceTable = "Warehouse Activity Header";
     SourceTableView = WHERE(Type = CONST("Invt. Pick"));
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,9 +18,10 @@
                 Caption = 'General';
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -29,23 +31,26 @@
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Document"; Rec."Source Document")
                 {
-                    ApplicationArea = All;
+
                     DrillDown = false;
                     Lookup = false;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Source Document field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source No."; Rec."Source No.")
                 {
-                    ApplicationArea = All;
+
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Source No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -63,46 +68,52 @@
                 }
                 field("Destination No."; Rec."Destination No.")
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Format(WMSMgt.GetCaption(Rec."Destination Type".AsInteger(), Rec."Source Document".AsInteger(), 0));
                     Editable = false;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Destination No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(DestinationEntityName; WMSMgt.GetDestinationEntityName(Rec."Destination Type", Rec."Destination No."))
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Format(WMSMgt.GetCaption(Rec."Destination Type".AsInteger(), Rec."Source Document".AsInteger(), 1));
                     Caption = 'Name';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipment Date"; Rec."Shipment Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Shipment Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Document No."; Rec."External Document No.")
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Format(WMSMgt.GetCaption(Rec."Destination Type".AsInteger(), Rec."Source Document".AsInteger(), 2));
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the External Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Document No.2"; Rec."External Document No.2")
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = Format(WMSMgt.GetCaption(Rec."Destination Type".AsInteger(), Rec."Source Document".AsInteger(), 3));
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the External Document No.2 field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Scan)
@@ -110,16 +121,18 @@
                 Caption = 'Scan';
                 field(QtyToHandleGlobal; QtyToHandleGlobal)
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = QtyToHandleCaption;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the QtyToHandleGlobal field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Barcode; Barcode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Barcode';
                     ToolTip = 'Specifies the value of the Barcode field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -143,10 +156,11 @@
                 }
                 field(SerialNo; SerialNo)
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = SerialNoCaption;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the SerialNo field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -154,10 +168,11 @@
                 }
                 field(LotNo; LotNo)
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = LotNoCaption;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the LotNo field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -170,7 +185,8 @@
                               "No." = FIELD("No.");
                 SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
                               WHERE(Breakbulk = CONST(false));
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
         area(factboxes)
@@ -182,17 +198,20 @@
                               "Variant Code" = FIELD("Variant Code"),
                               "Location Code" = FIELD("Location Code");
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -210,8 +229,9 @@
                     Caption = 'List';
                     Image = OpportunitiesList;
                     ShortCutKey = 'Shift+Ctrl+L';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the List action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -226,8 +246,9 @@
                     RunPageLink = "Table Name" = CONST("Whse. Activity Header"),
                                   Type = FIELD(Type),
                                   "No." = FIELD("No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Co&mments action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Posted Picks")
                 {
@@ -236,15 +257,17 @@
                     RunObject = Page "Posted Invt. Pick List";
                     RunPageLink = "Invt Pick No." = FIELD("No.");
                     RunPageView = SORTING("Invt Pick No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Posted Picks action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Source Documents")
                 {
                     Caption = 'Source Documents';
                     Image = "Order";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Source Documents action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -270,8 +293,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &Get Source Document action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -284,8 +308,9 @@
                 {
                     Caption = 'Autofill Qty. to Handle';
                     Image = AutofillQtyToHandle;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Autofill Qty. to Handle action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -296,8 +321,9 @@
                 {
                     Caption = 'Delete Qty. to Handle';
                     Image = DeleteQtyToHandle;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Delete Qty. to Handle action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -319,8 +345,9 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the P&ost action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -337,8 +364,9 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Post and &Print action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -354,8 +382,9 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Print action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -371,8 +400,9 @@
                 Image = "Report";
                 Promoted = false;
                 RunObject = Report "Picking List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Picking List action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

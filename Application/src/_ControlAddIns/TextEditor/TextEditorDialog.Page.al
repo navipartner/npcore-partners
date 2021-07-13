@@ -1,9 +1,10 @@
-﻿page 6151450 "NPR Text Editor Dialog"
+page 6151450 "NPR Text Editor Dialog"
 {
     Caption = 'Text Editor Dialog';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,7 +16,8 @@
             }
             usercontrol(TextEditor; "NPR TextEditor")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnControlReady();
                 begin

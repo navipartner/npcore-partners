@@ -3,7 +3,7 @@ report 6060126 "NPR TM Admission List"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'TM Admission List';
     dataset
     {
@@ -130,20 +130,23 @@ report 6060126 "NPR TM Admission List"
                     field("Show Open Reservations"; ShowOpenReservations)
                     {
                         Caption = 'Show Open Reservations';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Open Reservations field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Open Admitted"; ShowOpenAdmitted)
                     {
                         Caption = 'Show Open Admitted';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Open Admitted field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Departed"; ShowDeparted)
                     {
                         Caption = 'Show Departed';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Departed field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Options)
@@ -151,14 +154,16 @@ report 6060126 "NPR TM Admission List"
                     field("Show Each Member Once"; ShowEachMemberOnce)
                     {
                         Caption = 'Show Each Member Only Once';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Each Member Only Once field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Tickets Without Members"; ShowTicketsWithoutMembers)
                     {
                         Caption = 'Show Entries Without Members/Contact Information';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Entries Without Members/Contact Information field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

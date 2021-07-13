@@ -2,12 +2,13 @@ page 6059920 "NPR BTF Service Setup"
 {
     AdditionalSearchTerms = 'btwentyfour omnichannel,b24';
     PageType = List;
-    ApplicationArea = All;
+
     UsageCategory = Administration;
     SourceTable = "NPR BTF Service Setup";
     Editable = false;
     CardPageId = "NPR BTF Service Setup Card";
     Caption = 'BTwentyFour Service Setup';
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,24 +18,28 @@ page 6059920 "NPR BTF Service Setup"
             {
                 field(Code; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the service code. Unique, arbitrary, alpha-numeric, value (e.g. BTwentyFour API version).';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the service name.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the service is enabled. To be able to consume all resources, service has to be enabled.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field(Environment; Rec.Environment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies environment, sandbox or production.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -46,10 +51,11 @@ page 6059920 "NPR BTF Service Setup"
         {
             action(Endpoints)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'View or edit BTwentyFour API service endpoints.';
                 Image = LinkWeb;
                 Caption = 'Service Endpoints';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -60,10 +66,11 @@ page 6059920 "NPR BTF Service Setup"
             }
             action(Errors)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'View BTwentyFour API service endpoints error log entries.';
                 Image = ErrorLog;
                 Caption = 'Error Log';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -74,10 +81,11 @@ page 6059920 "NPR BTF Service Setup"
             }
             Action(JobQueueEntries)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'View list of job queue entries, enabled by BTwentyFour service.';
                 Image = JobLines;
                 Caption = 'Show Jobs';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -92,10 +100,11 @@ page 6059920 "NPR BTF Service Setup"
         {
             action(Authorization)
             {
-                ApplicationArea = Advanced;
+
                 Caption = 'Authorization';
                 ToolTip = 'Check if user, set under the Username, is authorized to access BTwentyFour API services.';
                 Image = AuthorizeCreditCard;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

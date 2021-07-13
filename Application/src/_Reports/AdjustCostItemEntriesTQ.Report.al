@@ -7,8 +7,7 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
                   TableData "Avg. Cost Adjmt. Entry Point" = rimd;
     ProcessingOnly = true;
     UsageCategory = Tasks;
-    ApplicationArea = All;
-
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Task Line"; "NPR Task Line")
@@ -38,23 +37,26 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
                         Caption = 'Item No. Filter';
                         Editable = FilterItemNoEditable;
                         TableRelation = Item;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Item No. Filter field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(FilterItemCategory; ItemCategoryFilter)
                     {
                         Caption = 'Item Category Filter';
                         Editable = FilterItemCategoryEditable;
                         TableRelation = "Item Category";
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Item Category Filter field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Post; PostToGL)
                     {
                         Caption = 'Post to G/L';
                         Enabled = PostEnable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Post to G/L field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         var
@@ -69,8 +71,9 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
                     field("Skip Various Items"; SkipVariousItems)
                     {
                         Caption = 'Skip Various Items';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Skip Various Items field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

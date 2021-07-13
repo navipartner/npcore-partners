@@ -3,7 +3,7 @@ report 6014497 "NPR Campaign Vendor List"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Campaign Vendor List.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Inventory Campaign Stat.';
     PreviewMode = PrintLayout;
 
@@ -176,16 +176,18 @@ report 6014497 "NPR Campaign Vendor List"
                 {
                     Caption = 'LocationFilter';
                     TableRelation = Location.Code;
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the LocationFilter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dimension 1 Filter"; Dimension1Filter)
                 {
                     CaptionClass = '1,3,1';
                     Caption = 'DimensionFilter';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the DimensionFilter field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

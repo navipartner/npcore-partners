@@ -3,7 +3,8 @@ page 6151577 "NPR Event Copy"
     Caption = 'Copy Job';
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,10 +15,11 @@ page 6151577 "NPR Event Copy"
                 Caption = 'Copy from';
                 field(SourceJobNo; SourceJobNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Job No.';
                     TableRelation = Job;
                     ToolTip = 'Specifies the event number.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -32,10 +34,11 @@ page 6151577 "NPR Event Copy"
                 }
                 field(FromJobTaskNo; FromJobTaskNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Job Task No. from';
                     Visible = false;
                     ToolTip = 'Specifies the first event task number to be copied from. Only planning lines with an event task number equal to or higher than the number specified in this field will be included.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -58,10 +61,11 @@ page 6151577 "NPR Event Copy"
                 }
                 field(ToJobTaskNo; ToJobTaskNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Job Task No. to';
                     Visible = false;
                     ToolTip = 'Specifies the last event task number to be copied from. Only planning lines with an event task number equal to or lower than the number specified in this field will be included.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -84,11 +88,12 @@ page 6151577 "NPR Event Copy"
                 }
                 field("From Source"; Source)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Source';
                     OptionCaption = 'Job Planning Lines,Job Ledger Entries,None';
                     Visible = false;
                     ToolTip = 'Specifies the basis on which you want the planning lines to be copied. If, for example, you want the planning lines to reflect actual usage and invoicing of items, resources, and general ledger expenses on the event you copy from, then select Job Ledger Entries in this field.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -97,35 +102,39 @@ page 6151577 "NPR Event Copy"
                 }
                 field("Planning Line Type"; PlanningLineType)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Incl. Planning Line Type';
                     Enabled = PlanningLineTypeEnable;
                     OptionCaption = 'Schedule+Contract,Schedule,Contract';
                     Visible = false;
                     ToolTip = 'Specifies how copy planning lines. Budget+Billable: All planning lines are copied. Budget: Only lines of type Budget or type Both Budget and Billable are copied. Billable: Only lines of type Billable or type Both Budget and Billable are copied.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ledger Entry Line Type"; LedgerEntryType)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Incl. Ledger Entry Line Type';
                     Enabled = LedgerEntryLineTypeEnable;
                     OptionCaption = 'Usage+Sale,Usage,Sale';
                     Visible = false;
                     ToolTip = 'Specifies how to copy job ledger entries. Usage+Sale: All job ledger entries are copied. Entries of type Usage are copied to new planning lines of type Budget. Entries of type Sale are copied to new planning lines of type Billable. Usage: All job ledger entries of type Usage are copied to new planning lines of type Budget. Sale: All job ledger entries of type Sale are copied to new planning lines of type Billable.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(FromDate; FromDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Starting Date';
                     Visible = false;
                     ToolTip = 'Specifies the date from which the report or batch job processes information.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ToDate; ToDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Ending Date';
                     Visible = false;
                     ToolTip = 'Specifies the date to which the report or batch job processes information.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Copy to")
@@ -133,29 +142,33 @@ page 6151577 "NPR Event Copy"
                 Caption = 'Copy to';
                 field(TargetJobNo; TargetJobNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Job No.';
                     Editable = not Recurring;
                     ToolTip = 'Specifies the event number.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(TargetJobDescription; TargetJobDescription)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Job Description';
                     ToolTip = 'Specifies a description of the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(TargetBillToCustomerNo; TargetBillToCustomerNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Bill-To Customer No.';
                     TableRelation = Customer;
                     ToolTip = 'Specifies the number of an alternate customer that the event is billed to instead of the main customer.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(NewStartingDate; NewStartingDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Starting Date';
                     ToolTip = 'Specifies a date from which the event will start.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -164,9 +177,10 @@ page 6151577 "NPR Event Copy"
                 }
                 field(NewEndingDate; NewEndingDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Ending Date';
                     ToolTip = 'Specifies a date at which the event will end.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -175,9 +189,10 @@ page 6151577 "NPR Event Copy"
                 }
                 field(Recurring; Recurring)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Recurring';
                     ToolTip = 'Specifies if you want to create a recurring event defined by parameters in Recurring Formula and Recurring Until.';
+                    ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
                         TargetJobNo := '';
@@ -185,15 +200,17 @@ page 6151577 "NPR Event Copy"
                 }
                 field(RecurrFormula; RecurrFormula)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Recurring Formula';
                     ToolTip = 'Specifies a formula by which event will occur. For example, every seven days (7D), or every month (1M) and so on.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(RecurrUntil; RecurrUntil)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Recurring Until';
                     ToolTip = 'Specifies the last date until the event is supposed to recurr.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Apply)
@@ -201,21 +218,24 @@ page 6151577 "NPR Event Copy"
                 Caption = 'Apply';
                 field(CopyJobPrices; CopyJobPrices)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Copy Job Prices';
                     ToolTip = 'Specifies that item prices, resource prices, and G/L prices will be copied from the event that you specified on the Copy From FastTab.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(CopyQuantity; CopyQuantity)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Copy Quantity';
                     ToolTip = 'Specifies that the quantities will be copied to the new event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(CopyDimensions; CopyDimensions)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Copy Dimensions';
                     ToolTip = 'Specifies that the dimensions will be copied to the new event.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

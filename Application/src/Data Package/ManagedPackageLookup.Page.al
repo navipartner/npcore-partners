@@ -9,9 +9,10 @@ page 6014598 "NPR Managed Package Lookup"
     ModifyAllowed = false;
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Managed Package Lookup";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,28 +22,33 @@ page 6014598 "NPR Managed Package Lookup"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Tags; Rec.Tags)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Tags field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

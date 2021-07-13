@@ -5,7 +5,8 @@ page 6151054 "NPR POS Paym. View Event Setup"
     PageType = Card;
     SourceTable = "NPR POS Paym. View Event Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,48 +16,57 @@ page 6151054 "NPR POS Paym. View Event Setup"
             {
                 field("Dimension Popup Enabled"; Rec."Dimension Popup Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dimension Popup Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dimension Code"; Rec."Dimension Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dimension Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Popup per"; Rec."Popup per")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Popup per field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Popup every"; Rec."Popup every")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Popup every field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Popup Start Time"; Rec."Popup Start Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Popup Start Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Popup End Time"; Rec."Popup End Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Popup End Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Popup Mode"; Rec."Popup Mode")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dimension Popup Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create New Dimension Values"; Rec."Create New Dimension Values")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create New Dimension Values field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Skip Popup on Dimension Value"; Rec."Skip Popup on Dimension Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Skip Popup on Dimension Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(FilterGr)
@@ -64,7 +74,8 @@ page 6151054 "NPR POS Paym. View Event Setup"
                 Caption = 'Popup Filter';
                 part("NPR Popup Dim. Filter"; "NPR Popup Dim. Filter")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }
@@ -79,16 +90,18 @@ page 6151054 "NPR POS Paym. View Event Setup"
                 Caption = 'POS Payment View Log Entries';
                 Image = History;
                 RunObject = Page "NPR POS Paym. View Log Entries";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Payment View Log Entries action';
+                ApplicationArea = NPRRetail;
             }
             action("POS Scenarios")
             {
                 Caption = 'POS Scenarios';
                 Image = Setup;
                 RunObject = Page "NPR POS Scenarios";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Scenarios action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

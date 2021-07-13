@@ -5,9 +5,9 @@ page 6151530 "NPR Nc Collec. Filters"
     MultipleNewLines = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
     PopulateAllFields = true;
     SourceTable = "NPR Nc Collector Filter";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -17,23 +17,27 @@ page 6151530 "NPR Nc Collec. Filters"
             {
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Filter Text"; Rec."Filter Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Text field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Collect When Modified"; Rec."Collect When Modified")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Collect When Modified field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }

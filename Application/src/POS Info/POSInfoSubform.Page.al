@@ -14,13 +14,15 @@ page 6150641 "NPR POS Info Subform"
                 Caption = 'Group';
                 field(Subcode; Rec.Subcode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Subcode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

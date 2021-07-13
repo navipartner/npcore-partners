@@ -1,10 +1,11 @@
-﻿page 6014491 "NPR Receipt Stats"
+page 6014491 "NPR Receipt Stats"
 {
     Caption = 'Receipt statistics';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Date;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,21 +16,24 @@
                 ShowCaption = false;
                 field("Period Start"; Rec."Period Start")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Name"; Rec."Period Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Period Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             field(PeriodType; PeriodType)
             {
-                ApplicationArea = All;
+
                 Caption = 'Select a Period';
                 OptionCaption = 'Day,Week,Month,Quarter,Year';
                 ToolTip = 'Specifies the value of the Select a Period field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin

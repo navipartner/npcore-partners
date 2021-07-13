@@ -18,9 +18,10 @@ page 6151330 "NPR Voucher Cue"
 
                 field("Retail Voucher"; Rec."Retail Vouchers")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageId = "NPR NpRv Vouchers";
                     ToolTip = 'Specifies the value of the Retail Vouchers field';
+                    ApplicationArea = NPRRetail;
                 }
 
             }

@@ -5,7 +5,8 @@ page 6059970 "NPR Variety Setup"
     PromotedActionCategories = 'New,Process,Report,View,Update';
     SourceTable = "NPR Variety Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,33 +16,39 @@ page 6059970 "NPR Variety Setup"
             {
                 field("Variety Enabled"; Rec."Variety Enabled")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variety Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Journal Blocking"; Rec."Item Journal Blocking")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Journal Blocking field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Description"; Rec."Variant Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Description 2"; Rec."Variant Description 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Variant Code From"; Rec."Create Variant Code From")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Variant Code From field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant No. Series"; Rec."Variant No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Std. No. Serie field. Number series must be maximum 10 characters long.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Barcode (Item Cross Ref.)")
@@ -49,20 +56,23 @@ page 6059970 "NPR Variety Setup"
                 Caption = 'Barcode (Item Cross Ref.)';
                 field("Create Item Cross Ref. auto."; Rec."Create Item Cross Ref. auto.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Item Cross Ref. auto. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Barcode Type (Item Cross Ref.)"; Rec."Barcode Type (Item Cross Ref.)")
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Barcode Type (Item Cross Ref.) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Cross Ref. No. Series (I)"; Rec."Item Cross Ref. No. Series (I)")
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Item) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -72,39 +82,46 @@ page 6059970 "NPR Variety Setup"
                 }
                 field("Item Cross Ref. No. Series (V)"; Rec."Item Cross Ref. No. Series (V)")
                 {
-                    ApplicationArea = All;
+
                     Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Variant) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Cross Ref. Description(I)"; Rec."Item Cross Ref. Description(I)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Cross Ref. Description (Item) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Cross Ref. Description(V)"; Rec."Item Cross Ref. Description(V)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Cross Ref. Description (Variant) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Internal EAN No. Series"; Rec."Internal EAN No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Internal EAN No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External EAN No. Series"; Rec."External EAN No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External EAN No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("EAN-Internal"; Rec."EAN-Internal")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the EAN-Internal field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("EAN-External"; Rec."EAN-External")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the EAN-External field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(View)
@@ -112,8 +129,9 @@ page 6059970 "NPR Variety Setup"
                 Caption = 'View';
                 field("Hide Inactive Values"; Rec."Hide Inactive Values")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Whether Inactive Values should be hidden in the Variant Matrix by default';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -134,8 +152,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the EAN13 Internal action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -152,8 +171,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the EAN13 External action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -170,8 +190,9 @@ page 6059970 "NPR Variety Setup"
                 {
                     Caption = 'Show Original Setup';
                     Image = History;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Show Original Setup action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -189,8 +210,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category4;
                     RunObject = Page "Item Reference Entries";
                     RunPageView = SORTING("Reference Type", "Reference No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Cross Reference action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Update")
@@ -204,8 +226,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Variant Descriptions action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -222,8 +245,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Cross Reference Descriptions action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -241,8 +265,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Update Barcodes";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Barcodes action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -260,8 +285,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Variety action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Field Setup")
                 {
@@ -271,8 +297,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Fields Setup";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Field Setup action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(Groups)
                 {
@@ -282,8 +309,9 @@ page 6059970 "NPR Variety Setup"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Group";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Groups action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Wizard)
@@ -292,8 +320,9 @@ page 6059970 "NPR Variety Setup"
                 {
                     Caption = 'Setup Wizard';
                     Image = Setup;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Setup Wizard action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

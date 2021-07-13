@@ -3,8 +3,9 @@ page 6014539 "NPR Insurance Category"
     Caption = 'Insurance Category';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Insurance Category";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,13 +16,15 @@ page 6014539 "NPR Insurance Category"
                 ShowCaption = false;
                 field(Kategori; Rec.Kategori)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Category field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Calculation Type"; Rec."Calculation Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Calculation Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

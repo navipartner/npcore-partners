@@ -20,8 +20,9 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 field(StartDate; StartDate)
                 {
                     Caption = 'Start Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -31,8 +32,9 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 field(Enddate; Enddate)
                 {
                     Caption = 'End date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -47,8 +49,9 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     field("No."; Rec."No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the No. field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -58,15 +61,17 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     }
                     field(Description; Rec.Description)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales (Qty.)"; Rec."Sales (Qty.)")
                     {
                         BlankZero = true;
                         Caption = 'Sales (Qty.)';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sales (Qty.) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -85,9 +90,10 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Day action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -98,9 +104,10 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Week action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -111,9 +118,10 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Month action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -124,9 +132,10 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Quarter action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -137,9 +146,10 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Year action';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

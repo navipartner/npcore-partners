@@ -5,7 +5,7 @@ page 6151531 "NPR Nc Collection List"
     PageType = List;
     SourceTable = "NPR Nc Collection";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -15,33 +15,39 @@ page 6151531 "NPR Nc Collection List"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Collector Code"; Rec."Collector Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Collector Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Creation Date"; Rec."Creation Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Creation Date field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("No. of Lines"; Rec."No. of Lines")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Lines field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -57,8 +63,9 @@ page 6151531 "NPR Nc Collection List"
                 Image = XMLFile;
                 RunObject = Page "NPR Nc Collection Lines";
                 RunPageLink = "Collection No." = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Lines action';
+                ApplicationArea = NPRNaviConnect;
             }
         }
         area(processing)
@@ -69,8 +76,9 @@ page 6151531 "NPR Nc Collection List"
                 {
                     Caption = 'Set to Collecting';
                     Image = Add;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set to Collecting action';
+                    ApplicationArea = NPRNaviConnect;
 
                     trigger OnAction()
                     begin
@@ -82,8 +90,9 @@ page 6151531 "NPR Nc Collection List"
                 {
                     Caption = 'Set to Ready to Send';
                     Image = Approve;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set to Ready to Send action';
+                    ApplicationArea = NPRNaviConnect;
 
                     trigger OnAction()
                     begin
@@ -95,8 +104,9 @@ page 6151531 "NPR Nc Collection List"
                 {
                     Caption = 'Set to Sent';
                     Image = SendApprovalRequest;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Set to Sent action';
+                    ApplicationArea = NPRNaviConnect;
 
                     trigger OnAction()
                     begin

@@ -4,8 +4,9 @@ page 6059798 "NPR E-mail Templ. Reports"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR E-mail Templ. Report";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,18 +16,21 @@ page 6059798 "NPR E-mail Templ. Reports"
             {
                 field("Report ID"; Rec."Report ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Report ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Filename; Rec.Filename)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filename field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Report Name"; Rec."Report Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Report Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

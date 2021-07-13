@@ -8,8 +8,9 @@ page 6014611 "NPR Retail Campaign"
     Caption = 'Retail Campaign';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail Campaign Header";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -22,19 +23,22 @@ page 6014611 "NPR Retail Campaign"
                     ShowCaption = false;
                     field("Code"; Rec.Code)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Description; Rec.Description)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Magento Category Id"; Rec."Magento Category Id")
                     {
-                        ApplicationArea = All;
+
                         Visible = MagentoEnabled;
                         ToolTip = 'Specifies the value of the Magento Category Id field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014410)
@@ -42,9 +46,10 @@ page 6014611 "NPR Retail Campaign"
                     ShowCaption = false;
                     field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount(Rec.Code, 0))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Sales Amount';
                         ToolTip = 'Specifies the value of the Sales Amount field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -53,9 +58,10 @@ page 6014611 "NPR Retail Campaign"
                     }
                     field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount(Rec.Code, 0))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Cost Amount';
                         ToolTip = 'Specifies the value of the Cost Amount field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -64,9 +70,10 @@ page 6014611 "NPR Retail Campaign"
                     }
                     field(Profit; RetailCampaignCalcMgt.CalcProfit(Rec.Code, 0))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Profit';
                         ToolTip = 'Specifies the value of the Profit field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -75,9 +82,10 @@ page 6014611 "NPR Retail Campaign"
                     }
                     field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct(Rec.Code, 0))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Profit %';
                         ToolTip = 'Specifies the value of the Profit % field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
                         begin
@@ -90,12 +98,14 @@ page 6014611 "NPR Retail Campaign"
             {
                 SubPageLink = "Campaign Code" = FIELD(Code);
                 UpdatePropagation = Both;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(RetailItems; "NPR Retail Campgn.Item Subform")
             {
                 SubPageLink = "Retail Campaign Code" = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -111,8 +121,9 @@ page 6014611 "NPR Retail Campaign"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Planning Items action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -132,8 +143,9 @@ page 6014611 "NPR Retail Campaign"
                 Image = ItemLines;
                 RunObject = Page "NPR Item Hierarchy Card";
                 RunPageLink = "Hierarchy Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Planning Items action';
+                ApplicationArea = NPRRetail;
             }
             action("View Demand Lines")
             {
@@ -143,8 +155,9 @@ page 6014611 "NPR Retail Campaign"
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD(Code),
                               "Distribution Group" = FIELD("Distribution Group");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Demand Lines action';
+                ApplicationArea = NPRRetail;
             }
             action("View Distribution Lines")
             {
@@ -153,8 +166,9 @@ page 6014611 "NPR Retail Campaign"
                 Promoted = false;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Item Hiearachy" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View Distribution Lines action';
+                ApplicationArea = NPRRetail;
             }
             action("Distribution Setup")
             {
@@ -165,8 +179,9 @@ page 6014611 "NPR Retail Campaign"
                 PromotedOnly = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Item Hiearachy" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Distribution Setup action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(reporting)
@@ -176,8 +191,9 @@ page 6014611 "NPR Retail Campaign"
                 Caption = 'Campaign Items';
                 Image = Campaign;
                 RunObject = Report "NPR Retail Campaign Items";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Campaign Items action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

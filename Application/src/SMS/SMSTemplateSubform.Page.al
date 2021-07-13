@@ -4,8 +4,9 @@ page 6059942 "NPR SMS Template Subform"
     Caption = 'Lines';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR SMS Template Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,9 +17,10 @@ page 6059942 "NPR SMS Template Subform"
                 IndentationColumn = 0;
                 field("SMS Text"; Rec."SMS Text")
                 {
-                    ApplicationArea = All;
+
                     ShowCaption = false;
                     ToolTip = 'Use {{Field Number}} to insert a field value in the text.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -38,9 +40,10 @@ page 6059942 "NPR SMS Template Subform"
             {
                 Caption = 'Insert Report Link';
                 Enabled = ReportLinkEnabled;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Insert Report Link action';
                 Image = Insert;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

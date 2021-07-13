@@ -7,8 +7,9 @@ page 6014473 "NPR Retail Journal Print"
     InsertAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail Journal Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,34 +19,40 @@ page 6014473 "NPR Retail Journal Print"
             {
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity to Print"; Rec."Quantity to Print")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity to Print field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Print; Print)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Print';
                     ToolTip = 'Specifies the value of the Print field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var
@@ -57,26 +64,30 @@ page 6014473 "NPR Retail Journal Print"
                 }
                 field(Barcode; Rec.Barcode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Barcode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Price Incl. Vat"; Rec."Discount Price Incl. Vat")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Unit Price';
                     ToolTip = 'Specifies the value of the Unit Price field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Vendor No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor Item No."; Rec."Vendor Item No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Vendor Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -96,8 +107,9 @@ page 6014473 "NPR Retail Journal Print"
                     PromotedCategory = Process;
                     PromotedOnly = true;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Invert Selection action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -112,8 +124,9 @@ page 6014473 "NPR Retail Journal Print"
                     PromotedCategory = Process;
                     PromotedOnly = true;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Price Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -130,8 +143,9 @@ page 6014473 "NPR Retail Journal Print"
                     PromotedCategory = Process;
                     PromotedOnly = true;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Shelf Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -148,8 +162,9 @@ page 6014473 "NPR Retail Journal Print"
                     PromotedCategory = Process;
                     PromotedOnly = true;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Sign action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

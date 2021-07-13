@@ -8,7 +8,8 @@ page 6059959 "NPR MCS Faces"
     PageType = List;
     SourceTable = "NPR MCS Faces";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,83 +19,99 @@ page 6059959 "NPR MCS Faces"
             {
                 field(PersonId; Rec.PersonId)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Person Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(FaceId; Rec.FaceId)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Face Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Gender; Rec.Gender)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gender field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Age; Rec.Age)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Age field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Face Height"; Rec."Face Height")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Face Height field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Face Width"; Rec."Face Width")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Face Width field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Face Position X"; Rec."Face Position X")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Face Position X field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Face Position Y"; Rec."Face Position Y")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Face Position Y field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Beard; Rec.Beard)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Beard field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Sideburns; Rec.Sideburns)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sideburns field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Moustache; Rec.Moustache)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Moustache field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(IsSmiling; Rec.IsSmiling)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Is Smiling field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Glasses; Rec.Glasses)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Glasses field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Identified; Rec.Identified)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Identified field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Created; Rec.Created)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action"; Rec.Action)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

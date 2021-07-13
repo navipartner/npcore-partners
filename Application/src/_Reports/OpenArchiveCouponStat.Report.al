@@ -4,7 +4,7 @@ report 6151598 "NPR Open/Archive Coupon Stat."
     RDLCLayout = './src/_Reports/layouts/OpenArchive Coupon Statistics.rdlc';
     Caption = 'Open/Archived Coupon Statistics';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("NpDc Coupon Type"; "NPR NpDc Coupon Type")
@@ -121,26 +121,30 @@ report 6151598 "NPR Open/Archive Coupon Stat."
                 field("Start Date"; StartDate)
                 {
                     Caption = 'Start Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End Date"; EndDate)
                 {
                     Caption = 'End Date';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blank CouponTypes"; RemoveBlankCouponTypes)
                 {
                     Caption = 'Remove Blank Coupon Types';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remove Blank Coupon Types field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No"; CustomerFilter)
                 {
                     Caption = 'Customer No';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin

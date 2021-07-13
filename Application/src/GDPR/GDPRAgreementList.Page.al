@@ -6,8 +6,9 @@ page 6151121 "NPR GDPR Agreement List"
     CardPageID = "NPR GDPR Agreement Card";
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR GDPR Agreement";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,24 +18,28 @@ page 6151121 "NPR GDPR Agreement List"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Latest Version"; Rec."Latest Version")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Latest Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Current Version"; Rec."Current Version")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Current Version field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

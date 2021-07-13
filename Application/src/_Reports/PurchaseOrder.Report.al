@@ -3,7 +3,7 @@ report 6014617 "NPR Purchase Order"
     RDLCLayout = './src/_Reports/layouts/NP Purchase Order.rdlc';
     WordLayout = './src/_Reports/layouts/NP Purchase Order.docx';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'NP Purchase Order';
     DefaultLayout = Word;
     PreviewMode = PrintLayout;
@@ -1099,20 +1099,23 @@ report 6014617 "NPR Purchase Order"
                     field("No of Copies"; NoOfCopies)
                     {
                         Caption = 'No. of Copies';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the No. of Copies field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(ShowInternalInformation; ShowInternalInfo)
                     {
                         Caption = 'Show Internal Information';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Internal Information field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Archive Document"; ArchiveDocument)
                     {
                         Caption = 'Archive Document';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Archive Document field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -1124,8 +1127,9 @@ report 6014617 "NPR Purchase Order"
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Log Interaction field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin

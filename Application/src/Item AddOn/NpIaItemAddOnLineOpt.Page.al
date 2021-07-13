@@ -15,55 +15,63 @@ page 6151128 "NPR NpIa ItemAddOn Line Opt."
             {
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
-                    ShowMandatory = true;
                     ToolTip = 'Specifies the number of an item.';
+                    ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the variant of the item on the line.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
-                    ShowMandatory = true;
                     ToolTip = 'Specifies a description of the entry of the product to be sold.';
+                    ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies an additional description of the entry of the product to be sold.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies how many units are being sold.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Per Unit"; Rec."Per Unit")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies how many units are being sold in base unit of measure.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Fixed Quantity"; Rec."Fixed Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if quantity can be changed on POS unit. If it''s current entry have a flag fixed quantity, then POS entry will be created with predefined Quantity.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the price of one unit of the item.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use Unit Price"; Rec."Use Unit Price")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the price of one unit of the item should be used for sold item.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿page 6060059 "NPR POS Inventory Overview"
+page 6060059 "NPR POS Inventory Overview"
 {
     // NPR5.34/BR  /20170726   CASE 282748 Object Created
     // NPR5.52/ALPO/20191002 CASE 370333 New options to show inventory for current location only
@@ -14,9 +14,10 @@
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Inv. Overview Line";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -27,9 +28,10 @@
                 ShowCaption = false;
                 field(ItemCode; ItemCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Item No.';
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -43,10 +45,11 @@
                 }
                 field(VariantCode; VariantCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variant Code';
                     Visible = VariantVisible;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -60,10 +63,11 @@
                 }
                 field(Variety1ValueCode; Variety1ValueCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 1';
                     Visible = Variety1ValueVisible;
                     ToolTip = 'Specifies the value of the Variety 1 field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -77,10 +81,11 @@
                 }
                 field(Variety2ValueCode; Variety2ValueCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 2';
                     Visible = Variety2ValueVisible;
                     ToolTip = 'Specifies the value of the Variety 2 field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -94,10 +99,11 @@
                 }
                 field(Variety3ValueCode; Variety3ValueCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 3';
                     Visible = Variety3ValueVisible;
                     ToolTip = 'Specifies the value of the Variety 3 field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -111,10 +117,11 @@
                 }
                 field(Variety4ValueCode; Variety4ValueCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Variety 4';
                     Visible = Variety4ValueVisible;
                     ToolTip = 'Specifies the value of the Variety 4 field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -132,31 +139,36 @@
                 Editable = false;
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Description"; Rec."Variant Description")
                 {
-                    ApplicationArea = All;
+
                     Visible = VariantVisible;
                     ToolTip = 'Specifies the value of the Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Name"; Rec."Location Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     DecimalPlaces = 0 : 2;
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Description"; Rec."Item Description")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description 2';
                     ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

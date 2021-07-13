@@ -4,8 +4,9 @@ page 6060080 "NPR Admis. Scanner Stat. Card"
     Caption = 'NPR MM Admis. Scanner Station Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Admis. Scanner Stations";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,18 +16,21 @@ page 6060080 "NPR Admis. Scanner Stat. Card"
             {
                 field("Scanner Station Id"; Rec."Scanner Station Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Scanner Station Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Activated; Rec.Activated)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Activated field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Admission Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -35,8 +39,9 @@ page 6060080 "NPR Admis. Scanner Stat. Card"
             part(AdmisScannStatFactbox; "NPR Adm. Scanner Stat. Factbox")
             {
                 Caption = 'Images';
-                ApplicationArea = All;
+
                 SubPageLink = "Scanner Station Id" = FIELD("Scanner Station Id");
+                ApplicationArea = NPRRetail;
             }
         }
     }

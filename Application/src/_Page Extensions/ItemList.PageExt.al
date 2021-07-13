@@ -1,4 +1,4 @@
-﻿pageextension 6014433 "NPR Item List" extends "Item List"
+pageextension 6014433 "NPR Item List" extends "Item List"
 {
     layout
     {
@@ -8,7 +8,8 @@
             {
                 Caption = 'Discounts';
                 SubPageLink = "No." = FIELD("No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
 
@@ -21,8 +22,9 @@
         {
             field("NPR Description 2"; Rec."Description 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Description 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -30,8 +32,9 @@
         {
             field("NPR Ticket Type"; Rec."NPR Ticket Type")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Ticket Type field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -39,14 +42,16 @@
         {
             field("NPR Magento Item"; Rec."NPR Magento Item")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Magento Item field';
+                ApplicationArea = NPRRetail;
             }
 
             field("NPR Item Status"; Rec."NPR Item Status")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Item Status field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -54,8 +59,9 @@
         {
             field("NPR Unit List Price"; Rec."Unit List Price")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Unit List Price field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -64,9 +70,10 @@
             field("NPR ItemAvlByLocation"; ItemAvlByLocation)
             {
                 Caption = 'Inv availability by location';
-                ApplicationArea = All;
+
                 DecimalPlaces = 2 : 2;
                 ToolTip = 'Specifies the value of the Inv availability by location field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnDrillDown()
                 begin
@@ -94,9 +101,10 @@
         {
             field("NPR Item Brand"; Rec."NPR Item Brand")
             {
-                ApplicationArea = All;
+
                 Visible = false;
                 ToolTip = 'Specifies the value of the NPR Item Brand field';
+                ApplicationArea = NPRRetail;
             }
 
         }
@@ -105,22 +113,25 @@
         {
             field("NPR Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
             {
-                ApplicationArea = All;
+
                 Visible = false;
                 ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
             {
-                ApplicationArea = all;
+
                 Visible = false;
                 ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                ApplicationArea = NPRRetail;
             }
 
             field("NPR Units per Parcel"; Rec."Units per Parcel")
             {
-                ApplicationArea = all;
+
                 Visible = false;
                 ToolTip = 'Specifies the value of the Units per Parcel field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -133,8 +144,9 @@
             {
                 Caption = 'POS Sales Entries';
                 Image = Entries;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Sales Entries action';
+                ApplicationArea = NPRRetail;
             }
             action("NPR Retail Price Log Entries")
             {
@@ -142,8 +154,9 @@
                 Image = Log;
                 RunObject = Page "NPR Retail Price Log Entries";
                 RunPageLink = "Item No." = FIELD("No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Retail Price Log Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -160,8 +173,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Pictures action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -183,8 +197,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledMultistore;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Webshops action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -206,8 +221,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Display Config action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -237,8 +253,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Report;
                     ShortCutKey = 'Ctrl+Alt+L';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Price Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -259,8 +276,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Report;
                     ShortCutKey = 'Ctrl+Alt+L';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Shelf Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -282,8 +300,9 @@
             {
                 Caption = 'Timeline';
                 Image = Timeline;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Timeline action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -295,8 +314,9 @@
                 Caption = 'Retail Inventory Set';
                 Image = Intercompany;
                 Visible = RetailInventoryEnabled;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Retail Inventory Set action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -314,8 +334,9 @@
                 Caption = 'Search Item';
                 Image = Find;
                 ShortCutKey = 'Shift+Ctrl+S';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Search Item action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -345,8 +366,9 @@
             {
                 Caption = 'Filter Search Items';
                 Image = "Filter";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Filter Search Items action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

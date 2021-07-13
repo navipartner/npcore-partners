@@ -6,7 +6,8 @@ page 6151013 "NPR NpRv Voucher Types"
     PageType = List;
     SourceTable = "NPR NpRv Voucher Type";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,33 +17,39 @@ page 6151013 "NPR NpRv Voucher Types"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Period"; Rec."Valid Period")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid Period field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voucher Qty. (Open)"; Rec."Voucher Qty. (Open)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voucher Qty. (Open) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Arch. Voucher Qty."; Rec."Arch. Voucher Qty.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Archived Voucher Qty. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -59,8 +66,9 @@ page 6151013 "NPR NpRv Voucher Types"
                 RunObject = Page "NPR NpRv Vouchers";
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Vouchers action';
+                ApplicationArea = NPRRetail;
             }
             action("Partner Relations")
             {
@@ -68,8 +76,9 @@ page 6151013 "NPR NpRv Voucher Types"
                 Image = UserCertificate;
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Voucher Type" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Partner Relations action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

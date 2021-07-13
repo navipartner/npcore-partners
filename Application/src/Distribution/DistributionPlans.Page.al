@@ -8,7 +8,8 @@ page 6151063 "NPR Distribution Plans"
     PageType = List;
     SourceTable = "NPR Distribution Headers";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,28 +19,33 @@ page 6151063 "NPR Distribution Plans"
             {
                 field("Distribution Group"; Rec."Distribution Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Hiearachy"; Rec."Item Hiearachy")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Hiearachy field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Distribution Type"; Rec."Distribution Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Distribution Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Required Date"; Rec."Required Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Required Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

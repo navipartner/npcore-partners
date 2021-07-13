@@ -8,12 +8,12 @@
     end;
 
     var
-        Text001: Label 'Finding new Data Log records: @1@@@@@@@@@@@@@@@@\Buffering Data Logs to Tasks: @2@@@@@@@@@@@@@@@@\    Task Quantity:            #5################\Removing Duplicate Tasks:     @3@@@@@@@@@@@@@@@@\    Removed Task Quantity:    #6################\Updating the Task List:       @4@@@@@@@@@@@@@@@@';
+        FindNewDataTxt: Label 'Finding new Data Log records: @1@@@@@@@@@@@@@@@@\Buffering Data Logs to Tasks: @2@@@@@@@@@@@@@@@@\    Task Quantity:            #5################\Removing Duplicate Tasks:     @3@@@@@@@@@@@@@@@@\    Removed Task Quantity:    #6################\Updating the Task List:       @4@@@@@@@@@@@@@@@@';
         NaviConnectSetup: Record "NPR Nc Setup";
         DataLogSubScriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         Initialized: Boolean;
         Window: Dialog;
-        Text002: Label 'Company: #7#####################################\Finding new Data Log records: @1@@@@@@@@@@@@@@@@\Buffering Data Logs to Tasks: @2@@@@@@@@@@@@@@@@\    Task Quantity:            #5################\Removing Duplicate Tasks:     @3@@@@@@@@@@@@@@@@\    Removed Task Quantity:    #6################\Updating the Task List:       @4@@@@@@@@@@@@@@@@';
+        FindNewData2Txt: Label 'Company: #7#####################################\Finding new Data Log records: @1@@@@@@@@@@@@@@@@\Buffering Data Logs to Tasks: @2@@@@@@@@@@@@@@@@\    Task Quantity:            #5################\Removing Duplicate Tasks:     @3@@@@@@@@@@@@@@@@\    Removed Task Quantity:    #6################\Updating the Task List:       @4@@@@@@@@@@@@@@@@';
 
     local procedure TaskComplete(var NcTask: Record "NPR Nc Task")
     var
@@ -50,7 +50,7 @@
         TempDataLogRecord.DeleteAll();
         TempTask.DeleteAll();
         if UseDialog() then
-            Window.Open(Text001);
+            Window.Open(FindNewDataTxt);
 
         if DataLogSubScriberMgt.GetNewRecords(TaskProcessor.Code, true,
                                               NaviConnectSetup."Max Task Count per Batch", TempDataLogRecord) then begin
@@ -77,7 +77,7 @@
         TaskProcesLine.SetFilter(Value, '<>%1&<>%2', '', CompanyName);
         if TaskProcesLine.FindSet() then begin
             if UseDialog() then
-                Window.Open(Text002);
+                Window.Open(FindNewData2Txt);
             repeat
                 if UseDialog() then
                     Window.Update(7, TaskProcesLine.Value);

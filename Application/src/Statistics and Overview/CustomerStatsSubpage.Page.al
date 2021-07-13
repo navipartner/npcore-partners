@@ -1,11 +1,12 @@
-﻿page 6014589 "NPR Customer Stats Subpage"
+page 6014589 "NPR Customer Stats Subpage"
 {
     Caption = 'Customer Statistics Subform';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Customer;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,19 +17,22 @@
                 ShowCaption = false;
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("-Sale Quantity"; -"Sale Quantity")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Sale (QTY)';
                     ToolTip = 'Specifies the value of the Sale (QTY) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -44,16 +48,18 @@
                 }
                 field("-LastYear Sale Quantity"; -"LastYear Sale Quantity")
                 {
-                    ApplicationArea = All;
+
                     Caption = '-> Last year';
                     Visible = LSQTY;
                     ToolTip = 'Specifies the value of the -> Last year field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sale Amount"; "Sale Amount")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Sale (LCY)';
                     ToolTip = 'Specifies the value of the Sale (LCY) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -69,36 +75,41 @@
                 }
                 field("<Control61506191>"; -"LastYear Sale Amount")
                 {
-                    ApplicationArea = All;
+
                     Caption = '-> Last year';
                     Visible = LSAmount;
                     ToolTip = 'Specifies the value of the -> Last year field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Profit Amount"; "Profit Amount")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Profit (LCY)';
                     ToolTip = 'Specifies the value of the Profit (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("-LastYear Profit Amount"; -"LastYear Profit Amount")
                 {
-                    ApplicationArea = All;
+
                     Caption = '-> Last year';
                     Visible = LPA;
                     ToolTip = 'Specifies the value of the -> Last year field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("<Control61506221>"; "Profit %")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Profit %';
                     ToolTip = 'Specifies the value of the Profit % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("LastYear Profit %"; "LastYear Profit %")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Code';
                     Visible = "LP%";
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

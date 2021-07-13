@@ -5,7 +5,8 @@ page 6151403 "NPR Magento Websites"
     PageType = List;
     SourceTable = "NPR Magento Website";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -19,43 +20,51 @@ page 6151403 "NPR Magento Websites"
                     ShowCaption = false;
                     field("Code"; Rec.Code)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Name; Rec.Name)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Default Website"; Rec."Default Website")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Std. Website field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Location Code"; Rec."Location Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Location Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales Order No. Series"; Rec."Sales Order No. Series")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sales Order No. Series field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer No. Series"; Rec."Customer No. Series")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specify a different number series to be used when creating customer during order import';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150620)
@@ -65,7 +74,8 @@ page 6151403 "NPR Magento Websites"
                     {
                         Caption = 'Stores';
                         SubPageLink = "Website Code" = FIELD(Code);
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -84,8 +94,9 @@ page 6151403 "NPR Magento Websites"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Websites action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

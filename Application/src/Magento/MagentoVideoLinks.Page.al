@@ -3,8 +3,9 @@ page 6151455 "NPR Magento Video Links"
     Caption = 'Magento Video Links';
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Video Link";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,8 +15,9 @@ page 6151455 "NPR Magento Video Links"
             {
                 field("Video Url"; Rec."Video Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Video Url field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -27,13 +29,15 @@ page 6151455 "NPR Magento Video Links"
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Short Text"; Rec."Short Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Short Text field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

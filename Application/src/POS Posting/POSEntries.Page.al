@@ -1,4 +1,4 @@
-﻿page 6150650 "NPR POS Entries"
+page 6150650 "NPR POS Entries"
 {
     Caption = 'POS Entries';
     Editable = false;
@@ -14,98 +14,117 @@
             {
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Period Register No."; Rec."POS Period Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Period Register No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Item Entry Status"; Rec."Post Item Entry Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Item Entry Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Entry Status"; Rec."Post Entry Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Entry Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Document Type"; Rec."Sales Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Document No."; Rec."Sales Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Sales (LCY)"; Rec."Item Sales (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Sales (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Quantity"; Rec."Sales Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Return Sales Quantity"; Rec."Return Sales Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Return Sales Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -121,8 +140,9 @@
                 Image = Sales;
                 RunObject = Page "NPR POS Entry Sales Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Sales Lines action';
+                ApplicationArea = NPRRetail;
             }
             action("Payment Lines")
             {
@@ -130,8 +150,9 @@
                 Image = Payment;
                 RunObject = Page "NPR POS Entry Pmt. Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Payment Lines action';
+                ApplicationArea = NPRRetail;
             }
             action("Comment Lines")
             {
@@ -142,8 +163,9 @@
                               "POS Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Table ID", "POS Entry No.", "POS Entry Line No.", Code, "Line No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Comment Lines action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -156,8 +178,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the &Navigate action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -175,8 +198,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Post Entry action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -202,8 +226,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Post Range action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -272,8 +297,9 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Sales Receipt action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -299,8 +325,9 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Large Sales Receipt action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -322,8 +349,9 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Balancing action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -350,8 +378,9 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the EFT Receipt action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -371,8 +400,9 @@
                     Image = Log;
                     RunObject = Page "NPR POS Entry Output Log";
                     RunPageLink = "POS Entry No." = FIELD("Entry No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Print Log action';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(PDF2NAV)
@@ -382,8 +412,9 @@
                 {
                     Caption = 'E-mail Log';
                     Image = Email;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the E-mail Log action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(SendAsPDF)
                 {
@@ -391,8 +422,9 @@
                     Image = SendEmailPDF;
                     Promoted = true;
                     PromotedOnly = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Send as PDF action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

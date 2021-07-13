@@ -1,12 +1,13 @@
-﻿page 6150628 "NPR POS Payment Bin Checkpoint"
+page 6150628 "NPR POS Payment Bin Checkpoint"
 {
     Caption = 'POS Payment Bin Checkpoint';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Payment Bin Checkp.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,35 +22,40 @@
                     Visible = ShowCountingSection;
                     field(PaymentTypeNo; Rec."Payment Type No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Payment Type No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Description; Rec.Description)
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(PaymentBinNo; Rec."Payment Bin No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(PaymentMethodNo; Rec."Payment Method No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Method No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(CountedAmountInclFloat; Rec."Counted Amount Incl. Float")
                     {
-                        ApplicationArea = All;
+
                         MinValue = 0;
                         ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         begin
@@ -65,19 +71,21 @@
                     }
                     field(CalculatedAmountInclFloat; Rec."Calculated Amount Incl. Float")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(CountingDifference; CountingDifference)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Difference';
                         Style = Unfavorable;
                         StyleExpr = CountingDifference <> 0;
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Difference field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -89,9 +97,10 @@
                     }
                     field(Comment1; Rec.Comment)
                     {
-                        ApplicationArea = All;
+
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Comment field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -104,36 +113,41 @@
                     Visible = ShowClosingSection;
                     field("Payment Type No."; Rec."Payment Type No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Payment Type No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Payment Method No."; Rec."Payment Method No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Method No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Payment Bin No."; Rec."Payment Bin No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Float Amount"; Rec."Float Amount")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies the value of the Float Amount field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Counted Amount Incl. Float"; Rec."Counted Amount Incl. Float")
                     {
-                        ApplicationArea = All;
+
                         MinValue = 0;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         begin
@@ -148,40 +162,44 @@
                     }
                     field("Transfer In Amount"; Rec."Transfer In Amount")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Transfer In Amount field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Transfer Out Amount"; Rec."Transfer Out Amount")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Transfer Out Amount field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(NetTransfer; NetTransfer)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         Caption = 'Transferred Amount';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Transferred Amount field';
                     }
                     field("Calculated Amount Incl. Float"; Rec."Calculated Amount Incl. Float")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("New Float Amount"; Rec."New Float Amount")
                     {
-                        ApplicationArea = All;
+
                         Editable = PageMode = PageMode::FINAL_COUNT;
                         MinValue = 0;
                         Style = Strong;
                         StyleExpr = true;
                         ToolTip = 'Specifies the value of the New Float Amount field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -197,10 +215,11 @@
                     }
                     field("Bank Deposit Amount"; Rec."Bank Deposit Amount")
                     {
-                        ApplicationArea = All;
+
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
                         ToolTip = 'Specifies the value of the Bank Deposit Amount field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -211,22 +230,25 @@
                     }
                     field("Bank Deposit Bin Code"; Rec."Bank Deposit Bin Code")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = Rec."Bank Deposit Amount" <> 0;
                         ToolTip = 'Specifies the value of the Bank Deposit Bin Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Bank Deposit Reference"; Rec."Bank Deposit Reference")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = Rec."Bank Deposit Amount" <> 0;
                         ToolTip = 'Specifies the value of the Bank Deposit Reference field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Move to Bin Amount"; Rec."Move to Bin Amount")
                     {
-                        ApplicationArea = All;
+
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
                         ToolTip = 'Specifies the value of the Move to Bin Amount field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -242,41 +264,47 @@
                     }
                     field("Move to Bin Code"; Rec."Move to Bin Code")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = Rec."Move to bin amount" <> 0;
                         ToolTip = 'Specifies the value of the Move to Bin No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Move to Bin Reference"; Rec."Move to Bin Reference")
                     {
-                        ApplicationArea = All;
+
                         ShowMandatory = Rec."Move to bin amount" <> 0;
                         ToolTip = 'Specifies the value of the Move to Bin Trans. ID field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Status; Rec.Status)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Status field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Checkpoint Bin Entry No."; Rec."Checkpoint Bin Entry No.")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Checkpoint Bin Entry No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Payment Bin Entry Amount"; Rec."Payment Bin Entry Amount")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin Entry Amount field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Payment Bin Entry Amount (LCY)"; Rec."Payment Bin Entry Amount (LCY)")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin Entry Amount (LCY) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -295,8 +323,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Count action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

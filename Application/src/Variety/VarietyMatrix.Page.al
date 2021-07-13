@@ -18,10 +18,11 @@ page 6059974 "NPR Variety Matrix"
     LinksAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Variety Buffer";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -32,10 +33,11 @@ page 6059974 "NPR Variety Matrix"
                 ShowCaption = false;
                 field(ShowField; CurrVRTField.Description)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Field';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Show Field field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -45,10 +47,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(ShowAsCrossVRT; ShowAsCrossVRT)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Show Horisontal';
                     OptionCaption = 'Variety1,Variety2,Variety3,Variety4';
                     ToolTip = 'Specifies the value of the Show Horisontal field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -61,9 +64,10 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(HideInactive; HideInactive)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Hide Inactive Values';
                     ToolTip = 'Specifies the value of the Hide Inactive Values field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -81,52 +85,58 @@ page 6059974 "NPR Variety Matrix"
                 ShowCaption = false;
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 1 Value"; Rec."Variety 1 Value")
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + Item."NPR Variety 1";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety1;
                     ToolTip = 'Specifies the value of the Variety 1 Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 2 Value"; Rec."Variety 2 Value")
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + Item."NPR Variety 2";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety2;
                     ToolTip = 'Specifies the value of the Variety 2 Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 3 Value"; Rec."Variety 3 Value")
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + Item."NPR Variety 3";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety3;
                     ToolTip = 'Specifies the value of the Variety 3 Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variety 4 Value"; Rec."Variety 4 Value")
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + Item."NPR Variety 4";
                     Editable = false;
                     Visible = showvariety4;
                     ToolTip = 'Specifies the value of the Variety 4 Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -145,10 +155,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field2; MATRIX_CellData[2])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -167,10 +178,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field3; MATRIX_CellData[3])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -189,10 +201,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field4; MATRIX_CellData[4])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -211,10 +224,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field5; MATRIX_CellData[5])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -233,10 +247,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field6; MATRIX_CellData[6])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -255,10 +270,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field7; MATRIX_CellData[7])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -277,10 +293,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field8; MATRIX_CellData[8])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -299,10 +316,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field9; MATRIX_CellData[9])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -321,10 +339,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field10; MATRIX_CellData[10])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -343,10 +362,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field11; MATRIX_CellData[11])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -365,10 +385,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field12; MATRIX_CellData[12])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -387,10 +408,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field13; MATRIX_CellData[13])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[13];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[13] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -409,10 +431,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field14; MATRIX_CellData[14])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[14];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[14] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -431,10 +454,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field15; MATRIX_CellData[15])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[15];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[15] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -453,10 +477,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field16; MATRIX_CellData[16])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[16];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[16] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -475,10 +500,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field17; MATRIX_CellData[17])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[17];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[17] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -497,10 +523,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field18; MATRIX_CellData[18])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[18];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[18] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -519,10 +546,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field19; MATRIX_CellData[19])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[19];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[19] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -541,10 +569,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field20; MATRIX_CellData[20])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[20];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[20] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -563,10 +592,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field21; MATRIX_CellData[21])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[21];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[21] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -585,10 +615,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field22; MATRIX_CellData[22])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[22];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[22] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -607,10 +638,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field23; MATRIX_CellData[23])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[23];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[23] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -629,10 +661,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field24; MATRIX_CellData[24])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[24];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[24] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -651,10 +684,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field25; MATRIX_CellData[25])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[25];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[25] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -673,10 +707,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field26; MATRIX_CellData[26])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[26];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[26] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -695,10 +730,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field27; MATRIX_CellData[27])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[27];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[27] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -717,10 +753,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field28; MATRIX_CellData[28])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[28];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[28] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -739,10 +776,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field29; MATRIX_CellData[29])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[29];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[29] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -761,10 +799,11 @@ page 6059974 "NPR Variety Matrix"
                 }
                 field(Field30; MATRIX_CellData[30])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[30];
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the value of the MATRIX_CellData[30] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -794,24 +833,27 @@ page 6059974 "NPR Variety Matrix"
                         Caption = 'Info';
                         field(CurrentlyShowing; CurrVRTField.Description)
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Currently Showing';
                             ToolTip = 'Specifies the value of the Currently Showing field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(SecondaryDescription; CurrVRTField."Secondary Description")
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Show in ()';
                             ToolTip = 'Specifies the value of the Show in () field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Total; Total)
                         {
-                            ApplicationArea = All;
+
                             //BlankZero = true;
                             Caption = 'Total';
                             //DecimalPlaces = 0:5;
                             Enabled = ShowTotal;
                             ToolTip = 'Specifies the value of the Total field';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group("Variety 1")
@@ -819,15 +861,17 @@ page 6059974 "NPR Variety Matrix"
                         Caption = 'Variety 1';
                         field(Variety1; Item."NPR Variety 1")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 1 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Variety1Table; Item."NPR Variety 1 Table")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 1 Table field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             var
@@ -845,15 +889,17 @@ page 6059974 "NPR Variety Matrix"
                         Caption = 'Variety 2';
                         field(Variety2; Item."NPR Variety 2")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 2 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Variety2Table; Item."NPR Variety 2 Table")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 2 Table field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             var
@@ -872,15 +918,17 @@ page 6059974 "NPR Variety Matrix"
                         Caption = 'Variety 3';
                         field(Variety3; Item."NPR Variety 3")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 3 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Variety3Table; Item."NPR Variety 3 Table")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 3 Table field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             var
@@ -899,15 +947,17 @@ page 6059974 "NPR Variety Matrix"
                         Caption = 'Variety 4';
                         field(Variety4; Item."NPR Variety 4")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 4 field';
+                            ApplicationArea = NPRRetail;
                         }
                         field(Variety4Table; Item."NPR Variety 4 Table")
                         {
-                            ApplicationArea = All;
+
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 4 Table field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnDrillDown()
                             var
@@ -937,8 +987,9 @@ page 6059974 "NPR Variety Matrix"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Table Copy action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -957,7 +1008,8 @@ page 6059974 "NPR Variety Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 var
@@ -976,7 +1028,8 @@ page 6059974 "NPR Variety Matrix"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
 
                 trigger OnAction()
                 var

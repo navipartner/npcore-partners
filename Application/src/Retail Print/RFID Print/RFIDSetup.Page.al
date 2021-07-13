@@ -1,4 +1,4 @@
-﻿page 6014478 "NPR RFID Setup"
+page 6014478 "NPR RFID Setup"
 {
     // NPR5.48/JAVA/20190205  CASE 327107 Transport NPR5.48 - 5 February 2019
 
@@ -7,8 +7,9 @@
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR RFID Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,18 +20,21 @@
                 Caption = 'General';
                 field("RFID Value No. Series"; Rec."RFID Value No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the RFID Value No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("RFID Hex Value Length"; Rec."RFID Hex Value Length")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the RFID Hex Value Length field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("RFID Hex Value Prefix"; Rec."RFID Hex Value Prefix")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the RFID Hex Value Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

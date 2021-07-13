@@ -5,8 +5,9 @@ page 6060106 "NPR MM Loyalty Point Setup"
     Caption = 'Loyalty Points Setup';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR MM Loyalty Point Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,55 +17,65 @@ page 6060106 "NPR MM Loyalty Point Setup"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Coupon Type Code"; Rec."Coupon Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Value Assignment"; Rec."Value Assignment")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value Assignment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Points Threshold"; Rec."Points Threshold")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Points Threshold field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount LCY"; Rec."Amount LCY")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount LCY field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Point Rate"; Rec."Point Rate")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Point Rate field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Minimum Coupon Amount"; Rec."Minimum Coupon Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Minimum Coupon Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Consume Available Points"; Rec."Consume Available Points")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Consume Available Points field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -7,7 +7,8 @@ page 6150719 "NPR POS Menu Filter List"
     PageType = List;
     SourceTable = "NPR POS Menu Filter";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,28 +18,33 @@ page 6150719 "NPR POS Menu Filter List"
             {
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Id"; Rec."Object Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Code"; Rec."Filter Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Name"; Rec."Object Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Object Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

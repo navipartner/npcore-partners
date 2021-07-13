@@ -8,10 +8,11 @@ page 6151587 "NPR Event Invoices"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     RefreshOnActivate = true;
     SourceTable = "Job Planning Line Invoice";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -21,52 +22,61 @@ page 6151587 "NPR Event Invoices"
             {
                 field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowDetails;
                     ToolTip = 'Specifies the value of the Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Quantity Transferred"; Rec."Quantity Transferred")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity Transferred field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Transferred Date"; Rec."Transferred Date")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowDetails;
                     ToolTip = 'Specifies the value of the Transferred Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invoiced Date"; Rec."Invoiced Date")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowDetails;
                     ToolTip = 'Specifies the value of the Invoiced Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invoiced Amount (LCY)"; Rec."Invoiced Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Invoiced Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invoiced Cost Amount (LCY)"; Rec."Invoiced Cost Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Invoiced Cost Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Job Ledger Entry No."; Rec."Job Ledger Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = ShowDetails;
                     ToolTip = 'Specifies the value of the Job Ledger Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -89,8 +99,9 @@ page 6151587 "NPR Event Invoices"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Open Sales Document action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

@@ -5,8 +5,9 @@ page 6014606 "NPR Attribute Translations"
     Caption = 'Client Attribute Translations';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Attribute Translation";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,30 +17,35 @@ page 6014606 "NPR Attribute Translations"
             {
                 field("Attribute Code"; Rec."Attribute Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Attribute Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language ID"; Rec."Language ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Language ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code Caption"; Rec."Code Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code Caption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Caption"; Rec."Filter Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Caption field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

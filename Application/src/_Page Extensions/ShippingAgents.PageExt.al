@@ -7,18 +7,21 @@ pageextension 6014441 "NPR Shipping Agents" extends "Shipping Agents"
         {
             field("NPR Shipping Agent Demand"; Rec."NPR Shipping Agent Demand")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Shipping Agent Demand field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Pacsoft Product"; Rec."NPR Pacsoft Product")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Pacsoft Product field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Custom Print Layout"; Rec."NPR Custom Print Layout")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Custom Print Layout field';
+                ApplicationArea = NPRRetail;
             }
 
         }

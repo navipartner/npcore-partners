@@ -7,7 +7,8 @@ page 6014686 "NPR Create Out. Endpoint Query"
     SourceTable = "NPR Endpoint Query";
     SourceTableTemporary = true;
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
+
 
     layout
     {
@@ -17,18 +18,21 @@ page 6014686 "NPR Create Out. Endpoint Query"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table View"; Rec."Table View")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table View field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -42,8 +46,9 @@ page 6014686 "NPR Create Out. Endpoint Query"
             {
                 Caption = 'Create Request';
                 Image = Create;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Request action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin

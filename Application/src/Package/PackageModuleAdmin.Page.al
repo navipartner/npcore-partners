@@ -8,7 +8,8 @@ page 6014648 "NPR Package Module Admin"
     Caption = 'Package Module Admin';
     SourceTable = "NPR Package Module Config.";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -22,53 +23,63 @@ page 6014648 "NPR Package Module Admin"
                     ShowCaption = false;
                     field("Normal No. Series"; Rec."Normal No. Series")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Normal package label numbers field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("DHL No. Series"; Rec."DHL No. Series")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the DHL package label numbers field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("DHL AWB No. Series"; Rec."DHL AWB No. Series")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the DHL AWB package label numbers field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("DHL Customer No"; Rec."DHL Customer No")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the DHL Customer No field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("COD No. Series"; Rec."COD No. Series")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Cash on delivery package numbers field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("CV No. Series"; Rec."CV No. Series")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Recipient receipt package numbers field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Barcode39 Path"; Rec."Barcode39 Path")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Path to Barcode39 field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Has EDI contract"; Rec."Has EDI contract")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Has EDI contract field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Business Service Code"; Rec."Business Service Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Business shipping agent service code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Private Service Code"; Rec."Private Service Code")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Private shipping agent service code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6150626)
@@ -76,18 +87,21 @@ page 6014648 "NPR Package Module Admin"
                     ShowCaption = false;
                     field("DHL ftp address"; Rec."DHL ftp address")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the DHL FTP Address field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("DHL ftp username"; Rec."DHL ftp username")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the DHL FTP Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("DHL ftp password"; Rec."DHL ftp password")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the DHL FTP Password field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -99,38 +113,45 @@ page 6014648 "NPR Package Module Admin"
                     ShowCaption = false;
                     field("EDI Sender Identifier"; Rec."EDI Sender Identifier")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Package EDI sender identification field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("EDI Sender SMS"; Rec."EDI Sender SMS")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the SMS to sender field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("EDI Recipient SMS"; Rec."EDI Recipient SMS")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the SMS to recipient field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("EDI Sender Email"; Rec."EDI Sender Email")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Email to sender field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("EDI Recipient Email"; Rec."EDI Recipient Email")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Email to recipient field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("EDI FTP username"; Rec."EDI FTP username")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the EDI FTP Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("EDI FTP password"; Rec."EDI FTP password")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the EDI FTP Password field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

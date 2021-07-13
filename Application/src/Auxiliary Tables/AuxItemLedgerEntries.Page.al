@@ -17,98 +17,117 @@ page 6014408 "NPR Aux. Item Ledger Entries"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item Category Code"; Rec."Item Category Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item Category Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Group Sale"; Rec."Group Sale")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Group Sale field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Code"; Rec."Discount Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vendor No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salespers./Purch. Code"; Rec."Salespers./Purch. Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salespers./Purch. Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Invoiced Quantity"; Rec."Invoiced Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Invoiced Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Time"; Rec."Document Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Date and Time"; Rec."Document Date and Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Date and Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

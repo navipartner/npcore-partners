@@ -17,9 +17,10 @@ page 6014684 "NPR POS Payment Bins Step"
                 {
                     ShowMandatory = true;
                     Caption = 'POS Unit Code';
-                    ApplicationArea = All;
+
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POS Unit Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -47,8 +48,9 @@ page 6014684 "NPR POS Payment Bins Step"
                 field(NoOfPOSPaymentBins; NoOfPOSPaymentBinsToCreate)
                 {
                     Caption = 'Number of payment bins to create';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Number of payment bins to create field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -76,8 +78,9 @@ page 6014684 "NPR POS Payment Bins Step"
                 field(StartingNoPaymentBin; StartingNoPaymentBin)
                 {
                     Caption = 'Starting No.';
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -97,35 +100,41 @@ page 6014684 "NPR POS Payment Bins Step"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Attached to POS Unit No."; Rec."Attached to POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Attached to POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Eject Method"; Rec."Eject Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Eject Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bin Type"; Rec."Bin Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Bin Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

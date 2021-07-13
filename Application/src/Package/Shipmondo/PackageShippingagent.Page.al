@@ -5,7 +5,8 @@ page 6014568 "NPR Package Shipping agent"
     SourceTable = "NPR package Shipping Agent";
     caption = 'NPR Shipping Agent';
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -14,13 +15,15 @@ page 6014568 "NPR Package Shipping agent"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Shipping Agent Code ';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Shipping Agent Code Name';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Control6014412)
                 {
@@ -28,30 +31,35 @@ page 6014568 "NPR Package Shipping agent"
                 }
                 field("Use own Agreement"; Rec."Use own Agreement")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the Shipping has an agreement with the Provider ';
+                    ApplicationArea = NPRRetail;
 
                 }
                 field("Ship to Contact Mandatory"; Rec."Ship to Contact Mandatory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the "Ship to Contact" is mandatory';
+                    ApplicationArea = NPRRetail;
 
                 }
                 field("Automatic Drop Point Service"; Rec."Automatic Drop Point Service")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the "Automatic Drop Point" Service is mandatory';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Email Mandatory"; Rec."Email Mandatory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the E-mail is mandatory';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Phone Mandatory"; Rec."Phone Mandatory")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the Phone Number is mandatory';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Advanced)
                 {
@@ -60,8 +68,9 @@ page 6014568 "NPR Package Shipping agent"
                 }
                 field("Package Type Required"; Rec."Package Type Required")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the "Package Type" Service is required';
+                    ApplicationArea = NPRRetail;
                     trigger OnValidate();
                     begin
                         PackageRequired := Rec."Package Type Required";
@@ -70,14 +79,16 @@ page 6014568 "NPR Package Shipping agent"
             }
             part("NPR Services Combination"; "NPR Services Combination")
             {
-                ApplicationArea = All;
+
                 SubPageLink = "Shipping Agent" = FIELD(Code);
+                ApplicationArea = NPRRetail;
             }
             part("NPR Pacsoft Package Codes"; "NPR Package Codes")
             {
-                ApplicationArea = All;
+
                 SubPageLink = "Shipping Agent Code" = FIELD(Code);
                 Visible = PackageRequired;
+                ApplicationArea = NPRRetail;
             }
         }
     }

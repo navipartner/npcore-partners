@@ -5,7 +5,7 @@ page 6151532 "NPR Nc Collection Lines"
     PageType = List;
     SourceTable = "NPR Nc Collection Line";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -15,68 +15,81 @@ page 6151532 "NPR Nc Collection Lines"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Collector Code"; Rec."Collector Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Collector Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Collection No."; Rec."Collection No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Collection No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Type of Change"; Rec."Type of Change")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type of Change field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Record ID"; Rec."Record ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Record ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Obsolete; Rec.Obsolete)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Obsolete field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Data log Record No."; Rec."Data log Record No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data log Record No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("PK Code 1"; Rec."PK Code 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the PK Code 1 field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("PK Code 2"; Rec."PK Code 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the PK Code 2 field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("PK Line 1"; Rec."PK Line 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the PK Line 1 field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("PK Option 1"; Rec."PK Option 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the PK Option 1 field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Date Created"; Rec."Date Created")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date Created field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }

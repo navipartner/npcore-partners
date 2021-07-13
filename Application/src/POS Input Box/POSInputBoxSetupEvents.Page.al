@@ -5,8 +5,9 @@ page 6060098 "NPR POS Input Box Setup Events"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Ean Box Setup Event";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,40 +17,47 @@ page 6060098 "NPR POS Input Box Setup Events"
             {
                 field("Event Code"; Rec."Event Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Module Name"; Rec."Module Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Module Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Description"; Rec."Event Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Event Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Code"; Rec."Action Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Action Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Action Description"; Rec."Action Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Action Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -63,8 +71,9 @@ page 6060098 "NPR POS Input Box Setup Events"
             {
                 Caption = 'Parameters';
                 Image = List;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Parameters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

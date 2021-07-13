@@ -4,8 +4,9 @@ page 6151576 "NPR Event Resource Overview"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Resource;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,44 +17,51 @@ page 6151576 "NPR Event Resource Overview"
                 ShowCaption = false;
                 field(StartingDate; StartingDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Starting Date';
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(EndingDate; EndingDate)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Ending Date';
                     ToolTip = 'Specifies the value of the Ending Date field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             repeater(Group)
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-Mail"; Rec."NPR E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Capacity; Rec.Capacity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Capacity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(QtyOnEvent; QtyOnEvent)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Qty. on Event';
                     ToolTip = 'Specifies the value of the Qty. on Event field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -67,9 +75,10 @@ page 6151576 "NPR Event Resource Overview"
                 }
                 field(Available; Available)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Available';
                     ToolTip = 'Specifies the value of the Available field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -86,8 +95,9 @@ page 6151576 "NPR Event Resource Overview"
                 RunObject = Page "Resource Card";
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the View action';
+                ApplicationArea = NPRRetail;
             }
             group("Period Length")
             {
@@ -96,9 +106,10 @@ page 6151576 "NPR Event Resource Overview"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by day';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -109,9 +120,10 @@ page 6151576 "NPR Event Resource Overview"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by week';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -122,9 +134,10 @@ page 6151576 "NPR Event Resource Overview"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by month';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -135,9 +148,10 @@ page 6151576 "NPR Event Resource Overview"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by quarter';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -148,9 +162,10 @@ page 6151576 "NPR Event Resource Overview"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Filters by year';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -163,8 +178,9 @@ page 6151576 "NPR Event Resource Overview"
             {
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Previous action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -175,8 +191,9 @@ page 6151576 "NPR Event Resource Overview"
             {
                 Caption = 'Next';
                 Image = NextRecord;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Next action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

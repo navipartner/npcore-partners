@@ -17,80 +17,95 @@ page 6014645 "NPR Tax Free Requests"
             {
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the User ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handler ID Enum"; Rec."Handler ID Enum")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handler ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Start"; Rec."Date Start")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Time Start"; Rec."Time Start")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Time Start field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date End"; Rec."Date End")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Time End"; Rec."Time End")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Mode field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Type"; Rec."Request Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error Code"; Rec."Error Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Error Message"; Rec."Error Message")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Error Message field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Success; Rec.Success)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Success field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Stored"; Rec.Request.HasValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Request Stored';
                     ToolTip = 'Specifies the value of the Request Stored field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response Stored"; Rec.Response.HasValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Response Stored';
                     ToolTip = 'Specifies the value of the Response Stored field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -108,8 +123,9 @@ page 6014645 "NPR Tax Free Requests"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download Request action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -134,8 +150,9 @@ page 6014645 "NPR Tax Free Requests"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Download Response action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

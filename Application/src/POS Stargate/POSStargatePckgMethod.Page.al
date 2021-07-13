@@ -4,8 +4,9 @@ page 6150714 "NPR POS Stargate Pckg Method"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Stargate Pckg. Method";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,13 +16,15 @@ page 6150714 "NPR POS Stargate Pckg Method"
             {
                 field("Method Name"; Rec."Method Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Method Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Package Name"; Rec."Package Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Package Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

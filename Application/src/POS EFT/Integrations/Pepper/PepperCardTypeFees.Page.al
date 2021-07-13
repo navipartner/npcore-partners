@@ -5,8 +5,9 @@ page 6184486 "NPR Pepper Card Type Fees"
     Caption = 'Pepper Card Type Fees';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Pepper Card Type Fee";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,33 +17,39 @@ page 6184486 "NPR Pepper Card Type Fees"
             {
                 field("Card Type Code"; Rec."Card Type Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Type Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Minimum Amount"; Rec."Minimum Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Minimum Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Merchant Fee %"; Rec."Merchant Fee %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Merchant Fee % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Merchant Fee Amount"; Rec."Merchant Fee Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Merchant Fee Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Surcharge %"; Rec."Customer Surcharge %")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Surcharge % field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Surcharge Amount"; Rec."Customer Surcharge Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Surcharge Amount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

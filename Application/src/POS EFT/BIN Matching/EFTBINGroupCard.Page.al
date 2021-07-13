@@ -14,34 +14,40 @@ page 6184513 "NPR EFT BIN Group Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Priority field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Issuer ID"; Rec."Card Issuer ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Issuer ID field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6014405; "NPR EFT BIN Group Paym. Links")
             {
                 SubPageLink = "Group Code" = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control6014406; "NPR EFT BIN Range SubPage")
             {
                 SubPageLink = "BIN Group Code" = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

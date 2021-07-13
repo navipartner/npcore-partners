@@ -4,8 +4,9 @@ page 6150737 "NPR Available POS Keybinds"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Available POS Keybind";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,8 +16,9 @@ page 6150737 "NPR Available POS Keybinds"
             {
                 field("Key Name"; Rec."Key Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Key Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

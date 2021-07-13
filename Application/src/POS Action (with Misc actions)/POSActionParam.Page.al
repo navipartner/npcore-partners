@@ -4,8 +4,9 @@ page 6150704 "NPR POS Action Param."
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Action Parameter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,13 +16,15 @@ page 6150704 "NPR POS Action Param."
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -30,14 +33,16 @@ page 6150704 "NPR POS Action Param."
                 }
                 field(Options; Rec.Options)
                 {
-                    ApplicationArea = All;
+
                     Editable = OptionsEditable;
                     ToolTip = 'Specifies the value of the Options field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Value"; Rec."Default Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

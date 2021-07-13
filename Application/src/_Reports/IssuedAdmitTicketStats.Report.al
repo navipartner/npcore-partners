@@ -1,10 +1,10 @@
-﻿report 6014422 "NPR Issued/Admit. Ticket Stats"
+report 6014422 "NPR Issued/Admit. Ticket Stats"
 {
     RDLCLayout = './src/_Reports/layouts/IssuedAdmitted Ticket Stats.rdlc';
     Caption = 'Issued/Admitted Ticket Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
 
     dataset
     {
@@ -242,26 +242,30 @@
                     field("Start Date"; StartDate)
                     {
                         Caption = 'Start Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Start Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("End Date"; EndDate)
                     {
                         Caption = 'End Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the End Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Skip Line With Zero"; SkipLineWithZero)
                     {
                         Caption = 'Skip Zero Amt Lines';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Skip Zero Amt Lines field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Customer Filter"; CustomerFilter)
                     {
                         Caption = 'Customer No.';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Customer No. field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -274,15 +278,17 @@
                     field("Variant Visibility"; VariantVisibility)
                     {
                         Caption = 'Show Variant';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Variant field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Admission Code"; AdmissionCode)
                     {
                         Caption = 'Admission Code';
                         TableRelation = "NPR TM Ticket Access Fact"."Fact Code" WHERE("Fact Name" = FILTER(ADMISSION_CODE));
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Admission Code field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

@@ -7,9 +7,10 @@ page 6014643 "NPR RP Data Item Constr. Links"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR RP Data Item Constr. Links";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -19,57 +20,65 @@ page 6014643 "NPR RP Data Item Constr. Links"
             {
                 field("Data Item Name"; Rec."Data Item Name")
                 {
-                    ApplicationArea = All;
+
                     Enabled = Rec."Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = Rec."Filter Type" <> 0;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Data Item Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Item Field ID"; Rec."Data Item Field ID")
                 {
-                    ApplicationArea = All;
+
                     Enabled = Rec."Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Data Item Field ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Item Field Name"; Rec."Data Item Field Name")
                 {
-                    ApplicationArea = All;
+
                     Enabled = Rec."Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Data Item Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Type"; Rec."Filter Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field ID"; Rec."Field ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Value"; Rec."Filter Value")
                 {
-                    ApplicationArea = All;
+
                     Enabled = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Filter Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Link Type"; Rec."Link Type")
                 {
-                    ApplicationArea = All;
+
                     Enabled = Rec."Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = Rec."Filter Type" <> 0;
                     ToolTip = 'Specifies the value of the Link Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

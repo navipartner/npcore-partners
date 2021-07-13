@@ -3,7 +3,8 @@ report 6060044 "NPR Map Excel Item Worksh."
     Caption = 'Map Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")
@@ -41,15 +42,17 @@ report 6060044 "NPR Map Excel Item Worksh."
             {
                 field("Header Row"; HeaderRow)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Header Row';
                     ToolTip = 'Specifies the value of the HeaderRow field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Try to match fields automatically"; BoolTryMatch)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Try to match fields automatically';
                     ToolTip = 'Specifies the value of the BoolTryMatch field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

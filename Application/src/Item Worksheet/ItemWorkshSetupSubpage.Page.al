@@ -11,18 +11,21 @@ page 6060050 "NPR Item Worksh. Setup Subpage"
             {
                 field("Related Field Name"; Rec."Related Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Related Field Name field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Value; Rec.Value)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Value field.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create New"; Rec."Create New")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create New field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

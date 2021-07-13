@@ -3,8 +3,9 @@ page 6059987 "NPR Discount Activities"
     Caption = 'Discount Activities';
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Discount Cue";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,15 +16,17 @@ page 6059987 "NPR Discount Activities"
                 ShowCaption = false;
                 field("Mixed Discounts Active"; Rec."Mixed Discounts Active")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "NPR Mixed Discount List";
                     ToolTip = 'Specifies the value of the Mixed Discounts Active field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Period Discounts Active"; Rec."Period Discounts Active")
                 {
-                    ApplicationArea = All;
+
                     DrillDownPageID = "NPR Campaign Discount List";
                     ToolTip = 'Specifies the value of the Period Discounts Active field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(Control6014404)
@@ -36,18 +39,20 @@ page 6059987 "NPR Discount Activities"
                         Caption = 'New Mixed Discount';
                         RunObject = Page "NPR Mixed Discount";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileNew;
                         ToolTip = 'Executes the New Mixed Discount action';
+                        ApplicationArea = NPRRetail;
                     }
                     action("New Period Discount")
                     {
                         Caption = 'New Perioddiscount';
                         RunObject = Page "NPR Campaign Discount";
                         RunPageMode = Create;
-                        ApplicationArea = All;
+
                         Image = TileBrickNew;
                         ToolTip = 'Executes the New Perioddiscount action';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

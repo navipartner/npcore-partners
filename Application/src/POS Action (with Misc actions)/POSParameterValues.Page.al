@@ -6,8 +6,9 @@ page 6150705 "NPR POS Parameter Values"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Parameter Value";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,33 +18,37 @@ page 6150705 "NPR POS Parameter Values"
             {
                 field(ParameterName; ParameterName)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Name';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ParameterDescription; ParameterDescription)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
                     ToolTip = 'Specifies the value of the Data Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(ParameterValue; ParameterValue)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Value';
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
                     ToolTip = 'Specifies the value of the Value field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -75,8 +80,9 @@ page 6150705 "NPR POS Parameter Values"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reset Values action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

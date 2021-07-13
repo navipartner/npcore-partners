@@ -5,7 +5,7 @@ report 6014475 "NPR Item Replenish. by Store"
     Caption = 'Inventory - List';
     PreviewMode = PrintLayout;
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
 
     dataset
     {
@@ -258,30 +258,34 @@ report 6014475 "NPR Item Replenish. by Store"
                     Caption = 'Options';
                     field("Exclude No Replenish Setup"; ExcludeNoReplenishSetup)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Excl. Empty Replenish Setup';
                         ToolTip = 'Specifies the value of the Excl. Empty Replenish Setup field';
                         Visible = false;
+                        ApplicationArea = NPRRetail;
                     }
                     field("Show Items"; ShowItems)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Show Items';
                         OptionCaption = 'All,With Replenish. Setup,Without Replenish. Setup';
                         ToolTip = 'Specifies the value of the Show Items field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Prepare Req Wksh"; PrepareReqWksh)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Prepare Order Planning';
                         ToolTip = 'Specifies the value of the Prepare Order Planning field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Order Date"; OrderDate)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Order Date';
                         ToolTip = 'Specifies the value of the Order Date field';
                         Visible = false;
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

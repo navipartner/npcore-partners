@@ -5,9 +5,10 @@ page 6151557 "NPR NpXml Batch Filters"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR NpXml Filter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,24 +18,28 @@ page 6151557 "NPR NpXml Batch Filters"
             {
                 field("Filter Type"; Rec."Filter Type")
                 {
-                    ApplicationArea = All;
+
                     OptionCaption = ',Constant,Filter';
                     ToolTip = 'Specifies the value of the Filter Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Parent Field No."; Rec."Parent Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Parent Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Parent Field Name"; Rec."Parent Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Parent Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Value"; Rec."Filter Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Value field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

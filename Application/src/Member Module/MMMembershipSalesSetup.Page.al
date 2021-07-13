@@ -5,7 +5,8 @@ page 6060125 "NPR MM Membership Sales Setup"
     PageType = List;
     SourceTable = "NPR MM Members. Sales Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,108 +16,129 @@ page 6060125 "NPR MM Membership Sales Setup"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Business Flow Type"; Rec."Business Flow Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Business Flow Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked At field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid From Base"; Rec."Valid From Base")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid From Base field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Cut-Off Date Calculation"; Rec."Sales Cut-Off Date Calculation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Cut-Off Date Calculation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid From Date Calculation"; Rec."Valid From Date Calculation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid From Date Calculation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Valid Until Calculation"; Rec."Valid Until Calculation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Valid Until Calculation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Duration Formula"; Rec."Duration Formula")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Duration Formula field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Suggested Membercount In Sales"; Rec."Suggested Membercount In Sales")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Suggested Membercount In Sales field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Assign Loyalty Points On Sale"; Rec."Assign Loyalty Points On Sale")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Assign Loyalty Points On Sale field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto-Renew To"; Rec."Auto-Renew To")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto-Renew To field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Auto-Admit Member On Sale"; Rec."Auto-Admit Member On Sale")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto-Admit Member On Sale field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Card Type Selection"; Rec."Member Card Type Selection")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Card Type Selection field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Card Type"; Rec."Member Card Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Card Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Magento M2 Membership Sign-up"; Rec."Magento M2 Membership Sign-up")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Magento M2 Membership Sign-up field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Age Constraint Type"; Rec."Age Constraint Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Age Constraint Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Age Constraint (Years)"; Rec."Age Constraint (Years)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Age Constraint (Years) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Requires Guardian"; Rec."Requires Guardian")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Requires Guardian field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -135,8 +157,9 @@ page 6060125 "NPR MM Membership Sales Setup"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Membership action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -151,15 +174,17 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Caption = 'Import Members From File';
                 Image = Import;
                 RunObject = Codeunit "NPR MM Import Members";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Members From File action';
+                ApplicationArea = NPRRetail;
             }
             action("Failed Import Worksheet")
             {
                 Caption = 'Failed Import Worksheet';
                 Image = ImportLog;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Failed Import Worksheet action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -181,16 +206,18 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Caption = 'Membership Setup';
                 Image = SetupList;
                 RunObject = Page "NPR MM Membership Setup";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Item List")
             {
                 Caption = 'Item List';
                 Image = List;
                 RunObject = Page "Item List";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Item List action';
+                ApplicationArea = NPRRetail;
             }
             action(Memberships)
             {
@@ -198,16 +225,18 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Image = List;
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Membership Code" = FIELD("Membership Code");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Memberships action';
+                ApplicationArea = NPRRetail;
             }
             action("Community Setup")
             {
                 Caption = 'Community Setup';
                 Image = Group;
                 RunObject = Page "NPR MM Member Community";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Community Setup action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

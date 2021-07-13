@@ -7,7 +7,8 @@ page 6151599 "NPR NpDc Arch. Coupons"
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Arch. Coupon";
     UsageCategory = History;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,48 +18,57 @@ page 6151599 "NPR NpDc Arch. Coupons"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Coupon Type"; Rec."Coupon Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Quantity"; Rec."Remaining Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remaining Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -75,8 +85,9 @@ page 6151599 "NPR NpDc Arch. Coupons"
                 RunObject = Page "NPR NpDc Arch.Coupon Entries";
                 RunPageLink = "Arch. Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Archived Coupon Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

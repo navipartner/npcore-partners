@@ -14,18 +14,21 @@ page 6014445 "NPR Payment Method Denom"
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
                     ToolTip = 'Specifies the value of the POS Payment Method Code field.';
-                    ApplicationArea = All;
+
                     Editable = false;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Denomination Type"; Rec."Denomination Type")
                 {
                     ToolTip = 'Specifies the value of the Denomination Type field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 field(Denomination; Rec.Denomination)
                 {
                     ToolTip = 'Specifies the value of the Denomination field.';
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
         }

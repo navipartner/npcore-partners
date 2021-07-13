@@ -3,7 +3,7 @@ report 6014434 "NPR Vendor/Debtor by date"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorDebtor by date.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Vendor/Customer by date';
     dataset
     {
@@ -124,26 +124,30 @@ report 6014434 "NPR Vendor/Debtor by date"
                     field("Til dato"; Tildato)
                     {
                         Caption = 'To Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the To Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Kunmed saldo"; Kunmedsaldo)
                     {
                         Caption = 'Only With Balance';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Only With Balance field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Kreditor"; PrintKreditor)
                     {
                         Caption = 'Creditor';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Creditor field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print Debitor"; PrintDebitor)
                     {
                         Caption = 'Customer';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Customer field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

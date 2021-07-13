@@ -1,4 +1,4 @@
-﻿page 6151262 "NPR SO Processor Act Ext"
+page 6151262 "NPR SO Processor Act Ext"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -15,16 +15,18 @@
                 Caption = 'For Release';
                 field("Sales Quotes - Open"; Rec."Sales Quotes - Open")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     DrillDownPageID = "Sales Quotes";
 
                     ToolTip = 'Specifies the number of sales quotes that are not yet converted to invoices or orders.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Orders - Open"; Rec."Sales Orders - Open")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the number of sales orders that are not fully posted.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(Control6014404)
@@ -34,21 +36,23 @@
                 {
                     action("New Sales Quote")
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'New Sales Quote';
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
                         Image = TileNew;
                         ToolTip = 'Offer items or services to a customer.';
+                        ApplicationArea = NPRRetail;
                     }
                     action("New Sales Order")
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'New Sales Order';
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
                         Image = TileNew;
                         ToolTip = 'Create a new sales order for items or services that require partial posting.';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -57,10 +61,11 @@
                 Caption = 'Sales Orders Released Not Shipped';
                 field(ReadyToShip; Rec."Ready to Ship")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Ready To Ship';
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the number of sales documents that are ready to ship.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -69,10 +74,11 @@
                 }
                 field(PartiallyShipped; Rec."Partially Shipped")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Partially Shipped';
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the number of sales documents that are partially shipped.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -81,10 +87,11 @@
                 }
                 field(DelayedOrders; Rec.Delayed)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Delayed';
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the number of sales documents where your delivery is delayed.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -93,10 +100,11 @@
                 }
                 field("Average Days Delayed"; Rec."Average Days Delayed")
                 {
-                    ApplicationArea = Basic, Suite;
+
                     DecimalPlaces = 0 : 1;
                     Image = Calendar;
                     ToolTip = 'Specifies the number of days that your order deliveries are delayed on average.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             cuegroup(Control555)
@@ -106,11 +114,12 @@
                 {
                     action(Navigate)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Navigate';
                         RunObject = Page Navigate;
                         Image = TileHelp;
                         ToolTip = 'Find all entries and documents that exist for the document number and posting date on the selected entry or document.';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

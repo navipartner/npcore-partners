@@ -1,8 +1,8 @@
 ﻿codeunit 6151526 "NPR Nc Endpoint File Mgt."
 {
     var
-        TextFileDownloaded: Label 'The file was downloaded.';
-        TextFileExported: Label 'The file was exported.';
+        TextFileDownloadedLbl: Label 'The file was downloaded.';
+        TextFileExportedLbl: Label 'The file was exported.';
 
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text)
     var
@@ -104,7 +104,7 @@
     begin
         NcEndpointFile.TestField(Path);
 
-        NcTriggerSyncMgt.AddResponse(NcTask, TextFileExported);
+        NcTriggerSyncMgt.AddResponse(NcTask, TextFileExportedLbl);
 
         TempBlob.CreateOutStream(OutStm);
         OutStm.WriteText(OutputText);
@@ -120,7 +120,7 @@
 
         if NcEndpointFile."Client Path" then begin
             DownloadFromStream(InStm, 'Save file as...', NcEndpointFile.Path, 'All Files|*.*', Filename);
-            NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + TextFileDownloaded);
+            NcTriggerSyncMgt.AddResponse(NcTask, NewLine() + TextFileDownloadedLbl);
         end;
     end;
 

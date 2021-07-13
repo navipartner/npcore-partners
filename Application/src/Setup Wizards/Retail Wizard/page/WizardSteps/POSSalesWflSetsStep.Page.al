@@ -14,9 +14,10 @@ page 6014657 "NPR POS Sales Wfl. Sets Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -25,8 +26,9 @@ page 6014657 "NPR POS Sales Wfl. Sets Step"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

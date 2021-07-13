@@ -8,8 +8,8 @@ page 6151524 "NPR Nc Endpoint E-mail List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint E-mail";
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -19,23 +19,27 @@ page 6151524 "NPR Nc Endpoint E-mail List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enabled field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Recipient E-Mail Address"; Rec."Recipient E-Mail Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Recipient E-Mail Address field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -49,8 +53,9 @@ page 6151524 "NPR Nc Endpoint E-mail List"
             {
                 Caption = 'Trigger Links';
                 Image = Link;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Trigger Links action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin

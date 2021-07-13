@@ -6,8 +6,9 @@ page 6014680 "NPR Endpoint QueryFilt. S.form"
     Caption = 'Endpoint Query Filter Subform';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Endpoint Query Filter";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,13 +18,15 @@ page 6014680 "NPR Endpoint QueryFilt. S.form"
             {
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Filter Text"; Rec."Filter Text")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Filter Text field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

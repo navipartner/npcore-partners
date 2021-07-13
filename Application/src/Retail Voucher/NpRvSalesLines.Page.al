@@ -5,9 +5,10 @@ page 6151017 "NPR NpRv Sales Lines"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpRv Sales Line";
     SourceTableView = SORTING(Type, "Voucher Type", "Voucher No.", "Reference No.");
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,93 +18,109 @@ page 6151017 "NPR NpRv Sales Lines"
             {
                 field("Reference No."; Rec."Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voucher Type"; Rec."Voucher Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voucher Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Voucher No."; Rec."Voucher No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Voucher No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Source"; Rec."Document Source")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Source field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sale Date"; Rec."Sale Date")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sale Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sale Line No."; Rec."Sale Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sale Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Document Line No."; Rec."Document Line No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting No."; Rec."Posting No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Posting No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Retail ID"; Rec."Retail ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Retail ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -117,8 +134,9 @@ page 6151017 "NPR NpRv Sales Lines"
             {
                 Caption = 'References';
                 Image = List;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the References action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

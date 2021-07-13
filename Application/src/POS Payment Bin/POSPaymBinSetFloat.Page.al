@@ -7,8 +7,9 @@ page 6150623 "NPR POS Paym.Bin Set Float"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Payment Method";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,34 +19,39 @@ page 6150623 "NPR POS Paym.Bin Set Float"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Processing Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Include In Counting"; Rec."Include In Counting")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Include In Counting field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Amount)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Amount';
                     DecimalPlaces = 2 : 2;
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     var

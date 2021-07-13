@@ -3,7 +3,8 @@ page 6014400 "NPR Magento Wizard"
     Caption = 'NP Magento Wizard';
     PageType = NavigatePage;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,10 +17,11 @@ page 6014400 "NPR Magento Wizard"
                 Visible = TopBannerVisible and not FinishActionEnabled;
                 field(MediaResourcesStandard; MediaResourcesStandard."Media Reference")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(FinishedBanner)
@@ -29,10 +31,11 @@ page 6014400 "NPR Magento Wizard"
                 Visible = TopBannerVisible and FinishActionEnabled;
                 field(MediaResourcesDone; MediaResourcesDone."Media Reference")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -69,7 +72,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Website';
                     part(MagentoWebsites; "NPR Website List WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -83,7 +87,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Store';
                     part(MagentoStores; "NPR Stores WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -97,7 +102,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Customer Mapping';
                     part(MagentCustMappings; "NPR Customer Mapping WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -111,7 +117,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Payment Gateway';
                     part(MagentoPaymentGateways; "NPR Payment Gateways WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -125,7 +132,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Payment Mapping';
                     part(MagentoPaymentMappings; "NPR Payment Mapping WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -139,7 +147,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Shippment Mapping';
                     part(MagentoShippingMappings; "NPR Shipment Mapping WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -153,7 +162,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Brand';
                     part(MagentoBrands; "NPR Brands WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -167,7 +177,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Display Group';
                     part(MagentoDisplayGroups; "NPR Display Groups WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -181,7 +192,8 @@ page 6014400 "NPR Magento Wizard"
                     Caption = 'Magento Display Config';
                     part(MagentoDisplayConfigs; "NPR Display Config WP")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
+
                     }
                 }
             }
@@ -208,7 +220,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoStoreDataFilledIn;
                             label(MagentoStoreLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Store';
                                 ToolTip = 'Specifies the value of the MagentoStoreLabel field';
                             }
@@ -219,7 +231,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoWebsiteDataFilledIn;
                             label(MagentoWebsiteLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Website';
                                 ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
                             }
@@ -230,7 +242,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoCustomerMappingDataFilledIn;
                             label(MagentoCustomerMappingLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Customer Mapping';
                                 ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
                             }
@@ -241,7 +253,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoPaymentGatewayDataFilledIn;
                             label(MagentoPaymentGatewayLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Payment Gateway';
                                 ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
                             }
@@ -252,7 +264,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoPaymentMappingDataFilledIn;
                             label(MagentoPaymentMappingLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Payment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
                             }
@@ -263,7 +275,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoShippmentMappingDataFilledIn;
                             label(MagentoShippmentMappingLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Shippment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
                             }
@@ -274,7 +286,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoBrandDataFilledIn;
                             label(MagentoBrandsLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Brand';
                                 ToolTip = 'Specifies the value of the MagentoBrandLabel field';
                             }
@@ -285,7 +297,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoDisplayGroupDataFilledIn;
                             label(MagentoDisplayGroupLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Display Group';
                                 ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
                             }
@@ -296,7 +308,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = not MagentoDisplayConfigDataFilledIn;
                             label(MagentoDisplayConfigLabel)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Display Config';
                                 ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
                             }
@@ -322,7 +334,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoStoreDataFilledIn;
                             label(MagentoStoreLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Store';
                                 ToolTip = 'Specifies the value of the MagentoStoreLabel field';
                             }
@@ -333,7 +345,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoWebsiteDataFilledIn;
                             label(MagentoWebsiteLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Website';
                                 ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
                             }
@@ -344,7 +356,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoCustomerMappingDataFilledIn;
                             label(MagentoCustomerMappingLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Customer Mapping';
                                 ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
                             }
@@ -355,7 +367,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoPaymentGatewayDataFilledIn;
                             label(MagentoPaymentGatewayLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Payment Gateway';
                                 ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
                             }
@@ -366,7 +378,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoPaymentMappingDataFilledIn;
                             label(MagentoPaymentMappingLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Payment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
                             }
@@ -377,7 +389,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoShippmentMappingDataFilledIn;
                             label(MagentoShippmentMappingLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Shippment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
                             }
@@ -388,7 +400,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoBrandDataFilledIn;
                             label(MagentoBrandsLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Brand';
                                 ToolTip = 'Specifies the value of the MagentoBrandLabel field';
                             }
@@ -399,7 +411,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoDisplayGroupDataFilledIn;
                             label(MagentoDisplayGroupLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Display Group';
                                 ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
                             }
@@ -410,7 +422,7 @@ page 6014400 "NPR Magento Wizard"
                             Visible = MagentoDisplayConfigDataFilledIn;
                             label(MagentoDisplayConfigLabel1)
                             {
-                                ApplicationArea = All;
+                                ApplicationArea = NPRRetail;
                                 Caption = '- Magento Display Config';
                                 ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
                             }
@@ -432,12 +444,13 @@ page 6014400 "NPR Magento Wizard"
         {
             action(ActionBack)
             {
-                ApplicationArea = All;
+
                 Caption = 'Back';
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction();
                 begin
@@ -446,12 +459,13 @@ page 6014400 "NPR Magento Wizard"
             }
             action(ActionNext)
             {
-                ApplicationArea = All;
+
                 Caption = 'Next';
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction();
                 begin
@@ -460,12 +474,13 @@ page 6014400 "NPR Magento Wizard"
             }
             action(ActionFinish)
             {
-                ApplicationArea = All;
+
                 Caption = 'Finish';
                 Enabled = FinishActionEnabled;
                 Image = Approve;
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction();
                 begin

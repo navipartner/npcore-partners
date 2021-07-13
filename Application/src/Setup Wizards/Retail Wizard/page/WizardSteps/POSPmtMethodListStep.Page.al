@@ -14,63 +14,75 @@ page 6014687 "NPR POS Pmt. Method List Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code2"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Vouched By"; Rec."Vouched By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Vouched By field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Include In Counting"; Rec."Include In Counting")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Include In Counting field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bin for Virtual-Count"; Rec."Bin for Virtual-Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Bin for Virtual-Count field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Post Condensed"; Rec."Post Condensed")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Post Condensed field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Condensed Posting Description"; Rec."Condensed Posting Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Condensed Posting Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Precision"; Rec."Rounding Precision")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding Precision field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Type"; Rec."Rounding Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Gains Account"; Rec."Rounding Gains Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding Gains Account field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Rounding Losses Account"; Rec."Rounding Losses Account")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Rounding Losses Account field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

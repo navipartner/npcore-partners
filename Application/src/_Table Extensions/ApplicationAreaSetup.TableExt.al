@@ -22,5 +22,15 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NPR Ticket Dynamic Price';
             DataClassification = CustomerContent;
         }
+        field(6060104; "NPR Retail"; Boolean)
+        {
+            Caption = 'NPR Retail';
+            DataClassification = CustomerContent;
+        }
+        field(6060105; "NPR NaviConnect"; Boolean)
+        {
+            Caption = 'NPR NaviConnect';
+            DataClassification = CustomerContent;
+        }
     }
 }

@@ -4,9 +4,10 @@ page 6150669 "NPR NPRE Restaurant Setup"
     PageType = Card;
     SourceTable = "NPR NPRE Restaurant Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     InsertAllowed = false;
     DeleteAllowed = false;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,13 +18,15 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 Caption = 'General';
                 field("Waiter Pad No. Series"; Rec."Waiter Pad No. Serie")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Waiter Pad No. Serie field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Service Flow Profile"; Rec."Default Service Flow Profile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Service Flow Profile field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Seating)
@@ -34,27 +37,31 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Caption = 'Statuses';
                     field("Seat.Status: Ready"; Rec."Seat.Status: Ready")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Ready for New Guests';
                         ToolTip = 'Specifies the value of the Ready for New Guests field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Seat.Status: Occupied"; Rec."Seat.Status: Occupied")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Occupied';
                         ToolTip = 'Specifies the value of the Occupied field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Seat.Status: Reserved"; Rec."Seat.Status: Reserved")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Reserved';
                         ToolTip = 'Specifies the value of the Reserved field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Seat.Status: Cleaning Required"; Rec."Seat.Status: Cleaning Required")
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Cleaning Required';
                         ToolTip = 'Specifies the value of the Cleaning Required field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -63,26 +70,30 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 Caption = 'Kitchen Integration';
                 field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Resend All On New Lines"; Rec."Resend All On New Lines")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Resend All On New Lines field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Step Discovery Method"; Rec."Serving Step Discovery Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serving Step Discovery Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 group(Print)
                 {
                     Caption = 'Print';
                     field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Kitchen Printing Active field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(KDS)
@@ -91,17 +102,19 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Visible = ShowKDS;
                     field("KDS Active"; Rec."KDS Active")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the KDS Active field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Order ID Assign. Method field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Station Req. Handl. On Serving"; Rec."Station Req. Handl. On Serving")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies how kitchen station production requests should be handled, if product has been served prior to finishing production';
                     }
                 }
@@ -112,8 +125,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
 
                 field("Save Layout Action"; Rec."Save Layout Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Save Layout Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -122,8 +136,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 }
                 field("Select Restaurant Action"; Rec."Select Restaurant Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Select Restaurant Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -132,8 +147,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 }
                 field("Select Table Action"; Rec."Select Table Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Select Table Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -142,8 +158,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 }
                 field("New Waiter Pad Action"; Rec."New Waiter Pad Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the New Waiter Pad Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -152,8 +169,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 }
                 field("Select Waiter Pad Action"; Rec."Select Waiter Pad Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Select Waiter Pad Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -162,8 +180,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 }
                 field("Set Waiter Pad Status Action"; Rec."Set Waiter Pad Status Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Set Waiter Pad Status Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -172,8 +191,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 }
                 field("Set Table Status Action"; Rec."Set Table Status Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Set Table Status Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -182,8 +202,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 }
                 field("Set Number of Guests Action"; Rec."Set Number of Guests Action")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Set Number of Guests Action field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -194,7 +215,8 @@ page 6150669 "NPR NPRE Restaurant Setup"
             part(PrintTemplates; "NPR NPRE Print Templ. Subpage")
             {
                 Caption = 'Print Templates';
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -208,8 +230,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 Caption = 'Print Categories';
                 Image = PrintForm;
                 RunObject = Page "NPR NPRE Slct Prnt Cat.";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Print Categories action';
+                ApplicationArea = NPRRetail;
             }
             action(Restaurants)
             {
@@ -220,8 +243,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Restaurants";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Restaurants action';
+                ApplicationArea = NPRRetail;
             }
             group(Kitchen)
             {
@@ -232,8 +256,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Image = Departments;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = CONST('');
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Stations action';
+                    ApplicationArea = NPRRetail;
                 }
                 action(KitchenStationSelection)
                 {
@@ -241,8 +266,9 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     Image = Troubleshoot;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = CONST('');
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Station Selection Setup action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

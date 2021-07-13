@@ -8,7 +8,8 @@ page 6014678 "NPR Endpoint Request List"
     PageType = List;
     SourceTable = "NPR Endpoint Request";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -18,73 +19,87 @@ page 6014678 "NPR Endpoint Request List"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Endpoint Code"; Rec."Endpoint Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Endpoint Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Batch No."; Rec."Request Batch No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request Batch No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Type of Change"; Rec."Type of Change")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type of Change field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Record ID"; Rec."Record ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Record ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Obsolete; Rec.Obsolete)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Obsolete field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data log Record No."; Rec."Data log Record No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data log Record No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Query No."; Rec."Query No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Query No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("PK Code 1"; Rec."PK Code 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Primary Key Code 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("PK Code 2"; Rec."PK Code 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Primary Key Code 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("PK Line 1"; Rec."PK Line 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Primary Key Line 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("PK Option 1"; Rec."PK Option 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Primary Key Option 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date Created"; Rec."Date Created")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date Created field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

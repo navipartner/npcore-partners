@@ -4,8 +4,9 @@ page 6150691 "NPR NPRE Kitchen Req. List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NPRE Kitchen Request";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,85 +17,101 @@ page 6150691 "NPR NPRE Kitchen Req. List"
                 Caption = 'Order Lines';
                 field("Request No."; Rec."Request No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Request No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Order ID"; Rec."Order ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Order ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serving Step field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serving Requested Date-Time"; Rec."Serving Requested Date-Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Serving Requested Date-Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Status"; Rec."Line Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Line Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Production Status"; Rec."Production Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Production Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No. of Kitchen Stations"; Rec."No. of Kitchen Stations")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. of Kitchen Stations field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(SeatingCode; Rec.SeatingCode())
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Seating Code';
                     ToolTip = 'Specifies the value of the Seating Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

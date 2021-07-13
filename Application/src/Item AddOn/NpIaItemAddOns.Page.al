@@ -6,7 +6,8 @@ page 6151125 "NPR NpIa Item AddOns"
     PageType = List;
     SourceTable = "NPR NpIa Item AddOn";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,18 +17,21 @@ page 6151125 "NPR NpIa Item AddOns"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the number of the involved entry or record.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies a description of the item.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-                    ApplicationArea = All;
+
                     ToolTIp = 'Specifies if the current Item AddOn is enabled.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

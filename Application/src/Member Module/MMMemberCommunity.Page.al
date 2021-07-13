@@ -5,7 +5,8 @@ page 6060132 "NPR MM Member Community"
     PageType = List;
     SourceTable = "NPR MM Member Community";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,69 +16,82 @@ page 6060132 "NPR MM Member Community"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External No. Search Order"; Rec."External No. Search Order")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External No. Search Order field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No. Series"; Rec."External Membership No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Member No. Series"; Rec."External Member No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Member No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No. Series"; Rec."Customer No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Unique Identity"; Rec."Member Unique Identity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Unique Identity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Member UI Violation"; Rec."Create Member UI Violation")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Member UI Violation field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Member Logon Credentials"; Rec."Member Logon Credentials")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Member Logon Credentials field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Membership to Cust. Rel."; Rec."Membership to Cust. Rel.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Membership to Cust. Rel. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Create Renewal Notifications"; Rec."Create Renewal Notifications")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Create Renewal Notifications field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Activate Loyalty Program"; Rec."Activate Loyalty Program")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Activate Loyalty Program field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Foreign Membership"; Rec."Foreign Membership")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Foreign Membership field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -93,8 +107,9 @@ page 6060132 "NPR MM Member Community"
                 Image = SetupList;
                 RunObject = Page "NPR MM Membership Setup";
                 RunPageLink = "Community Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Loyalty Setup")
             {
@@ -104,8 +119,9 @@ page 6060132 "NPR MM Member Community"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 RunObject = Page "NPR MM Loyalty Setup";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Loyalty Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Notification Setup")
             {
@@ -113,8 +129,9 @@ page 6060132 "NPR MM Member Community"
                 Image = SetupList;
                 RunObject = Page "NPR MM Member Notific. Setup";
                 RunPageLink = "Community Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Notification Setup action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6150626)
             {
@@ -126,8 +143,9 @@ page 6060132 "NPR MM Member Community"
                 Image = AutoReserve;
                 RunObject = Page "NPR MM Members. AutoRenew List";
                 RunPageLink = "Community Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Auto Renew Process action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6014406)
             {
@@ -138,8 +156,9 @@ page 6060132 "NPR MM Member Community"
                 Image = List;
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Community Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Memberships action';
+                ApplicationArea = NPRRetail;
             }
             separator(Separator6014405)
             {
@@ -149,8 +168,9 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Notifications';
                 Image = InteractionLog;
                 RunObject = Page "NPR MM Membership Notific.";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Notifications action';
+                ApplicationArea = NPRRetail;
             }
             action("Foreign Membership Setup")
             {
@@ -159,8 +179,9 @@ page 6060132 "NPR MM Member Community"
                 Image = ElectronicBanking;
                 RunObject = Page "NPR MM Foreign Members. Setup";
                 RunPageLink = "Community Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Foreign Membership Setup action';
+                ApplicationArea = NPRRetail;
             }
         }
         area(processing)
@@ -170,16 +191,18 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Update Memberships Customer';
                 Image = CreateInteraction;
                 RunObject = Report "NPR MM Sync. Community Cust.";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Update Memberships Customer action';
+                ApplicationArea = NPRRetail;
             }
 
             action(CreateDemoData)
             {
                 Caption = 'Create Demo Data';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Demo Data action';
                 Image = Action;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

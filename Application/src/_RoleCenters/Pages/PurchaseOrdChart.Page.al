@@ -11,15 +11,17 @@ page 6151261 "NPR Purchase Ord Chart"
         {
             field(StatusText; StatusText)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Status Text';
                 Editable = false;
                 ShowCaption = false;
                 ToolTip = 'Specifies the status of the chart.';
+                ApplicationArea = NPRRetail;
             }
             usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -34,11 +36,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 Image = View;
                 action(AllOrders)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'All Orders';
                     Enabled = AllOrdersEnabled;
                     ToolTip = 'View all not fully posted sales orders, including sales orders with document dates in the future because of long delivery times, delays, or other reasons.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -48,11 +51,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 }
                 action(OrdersUntilToday)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Orders Until Today';
                     Enabled = OrdersUntilTodayEnabled;
                     ToolTip = 'View not fully posted sales orders with document dates up until today''s date.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -62,11 +66,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 }
                 action(DelayedOrders)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Delayed Orders';
                     Enabled = DelayedOrdersEnabled;
                     ToolTip = 'View not fully posted sales orders with shipment dates that are before today''s date.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -81,11 +86,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 Image = Period;
                 action(Day)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Day';
                     Enabled = DayEnabled;
                     ToolTip = 'Each stack covers one day.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -95,11 +101,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 }
                 action(Week)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Week';
                     Enabled = WeekEnabled;
                     ToolTip = 'Each stack except for the last stack covers one week. The last stack contains data from the start of the week until the date that is defined by the Show option.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -109,11 +116,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 }
                 action(Month)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Month';
                     Enabled = MonthEnabled;
                     ToolTip = 'Each stack except for the last stack covers one month. The last stack contains data from the start of the month until the date that is defined by the Show option.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -123,11 +131,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 }
                 action(Quarter)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Quarter';
                     Enabled = QuarterEnabled;
                     ToolTip = 'Each stack except for the last stack covers one quarter. The last stack contains data from the start of the quarter until the date that is defined by the Show option.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -137,11 +146,12 @@ page 6151261 "NPR Purchase Ord Chart"
                 }
                 action(Year)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Year';
                     Enabled = YearEnabled;
                     ToolTip = 'Each stack except for the last stack covers one year. The last stack contains data from the start of the year until the date that is defined by the Show option.';
                     Image = Filter;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -160,11 +170,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     Image = Calculate;
                     action(Amount)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Amount';
                         Enabled = AmountEnabled;
                         ToolTip = 'The Y-axis shows the totaled LCY amount of the orders.';
                         Image = Filter;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -174,11 +185,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     }
                     action(NoofOrders)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'No. of Orders';
                         Enabled = NoOfOrdersEnabled;
                         ToolTip = 'The Y-axis shows the number of orders.';
                         Image = Filter;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -193,11 +205,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     Image = BarChart;
                     action(StackedArea)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Stacked Area';
                         Enabled = StackedAreaEnabled;
                         ToolTip = 'View the data in area layout.';
                         Image = SelectChart;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -207,11 +220,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     }
                     action(StackedAreaPct)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Stacked Area (%)';
                         Enabled = StackedAreaPctEnabled;
                         ToolTip = 'view the percentage distribution of the four order statuses in area layout.';
                         Image = SelectChart;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -221,11 +235,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     }
                     action(StackedColumn)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Stacked Column';
                         Enabled = StackedColumnEnabled;
                         ToolTip = 'view the data in column layout.';
                         Image = SelectChart;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -235,11 +250,12 @@ page 6151261 "NPR Purchase Ord Chart"
                     }
                     action(StackedColumnPct)
                     {
-                        ApplicationArea = Basic, Suite;
+
                         Caption = 'Stacked Column (%)';
                         Enabled = StackedColumnPctEnabled;
                         ToolTip = 'view the percentage distribution of the four order statuses in column layout.';
                         Image = SelectChart;
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -254,10 +270,11 @@ page 6151261 "NPR Purchase Ord Chart"
             }
             action(Setup)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Setup';
                 Image = Setup;
                 ToolTip = 'Specify if the chart will be based on a work date other than today''s date. This is mainly relevant in demonstration databases with fictitious sales orders.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

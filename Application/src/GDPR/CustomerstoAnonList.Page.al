@@ -5,8 +5,9 @@ page 6151152 "NPR Customers to Anon. List"
     Caption = 'Customers to Anonymize List';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Customers to Anonymize";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,13 +17,15 @@ page 6151152 "NPR Customers to Anon. List"
             {
                 field("Customer No"; Rec."Customer No")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

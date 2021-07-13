@@ -18,44 +18,51 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 ShowCaption = false;
                 field("Action Type"; Rec."Action Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the action type.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source Document"; Rec."Source Document")
                 {
-                    ApplicationArea = All;
+
                     BlankZero = true;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Document field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Source No."; Rec."Source No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Serial No."; Rec."Serial No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Serial No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -64,15 +71,17 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 }
                 field("Serial No. Blocked"; Rec."Serial No. Blocked")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Serial No. Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Lot No."; Rec."Lot No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Lot No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -81,27 +90,31 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 }
                 field("Lot No. Blocked"; Rec."Lot No. Blocked")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Lot No. Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Expiration Date"; Rec."Expiration Date")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Expiration Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bin Code"; Rec."Bin Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Bin Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -110,25 +123,29 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 }
                 field("Shelf No."; Rec."Shelf No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shelf No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. (Base)"; Rec."Qty. (Base)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. (Base) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. to Handle"; Rec."Qty. to Handle")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Qty. to Handle field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -137,98 +154,114 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 }
                 field("Qty. Handled"; Rec."Qty. Handled")
                 {
-                    ApplicationArea = All;
+
                     Visible = true;
                     ToolTip = 'Specifies the value of the Qty. Handled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. to Handle (Base)"; Rec."Qty. to Handle (Base)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. to Handle (Base) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. Handled (Base)"; Rec."Qty. Handled (Base)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. Handled (Base) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. Outstanding"; Rec."Qty. Outstanding")
                 {
-                    ApplicationArea = All;
+
                     Visible = true;
                     ToolTip = 'Specifies the value of the Qty. Outstanding field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. Outstanding (Base)"; Rec."Qty. Outstanding (Base)")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. Outstanding (Base) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Due Date"; Rec."Due Date")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Due Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Qty. per Unit of Measure"; Rec."Qty. per Unit of Measure")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. per Unit of Measure field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipping Advice"; Rec."Shipping Advice")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipping Advice field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Destination Type"; Rec."Destination Type")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Destination Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Destination No."; Rec."Destination No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Destination No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Special Equipment Code"; Rec."Special Equipment Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Special Equipment Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Assemble to Order"; Rec."Assemble to Order")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Assemble to Order field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -247,8 +280,9 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     Caption = '&Split Line';
                     Image = Split;
                     ShortCutKey = 'Ctrl+F11';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &Split Line action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -267,8 +301,9 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 {
                     Caption = 'Source &Document Line';
                     Image = SourceDocLine;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Source &Document Line action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -279,8 +314,9 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 {
                     Caption = 'Bin Contents List';
                     Image = BinContent;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Bin Contents List action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -295,8 +331,9 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     {
                         Caption = 'Event';
                         Image = "Event";
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Event action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -307,8 +344,9 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     {
                         Caption = 'Period';
                         Image = Period;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Period action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -319,8 +357,9 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     {
                         Caption = 'Variant';
                         Image = ItemVariant;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Variant action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin
@@ -332,8 +371,9 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                         AccessByPermission = TableData Location = R;
                         Caption = 'Location';
                         Image = Warehouse;
-                        ApplicationArea = All;
+
                         ToolTip = 'Executes the Location action';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         begin

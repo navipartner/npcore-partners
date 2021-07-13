@@ -6,8 +6,9 @@ page 6151494 "NPR Raptor Action List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Raptor Action";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,30 +18,35 @@ page 6151494 "NPR Raptor Action List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Type Description"; Rec."Data Type Description")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Data Type Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Raptor Module Code"; Rec."Raptor Module Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Raptor Module Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Raptor Module API Req. String"; Rec."Raptor Module API Req. String")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Raptor Module API Req. String field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -14,9 +14,10 @@ page 6014656 "NPR POS EOD Profiles Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -25,18 +26,21 @@ page 6014656 "NPR POS EOD Profiles Step"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End of Day Type"; Rec."End of Day Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End of Day Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Master POS Unit No."; Rec."Master POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Master POS Unit No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -58,28 +62,33 @@ page 6014656 "NPR POS EOD Profiles Step"
                 }
                 field("Z-Report UI"; Rec."Z-Report UI")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Z-Report UI field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("X-Report UI"; Rec."X-Report UI")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the X-Report UI field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Close Workshift UI"; Rec."Close Workshift UI")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Close Workshift UI field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Force Blind Counting field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("SMS Profile"; Rec."SMS Profile")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the SMS Profile field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -100,8 +109,9 @@ page 6014656 "NPR POS EOD Profiles Step"
                 }
                 field("Z-Report Number Series"; Rec."Z-Report Number Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Z-Report Number Series field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -122,8 +132,9 @@ page 6014656 "NPR POS EOD Profiles Step"
                 }
                 field("X-Report Number Series"; Rec."X-Report Number Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the X-Report Number Series field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -144,8 +155,9 @@ page 6014656 "NPR POS EOD Profiles Step"
                 }
                 field("Show Zero Amount Lines"; Rec."Show Zero Amount Lines")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Show Zero Amount Lines field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

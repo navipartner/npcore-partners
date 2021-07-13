@@ -3,7 +3,7 @@ report 6060101 "NPR Data Cleanup Test"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Test.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Data Cleanup Test';
     dataset
     {
@@ -79,23 +79,26 @@ report 6060101 "NPR Data Cleanup Test"
             {
                 field("Cleanup Action"; CleanupAction)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Cleanup Action';
                     OptionCaption = 'Delete,Rename,Both';
                     ToolTip = 'Specifies the value of the Cleanup Action field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Option"; TableOption)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Table Option';
                     OptionCaption = 'Option All,Customer,Vendor,Item,GLAccount';
                     ToolTip = 'Specifies the value of the Table Option field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No Filter"; NoFilter)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'No. Filter';
                     ToolTip = 'Specifies the value of the No. Filter field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

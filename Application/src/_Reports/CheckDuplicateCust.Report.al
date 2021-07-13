@@ -3,7 +3,7 @@ report 6060111 "NPR Check Duplicate Cust."
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Customers.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Check Duplicate Customers';
 
     dataset
@@ -116,20 +116,23 @@ report 6060111 "NPR Check Duplicate Cust."
                     field("Check Name"; CheckName)
                     {
                         Caption = 'Name';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Name field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Check Addr"; CheckAddr)
                     {
                         Caption = 'Address';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Address field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Check Phone"; CheckPhone)
                     {
                         Caption = 'Phone No.';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Phone No. field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

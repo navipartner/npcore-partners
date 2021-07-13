@@ -13,8 +13,9 @@ page 6059953 "NPR Disp. Content Lines Img"
             // field(Image; Rec.Picture)
             field(Image; Rec.Image)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Image field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -24,10 +25,11 @@ page 6059953 "NPR Disp. Content Lines Img"
         {
             action(ImportPicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a picture file.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -60,7 +62,7 @@ page 6059953 "NPR Disp. Content Lines Img"
             }
             // action(ExportPicture)
             // {
-            //     ApplicationArea = Basic, Suite;
+            //     ApplicationArea = NPRRetail;
             //     Caption = 'Export';
             //     Enabled = DeleteExportEnabled;
             //     Image = Export;
@@ -86,11 +88,12 @@ page 6059953 "NPR Disp. Content Lines Img"
             // }
             action(DeletePicture)
             {
-                ApplicationArea = Basic, Suite;
+
                 Caption = 'Delete';
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
                 ToolTip = 'Delete the record.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

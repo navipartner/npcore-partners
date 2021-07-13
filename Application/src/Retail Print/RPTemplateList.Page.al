@@ -6,7 +6,8 @@ page 6014639 "NPR RP Template List"
     PageType = List;
     SourceTable = "NPR RP Template Header";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,33 +18,39 @@ page 6014639 "NPR RP Template List"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printer Type"; Rec."Printer Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printer Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Printer Device"; Rec."Printer Device")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Printer Device field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comments field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Last Modified At"; Rec."Last Modified At")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Last Modified At field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -52,7 +59,8 @@ page 6014639 "NPR RP Template List"
             part(Control6014409; "NPR RP Template Media Factbox")
             {
                 SubPageLink = Template = FIELD(Code);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -65,8 +73,9 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Create Copy';
                 Image = Copy;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Create Copy action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -81,8 +90,9 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Export Package (Selected)';
                 Image = Export;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Package (Selected) action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -97,8 +107,9 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Export Package (All)';
                 Image = Export;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export Package (All) action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -113,8 +124,9 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Import Package File';
                 Image = Import;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Package File action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -127,8 +139,9 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Download Template data';
                 Image = ImportDatabase;
-                ApplicationArea = All;
+
                 ToolTip = 'Downloads Template data.';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

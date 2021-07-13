@@ -4,7 +4,8 @@ page 6059768 "NPR NaviDocs Handling Profiles"
     PageType = List;
     SourceTable = "NPR NaviDocs Handling Profile";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,33 +15,39 @@ page 6059768 "NPR NaviDocs Handling Profiles"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handle by NAS"; Rec."Handle by NAS")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handle by NAS field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default for Print"; Rec."Default for Print")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print All Containing Entry field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default for E-Mail"; Rec."Default for E-Mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default for E-Mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Electronic Document"; Rec."Default Electronic Document")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default for Electronic Document field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

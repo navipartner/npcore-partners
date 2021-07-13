@@ -14,10 +14,11 @@ page 6014688 "NPR POS Posting Setup Step"
             {
                 field("POS Store Code"; POSStoreCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'POS Store Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSStoreCode field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -32,10 +33,11 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("POS Payment Method Code"; POSPaymentMethodCode)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'POS Payment Method Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSPaymentMethodCode field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -50,10 +52,11 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("POS Payment Bin Code"; POSPaymentBinNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'POS Payment Bin Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSPaymentBinNo field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -68,10 +71,11 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("Close to POS Bin No."; CloseToPOSPaymentBinNo)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Close to POS Bin No.';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the CloseToPOSPaymentBinNo field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -86,8 +90,9 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("Account Type"; Rec."Account Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -96,8 +101,9 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("Account No."; Rec."Account No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Account No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -150,8 +156,9 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("Difference Account Type"; Rec."Difference Account Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Difference Account Type field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -162,8 +169,9 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("Difference Acc. No."; Rec."Difference Acc. No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Difference Acc. No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -216,8 +224,9 @@ page 6014688 "NPR POS Posting Setup Step"
                 }
                 field("Difference Acc. No. (Neg)"; Rec."Difference Acc. No. (Neg)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Difference Acc. No. (Neg) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

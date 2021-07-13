@@ -7,8 +7,9 @@ page 6184852 "NPR FR POS Audit Log Aux. Info"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR FR POS Audit Log Aux. Info";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,63 +19,75 @@ page 6184852 "NPR FR POS Audit Log Aux. Info"
             {
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Version"; Rec."NPR Version")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Version field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Name"; Rec."Store Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Name 2"; Rec."Store Name 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Name 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Address"; Rec."Store Address")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Address field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Address 2"; Rec."Store Address 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Address 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Post Code"; Rec."Store Post Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Post Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store City"; Rec."Store City")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store City field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Siret"; Rec."Store Siret")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Siret field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(APE; Rec.APE)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the APE field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Intra-comm. VAT ID"; Rec."Intra-comm. VAT ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Intra-comm. VAT ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Name"; Rec."Salesperson Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Salesperson Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

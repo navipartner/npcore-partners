@@ -8,7 +8,7 @@ page 6151537 "NPR Nc Endpoint Types"
     PageType = List;
     SourceTable = "NPR Nc Endpoint Type";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -18,8 +18,9 @@ page 6151537 "NPR Nc Endpoint Types"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -41,8 +42,9 @@ page 6151537 "NPR Nc Endpoint Types"
                 RunPageLink = "Endpoint Type" = FIELD(Code);
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Endpoints action';
+                ApplicationArea = NPRNaviConnect;
             }
         }
     }

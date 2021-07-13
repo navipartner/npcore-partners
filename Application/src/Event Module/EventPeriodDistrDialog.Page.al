@@ -3,7 +3,8 @@ page 6059831 "NPR Event Period Distr. Dialog"
     Caption = 'Event Period Distr. Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,9 +15,10 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 ShowCaption = false;
                 field(StartingDate; TempJobPlanningLine."Planning Date")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Starting Date';
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -27,9 +29,10 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 }
                 field(EndingDate; TempJobPlanningLine."Planned Delivery Date")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Ending Date';
                     ToolTip = 'Specifies the value of the Ending Date field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -40,9 +43,10 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 }
                 field(StartingTime; TempJobPlanningLine."NPR Starting Time")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Starting Time';
                     ToolTip = 'Specifies the value of the Starting Time field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -52,9 +56,10 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 }
                 field(EndingTime; TempJobPlanningLine."NPR Ending Time")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Ending Time';
                     ToolTip = 'Specifies the value of the Ending Time field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -64,22 +69,25 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 }
                 field(UnitOfMeasure; TempJobPlanningLine."Unit of Measure Code")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Unit of Measure';
                     ToolTip = 'Specifies the value of the Unit of Measure field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Quantity; TempJobPlanningLine.Quantity)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Quantity';
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(DaysOfTheWeek; DaysOfWeekOption)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Days Of The Week';
                     OptionCaption = 'All,Some';
                     ToolTip = 'Specifies the value of the Days Of The Week field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -93,52 +101,59 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 }
                 field(Monday; DaysOfWeek[1])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Monday';
                     Enabled = DaysArrayEnabled;
                     ToolTip = 'Specifies the value of the Monday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Tuesday; DaysOfWeek[2])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Tuesday';
                     Enabled = DaysArrayEnabled;
                     ToolTip = 'Specifies the value of the Tuesday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Wednesday; DaysOfWeek[3])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Wednesday';
                     Enabled = DaysArrayEnabled;
                     ToolTip = 'Specifies the value of the Wednesday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Thursday; DaysOfWeek[4])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Thursday';
                     Enabled = DaysArrayEnabled;
                     ToolTip = 'Specifies the value of the Thursday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Friday; DaysOfWeek[5])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Friday';
                     Enabled = DaysArrayEnabled;
                     ToolTip = 'Specifies the value of the Friday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Saturday; DaysOfWeek[6])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Saturday';
                     Enabled = DaysArrayEnabled;
                     ToolTip = 'Specifies the value of the Saturday field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Sunday; DaysOfWeek[7])
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Sunday';
                     Enabled = DaysArrayEnabled;
                     ToolTip = 'Specifies the value of the Sunday field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

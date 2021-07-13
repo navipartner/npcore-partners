@@ -16,33 +16,39 @@ page 6059783 "NPR POS Payment Bins Select"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Attached to POS Unit No."; Rec."Attached to POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Attached to POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Eject Method"; Rec."Eject Method")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Eject Method field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bin Type"; Rec."Bin Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Bin Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

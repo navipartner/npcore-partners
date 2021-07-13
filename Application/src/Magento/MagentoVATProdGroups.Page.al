@@ -5,7 +5,8 @@ page 6151410 "NPR Magento VAT Prod. Groups"
     PageType = List;
     SourceTable = "NPR Magento VAT Prod. Group";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -15,18 +16,21 @@ page 6151410 "NPR Magento VAT Prod. Groups"
             {
                 field("VAT Product Posting Group"; Rec."VAT Product Posting Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Product Posting Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Magento Tax Class"; Rec."Magento Tax Class")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Magento Tax Class field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -44,8 +48,9 @@ page 6151410 "NPR Magento VAT Prod. Groups"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup VAT Product Posting Groups action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

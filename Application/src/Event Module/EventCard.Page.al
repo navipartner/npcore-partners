@@ -3,11 +3,12 @@ page 6060150 "NPR Event Card"
     Caption = 'Event Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PromotedActionCategories = 'New,Process,Report,Prices,Tickets';
     RefreshOnActivate = true;
     SourceTable = Job;
     SourceTableView = WHERE("NPR Event" = CONST(true));
+    ApplicationArea = NPRRetail;
     layout
     {
         area(content)
@@ -17,9 +18,10 @@ page 6060150 "NPR Event Card"
                 Caption = 'General';
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -29,90 +31,104 @@ page 6060150 "NPR Event Card"
                 }
                 field("Event Status"; Rec."NPR Event Status")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies a status for the current event. You can change the status for the event as it progresses. Final calculations can be made on completed events.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies a short description of the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Event Customer No."; Rec."NPR Event Customer No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the number of the customer who pays for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Contact No."; Rec."Bill-to Contact No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the number of the contact person at the customer''s billing address.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Name"; Rec."Bill-to Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     Importance = Promoted;
                     ToolTip = 'Specifies the name of the customer who pays for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Address"; Rec."Bill-to Address")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the address of the customer to whom you will send the invoice.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Address 2"; Rec."Bill-to Address 2")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies an additional line of the address.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Post Code"; Rec."Bill-to Post Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the postal code of the customer who pays for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to City"; Rec."Bill-to City")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the city of the address.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Country/Region Code"; Rec."Bill-to Country/Region Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     Importance = Additional;
                     ToolTip = 'Specifies the country/region code of the customer''s billing address.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Contact"; Rec."Bill-to Contact")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the name of the contact person at the customer who pays for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Bill-to E-Mail"; Rec."NPR Bill-to E-Mail")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the e-mail of the customer who pays for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Search Description"; Rec."Search Description")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies an additional description of the event for searching purposes.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Person Responsible"; Rec."Person Responsible")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     Importance = Promoted;
                     ToolTip = 'Specifies the person at your company who is responsible for the event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -121,38 +137,44 @@ page 6060150 "NPR Event Card"
                 }
                 field("Person Responsible Name"; Rec."NPR Person Responsible Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the name of the person at your company who is responsible for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Organizer E-Mail"; Rec."NPR Organizer E-Mail")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     Importance = Additional;
                     ToolTip = 'Specifies an e-mail of the organization or a person that will hold exchange items for this event. Exchange items are e-mails, appointments and meeting requests.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Calendar Item Status"; Rec."NPR Calendar Item Status")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Shows information about last action taken towards exchange calendar and suggest whether an update to the calendar is needed.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Job Posting Group"; Rec."Job Posting Group")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     ToolTip = 'Specifies the posting group that links transactions made for the event with the appropriate general ledger accounts according to the general posting setup.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Total Amount"; Rec."NPR Total Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Shows the sum of Line Amount (LCY) on the event lines.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -164,20 +186,23 @@ page 6060150 "NPR Event Card"
                 }
                 field("Est. Total Amount Incl. VAT"; Rec."NPR Est. Total Amt. Incl. VAT")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Shows the sum of Est. Line Amt. Incl. VAT (LCY) on the event lines.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = GlobalEditable;
                     Importance = Additional;
                     ToolTip = 'Specifies the language for this event. Related with extended text funcionality for resources, items and g/l accounts on event lines.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Locked; Rec."NPR Locked")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies if the event is locked to prevent accidental changes on it. Please note that this will not block you from deleting the event';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -186,29 +211,33 @@ page 6060150 "NPR Event Card"
                 }
                 field("Admission Code"; Rec."NPR Admission Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Admission Code when integrating with ticket module. Setting a value in this field will filter pages Ticket Admissions, Admission Schedule Lines and Admission Schedule Entry accessed through actions Ticket Admissions, Admission Schedule Lines and Admission Schedule Entry.';
+                    ApplicationArea = NPRRetail;
                 }
                 group("Additional Information")
                 {
                     Caption = 'Additional Information';
                     field("Last Date Modified"; Rec."Last Date Modified")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies when the event card was last modified.';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Calendar Item ID"; Rec."NPR Calendar Item ID" <> '')
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Appointment Exists';
                         Editable = false;
                         ToolTip = 'Shows if an exchange appointment has been created for the event. It is automatically updated when using actions like Send to Calendar… and Remove from Calendar…';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Mail Item Status"; Rec."NPR Mail Item Status")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Shows information about last e-mail sent through actions under Send E-Mail to. It is automatically updated through those actions.';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -225,48 +254,54 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(AttributeDescriptionSet1; EventAttributeTemplateName[1])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Description';
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of first promoted attribute template. System finds templates by sorting all the attribute templates per Template Name that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription1Set1; RowDescription[1] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the first promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription2Set1; RowDescription[2] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the second promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription3Set1; RowDescription[3] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the third promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription4Set1; RowDescription[4] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the fourth promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription5Set1; RowDescription[5] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the fifth promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control6014512)
@@ -274,19 +309,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption1Set1; ColumnCaption[1] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the first promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_1Set1; AttributeValue[1] [1] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [1] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -295,10 +332,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_1Set1; AttributeValue[2] [1] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [1] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -307,10 +345,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_1Set1; AttributeValue[3] [1] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [1] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -319,10 +358,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_1Set1; AttributeValue[4] [1] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [1] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -331,10 +371,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_1Set1; AttributeValue[5] [1] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [1] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -347,19 +388,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption2Set1; ColumnCaption[2] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the second promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_2Set1; AttributeValue[1] [2] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [2] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -368,10 +411,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_2Set1; AttributeValue[2] [2] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [2] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -380,10 +424,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_2Set1; AttributeValue[3] [2] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [2] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -392,10 +437,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_2Set1; AttributeValue[4] [2] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [2] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -404,10 +450,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_2Set1; AttributeValue[5] [2] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [2] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -420,19 +467,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption3Set1; ColumnCaption[3] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the third promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_3Set1; AttributeValue[1] [3] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [3] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -441,10 +490,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_3Set1; AttributeValue[2] [3] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [3] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -453,10 +503,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_3Set1; AttributeValue[3] [3] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [3] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -465,10 +516,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_3Set1; AttributeValue[4] [3] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [3] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -477,10 +529,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_3Set1; AttributeValue[5] [3] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [3] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -493,19 +546,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption4Set1; ColumnCaption[4] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the fourth promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_4Set1; AttributeValue[1] [4] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [4] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -514,10 +569,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_4Set1; AttributeValue[2] [4] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [4] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -526,10 +582,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_4Set1; AttributeValue[3] [4] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [4] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -538,10 +595,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_4Set1; AttributeValue[4] [4] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [4] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -550,10 +608,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_4Set1; AttributeValue[5] [4] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [4] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -566,19 +625,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption5Set1; ColumnCaption[5] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the fifth promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_5Set1; AttributeValue[1] [5] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [5] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -587,10 +648,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_5Set1; AttributeValue[2] [5] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [5] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -599,10 +661,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_5Set1; AttributeValue[3] [5] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [5] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -611,10 +674,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_5Set1; AttributeValue[4] [5] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [5] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -623,10 +687,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_5Set1; AttributeValue[5] [5] [1])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [5] [1] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -649,48 +714,54 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(AttributeDescriptionSet2; EventAttributeTemplateName[2])
                         {
-                            ApplicationArea = All;
+
                             Caption = 'Description';
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of second promoted attribute template. System finds templates by sorting all the attribute templates per Template Name that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription1Set2; RowDescription[1] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the first promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription2Set2; RowDescription[2] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the second promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription3Set2; RowDescription[3] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the third promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription4Set2; RowDescription[4] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the fourth promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(RowDescription5Set2; RowDescription[5] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             ToolTip = 'Specifies the name of the fifth promoted row value on the row template set for current attribute template. System finds row values based on order you have defined rows that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                     }
                     group(Control6014458)
@@ -698,19 +769,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption1Set2; ColumnCaption[1] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the first promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_1Set2; AttributeValue[1] [1] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [1] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -719,10 +792,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_1Set2; AttributeValue[2] [1] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [1] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -731,10 +805,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_1Set2; AttributeValue[3] [1] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [1] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -743,10 +818,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_1Set2; AttributeValue[4] [1] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [1] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -755,10 +831,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_1Set2; AttributeValue[5] [1] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [1] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -771,19 +848,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption2Set2; ColumnCaption[2] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the second promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_2Set2; AttributeValue[1] [2] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [2] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -792,10 +871,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_2Set2; AttributeValue[2] [2] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [2] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -804,10 +884,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_2Set2; AttributeValue[3] [2] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [2] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -816,10 +897,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_2Set2; AttributeValue[4] [2] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [2] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -828,10 +910,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_2Set2; AttributeValue[5] [2] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [2] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -844,19 +927,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption3Set2; ColumnCaption[3] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the third promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_3Set2; AttributeValue[1] [3] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [3] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -865,10 +950,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_3Set2; AttributeValue[2] [3] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [3] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -877,10 +963,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_3Set2; AttributeValue[3] [3] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [3] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -889,10 +976,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_3Set2; AttributeValue[4] [3] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [3] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -901,10 +989,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_3Set2; AttributeValue[5] [3] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [3] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -917,19 +1006,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption4Set2; ColumnCaption[4] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the fourth promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_4Set2; AttributeValue[1] [4] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [4] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -938,10 +1029,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_4Set2; AttributeValue[2] [4] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [4] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -950,10 +1042,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_4Set2; AttributeValue[3] [4] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [4] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -962,10 +1055,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_4Set2; AttributeValue[4] [4] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [4] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -974,10 +1068,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_4Set2; AttributeValue[5] [4] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [4] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -990,19 +1085,21 @@ page 6060150 "NPR Event Card"
                         ShowCaption = false;
                         field(ColumnCaption5Set2; ColumnCaption[5] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = false;
                             ShowCaption = false;
                             Style = Strong;
                             StyleExpr = TRUE;
                             ToolTip = 'Specifies the name of the fifth promoted column value on the column template set for current attribute template. System finds column values based on order you have defined columns that are marked as Promoted.';
+                            ApplicationArea = NPRRetail;
                         }
                         field(AttributeValue1_5Set2; AttributeValue[1] [5] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable1Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[1] [5] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -1011,10 +1108,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue2_5Set2; AttributeValue[2] [5] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable2Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[2] [5] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -1023,10 +1121,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue3_5Set2; AttributeValue[3] [5] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable3Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[3] [5] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -1035,10 +1134,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue4_5Set2; AttributeValue[4] [5] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable4Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[4] [5] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -1047,10 +1147,11 @@ page 6060150 "NPR Event Card"
                         }
                         field(AttributeValue5_5Set2; AttributeValue[5] [5] [2])
                         {
-                            ApplicationArea = All;
+
                             Enabled = RowEditable5Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the AttributeValue[5] [5] [2] field';
+                            ApplicationArea = NPRRetail;
 
                             trigger OnValidate()
                             begin
@@ -1066,35 +1167,41 @@ page 6060150 "NPR Event Card"
                 Editable = GlobalEditable;
                 field("Preparation Period"; Rec."NPR Preparation Period")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the length of the period it takes for organizer to preapre everything for the event. Used as a check when specifying starting date for the event.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the date on which the event actually starts.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."NPR Starting Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the time at which the event actually starts.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-                    ApplicationArea = All;
+
                     Importance = Promoted;
                     ToolTip = 'Specifies the date on which the event is expected to be completed.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."NPR Ending Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the time at which the event is expected to be completed.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Creation Date"; Rec."Creation Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the date on which you set up the event.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(EventPlanningLinesSubpage; "NPR Event Plan. Lines Sub.")
@@ -1102,7 +1209,8 @@ page 6060150 "NPR Event Card"
                 Editable = GlobalEditable;
                 SubPageLink = "Job No." = FIELD("No."),
                               "NPR Group Source Line No." = CONST(0);
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control6014530; "NPR Event Group.Plan. Line Sub")
             {
@@ -1110,7 +1218,8 @@ page 6060150 "NPR Event Card"
                 SubPageLink = "Job No." = FIELD("No."),
                               "NPR Group Line" = CONST(true);
                 Visible = GroupedLineGroupVisible;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             group("Foreign Trade")
             {
@@ -1118,10 +1227,11 @@ page 6060150 "NPR Event Card"
                 Editable = GlobalEditable;
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = CurrencyCodeEditable;
                     Importance = Promoted;
                     ToolTip = 'Specifies the currency code for the event. By default, the currency code is empty. If you enter a foreign currency code, it results in the event being planned and invoiced in that currency.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -1130,9 +1240,10 @@ page 6060150 "NPR Event Card"
                 }
                 field("Invoice Currency Code"; Rec."Invoice Currency Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = InvoiceCurrencyCodeEditable;
                     ToolTip = 'Specifies the currency code you want to apply when creating invoices for an event. By default, the invoice currency code for an event is based on what currency code is defined on the customer card.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -1146,13 +1257,15 @@ page 6060150 "NPR Event Card"
             part(Control6014404; "NPR Event Comment Sheet")
             {
                 SubPageLink = "Table Name" = CONST(Job), "No." = FIELD("No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 SubPageLink = "No." = FIELD("Bill-to Customer No.");
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control1902136407; "Job No. of Prices FactBox")
             {
@@ -1162,7 +1275,8 @@ page 6060150 "NPR Event Card"
                               "Resource Gr. Filter" = FIELD("Resource Gr. Filter"),
                               "Planning Date Filter" = FIELD("Planning Date Filter");
                 Visible = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control1905650007; "Job WIP/Recognition FactBox")
             {
@@ -1172,22 +1286,26 @@ page 6060150 "NPR Event Card"
                               "Resource Gr. Filter" = FIELD("Resource Gr. Filter"),
                               "Planning Date Filter" = FIELD("Planning Date Filter");
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             systempart(Control1905767507; Notes)
             {
                 Visible = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(Control6014421; "NPR Event Atributes Info")
             {
                 SubPageLink = "Job No." = FIELD("No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -1211,8 +1329,9 @@ page 6060150 "NPR Event Card"
                     RunObject = Page "NPR Event Task Lines";
                     RunPageLink = "Job No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+T';
-                    ApplicationArea = All;
+
                     ToolTip = 'Plan how you want to set up your planning information. In this window you can specify the tasks involved in an event. To start planning an event or to post usage for an event, you must set up at least one event task.';
+                    ApplicationArea = NPRRetail;
                 }
                 action("&Dimensions")
                 {
@@ -1222,8 +1341,9 @@ page 6060150 "NPR Event Card"
                     RunPageLink = "Table ID" = CONST(167),
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea = All;
+
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to journal lines to distribute costs and analyze transaction history.';
+                    ApplicationArea = NPRRetail;
                 }
                 action("&Statistics")
                 {
@@ -1235,8 +1355,9 @@ page 6060150 "NPR Event Card"
                     RunObject = Page "NPR Event Statistics";
                     RunPageLink = "No." = FIELD("No.");
                     ShortCutKey = 'F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'View this event''s statistics.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(SalesDocuments)
                 {
@@ -1245,8 +1366,9 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View sales documents that are related to the selected event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1266,15 +1388,17 @@ page 6060150 "NPR Event Card"
                     RunObject = Page "Comment Sheet";
                     RunPageLink = "Table Name" = CONST(Job),
                                   "No." = FIELD("No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add comments for the record.';
+                    ApplicationArea = NPRRetail;
                 }
                 action("&Online Map")
                 {
                     Caption = '&Online Map';
                     Image = Map;
-                    ApplicationArea = All;
+
                     ToolTip = 'View online map for addresses assigned to this event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -1288,8 +1412,9 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View more details about potential errors/actions that occur on this event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1307,8 +1432,9 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Attributes";
                     RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add attributes which will be associated with this event. Attributes are custom made labels that let you track different statistics per event or can be used as a set of multiple cross-labels for which you can define values.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(WordLayouts)
                 {
@@ -1317,8 +1443,9 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add a word document with specific layout/data for this event.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1336,8 +1463,9 @@ page 6060150 "NPR Event Card"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'View or add different templates to be used for Microsoft Exchange integration. These include e-mails, meeting requests and appointments.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1356,8 +1484,9 @@ page 6060150 "NPR Event Card"
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
                     ToolTip = 'View a summary that shows a nice overview of who the sender and receipients are when using Microsoft Exchange integration. Removes the uncertainty of not knowing to whom the e-mail or a meeting request will be send to.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -1370,7 +1499,7 @@ page 6060150 "NPR Event Card"
                 Visible = ExtendedPriceEnabled;
                 action(SalesPriceLists)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Sales Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
@@ -1378,6 +1507,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you sell to the customer. A product price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1390,7 +1520,7 @@ page 6060150 "NPR Event Card"
                 }
                 action(SalesPriceListsDiscounts)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Sales Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
@@ -1398,6 +1528,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1410,7 +1541,7 @@ page 6060150 "NPR Event Card"
                 }
                 action(PurchasePriceLists)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Purchase Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
@@ -1418,6 +1549,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you buy from the vendor. A product price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1430,7 +1562,7 @@ page 6060150 "NPR Event Card"
                 }
                 action(PurchasePriceListsDiscounts)
                 {
-                    ApplicationArea = Basic, Suite;
+
                     Caption = 'Purchase Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
@@ -1438,6 +1570,7 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you buy from the vendor. A product discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1458,16 +1591,18 @@ page 6060150 "NPR Event Card"
                     Caption = 'Resource &Allocated per Job';
                     Image = ViewJob;
                     RunObject = Page "Resource Allocated per Job";
-                    ApplicationArea = All;
+
                     ToolTip = 'View this event''s resource allocation.';
+                    ApplicationArea = NPRRetail;
                 }
                 action("Res. Gr. All&ocated per Job")
                 {
                     Caption = 'Res. Gr. All&ocated per Job';
                     Image = ResourceGroup;
                     RunObject = Page "Res. Gr. Allocated per Job";
-                    ApplicationArea = All;
+
                     ToolTip = 'View the event''s resource group allocation.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(Tickets)
@@ -1482,8 +1617,9 @@ page 6060150 "NPR Event Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket Schedules";
-                    ApplicationArea = All;
+
                     ToolTip = 'View or set ticket schedules in ticket module.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(TicketAdmissions)
                 {
@@ -1493,8 +1629,9 @@ page 6060150 "NPR Event Card"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'View or set ticket admissions in ticket module. List will be filtered based on value in Admission Code field.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1516,8 +1653,9 @@ page 6060150 "NPR Event Card"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'View or set admissions schedule lines in ticket module. List will be filtered based on value in Admission Code field.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1541,8 +1679,9 @@ page 6060150 "NPR Event Card"
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Admis. Schedule Entry";
                     RunPageLink = "Admission Code" = FIELD("NPR Admission Code");
-                    ApplicationArea = All;
+
                     ToolTip = 'View or set admissions schedule entries in ticket module. List will be filtered based on value in Admission Code field.';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group(History)
@@ -1560,8 +1699,9 @@ page 6060150 "NPR Event Card"
                     RunPageLink = "Job No." = FIELD("No.");
                     RunPageView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
-                    ApplicationArea = All;
+
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -1575,8 +1715,9 @@ page 6060150 "NPR Event Card"
                 {
                     Caption = 'Collect Ticket Printouts';
                     Image = GetSourceDoc;
-                    ApplicationArea = All;
+
                     ToolTip = 'Collects tickets printouts for all issued tickets. Used for tickets which have a layout defined in Magento.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -1597,8 +1738,9 @@ page 6060150 "NPR Event Card"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Open the Copy Job Tasks page.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1617,8 +1759,9 @@ page 6060150 "NPR Event Card"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Open the Copy Jobs To page.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1637,8 +1780,9 @@ page 6060150 "NPR Event Card"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Opens the Event Copy Attr./Templ. page.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1658,8 +1802,9 @@ page 6060150 "NPR Event Card"
                     Caption = 'Send to Calendar';
                     Ellipsis = true;
                     Image = Calendar;
-                    ApplicationArea = All;
+
                     ToolTip = 'Creates an exchange calendar item. This can be either an appointment or a meeting request. Calendar item will be created in the senders calendar. You can use Exch. Int. E-mail Summary action to check who the sender is.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -1672,8 +1817,9 @@ page 6060150 "NPR Event Card"
                     Caption = 'Remove from Calendar';
                     Ellipsis = true;
                     Image = RemoveContacts;
-                    ApplicationArea = All;
+
                     ToolTip = 'Removes an exchange calendar created by Send to Calendar action. You''ll be prompted to select which one (if multiple) and to specify a reson for removal.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -1685,8 +1831,9 @@ page 6060150 "NPR Event Card"
                 {
                     Caption = 'Get Attendee Response';
                     Image = Answers;
-                    ApplicationArea = All;
+
                     ToolTip = 'Checks for the attendee response on the meeting request previously sent. Response from each resource is checked and status is updated in the lines.';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -1703,8 +1850,9 @@ page 6060150 "NPR Event Card"
                         Caption = 'Customer';
                         Ellipsis = true;
                         Image = Customer;
-                        ApplicationArea = All;
+
                         ToolTip = 'Sends an e-mail to the customer who is paying for the event. E-mail sent is fully customizable. Use Exch. Int. Templates action to define subject and body of the e-mail, Word Layouts action to set attachment and Exch. Int. E-mail Summary to check who the sender/receipient is before sending it.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -1719,8 +1867,9 @@ page 6060150 "NPR Event Card"
                         Caption = 'Team';
                         Ellipsis = true;
                         Image = TeamSales;
-                        ApplicationArea = All;
+
                         ToolTip = 'Sends an e-mail to the team responsible to prepare the event. E-mail sent is fully customizable. Use Exch. Int. Templates action to define subject and body of the e-mail, Word Layouts action to set attachment and Exch. Int. E-mail Summary to check who the sender/receipient is before sending it.';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
@@ -1743,8 +1892,9 @@ page 6060150 "NPR Event Card"
                 PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Analysis";
-                ApplicationArea = All;
+
                 ToolTip = 'Analyze the event, such as the budgeted prices, usage prices, and contract prices, and then compares the three sets of prices.';
+                ApplicationArea = NPRRetail;
             }
             action("Job - Planning Lines")
             {
@@ -1754,8 +1904,9 @@ page 6060150 "NPR Event Card"
                 PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job - Planning Lines";
-                ApplicationArea = All;
+
                 ToolTip = 'View all planning lines for the event. You use this window to plan what items, resources, and general ledger expenses that you expect to use on an event (budget) or you can specify what you actually agreed with your customer that he should pay for the event (billable).';
+                ApplicationArea = NPRRetail;
             }
         }
     }

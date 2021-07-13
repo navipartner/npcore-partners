@@ -1,13 +1,13 @@
 page 6151535 "NPR Nc Coll. Create Outg. Req."
 {
     Caption = 'Create Outgoing Collector Req.';
-    DataCaptionExpression = TextCreateNew;
+    DataCaptionExpression = TextCreateNewLbl;
     PageType = Document;
     ShowFilter = false;
     SourceTable = "NPR Nc Collector Request";
     SourceTableTemporary = true;
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -15,52 +15,36 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
         {
             group(General)
             {
+                Caption = 'General';
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
                     Lookup = true;
                     TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Table View"; Rec."Table View")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table View field';
+                    ApplicationArea = NPRNaviConnect;
                 }
-            }
-        }
-    }
-
-    actions
-    {
-        area(processing)
-        {
-            action("Create Request")
-            {
-                Caption = 'Create Request';
-                Image = "SelectEntries";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Create Request action';
-
-                trigger OnAction()
-                begin
-                    CurrPage.Close();
-                end;
             }
         }
     }
 
     trigger OnClosePage()
     var
-        TextConfirmCreate: Label 'Would you like to create this Outgoing Collector Request?';
+        TextConfirmCreateQst: Label 'Would you like to create this Outgoing Collector Request?';
     begin
         if (Rec.Name <> '') and (Rec."Table No." <> 0) then
-            if Confirm(TextConfirmCreate) then
+            if Confirm(TextConfirmCreateQst) then
                 CreateCollectorRequest();
     end;
 
@@ -71,8 +55,8 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
     end;
 
     var
-        TextCreateNew: Label 'Create New Outgoing Collector Request?';
-        TextCreated: Label 'Collector Request %1 created.';
+        TextCreateNewLbl: Label 'Create New Outgoing Collector Request?';
+        TextCreatedLbl: Label 'Collector Request %1 created.', Comment = '%1="NPR Nc Collector Request".Code';
 
     local procedure CreateCollectorRequest()
     var
@@ -88,6 +72,6 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
         NcCollectorRequest.Validate("Table No.", Rec."Table No.");
         NcCollectorRequest.Validate("Table View", Rec."Table View");
         NcCollectorRequest.Modify(true);
-        Message(TextCreated, NcCollectorRequest."No.");
+        Message(TextCreatedLbl, NcCollectorRequest."No.");
     end;
 }

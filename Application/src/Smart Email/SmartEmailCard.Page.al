@@ -12,13 +12,15 @@ page 6059822 "NPR Smart Email Card"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Provider; Rec.Provider)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Provider field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -27,29 +29,34 @@ page 6059822 "NPR Smart Email Card"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Merge Table ID"; Rec."Merge Table ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Merge Table ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Caption"; Rec."Table Caption")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Caption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Smart Email ID"; Rec."Smart Email ID")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Smart Email ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NpXml Template Code"; Rec."NpXml Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NpXml Template Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -62,8 +69,9 @@ page 6059822 "NPR Smart Email Card"
                     Visible = ShowMergeLanguage;
                     field("Merge Language (Mailchimp)"; Rec."Merge Language (Mailchimp)")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Merge Language (Mailchimp) field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -73,47 +81,54 @@ page 6059822 "NPR Smart Email Card"
                 Editable = false;
                 field("Smart Email Name"; Rec."Smart Email Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Smart Email Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Subject; Rec.Subject)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Subject field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(From; Rec.From)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the From field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reply To"; Rec."Reply To")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reply To field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6014403; "NPR Smart Email Variables")
             {
-                ApplicationArea = All;
+
                 SubPageLink = "Transactional Email Code" = FIELD(Code);
                 Visible = ShowVariablesSubPage;
+                ApplicationArea = NPRRetail;
             }
             group("Preview")
             {
                 Caption = 'Preview';
                 field("Preview Url"; Rec."Preview Url")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ExtendedDatatype = URL;
                     ToolTip = 'Specifies the value of the Preview Url field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var

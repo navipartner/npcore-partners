@@ -4,7 +4,7 @@ report 6014535 "NPR Sales Statistics By Dept."
     RDLCLayout = './src/_Reports/layouts/Sales Statistics By Department.rdlc';
     Caption = 'Sales Statistics By Department';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem("Dimension Value"; "Dimension Value")
@@ -410,40 +410,46 @@ report 6014535 "NPR Sales Statistics By Dept."
                     field("antal niveauer"; antalniveauer)
                     {
                         Caption = 'Show no. of levels';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show no. of levels field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("kunmed salg"; kunmedsalg)
                     {
                         Caption = 'Only with sales';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Only with sales field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("vis varer"; visvarer)
                     {
                         Caption = 'Print items';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print items field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("last Year"; lastYear)
                     {
                         Caption = 'Print last years numbers';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Print last years numbers field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("is Grouped By Location"; isGroupedByLocation)
                     {
                         CaptionClass = txtLabeldim1;
                         Caption = 'Group by';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Group by field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sales Person"; SalesPerson)
                     {
                         Caption = 'Sales Person';
                         TableRelation = "Salesperson/Purchaser".Code;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sales Person field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

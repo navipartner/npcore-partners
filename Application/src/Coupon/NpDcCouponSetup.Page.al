@@ -4,7 +4,8 @@ page 6151602 "NPR NpDc Coupon Setup"
     PageType = Card;
     SourceTable = "NPR NpDc Coupon Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -14,28 +15,33 @@ page 6151602 "NPR NpDc Coupon Setup"
             {
                 field("Coupon No. Series"; Rec."Coupon No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Arch. Coupon No. Series"; Rec."Arch. Coupon No. Series")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posted Coupon No. Series field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference No. Pattern"; Rec."Reference No. Pattern")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference No. Pattern field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print Template Code"; Rec."Print Template Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print Template Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Print on Issue"; Rec."Print on Issue")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Print on Issue field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -3,10 +3,11 @@ page 6014616 "NPR Display Groups WP"
     Caption = 'Display Groups';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Display Group";
     SourceTableTemporary = true;
     DelayedInsert = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,9 +17,10 @@ page 6014616 "NPR Display Groups WP"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -27,8 +29,9 @@ page 6014616 "NPR Display Groups WP"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

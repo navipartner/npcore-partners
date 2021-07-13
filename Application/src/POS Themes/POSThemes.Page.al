@@ -6,7 +6,8 @@ page 6150735 "NPR POS Themes"
     PageType = List;
     SourceTable = "NPR POS Theme";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,18 +17,21 @@ page 6150735 "NPR POS Themes"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -47,8 +51,9 @@ page 6150735 "NPR POS Themes"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Theme Dependencies";
                 RunPageLink = "POS Theme Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Theme Dependencies action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

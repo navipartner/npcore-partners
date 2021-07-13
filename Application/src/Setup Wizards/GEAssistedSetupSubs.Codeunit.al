@@ -40,7 +40,7 @@ codeunit 6014490 "NPR GE Assisted Setup Subs"
                                                 100,
                                                 ObjectType::Page,
                                                 Page::"NPR Magento Wizard",
-                                                AssistedSetupGroup::"NP Retail",
+                                                AssistedSetupGroup::NPRetail,
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
@@ -74,7 +74,7 @@ codeunit 6014490 "NPR GE Assisted Setup Subs"
                                                 100,
                                                 ObjectType::Page,
                                                 Page::"NPR Retail Wizard",
-                                                AssistedSetupGroup::"NP Retail",
+                                                AssistedSetupGroup::NPRetail,
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');

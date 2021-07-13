@@ -8,8 +8,9 @@ page 6059834 "NPR Event Comment Sheet"
     MultipleNewLines = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Comment Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -20,19 +21,19 @@ page 6059834 "NPR Event Comment Sheet"
                 ShowCaption = false;
                 field("Date"; Rec.Date)
                 {
-                    ApplicationArea = Comments;
                     ToolTip = 'Specifies the date the comment was created.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment itself.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = Comments;
                     ToolTip = 'Specifies a code for the comment.';
                     Visible = false;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

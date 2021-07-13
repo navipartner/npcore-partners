@@ -4,8 +4,9 @@ page 6150654 "NPR POS Paym. Line Subpage"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR POS Entry Payment Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,53 +16,63 @@ page 6150654 "NPR POS Paym. Line Subpage"
             {
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Payment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin Code"; Rec."POS Payment Bin Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Payment Bin Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Paid Currency Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount (LCY)"; Rec."Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount (Sales Currency)"; Rec."Amount (Sales Currency)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Amount (Sales Currency) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Document No."; Rec."External Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Document No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Amount (LCY)"; Rec."VAT Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT Base Amount (LCY)"; Rec."VAT Base Amount (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the VAT Base Amount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -75,8 +86,9 @@ page 6150654 "NPR POS Paym. Line Subpage"
             {
                 Caption = 'Dimensions';
                 Image = Dimensions;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Dimensions action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

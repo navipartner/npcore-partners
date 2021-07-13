@@ -1,4 +1,4 @@
-﻿page 6151553 "NPR NpXml Elements"
+page 6151553 "NPR NpXml Elements"
 {
     AutoSplitKey = true;
     Caption = 'Xml Elements';
@@ -7,9 +7,10 @@
     MultipleNewLines = true;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PromotedActionCategories = 'New,Process,Report,Manage';
     SourceTable = "NPR NpXml Element";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -23,31 +24,36 @@
                 ShowAsTree = true;
                 field("Element Name"; Rec."Element Name")
                 {
-                    ApplicationArea = All;
+
                     Style = Strong;
                     StyleExpr = ContainerElement;
                     ToolTip = 'Specifies the value of the Element Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Namespace; Rec.Namespace)
                 {
-                    ApplicationArea = All;
+
                     Visible = NamespacesEnabled;
                     ToolTip = 'Specifies the value of the Namespace field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Active; Rec.Active)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Active field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Hidden; Rec.Hidden)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Hidden field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -57,155 +63,184 @@
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field No."; Rec."Field No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Template Version No."; Rec."Template Version No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Template Version No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Value"; Rec."Default Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Prefix; Rec.Prefix)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Prefix field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(CDATA; Rec.CDATA)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the CDATA field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Field Type"; Rec."Field Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Field Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Enum List (,)"; Rec."Enum List (,)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Enum List field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Custom Codeunit ID"; Rec."Custom Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Custom Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Custom Codeunit Name"; Rec."Custom Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Custom Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Xml Value Function"; Rec."Xml Value Function")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Xml Value Function field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Xml Value Codeunit ID"; Rec."Xml Value Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Xml Value Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Xml Value Codeunit Name"; Rec."Xml Value Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Xml Value Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Generic Child Function"; Rec."Generic Child Function")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Generic Child Function field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Generic Child Codeunit ID"; Rec."Generic Child Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Generic Child Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Generic Child Codeunit Name"; Rec."Generic Child Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Generic Child Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Only with Value"; Rec."Only with Value")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Only with Value field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Iteration Type"; Rec."Iteration Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Iteration Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reverse Sign"; Rec."Reverse Sign")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reverse Sign field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Round Precision"; Rec."Round Precision")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies rounding precision for number values. For example: 0.01 means that value will have 2 decimals; 100 means that it could be 100, 200, 300...';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Round Direction"; Rec."Round Direction")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies rounding direction for number values. There are three options: ''<'' (rounds down), ''>'' (rounds up) and ''='' (rounds up or down to the nearest value (default). Values of 5 or greater are rounded up. Values less than 5 are rounded down)';
+                    ApplicationArea = NPRRetail;
                 }
                 field("No of Chars (Trunc. to Length)"; Rec."No of Chars (Trunc. to Length)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the length of field. Enter number of characters on which the value will be truncated.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Lower Case"; Rec."Lower Case")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Lower Case field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Blank Zero"; Rec."Blank Zero")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Blank Zero field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Replace Inherited Filters"; Rec."Replace Inherited Filters")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies whether it is allowed to replaces filters, inherited from parent Xml elements, if another filter has been set up for the same field for current Xml Element. If the option is not activated, both filters will be applied for the field at the same time (using different FilterGroups)';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Has Filter"; Rec."Has Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Has Filter field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Has Attribute"; Rec."Has Attribute")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Has Attribute field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(PagePartMappingFilter; "NPR NpXml Filters")
@@ -213,14 +248,16 @@
                 ShowFilter = false;
                 SubPageLink = "Xml Template Code" = FIELD("Xml Template Code"),
                               "Xml Element Line No." = FIELD("Line No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
             part(PagePartAttributes; "NPR NpXml Attributes")
             {
                 ShowFilter = false;
                 SubPageLink = "Xml Template Code" = FIELD("Xml Template Code"),
                               "Xml Element Line No." = FIELD("Line No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }
@@ -239,8 +276,9 @@
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Insert';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the New Element (Sibling) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -255,8 +293,9 @@
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Insert';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the New Element (Child) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -271,8 +310,9 @@
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Alt+Insert';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the New Element (Parent) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -288,8 +328,9 @@
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Delete';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Delete action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -309,8 +350,9 @@
                 {
                     Caption = 'Copy from Xml Template';
                     Image = CopyWorksheet;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Copy from Xml Template action';
+                    ApplicationArea = NPRRetail;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -328,8 +370,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Preview Xml action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -340,8 +383,9 @@
                 {
                     Caption = 'Normalize';
                     Image = ExchProdBOMItem;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Normalize action';
+                    ApplicationArea = NPRRetail;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -362,8 +406,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Move Up action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -378,8 +423,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Move Down action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -394,8 +440,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Decrement Level action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -410,8 +457,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Increment Level action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

@@ -1,13 +1,14 @@
-﻿page 6151558 "NPR NpXml Template Triggers"
+page 6151558 "NPR NpXml Template Triggers"
 {
     AutoSplitKey = true;
     Caption = 'Xml Template Triggers';
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     ShowFilter = false;
     SourceTable = "NPR NpXml Template Trigger";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,56 +18,65 @@
             {
                 field("Table No."; Rec."Table No.")
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Insert Trigger"; Rec."Insert Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Insert Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Modify Trigger"; Rec."Modify Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Modify Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delete Trigger"; Rec."Delete Trigger")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delete Trigger field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = All;
+
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Comment field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Generic Parent Function"; Rec."Generic Parent Function")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Generic Parent Function field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Generic Parent Codeunit ID"; Rec."Generic Parent Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Generic Parent Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Generic Parent Codeunit Name"; Rec."Generic Parent Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Generic Parent Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -80,8 +90,9 @@
             {
                 Caption = 'Trigger Links';
                 Image = Links;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Trigger Links action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -96,8 +107,9 @@
             {
                 Caption = 'Move Up';
                 Image = MoveUp;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Move Up action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -108,8 +120,9 @@
             {
                 Caption = 'Move Down';
                 Image = MoveDown;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Move Down action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -123,8 +136,9 @@
                 {
                     Caption = 'Decrement Level';
                     Image = PreviousRecord;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Decrement Level action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -135,8 +149,9 @@
                 {
                     Caption = 'Increment Level';
                     Image = NextRecord;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Increment Level action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin

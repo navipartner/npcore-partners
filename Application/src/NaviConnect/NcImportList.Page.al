@@ -8,7 +8,7 @@ page 6151504 "NPR Nc Import List"
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -20,51 +20,59 @@ page 6151504 "NPR Nc Import List"
                 ShowCaption = false;
                 field("Date"; Rec.Date)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Date field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("<Filter Import Type>"; Rec."Import Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Type field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Document ID"; Rec."Document ID")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document ID field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Sequence No."; Rec."Sequence No.")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sequence No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Document Name"; Rec."Document Name")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document Name field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field(Imported; Rec.Imported)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Imported field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Runtime Error"; Rec."Runtime Error")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Runtime Error field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Error Message"; Rec."Error Message")
                 {
-                    ApplicationArea = All;
+
                     DrillDown = true;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Error Message field';
+                    ApplicationArea = NPRNaviConnect;
 
                     trigger OnDrillDown()
                     var
@@ -75,65 +83,76 @@ page 6151504 "NPR Nc Import List"
                 }
                 field("Last Error E-mail Sent at"; Rec."Last Error E-mail Sent at")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Error E-mail Sent at field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Error E-mail Sent to"; Rec."Last Error E-mail Sent to")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Error E-mail Sent to field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Started at"; Rec."Import Started at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Started at field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Completed at"; Rec."Import Completed at")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Completed at field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Duration"; Rec."Import Duration")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Duration (sec.) field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Count"; Rec."Import Count")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Import Count field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Started by"; Rec."Import Started by")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Import Started by field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Server Instance Id"; Rec."Server Instance Id")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Server Instance Id field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Session Id"; Rec."Session Id")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Session Id field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Earliest Import Datetime"; Rec."Earliest Import Datetime")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Earliest Import Datetime field';
+                    ApplicationArea = NPRNaviConnect;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRNaviConnect;
                 }
 
             }
@@ -142,10 +161,11 @@ page 6151504 "NPR Nc Import List"
                 ShowCaption = false;
                 field("COUNT"; Rec.Count)
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Quantity';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Quantity field';
+                    ApplicationArea = NPRNaviConnect;
                 }
             }
         }
@@ -164,8 +184,9 @@ page 6151504 "NPR Nc Import List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import Selected action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -182,8 +203,9 @@ page 6151504 "NPR Nc Import List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F8';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Filter Imported action which will change filter on Imported field';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -202,8 +224,9 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Reschedule Selected for Import';
                 Image = UpdateXML;
                 ShortCutKey = 'F9';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reschedule Selected for Import action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -214,8 +237,9 @@ page 6151504 "NPR Nc Import List"
             {
                 Caption = 'Add File';
                 Image = Save;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Add File action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -229,8 +253,9 @@ page 6151504 "NPR Nc Import List"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Document Source action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -244,8 +269,9 @@ page 6151504 "NPR Nc Import List"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Show Formatted Source action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -257,12 +283,13 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Edit File';
                 Image = EditAttachment;
                 Visible = NOT WebClient;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Edit File action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
-                    Message(Text008);
+                    Message(EditFileMsg);
                 end;
             }
             action("Export File")
@@ -270,8 +297,9 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Export File';
                 Image = ExportAttachment;
                 Visible = WebClient;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Export File action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -291,8 +319,9 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Import File';
                 Image = ImportCodes;
                 Visible = WebClient;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import File action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 var
@@ -305,7 +334,7 @@ page 6151504 "NPR Nc Import List"
                     Extension := FileMgt.GetExtension(Rec."Document Name");
                     if Extension = '' then
                         Extension := '*';
-                    FileName := FileMgt.BLOBImportWithFilter(TempBlob, Text005, Rec."Document Name", FileMgt.GetToFilterText('', Rec."Document Name"), '*.' + Extension);
+                    FileName := FileMgt.BLOBImportWithFilter(TempBlob, ImportFileTxt, Rec."Document Name", FileMgt.GetToFilterText('', Rec."Document Name"), '*.' + Extension);
                     if FileName = '' then
                         exit;
 
@@ -328,8 +357,9 @@ page 6151504 "NPR Nc Import List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 ShortCutKey = 'Shift+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Documents action';
+                ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
@@ -347,15 +377,15 @@ page 6151504 "NPR Nc Import List"
     end;
 
     var
-        Text001: Label 'No Input';
-        Text002: Label 'The %1 selected Import Entries will be scheduled for re-import\Continue?';
-        Text003: Label 'No Documents';
-        Text004: Label '%1 Documents have been imported\\%2 Documents failed.';
+        NoInputTxt: Label 'No Input';
+        ScheduleForReImportQst: Label 'The %1 selected Import Entries will be scheduled for re-import\Continue?', Comment = '%1="NPR Nc Import Entry".Count()';
+        NoDocsMsg: Label 'No Documents';
+        NoOfImportedDoscMsg: Label '%1 Documents have been imported\\%2 Documents failed.', Comment = '%1=ImportedCount;%2=ImportEntry.Count()';
         WebClient: Boolean;
-        Text005: Label 'Import File';
-        Text006: Label 'XML Stylesheet is empty for Import Type: %1';
-        Text007: Label 'No Import Filenames matched %1';
-        Text008: Label 'In cloud environments files can not be stored on the server. Please use Export action to download the file, change it and then use Import action to return it into Database.';
+        ImportFileTxt: Label 'Import File';
+        EmptyStyleSheetErr: Label 'XML Stylesheet is empty for Import Type: %1', Comment = '%1="NPR Nc Import Entry"."Import Type"';
+        NoFileMatchErr: Label 'No Import Filenames matched %1', Comment = 'DocNo';
+        EditFileMsg: Label 'In cloud environments files can not be stored on the server. Please use Export action to download the file, change it and then use Import action to return it into Database.';
 
     local procedure AddFile()
     var
@@ -408,7 +438,7 @@ page 6151504 "NPR Nc Import List"
                 ImportedCount += 1;
             until ImportEntry.Next() = 0;
         ImportEntry.SetRange("Runtime Error", true);
-        Message(StrSubstNo(Text004, ImportedCount, ImportEntry.Count));
+        Message(NoOfImportedDoscMsg, ImportedCount, ImportEntry.Count());
     end;
 
     local procedure RescheduleSelectedforImport()
@@ -417,7 +447,7 @@ page 6151504 "NPR Nc Import List"
         NcImportProcessor: Codeunit "NPR Nc Import Processor";
     begin
         CurrPage.SetSelectionFilter(ImportEntry);
-        if Confirm(StrSubstNo(Text002, ImportEntry.Count), true) then begin
+        if Confirm(ScheduleForReImportQst, true, ImportEntry.Count()) then begin
             ImportEntry.ModifyAll(Imported, false, false);
             ImportEntry.ModifyAll("Runtime Error", false, false);
             ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
@@ -437,7 +467,7 @@ page 6151504 "NPR Nc Import List"
         ImportType.Get(Rec."Import Type");
         ImportType.TestField("Lookup Codeunit ID");
         if not (CODEUNIT.Run(ImportType."Lookup Codeunit ID", Rec)) then
-            Message(Text003);
+            Message(NoDocsMsg);
     end;
 
     local procedure ShowDocumentSource()
@@ -466,7 +496,7 @@ page 6151504 "NPR Nc Import List"
                 HyperLink(Path);
             end
         else
-            Message(Text001);
+            Message(NoInputTxt);
     end;
 
     procedure ShowFormattedDocument()
@@ -486,7 +516,7 @@ page 6151504 "NPR Nc Import List"
             NcImportType.Get(Rec."Import Type");
             NcImportType.CalcFields("XML Stylesheet");
             if not NcImportType."XML Stylesheet".HasValue() then
-                Error(Text006, Rec."Import Type");
+                Error(EmptyStyleSheetErr, Rec."Import Type");
 
             NcImportType."XML Stylesheet".CreateInStream(stream, TextEncoding::UTF8);
             while not stream.EOS do begin
@@ -504,7 +534,7 @@ page 6151504 "NPR Nc Import List"
             page.Run();
 
         end else
-            Message(Text001);
+            Message(NoInputTxt);
     end;
 
     procedure ShowFormattedDocByDocNo(DocNo: Text[100])
@@ -513,7 +543,7 @@ page 6151504 "NPR Nc Import List"
         NcImportListPg: Page "NPR Nc Import List";
     begin
         if DocNo = '' then
-            Error(Text001);
+            Error(NoInputTxt);
 
         NcImportEntry.SetFilter("Document Name", '%1', '*' + DocNo + '*');
         if NcImportEntry.FindSet() then begin
@@ -525,7 +555,7 @@ page 6151504 "NPR Nc Import List"
                 NcImportListPg.ShowFormattedDocument();
             end;
         end else
-            Error(Text007, DocNo);
+            Error(NoFileMatchErr, DocNo);
     end;
 }
 

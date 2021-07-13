@@ -4,7 +4,8 @@ report 6014408 "NPR Item Group Overview"
     RDLCLayout = './src/_Reports/layouts/Item Group Overview.rdlc';
     Caption = 'Item Group Overview';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     dataset
     {
         dataitem("Item Category"; "Item Category")

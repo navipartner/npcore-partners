@@ -7,8 +7,9 @@ page 6014612 "NPR Retail Campaign Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Retail Campaign Line";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,24 +19,28 @@ page 6014612 "NPR Retail Campaign Subform"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Amount"; RetailCampaignCalcMgt.CalcSalesAmount(Rec."Campaign Code", Rec."Line No."))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Sales Amount';
                     ToolTip = 'Specifies the value of the Sales Amount field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -44,9 +49,10 @@ page 6014612 "NPR Retail Campaign Subform"
                 }
                 field("Cost Amount"; RetailCampaignCalcMgt.CalcCostAmount(Rec."Campaign Code", Rec."Line No."))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Cost Amount';
                     ToolTip = 'Specifies the value of the Cost Amount field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -55,9 +61,10 @@ page 6014612 "NPR Retail Campaign Subform"
                 }
                 field(Profit; RetailCampaignCalcMgt.CalcProfit(Rec."Campaign Code", Rec."Line No."))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Profit';
                     ToolTip = 'Specifies the value of the Profit field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -66,9 +73,10 @@ page 6014612 "NPR Retail Campaign Subform"
                 }
                 field("Profit %"; RetailCampaignCalcMgt.CalcProfitPct(Rec."Campaign Code", Rec."Line No."))
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Profit %';
                     ToolTip = 'Specifies the value of the Profit % field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin

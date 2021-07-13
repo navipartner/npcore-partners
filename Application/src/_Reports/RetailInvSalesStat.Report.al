@@ -3,7 +3,7 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Inventory - Sales Statistics';
     dataset
     {
@@ -124,10 +124,11 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
                     Caption = 'Options';
                     field("Print Also Without Sale"; PrintAlsoWithoutSale)
                     {
-                        ApplicationArea = Suite;
+
                         Caption = 'Include Items Not Sold';
                         MultiLine = true;
                         ToolTip = 'Specifies if items that have not yet been sold are also included in the report.';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

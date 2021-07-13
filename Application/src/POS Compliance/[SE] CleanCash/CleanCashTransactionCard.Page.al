@@ -16,35 +16,41 @@ page 6014543 "NPR CleanCash Transaction Card"
                 Caption = 'General';
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the transactions unique entry number.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies POS Unit making the request.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Datetime"; Rec."Request Datetime")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies date and time request was created.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Send Status"; Rec."Request Send Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the send status of transaction.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Request Type"; Rec."Request Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the type of transaction.';
+                    ApplicationArea = NPRRetail;
 
                 }
                 field("Response Count"; Rec."Response Count")
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the number of response there are for this transaction.';
+                    ApplicationArea = NPRRetail;
                 }
 
             }
@@ -55,13 +61,15 @@ page 6014543 "NPR CleanCash Transaction Card"
                 Visible = IdentityGroupVisible;
                 field(OrganisationNo; Rec."Organisation No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies organisation number of the sender';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PosId; Rec."Pos Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the POS identity registered with the CleanCash unit.';
+                    ApplicationArea = NPRRetail;
                 }
 
             }
@@ -72,13 +80,15 @@ page 6014543 "NPR CleanCash Transaction Card"
                 Visible = StatusGroupVisible;
                 field(OrganisationNo2; Rec."Organisation No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies organisation number of the sender';
+                    ApplicationArea = NPRRetail;
                 }
                 field(PosId2; Rec."Pos Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the POS identity registered with the CleanCash unit.';
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -90,40 +100,47 @@ page 6014543 "NPR CleanCash Transaction Card"
 
                 field("Receipt Id"; Rec."Receipt Id")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the CleanCash receipt id.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Receipt Type"; Rec."Receipt Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specified type of receipt. Valid values are normal: (Normal sales receipt); kopia: (Copy of sales receipt; ovning: (Training mode sales receipt); profo: (Pro forma receipt).';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Date"; Rec."Receipt DateTime")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'CleanCash receipt date';
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the internal id of the POS sales.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("POS Document No."; Rec."POS Document No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies Document No. from POS sales.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("Receipt Total"; Rec."Receipt Total")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specfies postitive amount of receipt.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Negative Total"; Rec."Negative Total")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specfies negative amount of receipt.';
+                    ApplicationArea = NPRRetail;
                 }
 
                 group(Sender)
@@ -131,13 +148,15 @@ page 6014543 "NPR CleanCash Transaction Card"
                     Caption = 'Originates From';
                     field("Organisation No."; Rec."Organisation No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies organisation number of the sender';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Pos Id"; Rec."Pos Id")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the POS identity registered with the CleanCash unit.';
+                        ApplicationArea = NPRRetail;
                     }
 
                 }
@@ -147,24 +166,27 @@ page 6014543 "NPR CleanCash Transaction Card"
                     Caption = 'Response';
                     field("CleanCash Code"; Rec."CleanCash Code")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'Specifies base-32 encoded string to be printed on the receipt and stored in the POS terminal journal.';
+                        ApplicationArea = NPRRetail;
                     }
                     field("CleanCash Unit Id"; Rec."CleanCash Unit Id")
                     {
-                        ApplicationArea = All;
+
                         Editable = false;
                         ToolTip = 'The CleanCash manufacturing id code.';
+                        ApplicationArea = NPRRetail;
                     }
                 }
 
                 part(VatDetails; "NPR CleanCash Transaction VAT")
                 {
-                    ApplicationArea = All;
+
                     SubPageLink = "Request Entry No." = field("Entry No.");
                     SubPageView = sorting("Request Entry No.", "VAT Class");
                     ShowFilter = false;
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -173,9 +195,10 @@ page 6014543 "NPR CleanCash Transaction Card"
                 Caption = 'Response';
                 part(ResponsePart; "NPR CleanCash Response List")
                 {
-                    ApplicationArea = All;
+
                     SubPageView = sorting("Request Entry No.", "Response No.");
                     SubPageLink = "Request Entry No." = field("Entry No.");
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -187,10 +210,11 @@ page 6014543 "NPR CleanCash Transaction Card"
         {
             action(TrySendRequest)
             {
-                ApplicationArea = All;
+
                 Caption = 'Send Request';
                 ToolTip = 'If the request does not have status COMPLETE as request status, it can be resent to CleanCash.';
                 Image = SendTo;
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

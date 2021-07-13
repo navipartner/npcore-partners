@@ -7,8 +7,9 @@ page 6059972 "NPR Variety Table"
     Caption = 'Variety Table';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Variety Table";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,39 +19,46 @@ page 6059972 "NPR Variety Table"
             {
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use in Variant Description"; Rec."Use in Variant Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Use in Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Pre tag In Variant Description"; Rec."Pre tag In Variant Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Pre tag In Variant Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Use Description field"; Rec."Use Description field")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Use Description field field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Lock Table"; Rec."Lock Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Lock Table field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -72,8 +80,9 @@ page 6059972 "NPR Variety Table"
                 RunPageLink = Type = FIELD(Type),
                               Table = FIELD(Code);
                 RunPageView = SORTING(Type, Table, Value);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Values action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

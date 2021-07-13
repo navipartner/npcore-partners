@@ -6,7 +6,8 @@ page 6151171 "NPR NpGp Global POSSalesSetups"
     PageType = List;
     SourceTable = "NPR NpGp POS Sales Setup";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,18 +17,21 @@ page 6151171 "NPR NpGp Global POSSalesSetups"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Company Name field';
+                    ApplicationArea = NPRRetail;;
                 }
                 field("Service Url"; Rec."Service Url")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Service Url field';
+                    ApplicationArea = NPRRetail;;
                 }
             }
         }

@@ -14,23 +14,27 @@ page 6150743 "NPR POS Restaur. Profile Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Default Seating Location"; Rec."Default Seating Location")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Default Seating Location field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

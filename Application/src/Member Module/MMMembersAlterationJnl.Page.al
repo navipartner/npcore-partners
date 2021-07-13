@@ -1,4 +1,4 @@
-﻿page 6060073 "NPR MM Members. Alteration Jnl"
+page 6060073 "NPR MM Members. Alteration Jnl"
 {
 
     Caption = 'Membership Alteration Journal';
@@ -6,7 +6,8 @@
     SourceTable = "NPR MM Member Info Capture";
     SourceTableView = WHERE("Source Type" = CONST(ALTERATION_JNL));
     UsageCategory = Tasks;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,21 +17,24 @@
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; AlterationOption)
                 {
-                    ApplicationArea = All;
+
                     OptionCaption = ' ,Regret,Renew,Upgrade,Extend,Cancel';
                     ToolTip = 'Specifies the value of the AlterationOption field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Membership No."; Rec."External Membership No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Membership No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -46,14 +50,16 @@
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Item No. field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -69,18 +75,21 @@
                 }
                 field("Document Date"; Rec."Document Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Document Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Response Status"; Rec."Response Status")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Response Status field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -90,9 +99,10 @@
                 }
                 field("Response Message"; Rec."Response Message")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Response Message field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -110,8 +120,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Check action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -128,8 +139,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Check and Execute action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -142,8 +154,9 @@
                 Caption = 'Batch Renew';
                 Ellipsis = true;
                 Image = CalculatePlan;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Batch Renew action';
+                ApplicationArea = NPRRetail;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -164,8 +177,9 @@
                 Caption = 'Import From File';
                 Ellipsis = true;
                 Image = Import;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Import From File action';
+                ApplicationArea = NPRRetail;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -194,8 +208,9 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Setup";
                 RunPageLink = Code = FIELD("Membership Code");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Membership Card")
             {
@@ -206,8 +221,9 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Membership Card action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

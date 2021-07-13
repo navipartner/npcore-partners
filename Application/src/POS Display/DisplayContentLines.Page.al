@@ -4,10 +4,11 @@ page 6059952 "NPR Display Content Lines"
     LinksAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     Editable = false;
     SourceTable = "NPR Display Content Lines";
     CardPageId = "NPR Disp. Cont. Line Card";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,16 +18,18 @@ page 6059952 "NPR Display Content Lines"
             {
                 field(Url; Rec.Url)
                 {
-                    ApplicationArea = All;
+
                     Visible = UrlIsVisible;
                     ToolTip = 'Specifies the value of the Url field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part(Control6014404; "NPR Disp. Content Lines Img")
             {
                 SubPageLink = "Content Code" = FIELD("Content Code"),
                               "Line No." = FIELD("Line No.");
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

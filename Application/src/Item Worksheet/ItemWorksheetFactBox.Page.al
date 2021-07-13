@@ -10,91 +10,105 @@ page 6060051 "NPR Item Worksheet FactBox"
         {
             field("Item No."; Rec."Item No.")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Item No. field.';
+                ApplicationArea = NPRRetail;
             }
             field("Existing Item No."; Rec."Existing Item No.")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Existing Item No. field.';
+                ApplicationArea = NPRRetail;
             }
             field(Inventory; RecExItem.Inventory)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the RecExItem.Inventory field.';
+                ApplicationArea = NPRRetail;
             }
             field(Description; Rec.Description)
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Description field.';
+                ApplicationArea = NPRRetail;
             }
             field(ItemDescription; TempItem.Description)
             {
-                ApplicationArea = All;
+
                 CaptionClass = ExItemDescription;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the RecTempItem.Description field.';
+                ApplicationArea = NPRRetail;
             }
             field("Sales Price"; Rec."Sales Price")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Unit Price field.';
+                ApplicationArea = NPRRetail;
             }
             field("Unit Price"; TempItem."Unit Price")
             {
-                ApplicationArea = All;
+
                 BlankZero = true;
                 CaptionClass = ExItemUnitPrice;
                 ShowCaption = false;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the RecTempItem.Unit Price field.';
+                ApplicationArea = NPRRetail;
             }
             field("Direct Unit Cost"; Rec."Direct Unit Cost")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Direct Unit Cost field.';
+                ApplicationArea = NPRRetail;
             }
             field("Last unit cost"; TempItem."Last Direct Cost")
             {
-                ApplicationArea = All;
+
                 BlankZero = true;
                 CaptionClass = ExItemUnitCost;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the RecTempItem.Last Direct Cost field.';
+                ApplicationArea = NPRRetail;
             }
             field("Variety Lines to Skip"; Rec."Variety Lines to Skip")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Variety Lines to Skip field.';
+                ApplicationArea = NPRRetail;
             }
             field("Variety Lines to Update"; Rec."Variety Lines to Update")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Variety Lines to Update field.';
+                ApplicationArea = NPRRetail;
             }
             field("Variety Lines to Create"; Rec."Variety Lines to Create")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Variety Lines to Create field.';
+                ApplicationArea = NPRRetail;
             }
             field("No. of Changes"; Rec."No. of Changes")
             {
-                ApplicationArea = All;
+
                 BlankZero = true;
                 CaptionClass = ExNoOfChanges;
                 ToolTip = 'Specifies the value of the No. of Changes field.';
+                ApplicationArea = NPRRetail;
             }
             field("No. of Warnings"; Rec."No. of Warnings")
             {
-                ApplicationArea = All;
+
                 BlankZero = true;
                 CaptionClass = ExNoOfWarnings;
                 Style = Attention;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the No. of Warnings field.';
+                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -7,7 +7,8 @@ page 6151593 "NPR NpDc Coupons"
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Coupon";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,48 +18,57 @@ page 6151593 "NPR NpDc Coupons"
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Coupon Type"; Rec."Coupon Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Open field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Remaining Quantity"; Rec."Remaining Quantity")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Remaining Quantity field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Starting Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Ending Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reference No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -80,8 +90,9 @@ page 6151593 "NPR NpDc Coupons"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Print action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -106,8 +117,9 @@ page 6151593 "NPR NpDc Coupons"
                 {
                     Caption = 'Archive Coupons';
                     Image = Post;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Archive Coupons action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -125,8 +137,9 @@ page 6151593 "NPR NpDc Coupons"
                 {
                     Caption = 'Show Expired Coupons';
                     Image = "Filter";
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Show Expired Coupons action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -144,8 +157,9 @@ page 6151593 "NPR NpDc Coupons"
                 RunObject = Page "NPR NpDc Coupon Entries";
                 RunPageLink = "Coupon No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Coupon Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

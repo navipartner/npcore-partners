@@ -8,8 +8,9 @@ page 6014465 "NPR NP Attributes FactBox"
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = Item;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,9 +18,10 @@ page 6014465 "NPR NP Attributes FactBox"
         {
             field("No."; Rec."No.")
             {
-                ApplicationArea = All;
+
                 Caption = 'Item No.';
                 ToolTip = 'Specifies the value of the Item No. field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnDrillDown()
                 begin
@@ -28,11 +30,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -41,11 +44,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -54,11 +58,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -67,11 +72,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -80,11 +86,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -93,11 +100,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_06; NPRAttrTextArray[6])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,6,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible06;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -106,11 +114,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_07; NPRAttrTextArray[7])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,7,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible07;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -119,11 +128,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_08; NPRAttrTextArray[8])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,8,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible08;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -132,11 +142,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_09; NPRAttrTextArray[9])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,9,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible09;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin
@@ -145,11 +156,12 @@ page 6014465 "NPR NP Attributes FactBox"
             }
             field(NPRAttrTextArray_10; NPRAttrTextArray[10])
             {
-                ApplicationArea = All;
+
                 CaptionClass = '6014555,27,10,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible10;
                 ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
+                ApplicationArea = NPRRetail;
 
                 trigger OnValidate()
                 begin

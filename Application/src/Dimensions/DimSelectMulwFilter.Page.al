@@ -5,9 +5,10 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
     InsertAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "Dimension Selection Buffer";
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,25 +19,29 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
                 ShowCaption = false;
                 field(Selected; Rec.Selected)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Selected field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Dimension Value Filter"; Rec."Dimension Value Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Dimension Value Filter field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

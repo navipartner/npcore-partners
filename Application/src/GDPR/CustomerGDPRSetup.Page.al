@@ -1,4 +1,4 @@
-﻿page 6151150 "NPR Customer GDPR Setup"
+page 6151150 "NPR Customer GDPR Setup"
 {
     Caption = 'Customer GDPR Setup';
     DeleteAllowed = false;
@@ -6,7 +6,8 @@
     PageType = Card;
     SourceTable = "NPR Customer GDPR SetUp";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,13 +17,15 @@
             {
                 field("Anonymize After"; Rec."Anonymize After")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Anonymize After field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Customer Posting Group Filter"; Rec."Customer Posting Group Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Customer Posting Group Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -32,8 +35,9 @@
                 }
                 field("Gen. Bus. Posting Group Filter"; Rec."Gen. Bus. Posting Group Filter")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group Filter field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -43,14 +47,16 @@
                 }
                 field("No of Customers"; Rec."No of Customers")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No of Customers field';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field(EnableJobQueue; Rec."Enable Job Queue")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Enqueue job queue entries for anonymization';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -68,8 +74,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Extract Customers action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -180,15 +187,17 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR GDPR Anonymization Req.";
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Web Requests action';
+                ApplicationArea = NPRRetail;
             }
             action(JobQueueEntries)
             {
-                ApplicationArea = All;
+
                 Caption = 'Job Queue Entries';
                 Image = JobLines;
                 ToolTip = 'Executes the Job Queue Entries action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -3,7 +3,7 @@ report 6014514 "NPR Retail Journal List"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Journal List.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Retail Journal List';
     PreviewMode = PrintLayout;
     dataset

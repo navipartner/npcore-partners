@@ -13,13 +13,15 @@ page 6014431 "NPR SMS Recipient Group"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             part("NPR SMS Rcpt. Group Line"; "NPR SMS Rcpt. Group Line")
@@ -27,7 +29,8 @@ page 6014431 "NPR SMS Recipient Group"
                 Caption = 'Numbers';
                 SubPageLink = "Group Code" = FIELD("Code");
                 UpdatePropagation = Both;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
             }
         }
     }

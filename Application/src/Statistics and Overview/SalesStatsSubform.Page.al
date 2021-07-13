@@ -1,4 +1,4 @@
-﻿page 6014594 "NPR Sales Stats Subform"
+page 6014594 "NPR Sales Stats Subform"
 {
     Caption = 'Sales Statistics Subform';
     DeleteAllowed = false;
@@ -6,8 +6,9 @@
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Sales Stats Time Period";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,18 +18,21 @@
             {
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales (Qty)"; Rec."Sales (Qty)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales (Qty) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -43,8 +47,9 @@
                 }
                 field("Sales (LCY)"; Rec."Sales (LCY)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales (LCY) field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var

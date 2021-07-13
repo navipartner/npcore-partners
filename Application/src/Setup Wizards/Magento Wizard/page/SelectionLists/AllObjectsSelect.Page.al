@@ -5,9 +5,10 @@ page 6014621 "NPR All Objects Select"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = AllObj;
     SourceTableTemporary = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,21 +19,24 @@ page 6014621 "NPR All Objects Select"
                 ShowCaption = false;
                 field("Object Type"; Rec."Object Type")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Object Type';
                     ToolTip = 'Specifies the type of the object.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object ID"; Rec."Object ID")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Object ID';
                     ToolTip = 'Specifies the ID of the object.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Object Name"; Rec."Object Name")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Object Name';
                     ToolTip = 'Specifies the name of the object.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

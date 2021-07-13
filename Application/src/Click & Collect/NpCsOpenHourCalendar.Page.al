@@ -3,8 +3,9 @@ page 6151218 "NPR NpCs Open. Hour Calendar"
     Caption = 'Collect Store Opening Hour Calendar';
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Open. Hour Cal. Entry";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -14,23 +15,27 @@ page 6151218 "NPR NpCs Open. Hour Calendar"
             {
                 field("Calendar Date"; Rec."Calendar Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Start Time"; Rec."Start Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Start Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("End Time"; Rec."End Time")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the End Time field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Weekday; Rec.Weekday)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Weekday field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

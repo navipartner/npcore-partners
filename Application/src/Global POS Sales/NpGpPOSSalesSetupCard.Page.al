@@ -3,8 +3,9 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
     Caption = 'Global POS Sales Setup Card';
     PageType = Card;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpGp POS Sales Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,18 +19,21 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                     ShowCaption = false;
                     field("Code"; Rec.Code)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Code field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Description; Rec.Description)
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Company Name"; Rec."Company Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Company Name field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 group(Control6014408)
@@ -37,20 +41,23 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                     ShowCaption = false;
                     field("Service Url"; Rec."Service Url")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Service Url field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Service Username"; Rec."Service Username")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Service Username field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Password; Password)
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Service Password';
                         ExtendedDatatype = Masked;
                         ToolTip = 'Specifies the value of the Service Password field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -75,8 +82,9 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Validate Global POS Sales Setup action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

@@ -1,4 +1,4 @@
-﻿pageextension 6014430 "NPR Item Card" extends "Item Card"
+pageextension 6014430 "NPR Item Card" extends "Item Card"
 {
     PromotedActionCategories = 'New,Process,Report,Item,History,Special Sales Prices & Discounts,Approve,Request Approval,Magento';
     layout
@@ -7,8 +7,9 @@
         {
             field("NPR Description 2"; Rec."Description 2")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Description 2 field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -16,14 +17,16 @@
         {
             field("NPR Item Status"; Rec."NPR Item Status")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Item Status field';
+                ApplicationArea = NPRRetail;
             }
 
             field("NPR Item Brand"; Rec."NPR Item Brand")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Item Brand field';
+                ApplicationArea = NPRRetail;
             }
 
         }
@@ -32,9 +35,10 @@
         {
             field("NPR NPR_AverageCostACY"; AverageCostACY)
             {
-                ApplicationArea = All;
+
                 Caption = 'Average Cost ACY';
                 ToolTip = 'Specifies the value of the AverageCostACY field';
+                ApplicationArea = NPRRetail;
                 trigger OnDrillDown()
                 begin
                     CODEUNIT.RUN(CODEUNIT::"Show Avg. Calc. - Item", Rec);
@@ -46,8 +50,9 @@
         {
             field("NPR Statistics Group"; Rec."Statistics Group")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Statistics Group field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -55,8 +60,9 @@
         {
             field("NPR Explode BOM auto"; Rec."NPR Explode BOM auto")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Explode BOM auto field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -64,8 +70,9 @@
         {
             field("NPR Custom Discount Blocked"; Rec."NPR Custom Discount Blocked")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Custom Discount Blocked field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -73,8 +80,9 @@
         {
             field("NPR Inventory Value Zero"; Rec."Inventory Value Zero")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Inventory Value Zero field';
+                ApplicationArea = NPRRetail;
             }
 
         }
@@ -83,8 +91,9 @@
         {
             field("NPR Sales (Qty.)"; Rec."Sales (Qty.)")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Sales (Qty.) field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -92,8 +101,9 @@
         {
             field("NPR Group sale"; Rec."NPR Group sale")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Group sale field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -101,13 +111,15 @@
         {
             field("NPR Unit List Price"; Rec."Unit List Price")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Unit List Price field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Units per Parcel"; Rec."Units per Parcel")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the Units per Parcel field';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -118,14 +130,16 @@
                 Caption = 'Dimensions';
                 field("NPR Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
                 }
 
                 field("NPR Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -137,8 +151,9 @@
                 Caption = 'Discounts on POS';
                 field("NPR Has Mixed Discount"; Rec."NPR Has Mixed Discount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Has Mixed Discount field';
+                    ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
                         MixedDiscountLines: Page "NPR Mixed Discount Lines";
@@ -154,8 +169,9 @@
 
                 field("NPR Has Quantity Discount"; Rec."NPR Has Quantity Discount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Has Quantity Discount field';
+                    ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
                         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
@@ -171,8 +187,9 @@
 
                 field("NPR Has Period Discount"; Rec."NPR Has Period Discount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Has Period Discount field';
+                    ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
                         CampaignDiscountLines: Page "NPR Campaign Discount Lines";
@@ -196,58 +213,69 @@
                 Caption = 'Variety';
                 field("NPR Has Variants"; Rec."NPR Has Variants")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Has Variants field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety Group"; Rec."NPR Variety Group")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety Group field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 1"; Rec."NPR Variety 1")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 1 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 1 Table"; Rec."NPR Variety 1 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 1 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 2"; Rec."NPR Variety 2")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 2 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 2 Table"; Rec."NPR Variety 2 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 2 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 3"; Rec."NPR Variety 3")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 3 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 3 Table"; Rec."NPR Variety 3 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 3 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 4"; Rec."NPR Variety 4")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 4 field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Variety 4 Table"; Rec."NPR Variety 4 Table")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Variety 4 Table field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("NPR Cross Variety No."; Rec."NPR Cross Variety No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the NPR Cross Variety No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("NPR Properties")
@@ -258,13 +286,15 @@
 
                     field("NPR Item AddOn No."; Rec."NPR Item AddOn No.")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Item AddOn No. field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR NPRE Item Routing Profile"; Rec."NPR NPRE Item Routing Profile")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR NPRE Item Routing Profile field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
 
@@ -274,23 +304,27 @@
 
                     field("NPR Guarantee voucher"; Rec."NPR Guarantee voucher")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Guarantee voucher field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR No Print on Reciept"; Rec."NPR No Print on Reciept")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR No Print on Reciept field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Ticket Type"; Rec."NPR Ticket Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Ticket Type field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Print Tags"; Rec."NPR Print Tags")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Print Tags field';
+                        ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         var
                             PrintTagsPage: Page 6014417;
@@ -316,9 +350,10 @@
                     ShowCaption = true;
                     field("NPR Magento Item"; Rec."NPR Magento Item")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the NPR Magento Item field';
+                        ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
                             NPR_SetMagentoEnabled();
@@ -326,14 +361,16 @@
                     }
                     field("NPR Magento Status"; Rec."NPR Magento Status")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the NPR Magento Status field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Magento Name"; Rec."NPR Magento Name")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Magento Name field';
+                        ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
                             IF Rec."NPR Seo Link" <> '' THEN
@@ -344,9 +381,10 @@
                     }
                     field("NPR Magento Description"; Format(Rec."NPR Magento Description".HasValue))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Magento Description';
                         ToolTip = 'Specifies the value of the Magento Description field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -367,9 +405,10 @@
                     }
                     field("NPR Magento Short Description"; Format(Rec."NPR Magento Short Description".HasValue))
                     {
-                        ApplicationArea = All;
+
                         Caption = 'Magento Short Description';
                         ToolTip = 'Specifies the value of the Magento Short Description field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -387,59 +426,69 @@
                     }
                     field("NPR Magento Brand"; Rec."NPR Magento Brand")
                     {
-                        ApplicationArea = All;
+
                         Visible = MagentoEnabledBrand;
                         ToolTip = 'Specifies the value of the NPR Magento Brand field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR NPR_MagentoUnitPrice"; Rec."Unit Price")
                     {
-                        ApplicationArea = All;
+
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Unit Price field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Product New From"; Rec."NPR Product New From")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Product New From field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Product New To"; Rec."NPR Product New To")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Product New To field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Featured From"; Rec."NPR Featured From")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Featured From field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Featured To"; Rec."NPR Featured To")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Featured To field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Special Price"; Rec."NPR Special Price")
                     {
-                        ApplicationArea = All;
+
                         Visible = MagentoEnabledSpecialPrices;
                         ToolTip = 'Specifies the value of the NPR Special Price field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Special Price From"; Rec."NPR Special Price From")
                     {
-                        ApplicationArea = All;
+
                         Visible = MagentoEnabledSpecialPrices;
                         ToolTip = 'Specifies the value of the NPR Special Price From field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Special Price To"; Rec."NPR Special Price To")
                     {
-                        ApplicationArea = All;
+
                         Visible = MagentoEnabledSpecialPrices;
                         ToolTip = 'Specifies the value of the NPR Special Price To field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Custom Options"; Rec."NPR Custom Options")
                     {
-                        ApplicationArea = All;
+
                         Visible = MagentoEnabledCustomOptions;
                         ToolTip = 'Specifies the value of the NPR Custom Options field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -452,41 +501,48 @@
                     }
                     field("NPR Backorder"; Rec."NPR Backorder")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Backorder field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Display Only"; Rec."NPR Display Only")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'test';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Display only Text"; Rec."NPR Display only Text")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Display only Text field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Seo Link"; Rec."NPR Seo Link")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Seo Link field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Meta Title"; Rec."NPR Meta Title")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Meta Title field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Meta Description"; Rec."NPR Meta Description")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Meta Description field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("NPR Attribute Set ID"; Rec."NPR Attribute Set ID")
                     {
-                        ApplicationArea = All;
+
                         AssistEdit = true;
                         Editable = NOT Rec."NPR Magento Item";
                         Visible = MagentoEnabledAttributeSet;
                         ToolTip = 'Specifies the value of the NPR Attribute Set ID field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnAssistEdit()
                         var
@@ -506,8 +562,9 @@
                     Visible = MagentoPictureVarietyTypeVisible;
                     field("NPR Magento Picture Variety Type"; Rec."NPR Magento Pict. Variety Type")
                     {
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the NPR Magento Pict. Variety Type field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
                 part("NPR Magento Category Links"; "NPR Magento Category Links")
@@ -515,14 +572,16 @@
                     Caption = 'Category Links';
                     SubPageLink = "Item No." = FIELD("No.");
                     Visible = NOT MagentoEnabledMultiStore;
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
                 part("NPR Product Relations"; "NPR Magento Product Relations")
                 {
                     Caption = 'Product Relations';
                     SubPageLink = "From Item No." = FIELD("No.");
                     Visible = MagentoEnabledProductRelations;
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
+
                 }
             }
             group("NPR Extra Fields")
@@ -530,11 +589,12 @@
                 Caption = 'Extra Fields';
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -543,11 +603,12 @@
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -556,11 +617,12 @@
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -569,11 +631,12 @@
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -582,11 +645,12 @@
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -595,11 +659,12 @@
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -608,11 +673,12 @@
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -621,11 +687,12 @@
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -634,11 +701,12 @@
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -647,11 +715,12 @@
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
-                    ApplicationArea = All;
+
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
                     ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -666,23 +735,26 @@
         {
             part(NPRMagentoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
-                ApplicationArea = All;
+
                 Visible = MagentoEnabled;
+                ApplicationArea = NPRRetail;
             }
             part(NPRPicture; "NPR Magento Item Pict. Factbox")
 
             {
-                ApplicationArea = All;
+
                 Caption = 'Picture';
                 ShowFilter = false;
                 SubPageLink = "No." = FIELD("No.");
                 Visible = MagentoEnabled;
+                ApplicationArea = NPRRetail;
             }
             part("NPR Discount FactBox"; "NPR Discount FactBox")
             {
-                ApplicationArea = All;
+
                 Caption = 'Discounts';
                 SubPageLink = "No." = FIELD("No.");
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -701,15 +773,17 @@
                 Caption = 'Variety Matrix';
                 Image = ItemAvailability;
                 ShortCutKey = 'Ctrl+Alt+v';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Variety Matrix action';
+                ApplicationArea = NPRRetail;
             }
             action("NPR AttributeValues")
             {
                 Caption = 'All Attributes Values';
                 Image = ShowList;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the All Attributes Values action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -725,8 +799,9 @@
             {
                 Caption = 'POS Sales Entries';
                 Image = Entries;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the POS Sales Entries action';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -740,8 +815,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014402;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Retail Item Journal action';
+                ApplicationArea = NPRRetail;
             }
 
             action("NPR NPR_RetailItemReclassJnl")
@@ -752,8 +828,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014403;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Retail Item Reclassification Journal action';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -768,8 +845,9 @@
                 {
                     Caption = 'Transfer to Retail Journal';
                     Image = TransferToGeneralJournal;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Transfer to Retail Journal action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -821,8 +899,9 @@
                     PromotedCategory = Category5;
                     Image = BinLedger;
                     ShortcutKey = 'Ctrl+Alt+L';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Price Label action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -849,8 +928,9 @@
                     PromotedCategory = Category5;
                     Image = ItemVariant;
                     ShortCutKey = 'Ctrl+Alt+I';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Variety Matrix action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -867,8 +947,9 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     Image = ItemVariant;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Variety Maintenance action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -885,8 +966,9 @@
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     Image = BarCode;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Add missing Barcode(s) action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -903,8 +985,9 @@
                 {
                     Caption = 'Accessories';
                     Image = Allocations;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Accessories action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -927,8 +1010,9 @@
                     Image = Info;
                     RunObject = Page 6150643;
                     RunPageLink = "Table ID" = const(27), "Primary Key" = field("No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the POS Info action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -946,8 +1030,9 @@
                     RunObject = Page 6014466;
                     RunPageLink = "Item No." = field("No.");
                     RunPageMode = Edit;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Multiple Unit Prices action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("NPR NPR_PeriodDiscount")
                 {
@@ -956,8 +1041,9 @@
                     Promoted = true;
                     PromotedCategory = Category6;
                     ShortCutKey = 'Ctrl+P';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Period Discount action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -980,8 +1066,9 @@
                     Promoted = true;
                     PromotedCategory = Category6;
                     ShortcutKey = 'Ctrl+F';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Mix Discount action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1015,8 +1102,9 @@
                     PromotedCategory = Category9;
                     Visible = MagentoEnabled;
                     Image = Picture;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Pictures action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1040,8 +1128,9 @@
                     Visible = MagentoEnabled;
                     RunObject = page 6151455;
                     RunPageLink = "Item No." = field("No.");
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Videos action';
+                    ApplicationArea = NPRRetail;
                 }
 
                 action("NPR NPR_Webshops")
@@ -1052,8 +1141,9 @@
                     PromotedCategory = Category9;
                     Visible = MagentoEnabled and MagentoEnabledMultistore;
                     Image = Web;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Webshops action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -1077,8 +1167,9 @@
                     PromotedCategory = Category9;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
                     Image = ViewPage;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Display Config action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var

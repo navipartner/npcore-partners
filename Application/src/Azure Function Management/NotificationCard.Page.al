@@ -13,33 +13,39 @@ page 6151042 "NPR Notification Card"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Title; Rec.Title)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Title field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Body; Rec.Body)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Body field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Handled; Rec.Handled)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handled By"; Rec."Handled By")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled By field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Handled Register"; Rec."Handled Pos Unit No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Handled Pos Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -57,8 +63,9 @@ page 6151042 "NPR Notification Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Complete action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -74,8 +81,9 @@ page 6151042 "NPR Notification Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Cancel action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

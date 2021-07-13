@@ -6,7 +6,8 @@ page 6184485 "NPR Pepper Card Types"
     PageType = List;
     SourceTable = "NPR Pepper Card Type";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -16,23 +17,27 @@ page 6184485 "NPR Pepper Card Types"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Type POS"; Rec."Payment Type POS")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Type POS field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Card Type Group Code"; Rec."Card Type Group Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Card Type Group Code field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -50,8 +55,9 @@ page 6184485 "NPR Pepper Card Types"
                 RunPageLink = "Card Type Code" = FIELD(Code);
                 RunPageView = SORTING("Card Type Code", "Minimum Amount")
                               ORDER(Ascending);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Fees action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

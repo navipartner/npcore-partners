@@ -4,7 +4,7 @@ report 6014435 "NPR Vendor/Item Group"
     RDLCLayout = './src/_Reports/layouts/VendorItem Group.rdlc';
     Caption = 'Vendor/Item Group';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -450,14 +450,16 @@ report 6014435 "NPR Vendor/Item Group"
                     field("vis kun hovedtal"; Viskunhovedtal)
                     {
                         Caption = 'Show Only Main Figures';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Only Main Figures field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Sortervare gruppe"; Sortervaregruppe)
                     {
                         Caption = 'Sort Item Groups';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Sort Item Groups field';
+                        ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
                         begin
@@ -472,16 +474,18 @@ report 6014435 "NPR Vendor/Item Group"
                         Caption = 'Show';
                         Enabled = ShowBool;
                         OptionCaption = 'Amount,Turnover,DR';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(sorter; SortOrder)
                     {
                         Caption = 'Show Largest/Smallest';
                         Enabled = ShowBool;
                         OptionCaption = 'Most,Least';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Largest/Smallest field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }

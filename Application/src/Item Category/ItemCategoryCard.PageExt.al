@@ -7,33 +7,39 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
 
             field("NPR Item Template Code"; Rec."NPR Item Template Code")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Item Template Code field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Global Dimension 1 Code"; Rec."NPR Global Dimension 1 Code")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Global Dimension 1 Code field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Global Dimension 2 Code"; Rec."NPR Global Dimension 2 Code")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Global Dimension 2 Code field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Blocked"; Rec."NPR Blocked")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Blocked field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Main Category"; Rec."NPR Main Category")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Main Category field';
+                ApplicationArea = NPRRetail;
             }
             field("NPR Main Category Code"; Rec."NPR Main Category Code")
             {
-                ApplicationArea = All;
+
                 ToolTip = 'Specifies the value of the NPR Main Category Code field';
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -53,8 +59,9 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     RunObject = Page "Default Dimensions";
                     RunPageLink = "Table ID" = Const(5722), "No." = Field(Code);
                     ShortCutKey = 'Shift+Ctrl+D';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Dimensions action';
+                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -63,10 +70,11 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 Caption = '&Functions';
                 action("NPR Create Item Template")
                 {
-                    ApplicationArea = All;
+
                     Caption = 'Create Item Template';
                     Image = Template;
                     ToolTip = 'Executes the Create Item Template action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -87,8 +95,9 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 {
                     Caption = 'Create Item(s) From Item Category';
                     Image = ItemGroup;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Create Item(s) From Item Category action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -105,8 +114,9 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 {
                     Caption = 'Copy Item Category Setup to SubCategories';
                     Image = ProdBOMMatrixPerVersion;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Copy Item Category Setup to SubCategories';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -130,15 +140,17 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     RunObject = Page "NPR Aux. Item Ledger Entries";
                     RunPageLink = "Item Category Code" = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+N';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Item Ledger Entries action';
+                    ApplicationArea = NPRRetail;
                 }
                 action("NPR VAT Posting Grups")
                 {
                     Caption = '&VAT Posting Grups';
                     Image = Form;
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &VAT Posting Grups action';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
@@ -158,8 +170,9 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     Image = ItemWorksheet;
                     RunObject = Page "Item List";
                     RunPageLink = "Item Category Code" = FIELD(Code);
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the &Item List action';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -5,7 +5,8 @@ page 6151101 "NPR NpRi Reimbursement Templ."
     PageType = List;
     SourceTable = "NPR NpRi Reimbursement Templ.";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
@@ -14,18 +15,21 @@ page 6151101 "NPR NpRi Reimbursement Templ."
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Collection Module"; Rec."Data Collection Module")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Collection Module field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -34,19 +38,22 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 }
                 field("Data Collection Description"; Rec."Data Collection Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Data Collection Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Data Collection Summary"; Rec."Data Collection Summary")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Data Collection Summary field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reimbursement Module"; Rec."Reimbursement Module")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reimbursement Module field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -55,19 +62,22 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 }
                 field("Reimbursement Description"; Rec."Reimbursement Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Reimbursement Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Reimbursement Summary"; Rec."Reimbursement Summary")
                 {
-                    ApplicationArea = All;
+
                     Editable = false;
                     ToolTip = 'Specifies the value of the Reimbursement Summary field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Posting Description"; Rec."Posting Description")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Posting Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -86,8 +96,9 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasDataCollectionFilters;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Data Collection Filters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -105,8 +116,9 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasReimbursementParameters;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Reimbursement Parameters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

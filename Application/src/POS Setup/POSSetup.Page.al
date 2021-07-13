@@ -14,19 +14,21 @@ page 6150707 "NPR POS Setup"
             {
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
             }
             group("Actions")
             {
                 field("Login Action Code"; Rec."Login Action Code")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = LoginActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Login Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -35,11 +37,12 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Text Enter Action Code"; Rec."Text Enter Action Code")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = TextEnterActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Text Enter Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -48,11 +51,12 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Item Insert Action Code"; Rec."Item Insert Action Code")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = ItemInsertActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Item Insert Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -61,11 +65,12 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Payment Action Code"; Rec."Payment Action Code")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = PaymentActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Payment Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -74,11 +79,12 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Customer Action Code"; Rec."Customer Action Code")
                 {
-                    ApplicationArea = All;
+
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = CustomerActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Customer Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -87,10 +93,11 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Lock POS Action Code"; Rec."Lock POS Action Code")
                 {
-                    ApplicationArea = All;
+
                     Style = Unfavorable;
                     StyleExpr = LockActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Lock POS Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -99,10 +106,11 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Unlock POS Action Code"; Rec."Unlock POS Action Code")
                 {
-                    ApplicationArea = All;
+
                     Style = Unfavorable;
                     StyleExpr = UnlockActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Unlock POS Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -111,10 +119,11 @@ page 6150707 "NPR POS Setup"
                 }
                 field("OnBeforePaymentView Action"; Rec."OnBeforePaymentView Action")
                 {
-                    ApplicationArea = All;
+
                     Style = Unfavorable;
                     StyleExpr = OnBeforePaymentViewActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the On Before Payment View Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -123,8 +132,9 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Idle Timeout Action Code"; Rec."Idle Timeout Action Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Idle Timeout Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -133,8 +143,9 @@ page 6150707 "NPR POS Setup"
                 }
                 field("Admin Menu Action Code"; Rec."Admin Menu Action Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Admin Menu Action Code field';
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
@@ -158,8 +169,9 @@ page 6150707 "NPR POS Setup"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Refresh Invalid Action Parameters action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

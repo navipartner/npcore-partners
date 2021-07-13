@@ -4,9 +4,10 @@ page 6151598 "NPR NpDc SaleLinePOS Coupons"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     PopulateAllFields = true;
     SourceTable = "NPR NpDc SaleLinePOS Coupon";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,48 +17,57 @@ page 6151598 "NPR NpDc SaleLinePOS Coupons"
             {
                 field("Register No."; Rec."Register No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sale Date"; Rec."Sale Date")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sale Date field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sale Line No."; Rec."Sale Line No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sale Line No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Coupon Type"; Rec."Coupon Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Coupon No."; Rec."Coupon No.")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Coupon No. field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Discount Amount field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

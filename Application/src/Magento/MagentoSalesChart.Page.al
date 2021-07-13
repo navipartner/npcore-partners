@@ -11,16 +11,18 @@ page 6151482 "NPR Magento Sales Chart"
         {
             field("Date Range"; StatusText)
             {
-                ApplicationArea = All;
+
                 Caption = 'Date Range';
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the StatusText field';
+                ApplicationArea = NPRRetail;
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
+
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
@@ -41,9 +43,10 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Day)
                 {
                     Caption = 'Day';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Day action';
                     Image = Calendar;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -55,9 +58,10 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Week)
                 {
                     Caption = 'Week';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Week action';
                     Image = Calendar;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -69,9 +73,10 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Month)
                 {
                     Caption = 'Month';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Month action';
                     Image = Calendar;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -83,9 +88,10 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Quarter)
                 {
                     Caption = 'Quarter';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Quarter action';
                     Image = Calendar;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -97,9 +103,10 @@ page 6151482 "NPR Magento Sales Chart"
                 action(Year)
                 {
                     Caption = 'Year';
-                    ApplicationArea = All;
+
                     ToolTip = 'Executes the Year action';
                     Image = Calendar;
+                    ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
@@ -113,8 +120,9 @@ page 6151482 "NPR Magento Sales Chart"
             {
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Previous action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
@@ -126,8 +134,9 @@ page 6151482 "NPR Magento Sales Chart"
             {
                 Caption = 'Next';
                 Image = NextRecord;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Next action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin

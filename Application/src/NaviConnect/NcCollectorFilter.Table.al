@@ -54,7 +54,6 @@ table 6151526 "NPR Nc Collector Filter"
         {
             Caption = 'Collect When Modified';
             DataClassification = CustomerContent;
-            Description = 'NC2.08';
         }
     }
 
@@ -74,10 +73,10 @@ table 6151526 "NPR Nc Collector Filter"
             "Table No." := NcCollector."Table No.";
         end;
         if "Table No." = 0 then
-            Error(TxtSpecifyTableInCollector);
+            Error(SpecifyTableInCollectorErr);
     end;
 
     var
-        TxtSpecifyTableInCollector: Label 'Please specifiy the table in the Collector before adding filters.';
+        SpecifyTableInCollectorErr: Label 'Please specifiy the table in the Collector before adding filters.';
 }
 

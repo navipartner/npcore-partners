@@ -6,7 +6,8 @@ page 6151420 "NPR Magento Brands"
     PageType = List;
     SourceTable = "NPR Magento Brand";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,23 +18,27 @@ page 6151420 "NPR Magento Brands"
                 ShowCaption = false;
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Id field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Picture; Rec.Picture)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Picture field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sorting field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -52,8 +57,9 @@ page 6151420 "NPR Magento Brands"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupBrands;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Setup Brands action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
@@ -72,16 +78,18 @@ page 6151420 "NPR Magento Brands"
                 Image = Card;
                 RunObject = Page "NPR Magento Brand Card";
                 ShortCutKey = 'Shift+F5';
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Card action';
+                ApplicationArea = NPRRetail;
             }
             action("Display Config")
             {
                 Caption = 'Display Config';
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Display Config action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

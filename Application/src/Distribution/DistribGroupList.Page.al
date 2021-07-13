@@ -7,7 +7,8 @@ page 6151055 "NPR Distrib. Group List"
     PageType = List;
     SourceTable = "NPR Distrib. Group";
     UsageCategory = Lists;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,18 +18,21 @@ page 6151055 "NPR Distrib. Group List"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Type field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -47,8 +51,9 @@ page 6151055 "NPR Distrib. Group List"
                 PromotedOnly = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Distribution Group" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Distribution Setup action';
+                ApplicationArea = NPRRetail;
             }
             action("Distribution Group Members")
             {
@@ -59,8 +64,9 @@ page 6151055 "NPR Distrib. Group List"
                 PromotedOnly = true;
                 RunObject = Page "NPR Distrib. Group Member List";
                 RunPageLink = "Distribution Group" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Distribution Group Members action';
+                ApplicationArea = NPRRetail;
             }
         }
     }

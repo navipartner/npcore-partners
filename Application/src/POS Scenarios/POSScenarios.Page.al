@@ -7,7 +7,8 @@ page 6150729 "NPR POS Scenarios"
     PageType = List;
     SourceTable = "NPR POS Sales Workflow";
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
+
 
     layout
     {
@@ -17,34 +18,40 @@ page 6150729 "NPR POS Scenarios"
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Publisher Codeunit ID"; Rec."Publisher Codeunit ID")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Publisher Codeunit ID field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Publisher Codeunit Name"; Rec."Publisher Codeunit Name")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Publisher Codeunit Name field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Publisher Function"; Rec."Publisher Function")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Publisher Function field';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Control6014410; Rec."Workflow Steps")
                 {
-                    ApplicationArea = All;
+
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Workflow Steps field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -65,8 +72,9 @@ page 6150729 "NPR POS Scenarios"
                 RunObject = Page "NPR POS Scenarios Steps";
                 RunPageLink = "Set Code" = CONST(''),
                               "Workflow Code" = FIELD(Code);
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Workflow Steps action';
+                ApplicationArea = NPRRetail;
             }
             action("Initiate Workflow Steps")
             {
@@ -77,8 +85,9 @@ page 6150729 "NPR POS Scenarios"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
                 ToolTip = 'Executes the Initiate Workflow Steps action';
+                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var

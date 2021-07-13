@@ -3,10 +3,11 @@ page 6014531 "NPR Payment Mapping WP"
     Caption = 'Payment Method Mapping';
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR Magento Payment Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -16,19 +17,22 @@ page 6014531 "NPR Payment Mapping WP"
             {
                 field("External Payment Method Code"; Rec."External Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the External Payment Method Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("External Payment Type"; Rec."External Payment Type")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the External Payment Type field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Method Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PaymentMethod: Record "Payment Method";
@@ -48,13 +52,15 @@ page 6014531 "NPR Payment Mapping WP"
                 }
                 field("Allow Adjust Payment Amount"; Rec."Allow Adjust Payment Amount")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Allow Adjust Payment Amount field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Payment Gateway Code"; Rec."Payment Gateway Code")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Payment Gateway Code field';
+                    ApplicationArea = NPRRetail;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PaymentGateways: Page "NPR Pmt. Gateways Select";
@@ -76,8 +82,9 @@ page 6014531 "NPR Payment Mapping WP"
                 }
                 field("Captured Externally"; Rec."Captured Externally")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Captured Externally field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

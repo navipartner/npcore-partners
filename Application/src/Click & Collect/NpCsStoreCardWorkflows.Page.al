@@ -4,8 +4,9 @@ page 6151202 "NPR NpCs Store Card Workflows"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
-    ApplicationArea = All;
+
     SourceTable = "NPR NpCs Store Workflow Rel.";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -15,121 +16,144 @@ page 6151202 "NPR NpCs Store Card Workflows"
             {
                 field("Store Code"; Rec."Store Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = StoreCodeVisible;
                     ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Workflow Code"; Rec."Workflow Code")
                 {
-                    ApplicationArea = All;
+
                     Visible = (NOT StoreCodeVisible);
                     ToolTip = 'Specifies the value of the Workflow Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Workflow Description"; Rec."Workflow Description")
                 {
-                    ApplicationArea = All;
+
                     Visible = (NOT StoreCodeVisible);
                     ToolTip = 'Specifies the value of the Workflow Description field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Send Notification from Store"; Rec."Send Notification from Store")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Send Notification from Store field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notify Store via E-mail"; Rec."Notify Store via E-mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notify Store via E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store E-mail Temp. (Pending)"; Rec."Store E-mail Temp. (Pending)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store E-mail Template (Pending) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store E-mail Temp. (Expired)"; Rec."Store E-mail Temp. (Expired)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store E-mail Template (Expired) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notify Store via Sms"; Rec."Notify Store via Sms")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notify Store via Sms field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Sms Template (Pending)"; Rec."Store Sms Template (Pending)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Sms Template (Pending) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Store Sms Template (Expired)"; Rec."Store Sms Template (Expired)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Store Sms Template (Expired) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notify Customer via E-mail"; Rec."Notify Customer via E-mail")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notify Customer via E-mail field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-mail Template (Pending)"; Rec."E-mail Template (Pending)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-mail Template (Pending) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-mail Template (Confirmed)"; Rec."E-mail Template (Confirmed)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-mail Template (Confirmed) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-mail Template (Rejected)"; Rec."E-mail Template (Rejected)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-mail Template (Rejected) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("E-mail Template (Expired)"; Rec."E-mail Template (Expired)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the E-mail Template (Expired) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Notify Customer via Sms"; Rec."Notify Customer via Sms")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Notify Customer via Sms field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sms Template (Pending)"; Rec."Sms Template (Pending)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sms Template (Pending) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sms Template (Confirmed)"; Rec."Sms Template (Confirmed)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sms Template (Confirmed) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sms Template (Rejected)"; Rec."Sms Template (Rejected)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sms Template (Rejected) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Sms Template (Expired)"; Rec."Sms Template (Expired)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Sms Template (Expired) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Processing Print Template"; Rec."Processing Print Template")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Processing Print Template field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery Print Template (POS)"; Rec."Delivery Print Template (POS)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery Print Template (POS) field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Delivery Print Template (S.)"; Rec."Delivery Print Template (S.)")
                 {
-                    ApplicationArea = All;
+
                     ToolTip = 'Specifies the value of the Delivery Template (Sales Document) field';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

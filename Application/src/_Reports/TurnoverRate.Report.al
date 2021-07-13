@@ -3,7 +3,7 @@ report 6014427 "NPR Turnover Rate"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Turnover Rate.rdlc';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'Turnover Rate';
     dataset
     {

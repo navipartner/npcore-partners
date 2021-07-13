@@ -4,7 +4,7 @@ report 6014416 "NPR Sale Statistics per Vendor"
     RDLCLayout = './src/_Reports/layouts/Sale Statistics per Vendor.rdlc';
     Caption = 'Sale Statistics Per Vendor';
     UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -317,26 +317,30 @@ report 6014416 "NPR Sale Statistics per Vendor"
                     field("Inventory Date"; InventoryDate)
                     {
                         Caption = 'Inventory Per Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Inventory Per Date field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Print One Per Page"; PrintOnePerPage)
                     {
                         Caption = 'New Page Per Creditor';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the New Page Per Creditor field';
+                        ApplicationArea = NPRRetail;
                     }
                     field("Total Only"; TotalOnly)
                     {
                         Caption = 'Totals Only';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Totals Only field';
+                        ApplicationArea = NPRRetail;
                     }
                     field(Avoid0Sales; AvoidZeroSales)
                     {
                         Caption = 'Avoid 0 Sales';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Avoid 0 Sales field';
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
