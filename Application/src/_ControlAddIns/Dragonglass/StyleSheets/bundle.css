@@ -9119,14 +9119,14 @@ body {
     .data-grid__hidden-menu--left {
       background-color: var(--color-accent-100); }
       .data-grid__hidden-menu--left .hidden-menu-button {
-        border-left: 1px dashed var(--color-accent-200); }
+        border-left: 1px solid rgba(255, 255, 255, 0.2); }
         .data-grid__hidden-menu--left .hidden-menu-button:last-child {
           border: none; }
     .data-grid__hidden-menu--right {
       background-color: var(--color-primary-mobile-100);
       justify-content: flex-end; }
       .data-grid__hidden-menu--right .hidden-menu-button {
-        border-left: 1px dashed var(--color-primary-400); }
+        border-left: 1px solid rgba(255, 255, 255, 0.2); }
         .data-grid__hidden-menu--right .hidden-menu-button:first-child {
           border: none; }
     .data-grid__hidden-menu .hidden-menu-button {
@@ -9134,7 +9134,7 @@ body {
       position: relative;
       overflow: hidden;
       width: 7.5rem;
-      height: 5rem;
+      height: 7.5rem;
       display: flex;
       justify-content: center;
       align-items: center; }
@@ -9179,7 +9179,12 @@ body {
   .expanded-item__image {
     width: 30%;
     border-radius: 3px;
-    margin-right: 1em; }
+    margin-right: 1em;
+    display: flex;
+    justify-content: center; }
+    .expanded-item__image img {
+      max-width: 10rem;
+      max-height: 10rem; }
   .expanded-item__description {
     height: 100%;
     overflow-y: auto; }
@@ -9228,6 +9233,9 @@ body {
   width: 100%;
   position: fixed; }
 
+.price-tag small {
+  font-size: 0.65em; }
+
 .mobile-view {
   display: flex; }
   .mobile-view .mobile-button {
@@ -9243,7 +9251,8 @@ body {
     flex-grow: 1;
     flex-direction: row;
     align-items: center;
-    border-radius: 3px; }
+    border-radius: 3px;
+    transition: background-color 0.4s linear; }
     .mobile-view .mobile-button__icon {
       font-size: 2.25em;
       color: var(--color-text-200);
@@ -9911,7 +9920,12 @@ body {
       position: relative;
       margin-bottom: 0.75em; }
       .search-results .result__heading .icon {
-        width: 30%; }
+        width: 30%;
+        display: flex;
+        justify-content: center; }
+        .search-results .result__heading .icon img {
+          max-width: 10rem;
+          max-height: 10rem; }
       .search-results .result__heading .item-data {
         display: flex;
         flex-direction: column;

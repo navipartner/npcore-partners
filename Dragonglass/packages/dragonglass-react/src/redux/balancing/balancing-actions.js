@@ -12,6 +12,9 @@ export const DRAGONGLASS_BALANCING_CONFIRM_PAYMENT_TYPE = "DRAGONGLASS_BALANCING
 /** Updates coin type counting */
 export const DRAGONGLASS_BALANCING_UPDATE_COIN_TYPES = "DRAGONGLASS_BALANCING_UPDATE_COIN_TYPES";
 
+/** Updates back-end context */
+export const DRAGONGLASS_UPDATE_BACK_END_CONTEXT = "DRAGONGLASS_UPDATE_BACK_END_CONTEXT";
+
 const updateState = (payload) => ({
   type: DRAGONGLASS_BALANCING_UPDATE_STATE,
   payload,
@@ -30,6 +33,11 @@ const confirmPaymentType = (paymentTypeNo) => ({
 const updateCoinTypes = (paymentTypeNo, coinTypes) => ({
   type: DRAGONGLASS_BALANCING_UPDATE_COIN_TYPES,
   payload: { paymentTypeNo, coinTypes },
+});
+
+const updateBackEndContext = (context) => ({
+  type: DRAGONGLASS_UPDATE_BACK_END_CONTEXT,
+  payload: context
 });
 
 /** Defines the balancing screen state actions */
@@ -53,4 +61,9 @@ export const balancingActions = {
    * Updates coin types
    */
   updateCoinTypes: (paymentTypeNo, coinTypes) => StateStore.dispatch(updateCoinTypes(paymentTypeNo, coinTypes)),
+
+  /**
+   * Updates back-end balancing context
+   */
+  updateBackEndContext: (context) => StateStore.dispatch(updateBackEndContext(context)),
 };
