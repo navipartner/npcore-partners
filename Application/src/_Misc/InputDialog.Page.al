@@ -140,7 +140,7 @@ page 6014449 "NPR Input Dialog"
         TextInputs: array[10] of Text;
         Vars: array[10] of Variant;
 
-    procedure SetInput(ControlID: Integer; Variable: Variant; Description: Text[250])
+    procedure SetInput(ControlID: Integer; Variable: Variant; Description: Text)
     begin
         Vars[ControlID] := Variable;
         TextInputs[ControlID] := Format(Variable);

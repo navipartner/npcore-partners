@@ -336,7 +336,7 @@
                 end;
         end;
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
-        VoucherEntry."User ID" := UserId;
+        VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
         OnBeforeInsertIssuedVoucherEntry(VoucherEntry, Voucher, NpRvSalesLine);
         VoucherEntry.Insert();
@@ -385,7 +385,7 @@
         NpRvSendingLog."Log Message" := CopyStr(LogMessage, 1, MaxStrLen(NpRvSendingLog."Log Message"));
         NpRvSendingLog."Sent to" := CopyStr(SentTo, 1, MaxStrLen(NpRvSendingLog."Sent to"));
         NpRvSendingLog.Amount := NpRvVoucher.Amount;
-        NpRvSendingLog."User ID" := UserId;
+        NpRvSendingLog."User ID" := CopyStr(UserId, 1, MaxStrLen(NpRvSendingLog."User ID"));
         NpRvSendingLog."Error during Send" := ErrorMessage <> '';
         if ErrorMessage <> '' then begin
             NpRvSendingLog."Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
@@ -468,7 +468,7 @@
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
-        VoucherEntry."User ID" := UserId;
+        VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
         if NpRvVoucherType.Get(Voucher."Voucher Type") then
             VoucherEntry."Partner Code" := NpRvVoucherType."Partner Code";
@@ -570,7 +570,7 @@
             VoucherEntry.Open := true;
             VoucherEntry."Register No." := '';
             VoucherEntry."Document No." := '';
-            VoucherEntry."User ID" := UserId;
+            VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
             VoucherEntry."Closed by Entry No." := 0;
             VoucherEntry.Insert();
 
@@ -781,13 +781,19 @@
     procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
     var
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        ReferenceNo: Text;
+        ReferenceErr: Label 'Generated reference no. %1 is too long. Max length is %2.';
     begin
         TempVoucher.Init();
         TempVoucher."No." := '';
         TempVoucher.Validate("Voucher Type", VoucherType.Code);
         if VoucherType."No. Series" <> '' then
             NoSeriesMgt.InitSeries(TempVoucher."No. Series", '', 0D, TempVoucher."No.", TempVoucher."No. Series");
-        TempVoucher."Reference No." := GenerateReferenceNo(TempVoucher);
+        ReferenceNo := GenerateReferenceNo(TempVoucher);
+        if StrLen(ReferenceNo) > MaxStrLen(TempVoucher."Reference No.") then
+            Error(ReferenceErr, ReferenceNo, MaxStrLen(TempVoucher."Reference No."))
+        else
+            TempVoucher."Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen(TempVoucher."Reference No."));
         TempVoucher.Description := CopyStr(TempVoucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(TempVoucher.Description));
     end;
 
@@ -905,7 +911,7 @@
         VoucherEntry.Open := true;
         VoucherEntry."Register No." := '';
         VoucherEntry."Document No." := '';
-        VoucherEntry."User ID" := UserId();
+        VoucherEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
 
         InsertArchivedVoucher(RetailVoucher);
@@ -939,11 +945,15 @@
     end;
 
     procedure PrepareVoucherBuffer(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text)
+    var
+        TooLongReferenceErr: Label 'Reference No. %1 is too long. Max length is %2 characters.';
     begin
         NpRvVoucherBuffer.Init();
         NpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
         NpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
-        NpRvVoucherBuffer."Reference No." := ReferenceNo;
+        if StrLen(ReferenceNo) > MaxStrLen(NpRvVoucherBuffer."Reference No.") then
+            Error(TooLongReferenceErr, ReferenceNo, MaxStrLen(NpRvVoucherBuffer."Reference No.")) else
+            NpRvVoucherBuffer."Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen(NpRvVoucherBuffer."Reference No."));
         NpRvVoucherBuffer."Redeem Date" := SalePOS.Date;
         NpRvVoucherBuffer."Redeem Partner Code" := VoucherType."Partner Code";
         NpRvVoucherBuffer."Redeem Register No." := SalePOS."Register No.";

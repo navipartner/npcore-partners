@@ -1,4 +1,5 @@
-﻿codeunit 6151019 "NPR NpRv Module Valid.: Global"
+﻿
+codeunit 6151019 "NPR NpRv Module Valid.: Global"
 {
     var
         Text000: Label 'Validate Global Voucher';
@@ -369,7 +370,7 @@
         Document: XmlDocument;
         Node: XmlNode;
         RequestXmlText: Text;
-        ReferenceNo: Text;
+        ReferenceNo: Text[30];
         ResponseText: Text;
     begin
         ReferenceNo := NpRvVoucherBuffer."Reference No.";
@@ -455,6 +456,7 @@
             VoucherEntry.Positive := VoucherEntry.Amount > 0;
             if Evaluate(VoucherEntry."Posting Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_date', 0, false), 9) then;
             VoucherEntry.Open := VoucherEntry.Amount <> 0;
+#pragma warning disable AA0139
             VoucherEntry."Register No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_register_no', MaxStrLen(VoucherEntry."Register No."), false);
             VoucherEntry."Document No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_sales_ticket_no', MaxStrLen(VoucherEntry."Document No."), false);
             VoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(VoucherEntry."User ID"), false);
@@ -480,6 +482,7 @@
         Voucher."Phone No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'pohone_no', MaxStrLen(Voucher."Phone No."), false);
         Voucher."Voucher Message" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'voucher_message', MaxStrLen(Voucher."Voucher Message"), false);
         if Evaluate(Voucher."Issue Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_date', 0, false), 9) then;
+#pragma warning restore
         Voucher.Modify(true);
         Voucher.CalcFields(Amount);
         NpRvVoucherMgt.Voucher2Buffer(Voucher, NpRvVoucherBuffer);
