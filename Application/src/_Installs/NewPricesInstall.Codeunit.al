@@ -18,37 +18,10 @@ codeunit 6014599 "NPR New Prices Install"
 
         InitDiscountPriority();
 
-        UpdateMagentoSetup();
-
         EnableFeature('SalesPrices');
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
 
-    end;
-
-    local procedure UpdateMagentoSetup()
-    var
-        MagentoSetup: Record "NPR Magento Setup";
-    begin
-        if MagentoSetup.Get() then begin
-            MagentoSetup."Replicate to Price Source Type" := ConvertPriceType(MagentoSetup."Replicate to Sales Type");
-            MagentoSetup.Modify();
-        end
-    end;
-
-    local procedure ConvertPriceType(ReplicatetoSalesType: Enum "Sales Price Type") PriceSourceType: Enum "Price Source Type"
-    begin
-        case ReplicatetoSalesType of
-            ReplicatetoSalesType::"All Customers":
-                exit(PriceSourceType::"All Customers");
-            ReplicatetoSalesType::Campaign:
-                exit(PriceSourceType::Campaign);
-            ReplicatetoSalesType::Customer:
-                exit(PriceSourceType::Customer);
-            ReplicatetoSalesType::"Customer Price Group":
-                exit(PriceSourceType::"Customer Price Group");
-            else
-        end;
     end;
 
 
@@ -57,7 +30,8 @@ codeunit 6014599 "NPR New Prices Install"
         DiscountPriority: Record "NPR Discount Priority";
         POSSalesDiscCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
     begin
-        DiscountPriority.DeleteAll();
+        if not DiscountPriority.IsEmpty() then
+            DiscountPriority.DeleteAll();
         POSSalesDiscCalcMgt.InitDiscountPriority(DiscountPriority);
     end;
 
