@@ -1,13 +1,19 @@
 codeunit 6151022 "NPR NpRv Partner Mgt."
 {
     procedure InitLocalPartner(var NpRvPartner: Record "NPR NpRv Partner")
+    var
+        ServiceUrl: Text;
+        ServiceURLErr: Label 'ServiceURL returned in GetGlobalVoucherWSUrl function is too big to be stored in "Service Url" field. Please contact administrator.';
     begin
         if NpRvPartner.Name = '' then
-            NpRvPartner.Name := CompanyName;
+            NpRvPartner.Name := CopyStr(CompanyName(), 1, MaxStrLen(NpRvPartner.Name));
 
         if NpRvPartner."Service Url" = '' then begin
             InitGlobalVoucherService();
-            NpRvPartner."Service Url" := GetGlobalVoucherWSUrl(CompanyName);
+            ServiceUrl := GetGlobalVoucherWSUrl(CompanyName());
+            if StrLen(ServiceUrl) > MaxStrLen(NpRvPartner."Service Url") then
+                Error(ServiceURLErr) else
+                NpRvPartner."Service Url" := CopyStr(ServiceUrl, 1, MaxStrLen(NpRvPartner."Service Url"));
         end;
     end;
 
@@ -29,7 +35,7 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
     procedure TryValidateGlobalVoucherService(NpRvPartner: Record "NPR NpRv Partner")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDomManagement: codeunit "XML DOM Management";
+        XmlDomManagement: Codeunit "XML DOM Management";
         Client: HttpClient;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
@@ -103,7 +109,7 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
 
     local procedure GlobalVoucherWsCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR NpRv Global Voucher WS");
+        exit(Codeunit::"NPR NpRv Global Voucher WS");
     end;
 }
 

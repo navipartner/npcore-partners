@@ -147,7 +147,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         ReturnAmount := SaleAmount - PaidAmount;
 
         Context.InitializeJObjectParser(Parameters, FrontEnd);
-        VoucherTypeCode := Context.GetString('VoucherTypeCode');
+        VoucherTypeCode := CopyStr(Context.GetString('VoucherTypeCode'), 1, MaxStrLen(VoucherTypeCode));
         NpRvVoucherType.Get(VoucherTypeCode);
         POSPaymentMethod.Get(NpRvVoucherType."Payment Type");
         if POSPaymentMethod."Rounding Precision" > 0 then
@@ -420,12 +420,12 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    procedure ActionCode(): Text
+    procedure ActionCode(): Code[20]
     begin
         exit('ISSUE_RETURN_VOUCHER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Code[20]
     begin
         exit('1.1');
     end;

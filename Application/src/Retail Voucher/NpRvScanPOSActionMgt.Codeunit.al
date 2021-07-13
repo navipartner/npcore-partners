@@ -185,12 +185,12 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
             exit;
     end;
 
-    local procedure VoucherPaymentActionCode(): Text
+    local procedure VoucherPaymentActionCode(): Code[20]
     begin
         exit('SCAN_VOUCHER');
     end;
 
-    local procedure VoucherPaymentActionVersion(): Text
+    local procedure VoucherPaymentActionVersion(): Code[20]
     begin
         exit('1.0');
     end;
