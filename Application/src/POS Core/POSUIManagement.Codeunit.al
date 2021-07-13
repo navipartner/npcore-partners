@@ -350,8 +350,8 @@ codeunit 6150702 "NPR POS UI Management"
         BalancingCashMovementsLbl: Label 'Cash Movements';
         BalancingBalancingLbl: Label 'Balancing';
         BalancingCreatedAtLbl: Label 'Created At';
-        BalancingDirectSalesCountLbl: Label 'Direct Sales Count';
-        BalancingDirectItemsReturnLineLbl: Label 'Direct Items Return Line';
+        BalancingDirectItemSalesCountLbl: Label 'Direct Sales Count';
+        BalancingDirectItemReturnCountLbl: Label 'Direct Items Return Line';
         BalancingOverviewLbl: Label 'Overview';
         BalancingSalesLbl: Label 'Sales';
         BalancingDirectItemSalesLCYLbl: Label 'Direct Item Sales (LCY)';
@@ -370,7 +370,7 @@ codeunit 6150702 "NPR POS UI Management"
         BalancingBinTransferOutAmountLCYLbl: Label 'Bin Transfer Out Amount (LCY)';
         BalancingBinTransferInAmountLCYLbl: Label 'Bin Transfer In Amount (LCY)';
         BalancingCreditSalesLbl: Label 'Credit Sales';
-        BalancingCreditSalesCountLCYLbl: Label 'Credit Sales Count (LCY)';
+        BalancingCreditSalesCountLbl: Label 'Credit Sales Count (LCY)';
         BalancingCreditSalesAmountLCYLbl: Label 'Credit Sales Amount (LCY)';
         BalancingCreditNetSalesAmountLCYLbl: Label 'Credit Net Sales Amount (LCY)';
         BalancingDetailsLbl: Label 'Details';
@@ -422,7 +422,7 @@ codeunit 6150702 "NPR POS UI Management"
         BalancingCalculatedAmountInclFloatLbl: Label 'Calculated Amount Incl. Float';
         BalancingCountedAmountInclFloatLbl: Label 'Counted Amount Incl. Float';
         BalancingFloatAmountLbl: Label 'Float Amount';
-        BalancingTransferedAmountLbl: Label 'Transfered Amount';
+        BalancingTransferredAmountLbl: Label 'Transferred Amount';
         BalancingNewFloatAmountLbl: Label 'New Float Amount';
         BalancingBankDepositAmountLbl: Label 'Bank Deposit Amount';
         BalancingBankDepositBinCodeLbl: Label 'Bank Deposit Bin Code';
@@ -513,8 +513,8 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('Balancing_CashMovements', BalancingCashMovementsLbl);
         Captions.Add('Balancing_Balancing', BalancingBalancingLbl);
         Captions.Add('Balancing_CreatedAt', BalancingCreatedAtLbl);
-        Captions.Add('Balancing_DirectSalesCount', BalancingDirectSalesCountLbl);
-        Captions.Add('Balancing_DirectItemsReturnLine', BalancingDirectItemsReturnLineLbl);
+        Captions.Add('Balancing_DirectItemSalesCount', BalancingDirectItemSalesCountLbl);
+        Captions.Add('Balancing_DirectItemReturnCount', BalancingDirectItemReturnCountLbl);
         Captions.Add('Balancing_Overview', BalancingOverviewLbl);
         Captions.Add('Balancing_Sales', BalancingSalesLbl);
         Captions.Add('Balancing_DirectItemSalesLCY', BalancingDirectItemSalesLCYLbl);
@@ -533,7 +533,7 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('Balancing_BinTransferOutAmountLCY', BalancingBinTransferOutAmountLCYLbl);
         Captions.Add('Balancing_BinTransferInAmountLCY', BalancingBinTransferInAmountLCYLbl);
         Captions.Add('Balancing_CreditSales', BalancingCreditSalesLbl);
-        Captions.Add('Balancing_CreditSalesCountLCY', BalancingCreditSalesCountLCYLbl);
+        Captions.Add('Balancing_CreditSalesCount', BalancingCreditSalesCountLbl);
         Captions.Add('Balancing_CreditSalesAmountLCY', BalancingCreditSalesAmountLCYLbl);
         Captions.Add('Balancing_CreditNetSalesAmountLCY', BalancingCreditNetSalesAmountLCYLbl);
         Captions.Add('Balancing_Details', BalancingDetailsLbl);
@@ -585,7 +585,7 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('Balancing_CalculatedAmountInclFloat', BalancingCalculatedAmountInclFloatLbl);
         Captions.Add('Balancing_CountedAmountInclFloat', BalancingCountedAmountInclFloatLbl);
         Captions.Add('Balancing_FloatAmount', BalancingFloatAmountLbl);
-        Captions.Add('Balancing_TransferedAmount', BalancingTransferedAmountLbl);
+        Captions.Add('Balancing_TransferredAmount', BalancingTransferredAmountLbl);
         Captions.Add('Balancing_NewFloatAmount', BalancingNewFloatAmountLbl);
         Captions.Add('Balancing_BankDepositAmount', BalancingBankDepositAmountLbl);
         Captions.Add('Balancing_BankDepositBinCode', BalancingBankDepositBinCodeLbl);

@@ -4,7 +4,7 @@ import { balancingActions } from "../../redux/balancing/balancing-actions";
 let _getState = null;
 let _setState = null;
 
-export const getBalancingState = async () => {
+export const getBalancingState = async (context) => {
   if (!_getState) {
     _getState = NAVEventFactory.method({
       name: "BalancingGetState",
@@ -12,14 +12,14 @@ export const getBalancingState = async () => {
     });
   }
 
-  const result = await _getState.raise();
+  const result = await _getState.raise(context);
   balancingActions.updateState(result);
 };
 
-export const setBalancingState = async (state, confirmed) => {
+export const setBalancingState = async (state, confirmed, backEndContext) => {
   if (!_setState) {
     _setState = NAVEventFactory.method("BalancingSetState");
   }
 
-  _setState.raise({ state, confirmed });
+  _setState.raise({ state, confirmed, backEndContext });
 };

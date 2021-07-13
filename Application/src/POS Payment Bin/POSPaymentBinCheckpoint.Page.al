@@ -163,9 +163,9 @@
                     field(NetTransfer; NetTransfer)
                     {
                         ApplicationArea = All;
-                        Caption = 'Transfered Amount';
+                        Caption = 'Transferred Amount';
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Transfered Amount field';
+                        ToolTip = 'Specifies the value of the Transferred Amount field';
                     }
                     field("Calculated Amount Incl. Float"; Rec."Calculated Amount Incl. Float")
                     {

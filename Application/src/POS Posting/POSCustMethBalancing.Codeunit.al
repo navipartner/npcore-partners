@@ -18,8 +18,8 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
     local procedure GetSectionBalancing() Balancing: JsonObject
     begin
         Balancing.Add('createdAt', Format(_POSWorkshiftCheckpoint."Created At"));
-        Balancing.Add('directSalescount', _POSWorkshiftCheckpoint."Direct Item Sales Line Count"); // Check Name
-        Balancing.Add('directItemsReturnLine', _POSWorkshiftCheckpoint."Direct Item Returns Line Count"); // Check Name
+        Balancing.Add('directItemSalesCount', _POSWorkshiftCheckpoint."Direct Item Sales Line Count");
+        Balancing.Add('directItemReturnCount', _POSWorkshiftCheckpoint."Direct Item Returns Line Count");
     end;
 
     local procedure GetSectionOverview() Overview: JsonObject
@@ -54,7 +54,7 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
         OverviewOther.Add('binTransferInAmountLcy', _POSWorkshiftCheckpoint."Bin Transfer In Amount (LCY)");
         Overview.Add('other', OverviewOther);
 
-        OverviewCreditSales.Add('creditSalesCountLcy', _POSWorkshiftCheckpoint."Credit Sales Count"); // Check Name
+        OverviewCreditSales.Add('creditSalesCount', _POSWorkshiftCheckpoint."Credit Sales Count");
         OverviewCreditSales.Add('creditSalesAmountLcy', _POSWorkshiftCheckpoint."Credit Sales Amount (LCY)");
         OverviewCreditSales.Add('creditNetSalesAmountLcy', 100);
         Overview.Add('creditSales', OverviewCreditSales);
@@ -201,7 +201,7 @@ codeunit 6014568 "NPR POS Cust. Meth.: Balancing"
             Line.ReadFrom('{}');
             Line.Add('paymentTypeNo', POSPaymentBinCheckPoint."Payment Type No.");
             Line.Add('floatAmount', POSPaymentBinCheckPoint."Float Amount");
-            Line.Add('transferedAmount', POSPaymentBinCheckPoint."Transfer In Amount" + POSPaymentBinCheckPoint."Transfer Out Amount"); // Check Spelling - Net Transferred Amount
+            Line.Add('transferredAmount', POSPaymentBinCheckPoint."Transfer In Amount" + POSPaymentBinCheckPoint."Transfer Out Amount");
             Line.Add('calculatedAmount', POSPaymentBinCheckPoint."Calculated Amount Incl. Float");
             Line.Add('newFloatAmount', POSPaymentBinCheckPoint."New Float Amount");
             Line.Add('bankDepositAmount', POSPaymentBinCheckPoint."Bank Deposit Amount");

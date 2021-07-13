@@ -3,8 +3,8 @@ const __mock_state_balancing = {
   statistics: {
     balancing: {
       createdAt: "2021-04-28T13:25:32.0510000Z",
-      directSalescount: 100,
-      directItemsReturnLine: 100,
+      directItemSalesCount: 100,
+      directItemReturnCount: 100,
     },
     overview: {
       sales: {
@@ -30,7 +30,7 @@ const __mock_state_balancing = {
         binTransferInAmountLcy: 100,
       },
       creditSales: {
-        creditSalesCountLcy: 100,
+        creditSalesCount: 100,
         creditSalesAmountLcy: 100,
         creditNetSalesAmountLcy: 100,
       },
@@ -165,7 +165,7 @@ const __mock_state_balancing = {
       {
         paymentTypeNo: "EURO",
         floatAmount: 0,
-        transferedAmount: 100,
+        transferredAmount: 100,
         calculatedAmount: 100,
         newFloatAmount: 100,
         bankDepositAmount: 100,
@@ -178,7 +178,7 @@ const __mock_state_balancing = {
       {
         paymentTypeNo: "USD",
         floatAmount: 200,
-        transferedAmount: 200,
+        transferredAmount: 200,
         calculatedAmount: 200,
         newFloatAmount: 200,
         bankDepositAmount: 200,
@@ -191,7 +191,7 @@ const __mock_state_balancing = {
       {
         paymentTypeNo: "DK",
         floatAmount: 300,
-        transferedAmount: 300,
+        transferredAmount: 300,
         calculatedAmount: 300,
         newFloatAmount: 300,
         bankDepositAmount: 300,

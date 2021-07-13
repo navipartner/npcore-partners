@@ -4,6 +4,7 @@ import {
   DRAGONGLASS_BALANCING_UPDATE_COIN_TYPES,
   DRAGONGLASS_BALANCING_UPDATE_STATE,
   DRAGONGLASS_BALANCING_UPDATE_VALUES,
+  DRAGONGLASS_UPDATE_BACK_END_CONTEXT
 } from "./balancing-actions";
 import initialState from "./balancing-initial";
 
@@ -43,8 +44,8 @@ const updateCountingCalculations = (entry, property) => {
   const calculateNewFloatAmount = () => {
     newEntry.closingAndTransfer.newFloatAmount = Math.max(
       newEntry.counting.countedAmount -
-        newEntry.closingAndTransfer.bankDepositAmount -
-        newEntry.closingAndTransfer.moveToBinAmount,
+      newEntry.closingAndTransfer.bankDepositAmount -
+      newEntry.closingAndTransfer.moveToBinAmount,
       0
     );
   };
@@ -164,6 +165,11 @@ export const balancing = createReducer(initialState, {
     }
     result.cashCount.counting = counting;
     result.cashCount.closingAndTransfer = closingAndTransfer;
+    return result;
+  },
+
+  [DRAGONGLASS_UPDATE_BACK_END_CONTEXT]: (state, payload) => {
+    const result = { ...state, backEndContext: { ...payload } };
     return result;
   },
 });

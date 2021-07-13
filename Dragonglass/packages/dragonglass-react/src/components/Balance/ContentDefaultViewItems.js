@@ -20,7 +20,7 @@ export const contentItems = {
       type: "number",
     },
     {
-      property: "transferedAmount",
+      property: "transferredAmount",
       type: "number",
     },
     {
