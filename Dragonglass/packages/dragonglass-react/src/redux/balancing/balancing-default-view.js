@@ -14,13 +14,13 @@ export default {
                 value: "",
               },
               {
-                label: "l$.Balancing_DirectSalesCount",
-                select: "directSalescount",
+                label: "l$.Balancing_directItemSalesCount",
+                select: "directItemSalesCount",
                 value: "0",
               },
               {
-                label: "l$.Balancing_DirectItemsReturnLine",
-                select: "directItemsReturnLine",
+                label: "l$.Balancing_directItemReturnCount",
+                select: "directItemReturnCount",
                 value: "0",
               },
             ],
@@ -126,8 +126,8 @@ export default {
             select: "creditSales",
             fields: [
               {
-                label: "l$.Balancing_CreditSalesCountLCY",
-                select: "creditSalesCountLcy",
+                label: "l$.Balancing_creditSalesCount",
+                select: "creditSalesCount",
                 value: "4",
               },
               {
@@ -369,7 +369,7 @@ export default {
     closingAndTransfer: [
       { label: "l$.Balancing_PaymentTypeNo", select: "paymentTypeNo" },
       { label: "l$.Balancing_FloatAmount", select: "floatAmount", alignRight: true },
-      { label: "l$.Balancing_TransferedAmount", select: "transferedAmount", alignRight: true },
+      { label: "l$.Balancing_TransferredAmount", select: "transferredAmount", alignRight: true },
       { label: "l$.Balancing_CalculatedAmountInclFloat", select: "calculatedAmount", alignRight: true },
       { label: "l$.Balancing_NewFloatAmount", select: "newFloatAmount", alignRight: true },
       { label: "l$.Balancing_BankDepositAmount", select: "bankDepositAmount", alignRight: true },

@@ -20,6 +20,7 @@ import { FrontEndAsyncInterface } from "dragonglass-front-end-async";
 import { UpdatePreSearch } from "./handlers/UpdatePreSearch";
 import { UpdateSearch } from "./handlers/UpdateSearch";
 import { InvokeHardwareConnector } from "./handlers/InvokeHardwareConnector";
+import { BalanceSetContext } from "./handlers/BalanceSetContext";
 
 // Bootstrap built-in request handlers
 export const bootstrapBuiltinAsyncHandlersTodo = (transcendence) => {
@@ -44,4 +45,5 @@ export const bootstrapBuiltinAsyncHandlersTodo = (transcendence) => {
   FrontEndAsyncInterface.register(new UpdatePreSearch(), "UpdatePreSearch");
   FrontEndAsyncInterface.register(new UpdateSearch(), "UpdateSearch");
   FrontEndAsyncInterface.register(new InvokeHardwareConnector(), "InvokeHardwareConnector");
+  FrontEndAsyncInterface.register(new BalanceSetContext(), "BalanceSetContext");
 };

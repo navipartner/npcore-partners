@@ -6,8 +6,8 @@ export default {
   statistics: {
     balancing: {
       createdAt: null,
-      directSalescount: 0,
-      directItemsReturnLine: 0,
+      directItemSalesCount: 0,
+      directItemReturnCount: 0,
     },
     overview: {
       sales: {
@@ -33,7 +33,7 @@ export default {
         binTransferInAmountLcy: 0,
       },
       creditSales: {
-        creditSalesCountLcy: 0,
+        creditSalesCount: 0,
         creditSalesAmountLcy: 0,
         creditNetSalesAmountLcy: 0,
       },
@@ -94,4 +94,5 @@ export default {
     counting: [],
     closingAndTransfer: [],
   },
+  backEndContext: {}
 };

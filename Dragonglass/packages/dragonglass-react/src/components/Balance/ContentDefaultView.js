@@ -35,7 +35,7 @@ export default function ContentDefaultView({ state, layout, activePaymentTypeInd
       },
       closingAndTransfer: {
         floatAmount: values.floatAmount,
-        transferedAmount: values.transferedAmount,
+        transferredAmount: values.transferredAmount,
         calculatedAmount: values.calculatedAmount,
         newFloatAmount: values.newFloatAmount,
         bankDepositAmount: values.bankDepositAmount,
@@ -64,7 +64,7 @@ export default function ContentDefaultView({ state, layout, activePaymentTypeInd
     countedAmount: convertToFloat(countingData.countedAmount),
     difference: convertToFloat(countingData.difference),
     floatAmount: convertToFloat(closingAndTransferData.floatAmount),
-    transferedAmount: convertToFloat(closingAndTransferData.transferedAmount),
+    transferredAmount: convertToFloat(closingAndTransferData.transferredAmount),
     calculatedAmount: convertToFloat(closingAndTransferData.calculatedAmount),
     newFloatAmount: convertToFloat(closingAndTransferData.newFloatAmount),
     bankDepositAmount: convertToFloat(closingAndTransferData.bankDepositAmount),

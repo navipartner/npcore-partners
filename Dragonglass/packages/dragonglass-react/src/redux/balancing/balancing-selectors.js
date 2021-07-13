@@ -18,3 +18,5 @@ export const balancingSelectConfirmed = (state) =>
 
 export const balancingSelectConfirmedByPaymentType = (paymentType) => (state) =>
   state.balancing.cashCount.confirmed[paymentType];
+
+export const balancingSelectBackEndContext = (state) => state.balancing.backEndContext;
