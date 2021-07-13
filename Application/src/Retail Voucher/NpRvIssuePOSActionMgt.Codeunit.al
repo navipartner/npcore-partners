@@ -419,12 +419,12 @@
         exit(true);
     end;
 
-    local procedure IssueVoucherActionCode(): Text
+    local procedure IssueVoucherActionCode(): Code[20]
     begin
         exit('ISSUE_VOUCHER');
     end;
 
-    local procedure IssueVoucherActionVersion(): Text
+    local procedure IssueVoucherActionVersion(): Code[20]
     begin
         exit('1.1');
     end;

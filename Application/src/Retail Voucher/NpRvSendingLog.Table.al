@@ -78,7 +78,7 @@ table 6151030 "NPR NpRv Sending Log"
         if "Log Date" = 0DT then
             "Log Date" := CurrentDateTime;
         if "User ID" = '' then
-            "User ID" := UserId;
+            "User ID" := Copystr(UserId, 1, MaxStrLen("User ID"));
     end;
 
     procedure GetErrorMessage() FullLogMessage: Text

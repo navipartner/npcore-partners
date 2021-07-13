@@ -195,12 +195,12 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         NpRvVoucherMgt.TopUpVoucher(POSSession, VoucherNo, DiscountType, AmtInput, DiscountAmount, DiscountPct);
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('TOPUP_VOUCHER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Code[20]
     begin
         exit('1.0');
     end;

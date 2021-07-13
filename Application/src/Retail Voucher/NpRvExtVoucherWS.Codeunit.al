@@ -40,14 +40,14 @@
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
-        DocNo: Text;
+        DocNo: Text[50];
         LineNo: Integer;
     begin
         Clear(vouchers);
         if StrLen(CustomerNo) > MaxStrLen(NpRvVoucher."Customer No.") then
             exit;
 
-        DocNo := Format(CreateGuid());
+        DocNo := CreateGuid();
         NpRvVoucher.SetRange("Customer No.", UpperCase(CustomerNo));
         if NpRvVoucher.FindSet() then
             repeat
@@ -67,14 +67,14 @@
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
-        DocNo: Text;
+        DocNo: Text[50];
         LineNo: Integer;
     begin
         Clear(vouchers);
         if StrLen(Email) > MaxStrLen(NpRvVoucher."E-mail") then
             exit;
 
-        DocNo := Format(CreateGuid());
+        DocNo := CreateGuid();
         NpRvVoucher.SetFilter("E-mail", '@' + ConvertStr(Email, '@', '?'));
         if NpRvVoucher.FindSet() then
             repeat

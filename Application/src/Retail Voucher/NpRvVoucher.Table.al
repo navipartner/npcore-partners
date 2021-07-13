@@ -473,8 +473,13 @@ table 6151013 "NPR NpRv Voucher"
     local procedure InitReferenceNo()
     var
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        ReferenceNo: Text;
+        ReferenceNoErr: Label 'Generated Reference Number for Voucher Type %1 is too long. Please check setup or contact administrator.';
     begin
-        "Reference No." := VoucherMgt.GenerateReferenceNo(Rec);
+        ReferenceNo := VoucherMgt.GenerateReferenceNo(Rec);
+        if StrLen(ReferenceNo) > MaxStrLen("Reference No.") then
+            Error(ReferenceNoErr, Rec."Voucher Type") else
+            "Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen("Reference No."));
     end;
 
     local procedure TestReferenceNo()

@@ -33,11 +33,16 @@ table 6151024 "NPR NpRv Partner"
             var
                 Company: Record Company;
                 NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
+                ServiceUrl: Text;
+                ServiceURLErr: Label 'ServiceURL returned in GetGlobalVoucherWSUrl function is too big to be stored in "Service Url" field. Please contact administrator.';
             begin
-                if StrLen(Name) <= MaxStrLen(Company.Name) then begin
-                    if Company.Get(Name) then
-                        "Service Url" := NpRvPartnerMgt.GetGlobalVoucherWSUrl(Company.Name);
-                end;
+                if StrLen(Name) <= MaxStrLen(Company.Name) then
+                    if Company.Get(Name) then begin
+                        ServiceUrl := NpRvPartnerMgt.GetGlobalVoucherWSUrl(Company.Name);
+                        if StrLen(ServiceUrl) > MaxStrLen("Service Url") then
+                            Error(ServiceURLErr) else
+                            "Service Url" := CopyStr(ServiceUrl, 1, MaxStrLen("Service Url"));
+                    end;
             end;
         }
         field(10; "Service Url"; Text[250])
