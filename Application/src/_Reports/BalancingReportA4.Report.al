@@ -424,6 +424,12 @@ report 6014460 "NPR Balancing Report A4"
             column(ClosingDate_; POSEntry."Entry Date")
             {
             }
+            column(UserFullName_; User."Full Name")
+            {
+            }
+            column(SalespersonName_; Salesperson.Name)
+            {
+            }
             column(StoreLbl_; StoreLbl)
             {
             }
@@ -437,6 +443,12 @@ report 6014460 "NPR Balancing Report A4"
             {
             }
             column(SignatureLbl_; SignatureLbl)
+            {
+            }
+            column(PrintedBylbl_; PrintedByLbl)
+            {
+            }
+            column(Salespersonlbl_; Salespersonlbl)
             {
             }
             column(PricesIncVAT_; Format(POSEntry."Prices Including VAT"))
@@ -770,6 +782,7 @@ report 6014460 "NPR Balancing Report A4"
 
                 if POSEntry.Get("POS Workshift Checkpoint"."POS Entry No.") then;
                 if Salesperson.Get(POSEntry."Salesperson Code") then;
+                IF User.GET(USERSECURITYID()) THEN;
 
                 VarBalancedBy := '';
                 VarBalancedBy := BalancedByLbl + ' ' + Salesperson.Name + ' ' + WithLbl;
@@ -892,6 +905,7 @@ report 6014460 "NPR Balancing Report A4"
         CompanyInfo: Record "Company Information";
         POSEntry: Record "NPR POS Entry";
         Salesperson: Record "Salesperson/Purchaser";
+        User: Record User;
         PrintAttachedBins: Boolean;
         PrintClosing: Boolean;
         PrintCountedAmtInclFloat: Boolean;
@@ -942,5 +956,8 @@ report 6014460 "NPR Balancing Report A4"
         LblZReport: Label 'Z-Report';
         VarBalancedBy: Text;
         VarReportTitle: Text;
+        PrintedByLbl: Label 'Printed by';
+        Salespersonlbl: Label 'Salesperson';
+
 }
 
