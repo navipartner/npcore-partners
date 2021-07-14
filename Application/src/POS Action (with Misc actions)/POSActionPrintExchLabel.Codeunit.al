@@ -22,7 +22,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
             Sender.RegisterWorkflow20(
                 'await workflow.respond("AddPresetValuesToContext");' +
                 'if (($parameters.Setting == $parameters.Setting["Package"]) || ($parameters.Setting == $parameters.Setting["Selection"])) {' +
-                '   var result = await popup.calendarPlusLines({ title: $labels.title, caption: $labels.calendar, date: $context.defaultdate, dataSource: "BUILTIN_SALELINE");' +
+                '   var result = await popup.calendarPlusLines({ title: $labels.title, caption: $labels.calendar, date: $context.defaultdate, dataSource: "BUILTIN_SALELINE" });' +
                 '} else {' +
                 '   var result = await popup.datepad({ title: $labels.title, caption: $labels.validfrom, required: true, value: $context.defaultdate });' +
                 '};' +
