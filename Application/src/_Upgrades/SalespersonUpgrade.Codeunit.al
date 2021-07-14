@@ -11,18 +11,18 @@
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRSalespersonUpgrade-20210414-01', Locked = true;
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Salesperson Upgrade', 'Upgrade');
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Salesperson Upgrade")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
 
         UpgradeSalesperson();
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Salesperson Upgrade"));
 
         LogMessageStopwatch.LogFinish();
     end;

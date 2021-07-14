@@ -6,10 +6,11 @@ codeunit 6014500 "NPR Upgrade Magento Passwords"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Upgrade Magento Passwords', 'OnUpgradePerCompany');
 
-        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Magento Passwords")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -17,14 +18,9 @@ codeunit 6014500 "NPR Upgrade Magento Passwords"
         UpgradePasswordsInventoryCompanies();
         UpgradePasswordsPaymentGateway();
         UpgradePasswordsMagentoSetup();
-        UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Magento Passwords"));
 
         LogMessageStopwatch.LogFinish();
-    end;
-
-    local procedure GetMagentoPassUpgradeTag(): Text
-    begin
-        exit('Magento_Password_IsolatedStorage_20210129');
     end;
 
     local procedure UpgradePasswordsInventoryCompanies()

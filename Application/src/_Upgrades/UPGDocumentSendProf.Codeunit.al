@@ -12,10 +12,11 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Document Send. Prof.', 'OnUpgradePerCompany');
 
-        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Document Send. Prof.")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -25,14 +26,9 @@ codeunit 6014436 "NPR UPG Document Send. Prof."
         //
         // UpgradeCustomerDocumentSendingProfiles();
         // UpgradeVendorDocumentSendingProfiles();
-        UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Document Send. Prof."));
 
         LogMessageStopwatch.LogFinish();
-    end;
-
-    local procedure GetMagentoPassUpgradeTag(): Text
-    begin
-        exit('NPR_DocumentProcessing_DocumentSendingProfile_20210222');
     end;
 
     local procedure InsertDocumentSendingProfiles()

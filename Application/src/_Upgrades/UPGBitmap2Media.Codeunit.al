@@ -5,13 +5,13 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     // trigger OnUpgradePerCompany()
     // var
     //     LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-    //     UpgTagDef: Codeunit "NPR UPG Bitmap 2 Media Tag Def";
+    //     UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     //     UpgradeTagMgt: Codeunit "Upgrade Tag";
     // begin
     //     LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Bitmap 2 Media', 'OnUpgradePerCompany');
 
     //     // Check whether the tag has been used before, and if so, don't run upgrade code
-    //     if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then begin
+    //     if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Bitmap 2 Media")) then begin
     //         LogMessageStopwatch.LogFinish();
     //         exit;
     //     end;
@@ -20,7 +20,7 @@ codeunit 6014588 "NPR UPG Bitmap 2 Media"
     //     Upgrade();
 
     //     // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-    //     UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+    //     UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Bitmap 2 Media"));
 
     //     LogMessageStopwatch.LogFinish();
     // end;

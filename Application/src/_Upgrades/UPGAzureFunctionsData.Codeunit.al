@@ -6,23 +6,19 @@ codeunit 6014418 "NPR UPG Azure Functions Data"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Azure Functions Data', 'OnUpgradePerCompany');
 
-        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Azure Functions Data")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
 
         UpdateRegToPos();
-        UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Azure Functions Data"));
 
         LogMessageStopwatch.LogFinish();
-    end;
-
-    local procedure GetMagentoPassUpgradeTag(): Text
-    begin
-        exit('NPR_UPG_Azure_Functions_Data');
     end;
 
     local procedure UpdateRegToPos()

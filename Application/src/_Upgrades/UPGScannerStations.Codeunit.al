@@ -7,13 +7,13 @@ codeunit 6060095 "NPR UPG Scanner Stations"
 
     trigger OnUpgradePerCompany()
     var
-        UpgTagDef: Codeunit "NPR UPG Scanner Stat. Tag Def";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Scanner Stations', 'OnUpgradePerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Scanner Stations")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -22,7 +22,7 @@ codeunit 6060095 "NPR UPG Scanner Stations"
         Upgrade();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Scanner Stations"));
 
         LogMessageStopwatch.LogFinish();
     end;

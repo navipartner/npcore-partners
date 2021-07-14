@@ -14,11 +14,11 @@ codeunit 6014471 "NPR UPG Master Line Map"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRPUGMasterLineMap_Upgrade-20210312', Locked = true;
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Master Line Map', 'Upgrade');
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Master Line Map")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -32,7 +32,7 @@ codeunit 6014471 "NPR UPG Master Line Map"
         UpgradeItemReplByStoreMasterLineData();
         UpgradeRetailJournalLineMasterLineData();
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Master Line Map"));
 
         LogMessageStopwatch.LogFinish();
     end;

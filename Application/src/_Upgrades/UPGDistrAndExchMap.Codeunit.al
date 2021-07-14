@@ -12,11 +12,11 @@ codeunit 6014470 "NPR UPG Distr. And Exch. Map"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRPUGDistrAndExchMap_Upgrade-20210312', Locked = true;
+        UpgTagMgt: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Distr. And Exch. Map', 'Upgrade');
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagMgt.GetUpgradeTag(Codeunit::"NPR UPG Distr. And Exch. Map")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -25,7 +25,7 @@ codeunit 6014470 "NPR UPG Distr. And Exch. Map"
         UpgradeTransferLineDistributionData();
         UpgradePurchaseLineExchangeData();
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagMgt.GetUpgradeTag(Codeunit::"NPR UPG Distr. And Exch. Map"));
 
         LogMessageStopwatch.LogFinish();
     end;

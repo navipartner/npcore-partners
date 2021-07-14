@@ -40,11 +40,12 @@ codeunit 6014496 "NPR Reten. Pol. Install"
     procedure AddAllowedTables()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
         RtnPeriodEnum: Enum "Retention Period Enum";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Reten. Pol. Install', 'AddAllowedTables');
 
-        if UpgradeTag.HasUpgradeTag(GetNPRRetenPolTablesUpgradeTag()) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -80,7 +81,7 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         // do not forget to add table to DeleteRecordsWithIndirectPermissionsOnApplyRetentionPolicyIndirectPermissionRequired below
         // and to CDU permissions
 
-        UpgradeTag.SetUpgradeTag(GetNPRRetenPolTablesUpgradeTag());
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -137,17 +138,6 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         RetentionPolicySetup.Validate("Retention Period", RetentionPeriodCode);
         RetentionPolicySetup.Validate(Enabled, true);
         RetentionPolicySetup.Insert(true);
-    end;
-
-    local procedure GetNPRRetenPolTablesUpgradeTag(): Code[250]
-    begin
-        exit('NPR-RetenPolTables-20210224-02');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerCompanyUpgradeTags', '', false, false)]
-    local procedure RegisterPerDatabaseUpgradeTags(var PerCompanyUpgradeTags: List of [Code[250]])
-    begin
-        PerCompanyUpgradeTags.Add(GetNPRRetenPolTablesUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnBeforeOnRun', '', false, false)]

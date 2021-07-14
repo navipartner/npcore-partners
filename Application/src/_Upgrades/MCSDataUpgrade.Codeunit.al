@@ -6,23 +6,19 @@ codeunit 6014412 "NPR MCS Data Upgrade"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR MCS Data Upgrade', 'OnUpgradeDataPerCompany');
 
-        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR MCS Data Upgrade")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
 
         UpdateSetupAPIKeys();
-        UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR MCS Data Upgrade"));
 
         LogMessageStopwatch.LogFinish();
-    end;
-
-    local procedure GetMagentoPassUpgradeTag(): Text
-    begin
-        exit('NPR_MCS_Data_Upgrade');
     end;
 
     local procedure UpdateSetupAPIKeys()

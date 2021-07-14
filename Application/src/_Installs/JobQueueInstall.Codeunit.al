@@ -13,11 +13,11 @@ codeunit 6014438 "NPR Job Queue Install"
     procedure AddJobQueues()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRJobQueueInstall-20210324', Locked = true;
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Job Queue install', 'AddJobQueues');
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -27,7 +27,7 @@ codeunit 6014438 "NPR Job Queue Install"
         AddPosPostingJobQueue();
         AddSMSJobQueue();
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install"));
 
         LogMessageStopwatch.LogFinish();
     end;

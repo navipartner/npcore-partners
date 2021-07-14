@@ -11,11 +11,11 @@ codeunit 6014405 "NPR UPG Aux. Tables"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRPUGAuxTables_Upgrade-20210315-01', Locked = true;
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Aux. Tables', 'Upgrade');
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Aux. Tables")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -26,7 +26,7 @@ codeunit 6014405 "NPR UPG Aux. Tables"
         // UpgradeItemLedgerEntry();
         UpgradeGLAccount();
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Aux. Tables"));
 
         LogMessageStopwatch.LogFinish();
     end;
