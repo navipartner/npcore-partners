@@ -2,9 +2,6 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
 {
     Subtype = Upgrade;
 
-    var
-        MovePaymentTypePOSLbl: Label 'PaymentTypePOS_MoveToPOSPaymentMethod', Locked = true;
-
     trigger OnUpgradePerCompany()
     begin
         MovePaymentTypePOS();
@@ -14,17 +11,18 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Payment Type POS Upgrade', 'MovePaymentTypePos');
 
-        if UpgradeTag.HasUpgradeTag(MovePaymentTypePOSLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Payment Type POS Upgrade")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
 
         DoMovePaymentTypePOS();
 
-        UpgradeTag.SetUpgradeTag(MovePaymentTypePOSLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Payment Type POS Upgrade"));
 
         LogMessageStopwatch.LogFinish();
     end;

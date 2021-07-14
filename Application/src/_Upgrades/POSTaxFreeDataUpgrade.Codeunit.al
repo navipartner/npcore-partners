@@ -6,10 +6,11 @@ codeunit 6014414 "NPR POS Tax Free Data Upgrade"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR POS Tax Free Data Upgrade', 'OnUpgradePerCompany');
 
-        if UpgradeTagMgt.HasUpgradeTag(GetMagentoPassUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR POS Tax Free Data Upgrade")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -18,14 +19,9 @@ codeunit 6014414 "NPR POS Tax Free Data Upgrade"
         TaxFreeRequestUpgrade();
         TaxFreeVoucherUpgrade();
 
-        UpgradeTagMgt.SetUpgradeTag(GetMagentoPassUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR POS Tax Free Data Upgrade"));
 
         LogMessageStopwatch.LogFinish();
-    end;
-
-    local procedure GetMagentoPassUpgradeTag(): Text
-    begin
-        exit('NPR_POS_Tax_Free_Data_Upgrade');
     end;
 
     local procedure TaxFreePosUnitTableUpgrade()
