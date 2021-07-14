@@ -86,7 +86,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
 
                         trigger OnBeforePassVariable()
                         begin
-                            ResponseStatus := Format((CapacityStatusCode = 1), 0, 9);
+                            ResponseStatus := Format((CapacityStatusCode >= 1), 0, 9);
                         end;
                     }
                     textattribute(allocationby)
@@ -120,6 +120,8 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         trigger OnBeforePassVariable()
                         begin
                             case CapacityStatusCode of
+                                6:
+                                    ResponseMessage := _CalendarExceptionText;
                                 1:
                                     ResponseMessage := 'Ok.';
                                 -1:
@@ -132,6 +134,8 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                                     ResponseMessage := 'The external schedule id is invalid or all schedules have been cancelled.';
                                 -5:
                                     ResponseMessage := 'The admission schedule indicated that admission is closed.';
+                                -6:
+                                    ResponseMessage := _CalendarExceptionText;
                                 else
                                     ResponseMessage := StrSubstNo(ResponseLbl, CapacityStatusCode);
                             end;
@@ -180,6 +184,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         ItemNumber: Code[20];
                         VariantCode: Code[10];
                         ResolvingTable: Integer;
+                        NonWorking: Boolean;
                     begin
 
                         RemainingCapacity := 0;
@@ -207,10 +212,17 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, Today, Time, RemainingCapacity)) then
                             CapacityStatusCode := -1;
 
+                        TicketManagement.CheckTicketBaseCalendar(TmpAdmScheduleEntryResponse."Admission Code", ItemNumber, VariantCode, TmpAdmScheduleEntryResponse."Admission Start Date", NonWorking, _CalendarExceptionText);
+                        if (NonWorking) then
+                            CapacityStatusCode := -6;
+
                         if (CapacityStatusCode <> 1) then
                             exit;
 
                         SetCapacityStatusCode();
+
+                        if ((_CalendarExceptionText <> '') and (CapacityStatusCode > 0)) then
+                            CapacityStatusCode := 6;
 
                         PriceOption := '';
                         Amount := '';
@@ -257,6 +269,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
         CapacityStatusCode: Integer;
         gExternalItemNo: Code[20];
         ResponseLbl: Label 'Capacity Status Code %1 does not have a dedicated message yet.';
+        _CalendarExceptionText: Text;
 
     procedure AddResponse()
     begin
