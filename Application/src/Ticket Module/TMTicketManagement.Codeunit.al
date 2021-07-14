@@ -54,7 +54,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         SCHEDULE_ENTRY_EXPIRED_NO: Label '-1023';
         SCHEDULE_ENTRY_EXPIRED_NO2: Label '-1024';
         SCHEDULE_ENTRY_EXPIRED_NO3: Label '-1025';
-        TICKET_CALENDAR_NO: Label '-1027';
         RESERVATION_NOT_FOR_NOW_NO: Label '-1028';
         CONCURRENT_CAPACITY_EXCEEDED_NO: Label '-1030';
         RESCHEDULE_NOT_ALLOWED_NO: Label '-1031';
@@ -2511,6 +2510,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure CheckTicketBaseCalendarWorker(AdmissionCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionDate: Date; var NonWorking: Boolean; var ResponseMessage: Text)
     var
         TicketBOM: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
         TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
         CalendarManagement: Codeunit "Calendar Management";
         CalendarDesc: Text;
@@ -2518,39 +2518,61 @@ codeunit 6059784 "NPR TM Ticket Management"
         ResponseMessage := '';
         NonWorking := false;
 
-        TicketBOM.Get(ItemNo, VariantCode, AdmissionCode);
-        if (TicketBOM."Ticket Base Calendar Code" <> '') then begin
-            TempCustomizedCalendarChange.Init();
-            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
-            TempCustomizedCalendarChange."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
-            TempCustomizedCalendarChange."Date" := AdmissionDate;
-            TempCustomizedCalendarChange.Description := CalendarDesc;
-            TempCustomizedCalendarChange."Source Code" := AdmissionCode;
-            TempCustomizedCalendarChange.Insert();
-
-            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
-
-            if (not TempCustomizedCalendarChange.Nonworking) then begin
-                TempCustomizedCalendarChange.DeleteAll();
+        if (TicketBOM.Get(ItemNo, VariantCode, AdmissionCode)) then
+            if (TicketBOM."Ticket Base Calendar Code" <> '') then begin
                 TempCustomizedCalendarChange.Init();
                 TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
                 TempCustomizedCalendarChange."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
                 TempCustomizedCalendarChange."Date" := AdmissionDate;
                 TempCustomizedCalendarChange.Description := CalendarDesc;
                 TempCustomizedCalendarChange."Source Code" := AdmissionCode;
-                TempCustomizedCalendarChange."Additional Source Code" := ItemNo;
                 TempCustomizedCalendarChange.Insert();
 
                 CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
+                NonWorking := TempCustomizedCalendarChange.Nonworking;
+                CalendarDesc := TempCustomizedCalendarChange.Description;
+
+                if (not TempCustomizedCalendarChange.Nonworking) then begin
+                    TempCustomizedCalendarChange.DeleteAll();
+                    TempCustomizedCalendarChange.Init();
+                    TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
+                    TempCustomizedCalendarChange."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
+                    TempCustomizedCalendarChange."Date" := AdmissionDate;
+                    TempCustomizedCalendarChange.Description := CalendarDesc;
+                    TempCustomizedCalendarChange."Source Code" := AdmissionCode;
+                    TempCustomizedCalendarChange."Additional Source Code" := ItemNo;
+                    TempCustomizedCalendarChange.Insert();
+
+                    CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
+                    NonWorking := TempCustomizedCalendarChange.Nonworking;
+                    CalendarDesc := TempCustomizedCalendarChange.Description;
+                end;
             end;
 
-            NonWorking := TempCustomizedCalendarChange.Nonworking;
-            if (NonWorking) then
-                if (CalendarDesc = '') then
-                    CalendarDesc := StrSubstNo(TICKET_CALENDAR, ItemNo, VariantCode, AdmissionCode, AdmissionDate);
+        if (not NonWorking) then
+            if (Admission.Get(AdmissionCode)) then
+                if (Admission."Ticket Base Calendar Code" <> '') then begin
+                    TempCustomizedCalendarChange.DeleteAll();
+                    TempCustomizedCalendarChange.Init();
+                    TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
+                    TempCustomizedCalendarChange."Base Calendar Code" := Admission."Ticket Base Calendar Code";
+                    TempCustomizedCalendarChange."Date" := AdmissionDate;
+                    TempCustomizedCalendarChange.Description := CalendarDesc;
+                    TempCustomizedCalendarChange."Source Code" := AdmissionCode;
+                    TempCustomizedCalendarChange.Insert();
 
-            ResponseMessage := StrSubstNo(CalendarDesc, TICKET_CALENDAR_NO);
-        end;
+                    CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
+                    NonWorking := TempCustomizedCalendarChange.Nonworking;
+                    CalendarDesc := TempCustomizedCalendarChange.Description;
+                end;
+
+
+        if (NonWorking) then
+            if (CalendarDesc = '') then
+                CalendarDesc := StrSubstNo(TICKET_CALENDAR, ItemNo, VariantCode, AdmissionCode, AdmissionDate);
+
+        ResponseMessage := CalendarDesc;
+
     end;
 
     procedure CheckTicketBaseCalendar(AdmissionCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionDate: Date; var NonWorking: Boolean; var ResponseMessage: Text)

@@ -101,9 +101,6 @@ page 6060112 "NPR TM Ticket Select Schedule"
 
     trigger OnAfterGetRecord()
     var
-        MaxCapacity: Integer;
-        CapacityControl: Option;
-        Admission: Record "NPR TM Admission";
         NonWorking: Boolean;
         DateTimeLbl: Label '%1 %2', Locked = true;
         RemainingLbl: Label '%1', Locked = true;
@@ -112,25 +109,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
 
         LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today()), Format(Time()));
 
-        Rec.CalcFields("Open Reservations", "Open Admitted", "Initial Entry");
-
-        TicketManagement.GetTicketCapacity(gTicketItemNo, gTicketVariantCode, Rec."Admission Code", Rec."Schedule Code", Rec."Entry No.", MaxCapacity, CapacityControl);
-
-        RemainingReservations := MaxCapacity - Rec."Open Reservations";
-        RemainingAdmitted := MaxCapacity - Rec."Open Admitted";
-
-        case CapacityControl of
-            Admission."Capacity Control"::ADMITTED:
-                Remaining := MaxCapacity - Rec."Open Admitted" - Rec."Open Reservations";
-            Admission."Capacity Control"::FULL:
-                Remaining := MaxCapacity - Rec."Open Admitted" - Rec."Open Reservations";
-            Admission."Capacity Control"::NONE:
-                Remaining := MaxCapacity;
-            Admission."Capacity Control"::SALES:
-                Remaining := MaxCapacity - Rec."Initial Entry";
-            Admission."Capacity Control"::SEATING:
-                Remaining := MaxCapacity - Rec."Open Admitted" - Rec."Open Reservations";
-        end;
+        TicketManagement.ValidateAdmSchEntryForSales(Rec, gTicketItemNo, gTicketItemNo, Today, Time, Remaining);
 
         RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
@@ -141,11 +120,16 @@ page 6060112 "NPR TM Ticket Select Schedule"
         end;
 
         TicketManagement.CheckTicketBaseCalendar(Rec."Admission Code", gTicketItemNo, gTicketVariantCode, Rec."Admission Start Date", NonWorking, CalendarExceptionText);
+        if (CalendarExceptionText <> '') then
+            RemainingText := Format(Remaining) + ' - ' + CalendarExceptionText;
+
+        if (NonWorking) then
+            RemainingText := CalendarExceptionText;
     end;
 
     trigger OnInit()
     var
-    DateTimeLbl: Label '%1 %2', Locked = true;
+        DateTimeLbl: Label '%1 %2', Locked = true;
     begin
         LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today), Format(Time));
     end;
