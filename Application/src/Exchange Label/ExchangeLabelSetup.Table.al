@@ -40,6 +40,7 @@ table 6014486 "NPR Exchange Label Setup"
             DataClassification = CustomerContent;
         }
     }
+
     keys
     {
         key(PK; "Primary Key")
@@ -47,5 +48,4 @@ table 6014486 "NPR Exchange Label Setup"
             Clustered = true;
         }
     }
-
 }
