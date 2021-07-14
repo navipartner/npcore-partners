@@ -273,7 +273,7 @@
         if IsNullGuid(SaleLinePOS.SystemId) then
             exit('');
 
-        if POSCrossReference.Get(SaleLinePOS.SystemId) then
+        if POSCrossReference.GetBySystemId(SaleLinePOS.SystemId) then
             exit(POSCrossReference."Reference No.");
 
         ReferenceNo := GenerateLineReferenceNo(SaleLinePOS);
