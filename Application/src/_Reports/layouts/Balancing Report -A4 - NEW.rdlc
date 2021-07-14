@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>701f48d6-a7f6-4434-a079-cd02729014af</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -5005,7 +5006,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!VATTaxSummarylbl.Value</Value>
+                                                    <Value>=Fields!VATTaxSummarylbl.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5038,7 +5039,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto" />
+                                                    <Value />
                                                     <Style>
                                                       <FontSize>9pt</FontSize>
                                                     </Style>
@@ -5070,7 +5071,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto" />
+                                                    <Value />
                                                     <Style>
                                                       <FontSize>9pt</FontSize>
                                                     </Style>
@@ -5102,7 +5103,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto" />
+                                                    <Value />
                                                     <Style>
                                                       <FontSize>9pt</FontSize>
                                                     </Style>
@@ -5134,7 +5135,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto" />
+                                                    <Value />
                                                     <Style>
                                                       <FontSize>9pt</FontSize>
                                                     </Style>
@@ -5171,7 +5172,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxAreaCodelbl_.Value</Value>
+                                                    <Value>=Fields!TaxAreaCodelbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5202,7 +5203,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!VATIdentifierlbl_.Value</Value>
+                                                    <Value>=Fields!VATIdentifierlbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5233,7 +5234,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxCalculationTypelbl_.Value</Value>
+                                                    <Value>=Fields!TaxCalculationTypelbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5268,7 +5269,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxTypelbl_.Value</Value>
+                                                    <Value>=Fields!TaxTypelbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5303,7 +5304,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxPerclbl_.Value</Value>
+                                                    <Value>=Fields!TaxPerclbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5338,7 +5339,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxBaseAmountlbl_.Value</Value>
+                                                    <Value>=Fields!TaxBaseAmountlbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5373,7 +5374,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxAmountlbl_.Value</Value>
+                                                    <Value>=Fields!TaxAmountlbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5408,7 +5409,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!AmtInclTaxlbl_.Value</Value>
+                                                    <Value>=Fields!AmtInclTaxlbl_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -5448,7 +5449,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxAreaCode_.Value</Value>
+                                                    <Value>=Fields!TaxAreaCode_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                     </Style>
@@ -5477,7 +5478,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!VATIdentifier_.Value</Value>
+                                                    <Value>=Fields!VATIdentifier_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                     </Style>
@@ -5506,7 +5507,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxCalculationType_.Value</Value>
+                                                    <Value>=Fields!TaxCalculationType_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                     </Style>
@@ -5535,7 +5536,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxType_.Value</Value>
+                                                    <Value>=Fields!TaxType_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                     </Style>
@@ -5564,7 +5565,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxPerc_.Value</Value>
+                                                    <Value>=Fields!TaxPerc_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <Format>=Fields!TaxPerc_Format.Value</Format>
@@ -5595,7 +5596,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxBaseAmount_.Value</Value>
+                                                    <Value>=Fields!TaxBaseAmount_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <Format>=Fields!TaxBaseAmount_Format.Value</Format>
@@ -5626,7 +5627,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!TaxAmount_.Value</Value>
+                                                    <Value>=Fields!TaxAmount_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <Format>=Fields!TaxAmount_Format.Value</Format>
@@ -5657,7 +5658,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!AmtInclTax_.Value</Value>
+                                                    <Value>=Fields!AmtInclTax_.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <Format>=Fields!AmtInclTax_Format.Value</Format>
@@ -5785,37 +5786,10 @@
       <Width>19.35841cm</Width>
       <Page>
         <PageHeader>
-          <Height>6.08543cm</Height>
+          <Height>6.42939cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
-            <Textbox Name="Textbox18">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=User!UserID</Value>
-                      <Style>
-                        <FontSize>9pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox18</rd:DefaultName>
-              <Top>0.76959in</Top>
-              <Left>0.04167in</Left>
-              <Height>0.20833in</Height>
-              <Width>1.60417in</Width>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-              </Style>
-            </Textbox>
             <Textbox Name="Textbox19">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
@@ -5839,7 +5813,6 @@
               <Left>4.60209in</Left>
               <Height>0.20833in</Height>
               <Width>2.91667in</Width>
-              <ZIndex>1</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5851,7 +5824,7 @@
               <Left>0.02084in</Left>
               <Height>0in</Height>
               <Width>7.55144in</Width>
-              <ZIndex>2</ZIndex>
+              <ZIndex>1</ZIndex>
               <Style>
                 <Border>
                   <Style>Solid</Style>
@@ -5865,7 +5838,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!StoreLbl_.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!StoreLbl_.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                       </Style>
@@ -5879,7 +5852,7 @@
               <Left>0.02084in</Left>
               <Height>0.19792in</Height>
               <Width>1.44792in</Width>
-              <ZIndex>3</ZIndex>
+              <ZIndex>2</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5907,7 +5880,7 @@
               <Left>1.49654in</Left>
               <Height>0.19792in</Height>
               <Width>1in</Width>
-              <ZIndex>4</ZIndex>
+              <ZIndex>3</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5935,7 +5908,7 @@
               <Left>0.02084in</Left>
               <Height>0.19792in</Height>
               <Width>1.44792in</Width>
-              <ZIndex>5</ZIndex>
+              <ZIndex>4</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5963,7 +5936,7 @@
               <Left>1.49654in</Left>
               <Height>0.19792in</Height>
               <Width>1.61458in</Width>
-              <ZIndex>6</ZIndex>
+              <ZIndex>5</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -5994,7 +5967,7 @@
               <Left>1.49654in</Left>
               <Height>0.19792in</Height>
               <Width>1.55965in</Width>
-              <ZIndex>7</ZIndex>
+              <ZIndex>6</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -6022,7 +5995,7 @@
               <Left>0.01963in</Left>
               <Height>0.19792in</Height>
               <Width>1.44913in</Width>
-              <ZIndex>8</ZIndex>
+              <ZIndex>7</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -6030,10 +6003,11 @@
               </Style>
             </Textbox>
             <Line Name="Line2">
-              <Top>2.23556in</Top>
+              <Top>2.41264in</Top>
+              <Left>0.01963in</Left>
               <Height>0in</Height>
               <Width>7.57228in</Width>
-              <ZIndex>9</ZIndex>
+              <ZIndex>8</ZIndex>
               <Style>
                 <Border>
                   <Style>Solid</Style>
@@ -6063,7 +6037,7 @@
               <Left>0.01963in</Left>
               <Height>0.25in</Height>
               <Width>2.16951in</Width>
-              <ZIndex>10</ZIndex>
+              <ZIndex>9</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -6094,7 +6068,7 @@
               <Left>1.49654in</Left>
               <Height>0.19792in</Height>
               <Width>1.55965in</Width>
-              <ZIndex>11</ZIndex>
+              <ZIndex>10</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -6122,7 +6096,7 @@
               <Left>0.02084in</Left>
               <Height>0.19792in</Height>
               <Width>1.44792in</Width>
-              <ZIndex>12</ZIndex>
+              <ZIndex>11</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -6137,7 +6111,7 @@
               <Left>13.13164cm</Left>
               <Height>40pt</Height>
               <Width>5.8337cm</Width>
-              <ZIndex>13</ZIndex>
+              <ZIndex>12</ZIndex>
               <Visibility>
                 <Hidden>=iif(IsNothing(First(Fields!CompInfoPicture_.Value, "DataSet_Result")) = true,true,false)</Hidden>
               </Visibility>
@@ -6155,7 +6129,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!POSUnitLbl_.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!POSUnitLbl_.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                       </Style>
@@ -6169,7 +6143,7 @@
               <Left>0.01963in</Left>
               <Height>0.19792in</Height>
               <Width>1.44792in</Width>
-              <ZIndex>14</ZIndex>
+              <ZIndex>13</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -6183,7 +6157,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!POSUnitNo_.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!POSUnitNo_.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                       </Style>
@@ -6197,7 +6171,122 @@
               <Left>1.49533in</Left>
               <Height>0.19792in</Height>
               <Width>1in</Width>
+              <ZIndex>14</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox18">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=First(Fields!UserFullName_.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox18</rd:DefaultName>
+              <Top>0.76473in</Top>
+              <Left>1.5186in</Left>
+              <Height>0.20833in</Height>
+              <Width>1.60417in</Width>
               <ZIndex>15</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox76">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=First(Fields!PrintedBylbl_.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox20</rd:DefaultName>
+              <Top>0.76473in</Top>
+              <Left>0.02901in</Left>
+              <Height>0.19792in</Height>
+              <Width>1.44792in</Width>
+              <ZIndex>16</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox79">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=First(Fields!SalespersonName_.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox20</rd:DefaultName>
+              <Top>2.13487in</Top>
+              <Left>1.49654in</Left>
+              <Height>0.19792in</Height>
+              <Width>1.55965in</Width>
+              <ZIndex>17</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox81">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=First(Fields!Slespersonlbl_.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox20</rd:DefaultName>
+              <Top>2.13487in</Top>
+              <Left>0.02084in</Left>
+              <Height>0.19792in</Height>
+              <Width>1.44792in</Width>
+              <ZIndex>18</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -6259,6 +6348,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>5006aa40-894b-4390-81a2-4a699a48bc06</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
@@ -6823,6 +6913,12 @@ End Function
         <Field Name="ClosingDate_">
           <DataField>ClosingDate_</DataField>
         </Field>
+        <Field Name="UserFullName_">
+          <DataField>UserFullName_</DataField>
+        </Field>
+        <Field Name="SalespersonName_">
+          <DataField>SalespersonName_</DataField>
+        </Field>
         <Field Name="StoreLbl_">
           <DataField>StoreLbl_</DataField>
         </Field>
@@ -6837,6 +6933,12 @@ End Function
         </Field>
         <Field Name="SignatureLbl_">
           <DataField>SignatureLbl_</DataField>
+        </Field>
+        <Field Name="PrintedBylbl_">
+          <DataField>PrintedBylbl_</DataField>
+        </Field>
+        <Field Name="Salespersonlbl_">
+          <DataField>Salespersonlbl_</DataField>
         </Field>
         <Field Name="PricesIncVAT_">
           <DataField>PricesIncVAT_</DataField>
