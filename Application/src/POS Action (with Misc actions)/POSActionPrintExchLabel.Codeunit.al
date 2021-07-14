@@ -1,12 +1,7 @@
 codeunit 6150788 "NPR POS Action: PrintExchLabel"
 {
     var
-        ActionDescription: Label 'This is a built-in action for printing exchange labels.';
-        Title: Label 'Print Exchange Label';
-        ValidFrom: Label 'Valid From Date';
-        CalendarCaption: Label 'Select a valid from date and the lines to include';
-        ErrorTxtQtyCannotbeNeg: Label 'Error! Quantity cannot be negative!';
-        ReadingErr: Label 'reading in %1';
+        ReadingErr: Label 'reading in %1 of %2';
 
     local procedure ActionCode(): Text
     begin
@@ -15,106 +10,130 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.5');
+        exit('2.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        ActionDescriptionLbl: Label 'This is a built-in action for printing exchange labels';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Button,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('1', 'if ((param.Setting != param.Setting["Package"]) && (param.Setting != param.Setting["Selection"]))' +
-                                         '{ datepad({ title: labels.title, caption: labels.validfrom, value: context.defaultdate, notBlank: true}, "value").respond(); };');
-            Sender.RegisterWorkflowStep('2', 'if ((param.Setting == param.Setting["Package"]) || (param.Setting == param.Setting["Selection"]))' +
-                                         '{ calendar({caption: labels.calendar, title: labels.title, checkedByDefault: true, date: context.defaultdate, columns: [10, 12, 15] }).respond(); };');
-            Sender.RegisterWorkflow(true);
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+            Sender.RegisterWorkflow20(
+                'await workflow.respond("AddPresetValuesToContext");' +
+                'if (($parameters.Setting == $parameters.Setting["Package"]) || ($parameters.Setting == $parameters.Setting["Selection"])) {' +
+                '   var result = await popup.calendarPlusLines({ title: $labels.title, caption: $labels.calendar, date: $context.defaultdate, dataSource: "BUILTIN_SALELINE");' +
+                '} else {' +
+                '   var result = await popup.datepad({ title: $labels.title, caption: $labels.validfrom, required: true, value: $context.defaultdate });' +
+                '};' +
+                'if (result === null) { return };' +
+                'workflow.respond("PrintExchangeLabels", { UserSelection: result });'
+            );
 
             Sender.RegisterOptionParameter('Setting', 'Single,Line Quantity,All Lines,Selection,Package', 'Single');
             Sender.RegisterBooleanParameter('PreventNegativeQty', true);
-            Sender.RegisterDataBinding();
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        Context: Codeunit "NPR POS JSON Management";
-        POSSetup: Codeunit "NPR POS Setup";
-        DefaultDate: Date;
+        CalendarCaptionLbl: Label 'Select a valid from date and the lines to include';
+        TitleLbl: Label 'Print Exchange Label';
+        ValidFromLbl: Label 'Valid From Date';
+    begin
+        Captions.AddActionCaption(ActionCode(), 'title', TitleLbl);
+        Captions.AddActionCaption(ActionCode(), 'validfrom', ValidFromLbl);
+        Captions.AddActionCaption(ActionCode(), 'calendar', CalendarCaptionLbl);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
+    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
-
-        POSSession.GetSetup(POSSetup);
-        if not (Evaluate(DefaultDate, POSSetup.ExchangeLabelDefaultDate()) and (StrLen(POSSetup.ExchangeLabelDefaultDate()) > 0)) then
-            DefaultDate := Today();
-
-        Context.SetContext('defaultdate', Format(DefaultDate, 0, 9));
-        FrontEnd.SetActionContext(ActionCode(), Context);
-
         Handled := true;
+
+        CASE WorkflowStep OF
+            'AddPresetValuesToContext':
+                AddPresetValuesToContext(Context, POSSession);
+            'PrintExchangeLabels':
+                PrintExchangeLabels(Context, POSSession);
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'title', Title);
-        Captions.AddActionCaption(ActionCode(), 'validfrom', ValidFrom);
-        Captions.AddActionCaption(ActionCode(), 'calendar', CalendarCaption);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
-        Setting: Integer;
-        JSON: Codeunit "NPR POS JSON Management";
-        Date: Date;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSetup: Codeunit "NPR POS Setup";
+        DefaultValidFromDate: Date;
+    begin
+        POSSession.GetSetup(POSSetup);
+        if not (Evaluate(DefaultValidFromDate, POSSetup.ExchangeLabelDefaultDate()) and (StrLen(POSSetup.ExchangeLabelDefaultDate()) > 0)) then
+            DefaultValidFromDate := Today();
+
+        Context.SetContext('defaultdate', Format(DefaultValidFromDate, 0, 9));
+    end;
+
+    local procedure PrintExchangeLabels(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    var
+        PrintLines: Record "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
-        PrintLines: Record "NPR POS Sale Line";
-        CalendarObject: JsonObject;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        UserSelectionJToken: JsonToken;
+        UserSelectionJObject: JsonObject;
+        RowKeys: List of [Text];
+        RowKey: Text;
+        RowPosition: Text;
+        ValidFromDate: Date;
+        Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
         PreventNegativeQty: Boolean;
+        CannotbeNegErr: Label 'cannot be negative';
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        PreventNegativeQty := JSON.GetBooleanParameter('PreventNegativeQty');
+        PreventNegativeQty := Context.GetBooleanParameter('PreventNegativeQty');
         if PreventNegativeQty then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
             if SaleLinePOS.Quantity < 0 then
-                Error(ErrorTxtQtyCannotbeNeg);
+                SaleLinePOS.FieldError(Quantity, CannotbeNegErr);
         end;
 
-
-        Setting := JSON.GetIntegerParameterOrFail('Setting', ActionCode());
-
+        Context.SetScopeRoot();
+        Setting := Context.GetIntegerParameterOrFail('Setting', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        UserSelectionJToken := Context.GetJTokenOrFail('UserSelection', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
         case Setting of
-            0, 1, 2:
+            Setting::Single,
+            Setting::"Line Quantity",
+            Setting::"All Lines":
                 begin
-                    Date := JSON.GetDateOrFail('value', StrSubstNo(ReadingErr, ActionCode()));
+                    ValidFromDate := DT2Date(UserSelectionJToken.AsValue().AsDateTime());
                     POSSession.GetSaleLine(POSSaleLine);
                     POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
                     PrintLines := SaleLinePOS;
                     PrintLines.SetRecFilter();
                 end;
-            3, 4:
+
+            Setting::Selection,
+            Setting::Package:
                 begin
-                    JSON.GetJsonObjectOrFail('value', CalendarObject, StrSubstNo(ReadingErr, ActionCode()));
-                    Error('CTRLUPRADE');
+                    UserSelectionJObject := UserSelectionJToken.AsObject();
+                    UserSelectionJObject.Get('date', UserSelectionJToken);
+                    ValidFromDate := DT2Date(UserSelectionJToken.AsValue().AsDateTime());
+
+                    UserSelectionJObject.Get('rows', UserSelectionJToken);
+                    UserSelectionJObject := UserSelectionJToken.AsObject();
+                    RowKeys := UserSelectionJObject.Keys();
+                    foreach RowKey in RowKeys do
+                        if RowKey <> 'count' then begin
+                            UserSelectionJObject.Get(RowKey, UserSelectionJToken);
+                            RowPosition := UserSelectionJToken.AsValue().AsText();
+                            PrintLines.SetPosition(RowPosition);
+                            PrintLines.Mark(true);
+                        end;
+                    PrintLines.MarkedOnly(true);
                 end;
         end;
 
-        ExchangeLabelMgt.PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, Date);
+        ExchangeLabelMgt.PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, ValidFromDate);
     end;
 }
