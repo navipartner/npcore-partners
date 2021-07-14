@@ -1,12 +1,12 @@
 page 6014419 "NPR Exchange Label Setup"
 {
-
     Caption = 'Exchange Label Setup';
     PageType = Card;
     SourceTable = "NPR Exchange Label Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-
+    InsertAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -48,4 +48,12 @@ page 6014419 "NPR Exchange Label Setup"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
+        end;
+    end;
 }
