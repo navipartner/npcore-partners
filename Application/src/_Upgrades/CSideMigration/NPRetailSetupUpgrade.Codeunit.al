@@ -2,31 +2,29 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
 {
     Subtype = Upgrade;
 
-    var
-        RemoveSourceCodeLbl: Label 'NPRetailSetup_RemoveSourceCodeLbl', Locked = true;
-
     trigger OnUpgradePerCompany()
     begin
         RemoveSourceCode();
         UpgradeFiedsToDedicatedSetups();
     end;
 
-
     local procedure RemoveSourceCode()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        RemoveSourceCodeLbl: Label 'RemoveSourceCode', Locked = true;
     begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NP Retail Setup Upgrade', 'RemoveSourceCode');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NP Retail Setup Upgrade', RemoveSourceCodeLbl);
 
-        if UpgradeTag.HasUpgradeTag(RemoveSourceCodeLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", RemoveSourceCodeLbl)) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
 
         DoRemoveSourceCode();
 
-        UpgradeTag.SetUpgradeTag(RemoveSourceCodeLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", RemoveSourceCodeLbl));
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -51,11 +49,12 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRetailSetup_MoveFieldsToDedicatedSetups-20210303', Locked = true;
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeFiedsToDedicatedSetupsLbl: Label 'UpgradeFiedsToDedicatedSetups', Locked = true;
     begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NP Retail Setup Upgrade', 'UpgradeFiedsToDedicatedSetups');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NP Retail Setup Upgrade', UpgradeFiedsToDedicatedSetupsLbl);
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", UpgradeFiedsToDedicatedSetupsLbl)) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -64,7 +63,7 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         UpgradeDiscountPriority();
         UpgradePOSViewProfile();
         UpgradeExchangeLabelSetup();
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", UpgradeFiedsToDedicatedSetupsLbl));
 
         LogMessageStopwatch.LogFinish();
     end;

@@ -11,16 +11,16 @@ codeunit 6014599 "NPR New Prices Install"
     procedure RemoveDiscountPriorityRecords()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRNewPriceTableInstall-20210618', Locked = true;
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR New Prices Install")) then
             exit;
 
         InitDiscountPriority();
 
         EnableFeature('SalesPrices');
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR New Prices Install"));
 
     end;
 

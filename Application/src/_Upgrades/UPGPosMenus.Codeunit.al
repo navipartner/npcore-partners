@@ -6,13 +6,14 @@ codeunit 6014539 "NPR UPG Pos Menus"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Pos Menus', 'OnUpgradePerCompany');
 
         ReplaceItemAddonPOSAction();
-        if not UpgradeTagMgt.HasUpgradeTag(GetUpgradeTag()) then begin
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus")) then begin
             AdjustSplitBillPOSActionParameters();
-            UpgradeTagMgt.SetUpgradeTag(GetUpgradeTag());
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus"));
         end;
 
         LogMessageStopwatch.LogFinish();
@@ -104,16 +105,5 @@ codeunit 6014539 "NPR UPG Pos Menus"
                         end;
                     until TempParamValue.Next() = 0;
             until POSMenuButton.Next() = 0;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerCompanyUpgradeTags', '', false, false)]
-    local procedure OnGetPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]]);
-    begin
-        PerCompanyUpgradeTags.Add(GetUpgradeTag());
-    end;
-
-    procedure GetUpgradeTag(): Text
-    begin
-        exit(CopyStr(CompanyName() + ' NPRSplitBillActionToWF2 ' + Format(Today(), 0, 9), 1, 250));
     end;
 }

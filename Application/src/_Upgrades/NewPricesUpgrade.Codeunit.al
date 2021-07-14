@@ -13,11 +13,11 @@ codeunit 6014595 "NPR New Prices Upgrade"
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRNewPriceTableUpgrade-20210618', Locked = true;
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Prices Upgrade', 'OnUpgradeDataPerCompany');
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR New Prices Upgrade")) then
             exit;
 
         InitDiscountPriority();
@@ -26,7 +26,7 @@ codeunit 6014595 "NPR New Prices Upgrade"
 
         EnableFeature('SalesPrices');
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR New Prices Upgrade"));
         LogMessageStopwatch.LogFinish();
     end;
 

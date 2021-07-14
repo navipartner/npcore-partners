@@ -5,13 +5,13 @@ codeunit 6150929 "NPR UPG MPOS App Setup"
     trigger OnUpgradePerCompany()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        UpgTagDef: Codeunit "NPR UPG Register Tag Def";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG MPOS App Setup', 'OnUpgradePerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG MPOS App Setup")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -20,7 +20,7 @@ codeunit 6150929 "NPR UPG MPOS App Setup"
         Upgrade();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG MPOS App Setup"));
 
         LogMessageStopwatch.LogFinish();
     end;

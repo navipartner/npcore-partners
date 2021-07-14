@@ -6,13 +6,13 @@ codeunit 6014591 "NPR UPG POS Pass"
     trigger OnCheckPreconditionsPerCompany()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        UpgTagDef: Codeunit "NPR UPG POS Unit Pass Tag Def";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Pass', 'OnCheckPreconditionsPerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag()) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Pass")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -21,7 +21,7 @@ codeunit 6014591 "NPR UPG POS Pass"
         UpgradePOSUnitPasswords();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag());
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Pass"));
 
         LogMessageStopwatch.LogFinish();
     end;
