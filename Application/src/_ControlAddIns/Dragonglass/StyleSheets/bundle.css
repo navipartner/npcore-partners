@@ -5075,35 +5075,35 @@ body {
       .dragonglass .dialog__buttons .button > div:hover {
         background: #0267a4; }
 
-.dragonglass .dialog__container--calendarplusgrid {
+.dragonglass .dialog__container--calendarpluslines {
   width: 1000px;
   height: 650px;
   max-height: initial;
   min-height: auto;
   max-width: initial;
   min-width: auto; }
-  .dragonglass .dialog__container--calendarplusgrid .dialog__body {
+  .dragonglass .dialog__container--calendarpluslines .dialog__body {
     display: flex;
     height: 100%; }
-    .dragonglass .dialog__container--calendarplusgrid .dialog__body .datepicker-host {
+    .dragonglass .dialog__container--calendarpluslines .dialog__body .datepicker-host {
       width: 35%; }
-    .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid {
+    .dragonglass .dialog__container--calendarpluslines .dialog__body .grid {
       width: 65%;
       flex: 1;
       flex-direction: column; }
-      .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table {
+      .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table {
         width: 100%;
         overflow-y: auto;
         flex: 1 1 auto; }
-        .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table {
+        .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table {
           border-collapse: collapse;
           width: 100%;
           table-layout: fixed; }
-          .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table thead {
+          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table thead {
             background-color: #0277bd;
             color: #eeeeee; }
-          .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table th,
-          .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table td {
+          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table th,
+          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td {
             float: left;
             line-height: 1.6em;
             overflow: hidden;
@@ -5111,34 +5111,34 @@ body {
             vertical-align: middle;
             white-space: nowrap;
             width: 11%; }
-            .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table th:first-child,
-            .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table td:first-child {
+            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table th:first-child,
+            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td:first-child {
               width: 45%; }
-          .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table th {
+          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table th {
             font-weight: 600;
             height: 2em;
             padding: 0.2em;
             text-align: center; }
-          .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table td {
+          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td {
             border-right: 1px solid #c1c4ca;
             padding: 0.5% 1%;
             justify-content: flex-end;
             display: flex; }
-            .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table td:first-child {
+            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td:first-child {
               justify-content: flex-start; }
-            .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table td:last-child {
+            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td:last-child {
               border: none; }
-          .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table tbody tr {
+          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table tbody tr {
             border-bottom: 1px solid #f1f4fa;
             cursor: default;
             display: flex; }
-            .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table table tbody tr.tr-highlight {
+            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table tbody tr.tr-highlight {
               background-color: #cee5f9; }
-        .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table.grid__table--head {
+        .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table.grid__table--head {
           flex: 0 0 auto;
           overflow: hidden;
           height: auto; }
-        .dragonglass .dialog__container--calendarplusgrid .dialog__body .grid .grid__table.grid__table--body {
+        .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table.grid__table--body {
           border: 1px solid #c1c4ca;
           border-top: none;
           flex-basis: 0;
@@ -5546,7 +5546,7 @@ body {
     .transcendence .dialog__buttons #button-dialog-ok div:hover, .transcendence .dialog__buttons #button-dialog-ok div:active {
       background-color: var(--green-hover); }
 
-.transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid {
+.transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines {
   width: 1000px;
   height: 650px;
   max-height: initial;
@@ -5554,26 +5554,26 @@ body {
   max-width: initial;
   min-width: auto; }
   @media (min-width: 320px) and (max-width: 768px) {
-    .transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid {
+    .transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines {
       width: 100%;
       height: 100%; } }
-  .transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid .dialog__body {
+  .transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines .dialog__body {
     display: flex;
     height: 100%; }
     @media (min-width: 320px) and (max-width: 768px) {
-      .transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid .dialog__body {
+      .transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines .dialog__body {
         height: calc(100% - 140px);
         flex-flow: column; } }
-    .transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid .dialog__body .datepicker-host {
+    .transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines .dialog__body .datepicker-host {
       width: 35%; }
       @media (min-width: 320px) and (max-width: 768px) {
-        .transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid .dialog__body .datepicker-host {
+        .transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines .dialog__body .datepicker-host {
           width: 100%;
           margin-bottom: 20px; } }
-    .transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid .dialog__body .grid {
+    .transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines .dialog__body .grid {
       width: 65%; }
       @media (min-width: 320px) and (max-width: 768px) {
-        .transcendence .dialog-host .dialog__container.dialog__container--calendarplusgrid .dialog__body .grid {
+        .transcendence .dialog-host .dialog__container.dialog__container--calendarpluslines .dialog__body .grid {
           width: 100%; } }
 
 .transcendence .dialog__container--configuration {
