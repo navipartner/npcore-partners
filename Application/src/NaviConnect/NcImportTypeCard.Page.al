@@ -249,6 +249,26 @@ page 6151509 "NPR Nc Import Type Card"
                     NcSyncMgt.DownloadFtpType(Rec);
                 end;
             }
+            action("Download XML Stylesheet")
+            {
+                Caption = 'Download XML Stylesheet';
+                Image = ImportDatabase;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ApplicationArea = All;
+                Enabled = Rec.Code <> '';
+                ToolTip = 'Executes the Download XML Stylesheet from Azure Blob Storage action';
+
+                trigger OnAction()
+                var
+                    XmlStylesheetDeoployFromAzure: Page "NPR Nc XML Styl. Dep. From Az.";
+                begin
+                    XmlStylesheetDeoployFromAzure.Initialize(Rec.Code);
+                    XmlStylesheetDeoployFromAzure.Run();
+                end;
+            }
             action(SendTestErrorMail)
             {
                 Caption = 'Send Test Error E-mail';
