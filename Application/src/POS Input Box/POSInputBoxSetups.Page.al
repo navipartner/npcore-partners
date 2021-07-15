@@ -5,7 +5,8 @@ page 6060096 "NPR POS Input Box Setups"
     Editable = false;
     PageType = List;
     SourceTable = "NPR Ean Box Setup";
-    UsageCategory = None;
+    UsageCategory = Administration;
+    ApplicationArea = NPRRetail;
 
     layout
     {
