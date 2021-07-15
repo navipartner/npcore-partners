@@ -8238,6 +8238,10 @@ body {
 .transcendence .view.payment .input--with-caption {
   margin-bottom: 0; }
 
+.transcendence .binding-problem {
+  font-weight: bold;
+  color: tomato; }
+
 .transcendence .restaurant__container {
   width: 100%;
   height: 100%;
