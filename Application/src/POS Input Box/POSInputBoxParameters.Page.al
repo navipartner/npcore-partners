@@ -5,10 +5,8 @@ page 6060099 "NPR POS Input Box Parameters"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Ean Box Parameter";
-    ApplicationArea = NPRRetail;
 
     layout
     {
