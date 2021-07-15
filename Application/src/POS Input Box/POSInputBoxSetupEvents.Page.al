@@ -4,10 +4,8 @@ page 6060098 "NPR POS Input Box Setup Events"
     Caption = 'POS Input Box Setup Events';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR Ean Box Setup Event";
-    ApplicationArea = NPRRetail;
 
     layout
     {
