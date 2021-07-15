@@ -238,6 +238,7 @@ codeunit 6150721 "NPR POS Action - Login"
     local procedure DaysSinceLastBalance(PosUnitNo: Code[10]): Integer
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        POSEntry: record "NPR POS Entry";
     begin
         POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', PosUnitNo);
         POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
@@ -246,7 +247,15 @@ codeunit 6150721 "NPR POS Action - Login"
         if (not POSWorkshiftCheckpoint.FindLast()) then
             exit(-1); // Never been balanced
 
-        exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
+        POSEntry.SETRANGE("POS Unit No.", '=%1', PosUnitNo);
+        POSEntry.SETFILTER("Entry No.", '>%1', POSWorkshiftCheckpoint."POS Entry No.");
+        POSEntry.SETRANGE("System Entry", FALSE);
+        POSEntry.SETFILTER("Entry Type", '<>%1', POSEntry."Entry Type"::"Cancelled Sale");
+        IF NOT POSEntry.FINDFIRST() THEN
+            EXIT(0);
+
+        IF TODAY - POSEntry."Entry Date" >= 1 THEN
+            exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
     end;
 
     [IntegrationEvent(false, false)]
