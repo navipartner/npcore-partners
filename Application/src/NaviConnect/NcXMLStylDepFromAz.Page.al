@@ -1,7 +1,7 @@
 page 6151511 "NPR Nc XML Styl. Dep. From Az."
 {
     PageType = NavigatePage;
-    ApplicationArea = All;
+    ApplicationArea = NPRNaviConnect;
     UsageCategory = Administration;
     Caption = 'XML Stylesheet Deploy from Azure';
 
@@ -11,7 +11,7 @@ page 6151511 "NPR Nc XML Styl. Dep. From Az."
         {
             field("XML Stylesheet"; XmlStylesheet)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRNaviConnect;
                 Caption = 'XML Stylesheet';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the XML Stylesheet field';
@@ -54,7 +54,7 @@ page 6151511 "NPR Nc XML Styl. Dep. From Az."
         {
             action(ActionFinish)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRNaviConnect;
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
