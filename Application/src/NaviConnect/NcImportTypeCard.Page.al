@@ -257,7 +257,7 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+                ApplicationArea = NPRNaviConnect;
                 Enabled = Rec.Code <> '';
                 ToolTip = 'Executes the Download XML Stylesheet from Azure Blob Storage action';
 
