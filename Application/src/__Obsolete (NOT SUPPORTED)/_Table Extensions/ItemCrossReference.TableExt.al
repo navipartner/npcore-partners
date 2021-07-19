@@ -5,7 +5,7 @@ tableextension 6014443 "NPR Item Cross Reference" extends "Item Cross Reference"
     {
         field(6014440; "NPR Is Retail Serial No."; Boolean)
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Cross-Reference replaced with Item Reference';
             ObsoleteTag = 'ItemReference.TableExt.al';
 
