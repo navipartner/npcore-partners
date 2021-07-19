@@ -413,7 +413,7 @@
                     SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(Element, 'quantity', true));
                     SalesLine.Validate("Unit Price", NpXmlDomMgt.GetElementDec(Element, 'unit_price', true));
                     SalesLine.Validate("VAT %", NpXmlDomMgt.GetElementDec(Element, 'vat_pct', true));
-                    SalesLine.Validate("Amount Including VAT", NpXmlDomMgt.GetElementDec(Element, 'line_amount', true));
+                    SalesLine.Validate("Line Amount", NpXmlDomMgt.GetElementDec(Element, 'line_amount', true));
                     SalesLine.Modify(true);
                 end;
             SalesLine.Type::" ":
