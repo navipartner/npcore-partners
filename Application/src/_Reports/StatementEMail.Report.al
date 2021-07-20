@@ -11,6 +11,7 @@ report 6014550 "NPR Statement E-Mail"
         {
             DataItemTableView = SORTING("No.");
             RequestFilterFields = "No.", "Search Name", "Print Statements", "Currency Filter";
+            CalcFields = "Balance (LCY)";
 
             trigger OnAfterGetRecord()
             var
@@ -27,6 +28,9 @@ report 6014550 "NPR Statement E-Mail"
                 Filename: Text[50];
                 SendToEmail: Text[250];
             begin
+                if "Balance (LCY)" = 0 then
+                    CurrReport.Skip();
+
                 DocSendProfile.GetDefaultForCustomer(Customer."No.", DocSendProfile);
                 if DocSendProfile."E-Mail" = DocSendProfile."E-Mail"::No then
                     CurrReport.Skip();
