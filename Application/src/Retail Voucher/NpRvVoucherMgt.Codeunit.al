@@ -1020,7 +1020,6 @@
         Voucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         GLAcc: Record "G/L Account";
-
     begin
         VoucherType.Get(VoucherTypeCode);
         PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
@@ -1065,7 +1064,7 @@
         TempNpRvVoucherBuffer.Amount := AmountToCapture;
         POSLine."No." := VoucherType."Payment Type";
         POSLine."Register No." := SalePOS."Register No.";
-        POSLine.Description := TempNpRvVoucherBuffer.Description;
+        POSLine.Description := Voucher.Description;
         POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
         POSLine."Amount Including VAT" := TempNpRvVoucherBuffer.Amount;
         POSPaymentLine.InsertPaymentLine(POSLine, 0);
