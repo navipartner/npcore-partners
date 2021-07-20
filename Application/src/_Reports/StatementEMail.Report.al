@@ -9,14 +9,16 @@ report 6014550 "NPR Statement E-Mail"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.") WHERE("NPR Document Processing" = FILTER(Email | PrintAndEmail));
+            DataItemTableView = SORTING("No.");
             RequestFilterFields = "No.", "Search Name", "Print Statements", "Currency Filter";
+            CalcFields = "Balance (LCY)";
 
             trigger OnAfterGetRecord()
             var
-                EmailAttachmentTemp: Record "NPR E-mail Attachment" temporary;
+                TempEmailAttachment: Record "NPR E-mail Attachment" temporary;
                 EmailTemplateHeader: Record "NPR E-mail Template Header";
                 ReportSelections: Record "Report Selections";
+                DocSendProfile: Record "Document Sending Profile";
                 EmailMgt: Codeunit "NPR E-mail Management";
                 RecRef: RecordRef;
                 FldRef: FieldRef;
@@ -26,6 +28,13 @@ report 6014550 "NPR Statement E-Mail"
                 Filename: Text[50];
                 SendToEmail: Text[250];
             begin
+                if "Balance (LCY)" = 0 then
+                    CurrReport.Skip();
+
+                DocSendProfile.GetDefaultForCustomer(Customer."No.", DocSendProfile);
+                if DocSendProfile."E-Mail" = DocSendProfile."E-Mail"::No then
+                    CurrReport.Skip();
+
                 RecRef.GetTable(Customer);
                 ReportGenerated := false;
                 ReportSelections.SetRange(Usage, ReportSelections.Usage::"C.Statement");
@@ -35,25 +44,25 @@ report 6014550 "NPR Statement E-Mail"
                         if Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send now" then
                             if EmailMgt.GetEmailTemplateHeader(RecRef, EmailTemplateHeader) then begin
                                 Filename := EmailMgt.GetFilename(EmailTemplateHeader, RecRef);
-                                EmailAttachmentTemp.DeleteAll();
-                                EmailAttachmentTemp.Init();
-                                EmailAttachmentTemp.Description := Filename;
-                                EmailAttachmentTemp."Attached File".CreateOutStream(OStream);
+                                TempEmailAttachment.DeleteAll();
+                                TempEmailAttachment.Init();
+                                TempEmailAttachment.Description := Filename;
+                                TempEmailAttachment."Attached File".CreateOutStream(OStream);
                                 FldRef := RecRef.Field(1);
                                 FilterGroupNo := SetNextGroupFilter(RecRef, FldRef, Customer."No.");
                                 ReportGenerated := REPORT.SaveAs(ReportSelections."Report ID", RequestPageParameters, REPORTFORMAT::Pdf, OStream, RecRef);
                                 SetGroupFilter(RecRef, FldRef, '', FilterGroupNo);
                                 if ReportGenerated then
-                                    ReportGenerated := EmailAttachmentTemp."Attached File".HasValue;
+                                    ReportGenerated := TempEmailAttachment."Attached File".HasValue;
                                 if ReportGenerated then begin
                                     ReportGenerated := false;
                                     SendToEmail := GetCustomReportSelectionEmail(Customer."No.", ReportSelections."Report ID");
                                     if SendToEmail = '' then
                                         SendToEmail := Customer."E-Mail";
-                                    EmailAttachmentTemp.Insert();
+                                    TempEmailAttachment.Insert();
                                     if EmailMgt.SetupEmailTemplate(RecRef, SendToEmail, true, EmailTemplateHeader) = '' then
                                         if EmailMgt.CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, DATABASE::Customer) = '' then begin
-                                            if EmailMgt.AddAttachmentToSmtpMessage(EmailAttachmentTemp) then begin
+                                            if EmailMgt.AddAttachmentToSmtpMessage(TempEmailAttachment) then begin
                                                 EmailMgt.SendSmtpMessage(RecRef, true);
                                                 ReportGenerated := true;
                                             end;
@@ -87,7 +96,7 @@ report 6014550 "NPR Statement E-Mail"
                 Counter := 0;
                 RecRef.Open(18);
                 RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob);
-                Customer.SetView(RecRef.GetView);
+                Customer.SetView(RecRef.GetView());
                 Evaluate(Pdf2NavOutputMethod, RequestPageParametersHelper.GetRequestPageOptionValue('Pdf2NavOutputMethod', RequestPageParameters));
                 Evaluate(NaviDocsDelayUntil, RequestPageParametersHelper.GetRequestPageOptionValue('NaviDocsDelayUntil', RequestPageParameters), 9);
             end;
@@ -108,15 +117,17 @@ report 6014550 "NPR Statement E-Mail"
                     field(ShowOverdueEntries; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Show Overdue Entries field';
+                        ApplicationArea = All;
                     }
                     field(IncludeAllCustomerswithLE; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include All Customers with Ledger Entries field';
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -128,8 +139,9 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include All Customers with a Balance field';
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
@@ -140,52 +152,60 @@ report 6014550 "NPR Statement E-Mail"
                     field(IncludeReversedEntries; PrintReversedEntries)
                     {
                         Caption = 'Include Reversed Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Reversed Entries field';
+                        ApplicationArea = All;
                     }
                     field(IncludeUnappliedEntries; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Unapplied Entries field';
+                        ApplicationArea = All;
                     }
-                    field(IncludeAgingBand; IncludeAgingBand)
+                    field("Include Aging Band"; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Include Aging Band field';
+                        ApplicationArea = All;
                     }
                     field(AgingBandPeriodLengt; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Aging Band Period Length field';
+                        ApplicationArea = All;
                     }
                     field(AgingBandby; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Aging Band by field';
+                        ApplicationArea = All;
                     }
-                    field(LogInteraction; LogInteraction)
+                    field("Log Interaction"; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Log Interaction field';
+                        ApplicationArea = All;
                     }
-                    field(StartDate; StartDate)
+                    field("Start Date"; StartDate)
                     {
                         Caption = 'Start Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Start Date field';
+                        ApplicationArea = All;
                     }
-                    field(EndDate; EndDate)
+                    field("End Date"; EndDate)
                     {
                         Caption = 'End Date';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the End Date field';
+                        ApplicationArea = All;
                     }
                 }
                 group("Output Options")
@@ -195,16 +215,17 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Report Output';
                         OptionCaption = 'Send now,Send through NaviDocs';
-                        ApplicationArea = All;
+
                         ToolTip = 'Specifies the value of the Report Output field';
+                        ApplicationArea = All;
 
                         trigger OnValidate()
                         begin
                             if Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send through NaviDocs" then
-                                if not IsNaviDocsEnabled then begin
+                                if not IsNaviDocsEnabled() then begin
                                     Pdf2NavOutputMethod := Pdf2NavOutputMethod::"Send now";
                                     Message(NaviDocsDisabled);
-                                    RequestOptionsPage.Update;
+                                    RequestOptionsPage.Update();
                                 end;
 
                             ShowNaviDocsOption := Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send through NaviDocs";
@@ -215,8 +236,10 @@ report 6014550 "NPR Statement E-Mail"
                         Visible = ShowNaviDocsOption;
                         field("Delay sending until"; NaviDocsDelayUntil)
                         {
-                            ApplicationArea = All;
+
+                            Caption = 'Delay sending until';
                             ToolTip = 'Specifies the value of the NaviDocsDelayUntil field';
+                            ApplicationArea = All;
                         }
                     }
                 }
@@ -232,7 +255,7 @@ report 6014550 "NPR Statement E-Mail"
         trigger OnOpenPage()
         begin
             InitRequestPageDataInternal();
-            if not IsNaviDocsEnabled then
+            if not IsNaviDocsEnabled() then
                 Pdf2NavOutputMethod := Pdf2NavOutputMethod::"Send now";
             ShowNaviDocsOption := Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send through NaviDocs";
         end;
@@ -252,7 +275,7 @@ report 6014550 "NPR Statement E-Mail"
         CurrReport.UseRequestPage(false);
         RequestPageParameters := StatementEMail.RunRequestPage();
         if RequestPageParameters = '' then
-            CurrReport.Quit;
+            CurrReport.Quit();
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStr);
         OutStr.WriteText(RequestPageParameters);
@@ -278,7 +301,6 @@ report 6014550 "NPR Statement E-Mail"
         StartDate: Date;
         NaviDocsDelayUntil: DateTime;
         Counter: Integer;
-        "-- PN71.1.08": Integer;
         NaviDocsDisabled: Label 'NaviDocs is''t Enabled.';
         AttachmentDescription: Label 'Report parameters';
         Txt001: Label 'Statement sent to %1 customers.';
@@ -319,7 +341,7 @@ report 6014550 "NPR Statement E-Mail"
         TempNaviDocsEntryAttachment."File Extension" := 'xml';
         TempNaviDocsEntryAttachment."Internal Type" := TempNaviDocsEntryAttachment."Internal Type"::"Report Parameters";
         TempNaviDocsEntryAttachment.Insert();
-        NaviDocsManagement.AddDocumentEntryWithAttachments(RecRef, NaviDocsManagement.HandlingTypeMailCode, ReportId, SendToEmail, '', DelayUntil, TempNaviDocsEntryAttachment);
+        NaviDocsManagement.AddDocumentEntryWithAttachments(RecRef, NaviDocsManagement.HandlingTypeMailCode(), ReportId, SendToEmail, '', DelayUntil, TempNaviDocsEntryAttachment);
     end;
 
     local procedure GetCustomReportSelectionEmail(CustomerNo: Code[20]; ReportID: Integer): Text
@@ -384,7 +406,7 @@ report 6014550 "NPR Statement E-Mail"
     var
         NaviDocsSetup: Record "NPR NaviDocs Setup";
     begin
-        exit(NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs");
+        exit(NaviDocsSetup.Get() and NaviDocsSetup."Enable NaviDocs");
     end;
 }
 
