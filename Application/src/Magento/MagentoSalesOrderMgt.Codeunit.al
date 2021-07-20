@@ -823,6 +823,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         UnitofMeasure: Code[10];
         VariantCode: Code[10];
         RequestedDeliveryDate: Date;
+        ItemDescription: Text;
     begin
         ExternalItemNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_no', true);
         Position := StrPos(ExternalItemNo, '_');
@@ -859,6 +860,9 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
         SalesLine.Validate(Type, SalesLine.Type::Item);
         SalesLine.Validate("No.", ItemNo);
+        ItemDescription := NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), false);
+        if ItemDescription <> '' then
+            SalesLine.Description := ItemDescription;
         SalesLine."Variant Code" := VariantCode;
         if VariantCode <> '' then
             SalesLine."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(SalesLine."Description 2"));
