@@ -60,6 +60,8 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Description = 'NPR7.100.000';
             TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014470; "NPR Pacsoft Ship. Not Created"; Boolean)
         {
