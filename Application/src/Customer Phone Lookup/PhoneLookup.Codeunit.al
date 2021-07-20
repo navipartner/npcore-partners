@@ -53,16 +53,6 @@ codeunit 6014437 "NPR Phone Lookup"
             UpdateCont(Rec, TempPhoneLookupBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterModifyEvent', '', true, true)]
-    local procedure ContactOnAfterModify(var Rec: Record Contact; RunTrigger: Boolean)
-    begin
-        if not RunTrigger then
-            exit;
-
-        Rec."Last Date Modified" := Today();
-        Rec.Modify(false);
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure CustomerOnValidateNo(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     var
