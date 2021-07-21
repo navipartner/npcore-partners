@@ -243,7 +243,7 @@ report 6014540 "NPR Items With Low Sales"
         TxtTotal: Label 'Total';
         TxtTotalSales: Label 'Total Sales';
         Vendors_item_no_CaptionLbl: Label 'Vendors item no.';
-        ItemDateFilter: Text[30];
+        ItemDateFilter: Text;
 
     procedure Pct(Number1: Decimal; Number2: Decimal): Decimal
     begin

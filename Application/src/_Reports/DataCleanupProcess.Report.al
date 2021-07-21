@@ -40,7 +40,9 @@ report 6060102 "NPR Data Cleanup Process"
                 DataCleanupCVI2.Get("Data Cleanup GCVI"."Cleanup Action", "Data Cleanup GCVI".Type, "Data Cleanup GCVI"."No.");
 
                 if not CODEUNIT.Run(CODEUNIT::"NPR Data Cleanup GCVI Line", DataCleanupCVI2) then begin
+# pragma warning disable AA0139
                     DataCleanupCVI2.Status := GetLastErrorText;
+# pragma warning restore
                     DataCleanupCVI2.IsError := true;
                     ProcessResult := false;
                 end else begin

@@ -67,7 +67,9 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                         repeat
                             TempDimBuf.Init();
                             TempDimBuf."Table ID" := DATABASE::"NPR POS Entry Sales Line";
+# pragma warning disable AA0139
                             TempDimBuf."Dimension Code" := TempSelectedDim."Dimension Code";
+# pragma warning restore
                             if DimSetEntry.Get(POSSalesLine2."Dimension Set ID", TempSelectedDim."Dimension Code") then
                                 TempDimBuf."Dimension Value Code" := DimSetEntry."Dimension Value Code";
                             TempDimBuf.Insert();
@@ -262,7 +264,9 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
     trigger OnPreReport()
     begin
         Currency.InitRoundingPrecision();
+# pragma warning disable AA0139
         SelectedDim.GetSelectedDim(UserId, 3, REPORT::"NPR NPRE: Rest. Daily Turnover", '', TempSelectedDim);
+# pragma warning restore
         GenerateDimSetIDFilter();
         GenerateAppliedFilterBuffer();
     end;
@@ -284,7 +288,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
         DimFilterTxt: Label 'Dimension: %1';
         NoEntriesWithinFilter: Label 'There are no entries within applied dimension filters.';
         FilterIsNotSupported: Label 'You cannot set filter for field "%1" of table "%2" in this report.\Please contact system vendor if you want the report to support such filter.';
-        ColumnDim: Text;
+        ColumnDim: Text[250];
         DimSetFilter: Text;
 
     local procedure GenerateDimSetIDFilter()
@@ -295,13 +299,19 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
     begin
         TempSelectedDim.SetFilter("Dimension Value Filter", '<>%1', '');
         if TempSelectedDim.FindSet() then begin
+# pragma warning disable AA0139
             DimMgt.GetDimSetIDsForFilter(TempSelectedDim."Dimension Code", TempSelectedDim."Dimension Value Filter");
+# pragma warning restore
             DimMgt.GetTempDimSetEntry(TempDimSetEntryBuffer);
             while not TempDimSetEntryBuffer.IsEmpty() and (TempSelectedDim.Next() <> 0) do begin
+# pragma warning disable AA0139
                 FilterForBlankIncluded := FilterIncludesBlank(TempSelectedDim."Dimension Code", TempSelectedDim."Dimension Value Filter");
+# pragma warning restore
                 DimSetEntry.SetRange("Dimension Code", TempSelectedDim."Dimension Code");
                 DimSetEntry.SetFilter("Dimension Value Code", TempSelectedDim."Dimension Value Filter");
+# pragma warning disable AA0139
                 DimSetEntry."Dimension Code" := TempSelectedDim."Dimension Code";
+# pragma warning restore
                 DimSetEntry2.SetRange("Dimension Code", TempSelectedDim."Dimension Code");
                 TempDimSetEntryBuffer.FindSet();
                 repeat

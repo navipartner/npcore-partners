@@ -186,7 +186,7 @@ report 6014439 "NPR Item Sales Postings"
         Profit: Decimal;
         ItemProfitPct: Decimal;
         Item: Record Item;
-        Reportfilter: Text[1024];
+        Reportfilter: Text;
         ShowVendorItemNo: Boolean;
         Item1: Record Item;
         VendorItemNo: Text;

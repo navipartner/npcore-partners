@@ -312,9 +312,13 @@ report 6060100 "NPR Data Cleanup Fill"
                         if FillTable then
                             if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Item, Item."No.") then begin
                                 if ItemRenameOption = ItemRenameOption::"Vendor Item No." then
+# pragma warning disable AA0139
                                     InsertCVIRec(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Item, Item."No.", 0D, Item."Vendor Item No.");
+# pragma warning restore
                                 if ItemRenameOption = ItemRenameOption::"Vendor + Vendor Item No." then
+# pragma warning disable AA0139
                                     InsertCVIRec(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Item, Item."No.", 0D, Item."Vendor No." + '-' + Item."Vendor Item No.");
+# pragma warning restore
                             end;
                     end;
                 end;
@@ -412,7 +416,7 @@ report 6060100 "NPR Data Cleanup Fill"
         end;
     end;
 
-    local procedure InsertCVIRec(CleanupAction: Option " ","None",Delete,Rename; Type: Option Customer,Vendor,Item,GLAccount; No: Code[250]; LastEntryDate: Date; NewNo: Code[20])
+    local procedure InsertCVIRec(CleanupAction: Option " ","None",Delete,Rename; Type: Option Customer,Vendor,Item,GLAccount; No: Code[20]; LastEntryDate: Date; NewNo: Code[20])
     var
         InsertedLbl: Label 'INSERTED';
     begin

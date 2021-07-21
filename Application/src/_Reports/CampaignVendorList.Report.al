@@ -220,7 +220,7 @@ report 6014497 "NPR Campaign Vendor List"
         CompanyInfo: Record "Company Information";
         Item: Record Item;
         Vendor1: Record Vendor;
-        VendorFilter: Text[100];
+        VendorFilter: Text;
         Dimension1Filter: Text[200];
         LocationFilter: Text[200];
 }

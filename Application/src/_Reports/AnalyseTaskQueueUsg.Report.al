@@ -351,8 +351,8 @@ report 6059900 "NPR Analyse Task Queue Usg."
         Hours: Integer;
         "Min": Integer;
         Sec: Integer;
-        MinTxt: Text[30];
-        SecTxt: Text[30];
+        MinTxt: Text;
+        SecTxt: Text;
     begin
         if DurIn = 0 then
             exit('');

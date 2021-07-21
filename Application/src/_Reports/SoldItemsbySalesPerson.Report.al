@@ -93,5 +93,5 @@ report 6014412 "NPR Sold Items by Sales Person"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         ProfitPct: Decimal;
         ObjectDetails: Text[100];
-        SalespersonName: Text[30];
+        SalespersonName: Text[50];
 }

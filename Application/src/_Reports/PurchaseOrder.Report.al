@@ -1282,10 +1282,10 @@ report 6014617 "NPR Purchase Order"
         VALExchRate: Text[50];
         VendAddr: array[8] of Text[100];
         OldDimText: Text[75];
-        ReferenceText: Text[80];
+        ReferenceText: Text;
         VALSpecLCYHeader: Text[80];
-        VATNoText: Text[80];
-        DimText: Text[120];
+        VATNoText: Text;
+        DimText: Text[75];
         Pct1Lbl: Label '%1 %2', locked = true;
         Pct2Lbl: Label '%1, %2 %3', locked = true;
 

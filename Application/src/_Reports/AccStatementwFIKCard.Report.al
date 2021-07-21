@@ -1059,7 +1059,9 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         Giro_No := FIKNo;
 
         Payment_ID := PadStr('', StringLen - 2 - StrLen(Cust."No."), '0') + Cust."No." + '1';
+# pragma warning disable AA0139
         Payment_ID := Payment_ID + Modulus10(Payment_ID);
+# pragma warning restore
     end;
 }
 

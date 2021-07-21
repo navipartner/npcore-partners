@@ -251,7 +251,7 @@ report 6014529 "NPR Vendor/Salesperson"
         Vendor_Caption_Lbl: Label 'Vendor';
         Report_Caption_Lbl: Label 'Vendor/Salesperson';
         navn: Text[30];
-        VendorFilter: Text[200];
-        Salespersonfilter: Text[250];
+        VendorFilter: Text;
+        Salespersonfilter: Text;
 }
 

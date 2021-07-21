@@ -152,8 +152,9 @@ report 6014663 "NPR Retail Calc. Inv."
                     Window.Open(Text002, "No.");
 
                 if not SkipDim then
+#pragma warning disable AA0139
                     SelectedDim.GetSelectedDim(UserId, 3, REPORT::"NPR Retail Calc. Inv.", '', TempSelectedDim);
-
+#pragma warning restore
                 TempQuantityOnHandBuffer.Reset();
                 TempQuantityOnHandBuffer.DeleteAll();
             end;

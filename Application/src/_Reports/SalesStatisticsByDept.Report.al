@@ -659,14 +659,14 @@ report 6014535 "NPR Sales Statistics By Dept."
         antalniveauer: Integer;
         SalesPerson: Text;
         captionClassDim1: Text[30];
-        dateFilter: Text[30];
-        dim1Filter: Text[30];
-        dim2Filter: Text[30];
+        dateFilter: Text;
+        dim1Filter: Text;
+        dim2Filter: Text;
         pctfjortekst: Text[30];
-        txtDim1: Text[30];
-        vendorFilter: Text[30];
+        txtDim1: Text;
+        vendorFilter: Text;
         txtLabeldim1: Text[100];
-        FilterList: Text[200];
+        FilterList: Text;
 
     procedure pct(Value: Decimal; total: Decimal) resultat: Decimal
     begin

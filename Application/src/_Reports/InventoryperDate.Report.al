@@ -291,6 +291,6 @@ report 6014417 "NPR Inventory per Date"
         UnitCostLbl: Label 'Unit cost';
         SelectCalcMethod: Option "Sidste Kostpris",Kostpris;
         CalcMethod: Text[50];
-        Itemfilter: Text[100];
+        Itemfilter: Text;
 }
 

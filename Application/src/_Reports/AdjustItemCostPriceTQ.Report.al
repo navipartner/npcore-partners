@@ -233,12 +233,16 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
         if "Task Line".GetFilters <> '' then
             if "Task Line".Find('-') then
                 if not CurrReport.UseRequestPage() then begin
+# pragma warning disable AA0139
                     ItemView := "Task Line".GetTableView(DATABASE::Item, ItemView);
+# pragma warning restore
                     Item.SetView(ItemView);
                     AdjustCard := "Task Line".GetParameterInt('ADJUST');
                     Selection := "Task Line".GetParameterInt('ADJUSTFIELD');
                     AdjFactor := "Task Line".GetParameterInt('ADJUSTMENTFACTOR');
+# pragma warning disable AA0139
                     RoundingMethod.Code := "Task Line".GetParameterText('ROUNDINGMETHOD');
+# pragma warning restore
                 end;
         RoundingMethod.SetRange(Code, RoundingMethod.Code);
 

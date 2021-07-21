@@ -724,7 +724,7 @@ table 6059902 "NPR Task Line"
         TestField(Recurrence, Recurrence::None);
     end;
 
-    procedure GetParameterText(ParameterName: Text[30]): Text[1024]
+    procedure GetParameterText(ParameterName: Text[30]): Text[250]
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin

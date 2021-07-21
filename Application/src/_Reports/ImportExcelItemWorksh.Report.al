@@ -258,10 +258,14 @@ report 6060042 "NPR Import Excel Item Worksh."
                                 ItemWorksheetLine.Validate("Variety Group", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item Category Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+# pragma warning disable AA0139
                                 ItemWorksheetLine."Item Category Code" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+# pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Product Group Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+# pragma warning disable AA0139
                                 ItemWorksheetLine."Product Group Code" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+# pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Recommended Retail Price"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
@@ -358,16 +362,24 @@ report 6060042 "NPR Import Excel Item Worksh."
                     if MappingFound then begin
                         if GetColumnMapping(DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 1 Value"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+# pragma warning disable AA0139
                                 ItemWorksheetVariantLine."Variety 1 Value" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+# pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 2 Value"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+# pragma warning disable AA0139
                                 ItemWorksheetVariantLine."Variety 2 Value" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+# pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 3 Value"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+# pragma warning disable AA0139
                                 ItemWorksheetVariantLine."Variety 3 Value" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+# pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 4 Value"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+# pragma warning disable AA0139
                                 ItemWorksheetVariantLine."Variety 4 Value" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+# pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Vendors Bar Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetVariantLine.Validate("Vendors Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
