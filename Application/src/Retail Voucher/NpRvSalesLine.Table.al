@@ -67,7 +67,7 @@ table 6151015 "NPR NpRv Sales Line"
             DataClassification = CustomerContent;
             TableRelation = "NPR NpRv Voucher";
         }
-        field(60; "Reference No."; Text[30])
+        field(60; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

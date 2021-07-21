@@ -52,7 +52,7 @@ table 6014493 "NPR Arch. NpRv SL POS Ref."
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(60; "Reference No."; Text[30])
+        field(60; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

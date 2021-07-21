@@ -151,16 +151,16 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunValidateVoucher', '', true, true)]
-    local procedure OnRunValidateVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
+    local procedure OnRunValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
     begin
         if Handled then
             exit;
-        if NpRvVoucherBuffer."Validate Voucher Module" <> ModuleCode() then
+        if TempNpRvVoucherBuffer."Validate Voucher Module" <> ModuleCode() then
             exit;
 
         Handled := true;
 
-        ReserveVoucher(NpRvVoucherBuffer);
+        ReserveVoucher(TempNpRvVoucherBuffer);
     end;
 
     [EventSubscriber(ObjectType::Table, 6151015, 'OnBeforeDeleteEvent', '', true, true)]
@@ -353,7 +353,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         end;
     end;
 
-    procedure ReserveVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    procedure ReserveVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         Voucher: Record "NPR NpRv Voucher";
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
@@ -370,18 +370,18 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         Document: XmlDocument;
         Node: XmlNode;
         RequestXmlText: Text;
-        ReferenceNo: Text[30];
+        ReferenceNo: Text[50];
         ResponseText: Text;
     begin
-        ReferenceNo := NpRvVoucherBuffer."Reference No.";
-        VoucherType.Get(NpRvVoucherBuffer."Voucher Type");
+        ReferenceNo := TempNpRvVoucherBuffer."Reference No.";
+        VoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
         if VoucherType."Validate Voucher Module" <> ModuleCode() then
             exit;
         NpRvGlobalVoucherSetup.Get(VoucherType.Code);
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         Clear(Voucher);
-        Voucher.SetRange("Reference No.", NpRvVoucherBuffer."Reference No.");
+        Voucher.SetRange("Reference No.", TempNpRvVoucherBuffer."Reference No.");
         Voucher.SetRange("Voucher Type", VoucherType.Code);
         if Voucher.FindFirst() then begin
             if Voucher.CalcInUseQty() > 0 then
@@ -393,10 +393,10 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
               '<ReserveVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
                 '<vouchers>' +
                   '<voucher reference_no="' + ReferenceNo + '" voucher_type="' + VoucherType.Code + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
-                    '<redeem_date>' + Format(NpRvVoucherBuffer."Redeem Date", 0, 9) + '</redeem_date>' +
-                    '<redeem_register_no>' + NpRvVoucherBuffer."Redeem Register No." + '</redeem_register_no>' +
-                    '<redeem_sales_ticket_no>' + NpRvVoucherBuffer."Redeem Sales Ticket No." + '</redeem_sales_ticket_no>' +
-                    '<redeem_user_id>' + NpRvVoucherBuffer."Redeem User ID" + '</redeem_user_id>' +
+                    '<redeem_date>' + Format(TempNpRvVoucherBuffer."Redeem Date", 0, 9) + '</redeem_date>' +
+                    '<redeem_register_no>' + TempNpRvVoucherBuffer."Redeem Register No." + '</redeem_register_no>' +
+                    '<redeem_sales_ticket_no>' + TempNpRvVoucherBuffer."Redeem Sales Ticket No." + '</redeem_sales_ticket_no>' +
+                    '<redeem_user_id>' + TempNpRvVoucherBuffer."Redeem User ID" + '</redeem_user_id>' +
                     '<redeem_partner_code>' + VoucherType."Partner Code" + '</redeem_partner_code>' +
                   '</voucher>' +
                 '</vouchers>' +
@@ -485,7 +485,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
 #pragma warning restore
         Voucher.Modify(true);
         Voucher.CalcFields(Amount);
-        NpRvVoucherMgt.Voucher2Buffer(Voucher, NpRvVoucherBuffer);
+        NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
     end;
 
     procedure RedeemVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry")
