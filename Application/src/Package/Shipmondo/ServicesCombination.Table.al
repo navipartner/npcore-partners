@@ -1,5 +1,6 @@
 table 6014576 "NPR Services Combination"
 {
+    Caption = 'Services Combination';
 
     fields
     {

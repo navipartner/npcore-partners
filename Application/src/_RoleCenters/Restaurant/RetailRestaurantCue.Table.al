@@ -1,6 +1,7 @@
 table 6151251 "NPR Restaurant Cue"
 {
     DataClassification = CustomerContent;
+    Caption = 'Restaurant Cue';
 
     fields
     {

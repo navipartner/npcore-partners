@@ -1,6 +1,7 @@
 table 6151450 "NPR Text Editor Dialog Option"
 {
     DataClassification = SystemMetadata;
+    Caption = 'Text Editor Dialog Option';
     // TODO: Switch to temporary table in BC runtime 6.0+.
     // TableType = Temporary;
 

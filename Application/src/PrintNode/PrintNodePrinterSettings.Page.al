@@ -3,6 +3,7 @@ page 6151222 "NPR PrintNode Printer Settings"
     UsageCategory = None;
     PageType = Card;
     Editable = false;
+    Caption = 'PrintNode Printer Settings';
     layout
     {
         area(Content)

@@ -101,103 +101,103 @@ page 6151169 "NPR NpGp POS Sales Lines"
                 {
 
                     ToolTip = 'Specifies the value of the Quantity (Base) field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
 
                     ToolTip = 'Specifies the value of the Unit Price field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
 
                     ToolTip = 'Specifies the value of the Currency Code field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("VAT %"; Rec."VAT %")
                 {
 
                     ToolTip = 'Specifies the value of the VAT % field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Discount %"; Rec."Line Discount %")
                 {
 
                     ToolTip = 'Specifies the value of the Line Discount % field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Discount Amount Excl. VAT"; Rec."Line Discount Amount Excl. VAT")
                 {
 
                     ToolTip = 'Specifies the value of the Line Discount Amount Excl. VAT field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Discount Amount Incl. VAT"; Rec."Line Discount Amount Incl. VAT")
                 {
 
                     ToolTip = 'Specifies the value of the Line Discount Amount field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Amount"; Rec."Line Amount")
                 {
 
                     ToolTip = 'Specifies the value of the Line Amount field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Excl. VAT"; Rec."Amount Excl. VAT")
                 {
 
                     ToolTip = 'Specifies the value of the Amount Excl. VAT field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. VAT"; Rec."Amount Incl. VAT")
                 {
 
                     ToolTip = 'Specifies the value of the Amount Incl. VAT field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Dsc. Amt. Excl. VAT (LCY)"; Rec."Line Dsc. Amt. Excl. VAT (LCY)")
                 {
 
                     ToolTip = 'Specifies the value of the Line Dsc. Amt. Excl. VAT (LCY) field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line Dsc. Amt. Incl. VAT (LCY)"; Rec."Line Dsc. Amt. Incl. VAT (LCY)")
                 {
 
                     ToolTip = 'Specifies the value of the Line Dsc. Amt. Incl. VAT (LCY) field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Excl. VAT (LCY)"; Rec."Amount Excl. VAT (LCY)")
                 {
 
                     ToolTip = 'Specifies the value of the Amount Excl. VAT (LCY) field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. VAT (LCY)"; Rec."Amount Incl. VAT (LCY)")
                 {
 
                     ToolTip = 'Specifies the value of the Amount Incl. VAT (LCY) field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
 
                     ToolTip = 'Specifies the value of the POS Entry No. field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
 
                     ToolTip = 'Specifies the value of the Line No. field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
                 field("System Id"; Rec.SystemId)
                 {
 
                     ToolTip = 'Specifies the value of the System Id field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -217,7 +217,7 @@ page 6151169 "NPR NpGp POS Sales Lines"
                 ShortCutKey = 'Ctrl+F7';
 
                 ToolTip = 'Executes the Detailed Global POS Sales Entries action';
-                ApplicationArea = NPRRetail;;
+                ApplicationArea = NPRRetail;
             }
             action("POS Info")
             {
@@ -226,7 +226,7 @@ page 6151169 "NPR NpGp POS Sales Lines"
                 RunObject = Page "NPR NpGp POS Info POS Entry";
 
                 ToolTip = 'Executes the POS Info action';
-                ApplicationArea = NPRRetail;;
+                ApplicationArea = NPRRetail;
             }
         }
     }

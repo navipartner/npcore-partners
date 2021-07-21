@@ -1,5 +1,6 @@
 query 6014615 "NPR Retail Cmpgn Items Mix 2"
 {
+    Caption = 'Retail Cmpgn Items Mix 2';
     // MAG2.26/MHA /20200507  CASE 401235 Object created - returns Items used on Mixed Discount Line (Item Disc. Group) related to Retail Campaign
 
 

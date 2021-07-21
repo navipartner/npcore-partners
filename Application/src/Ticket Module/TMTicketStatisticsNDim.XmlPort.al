@@ -152,7 +152,7 @@ xmlport 6060110 "NPR TM Ticket Statistics N-Dim"
     procedure SetResponse(var TmpTicketAccessStatistics: Record "NPR TM Ticket Access Stats" temporary)
     var
         StatisticsNotFoundLbl: Label 'No statistics found for daterange %1..%2';
-        ExecutionTimeLbl: Label '%1 (ms)',Locked = true;
+        ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
     begin
         ResponseStatus := 'ERROR';
         ResponseMessage := StrSubstNo(StatisticsNotFoundLbl, Format(RequestFromDate, 0, 9), Format(RequestUntilDate, 0, 9));

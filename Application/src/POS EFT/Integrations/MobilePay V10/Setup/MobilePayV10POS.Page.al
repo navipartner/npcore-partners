@@ -5,6 +5,7 @@ page 6014436 "NPR MobilePayV10 POS"
     SourceTableTemporary = true;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    Caption = 'MobilePayV10 POS';
 
 
     layout

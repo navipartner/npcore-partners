@@ -1,5 +1,6 @@
 query 6014614 "NPR Retail Cmpgn. Items Mix 1"
 {
+    Caption = 'Retail Cmpgn. Items Mix 1';
     elements
     {
         dataitem(Retail_Campaign_Line; "NPR Retail Campaign Line")

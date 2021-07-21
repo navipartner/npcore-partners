@@ -173,7 +173,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
 
     procedure GetSummary(): Text[30]
     var
-        SummaryLbl: Label '%1-%2', Locked = true;    
+        SummaryLbl: Label '%1-%2', Locked = true;
     begin
         exit(StrSubstNo(SummaryLbl, ExternalIdCount, QtySum));
     end;

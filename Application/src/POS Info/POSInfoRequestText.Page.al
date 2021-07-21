@@ -6,6 +6,7 @@ page 6014456 "NPR POS Info: Request Text"
     InsertAllowed = false;
     DeleteAllowed = false;
     DataCaptionExpression = GetDataCaptionExpression();
+    Caption = 'POS Info: Request Text';
 
     layout
     {

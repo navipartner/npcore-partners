@@ -5,6 +5,7 @@ page 6014437 "NPR MobilePayV10 Payment Setup"
     UsageCategory = Administration;
     SourceTable = "NPR MobilePayV10 Payment Setup";
     ApplicationArea = NPRRetail;
+    Caption = 'MobilePayV10 Payment Setup';
 
     layout
     {

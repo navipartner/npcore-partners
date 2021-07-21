@@ -1,5 +1,6 @@
 query 6014616 "NPR Period Discount Items"
 {
+    Caption = 'Period Discount Items';
     // MAG2.26/MHA /20200507  CASE 401235 Object created - returns Items used on Period Discount Line
 
 

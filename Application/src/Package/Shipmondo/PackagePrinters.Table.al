@@ -1,5 +1,6 @@
 table 6014575 "NPR Package Printers"
 {
+    Caption = 'Package Printers';
     fields
     {
         field(1; Name; Text[50])

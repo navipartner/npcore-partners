@@ -1,5 +1,6 @@
 table 6014544 "NPR MobilePayV10 Unit Setup"
 {
+    Caption = 'MobilePayV10 Unit Setup';
     fields
     {
         field(1; "POS Unit No."; Code[10])

@@ -1,6 +1,7 @@
 table 6151248 "NPR NP Retail Admin Cue"
 {
     DataClassification = CustomerContent;
+    Caption = 'NP Retail Admin Cue';
     fields
     {
         field(1; "Primary key"; Code[10])

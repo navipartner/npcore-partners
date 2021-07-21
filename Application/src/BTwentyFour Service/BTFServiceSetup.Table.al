@@ -125,14 +125,14 @@ table 6014522 "NPR BTF Service Setup"
 
     procedure InitService(NewServiceURL: Text; NewName: Text; NewAboutAPI: Text; NewSubscriptionKey: Text; NewEnvironment: Enum "NPR BTF Environment"; NewUsername: Text; NewPortal: Text; NewPassword: Text; NewEnabled: Boolean)
     begin
-        "Service URL" := CopyStr(NewServiceURL,1,MaxStrLen("Service URL"));
+        "Service URL" := CopyStr(NewServiceURL, 1, MaxStrLen("Service URL"));
         Name := copystr(NewName, 1, MaxStrLen(Name));
-        "About API" := CopyStr(NewAboutAPI,1,MaxStrLen("About API"));
-        "Subscription-Key" := CopyStr(NewSubscriptionKey,1,MaxStrLen("Subscription-Key"));
+        "About API" := CopyStr(NewAboutAPI, 1, MaxStrLen("About API"));
+        "Subscription-Key" := CopyStr(NewSubscriptionKey, 1, MaxStrLen("Subscription-Key"));
         Environment := NewEnvironment;
-        Username := CopyStr(NewUsername,1,MaxStrLen(Username));
-        Portal := CopyStr(NewPortal,1,MaxStrLen(Portal));
-        Password := CopyStr(NewPassword,1,MaxStrLen(Password));
+        Username := CopyStr(NewUsername, 1, MaxStrLen(Username));
+        Portal := CopyStr(NewPortal, 1, MaxStrLen(Portal));
+        Password := CopyStr(NewPassword, 1, MaxStrLen(Password));
         Enabled := NewEnabled;
     end;
 

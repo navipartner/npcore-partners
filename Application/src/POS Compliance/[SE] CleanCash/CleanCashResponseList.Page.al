@@ -5,6 +5,7 @@ page 6014542 "NPR CleanCash Response List"
     SourceTable = "NPR CleanCash Trans. Response";
     Editable = false;
     DeleteAllowed = false;
+    Caption = 'CleanCash Response List';
 
     layout
     {

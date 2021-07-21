@@ -1,5 +1,6 @@
 query 6014612 "NPR Campaign Items (Period)"
 {
+    Caption = 'Campaign Items (Period)';
     // MAG2.26/MHA /20200507  CASE 401235 Object created - returns Items used on Period Discount Line related to Retail Campaign
 
 
