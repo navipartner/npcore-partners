@@ -9,26 +9,22 @@ table 6151017 "NPR NpRv Sales Line Ref."
     {
         field(1; Id; Guid)
         {
-            Description = 'NPR5.55';
             DataClassification = CustomerContent;
         }
         field(10; "Sales Line Id"; Guid)
         {
             Caption = 'Sales Line Id';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(20; "Voucher No."; Code[20])
         {
             Caption = 'Voucher No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
-        field(30; "Reference No."; Text[30])
+        field(30; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
 
             trigger OnValidate()
             begin

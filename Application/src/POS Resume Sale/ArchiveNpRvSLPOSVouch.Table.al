@@ -77,7 +77,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
             TableRelation = "NPR NpRv Voucher";
             DataClassification = CustomerContent;
         }
-        field(60; "Reference No."; Text[30])
+        field(60; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             Description = 'NPR5.49';

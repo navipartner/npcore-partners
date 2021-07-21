@@ -17,7 +17,7 @@ table 6151023 "NPR NpRv Ext. Voucher Buffer"
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(15; "Reference No."; Text[30])
+        field(15; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

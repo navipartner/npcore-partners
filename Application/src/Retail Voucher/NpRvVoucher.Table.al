@@ -44,7 +44,7 @@ table 6151013 "NPR NpRv Voucher"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(15; "Reference No."; Text[30])
+        field(15; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

@@ -47,7 +47,7 @@ table 6151605 "NPR NpDc Ext. Coupon Reserv."
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(80; "Reference No."; Text[30])
+        field(80; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

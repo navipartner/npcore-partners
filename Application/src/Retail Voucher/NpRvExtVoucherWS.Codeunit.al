@@ -280,7 +280,7 @@
         Voucher2Buffer(NpRvVoucher, NpRvExtVoucherBuffer);
     end;
 
-    procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[30]; var Voucher: Record "NPR NpRv Voucher"): Boolean
+    procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"): Boolean
     begin
         if ReferenceNo = '' then
             exit(false);
@@ -294,7 +294,7 @@
         exit(Voucher.FindLast());
     end;
 
-    procedure FindSalesVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[30]; var NpRvSalesLine: Record "NPR NpRv Sales Line"): Boolean
+    procedure FindSalesVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[50]; var NpRvSalesLine: Record "NPR NpRv Sales Line"): Boolean
     begin
         NpRvSalesLine.SetFilter("Voucher Type", UpperCase(VoucherTypeFilter));
         NpRvSalesLine.SetRange("Reference No.", ReferenceNo);
