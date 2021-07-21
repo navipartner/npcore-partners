@@ -2,10 +2,11 @@ table 6151021 "NPR NpRv Voucher Buffer"
 {
     Caption = 'Voucher Buffer';
     DataClassification = CustomerContent;
+    TableType = Temporary;
 
     fields
     {
-        field(1; "Reference No."; Text[30])
+        field(1; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

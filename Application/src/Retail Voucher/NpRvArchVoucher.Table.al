@@ -23,7 +23,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(15; "Reference No."; Text[30])
+        field(15; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

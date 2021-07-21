@@ -131,14 +131,14 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
         }
     }
 
-    procedure GetSourceTable(var NpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary)
+    procedure GetSourceTable(var TempNpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary)
     begin
-        NpRvVoucherBuffer2.Copy(NpRvVoucherBuffer, true);
+        TempNpRvVoucherBuffer2.Copy(NpRvVoucherBuffer, true);
     end;
 
-    procedure SetSourceTable(var NpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary)
+    procedure SetSourceTable(var TempNpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary)
     begin
-        NpRvVoucherBuffer.Copy(NpRvVoucherBuffer2, true);
+        NpRvVoucherBuffer.Copy(TempNpRvVoucherBuffer2, true);
     end;
 }
 

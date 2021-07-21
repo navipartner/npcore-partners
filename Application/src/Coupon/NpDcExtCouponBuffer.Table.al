@@ -17,7 +17,7 @@ table 6151606 "NPR NpDc Ext. Coupon Buffer"
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(15; "Reference No."; Text[30])
+        field(15; "Reference No."; Text[50])
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;

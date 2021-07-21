@@ -69,61 +69,61 @@
         until TempNpRvVoucherBuffer.Next() = 0;
     end;
 
-    local procedure CreateVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    local procedure CreateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
     begin
-        NpRvVoucherBuffer.TestField("Voucher Type");
-        NpRvVoucherBuffer.TestField("Reference No.");
-        if FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", NpRvVoucher) then
+        TempNpRvVoucherBuffer.TestField("Voucher Type");
+        TempNpRvVoucherBuffer.TestField("Reference No.");
+        if FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", NpRvVoucher) then
             exit;
 
-        NpRvVoucherType.Get(NpRvVoucherBuffer."Voucher Type");
+        NpRvVoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
 
         NpRvVoucher.Init();
         NpRvVoucher."No." := '';
-        NpRvVoucher."Reference No." := NpRvVoucherBuffer."Reference No.";
-        NpRvVoucher."Voucher Type" := NpRvVoucherBuffer."Voucher Type";
-        NpRvVoucher.Description := NpRvVoucherBuffer.Description;
-        NpRvVoucher."Starting Date" := NpRvVoucherBuffer."Starting Date";
-        NpRvVoucher."Ending Date" := NpRvVoucherBuffer."Ending Date";
-        NpRvVoucher."Account No." := NpRvVoucherBuffer."Account No.";
-        NpRvVoucher.Amount := NpRvVoucherBuffer.Amount;
-        NpRvVoucher.Name := NpRvVoucherBuffer.Name;
-        NpRvVoucher."Name 2" := NpRvVoucherBuffer."Name 2";
-        NpRvVoucher.Address := NpRvVoucherBuffer.Address;
-        NpRvVoucher."Address 2" := NpRvVoucherBuffer."Address 2";
-        NpRvVoucher."Post Code" := NpRvVoucherBuffer."Post Code";
-        NpRvVoucher.City := NpRvVoucherBuffer.City;
-        NpRvVoucher.County := NpRvVoucherBuffer.County;
-        NpRvVoucher."Country/Region Code" := NpRvVoucherBuffer."Country/Region Code";
-        NpRvVoucher."E-mail" := NpRvVoucherBuffer."E-mail";
-        NpRvVoucher."Phone No." := NpRvVoucherBuffer."Phone No.";
-        NpRvVoucher."Voucher Message" := NpRvVoucherBuffer."Voucher Message";
-        NpRvVoucher."Issue Date" := NpRvVoucherBuffer."Issue Date";
-        NpRvVoucher."Issue Register No." := NpRvVoucherBuffer."Issue Register No.";
-        NpRvVoucher."Issue Document No." := NpRvVoucherBuffer."Issue Sales Ticket No.";
-        NpRvVoucher."Issue User ID" := NpRvVoucherBuffer."Issue User ID";
+        NpRvVoucher."Reference No." := TempNpRvVoucherBuffer."Reference No.";
+        NpRvVoucher."Voucher Type" := TempNpRvVoucherBuffer."Voucher Type";
+        NpRvVoucher.Description := TempNpRvVoucherBuffer.Description;
+        NpRvVoucher."Starting Date" := TempNpRvVoucherBuffer."Starting Date";
+        NpRvVoucher."Ending Date" := TempNpRvVoucherBuffer."Ending Date";
+        NpRvVoucher."Account No." := TempNpRvVoucherBuffer."Account No.";
+        NpRvVoucher.Amount := TempNpRvVoucherBuffer.Amount;
+        NpRvVoucher.Name := TempNpRvVoucherBuffer.Name;
+        NpRvVoucher."Name 2" := TempNpRvVoucherBuffer."Name 2";
+        NpRvVoucher.Address := TempNpRvVoucherBuffer.Address;
+        NpRvVoucher."Address 2" := TempNpRvVoucherBuffer."Address 2";
+        NpRvVoucher."Post Code" := TempNpRvVoucherBuffer."Post Code";
+        NpRvVoucher.City := TempNpRvVoucherBuffer.City;
+        NpRvVoucher.County := TempNpRvVoucherBuffer.County;
+        NpRvVoucher."Country/Region Code" := TempNpRvVoucherBuffer."Country/Region Code";
+        NpRvVoucher."E-mail" := TempNpRvVoucherBuffer."E-mail";
+        NpRvVoucher."Phone No." := TempNpRvVoucherBuffer."Phone No.";
+        NpRvVoucher."Voucher Message" := TempNpRvVoucherBuffer."Voucher Message";
+        NpRvVoucher."Issue Date" := TempNpRvVoucherBuffer."Issue Date";
+        NpRvVoucher."Issue Register No." := TempNpRvVoucherBuffer."Issue Register No.";
+        NpRvVoucher."Issue Document No." := TempNpRvVoucherBuffer."Issue Sales Ticket No.";
+        NpRvVoucher."Issue User ID" := TempNpRvVoucherBuffer."Issue User ID";
         NpRvVoucher.Insert(true);
 
         NpRvVoucherEntry.Init();
         NpRvVoucherEntry."Entry No." := 0;
         NpRvVoucherEntry."Voucher No." := NpRvVoucher."No.";
         NpRvVoucherEntry."Entry Type" := NpRvVoucherEntry."Entry Type"::"Issue Voucher";
-        if NpRvVoucherType."Partner Code" <> NpRvVoucherBuffer."Issue Partner Code" then
+        if NpRvVoucherType."Partner Code" <> TempNpRvVoucherBuffer."Issue Partner Code" then
             NpRvVoucherEntry."Entry Type" := NpRvVoucherEntry."Entry Type"::"Partner Issue Voucher";
         NpRvVoucherEntry."Voucher Type" := NpRvVoucher."Voucher Type";
-        NpRvVoucherEntry.Amount := NpRvVoucherBuffer.Amount;
+        NpRvVoucherEntry.Amount := TempNpRvVoucherBuffer.Amount;
         NpRvVoucherEntry."Remaining Amount" := NpRvVoucherEntry.Amount;
         NpRvVoucherEntry.Positive := NpRvVoucherEntry.Amount > 0;
-        NpRvVoucherEntry."Posting Date" := NpRvVoucherBuffer."Issue Date";
+        NpRvVoucherEntry."Posting Date" := TempNpRvVoucherBuffer."Issue Date";
         NpRvVoucherEntry.Open := NpRvVoucherEntry.Amount <> 0;
-        NpRvVoucherEntry."Register No." := NpRvVoucherBuffer."Issue Register No.";
-        NpRvVoucherEntry."Document No." := NpRvVoucherBuffer."Issue Sales Ticket No.";
-        NpRvVoucherEntry."User ID" := NpRvVoucherBuffer."Issue User ID";
-        NpRvVoucherEntry."Partner Code" := NpRvVoucherBuffer."Issue Partner Code";
+        NpRvVoucherEntry."Register No." := TempNpRvVoucherBuffer."Issue Register No.";
+        NpRvVoucherEntry."Document No." := TempNpRvVoucherBuffer."Issue Sales Ticket No.";
+        NpRvVoucherEntry."User ID" := TempNpRvVoucherBuffer."Issue User ID";
+        NpRvVoucherEntry."Partner Code" := TempNpRvVoucherBuffer."Issue Partner Code";
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
     end;
@@ -146,51 +146,51 @@
         until TempNpRvVoucherBuffer.Next() = 0;
     end;
 
-    local procedure ReserveVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    local procedure ReserveVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Timestamp: DateTime;
         InUseQty: Integer;
     begin
-        if not FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", NpRvVoucher) then
-            Error(Text000, NpRvVoucherBuffer."Reference No.");
+        if not FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", NpRvVoucher) then
+            Error(Text000, TempNpRvVoucherBuffer."Reference No.");
 
-        Voucher2Buffer(NpRvVoucher, NpRvVoucherBuffer);
-        NpRvVoucherBuffer.Modify();
+        Voucher2Buffer(NpRvVoucher, TempNpRvVoucherBuffer);
+        TempNpRvVoucherBuffer.Modify();
 
         NpRvVoucher.CalcFields(Open);
         InUseQty := NpRvVoucher.CalcInUseQty();
         if not NpRvVoucher.Open then
-            Error(Text003, NpRvVoucherBuffer."Reference No.");
+            Error(Text003, TempNpRvVoucherBuffer."Reference No.");
 
         if InUseQty > 0 then begin
-            NpRvSalesLine.SetRange("Register No.", NpRvVoucherBuffer."Redeem Register No.");
-            NpRvSalesLine.SetRange("Sales Ticket No.", NpRvVoucherBuffer."Redeem Sales Ticket No.");
+            NpRvSalesLine.SetRange("Register No.", TempNpRvVoucherBuffer."Redeem Register No.");
+            NpRvSalesLine.SetRange("Sales Ticket No.", TempNpRvVoucherBuffer."Redeem Sales Ticket No.");
             NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
-            NpRvSalesLine.SetRange("Sale Date", NpRvVoucherBuffer."Redeem Date");
+            NpRvSalesLine.SetRange("Sale Date", TempNpRvVoucherBuffer."Redeem Date");
             NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
             NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
             if InUseQty = NpRvSalesLine.Count() then
                 exit;
 
-            Error(Text001, NpRvVoucherBuffer."Reference No.");
+            Error(Text001, TempNpRvVoucherBuffer."Reference No.");
         end;
 
         Timestamp := CurrentDateTime;
         if NpRvVoucher."Starting Date" > Timestamp then
-            Error(Text004, NpRvVoucherBuffer."Reference No.");
+            Error(Text004, TempNpRvVoucherBuffer."Reference No.");
 
         if (NpRvVoucher."Ending Date" < Timestamp) and (NpRvVoucher."Ending Date" <> 0DT) then
-            Error(Text005, NpRvVoucherBuffer."Reference No.");
+            Error(Text005, TempNpRvVoucherBuffer."Reference No.");
 
 
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
-        NpRvSalesLine."Register No." := NpRvVoucherBuffer."Redeem Register No.";
-        NpRvSalesLine."Sales Ticket No." := NpRvVoucherBuffer."Redeem Sales Ticket No.";
+        NpRvSalesLine."Register No." := TempNpRvVoucherBuffer."Redeem Register No.";
+        NpRvSalesLine."Sales Ticket No." := TempNpRvVoucherBuffer."Redeem Sales Ticket No.";
         NpRvSalesLine."Sale Type" := NpRvSalesLine."Sale Type"::Sale;
-        NpRvSalesLine."Sale Date" := NpRvVoucherBuffer."Redeem Date";
+        NpRvSalesLine."Sale Date" := TempNpRvVoucherBuffer."Redeem Date";
         NpRvSalesLine."Sale Line No." := 10000;
         NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
         NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
@@ -217,26 +217,26 @@
         until TempNpRvVoucherBuffer.Next() = 0;
     end;
 
-    local procedure CancelReserveVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    local procedure CancelReserveVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         InUseQty: Integer;
     begin
-        if not FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", NpRvVoucher) then
+        if not FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", NpRvVoucher) then
             exit;
 
-        Voucher2Buffer(NpRvVoucher, NpRvVoucherBuffer);
-        NpRvVoucherBuffer.Modify();
+        Voucher2Buffer(NpRvVoucher, TempNpRvVoucherBuffer);
+        TempNpRvVoucherBuffer.Modify();
 
         InUseQty := NpRvVoucher.CalcInUseQty();
         if InUseQty = 0 then
             exit;
 
-        NpRvSalesLine.SetRange("Register No.", NpRvVoucherBuffer."Redeem Register No.");
-        NpRvSalesLine.SetRange("Sales Ticket No.", NpRvVoucherBuffer."Redeem Sales Ticket No.");
+        NpRvSalesLine.SetRange("Register No.", TempNpRvVoucherBuffer."Redeem Register No.");
+        NpRvSalesLine.SetRange("Sales Ticket No.", TempNpRvVoucherBuffer."Redeem Sales Ticket No.");
         NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
-        NpRvSalesLine.SetRange("Sale Date", NpRvVoucherBuffer."Redeem Date");
+        NpRvSalesLine.SetRange("Sale Date", TempNpRvVoucherBuffer."Redeem Date");
         NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
         NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
         if NpRvSalesLine.FindFirst() then
@@ -415,7 +415,7 @@
         until TempNpRvVoucherBuffer.Next() = 0;
     end;
 
-    local procedure RedeemPartnerVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    local procedure RedeemPartnerVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -423,12 +423,12 @@
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         InUseQty: Integer;
     begin
-        if not FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", NpRvVoucher) then
+        if not FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", NpRvVoucher) then
             exit;
 
         NpRvVoucher.CalcFields(Open, Amount);
         NpRvVoucher.TestField(Open);
-        if NpRvVoucher.Amount < NpRvVoucherBuffer.Amount then
+        if NpRvVoucher.Amount < TempNpRvVoucherBuffer.Amount then
             Error(Text002, NpRvVoucher.Amount);
 
         NpRvVoucherEntry.Init();
@@ -436,15 +436,15 @@
         NpRvVoucherEntry."Voucher No." := NpRvVoucher."No.";
         NpRvVoucherEntry."Entry Type" := NpRvVoucherEntry."Entry Type"::"Partner Payment";
         NpRvVoucherEntry."Voucher Type" := NpRvVoucher."Voucher Type";
-        NpRvVoucherEntry.Amount := -NpRvVoucherBuffer.Amount;
+        NpRvVoucherEntry.Amount := -TempNpRvVoucherBuffer.Amount;
         NpRvVoucherEntry."Remaining Amount" := NpRvVoucherEntry.Amount;
         NpRvVoucherEntry.Positive := NpRvVoucherEntry.Amount > 0;
-        NpRvVoucherEntry."Posting Date" := NpRvVoucherBuffer."Redeem Date";
+        NpRvVoucherEntry."Posting Date" := TempNpRvVoucherBuffer."Redeem Date";
         NpRvVoucherEntry.Open := NpRvVoucherEntry.Amount <> 0;
-        NpRvVoucherEntry."Register No." := NpRvVoucherBuffer."Redeem Register No.";
-        NpRvVoucherEntry."Document No." := NpRvVoucherBuffer."Redeem Sales Ticket No.";
-        NpRvVoucherEntry."User ID" := NpRvVoucherBuffer."Redeem User ID";
-        NpRvVoucherEntry."Partner Code" := NpRvVoucherBuffer."Redeem Partner Code";
+        NpRvVoucherEntry."Register No." := TempNpRvVoucherBuffer."Redeem Register No.";
+        NpRvVoucherEntry."Document No." := TempNpRvVoucherBuffer."Redeem Sales Ticket No.";
+        NpRvVoucherEntry."User ID" := TempNpRvVoucherBuffer."Redeem User ID";
+        NpRvVoucherEntry."Partner Code" := TempNpRvVoucherBuffer."Redeem Partner Code";
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
@@ -455,20 +455,20 @@
             NpRvVoucherMgt.ArchiveVouchers(NpRvVoucher);
         InUseQty := NpRvVoucher.CalcInUseQty();
         if InUseQty > 0 then begin
-            NpRvSalesLine.SetRange("Register No.", NpRvVoucherBuffer."Redeem Register No.");
-            NpRvSalesLine.SetRange("Sales Ticket No.", NpRvVoucherBuffer."Redeem Sales Ticket No.");
+            NpRvSalesLine.SetRange("Register No.", TempNpRvVoucherBuffer."Redeem Register No.");
+            NpRvSalesLine.SetRange("Sales Ticket No.", TempNpRvVoucherBuffer."Redeem Sales Ticket No.");
             NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
-            NpRvSalesLine.SetRange("Sale Date", NpRvVoucherBuffer."Redeem Date");
+            NpRvSalesLine.SetRange("Sale Date", TempNpRvVoucherBuffer."Redeem Date");
             NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
             NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
             NpRvSalesLine.DeleteAll();
         end;
 
-        Voucher2Buffer(NpRvVoucher, NpRvVoucherBuffer);
-        NpRvVoucherBuffer.Modify();
+        Voucher2Buffer(NpRvVoucher, TempNpRvVoucherBuffer);
+        TempNpRvVoucherBuffer.Modify();
     end;
 
-    procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[30]; var Voucher: Record "NPR NpRv Voucher"): Boolean
+    procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"): Boolean
     begin
         Voucher.SetFilter("Voucher Type", UpperCase(VoucherTypeFilter));
         Voucher.SetRange("Reference No.", ReferenceNo);
@@ -499,31 +499,31 @@
         exit(ServiceName);
     end;
 
-    local procedure Voucher2Buffer(var NpRvVoucher: Record "NPR NpRv Voucher"; var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer")
+    local procedure Voucher2Buffer(var NpRvVoucher: Record "NPR NpRv Voucher"; var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     begin
         NpRvVoucher.CalcFields(Amount, "Issue Date", "Issue Register No.", "Issue Document No.", "Issue User ID", "Issue Partner Code");
-        NpRvVoucherBuffer."Voucher Type" := NpRvVoucher."Voucher Type";
-        NpRvVoucherBuffer.Description := NpRvVoucher.Description;
-        NpRvVoucherBuffer."Starting Date" := NpRvVoucher."Starting Date";
-        NpRvVoucherBuffer."Ending Date" := NpRvVoucher."Ending Date";
-        NpRvVoucherBuffer."Account No." := NpRvVoucher."Account No.";
-        NpRvVoucherBuffer.Amount := NpRvVoucher.Amount;
-        NpRvVoucherBuffer.Name := NpRvVoucher.Name;
-        NpRvVoucherBuffer."Name 2" := NpRvVoucher."Name 2";
-        NpRvVoucherBuffer.Address := NpRvVoucher.Address;
-        NpRvVoucherBuffer."Address 2" := NpRvVoucher."Address 2";
-        NpRvVoucherBuffer."Post Code" := NpRvVoucher."Post Code";
-        NpRvVoucherBuffer.City := NpRvVoucher.City;
-        NpRvVoucherBuffer.County := NpRvVoucher.County;
-        NpRvVoucherBuffer."Country/Region Code" := NpRvVoucher."Country/Region Code";
-        NpRvVoucherBuffer."E-mail" := NpRvVoucher."E-mail";
-        NpRvVoucherBuffer."Phone No." := NpRvVoucher."Phone No.";
-        NpRvVoucherBuffer."Voucher Message" := NpRvVoucher."Voucher Message";
-        NpRvVoucherBuffer."Issue Date" := NpRvVoucher."Issue Date";
-        NpRvVoucherBuffer."Issue Register No." := NpRvVoucher."Issue Register No.";
-        NpRvVoucherBuffer."Issue Sales Ticket No." := NpRvVoucher."Issue Document No.";
-        NpRvVoucherBuffer."Issue User ID" := NpRvVoucher."Issue User ID";
-        NpRvVoucherBuffer."Issue Partner Code" := NpRvVoucher."Issue Partner Code";
+        TempNpRvVoucherBuffer."Voucher Type" := NpRvVoucher."Voucher Type";
+        TempNpRvVoucherBuffer.Description := NpRvVoucher.Description;
+        TempNpRvVoucherBuffer."Starting Date" := NpRvVoucher."Starting Date";
+        TempNpRvVoucherBuffer."Ending Date" := NpRvVoucher."Ending Date";
+        TempNpRvVoucherBuffer."Account No." := NpRvVoucher."Account No.";
+        TempNpRvVoucherBuffer.Amount := NpRvVoucher.Amount;
+        TempNpRvVoucherBuffer.Name := NpRvVoucher.Name;
+        TempNpRvVoucherBuffer."Name 2" := NpRvVoucher."Name 2";
+        TempNpRvVoucherBuffer.Address := NpRvVoucher.Address;
+        TempNpRvVoucherBuffer."Address 2" := NpRvVoucher."Address 2";
+        TempNpRvVoucherBuffer."Post Code" := NpRvVoucher."Post Code";
+        TempNpRvVoucherBuffer.City := NpRvVoucher.City;
+        TempNpRvVoucherBuffer.County := NpRvVoucher.County;
+        TempNpRvVoucherBuffer."Country/Region Code" := NpRvVoucher."Country/Region Code";
+        TempNpRvVoucherBuffer."E-mail" := NpRvVoucher."E-mail";
+        TempNpRvVoucherBuffer."Phone No." := NpRvVoucher."Phone No.";
+        TempNpRvVoucherBuffer."Voucher Message" := NpRvVoucher."Voucher Message";
+        TempNpRvVoucherBuffer."Issue Date" := NpRvVoucher."Issue Date";
+        TempNpRvVoucherBuffer."Issue Register No." := NpRvVoucher."Issue Register No.";
+        TempNpRvVoucherBuffer."Issue Sales Ticket No." := NpRvVoucher."Issue Document No.";
+        TempNpRvVoucherBuffer."Issue User ID" := NpRvVoucher."Issue User ID";
+        TempNpRvVoucherBuffer."Issue Partner Code" := NpRvVoucher."Issue Partner Code";
     end;
 
     local procedure SetGlobalLanguage(LanguageUsername: Text)

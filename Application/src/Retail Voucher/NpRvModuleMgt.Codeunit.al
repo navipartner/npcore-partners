@@ -31,7 +31,7 @@ codeunit 6151011 "NPR NpRv Module Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRunValidateVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
+    procedure OnRunValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
     begin
     end;
 

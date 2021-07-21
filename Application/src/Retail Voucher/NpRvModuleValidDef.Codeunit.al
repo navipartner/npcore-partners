@@ -8,17 +8,17 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
         Text004: Label 'Voucher is not valid anymore';
         Text005: Label 'Invalid Reference No. %1';
 
-    procedure ValidateVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    procedure ValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         Timestamp: DateTime;
     begin
-        if not NpRvVoucherMgt.FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", Voucher) then
-            Error(Text005, NpRvVoucherBuffer."Reference No.");
-        NpRvVoucherMgt.Voucher2Buffer(Voucher, NpRvVoucherBuffer);
-        VoucherType.Get(NpRvVoucherBuffer."Voucher Type");
+        if not NpRvVoucherMgt.FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then
+            Error(Text005, TempNpRvVoucherBuffer."Reference No.");
+        NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
+        VoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
         VoucherType.TestField("Payment Type");
         if Voucher.CalcInUseQty() > 0 then
             Error(Text001);
@@ -67,14 +67,14 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunValidateVoucher', '', true, true)]
-    local procedure OnRunValidateVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer"; var Handled: Boolean)
+    local procedure OnRunValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
     begin
         if Handled then
             exit;
-        if NpRvVoucherBuffer."Validate Voucher Module" <> ModuleCode() then
+        if TempNpRvVoucherBuffer."Validate Voucher Module" <> ModuleCode() then
             exit;
 
-        ValidateVoucher(NpRvVoucherBuffer);
+        ValidateVoucher(TempNpRvVoucherBuffer);
     end;
 
     local procedure CurrCodeunitId(): Integer
