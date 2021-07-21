@@ -14,7 +14,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pass"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SS Profile"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pricing Profile"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustSplitBillPOSActionParameters'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustDeletePOSLinePOSActionParameters'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Cross Ref"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Master Line Map"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Gift Voucher"));
@@ -70,8 +71,6 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRPOSUnit-ee2acd97-c63a-479b-bbe7-4d6d10514974');
             Codeunit::"NPR UPG POS Pricing Profile":
                 exit('NPRRegister-a306e4b4-b004-4ac5-8749-fcd1c8ba5d1f');
-            Codeunit::"NPR UPG Pos Menus":
-                exit('NPRSplitBillActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
             Codeunit::"NPR UPG POS Cross Ref":
                 exit(CompanyName() + 'NPRPOSCrossRef' + Format(Today(), 0, 9));
             Codeunit::"NPR UPG Master Line Map":
@@ -119,6 +118,13 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRJobQueueInstall-20210324');
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210618');
+            Codeunit::"NPR UPG Pos Menus":
+                case UpgradeStep of
+                    'AdjustSplitBillPOSActionParameters':
+                        exit('NPRSplitBillActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
+                    'AdjustDeletePOSLinePOSActionParameters':
+                        exit('NPRDeletePOSLineActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
+                end;
         end;
     end;
 }
