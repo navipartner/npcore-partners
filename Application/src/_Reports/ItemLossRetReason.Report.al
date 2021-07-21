@@ -236,7 +236,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
         Sales_AmountCaptionLbl: Label 'Sales Amount';
         Text001: Label 'Source Code Filter:  ';
         TotalCaptionLbl: Label 'Total';
-        ReportFilters: Text[250];
+        ReportFilters: Text;
 
     procedure CalculateShrinkage()
     var

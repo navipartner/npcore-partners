@@ -130,7 +130,7 @@ report 6014542 "NPR Item - Loss"
         TxtQty: Label 'Qty.';
         Text001: Label 'Source Code Filter:  ';
         TotalCaptionLbl: Label 'Total';
-        ItemFilters: Text[250];
+        ItemFilters: Text;
 
     procedure SvindCalculation()
     var

@@ -245,6 +245,7 @@
                     until ItemWorksheetExcelColumn.Next() = 0;
                 end else begin
                     MappingFound := false;
+# pragma warning disable AA0139
                     EnterCell(HeaderRowNo, 1, FieldCaption("Item No."), false, true, '', TempExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption(Description), false, true, '', TempExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Item Category Code"), false, true, '', TempExcelBuf."Cell Type"::Text);
@@ -266,6 +267,7 @@
                     EnterCell(HeaderRowNo, 0, FieldCaption("Internal Bar Code"), false, true, '', TempExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Net Weight"), false, true, '', TempExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Gross Weight"), false, true, '', TempExcelBuf."Cell Type"::Text);
+# pragma warning restore
                     NPRAttrManagement.GetAttributeVisibility(DATABASE::"NPR Item Worksheet Line", NPRAttrVisibleArray);
                     i := 1;
                     if NPRAttrVisibleArray[1] then

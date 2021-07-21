@@ -198,8 +198,8 @@ report 6014428 "NPR Shelf Labels"
         TMPItemGroup: Text;
         TMPUnitPriceDecimal: Text;
         TMPUnitPriceWhole: Text;
-        NPRAtrributeTextArray: array[20] of Text[50];
-        NPRAttributeTextArrayText: array[20] of Text[50];
+        NPRAtrributeTextArray: array[20] of Text;
+        NPRAttributeTextArrayText: array[20] of Text;
 
     local procedure GetItemNPRAttr(ItemRec: Record Item)
     var

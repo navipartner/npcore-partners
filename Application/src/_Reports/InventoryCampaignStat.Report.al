@@ -219,6 +219,6 @@ report 6014499 "NPR Inventory Campaign Stat."
         teodg: Decimal;
         totdb: Decimal;
         F: Text[30];
-        PeriodDiscountLineVendorNo: Text[100];
+        PeriodDiscountLineVendorNo: Text;
 }
 

@@ -386,7 +386,7 @@ report 6014533 "NPR Inventory - flow"
         ShowVendorSection: Boolean;
         SkipNoSales: Boolean;
         SkipWithoutPortfolio: Boolean;
-        ItemGroupPrevious: Code[10];
+        ItemGroupPrevious: Code[20];
         ItemNo: Code[20];
         dg: Decimal;
         Regulatory: Decimal;

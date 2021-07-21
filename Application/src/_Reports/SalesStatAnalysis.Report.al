@@ -787,7 +787,7 @@ report 6014457 "NPR Sales Stat/Analysis"
         GroupByText: Label 'Group by ';
         TotalText: Label 'Total for Item Group %1';
         CaptionClassDim1: Text[30];
-        TxtDim1: Text[30];
+        TxtDim1: Text;
         TxtLabeldim1: Text[100];
 
     procedure Pct(Value: Decimal; Total: Decimal) Calculation: Decimal

@@ -212,6 +212,6 @@ report 6014597 "NPR Sales Per Contact"
         PeriodLbl: Label 'Period: %1', Comment = '%1 = Contact Date Filter';
         TopLbl: Label 'Top %1', Comment = '%1 = Quantity';
         SortOrder: Option Largest,Smallest;
-        ContactDateFilter: Text[30];
+        ContactDateFilter: Text;
 }
 

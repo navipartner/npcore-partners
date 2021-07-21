@@ -415,7 +415,6 @@ report 6014426 "NPR Vendor Top/Sale"
 
     trigger OnPreReport()
     begin
-        VendorFilter := Vendor.GetFilters;
         VendorDateFilter := Vendor.GetFilter("Date Filter");
 
         j := '2';
@@ -482,8 +481,7 @@ report 6014426 "NPR Vendor Top/Sale"
         SortOrder: Option Highest,Lowest;
         ShowType: Option "Item Sales",,Gains,Margin;
         j: Text[30];
-        VendorDateFilter: Text[30];
-        VendorFilter: Text[250];
+        VendorDateFilter: Text;
         Pct1Lbl: Label '%1%', locked = true;
 # pragma warning disable AA0228
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal

@@ -25,7 +25,7 @@ report 6014550 "NPR Statement E-Mail"
                 ReportGenerated: Boolean;
                 FilterGroupNo: Integer;
                 OStream: OutStream;
-                Filename: Text[50];
+                Filename: Text[250];
                 SendToEmail: Text[250];
             begin
                 if "Balance (LCY)" = 0 then
@@ -43,7 +43,9 @@ report 6014550 "NPR Statement E-Mail"
                     repeat
                         if Pdf2NavOutputMethod = Pdf2NavOutputMethod::"Send now" then
                             if EmailMgt.GetEmailTemplateHeader(RecRef, EmailTemplateHeader) then begin
+# pragma warning disable AA0139
                                 Filename := EmailMgt.GetFilename(EmailTemplateHeader, RecRef);
+# pragma warning restore
                                 TempEmailAttachment.DeleteAll();
                                 TempEmailAttachment.Init();
                                 TempEmailAttachment.Description := Filename;
@@ -344,7 +346,7 @@ report 6014550 "NPR Statement E-Mail"
         NaviDocsManagement.AddDocumentEntryWithAttachments(RecRef, NaviDocsManagement.HandlingTypeMailCode(), ReportId, SendToEmail, '', DelayUntil, TempNaviDocsEntryAttachment);
     end;
 
-    local procedure GetCustomReportSelectionEmail(CustomerNo: Code[20]; ReportID: Integer): Text
+    local procedure GetCustomReportSelectionEmail(CustomerNo: Code[20]; ReportID: Integer): Text[250]
     var
         CustomReportSelection: Record "Custom Report Selection";
     begin
