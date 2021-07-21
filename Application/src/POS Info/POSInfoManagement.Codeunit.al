@@ -87,7 +87,7 @@
         end else begin
             POSInfoAuditRoll.SetRange("Register No.", SalePOS."Register No.");
             POSInfoAuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            if POSInfoAuditRoll.FindFirst() then
+            if POSInfoAuditRoll.FindSet() then
                 repeat
                     POSInfoPOSEntry.Init();
                     POSInfoPOSEntry."POS Entry No." := POSEntry."Entry No.";
@@ -111,7 +111,8 @@
         POSInfoTransaction.SetRange("Register No.", Rec."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", 0);
-        POSInfoTransaction.DeleteAll();
+        if not POSInfoTransaction.IsEmpty() then
+            POSInfoTransaction.DeleteAll();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
@@ -368,14 +369,15 @@
     begin
         POSInfoTransaction.SetRange("Register No.", PSalePos."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", PSalePos."Sales Ticket No.");
-        if POSInfoTransaction.FindFirst() then
+        if POSInfoTransaction.FindSet(true) then begin
             repeat
                 UpdatePOSInfoTransaction(POSInfoTransaction);
                 POSInfoAuditRoll.Init();
                 POSInfoAuditRoll.TransferFields(POSInfoTransaction);
                 POSInfoAuditRoll.Insert();
             until POSInfoTransaction.Next() = 0;
-        POSInfoTransaction.DeleteAll();
+            POSInfoTransaction.DeleteAll();
+        end;
     end;
 
     procedure DeleteLine(var SaleLinePOS: Record "NPR POS Sale Line")
@@ -388,7 +390,8 @@
         POSInfoTransaction.SetRange("Register No.", SaleLinePOS."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
-        POSInfoTransaction.DeleteAll();
+        if not POSInfoTransaction.IsEmpty() then
+            POSInfoTransaction.DeleteAll();
     end;
 
     procedure RetrieveSavedLines(ToSalePOS: Record "NPR POS Sale"; FromSalePOS: Record "NPR POS Sale")
@@ -398,7 +401,7 @@
     begin
         POSInfoTransactionOld.SetRange("Register No.", FromSalePOS."Register No.");
         POSInfoTransactionOld.SetRange("Sales Ticket No.", FromSalePOS."Sales Ticket No.");
-        if POSInfoTransactionOld.FindFirst() then
+        if POSInfoTransactionOld.FindSet(true) then
             repeat
                 POSInfoTransactionNew := POSInfoTransactionOld;
                 POSInfoTransactionNew."Register No." := ToSalePOS."Register No.";
@@ -420,18 +423,21 @@
         SaleLinePOS.SetRange(Date, POSInfoTransaction."Sale Date");
         if POSInfoTransaction."Sales Line No." <> 0 then
             SaleLinePOS.SetRange("Line No.", POSInfoTransaction."Sales Line No.");
+        if SaleLinePOS.IsEmpty() then
+            exit;
 
-        if SaleLinePOS.FindSet() then
-            repeat
-                if POSInfoTransaction."Sales Line No." <> 0 then begin
-                    POSInfoTransaction."No." := SaleLinePOS."No.";
-                    POSInfoTransaction.Price := SaleLinePOS."Unit Price";
-                end;
-                POSInfoTransaction.Quantity := POSInfoTransaction.Quantity + SaleLinePOS.Quantity;
-                POSInfoTransaction."Net Amount" := POSInfoTransaction."Net Amount" + SaleLinePOS.Amount;
-                POSInfoTransaction."Gross Amount" := POSInfoTransaction."Gross Amount" + SaleLinePOS."Amount Including VAT";
-                POSInfoTransaction."Discount Amount" := POSInfoTransaction."Discount Amount" + SaleLinePOS."Discount Amount";
-            until SaleLinePOS.Next() = 0;
+        SaleLinePOS.CalcSums(Quantity, Amount, "Amount Including VAT", "Discount Amount");
+        POSInfoTransaction.Quantity := POSInfoTransaction.Quantity + SaleLinePOS.Quantity;
+        POSInfoTransaction."Net Amount" := POSInfoTransaction."Net Amount" + SaleLinePOS.Amount;
+        POSInfoTransaction."Gross Amount" := POSInfoTransaction."Gross Amount" + SaleLinePOS."Amount Including VAT";
+        POSInfoTransaction."Discount Amount" := POSInfoTransaction."Discount Amount" + SaleLinePOS."Discount Amount";
+
+        if POSInfoTransaction."Sales Line No." <> 0 then begin
+            SaleLinePOS.SetLoadFields("No.", "Unit Price");
+            SaleLinePOS.FindLast();
+            POSInfoTransaction."No." := SaleLinePOS."No.";
+            POSInfoTransaction.Price := SaleLinePOS."Unit Price";
+        end;
     end;
 
     procedure ProcessPOSInfoText(pSaleLinePos: Record "NPR POS Sale Line"; pSalePos: Record "NPR POS Sale"; pPOSInfoCode: Code[20]; pInfoText: Text)
