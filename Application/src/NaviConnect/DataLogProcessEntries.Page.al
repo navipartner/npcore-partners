@@ -5,6 +5,7 @@ page 6059894 "NPR Data Log Process. Entries"
     SourceTable = "NPR Data Log Processing Entry";
     UsageCategory = Lists;
     ApplicationArea = NPRNaviConnect;
+    Caption = 'Data Log Process. Entries';
 
     layout
     {

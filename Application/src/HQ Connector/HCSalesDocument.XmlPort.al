@@ -286,9 +286,9 @@ xmlport 6150902 "NPR HC Sales Document"
                     {
                     }
 #else
-                        fieldelement(selltocustomertemplatecode; SalesHeader."Sell-to Customer Templ. Code")
-                        {
-                        }
+                    fieldelement(selltocustomertemplatecode; SalesHeader."Sell-to Customer Templ. Code")
+                    {
+                    }
 #endif
                     fieldelement(selltocontactno; SalesHeader."Sell-to Contact No.")
                     {
@@ -301,9 +301,9 @@ xmlport 6150902 "NPR HC Sales Document"
                     {
                     }
 #else
-                        fieldelement(billtocustomertemplatecode; SalesHeader."Bill-to Customer Templ. Code")
-                        {
-                        }
+                    fieldelement(billtocustomertemplatecode; SalesHeader."Bill-to Customer Templ. Code")
+                    {
+                    }
 #endif
                     fieldelement(opportunityno; SalesHeader."Opportunity No.")
                     {

@@ -1,5 +1,6 @@
 table 6014456 "NPR Salesperson Buffer"
 {
+    Caption = 'Salesperson Buffer';
 
     fields
     {

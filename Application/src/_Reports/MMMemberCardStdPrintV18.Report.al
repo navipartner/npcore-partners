@@ -6,6 +6,7 @@ report 6060123 "NPR MM Member Card Std Print"
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    Caption = 'MM Member Card Std Print';
 
     dataset
     {

@@ -23,9 +23,9 @@ codeunit 6150742 "NPR POS Cancel Sale Key Bind"
             exit;
         POSSession.GetCurrentView(POSView);
         case POSView.Type() of
-            POSView.Type()::Sale:
+            POSView.Type() ::Sale:
                 CancelSale(FrontEnd, POSSession);
-            POSView.Type()::Payment:
+            POSView.Type() ::Payment:
                 POSSession.ChangeViewSale();
         end;
     end;

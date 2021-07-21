@@ -6,6 +6,7 @@ page 6014569 "NPR Package Shipping Agents"
     PageType = List;
     SourceTable = "NPR Package Shipping Agent";
     ApplicationArea = NPRRetail;
+    Caption = 'Package Shipping Agents';
 
     layout
     {

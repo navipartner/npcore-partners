@@ -1,6 +1,7 @@
-﻿table 6014579 "NPR Blob To Media Migration"
+table 6014579 "NPR Blob To Media Migration"
 {
     DataClassification = SystemMetadata;
+    Caption = 'Blob To Media Migration';
 
     fields
     {

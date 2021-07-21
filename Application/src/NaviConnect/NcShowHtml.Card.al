@@ -6,6 +6,7 @@ page 6014441 "NPR Nc Show Html"
     DeleteAllowed = false;
     InsertAllowed = false;
     ApplicationArea = NPRNaviConnect;
+    Caption = 'Nc Show Html';
 
     layout
     {

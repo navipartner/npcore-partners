@@ -32,6 +32,6 @@ codeunit 6059942 "NPR VAN Doc. Endpoint Deliv."
     end;
 
     var
-        SendFailedErr: Label 'Upload to Endpoint %1 failed.', Comment='%1="NPR Nc Endpoint".Code';
+        SendFailedErr: Label 'Upload to Endpoint %1 failed.', Comment = '%1="NPR Nc Endpoint".Code';
 }
 

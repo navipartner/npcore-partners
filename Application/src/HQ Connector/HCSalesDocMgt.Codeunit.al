@@ -1,4 +1,4 @@
-﻿codeunit 6150906 "NPR HC Sales Doc. Mgt."
+codeunit 6150906 "NPR HC Sales Doc. Mgt."
 {
     TableNo = "NPR Nc Import Entry";
 
@@ -189,14 +189,14 @@
 #if BC17
         Evaluate(TempSalesHeader."Sell-to Customer Template Code", NpXmlDomMgt.GetXmlText(Element, 'selltocustomertemplatecode', 0, false), 9);
 #else
-            Evaluate(TempSalesHeader."Sell-to Customer Templ. Code", NpXmlDomMgt.GetXmlText(Element, 'selltocustomertemplatecode', 0, false), 9);
+        Evaluate(TempSalesHeader."Sell-to Customer Templ. Code", NpXmlDomMgt.GetXmlText(Element, 'selltocustomertemplatecode', 0, false), 9);
 #endif
         Evaluate(TempSalesHeader."Sell-to Contact No.", NpXmlDomMgt.GetXmlText(Element, 'selltocontactno', 0, false), 9);
         Evaluate(TempSalesHeader."Bill-to Contact No.", NpXmlDomMgt.GetXmlText(Element, 'billtocontactno', 0, false), 9);
 #if BC17
         Evaluate(TempSalesHeader."Bill-to Customer Template Code", NpXmlDomMgt.GetXmlText(Element, 'selltocustomertemplatecode', 0, false), 9);
 #else
-            Evaluate(TempSalesHeader."Bill-to Customer Templ. Code", NpXmlDomMgt.GetXmlText(Element, 'billtocustomertemplatecode', 0, false), 9);
+        Evaluate(TempSalesHeader."Bill-to Customer Templ. Code", NpXmlDomMgt.GetXmlText(Element, 'billtocustomertemplatecode', 0, false), 9);
 #endif
         Evaluate(TempSalesHeader."Opportunity No.", NpXmlDomMgt.GetXmlText(Element, 'opportunityno', 0, false), 9);
         Evaluate(TempSalesHeader."Responsibility Center", NpXmlDomMgt.GetXmlText(Element, 'responisbilitycenter', 0, false), 9);

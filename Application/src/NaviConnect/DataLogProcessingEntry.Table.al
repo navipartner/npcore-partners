@@ -2,6 +2,7 @@ table 6059894 "NPR Data Log Processing Entry"
 {
     DrillDownPageID = "NPR Data Log Process. Entries";
     LookupPageID = "NPR Data Log Process. Entries";
+    Caption = 'Data Log Processing Entry';
 
     fields
     {

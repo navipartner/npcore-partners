@@ -19,19 +19,22 @@ page 6151171 "NPR NpGp Global POSSalesSetups"
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
+                    ;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
 
                     ToolTip = 'Specifies the value of the Company Name field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
+                    ;
                 }
                 field("Service Url"; Rec."Service Url")
                 {
 
                     ToolTip = 'Specifies the value of the Service Url field';
-                    ApplicationArea = NPRRetail;;
+                    ApplicationArea = NPRRetail;
+                    ;
                 }
             }
         }

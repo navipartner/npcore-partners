@@ -1,6 +1,7 @@
 table 6151246 "NPR Web Sales"
 {
     DataClassification = CustomerContent;
+    Caption = 'Web Sales';
 
     fields
     {

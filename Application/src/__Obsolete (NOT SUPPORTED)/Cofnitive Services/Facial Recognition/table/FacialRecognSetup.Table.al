@@ -3,6 +3,7 @@ table 6059916 "NPR Facial Recogn. Setup"
     ObsoleteState = Pending;
     ObsoleteReason = 'Refractored to old code MCS Face Recognition';
     DataClassification = CustomerContent;
+    Caption = 'Facial Recogn. Setup';
     fields
     {
         field(1; "Code"; Code[20])

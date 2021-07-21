@@ -1,5 +1,6 @@
 query 6150660 "NPR NPRE Kitchen Req. w Source"
 {
+    Caption = 'NPRE Kitchen Req. w Source';
     elements
     {
         dataitem(KitchenOrder; "NPR NPRE Kitchen Order")

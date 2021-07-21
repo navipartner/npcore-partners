@@ -1,6 +1,7 @@
 table 6151247 "NPR POS Entry Cue."
 {
     DataClassification = CustomerContent;
+    Caption = 'POS Entry Cue.';
     fields
     {
         field(1; "Primary Key"; Code[10])

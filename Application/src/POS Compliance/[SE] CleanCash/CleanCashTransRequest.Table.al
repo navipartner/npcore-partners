@@ -1,6 +1,7 @@
 table 6014438 "NPR CleanCash Trans. Request"
 {
     DataClassification = CustomerContent;
+    Caption = 'CleanCash Trans. Request';
 
     fields
     {
