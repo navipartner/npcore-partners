@@ -1,11 +1,5 @@
 codeunit 6150796 "NPR POSAction: Delete POS Line"
 {
-    var
-        ActionDescription: Label 'This built in function deletes sales or payment line from the POS';
-        Title: Label 'Delete Line';
-        Prompt: Label 'Are you sure you want to delete the line %1?';
-        NotAllowed: Label 'This line can''t be deleted.';
-
     local procedure ActionCode(): Text
     begin
         exit('DELETE_POS_LINE');
@@ -13,58 +7,62 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
 
     local procedure ActionVersion(): Text
     begin
-
-        exit('1.2');
+        exit('2.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        ActionDescriptionLbl: Label 'This built in function deletes sales or payment line from the POS';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+            Sender.RegisterWorkflow20(
+                'let saleLines = runtime.getData("BUILTIN_SALELINE");' +
+                'if ((!saleLines.length) || (saleLines._invalid)) {' +
+                '    await popup.error($labels.notallowed);' +
+                '    return;' +
+                '};' +
 
-            Sender.RegisterWorkflowStep('decl0', 'confirmtext = labels.notallowed;');
-            Sender.RegisterWorkflowStep('decl1', 'if (!data.isEmpty())    {confirmtext = labels.Prompt.substitute(data("10"));};');
-            Sender.RegisterWorkflowStep('confirm', '(param.ConfirmDialog == param.ConfirmDialog["Yes"]) ? confirm({title: labels.title, caption: confirmtext}).respond() : respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataBinding();
-            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-            Sender.RegisterOptionParameter('ConfirmDialog', 'No,Yes', 'No');
+                'if ($parameters.ConfirmDialog) {' +
+                '    if (!await popup.confirm({ title: $labels.title, caption: $labels.Prompt.substitute(saleLines._current[10]) })) {' +
+                '        return;' +
+                '    };' +
+                '};' +
+                'workflow.respond();'
+            );
+            Sender.RegisterBooleanParameter('ConfirmDialog', false);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
+    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
-
-        DeletePosLine(Context, POSSession, FrontEnd);
         Handled := true;
+
+        DeletePosLine(POSSession);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    var
+        TitleLbl: Label 'Delete Line';
+        PromptLbl: Label 'Are you sure you want to delete the line %1?';
+        NotAllowedLbl: Label 'This line can''t be deleted.';
     begin
-        Captions.AddActionCaption(ActionCode(), 'title', Title);
-        Captions.AddActionCaption(ActionCode(), 'notallowed', NotAllowed);
-        Captions.AddActionCaption(ActionCode(), 'Prompt', Prompt);
+        Captions.AddActionCaption(ActionCode(), 'title', TitleLbl);
+        Captions.AddActionCaption(ActionCode(), 'notallowed', NotAllowedLbl);
+        Captions.AddActionCaption(ActionCode(), 'Prompt', PromptLbl);
     end;
 
-    local procedure DeletePosLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session")
     var
-        JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
         CurrentView: Codeunit "NPR POS View";
     begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
 
         if (CurrentView.Type() = CurrentView.Type() ::Sale) then begin

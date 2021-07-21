@@ -11,9 +11,13 @@ codeunit 6014539 "NPR UPG Pos Menus"
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Pos Menus', 'OnUpgradePerCompany');
 
         ReplaceItemAddonPOSAction();
-        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus")) then begin
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustSplitBillPOSActionParameters')) then begin
             AdjustSplitBillPOSActionParameters();
-            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus"));
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustSplitBillPOSActionParameters'));
+        end;
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustDeletePOSLinePOSActionParameters')) then begin
+            AdjustDeletePOSLinePOSActionParameters();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustDeletePOSLinePOSActionParameters'));
         end;
 
         LogMessageStopwatch.LogFinish();
@@ -101,6 +105,51 @@ codeunit 6014539 "NPR UPG Pos Menus"
                         end;
                         if ParamValue.Find() then begin
                             ParamValue.Value := TempParamValue.Value;
+                            ParamValue.Modify();
+                        end;
+                    until TempParamValue.Next() = 0;
+            until POSMenuButton.Next() = 0;
+    end;
+
+    local procedure AdjustDeletePOSLinePOSActionParameters()
+    var
+        POSAction: Record "NPR POS Action";
+        POSMenuButton: Record "NPR POS Menu Button";
+        ParamValue: Record "NPR POS Parameter Value";
+        TempParamValue: Record "NPR POS Parameter Value" temporary;
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+    begin
+        if not TempParamValue.IsTemporary then
+            exit;
+        if not POSAction.Get('DELETE_POS_LINE') then
+            exit;
+        POSMenuButton.SetRange("Action Type", POSMenuButton."Action Type"::Action);
+        POSMenuButton.SetRange("Action Code", POSAction.Code);
+        if POSMenuButton.FindSet() then
+            repeat
+                TempParamValue.DeleteAll();
+                ParamValue.SetRange("Table No.", Database::"NPR POS Menu Button");
+                ParamValue.SetRange(Code, POSMenuButton."Menu Code");
+                ParamValue.SetRange("Record ID", POSMenuButton.RecordId);
+                ParamValue.SetRange(ID, POSMenuButton.ID);
+                if ParamValue.FindSet() then
+                    repeat
+                        TempParamValue := ParamValue;
+                        TempParamValue.Insert();
+                    until ParamValue.Next() = 0;
+
+                ParamMgt.ClearParametersForRecord(POSMenuButton.RecordId, 0);
+                ParamMgt.CopyFromActionToMenuButton(POSMenuButton."Action Code", POSMenuButton);
+
+                if TempParamValue.FindSet() then
+                    repeat
+                        ParamValue := TempParamValue;
+                        if ParamValue.Find() then begin
+                            if ParamValue.Name = 'ConfirmDialog' then begin
+                                if UpperCase(TempParamValue.Value) = 'YES' then
+                                    ParamValue.Value := 'true';
+                            end else
+                                ParamValue.Value := TempParamValue.Value;
                             ParamValue.Modify();
                         end;
                     until TempParamValue.Next() = 0;

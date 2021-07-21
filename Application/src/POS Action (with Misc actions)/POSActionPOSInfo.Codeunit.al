@@ -29,9 +29,10 @@ codeunit 6150829 "NPR POS Action: POS Info"
                 '      return;' +
                 '    };' +
                 '  } else {' +
-                '    await workflow.respond("ValidateUserInput");' +
+                '    workflow.respond("ValidateUserInput");' +
                 '  };' +
-                '};');
+                '};'
+                );
 
             Sender.RegisterTextParameter('POSInfoCode', '');
             Sender.RegisterOptionParameter('ApplicationScope', ' ,Current Line,All Lines,New Lines,Ask', 'All Lines');
