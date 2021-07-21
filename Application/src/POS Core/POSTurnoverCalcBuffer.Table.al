@@ -2,6 +2,7 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
 {
     DataClassification = CustomerContent;
     TableType = Temporary;
+    Caption = 'POS Turnover Calc. Buffer';
 
     fields
     {

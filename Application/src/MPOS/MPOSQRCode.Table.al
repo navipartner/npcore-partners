@@ -255,7 +255,6 @@ table 6059964 "NPR MPOS QR Code"
         // MPOSQRCode."QR Image".ImportStream(InStr, MPOSQRCode.FieldName("QR Image"));
         MPOSQRCode."QR code".CreateOutStream(OuStr);
         CopyStream(OuStr, InStr);
-        
         MPOSQRCode.Modify();
     end;
 

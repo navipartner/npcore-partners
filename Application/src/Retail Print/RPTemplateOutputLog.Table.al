@@ -1,5 +1,6 @@
 table 6014501 "NPR RP Template Output Log"
 {
+    Caption = 'RP Template Output Log';
     fields
     {
         field(1; "Entry No."; Integer)

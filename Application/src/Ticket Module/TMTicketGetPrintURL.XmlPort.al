@@ -66,6 +66,7 @@ xmlport 6060122 "NPR TM Ticket Get Print URL"
         TicketSetup: Record "NPR TM Ticket Setup";
         LineCounter: Integer;
         TicketUrlLbl: Label '%1%2', Locked = true;
+
     procedure CreateResponse()
     var
         Ticket: Record "NPR TM Ticket";

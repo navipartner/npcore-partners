@@ -6,6 +6,7 @@ page 6014435 "NPR MobilePayV10 Stores"
     Editable = false;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    Caption = 'MobilePayV10 Stores';
 
 
     layout

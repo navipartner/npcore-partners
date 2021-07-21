@@ -1,6 +1,7 @@
 table 6014454 "NPR CleanCash Trans. VAT"
 {
     DataClassification = CustomerContent;
+    Caption = 'CleanCash Trans. VAT';
 
     fields
     {

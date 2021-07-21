@@ -238,7 +238,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         Image = SalesPerson;
                         action("NPR Sales Person Top 20")
                         {
-                            Caption = 'NPR Sales Person Top 20';
+                            Caption = 'Sales Person Top 20';
                             Image = Report2;
                             RunObject = Report "NPR Sales Person Top 20";
 
@@ -247,7 +247,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Sales code/Item group top")
                         {
-                            Caption = 'NPR  Sales code/Item group top';
+                            Caption = 'Sales code/Item group top';
                             Image = Report2;
                             RunObject = Report "NPR Salesperson/Item Group Top";
 
@@ -256,7 +256,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Sale Statistics per Vendor")
                         {
-                            Caption = 'NPR Sale Statistics per Vendor';
+                            Caption = 'Sale Statistics per Vendor';
                             Image = Report2;
                             RunObject = Report "NPR Sale Statistics per Vendor";
 
@@ -265,7 +265,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Sales Statistics By Department")
                         {
-                            Caption = 'NPR Sales Statistics By Department';
+                            Caption = 'Sales Statistics By Department';
                             Image = Report2;
                             RunObject = Report "NPR Sales Statistics By Dept.";
 
@@ -308,7 +308,7 @@ page 6151241 "NPR Retail Manager Role Center"
                             Image = AnalysisView;
                             action("NPR Sales per week year/Last year")
                             {
-                                Caption = 'NPR Sales per week year/Last year';
+                                Caption = 'Sales per week year/Last year';
                                 Image = Report2;
                                 RunObject = Report "NPR Sales per week year/Last";
 
@@ -317,7 +317,7 @@ page 6151241 "NPR Retail Manager Role Center"
                             }
                             action("NPR Discount Statistics")
                             {
-                                Caption = 'NPR Discount Statistics';
+                                Caption = 'Discount Statistics';
                                 Image = Report2;
                                 RunObject = Report "NPR Discount Statistics";
 
@@ -338,7 +338,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Inventory by age")
                         {
-                            Caption = 'NPR Inventory by age';
+                            Caption = 'Inventory by age';
                             Image = Report;
                             RunObject = report "NPR Inventory by age";
 
@@ -347,7 +347,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Inv. Sales Statistics")
                         {
-                            Caption = 'NPR Inv. Sales Statistics';
+                            Caption = 'Inv. Sales Statistics';
                             Image = Report;
                             RunObject = report "NPR Item Sales Stats/Provider";
 
@@ -356,7 +356,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Inventory per Date")
                         {
-                            Caption = 'NPR Inventory per Date';
+                            Caption = 'Inventory per Date';
                             Image = Report;
                             RunObject = report "NPR Inventory per Date";
 
@@ -365,7 +365,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Item Group Inventory Value")
                         {
-                            Caption = 'NPR Item Group Inventory Value';
+                            Caption = 'Item Group Inventory Value';
                             Image = Report;
                             RunObject = report "NPR Item Group Inv. Value";
 
@@ -375,7 +375,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Statistic - Sales")
                         {
-                            Caption = 'NPR Statistic - Sales';
+                            Caption = 'Statistic - Sales';
                             Image = Report;
                             RunObject = report "NPR Item Sales Postings";
 
@@ -385,7 +385,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Low Sales")
                         {
-                            Caption = 'NPR Low Sales';
+                            Caption = 'Low Sales';
                             Image = Report;
                             RunObject = report "NPR Items With Low Sales";
 
@@ -395,7 +395,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Shrinkage")
                         {
-                            Caption = 'NPR Shrinkage';
+                            Caption = 'Shrinkage';
                             Image = Report;
                             RunObject = report "NPR Item - Loss";
 
@@ -405,7 +405,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Item Loss - Return Reason")
                         {
-                            Caption = 'NPR Item Loss - Return Reason';
+                            Caption = 'Item Loss - Return Reason';
                             Image = Report;
                             RunObject = report "NPR Item Loss - Ret. Reason";
 
@@ -414,7 +414,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Sales Statistics Variant")
                         {
-                            Caption = 'NPR Sales Statistics Variant';
+                            Caption = 'Sales Statistics Variant';
                             Image = Report;
                             RunObject = report "NPR Sales Stats Per Variety";
 
@@ -423,7 +423,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Inventory per Variant at date")
                         {
-                            Caption = 'NPR Inventory per Variant at date';
+                            Caption = 'Inventory per Variant at date';
                             Image = Report;
                             RunObject = report "NPR Inventory per Variant/date";
 
@@ -432,7 +432,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Item Barcode Sheet")
                         {
-                            Caption = 'NPR Item Barcode Sheet';
+                            Caption = 'Item Barcode Sheet';
                             Image = Report;
                             RunObject = report "NPR Item Barcode Status Sheet";
 
@@ -441,7 +441,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Return Reason Code Statistics")
                         {
-                            Caption = 'NPR Return Reason Code Statistics';
+                            Caption = 'Return Reason Code Statistics';
                             Image = Report;
                             RunObject = report "NPR Return Reason Code Stat.";
 
@@ -451,7 +451,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Adjust Cost - Item Entries")
                         {
-                            Caption = 'NPR Adjust Cost - Item Entries';
+                            Caption = 'Adjust Cost - Item Entries';
                             Image = Report;
                             RunObject = report "NPR Adjust Cost: ItemEntriesTQ";
 
@@ -461,7 +461,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Item Sales Statistics")
                         {
-                            Caption = 'NPR Item Sales Statistics';
+                            Caption = 'Item Sales Statistics';
                             Image = Report;
                             RunObject = report "NPR Item Sales Statistics";
 
@@ -470,7 +470,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Item Group Top")
                         {
-                            Caption = 'NPR Item Group Top';
+                            Caption = 'Item Group Top';
                             Image = Report;
                             RunObject = report "NPR Item Group Top";
 
@@ -485,7 +485,7 @@ page 6151241 "NPR Retail Manager Role Center"
 
                         action("NPR Item Group Overview")
                         {
-                            Caption = 'NPR Item Group Overview';
+                            Caption = 'Item Group Overview';
                             Image = Report;
                             RunObject = Report "NPR Item Group Overview";
 
@@ -494,7 +494,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Vendor sales per line")
                         {
-                            Caption = 'NPR Vendor sales per line';
+                            Caption = 'Vendor sales per line';
                             Image = Report;
                             RunObject = report "NPR Vendor trx by Item group";
 
@@ -503,7 +503,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Sales Person Trn. by Item Gr.")
                         {
-                            Caption = 'NPR Sales Person Trn. by Item Gr.';
+                            Caption = 'Sales Person Trn. by Item Gr.';
                             Image = Report;
                             RunObject = Report "NPR S.Person Trx by Item Gr.";
 
@@ -512,7 +512,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         }
                         action("NPR Sales Stat/Analysis")
                         {
-                            Caption = 'NPR Sales Stat/Analysis';
+                            Caption = 'Sales Stat/Analysis';
                             Image = Report;
                             RunObject = Report "NPR Sales Stat/Analysis";
 
@@ -526,7 +526,7 @@ page 6151241 "NPR Retail Manager Role Center"
                         Image = Discount;
                         action("NPR Period Discount Statistics")
                         {
-                            Caption = 'NPR Period Discount Statistics';
+                            Caption = 'Period Discount Statistics';
                             Image = Report;
                             RunObject = report "NPR Period Discount Stat.";
 

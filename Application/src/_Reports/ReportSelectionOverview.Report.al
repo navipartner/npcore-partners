@@ -4,5 +4,6 @@ report 6014613 "NPR Report Selection Overview"
     RDLCLayout = './src/_Reports/layouts/Report Selection Overview.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    Caption = 'Report Selection Overview';
 }
 

@@ -1,6 +1,7 @@
 query 6014400 "NPR POS Turnover"
 {
     QueryType = Normal;
+    Caption = 'POS Turnover';
 
     elements
     {

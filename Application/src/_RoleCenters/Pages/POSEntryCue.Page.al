@@ -3,6 +3,7 @@ page 6151260 "NPR POS Entry Cue"
     PageType = CardPart;
     SourceTable = "NPR POS Entry Cue.";
     UsageCategory = None;
+    Caption = 'POS Entry Cue';
 
     layout
     {

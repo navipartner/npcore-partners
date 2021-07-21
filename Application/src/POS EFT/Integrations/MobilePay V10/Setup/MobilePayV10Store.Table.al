@@ -2,6 +2,7 @@ table 6014535 "NPR MobilePayV10 Store"
 {
     DataClassification = CustomerContent;
     LookupPageId = "NPR MobilePayV10 Stores";
+    Caption = 'MobilePayV10 Store';
 
     fields
     {

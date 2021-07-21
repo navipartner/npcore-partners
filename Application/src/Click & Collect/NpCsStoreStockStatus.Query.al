@@ -1,6 +1,7 @@
 query 6151223 "NPR NpCs Store Stock Status"
 {
     QueryType = Normal;
+    Caption = 'NpCs Store Stock Status';
 
     elements
     {

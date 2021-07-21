@@ -1,4 +1,4 @@
-﻿codeunit 6060107 "NPR POS Input Box Evt Handler"
+codeunit 6060107 "NPR POS Input Box Evt Handler"
 {
     var
         Text000: Label 'Ambigous input, please specify.';
@@ -42,7 +42,7 @@
 
         POSSession.GetCurrentView(CurrView);
         case CurrView.Type() of
-            CurrView.Type()::Sale:
+            CurrView.Type() ::Sale:
                 begin
                     if POSUnit."Ean Box Sales Setup" = '' then
                         POSUnit."Ean Box Sales Setup" := EanBoxSetupMgt.DefaultSalesSetupCode();

@@ -1,5 +1,6 @@
 query 6014618 "NPR Mixed Disc. Items Mix 1"
 {
+    Caption = 'Mixed Disc. Items Mix 1';
     elements
     {
         dataitem(Mixed_Discount_Line; "NPR Mixed Discount Line")

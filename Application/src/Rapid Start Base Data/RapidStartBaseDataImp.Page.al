@@ -4,6 +4,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
 
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    Caption = 'RapidStart Base Data Imp.';
 
     layout
     {

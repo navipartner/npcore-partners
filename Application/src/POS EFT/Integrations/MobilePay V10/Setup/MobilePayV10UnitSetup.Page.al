@@ -5,6 +5,7 @@ page 6014405 "NPR MobilePayV10 Unit Setup"
     UsageCategory = Administration;
     SourceTable = "NPR MobilePayV10 Unit Setup";
     ApplicationArea = NPRRetail;
+    Caption = 'MobilePayV10 Unit Setup';
 
     layout
     {

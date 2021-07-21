@@ -6,6 +6,7 @@ page 6151242 "NPR Retail Magento Setup List"
 
     SourceTable = "NPR Magento Setup";
     ApplicationArea = NPRRetail;
+    Caption = 'Retail Magento Setup List';
     layout
     {
         area(content)

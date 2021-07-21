@@ -1,5 +1,6 @@
 query 6014617 "NPR Mixed Disc. Items Mix 0"
 {
+    Caption = 'Mixed Disc. Items Mix 0';
     // MAG2.26/MHA /20200507  CASE 401235 Object created - returns Items used on Mixed Discount Line (Item)
 
 
