@@ -209,7 +209,7 @@ report 6060137 "NPR MM Membership Batch Renew"
         ValidOnDate: Date;
         PROGRESSLbl: Label 'Working: @1@@@@@@@@@@@@@@@@@@';
         TypeOfActive: Option ACTIVE,LAST_PERIOD;
-        RenewDescription: Text;
+        RenewDescription: Text[100];
 
     local procedure DoRenew(Membership: Record "NPR MM Membership"; var ReasonText: Text): Boolean
     var
@@ -260,7 +260,10 @@ report 6060137 "NPR MM Membership Batch Renew"
     begin
 
         MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::ALTERATION_JNL;
+# pragma warning disable AA0139
+        // Refactoring needed
         MemberInfoCapture."Document No." := UserId;
+# pragma warning restore
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;
@@ -279,7 +282,10 @@ report 6060137 "NPR MM Membership Batch Renew"
     begin
 
         MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::ALTERATION_JNL;
+#pragma warning disable AA0139
+        // Refactoring needed
         MemberInfoCapture."Document No." := UserId;
+# pragma warning restore
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::RENEW;

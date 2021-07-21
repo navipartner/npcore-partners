@@ -246,8 +246,8 @@ report 6014611 "NPR Sales Stats w/ Variants"
         ItemsNotSoldTxt: Label 'The report also contains items, that have not been sold. ';
         ItemVariantInfo_Caption: Label 'Variant Info';
         ItemVendorNo_Caption: Label 'Vendor Item No.';
-        PeriodText: Text[30];
-        ItemFilter: Text[250];
+        PeriodText: Text;
+        ItemFilter: Text;
         Pct1Lbl: Label '%1: %2', locked = true;
 
     procedure Calculate()

@@ -225,7 +225,9 @@ report 6014475 "NPR Item Replenish. by Store"
                     //  ReqLine."Demand Type" := ItemReplenishText;
                     ReqLine.Level := 1;
                     ReqLine."Action Message" := ReqLine."Action Message"::New;
+# pragma warning disable AA0139
                     ReqLine."User ID" := UserId;
+# pragma warning restore
                     ReqLine."Qty. per Unit of Measure" := 1;
                     ReqLine.Validate(Quantity, OrderQty);
                     ReqLine.SetSupplyDates(OrderDate);
@@ -418,7 +420,9 @@ report 6014475 "NPR Item Replenish. by Store"
             if not TempItemLedgEntry.FindFirst() then
                 InsertIntoTemp(ItemReplenishByStore."Item No.", ItemReplenishByStore."Variant Code", LocationCodeHere, 0, 0, 0);
             TempItemLedgEntry."Qty. per Unit of Measure" := ItemReplenishByStore."Reorder Point";
+# pragma warning disable AA0139
             TempItemLedgEntry."Document No." := ItemReplenishByStore."Reorder Point Text";
+# pragma warning restore
             TempItemLedgEntry."Shipped Qty. Not Returned" := ItemReplenishByStore."Reorder Quantity"; // Reorder Quantity (5)
             TempItemLedgEntry."Global Dimension 1 Code" := Format(ItemReplenishByStore."Maximum Inventory");
             TempItemLedgEntry.Description := ItemReplenishByStore."Maximum Inventory Text";

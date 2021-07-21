@@ -506,7 +506,7 @@ report 6014612 "NPR Inventory per Variant/date"
         Txt003: Label 'Total';
         ItemVendorItemNo_Caption: Label 'Vendor item no.';
         LocationText: Text;
-        Itemfilter: Text[100];
+        Itemfilter: Text;
 
 
     procedure CheckInventory(var localItem: Record Item): Boolean

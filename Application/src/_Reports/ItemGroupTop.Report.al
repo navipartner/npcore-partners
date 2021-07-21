@@ -325,7 +325,7 @@ report 6014420 "NPR Item Group Top"
         SortType: Option ant,sal,db,dg;
         SortOrder: Option st,mi;
         FiltersDimValue: Text;
-        Dim1Filter: Text[30];
+        Dim1Filter: Text;
         j: Text[30];
 }
 

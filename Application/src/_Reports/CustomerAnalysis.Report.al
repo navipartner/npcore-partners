@@ -580,8 +580,8 @@ report 6014432 "NPR Customer Analysis"
         TotalCaptionLbl: Label 'Total';
         SortOrder: Option Maximum,Minimum;
         ShowType: Option Sales,Balance,Margin;
-        CustomerDateFilter: Text[30];
-        CustomerFilter: Text[250];
+        CustomerDateFilter: Text;
+        CustomerFilter: Text;
         Pct1Lbl: Label '%1%', locked = true;
 
 # pragma warning disable AA0228

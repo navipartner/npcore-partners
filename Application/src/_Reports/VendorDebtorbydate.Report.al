@@ -44,8 +44,8 @@ report 6014434 "NPR Vendor/Debtor by date"
 
             trigger OnAfterGetRecord()
             begin
-                afdfilter := Vendor.GetFilter(Vendor."Global Dimension 1 Filter");
-                Vendor.SetFilter("Global Dimension 1 Filter", afdfilter);
+                DimFilter := Vendor.GetFilter(Vendor."Global Dimension 1 Filter");
+                Vendor.SetFilter("Global Dimension 1 Filter", DimFilter);
                 Vendor.SetRange("Date Filter", DMY2Date(1, 1, 1980), Tildato);
                 Vendor.CalcFields("Net Change (LCY)");
 
@@ -91,8 +91,8 @@ report 6014434 "NPR Vendor/Debtor by date"
 
             trigger OnAfterGetRecord()
             begin
-                afdfilter := Customer.GetFilter(Customer."Global Dimension 1 Filter");
-                Customer.SetFilter("Global Dimension 1 Filter", afdfilter);
+                DimFilter := Customer.GetFilter(Customer."Global Dimension 1 Filter");
+                Customer.SetFilter("Global Dimension 1 Filter", DimFilter);
                 Customer.SetRange("Date Filter", DMY2Date(1, 1, 1980), Tildato);
                 Customer.CalcFields("Net Change (LCY)");
 
@@ -188,7 +188,7 @@ report 6014434 "NPR Vendor/Debtor by date"
         PrintKreditor: Boolean;
         ShowCreditor: Boolean;
         ShowCustomer: Boolean;
-        afdfilter: Code[20];
+        DimFilter: Text;
         Tildato: Date;
 }
 

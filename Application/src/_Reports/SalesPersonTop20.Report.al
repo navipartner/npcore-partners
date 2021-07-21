@@ -268,6 +268,6 @@ report 6014406 "NPR Sales Person Top 20"
         SortOrder: Option Largest,Smallest;
         ShowType: Option Turnover,Discount,"Contribution Margin","Contribution Ratio";
         J: Text[30];
-        SalespersonFilter: Text[250];
+        SalespersonFilter: Text;
 }
 

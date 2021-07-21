@@ -120,7 +120,7 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         RecRef: RecordRef;
-        RecordView: Text;
+        RecordView: Text[1024];
         TempTaskLine: Record "NPR Task Line" temporary;
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin

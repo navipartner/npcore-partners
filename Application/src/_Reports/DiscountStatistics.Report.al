@@ -256,12 +256,12 @@ report 6014402 "NPR Discount Statistics"
     var
         CompanyInformation: Record "Company Information";
         ShowItemLedger: Boolean;
-        DateFilter: Code[50];
-        DiscountFilter: Code[50];
-        ItemNoFilter: Code[50];
-        POSUnitFilter: Code[50];
-        SalesPersonFilter: Code[50];
-        SupplierFilter: Code[50];
+        DateFilter: Text;
+        DiscountFilter: Text;
+        ItemNoFilter: Text;
+        POSUnitFilter: Text;
+        SalesPersonFilter: Text;
+        SupplierFilter: Text;
         SalesLCY: Decimal;
         Total_VE_Discount_Amt: Decimal;
         Total_VE_Qty: Decimal;
