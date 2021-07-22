@@ -267,6 +267,11 @@ table 6060126 "NPR MM Member"
     end;
 
     trigger OnModify()
+    begin
+        UpdateContactFromMember();
+    end;
+
+    procedure UpdateContactFromMember()
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipRole: Record "NPR MM Membership Role";
@@ -279,7 +284,6 @@ table 6060126 "NPR MM Member"
                 MembershipManagement.UpdateContactFromMember(MembershipRole."Membership Entry No.", Rec);
             until (MembershipRole.Next() = 0);
         end;
-
     end;
 
     // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
