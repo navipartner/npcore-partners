@@ -425,22 +425,30 @@ table 6150621 "NPR POS Entry"
         }
         key(Key3; "POS Store Code", "POS Unit No.", "Document No.")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         key(Key4; "Document No.")
-        {
-        }
+        { }
 
         key(Key5; "Customer No.", "Post Entry Status")
-        { }
+        {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
+        }
 
         key(Key6; "Salesperson Code", "Post Entry Status")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         key(Key7; "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
         {
             SumIndexFields = "Amount Excl. Tax", "Amount Incl. Tax";
             MaintainSqlIndex = false;
         }
+        key(Key8; "Fiscal No.")
+        { }
     }
 
     fieldgroups

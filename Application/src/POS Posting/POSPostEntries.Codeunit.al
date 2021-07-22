@@ -131,13 +131,13 @@
         LineCount: Integer;
     begin
         ShowProgressDialog := false;
-        if GuiAllowed then begin
+        if GuiAllowed() then begin
             PerEntryDialog.Open(Text006);
             NoOfRecords := POSEntry.Count();
         end;
         if POSEntry.FindSet() then
             repeat
-                if GuiAllowed then begin
+                if GuiAllowed() then begin
                     LineCount := LineCount + 1;
                     PerEntryDialog.Update(1, POSEntry."Entry No.");
                     PerEntryDialog.Update(2, Round(LineCount / NoOfRecords * 10000, 1));
@@ -146,7 +146,7 @@
                 Code(POSEntry2);
                 Commit();
             until POSEntry.Next() = 0;
-        if GuiAllowed then
+        if GuiAllowed() then
             PerEntryDialog.Close();
     end;
 
@@ -1752,17 +1752,17 @@
             exit;
         if POSPostingBuffer.Type <> POSPostingBuffer.Type::Customer then
             exit;
-        if POSPostingBuffer."Applies-to Doc. No." = '' then
-            exit;
 
         CustLedgerEntry.SetAutoCalcFields("Remaining Amount");
-        CustLedgerEntry.SetRange("Customer No.", POSPostingBuffer."No.");
-        CustLedgerEntry.SetRange("Document No.", POSPostingBuffer."Applies-to Doc. No.");
+        CustLedgerEntry.SetCurrentKey("Document Type", "Customer No.", Open, "Due Date");
         CustLedgerEntry.SetRange("Document Type", POSPostingBuffer."Applies-to Doc. Type");
+        CustLedgerEntry.SetRange("Customer No.", POSPostingBuffer."No.");
         CustLedgerEntry.SetRange(Open, true);
-        if not CustLedgerEntry.FindFirst() then
+        CustLedgerEntry.SetRange("Document No.", POSPostingBuffer."Applies-to Doc. No.");
+        if CustLedgerEntry.IsEmpty() then
             exit;
 
+        CustLedgerEntry.FindFirst();
         if CustLedgerEntry.Positive then begin
             if CustLedgerEntry."Remaining Amount" < -POSPostingBuffer.Amount then
                 exit;
@@ -1770,6 +1770,7 @@
             if CustLedgerEntry."Remaining Amount" > -POSPostingBuffer.Amount then
                 exit;
         end;
+
 
         GenJournalLine.Validate("Applies-to Doc. Type", POSPostingBuffer."Applies-to Doc. Type");
         GenJournalLine.Validate("Applies-to Doc. No.", POSPostingBuffer."Applies-to Doc. No.");
