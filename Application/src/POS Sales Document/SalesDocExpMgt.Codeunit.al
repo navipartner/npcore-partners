@@ -21,9 +21,7 @@
         TransferSalesPerson: Boolean;
         TransferPostingSetup: Boolean;
         TransferDimensions: Boolean;
-        TransferPaymentMethod: Boolean;
         TransferTaxSetup: Boolean;
-        TransferTransactionData: Boolean;
         AutoReserveSalesLines: Boolean;
         SendPostedPdf2Nav: Boolean;
         PrintingErrorTxt: Label 'Printing of Documents failed with error: %1';
@@ -45,6 +43,8 @@
         SendICOrderConf: Boolean;
         UseLocationFrom: Option "POS Unit","POS Store","POS Sale","Specific Location";
         UseLocationCode: Code[10];
+
+        PaymentMethodCode: Code[10];
         CustomerCreditCheck: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
 
@@ -118,11 +118,6 @@
         TransferDimensions := TransferDimensionsIn;
     end;
 
-    procedure SetTransferPaymentMethod(TransferPaymentMethodIn: Boolean)
-    begin
-        TransferPaymentMethod := TransferPaymentMethodIn;
-    end;
-
     procedure SetTransferTaxSetup(TransferTaxSetupIn: Boolean)
     begin
         TransferTaxSetup := TransferTaxSetupIn;
@@ -167,6 +162,11 @@
     procedure SetCustomerCreditCheck(Set: Boolean)
     begin
         CustomerCreditCheck := Set;
+    end;
+
+    procedure SetPaymentMethod(NewPaymentMethodCode: Code[10])
+    begin
+        PaymentMethodCode := NewPaymentMethodCode;
     end;
 
     procedure ProcessPOSSale(var SalePOS: Record "NPR POS Sale")
@@ -311,6 +311,7 @@
         SalesHeader."Your Reference" := SalePOS.Reference;
         SalesHeader."External Document No." := SalePOS."External Document No.";
         SalesHeader.Validate("Location Code", GetLocationCode(SalePOS));
+        SalesHeader.Validate("Payment Method Code", PaymentMethodCode);
         SalesHeader.Ship := Ship;
         SalesHeader.Invoice := Invoice;
         SalesHeader.Receive := Receive;
@@ -543,9 +544,6 @@
     end;
 
     local procedure TransferInfoFromSalePOS(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
-    var
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if TransferSalesPerson then begin
             if SalePOS."Salesperson Code" <> '' then
@@ -565,26 +563,11 @@
             SalesHeader."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
         end;
 
-        if TransferPaymentMethod then begin
-            SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SaleLinePOS.SetRange(Date, SalePOS.Date);
-            SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
-            if SaleLinePOS.FindFirst() then
-                if POSPaymentMethod.Get(SaleLinePOS."No.") then
-                    if POSPaymentMethod."Payment Method Code" <> '' then
-                        SalesHeader.Validate("Payment Method Code", POSPaymentMethod."Payment Method Code");
-        end;
-
         if TransferTaxSetup then begin
             if SalePOS."Tax Area Code" <> '' then
                 SalesHeader.Validate("Tax Area Code", SalePOS."Tax Area Code");
             if SalePOS."Tax Liable" then
                 SalesHeader.Validate("Tax Liable", true);
-        end;
-
-        if TransferTransactionData then begin
-
         end;
     end;
 
@@ -612,9 +595,6 @@
                 SalesLine.Validate("Tax Liable", true);
         end;
 
-        if TransferTransactionData then begin
-
-        end;
     end;
 
     procedure ReserveSalesLines(var SalesHeader: Record "Sales Header"; WithError: Boolean)

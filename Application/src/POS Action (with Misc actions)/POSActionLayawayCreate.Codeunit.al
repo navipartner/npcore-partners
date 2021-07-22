@@ -174,7 +174,6 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         RetailSalesDocMgt.SetTransferSalesPerson(true);
         RetailSalesDocMgt.SetTransferPostingsetup(true);
         RetailSalesDocMgt.SetTransferDimensions(true);
-        RetailSalesDocMgt.SetTransferPaymentMethod(true);
         RetailSalesDocMgt.SetTransferTaxSetup(true);
         RetailSalesDocMgt.SetAutoReserveSalesLine(ReserveItems);
         RetailSalesDocMgt.SetAsk(false);

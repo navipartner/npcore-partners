@@ -40,6 +40,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionRetailPrint: Label 'Retail Confirmation Print';
         CaptionOpenDoc: Label 'Open Document';
         CaptionCheckCustCredit: Label 'Check Customer Credit';
+
         DescAskExtDocNo: Label 'Ask user to input external document number';
         DescAskAttention: Label 'Ask user to input attention';
         DescAskYourRef: Label 'Ask user to input ''Your Reference''';
@@ -106,6 +107,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
         DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
         ReadingErr: Label 'reading in %1 of %2';
+        CaptionPaymentMethodCode: Label 'Payment Method Code';
+        DescPaymentMethodCode: Label 'Select Payment Method Code to be used for sales document';
         CaptionCustomerTableView: Label 'Customer Table View';
         CaptionCustomerLookupPage: Label 'Customer Lookup Page';
         DescCustomerTableView: Label 'Pre-filtered customer list';
@@ -118,7 +121,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.12');
+        exit('1.13');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -162,7 +165,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             Sender.RegisterBooleanParameter('AskYourRef', false);
             Sender.RegisterBooleanParameter('SetTransferSalesperson', true);
             Sender.RegisterBooleanParameter('SetTransferDimensions', true);
-            Sender.RegisterBooleanParameter('SetTransferPaymentMethod', true);
             Sender.RegisterBooleanParameter('SetTransferTaxSetup', true);
             Sender.RegisterBooleanParameter('ConfirmExport', true);
             Sender.RegisterBooleanParameter('PrepaymentDialog', false);
@@ -186,6 +188,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             Sender.RegisterOptionParameter('UseLocationFrom', '<Undefined>,POS Store,POS Sale,SpecificLocation', 'POS Store');
             Sender.RegisterTextParameter('UseSpecLocationCode', '');
             Sender.RegisterBooleanParameter('SendICOrderConfirmation', false);
+            Sender.RegisterTextParameter('PaymentMethodCode', '');
             Sender.RegisterTextParameter('CustomerTableView', '');
             Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
         end;
@@ -421,6 +424,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
         LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
         SpecificLocationCode: Code[10];
+        PaymentMethodCode: Code[10];
     begin
         RetailSalesDocMgt.SetAsk(JSON.GetBooleanParameterOrFail('SetAsk', ActionCode()));
         RetailSalesDocMgt.SetPrint(JSON.GetBooleanParameterOrFail('SetPrint', ActionCode()));
@@ -433,7 +437,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         RetailSalesDocMgt.SetTransferSalesPerson(JSON.GetBooleanParameterOrFail('SetTransferSalesperson', ActionCode()));
         RetailSalesDocMgt.SetTransferPostingsetup(JSON.GetBooleanParameterOrFail('SetTransferPostingSetup', ActionCode()));
         RetailSalesDocMgt.SetTransferDimensions(JSON.GetBooleanParameterOrFail('SetTransferDimensions', ActionCode()));
-        RetailSalesDocMgt.SetTransferPaymentMethod(JSON.GetBooleanParameterOrFail('SetTransferPaymentMethod', ActionCode()));
         RetailSalesDocMgt.SetTransferTaxSetup(JSON.GetBooleanParameterOrFail('SetTransferTaxSetup', ActionCode()));
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(JSON.GetBooleanParameterOrFail('OpenDocumentAfterExport', ActionCode()));
         RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameterOrFail('SetSend', ActionCode()));
@@ -476,6 +479,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         if (LocationSource = LocationSource::SpecificLocation) and (SpecificLocationCode = '') then
             Error(SpecLocationCodeMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom), CaptionUseSpecLocationCode);
         RetailSalesDocMgt.SetLocationSource(LocationSource, SpecificLocationCode);
+        PaymentMethodCode := JSON.GetStringParameter('PaymentMethodCode');
+        RetailSalesDocMgt.SetPaymentMethod(PaymentMethodCode);
     end;
 
     local procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal
@@ -662,6 +667,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := CaptionUseSpecLocationCode;
             'SendICOrderConfirmation':
                 Caption := CaptionSendICOrderConfirmation;
+            'PaymentMethodCode':
+                Caption := CaptionPaymentMethodCode;
             'CustomerTableView':
                 Caption := CaptionCustomerTableView;
             'CustomerLookupPage':
@@ -758,6 +765,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := StrSubstNo(DescUseSpecLocationCode, CaptionUseLocationFrom, SelectStr(4, OptionUseLocationFrom));
             'SendICOrderConfirmation':
                 Caption := DescSendICOrderConfirmation;
+            'PaymentMethodCode':
+                Caption := DescPaymentMethodCode;
             'CustomerTableView':
                 Caption := DescCustomerTableView;
             'CustomerLookupPage':
@@ -785,6 +794,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         Location: Record Location;
+        PaymentMethod: Record "Payment Method";
         FilterBuilder: FilterPageBuilder;
         Customer: Record Customer;
     begin
@@ -799,6 +809,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                     Location.FilterGroup(0);
                     if PAGE.RunModal(0, Location) = ACTION::LookupOK then
                         POSParameterValue.Value := Location.Code;
+                end;
+            'PaymentMethodCode':
+                begin
+                    if PAGE.RunModal(0, PaymentMethod) = ACTION::LookupOK then
+                        POSParameterValue.Value := PaymentMethod.Code;
                 end;
             'CustomerTableView':
                 begin
@@ -817,6 +832,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         Location: Record Location;
+        PaymentMethod: Record "Payment Method";
         Customer: Record Customer;
         PageId: Integer;
         PageMetadata: Record "Page Metadata";
@@ -832,6 +848,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                     Location.SetRange("Use As In-Transit", false);
                     Location.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Location.Code));
                     Location.Find();
+                end;
+            'PaymentMethodCode':
+                begin
+                    if PAGE.RunModal(0, PaymentMethod) = ACTION::LookupOK then
+                        POSParameterValue.Value := PaymentMethod.Code;
                 end;
             'CustomerTableView':
                 begin

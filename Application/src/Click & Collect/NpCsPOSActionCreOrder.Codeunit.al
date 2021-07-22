@@ -545,7 +545,6 @@
         RetailSalesDocMgt.SetTransferSalesPerson(true);
         RetailSalesDocMgt.SetTransferPostingsetup(true);
         RetailSalesDocMgt.SetTransferDimensions(true);
-        RetailSalesDocMgt.SetTransferPaymentMethod(true);
         RetailSalesDocMgt.SetTransferTaxSetup(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
         RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('Check Customer Credit'));
