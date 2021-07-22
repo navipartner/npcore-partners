@@ -204,6 +204,8 @@ table 6150616 "NPR POS Payment Method"
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
             TableRelation = "Payment Method";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(520; "EFT Surcharge Service Item No."; Code[20])
         {

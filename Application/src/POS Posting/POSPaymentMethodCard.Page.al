@@ -31,13 +31,11 @@ page 6150619 "NPR POS Payment Method Card"
                     ValuesAllowed = CASH, VOUCHER, CHECK, EFT, PAYOUT, "FOREIGN VOUCHER";
                 }
 
-                field("Return Payment Method Code";
-                Rec."Return Payment Method Code")
+                field("Return Payment Method Code"; Rec."Return Payment Method Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Return Payment Method Code field. Return Payment Method will be used for return of overpaid amount.';
-                    ShowMandatory = true;
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Return Payment Method Code field. Return Payment Method will be used for return of overpaid amount. For Foreign Currency, we need to set it to the POS Payment Method used for local currency as we return the overpaid amount in local currency.';
+                    ShowMandatory = true;
                 }
                 field("Block POS Payment"; Rec."Block POS Payment")
                 {
@@ -51,7 +49,6 @@ page 6150619 "NPR POS Payment Method Card"
                     ToolTip = 'Specifies if drawer will open after POS Transaction ends if selected POS Payment Mehod is used in transaction.';
                     ApplicationArea = NPRRetail;
                 }
-
             }
             group(Other)
             {
@@ -70,12 +67,6 @@ page 6150619 "NPR POS Payment Method Card"
                     ApplicationArea = NPRRetail;
                 }
 
-                field("Payment Method Code"; Rec."Payment Method Code")
-                {
-
-                    ToolTip = 'Specifies which Payment Method is connected to selected POS Payment Mehod. Payment Method Code is used when converting POS Sale to Sales Order.';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Currency Code"; Rec."Currency Code")
                 {
 
@@ -106,29 +97,10 @@ page 6150619 "NPR POS Payment Method Card"
                     ToolTip = 'Specifies if Payment input popup for selected POS Payment Method defaults to zero.';
                     ApplicationArea = NPRRetail;
                 }
-
                 field("Auto End Sale"; Rec."Auto End Sale")
                 {
 
                     ToolTip = 'Specifies if POS Transaction automatically ends when POS Payment method is selected.';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Forced Amount"; Rec."Forced Amount")
-                {
-
-                    ToolTip = 'Specifies if amount is forced when using selected POS Payment Method in transaction or you can enter the amount yourself. Works on POS Payment Methods type EFT.';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Match Sales Amount"; Rec."Match Sales Amount")
-                {
-
-                    ToolTip = 'Specifies if EFT Terminal matches amount of POS Transaction.';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Reverse Unrealized VAT"; Rec."Reverse Unrealized VAT")
-                {
-
-                    ToolTip = 'Specifies if Unrealized VAT will be reversed when posting Payment line.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -138,8 +110,6 @@ page 6150619 "NPR POS Payment Method Card"
                     ToolTip = 'Specifies if there is limit for Minimum Amount for selected POS Payment Method on Web Orders.';
                     ApplicationArea = NPRRetail;
                 }
-
-
             }
             group(Rounding)
             {
@@ -190,6 +160,22 @@ page 6150619 "NPR POS Payment Method Card"
                     ToolTip = 'Specifies if refund is allowed for selected POS Payment Method.';
                     ApplicationArea = NPRRetail;
                 }
+
+            }
+            group(EFT)
+            {
+                Caption = 'EFT';
+                Visible = Rec."Processing Type" = Rec."Processing Type"::EFT;
+                field("Forced Amount"; Rec."Forced Amount")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if amount is forced when using selected POS Payment Method in transaction or you can enter the amount yourself. Works on POS Payment Methods type EFT.';
+                }
+                field("Match Sales Amount"; Rec."Match Sales Amount")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if EFT Terminal matches amount of POS Transaction.';
+                }
                 field("EFT Surcharge Service Item No."; Rec."EFT Surcharge Service Item No.")
                 {
 
@@ -202,7 +188,17 @@ page 6150619 "NPR POS Payment Method Card"
                     ToolTip = 'Specifies which Service Item will be used for EFT Tip.';
                     ApplicationArea = NPRRetail;
                 }
+            }
 
+            group(Vouchers)
+            {
+                Caption = 'Vouchers';
+                Visible = Rec."Processing Type" = Rec."Processing Type"::VOUCHER;
+                field("Reverse Unrealized VAT"; Rec."Reverse Unrealized VAT")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if Unrealized VAT will be reversed when posting Payment line.';
+                }
             }
         }
     }
