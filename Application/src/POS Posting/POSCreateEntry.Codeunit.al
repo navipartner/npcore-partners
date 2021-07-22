@@ -1246,14 +1246,13 @@
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateFindRecords', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateFindRecords', '', true, true)]
     local procedure OnNavigateFindRecords(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
         RecordCount: Integer;
     begin
-
         if (POSEntry.ReadPermission) then begin
             if not (POSEntry.SetCurrentKey(POSEntry."Document No.")) then;
             POSEntry.Reset();
@@ -1282,7 +1281,7 @@
 
     end;
 
-    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateShowRecords', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
     local procedure OnNavigateShowRecords(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean)
     var
         POSEntry: Record "NPR POS Entry";
@@ -1308,7 +1307,7 @@
 #else
             if (TempDocumentEntry."Document Type".AsInteger() = 1) then begin
 #endif
-                if not (POSEntry.SetCurrentKey(POSEntry."Fiscal No.")) then;
+                POSEntry.SetCurrentKey("Fiscal No.");
                 POSEntry.SetFilter("Fiscal No.", TempDocumentEntry."Document No.");
             end;
 

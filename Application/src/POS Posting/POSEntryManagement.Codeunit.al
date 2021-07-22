@@ -249,6 +249,7 @@ codeunit 6150629 "NPR POS Entry Management"
     begin
         //DocumentNo = Unique, volatile front end no. (=SalePOS."Sales Ticket No.")
         Clear(POSEntryOut);
+        POSEntryOut.SetCurrentKey("Document No.");
         POSEntryOut.SetRange("Document No.", DocumentNo);
         exit(POSEntryOut.FindFirst());
     end;
@@ -257,6 +258,7 @@ codeunit 6150629 "NPR POS Entry Management"
     begin
         //FiscalNo = Back end no. - Can be different from DocumentNo
         Clear(POSEntryOut);
+        POSEntryOut.SetCurrentKey("Fiscal No.");
         POSEntryOut.SetRange("Fiscal No.", FiscalNo);
         exit(POSEntryOut.FindFirst());
     end;

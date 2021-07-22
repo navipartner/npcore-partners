@@ -209,11 +209,12 @@
             end else begin
                 //Normal Sale
                 ItemLedgerEntry.Reset();
+                ItemLedgerEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.");
+                ItemLedgerEntry.SetRange("Item No.", ItemJournalLine."Item No.");
                 ItemLedgerEntry.SetRange(Open, true);
+                ItemLedgerEntry.SetRange("Variant Code", ItemJournalLine."Variant Code");
                 ItemLedgerEntry.SetRange(Positive, true);
                 ItemLedgerEntry.SetRange("Serial No.", ItemJournalLine."Serial No.");
-                ItemLedgerEntry.SetRange("Item No.", ItemJournalLine."Item No.");
-                ItemLedgerEntry.SetRange("Variant Code", ItemJournalLine."Variant Code");
                 ItemLedgerEntry.FindFirst();
                 ReservationEntry."Creation Date" := ItemLedgerEntry."Posting Date";
             end;
