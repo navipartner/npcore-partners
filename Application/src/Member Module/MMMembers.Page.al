@@ -1,6 +1,5 @@
 page 6060126 "NPR MM Members"
 {
-
     Caption = 'Members';
     CardPageID = "NPR MM Member Card";
     DataCaptionExpression = Rec."External Member No.";
@@ -12,7 +11,6 @@ page 6060126 "NPR MM Members"
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -21,109 +19,91 @@ page 6060126 "NPR MM Members"
             {
                 field("External Member No."; Rec."External Member No.")
                 {
-
                     ToolTip = 'Specifies the value of the External Member No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("First Name"; Rec."First Name")
                 {
-
                     ToolTip = 'Specifies the value of the First Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Middle Name"; Rec."Middle Name")
                 {
-
                     ToolTip = 'Specifies the value of the Middle Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
-
                     ToolTip = 'Specifies the value of the Last Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-
                     ToolTip = 'Specifies the value of the Blocked field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Gender; Rec.Gender)
                 {
-
                     ToolTip = 'Specifies the value of the Gender field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Birthday; Rec.Birthday)
                 {
-
                     ToolTip = 'Specifies the value of the Birthday field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact No."; Rec."Contact No.")
                 {
-
                     ToolTip = 'Specifies the value of the Contact No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
-
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Address; Rec.Address)
                 {
-
                     ToolTip = 'Specifies the value of the Address field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Code Code"; Rec."Post Code Code")
                 {
-
                     ToolTip = 'Specifies the value of the ZIP Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(City; Rec.City)
                 {
-
                     ToolTip = 'Specifies the value of the City field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Country; Rec.Country)
                 {
-
                     ToolTip = 'Specifies the value of the Country field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Display Name"; Rec."Display Name")
                 {
-
                     ToolTip = 'Specifies the value of the Display Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
-
                     ToolTip = 'Specifies the value of the Store Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -139,7 +119,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -155,7 +134,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -171,7 +149,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -187,7 +164,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -203,7 +179,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -219,7 +194,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -235,7 +209,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -251,7 +224,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -267,7 +239,6 @@ page 6060126 "NPR MM Members"
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -297,7 +268,6 @@ page 6060126 "NPR MM Members"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Create Membership action';
                 ApplicationArea = NPRRetail;
 
@@ -328,7 +298,6 @@ page 6060126 "NPR MM Members"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Register Arrival action';
                 ApplicationArea = NPRRetail;
 
@@ -349,15 +318,12 @@ page 6060126 "NPR MM Members"
             {
                 Caption = 'Synchronize Contact';
                 Image = CreateInteraction;
-
                 ToolTip = 'Executes the Synchronize Contact action';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 begin
-
                     SyncContact();
-
                 end;
             }
             action(SetNPRAttributeFilter)
@@ -368,8 +334,7 @@ page 6060126 "NPR MM Members"
                 PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
-
+                Visible = AttributesVisible;
                 ToolTip = 'Executes the Set Client Attribute Filter action';
                 ApplicationArea = NPRRetail;
 
@@ -377,7 +342,6 @@ page 6060126 "NPR MM Members"
                 var
                     NPRAttributeValueSet: Record "NPR Attribute Value Set";
                 begin
-
                     if (not NPRAttrManagement.SetAttributeFilter(NPRAttributeValueSet)) then
                         exit;
 
@@ -399,7 +363,6 @@ page 6060126 "NPR MM Members"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
                 RunPageLink = "Member Entry No." = FIELD("Entry No.");
-
                 ToolTip = 'Executes the Preferred Com. Methods action';
                 ApplicationArea = NPRRetail;
             }
@@ -414,7 +377,6 @@ page 6060126 "NPR MM Members"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Member No." = FIELD("External Member No.");
-
                 ToolTip = 'Executes the Arrival Log action';
                 ApplicationArea = NPRRetail;
             }
@@ -430,18 +392,18 @@ page 6060126 "NPR MM Members"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-
                     ToolTip = 'Executes the Browsing History action';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
                         RaptorAction: Record "NPR Raptor Action";
+                        Membership: Record "NPR MM Membership";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-
+                        GetMembershipFromRole(Membership);
                         if (Membership."Customer No." = '') then
-                            Error(NO_ENTRIES, Rec."External Member No.");
+                            Error(EntriesNotFoundForMemberErr, Rec."External Member No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
@@ -456,18 +418,18 @@ page 6060126 "NPR MM Members"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
-
                     ToolTip = 'Executes the Recommendations action';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
                         RaptorAction: Record "NPR Raptor Action";
+                        Membership: Record "NPR MM Membership";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-
+                        GetMembershipFromRole(Membership);
                         if (Membership."Customer No." = '') then
-                            Error(NO_ENTRIES, Rec."External Member No.");
+                            Error(EntriesNotFoundForMemberErr, Rec."External Member No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
 
@@ -477,33 +439,17 @@ page 6060126 "NPR MM Members"
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    var
-        MembershipRole: Record "NPR MM Membership Role";
-    begin
-
-        Clear(Membership);
-        MembershipRole.SetRange("Member Entry No.", Rec."Entry No.");
-        MembershipRole.SetRange(Blocked, false);
-        if MembershipRole.FindFirst() then
-            Membership.Get(MembershipRole."Membership Entry No.");
-
-    end;
-
     trigger OnAfterGetRecord()
     begin
-
         GetMasterDataAttributeValue();
-
     end;
 
     trigger OnOpenPage()
     var
         RaptorSetup: Record "NPR Raptor Setup";
+        i: Integer;
     begin
-
         NPRAttrManagement.GetAttributeVisibility(GetAttributeTableId(), NPRAttrVisibleArray);
-        // Because NAV is stupid!
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
         NPRAttrVisible03 := NPRAttrVisibleArray[3];
@@ -515,12 +461,14 @@ page 6060126 "NPR MM Members"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
+        for i := 1 to ArrayLen(NPRAttrVisibleArray) do
+            AttributesVisible := AttributesVisible or NPRAttrVisibleArray[i];
+
         RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
 
     end;
 
     var
-        Membership: Record "NPR MM Membership";
         NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
@@ -535,9 +483,10 @@ page 6060126 "NPR MM Members"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
-        CONFIRM_SYNC: Label 'Do you want to sync the contacts for %1 members?';
+        AttributesVisible: Boolean;
         RaptorEnabled: Boolean;
-        NO_ENTRIES: Label 'No entries found for member %1.';
+        ConfirmContactSynchQst: Label 'Do you want to sync the contacts for %1 members?', Comment = '%1=Member.Count()';
+        EntriesNotFoundForMemberErr: Label 'No entries found for member %1.', Comment = '%1=Rec."External Member No."';
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
@@ -548,17 +497,10 @@ page 6060126 "NPR MM Members"
 
     local procedure GetMasterDataAttributeValue()
     begin
-
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
-        NPRAttrEditable := CurrPage.Editable();
-
-    end;
-
-    procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
-    begin
-
-        exit(NPRAttrVisibleArray[AttributeNumber]);
-
+        if AttributesVisible then begin
+            NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
+            NPRAttrEditable := CurrPage.Editable();
+        end;
     end;
 
     local procedure GetAttributeTableId(): Integer
@@ -578,18 +520,21 @@ page 6060126 "NPR MM Members"
     local procedure SyncContact()
     var
         Member: Record "NPR MM Member";
+        MemberCount: Integer;
     begin
-
         CurrPage.SetSelectionFilter(Member);
-        if (Member.FindSet()) then begin
-            if (Member.Count() > 1) then
-                if (not Confirm(CONFIRM_SYNC, true, Member.Count())) then
+        if not Member.IsEmpty() then begin
+            MemberCount := Member.Count();
+            if MemberCount > 1 then
+                if not Confirm(ConfirmContactSynchQst, true, MemberCount) then
                     Error('');
+
+            Member.FindSet(true);
             repeat
-                Member.Modify(true);
+                Member.UpdateContactFromMember();
+                Member.Modify();
             until (Member.Next() = 0);
         end;
-
     end;
 
     local procedure SelectMembershipSetup(var MembershipSalesSetup: Record "NPR MM Members. Sales Setup"): Boolean
@@ -611,7 +556,6 @@ page 6060126 "NPR MM Members"
         end;
 
         exit(false);
-
     end;
 
     local procedure CreateMembership(MembershipSalesSetup: Record "NPR MM Members. Sales Setup") MembershipEntryNo: Integer
@@ -651,9 +595,18 @@ page 6060126 "NPR MM Members"
                 else
                     Error('Not implemented.');
             end;
-
         end;
+    end;
 
+    local procedure GetMembershipFromRole(var Membership: Record "NPR MM Membership")
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        Clear(Membership);
+        MembershipRole.SetRange("Member Entry No.", Rec."Entry No.");
+        MembershipRole.SetRange(Blocked, false);
+        if MembershipRole.FindFirst() then
+            Membership.Get(MembershipRole."Membership Entry No.");
     end;
 }
 

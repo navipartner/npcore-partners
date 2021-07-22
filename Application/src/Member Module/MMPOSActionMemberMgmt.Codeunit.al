@@ -1,10 +1,5 @@
 codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         QTY_CANT_CHANGE: Label 'Changing quantity for membership sales is not possible.';
         ActionDescription: Label 'This action handles member management functions.';
@@ -22,7 +17,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
         NOT_MEMBERSHIP_SALES: Label 'The selected sales line is not a membership sales.';
-        Text000: Label 'Update Membership metadata on Sale Line Insert';
+        UpdateMembershipMetadataLbl: Label 'Update Membership metadata on Sale Line Insert';
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         MembershipEvents: Codeunit "NPR MM Membership Events";
 
@@ -36,7 +31,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         exit('1.5');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Codeunit::"NPR POS JSON Management", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
     var
         FunctionOptionString: Text;
@@ -52,7 +47,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
-
             FunctionOptionString := 'Member Arrival,' +
                                     'Select Membership,' +
                                     'View Membership Entry,Regret Membership Entry,' +
@@ -74,7 +68,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode(), 'MemberCardPrompt', MemberCardPrompt);
@@ -83,7 +77,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         Captions.AddActionCaption(ActionCode(), 'MembershipTitle', MembershipTitle);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -93,7 +87,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         DialogMethodType: Option;
         DefaultInputValue: Text;
     begin
-
         if (not Action.IsThisAction(ActionCode())) then
             exit;
 
@@ -160,7 +153,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
     local procedure UpdateMembershipOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
@@ -182,7 +175,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 Message('%1', MemberRetailIntegration.GetErrorText(ReturnCode));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeDeletePOSSaleLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
@@ -195,7 +188,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         DeleteMemberInfoCapture(SaleLinePOS);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
     local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -820,22 +813,26 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
     begin
-
         exit(SelectMemberCardViaMemberUI(ExtMemberCardNo));
-
     end;
 
     local procedure SelectMemberUI(var ExtMemberNo: Code[20]): Boolean
     var
         Member: Record "NPR MM Member";
     begin
-
         if (ACTION::LookupOK <> PAGE.RunModal(0, Member)) then
             exit(false);
 
         ExtMemberNo := Member."External Member No.";
         exit(ExtMemberNo <> '');
+    end;
 
+    local procedure SelectMemberUI(var Member: Record "NPR MM Member"): Boolean
+    begin
+        if ACTION::LookupOK <> PAGE.RunModal(0, Member) then
+            exit;
+
+        exit(Member."External Member No." <> '');
     end;
 
     local procedure SelectMemberCardViaMemberUI(var ExtMemberCardNo: Text[100]): Boolean
@@ -843,54 +840,60 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
         MemberCardList: Page "NPR MM Member Card List";
-        ExtMemberNo: Code[20];
+        MemberCardCount: Integer;
     begin
-
-        if (not SelectMemberUI(ExtMemberNo)) then
-            exit(false);
-
-        Member.SetFilter("External Member No.", '=%1', ExtMemberNo);
-        Member.SetFilter(Blocked, '=%1', false);
-        if (not Member.FindFirst()) then
-            exit(false);
+        Member.SetRange(Blocked, false);
+        if not SelectMemberUI(Member) then
+            exit;
 
         MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
         MemberCard.SetFilter(Blocked, '=%1', false);
-        MemberCard.SetFilter("Valid Until", '=%1|>=%2', 0D, Today);
-        if (MemberCard.Count() > 1) then begin
-            MemberCardList.SetTableView(MemberCard);
-            MemberCardList.Editable(false);
-            MemberCardList.LookupMode(true);
-            if (ACTION::LookupOK <> MemberCardList.RunModal()) then
-                exit(false);
+        MemberCard.SetFilter("Valid Until", '=%1|>=%2', 0D, Today());
+        MemberCardCount := MemberCard.Count();
 
-            MemberCardList.GetRecord(MemberCard);
-
-        end else begin
-            if (not MemberCard.FindFirst()) then begin
-                MemberCard.Reset();
-                MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
-                MemberCard.SetFilter(Blocked, '=%1', false);
-                if (MemberCard.Count() > 1) then begin
+        case true of
+            MemberCardCount > 1:
+                begin
                     MemberCardList.SetTableView(MemberCard);
                     MemberCardList.Editable(false);
                     MemberCardList.LookupMode(true);
                     if (ACTION::LookupOK <> MemberCardList.RunModal()) then
                         exit(false);
+
                     MemberCardList.GetRecord(MemberCard);
-                end else begin
-                    if (not MemberCard.FindFirst()) then
-                        exit(false);
                 end;
-            end;
+            MemberCardCount = 1:
+                begin
+                    MemberCard.FindFirst();
+                end;
+            else begin
+                    MemberCard.Reset();
+                    MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
+                    MemberCard.SetFilter(Blocked, '=%1', false);
+                    MemberCardCount := MemberCard.Count();
+                    case true of
+                        MemberCardCount > 1:
+                            begin
+                                MemberCardList.SetTableView(MemberCard);
+                                MemberCardList.Editable(false);
+                                MemberCardList.LookupMode(true);
+                                if ACTION::LookupOK <> MemberCardList.RunModal() then
+                                    exit;
+                                MemberCardList.GetRecord(MemberCard);
+                            end;
+                        else begin
+                                if not MemberCard.FindFirst() then
+                                    exit;
+                            end;
+                    end;
+                end;
         end;
 
         ExtMemberCardNo := MemberCard."External Card No.";
         exit(true);
-
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl", 'OnAfterLoadFromQuote', '', true, true)]
     local procedure OnBeforeLoadSavedSaleSubscriber(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -899,7 +902,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         OriginalSalesTicketNo: Code[20];
         NewSalesTicketNo: Code[20];
     begin
-
         OriginalSalesTicketNo := POSQuoteEntry."Sales Ticket No.";
         NewSalesTicketNo := SalePOS."Sales Ticket No.";
 
@@ -913,9 +915,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             until (MemberInfoCapture.Next() = 0);
         end;
 
-        if (POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0)) then begin
+        if POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0) then begin
             POSSalesInfo."Receipt No." := NewSalesTicketNo;
-            if (not (POSSalesInfo.Insert())) then;
+            if not POSSalesInfo.Insert() then;
         end;
 
         POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::LINE);
@@ -929,31 +931,27 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-
         if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
 
         case Rec."Subscriber Function" of
             'UpdateMembershipOnSaleLineInsert':
                 begin
-                    Rec.Description := Text000;
+                    Rec.Description := UpdateMembershipMetadataLbl;
                     Rec."Sequence No." := 30;
                 end;
         end;
-
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-
         exit(CODEUNIT::"NPR MM POS Action: MemberMgmt.");
-
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnAfterLogin', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnAfterLogin', '', true, true)]
     local procedure OnAfterLogin_SelectMemberRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         SalePOS: Record "NPR POS Sale";
@@ -964,7 +962,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ExternalMemberNo: Code[20];
         MembershipSelected: Boolean;
     begin
-
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
 
@@ -979,21 +976,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ClearLastError();
 
         repeat
-
-            //  MembershipSelected := false;
-            //
-            //  if (ExternalMemberCardNo = '') then
-            //    if (not SelectMemberCardUI (ExternalMemberCardNo)) then
-            //      exit;
-            //
-            // if (MemberRetailIntegration.POS_ValidateMemberCardNo (false, true, DialogMethod::NO_PROMPT, true, ExternalMemberCardNo)) then
-            //    MembershipSelected := AssignPOSMembership (SalePOS, ExternalMemberCardNo);
-            //
-            //  if (not MembershipSelected) then begin
-            //    MESSAGE ('There was an error selecting member %1:\\%2', ExternalMemberCardNo, GetLASTERRORTEXT);
-            //    ExternalMemberCardNo := '';
-            //  end;
-
             MembershipSelected := false;
 
             if (ExternalMemberNo = '') then
@@ -1003,16 +985,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
                 Clear(POSMemberCardEdit);
 
-                //  POSMemberCard.LOOKUPMODE (true);
-                //  POSMemberCard.SETRECORD (Member);
-                //  //POSMemberCard.SetMembershipEntryNo (Membership."Entry No.");
-                //
-                //  if (POSMemberCard.RUNMODAL() = ACTION::LookupOK) then
-                //    MembershipSelected := AssignPOSMember (SalePOS, ExternalMemberNo);
-
                 POSMemberCardEdit.SetRecord(Member);
                 POSMemberCardEdit.LookupMode(true);
-                ClearLastError();  //MM1.45 [407500]
+                ClearLastError();
                 if (POSMemberCardEdit.RunModal() = ACTION::LookupOK) then
                     MembershipSelected := AssignPOSMember(SalePOS, ExternalMemberNo);
 
@@ -1031,10 +1006,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         end;
 
         POSSession.RequestRefreshData();
-
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnAfterLoginDiscovery(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 

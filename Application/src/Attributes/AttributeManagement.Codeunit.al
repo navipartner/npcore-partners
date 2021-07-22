@@ -75,16 +75,14 @@
         i: Integer;
     begin
         for i := 1 to ArrayLen(vAttributeVisibility) do begin
-            AttributeID.SetFilter("Table ID", '=%1', TableID);
-            AttributeID.SetFilter("Shortcut Attribute ID", '=%1', i);
+            AttributeID.SetRange("Table ID", TableID);
+            AttributeID.SetRange("Shortcut Attribute ID", i);
             vAttributeVisibility[i] := AttributeID.FindFirst();
 
             if (vAttributeVisibility[i]) then begin
                 Attribute.Get(AttributeID."Attribute Code");
-                if (Attribute.Blocked) then
-                    vAttributeVisibility[i] := false;
+                vAttributeVisibility[i] := not Attribute.Blocked;
             end;
-
         end;
     end;
 
