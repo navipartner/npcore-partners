@@ -434,7 +434,6 @@ page 6151504 "NPR Nc Import List"
         if ImportEntry.FindSet() then
             repeat
                 CODEUNIT.Run(CODEUNIT::"NPR Nc Import Processor", ImportEntry);
-                ImportEntry.Find();
                 ImportedCount += 1;
             until ImportEntry.Next() = 0;
         ImportEntry.SetRange("Runtime Error", true);
