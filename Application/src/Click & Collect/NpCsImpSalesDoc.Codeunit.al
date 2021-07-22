@@ -416,6 +416,18 @@
                     SalesLine.Validate("Line Amount", NpXmlDomMgt.GetElementDec(Element, 'line_amount', true));
                     SalesLine.Modify(true);
                 end;
+            SalesLine.Type::"G/L Account":
+                begin
+                    SalesLine.Validate("No.", NpXmlDomMgt.GetElementCode(Element, 'no', MaxStrLen(SalesLine."No."), true));
+                    SalesLine.Validate("Unit of Measure Code", NpXmlDomMgt.GetElementCode(Element, 'unit_of_measure_code', MaxStrLen(SalesLine."Unit of Measure Code"), true));
+                    SalesLine.Description := NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true);
+                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
+                    SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(Element, 'quantity', true));
+                    SalesLine.Validate("Unit Price", NpXmlDomMgt.GetElementDec(Element, 'unit_price', true));
+                    SalesLine.Validate("VAT %", NpXmlDomMgt.GetElementDec(Element, 'vat_pct', true));
+                    SalesLine.Validate("Line Amount", NpXmlDomMgt.GetElementDec(Element, 'line_amount', true));
+                    SalesLine.Modify(true);
+                end;
             SalesLine.Type::" ":
                 begin
                     SalesLine.Description := NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true);
