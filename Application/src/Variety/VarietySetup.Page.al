@@ -53,7 +53,7 @@ page 6059970 "NPR Variety Setup"
             }
             group("Barcode (Item Cross Ref.)")
             {
-                Caption = 'Barcode (Item Cross Ref.)';
+                Caption = 'Barcode (Item Ref.)';
                 field("Create Item Cross Ref. auto."; Rec."Create Item Cross Ref. auto.")
                 {
 
@@ -71,7 +71,7 @@ page 6059970 "NPR Variety Setup"
                 {
 
                     Editable = Rec."Create Item Cross Ref. auto.";
-                    ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Item) field';
+                    ToolTip = 'If value is set, then item reference with type Bar Code will be created for Item. For details, please check an actions on Item Card - Add Missing Barcode(s).';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -84,7 +84,7 @@ page 6059970 "NPR Variety Setup"
                 {
 
                     Editable = Rec."Create Item Cross Ref. auto.";
-                    ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Variant) field';
+                    ToolTip = 'If value is set, then item reference with type Bar Code will be created for each Item Variant. For details, please check an actions on Item Card - Add Missing Barcode(s).';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Cross Ref. Description(I)"; Rec."Item Cross Ref. Description(I)")

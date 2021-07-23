@@ -959,22 +959,38 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
                 }
 
-                action("NPR NPR_MissingBarcode")
+                action("NPRMissingBarcode")
                 {
                     Caption = 'Add missing Barcode(s)';
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     Image = BarCode;
-
-                    ToolTip = 'Executes the Add missing Barcode(s) action';
+                    ToolTip = 'New item reference(s), if not found, will be created based on No. Series set in Variety Setup. How many references are going to be created, it depends on Variety Setup. For details, please check group Barcode (Item Ref.) under the Variety Setup.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
-                        VRTCloneData: Codeunit 6059972;
+                        VRTCloneData: Codeunit "NPR Variety Clone Data";
                     begin
                         VRTCloneData.AssignBarcodes(Rec);
+                    end;
+                }
+                action("NPRCreateBarcode")
+                {
+                    Caption = 'Create Barcode';
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedIsBig = true;
+                    Image = BarCode;
+                    ToolTip = 'Window for setting custom barcode will be opened. After setting barcode, new item reference, if not found, will be created with value entered in opened window.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        VRTCloneData: Codeunit "NPR Variety Clone Data";
+                    begin
+                        VRTCloneData.AssignCustomBarcode(Rec."No.");
                     end;
                 }
             }

@@ -728,6 +728,20 @@
         );
     end;
 
+    procedure AssignCustomBarcode(ItemNo: Code[20])
+    var
+        InputBarcode: Page "NPR Variety Input Barcode";
+        ReferenceNo: Code[50];
+    begin
+        InputBarcode.LookupMode := true;
+        if InputBarcode.RunModal() <> ACTION::LookupOK then
+            exit;
+        ReferenceNo := InputBarcode.GetBarcode();
+        if ReferenceNo = '' then
+            exit;
+        InsertItemRef(ItemNo, '', ReferenceNo, Enum::"Item Reference Type"::"Bar Code", '');
+    end;
+
     procedure AssignBarcodes(Item: Record Item)
     var
         ItemVar: Record "Item Variant";
@@ -740,21 +754,21 @@
             ItemRef.SetRange("Item No.", Item."No.");
             ItemRef.SetRange("Variant Code", '');
             ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
-            if ItemRef.IsEmpty then
+            if ItemRef.IsEmpty() then
                 AddItemRef(Item."No.", '');
         end;
 
-        ItemVar.SetRange("Item No.", Item."No.");
-        if ItemVar.FindSet() then
-            repeat
-                if (VRTSetup."Item Cross Ref. No. Series (V)" <> '') then begin
+        if (VRTSetup."Item Cross Ref. No. Series (V)" <> '') then begin
+            ItemVar.SetRange("Item No.", Item."No.");
+            if ItemVar.FindSet() then
+                repeat
                     ItemRef.SetRange("Item No.", Item."No.");
                     ItemRef.SetRange("Variant Code", ItemVar.Code);
                     ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
-                    if ItemRef.IsEmpty then
+                    if ItemRef.IsEmpty() then
                         AddItemRef(Item."No.", ItemVar.Code);
-                end;
-            until ItemVar.Next() = 0;
+                until ItemVar.Next() = 0;
+        end;
     end;
 
     procedure UpdateVariantDescriptions()
