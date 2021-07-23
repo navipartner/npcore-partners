@@ -302,24 +302,6 @@ page 6014463 "NPR Item ListPart"
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    var
-        CRMCouplingManagement: Codeunit "CRM Coupling Management";
-        WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
-        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
-    begin
-        if CRMIntegrationEnabled then
-            CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
-
-        ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
-
-        ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
-
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
-
-        SetWorkflowManagementEnabledState();
-    end;
-
     trigger OnAfterGetRecord()
     begin
         EnableControls();
@@ -354,23 +336,15 @@ page 6014463 "NPR Item ListPart"
     end;
 
     trigger OnOpenPage()
-    var
-        CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
-        CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
         IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled();
-        SetWorkflowManagementEnabledState();
     end;
 
     var
         TempItemFilteredFromAttributes: Record Item temporary;
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
         IsFoundationEnabled: Boolean;
-        CRMIntegrationEnabled: Boolean;
         RunOnTempRec: Boolean;
-        EventFilter: Text;
-        CanRequestApprovalForFlow: Boolean;
-        CanCancelApprovalForFlow: Boolean;
         [InDataSet]
         IsNonInventoriable: Boolean;
 
@@ -390,12 +364,5 @@ page 6014463 "NPR Item ListPart"
         IsNonInventoriable := Rec.IsNonInventoriableType();
     end;
 
-    local procedure SetWorkflowManagementEnabledState()
-    var
-        WorkflowEventHandling: Codeunit "Workflow Event Handling";
-    begin
-        EventFilter := WorkflowEventHandling.RunWorkflowOnSendItemForApprovalCode() + '|' +
-          WorkflowEventHandling.RunWorkflowOnItemChangedCode();
 
-    end;
 }
