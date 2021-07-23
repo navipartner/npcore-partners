@@ -23,7 +23,10 @@
                 fieldelement(posting_date; SalesInvHeader."Posting Date")
                 {
                 }
-                fieldelement(amount_excl_vat; SalesInvHeader."Amount Including VAT")
+                fieldelement(amount_excl_vat; SalesInvHeader.Amount)
+                {
+                }
+                fieldelement(amount_incl_vat; SalesInvHeader."Amount Including VAT")
                 {
                 }
                 fieldelement(currency_code; SalesInvHeader."Currency Code")
@@ -188,7 +191,10 @@
                 fieldelement(posting_date; SalesCrMemoHeader."Posting Date")
                 {
                 }
-                fieldelement(amount_excl_vat; SalesCrMemoHeader."Amount Including VAT")
+                fieldelement(amount_excl_vat; SalesCrMemoHeader.Amount)
+                {
+                }
+                fieldelement(amount_incl_vat; SalesCrMemoHeader."Amount Including VAT")
                 {
                 }
                 fieldelement(currency_code; SalesCrMemoHeader."Currency Code")
