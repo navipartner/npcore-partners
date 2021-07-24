@@ -325,6 +325,13 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         PrintBarcode5Lbl: Label '%1J%2K%3L', Locked = true;
         PrintBarcode6Lbl: Label '<oL%1>', Locked = true;
         PrintBarcode7Lbl: Label '^%1^', Locked = true;
+        QRBarcodeVers: Integer;
+        QRBarcodeErrLvl: Integer;
+        QRMaxLength: Integer;
+        QRPrintVersionLbl: Label '<QRV%1>', Locked = true;
+        QRPrintBarcodeLbl: Label '<QR%1,%2,%3,%4>{%5}', Locked = true;
+        QRWidth: Integer;
+        QRCenter: Integer;
     begin
         StringLib.Construct(BarcodeType);
 
@@ -333,50 +340,126 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
             if Evaluate(BarcodeXCoord, StringLib.SelectStringSep(2, ' ')) then;
         end;
 
-        // Probably need to check if negative
-        if PageWidth > BarcodeXCoord then
-            BarcodeXCoord := PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
-        else
-            BarcodeXCoord := PageWidth;
+        if CopyStr(BarcodeType, 1, 2) <> 'QR' then begin
+            // Probably need to check if negative
+            if PageWidth > BarcodeXCoord then
+                BarcodeXCoord := PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
+            else
+                BarcodeXCoord := PageWidth;
+            // TEMP
+            AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, BarcodeXCoord, yCoord));
+            // Alignment, will only work on new firmware 150+
+            case Alignment of
+                1:
+                    AddTextToBuffer(StrSubstNo(PrintBarcode2Lbl, PageWidth));
+            end;
+            //+NPR5.55 [403786]
 
-        // TEMP
-        AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, BarcodeXCoord, yCoord));
-        // Alignment, will only work on new firmware 150+
-        case Alignment of
-            1:
+            AddTextToBuffer('<BI>');
+
+            if Width > 1 then
+                AddTextToBuffer(StrSubstNo(PrintBarcode3Lbl, Width)); // set after DPI?
+
+            AddTextToBuffer('<RL>'); // Orientation
+
+            case BarcodeType of
+                'EAN13':
+                    begin
+                        if Height > 1 then
+                            AddTextToBuffer(StrSubstNo(PrintBarcode4Lbl, Height))
+                        else
+                            AddTextToBuffer('<eL>');
+                        AddTextToBuffer(StrSubstNo(PrintBarcode5Lbl, CopyStr(Text, 1, 1), CopyStr(Text, 2, 6), CopyStr(Text, 8, 6)));
+                    end;
+                'CODE128':
+                    begin
+                        if Height > 1 then
+                            AddTextToBuffer(StrSubstNo(PrintBarcode6Lbl, Height))
+                        else
+                            AddTextToBuffer('<oL>');
+                        AddTextToBuffer(StrSubstNo(PrintBarcode7Lbl, Text));
+                    end;
+            end;
+
+            if Height > 1 then
+                ySpace := Height * 10
+            else
+                ySpace := 40;
+
+        end else begin // QR
+            if StrPos(BarcodeType, '7') > 0 then
+                QRBarcodeVers := 7
+            else
+                if StrPos(BarcodeType, '11') > 0 then
+                    QRBarcodeVers := 11
+                else
+                    if StrPos(BarcodeType, '15') > 0 then
+                        QRBarcodeVers := 15
+                    else
+                        QRBarcodeVers := 2;
+
+            case CopyStr(BarcodeType, strlen(BarcodeType)) of
+                'L':
+                    QRBarcodeErrLvl := 1;
+                'H':
+                    QRBarcodeErrLvl := 2;
+                'Q':
+                    QRBarcodeErrLvl := 3;
+                else
+                    QRBarcodeErrLvl := 0;
+            end;
+
+            QRMaxLength := CheckMaxLengthQR(QRBarcodeVers, QRBarcodeErrLvl);
+
+            if StrLen(Text) > QRMaxLength then
+                Error('The value of the QR code exceeds the max limit for current QR settings. Try Lowering the Error Correction Level or increasing the QR version.')
+            else begin
+                AddTextToBuffer(StrSubstNo(QRPrintVersionLbl, QRBarcodeVers));
+
+                if (Width >= 3) and (Width <= 16) then
+                    QRWidth := Width
+                else
+                    QRWidth := 6; // default
+
+                AddTextToBuffer('<RL>'); // Orientation
+
+                // Overrule width to center
+                case QRBarcodeVers of
+                    2:
+                        begin
+                            ySpace := (QRWidth * 25);
+                            QRCenter := (PageWidth + ySpace) DIV 2
+                        end;
+                    7:
+                        begin
+                            ySpace := (QRWidth * 45);
+                            QRCenter := (PageWidth + ySpace) DIV 2
+                        end;
+                    11:
+                        begin
+                            ySpace := (QRWidth * 61);
+                            QRCenter := (PageWidth + ySpace) DIV 2
+                        end;
+                    15:
+                        begin
+                            ySpace := (QRWidth * 77);
+                            QRCenter := (PageWidth + ySpace) DIV 2
+                        end;
+                end;
+
+                AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, QRCenter, yCoord));
+                AddTextToBuffer(StrSubstNo(QRPrintBarcodeLbl, QRWidth, 0, 0, QRBarcodeErrLvl, Text));
+
+                yCoord += ySpace + 10;
+
+                AddTextToBuffer('<RL>');
+                AddTextToBuffer(StrSubstNo(PrintBarcodeLbl, PageWidth, yCoord));
+                AddTextToBuffer('<F8>');
                 AddTextToBuffer(StrSubstNo(PrintBarcode2Lbl, PageWidth));
+                AddTextToBuffer('~' + Text + '~');
+                ySpace := 40;
+            end;
         end;
-        //+NPR5.55 [403786]
-        AddTextToBuffer('<BI>');
-
-        if Width > 1 then
-            AddTextToBuffer(StrSubstNo(PrintBarcode3Lbl, Width)); // set after DPI?
-
-        AddTextToBuffer('<RL>'); // Orientation
-
-        case BarcodeType of
-            'EAN13':
-                begin
-                    if Height > 1 then
-                        AddTextToBuffer(StrSubstNo(PrintBarcode4Lbl, Height))
-                    else
-                        AddTextToBuffer('<eL>');
-                    AddTextToBuffer(StrSubstNo(PrintBarcode5Lbl, CopyStr(Text, 1, 1), CopyStr(Text, 2, 6), CopyStr(Text, 8, 6)));
-                end;
-            'CODE128':
-                begin
-                    if Height > 1 then
-                        AddTextToBuffer(StrSubstNo(PrintBarcode6Lbl, Height))
-                    else
-                        AddTextToBuffer('<oL>');
-                    AddTextToBuffer(StrSubstNo(PrintBarcode7Lbl, Text));
-                end;
-        end;
-
-        if Height > 1 then
-            ySpace := Height * 10
-        else
-            ySpace := 40;
     end;
 
     local procedure PrintStoredLogo(ID: Integer; Height: Integer)
@@ -604,7 +687,8 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         StringLib.Construct(Font);
         Font := StringLib.SelectStringSep(1, ' ');
 
-        if Font in ['EAN13', 'CODE128'] then
+        if Font in ['EAN13', 'CODE128',
+                    'QR', 'QR2L', 'QR2M', 'QR2Q', 'QR2H', 'QR7L', 'QR7M', 'QR7Q', 'QR7H', 'QR11L', 'QR11M', 'QR11Q', 'QR11H', 'QR15L', 'QR15M', 'QR15Q', 'QR15H'] then
             exit(true);
     end;
 
@@ -709,6 +793,25 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         AddOption(RetailList, 'CODE128 50', '');
         AddOption(RetailList, 'CODE128 100', '');
         AddOption(RetailList, 'CODE128 150', '');
+        // QR
+        AddOption(RetailList, 'QR', '');
+        AddOption(RetailList, 'QR2L', '');
+        AddOption(RetailList, 'QR2M', '');
+        AddOption(RetailList, 'QR2Q', '');
+        AddOption(RetailList, 'QR2H', '');
+        AddOption(RetailList, 'QR7L', '');
+        AddOption(RetailList, 'QR7M', '');
+        AddOption(RetailList, 'QR7Q', '');
+        AddOption(RetailList, 'QR7H', '');
+        AddOption(RetailList, 'QR11L', '');
+        AddOption(RetailList, 'QR11M', '');
+        AddOption(RetailList, 'QR11Q', '');
+        AddOption(RetailList, 'QR11H', '');
+        AddOption(RetailList, 'QR15L', '');
+        AddOption(RetailList, 'QR15M', '');
+        AddOption(RetailList, 'QR15Q', '');
+        AddOption(RetailList, 'QR15H', '');
+
 
         // Fonts without Æ Ø Å:
         AddOption(RetailList, 'F1', '');
@@ -756,5 +859,54 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib."
         exit(mm * 0.03937007874);
     end;
 
+    local procedure CheckMaxLengthQR(QRVersion: Integer; QRErrorCorrectionLevel: Integer): Integer
+    begin
+        case QRVersion of
+            2:
+                case QRErrorCorrectionLevel of
+                    0:
+                        exit(26);
+                    1:
+                        exit(32);
+                    2:
+                        exit(14);
+                    3:
+                        exit(20);
+                end;
+            7:
+                case QRErrorCorrectionLevel of
+                    0:
+                        exit(122);
+                    1:
+                        exit(154);
+                    2:
+                        exit(64);
+                    3:
+                        exit(86);
+                end;
+            11:
+                case QRErrorCorrectionLevel of
+                    0:
+                        exit(251);
+                    1:
+                        exit(321);
+                    2:
+                        exit(137);
+                    3:
+                        exit(177);
+                end;
+            15:
+                case QRErrorCorrectionLevel of
+                    0:
+                        exit(412);
+                    1:
+                        exit(520);
+                    2:
+                        exit(220);
+                    3:
+                        exit(292);
+                end;
+        end;
+    end;
 }
 
