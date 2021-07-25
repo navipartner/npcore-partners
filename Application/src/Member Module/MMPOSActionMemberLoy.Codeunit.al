@@ -208,6 +208,7 @@
         Membership.FindLast();
         if (MembershipEntryNo <> Membership."Entry No.") then
             Error(MULTIPLE_MEMBERSHIPS, SalePOS."Customer No.");
+        Commit();
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
