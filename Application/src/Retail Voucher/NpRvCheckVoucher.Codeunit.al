@@ -1,4 +1,4 @@
-codeunit 6014589 "NPR NpRvCheckVoucher"
+codeunit 6014621 "NPR NpRvCheckVoucher"
 
 {
     local procedure ActionCode(): Code[20]
