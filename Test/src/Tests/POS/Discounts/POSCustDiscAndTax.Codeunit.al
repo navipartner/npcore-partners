@@ -7332,8 +7332,10 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         PriceListLine.Validate("Asset No.", Item."No.");
         PriceListLine."Line Discount %" := LineDiscPct;
         PriceListLine."Starting Date" := Today() - 7;
-        PriceListLine.Status := PriceListLine.Status::Active;
+        PriceListLine.Status := PriceListLine.Status::Draft;
         PriceListLine.Insert();
+        PriceListLine.Status := PriceListLine.Status::Active;
+        PriceListLine.Modify();
         exit(PriceListLine."Line Discount %");
     end;
 }

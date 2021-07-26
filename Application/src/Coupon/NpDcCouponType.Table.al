@@ -149,11 +149,21 @@ table 6151590 "NPR NpDc Coupon Type"
             Editable = false;
             FieldClass = FlowField;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Code")
+        {
+        }
+
+        key(Key2; "Replication Counter")
         {
         }
     }
@@ -195,5 +205,6 @@ table 6151590 "NPR NpDc Coupon Type"
         if "Max Use per Sale" < 1 then
             "Max Use per Sale" := 1;
     end;
+
 }
 

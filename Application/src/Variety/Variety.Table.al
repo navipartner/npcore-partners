@@ -49,11 +49,21 @@ table 6059971 "NPR Variety"
             Caption = 'Use Description field';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Code")
+        {
+        }
+
+        key(Key2; "Replication Counter")
         {
         }
     }

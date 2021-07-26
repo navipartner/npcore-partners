@@ -55,6 +55,12 @@ table 6014554 "NPR Attribute ID"
             OptionMembers = NOT_SET,MASTERDATA,DOCUMENT,DOCUMENTLINE,WORKSHEETLINE,WORKSHEETSUBLINE;
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -63,6 +69,10 @@ table 6014554 "NPR Attribute ID"
         {
         }
         key(Key2; "Attribute Code")
+        {
+        }
+
+        key(Key3; "Replication Counter")
         {
         }
     }

@@ -310,6 +310,12 @@ table 6014413 "NPR Period Discount"
             TableRelation = Location;
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -326,11 +332,16 @@ table 6014413 "NPR Period Discount"
         key(Key4; "Starting Date", "Starting Time", "Ending Date", "Ending Time")
         {
         }
+
+        key(Key5; "Replication Counter")
+        {
+        }
     }
 
     fieldgroups
     {
     }
+
 
     trigger OnDelete()
     var

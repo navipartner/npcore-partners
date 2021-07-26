@@ -401,12 +401,17 @@
             "id": "AS0032",
             "action":"Hidden",
             "justification": "Controls that have been published should not be deleted"
-        }, 
+        },
         {
             "id": "AS0034",
             "action":"Warning",
             "justification": "Unsupported table property change"
-        },       
+        },   
+        {
+            "id": "AS0049",
+            "action":"Warning",
+            "justification": "Error was trown for new codeunits with Internal access"
+        },        
         {
             "id": "AS0053",
             "action":"Hidden",

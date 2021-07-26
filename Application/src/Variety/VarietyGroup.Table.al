@@ -299,12 +299,23 @@ table 6059976 "NPR Variety Group"
                 //+NPR5.43 [317108]
             end;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Code")
         {
+        }
+
+        key(Key2; "Replication Counter")
+        {
+
         }
     }
 
@@ -565,5 +576,6 @@ table 6059976 "NPR Variety Group"
         end;
         //+NPR5.43 [317108]
     end;
+
 }
 

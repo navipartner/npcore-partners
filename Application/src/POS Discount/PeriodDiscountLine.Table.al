@@ -381,6 +381,12 @@ table 6014414 "NPR Period Discount Line"
             Description = 'NPR5.38';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -395,6 +401,9 @@ table 6014414 "NPR Period Discount Line"
         {
         }
         key(Key4; "Item No.", "Variant Code", Status, "Starting Date", "Ending Date", "Starting Time", "Ending Time")
+        {
+        }
+        key(Key5; "Replication Counter")
         {
         }
     }

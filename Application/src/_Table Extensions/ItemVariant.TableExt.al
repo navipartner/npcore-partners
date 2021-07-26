@@ -96,5 +96,18 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
+    }
+
+    keys
+    {
+        key("NPR Key1"; "NPR Replication Counter")
+        {
+        }
     }
 }
