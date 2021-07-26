@@ -184,6 +184,12 @@ table 6014488 "NPR Aux. Item Ledger Entry"
             Caption = 'New Entry No.';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -203,5 +209,10 @@ table 6014488 "NPR Aux. Item Ledger Entry"
         {
             SumIndexFields = Quantity, "Invoiced Quantity";
         }
+
+        key(Key5; "Replication Counter")
+        {
+        }
+
     }
 }

@@ -224,6 +224,12 @@ table 6014412 "NPR Mixed Discount Line"
             Editable = false;
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -242,6 +248,10 @@ table 6014412 "NPR Mixed Discount Line"
         {
         }
         key(Key5; "Disc. Grouping Type", "No.", "Variant Code", "Starting Date", "Ending Date", "Starting Time", "Ending Time", Status)
+        {
+        }
+
+        key(Key6; "Replication Counter")
         {
         }
     }

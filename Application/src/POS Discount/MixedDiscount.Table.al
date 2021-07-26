@@ -269,6 +269,12 @@ table 6014411 "NPR Mixed Discount"
             Caption = 'Actual Item Qty.';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -283,6 +289,10 @@ table 6014411 "NPR Mixed Discount"
         {
         }
         key(Key4; "Actual Discount Amount", "Actual Item Qty.")
+        {
+        }
+
+        key(Key5; "Replication Counter")
         {
         }
     }

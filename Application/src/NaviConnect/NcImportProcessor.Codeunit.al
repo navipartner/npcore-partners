@@ -2,6 +2,9 @@ codeunit 6151511 "NPR Nc Import Processor"
 {
     TableNo = "NPR Nc Import Entry";
 
+    var
+        BatchEntriesMustBeImportedInOrderErr: Label 'Cannot Import the entry because Batch Entries should be imported in the order of creation. There are one or more entries with Entry No. lower than the Entry No. ''%1''. Please import first the oldest entry from Batch Id ''%2''.';
+
     trigger OnRun()
     begin
         if Rec.HasActiveImport() then
@@ -17,6 +20,8 @@ codeunit 6151511 "NPR Nc Import Processor"
     var
         DataLogMgt: Codeunit "NPR Data Log Management";
     begin
+        CheckBatchImportEntriesOrder(NcImportEntry);
+
         MarkAsStarted(NcImportEntry);
 
         Success := CODEUNIT.Run(CODEUNIT::"NPR Nc Import Mgt.", NcImportEntry);
@@ -73,6 +78,7 @@ codeunit 6151511 "NPR Nc Import Processor"
             OutStr.WriteText(LastErrorText);
         end;
         NcImportEntry.Modify(true);
+        MarkUnimportedEntriesWithSameBatchIdAsError(NcImportEntry);
         Commit();
 
         if Success then
@@ -125,6 +131,44 @@ codeunit 6151511 "NPR Nc Import Processor"
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Nc Import Processor");
+    end;
+
+    local procedure MarkUnimportedEntriesWithSameBatchIdAsError(NcImportEntry: Record "NPR Nc Import Entry")
+    var
+        NcImportEntry2: Record "NPR Nc Import Entry";
+        ErrorTxt: Text;
+        OutStr: OutStream;
+        ErrorTxtLabel: Label 'Import stopped because an error occured in Entry No. ''%1'' which is related to same Batch Id.', Locked = true;
+    begin
+        IF NcImportEntry."Runtime Error" AND (NOT IsNullGuid(NcImportEntry."Batch Id")) then begin
+            NcImportEntry2.SetRange("Import Type", NcImportEntry."Import Type");
+            NcImportEntry2.SetRange("Batch Id", NcImportEntry."Batch Id");
+            NcImportEntry2.SetRange(Imported, false);
+            NcImportEntry2.SetFilter("Entry No.", '>%1', NcImportEntry."Entry No.");
+            IF NcImportEntry2.FindSet(true, false) then
+                repeat
+                    NcImportEntry2."Runtime Error" := true;
+                    ErrorTxt := StrSubstNo(ErrorTxtLabel, NcImportEntry."Entry No.");
+                    NcImportEntry2."Error Message" := CopyStr(ErrorTxt, 1, MaxStrLen(NcImportEntry2."Error Message"));
+                    NcImportEntry2."Last Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+                    OutStr.WriteText(ErrorTxt);
+                    NcImportEntry2.Modify(true);
+                until NcImportEntry2.Next() = 0;
+        end;
+    end;
+
+    local procedure CheckBatchImportEntriesOrder(pImportEntry: Record "NPR Nc Import Entry")
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+    begin
+        If NOT ISNULLGUID(pImportEntry."Batch Id") then begin
+            ImportEntry.SetRange("Import Type", pImportEntry."Import Type");
+            ImportEntry.SetRange("Batch Id", pImportEntry."Batch Id");
+            ImportEntry.SetRange(Imported, false);
+            ImportEntry.SetFilter("Entry No.", '<%1', pImportEntry."Entry No.");
+            IF NOT ImportEntry.IsEmpty then
+                Error(BatchEntriesMustBeImportedInOrderErr, pImportEntry."Entry No.", pImportEntry."Batch Id");
+        end;
     end;
 }
 

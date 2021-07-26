@@ -120,6 +120,12 @@ table 6014552 "NPR Attribute"
             Description = 'NPR5.39';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -127,10 +133,15 @@ table 6014552 "NPR Attribute"
         key(Key1; "Code")
         {
         }
+
+        key(Key2; "Replication Counter")
+        {
+        }
     }
 
     fieldgroups
     {
     }
+
 }
 

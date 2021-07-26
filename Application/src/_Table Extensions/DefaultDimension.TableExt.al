@@ -1,5 +1,22 @@
 tableextension 6014417 "NPR Default Dimension" extends "Default Dimension"
 {
+
+    fields
+    {
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
+
+    }
+    keys
+    {
+        key("NPR Key1"; "NPR Replication Counter")
+        {
+        }
+    }
+
     trigger OnAfterInsert()
     begin
         UpdateGlobalDimensions(Rec."Dimension Value Code");

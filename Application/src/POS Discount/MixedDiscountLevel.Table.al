@@ -57,11 +57,21 @@ table 6014427 "NPR Mixed Discount Level"
                     "Discount Amount" := 0;
             end;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Mixed Discount Code", Quantity)
+        {
+        }
+
+        key(Key2; "Replication Counter")
         {
         }
     }

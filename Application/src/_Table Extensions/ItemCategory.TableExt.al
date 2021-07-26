@@ -228,6 +228,19 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
                                 "Global Dimension 2 Code" = FIELD("NPR Global Dimension 2 Filter"),
                                 "Location Code" = field("NPR Location Filter")));
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
+    }
+
+    keys
+    {
+        key("NPR Key1"; "NPR Replication Counter")
+        {
+        }
     }
 
     procedure NPRValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
