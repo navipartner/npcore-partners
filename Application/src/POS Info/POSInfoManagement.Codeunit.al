@@ -70,6 +70,7 @@
         POSInfoAuditRoll: Record "NPR POS Info Audit Roll";
         POSInfoPOSEntry: Record "NPR POS Info POS Entry";
     begin
+        POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransaction.SetRange("Register No.", SalePOS."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if POSInfoTransaction.FindSet() then begin
@@ -108,6 +109,7 @@
     begin
         if Rec.IsTemporary then
             exit;
+        POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransaction.SetRange("Register No.", Rec."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", 0);
@@ -211,6 +213,7 @@
 
     local procedure SetPosInfoTransactionFilters(var POSInfoTransaction: Record "NPR POS Info Transaction"; pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     begin
+        POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
         POSInfoTransaction.SetRange("Register No.", pSaleLinePos."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", pSaleLinePos."Sales Ticket No.");
         case true of
@@ -221,7 +224,6 @@
             else
                 POSInfoTransaction.SetRange("Sales Line No.");
         end;
-        POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
     end;
 
     local procedure GetPosInfoOutput(POSInfo: Record "NPR POS Info"; UserInputString: Text) Info: Text
@@ -367,6 +369,7 @@
         POSInfoTransaction: Record "NPR POS Info Transaction";
         POSInfoAuditRoll: Record "NPR POS Info Audit Roll";
     begin
+        POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransaction.SetRange("Register No.", PSalePos."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", PSalePos."Sales Ticket No.");
         if POSInfoTransaction.FindSet(true) then begin
@@ -387,6 +390,7 @@
         if SaleLinePOS.IsTemporary then
             exit;
 
+        POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransaction.SetRange("Register No.", SaleLinePOS."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
@@ -399,6 +403,7 @@
         POSInfoTransactionOld: Record "NPR POS Info Transaction";
         POSInfoTransactionNew: Record "NPR POS Info Transaction";
     begin
+        POSInfoTransactionOld.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransactionOld.SetRange("Register No.", FromSalePOS."Register No.");
         POSInfoTransactionOld.SetRange("Sales Ticket No.", FromSalePOS."Sales Ticket No.");
         if POSInfoTransactionOld.FindSet(true) then
@@ -456,15 +461,14 @@
             Error(InfoRequiredErr, POSInfo.Code);
         end;
 
+        POSInfoTransaction.SetRange("POS Info Code", pPOSInfoCode);
         POSInfoTransaction.SetRange("Register No.", pSalePos."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", pSalePos."Sales Ticket No.");
-
         if not POSInfo."Once per Transaction" then begin
             POSInfoTransaction.SetRange("Sales Line No.", pSaleLinePos."Line No.")
         end else begin
             POSInfoTransaction.SetRange("Sales Line No.");
         end;
-        POSInfoTransaction.SetRange("POS Info Code", pPOSInfoCode);
 
         if POSInfoTransaction.FindFirst() then begin
             POSInfoTransaction."POS Info" := Info;
@@ -502,6 +506,7 @@
         then
             exit(false);
 
+        POSInfoTransaction_Hdr.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransaction_Hdr.SetRange("Register No.", SaleLinePos."Register No.");
         POSInfoTransaction_Hdr.SetRange("Sales Ticket No.", SaleLinePos."Sales Ticket No.");
         POSInfoTransaction_Hdr.SetRange("Sales Line No.", 0);
@@ -515,10 +520,10 @@
             if not POSInfo."Once per Transaction" and POSInfo."Copy from Header" then begin
                 SaleLinePos.TestField("Line No.");  //Ensure line has been already inserted
                 POSInfoTransaction.Reset();
+                POSInfoTransaction.SetRange("POS Info Code", POSInfoTransaction_Hdr."POS Info Code");
                 POSInfoTransaction.SetRange("Register No.", SaleLinePos."Register No.");
                 POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePos."Sales Ticket No.");
                 POSInfoTransaction.SetRange("Sales Line No.", SaleLinePos."Line No.");
-                POSInfoTransaction.SetRange("POS Info Code", POSInfoTransaction_Hdr."POS Info Code");
                 if POSInfoTransaction.IsEmpty then begin
                     POSInfoTransaction.Init();
                     POSInfoTransaction."Register No." := SaleLinePos."Register No.";
@@ -561,7 +566,9 @@
     local procedure FilterPOSInfoTrans(var POSInfoTransaction: Record "NPR POS Info Transaction"; POSInfoCode: Code[20]; RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer)
     begin
         POSInfoTransaction.Reset();
-        if POSInfoCode <> '' then
+        if POSInfoCode = '' then
+            POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.")
+        else
             POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
         POSInfoTransaction.SetRange("Register No.", RegisterNo);
         POSInfoTransaction.SetRange("Sales Ticket No.", SalesTicketNo);
