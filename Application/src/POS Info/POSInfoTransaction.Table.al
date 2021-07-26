@@ -102,6 +102,9 @@ table 6150644 "NPR POS Info Transaction"
         key(Key2; "Entry No.")
         {
         }
+        key(Key3; "Register No.", "Sales Ticket No.", "Sales Line No.")
+        {
+        }
     }
 
     fieldgroups
