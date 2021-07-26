@@ -712,16 +712,8 @@ table 6014406 "NPR POS Sale Line"
         {
             Caption = 'Special price';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Special price" = 0 then begin
-                    GetItem();
-                    "Custom Price" := false;
-                    "Eksp. Salgspris" := false;
-                    GetAmount(Rec, Item, FindItemSalesPrice());
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(84; "Gen. Posting Type"; Enum "General Posting Type")
         {
