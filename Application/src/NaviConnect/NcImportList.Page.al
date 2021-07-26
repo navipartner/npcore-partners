@@ -191,7 +191,6 @@ page 6151504 "NPR Nc Import List"
                 trigger OnAction()
                 begin
                     ImportSelected();
-
                 end;
             }
             action("Filter Imported")
@@ -425,6 +424,7 @@ page 6151504 "NPR Nc Import List"
     local procedure ImportSelected()
     var
         ImportEntry: Record "NPR Nc Import Entry";
+        ImportEntry2: Record "NPR Nc Import Entry";
         ImportedCount: Integer;
     begin
         ImportedCount := 0;
@@ -433,7 +433,8 @@ page 6151504 "NPR Nc Import List"
         Commit();
         if ImportEntry.FindSet() then
             repeat
-                CODEUNIT.Run(CODEUNIT::"NPR Nc Import Processor", ImportEntry);
+                ImportEntry2 := ImportEntry;
+                CODEUNIT.Run(CODEUNIT::"NPR Nc Import Processor", ImportEntry2);
                 ImportedCount += 1;
             until ImportEntry.Next() = 0;
         ImportEntry.SetRange("Runtime Error", true);

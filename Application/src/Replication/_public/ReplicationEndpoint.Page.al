@@ -1,0 +1,99 @@
+page 6014504 "NPR Replication Endpoint"
+{
+
+    Caption = 'Replication Endpoint';
+    Extensible = true;
+    PageType = Card;
+    SourceTable = "NPR Replication Endpoint";
+    UsageCategory = None;
+
+    layout
+    {
+        area(content)
+        {
+            group(General)
+            {
+                field("EndPoint ID"; Rec."EndPoint ID")
+                {
+                    ToolTip = 'Specifies the EndPoint ID.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Description; Rec.Description)
+                {
+                    ToolTip = 'Specifies Description of the Endpoint';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Endpoint Method"; Rec."Endpoint Method")
+                {
+                    ToolTip = 'Specifies Endpoint Method.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Path; Rec.Path)
+                {
+                    ToolTip = 'Specifies the Path which will be added to the base URL when sending the request.';
+                    ApplicationArea = NPRRetail;
+                    MultiLine = true;
+                }
+                field("SQL Timestamp"; Rec."Replication Counter")
+                {
+                    ToolTip = 'Used to get records from related company that have changed since the last synchronization.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Sequence Order"; Rec."Sequence Order")
+                {
+                    ToolTip = 'Specifies order in which requests are executed.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("odata.maxpagesize"; Rec."odata.maxpagesize")
+                {
+                    ToolTip = 'Specifies the maximum number of records per page returned by the endpoint request.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Enabled; Rec.Enabled)
+                {
+                    ToolTip = 'Specifies if the Endpoint is Enabled. If Disabled system will not execute import for this record.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(Navigation)
+        {
+            action(Errors)
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'View endpoint error log entries.';
+                Image = ErrorLog;
+                Caption = 'Error Log';
+
+                trigger OnAction()
+                var
+                    ReplicationAPI: Codeunit "NPR Replication API";
+                begin
+                    ReplicationAPI.ShowErrorLogEntries(Rec."Service Code", Rec."EndPoint ID");
+                end;
+            }
+        }
+
+        area(Processing)
+        {
+            action("Run Import")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Run Import only for selected Endpoint line.';
+                Image = CompleteLine;
+                trigger OnAction()
+                var
+                    ReplicationAPI: Codeunit "NPR Replication API";
+                begin
+                    ReplicationAPI.RunSpecificEndpointImportManually(Rec, '');
+                end;
+            }
+        }
+
+    }
+
+}

@@ -1,0 +1,183 @@
+page 6014537 "NPR APIV1 - Item Categories"
+{
+    APIGroup = 'core';
+    APIPublisher = 'navipartner';
+    APIVersion = 'v1.0';
+    DelayedInsert = true;
+    EntityName = 'itemCategory';
+    EntitySetName = 'itemCategories';
+    Extensible = false;
+    ODataKeyFields = SystemId;
+    PageType = API;
+    SourceTable = "Item Category";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field(id; Rec.SystemId)
+                {
+                    Caption = 'Id';
+                    Editable = false;
+                }
+                field("code"; Rec.Code)
+                {
+                    Caption = 'Code';
+                    ShowMandatory = true;
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo(Code));
+                    end;
+                }
+                field(displayName; Rec.Description)
+                {
+                    Caption = 'Description';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo(Description));
+                    end;
+                }
+
+                field(parentCategory; Rec."Parent Category")
+                {
+                    Caption = 'Parent Category';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Parent Category"));
+                    end;
+                }
+
+                field(presentationOrder; Rec."Presentation Order")
+                {
+                    Caption = 'Presentation Order';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Presentation Order"));
+                    end;
+                }
+
+                field(indentation; Rec.Indentation)
+                {
+                    Caption = 'Indentation';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo(Indentation));
+                    end;
+                }
+
+                field(nprItemTemplateCode; Rec."NPR Item Template Code")
+                {
+                    Caption = 'Item Template Code';
+                }
+
+                field(nprMainCategory; Rec."NPR Main Category")
+                {
+                    Caption = 'Main Category';
+                }
+
+                field(nprMainCategoryCode; Rec."NPR Main Category Code")
+                {
+                    Caption = 'Main Category Code';
+                }
+
+                field(nprBlocked; Rec."NPR Blocked")
+                {
+                    Caption = 'Blocked';
+                }
+
+                field(nprGlobalDimension1Code; Rec."NPR Global Dimension 1 Code")
+                {
+                    Caption = 'Global Dimension 1 Code';
+                }
+
+                field(nprGlobalDimension2Code; Rec."NPR Global Dimension 2 Code")
+                {
+                    Caption = 'Global Dimension 2 Code';
+                }
+
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                }
+
+                field(replicationCounter; Rec."NPR Replication Counter")
+                {
+                    Caption = 'replicationCounter', Locked = true;
+                }
+
+
+            }
+        }
+    }
+
+    actions
+    {
+    }
+
+    trigger OnInit()
+    begin
+        CurrentTransactionType := TransactionType::Update;
+    end;
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    var
+        ItemCategory: Record "Item Category";
+        GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
+        RecRef: RecordRef;
+    begin
+        ItemCategory.SetRange(Code, Code);
+        if not ItemCategory.IsEmpty() then
+            Insert();
+
+        Insert(true);
+
+        RecRef.GetTable(Rec);
+        GraphMgtGeneralTools.ProcessNewRecordFromAPI(RecRef, TempFieldSet, CurrentDateTime());
+        RecRef.SetTable(Rec);
+
+        Modify(true);
+        exit(false);
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    var
+        ItemCategory: Record "Item Category";
+    begin
+        ItemCategory.GetBySystemId(SystemId);
+
+        if Code = ItemCategory.Code then
+            Modify(true)
+        else begin
+            ItemCategory.TransferFields(Rec, false);
+            ItemCategory.Rename(Code);
+            TransferFields(ItemCategory);
+        end;
+    end;
+
+    var
+        TempFieldSet: Record 2000000041 temporary;
+
+    local procedure RegisterFieldSet(FieldNo: Integer)
+    begin
+        if TempFieldSet.Get(Database::"Item Category", FieldNo) then
+            exit;
+
+        TempFieldSet.Init();
+        TempFieldSet.TableNo := Database::"Item Category";
+        TempFieldSet.Validate("No.", FieldNo);
+        TempFieldSet.Insert(true);
+    end;
+}
+
+
+
+
+
+

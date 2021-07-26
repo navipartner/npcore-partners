@@ -432,6 +432,12 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Display Only Text';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -444,6 +450,9 @@ tableextension 6014427 "NPR Item" extends Item
         {
             ObsoleteState = Removed;
             ObsoleteReason = 'Used field is obsoleted.';
+        }
+        key("NPR Key3"; "NPR Replication Counter")
+        {
         }
     }
 

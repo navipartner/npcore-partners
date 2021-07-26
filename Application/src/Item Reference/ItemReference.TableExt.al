@@ -7,10 +7,17 @@ tableextension 6014440 "NPR Item Reference" extends "Item Reference"
             Caption = 'Label Barcode';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(LabelBarcode; "NPR Label Barcode") { }
+        key("NPR Key1"; "NPR Replication Counter") { }
     }
 }

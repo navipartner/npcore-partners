@@ -20,6 +20,19 @@ tableextension 6014451 "NPR Purchase Price" extends "Purchase Price"
             ObsoleteState = Removed;
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
+    }
+
+    keys
+    {
+        key(Key1; "NPR Replication Counter")
+        {
+        }
     }
 }
 #pragma warning restore

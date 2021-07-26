@@ -115,11 +115,21 @@ table 6014420 "NPR Mixed Disc. Time Interv."
             Caption = 'Period Description';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Mix Code", "Line No.")
+        {
+        }
+
+        key(Key2; "Replication Counter")
         {
         }
     }

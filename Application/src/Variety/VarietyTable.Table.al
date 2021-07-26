@@ -68,11 +68,19 @@ table 6059972 "NPR Variety Table"
             Caption = 'Lock Table';
             DataClassification = CustomerContent;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; Type, "Code")
+        {
+        }
+        key(Key2; "Replication Counter")
         {
         }
     }

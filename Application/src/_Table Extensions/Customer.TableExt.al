@@ -211,6 +211,18 @@ tableextension 6014423 "NPR Customer" extends Customer
                 M2AccountLookupMgt.ValidateMagentoStore(Rec);
             end;
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
+    }
+    keys
+    {
+        key("NPR Key1"; "NPR Replication Counter")
+        {
+        }
     }
 
     trigger OnBeforeDelete()
@@ -240,5 +252,4 @@ tableextension 6014423 "NPR Customer" extends Customer
         if not SalesLinePOS.IsEmpty() then
             Error(DeleteCustActiveCashErr, Rec."No.");
     end;
-
 }

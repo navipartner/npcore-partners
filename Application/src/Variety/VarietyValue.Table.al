@@ -54,6 +54,12 @@ table 6059973 "NPR Variety Value"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -62,6 +68,9 @@ table 6059973 "NPR Variety Value"
         {
         }
         key(Key2; Type, "Table", "Sort Order")
+        {
+        }
+        key(Key3; "Replication Counter")
         {
         }
     }
@@ -174,5 +183,6 @@ table 6059973 "NPR Variety Value"
         exit(VRTTable."Lock Table");
         //+VRT1.10
     end;
+
 }
 

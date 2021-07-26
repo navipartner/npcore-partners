@@ -143,6 +143,12 @@ table 6151504 "NPR Nc Import Entry"
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
+
+        field(110; "Batch Id"; GUID)
+        {
+            Caption = 'Batch Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -156,7 +162,14 @@ table 6151504 "NPR Nc Import Entry"
         key(Key3; "Import Type", Date, Imported)
         {
         }
+        key(Key4; "Import Type", "Batch Id", Imported)
+        {
+        }
     }
+
+    var
+        DeleteAllRecordsFromBatchConfirm: Label 'This operation will delete all entries with Batch Id %1. Are you sure you want to continue?';
+
 
     trigger OnInsert()
     begin
@@ -164,6 +177,26 @@ table 6151504 "NPR Nc Import Entry"
             Date := CurrentDateTime;
     end;
 
+    trigger OnDelete()
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        DeleteConfirmed: Boolean;
+    begin
+        IF NOT ISNULLGUID(Rec."Batch Id") then begin
+            DeleteConfirmed := true;
+            IF GuiAllowed then
+                IF NOT Confirm(StrSubstNo(DeleteAllRecordsFromBatchConfirm, Rec."Batch Id")) then
+                    DeleteConfirmed := false;
+
+            IF DeleteConfirmed then begin
+                ImportEntry.SetRange("Import Type", Rec."Import Type");
+                ImportEntry.SetRange("Batch Id", Rec."Batch Id");
+                If NOT ImportEntry.IsEmpty then
+                    ImportEntry.DeleteAll();
+            end else
+                Error('');
+        end;
+    end;
 
     procedure LoadXmlDoc(var Document: XmlDocument): Boolean
     var
