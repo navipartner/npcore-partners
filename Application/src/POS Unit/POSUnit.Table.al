@@ -345,6 +345,14 @@ table 6150615 "NPR POS Unit"
         exit(SecurityProfile.Get("POS Security Profile"));
     end;
 
+    procedure GetProfile(var POSAuditProfile: Record "NPR POS Audit Profile"): Boolean
+    begin
+        Clear("POS Audit Profile");
+        if "POS Audit Profile" = '' then
+            exit;
+        exit(POSAuditProfile.Get("POS Audit Profile"));
+    end;
+
     procedure GetCurrentPOSUnit(): Code[10]
     var
         UserSetup: Record "User Setup";

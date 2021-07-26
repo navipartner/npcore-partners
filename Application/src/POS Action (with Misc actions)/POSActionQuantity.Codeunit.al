@@ -1,17 +1,9 @@
 codeunit 6150808 "NPR POS Action: Quantity"
 {
     var
-        ActionDescription: Label 'This is a build in function to change quantity.';
-        CannotExceedMaxQtyErr: Label 'Quantity cannot exceed the limit value.';
-        MUST_BE_POSITIVE: Label 'Quantity must be positive.';
-        MUST_BE_NEGATIVE: Label 'Quantity must be negative.';
-        SALE_MUST_BE_POSITIVE: Label 'Quantity must be positive on the sales line.';
-        SALE_MUST_BE_NEGATIVE: Label 'Quantity must be negative on the sales line.';
-        QtyCaption: Label 'Enter Quantity';
-        PriceCaption: Label 'Enter Unit Price';
-        WRONG_RETURN_QUANTITY: Label 'The maximum number of units to return for %1 is %2.';
-        WRONG_QUANTITY: Label 'The minimum number of units to sell must be greater than zero.';
-        ReadingErr: Label 'reading in %1';
+        MustBePositiveErr: Label 'Quantity must be positive.';
+        MustBeNegativeErr: Label 'Quantity must be negative.';
+        ReadingErr: Label 'reading in %1 of %2';
 
     local procedure ActionCode(): Text
     begin
@@ -20,56 +12,17 @@ codeunit 6150808 "NPR POS Action: Quantity"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.8');
+        exit('2.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        ActionDescriptionLbl: Label 'This is a build in function to change quantity.';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('ValidatePositiveConstraint', 'if ((param.Constraint == param.Constraint["Positive Quantity Only"]) && (parseFloat (data("12")) < 0)) { message (labels.MustBePositive);abort();};');
-            Sender.RegisterWorkflowStep('ValidateNegativeConstraint', 'if ((param.Constraint == param.Constraint["Negative Quantity Only"]) && (parseFloat (data("12")) > 0)) { message (labels.MustBeNegative);abort();};');
-            Sender.RegisterWorkflowStep('PromptQuantity',
-              'switch(param.InputType + "") {' +
-              '  case "0":' +
-              '    numpad({caption: labels.QtyCaption, value: Math.abs(parseFloat(data("12")))}).cancel(abort);' +
-              '    break;' +
-              '  case "1":' +
-              '    if (param.ChangeToQuantity.substring(param.ChangeToQuantity.length - 1) == "*") {' +
-              '      param.ChangeToQuantity = param.ChangeToQuantity.substring(0,param.ChangeToQuantity.length - 1);' +
-              '    }' +
-              '    context.$PromptQuantity = {"numpad": param.ChangeToQuantity};' +
-              '    break;' +
-              '  case "2":' +
-              '    var qty = parseFloat(data("12")) + param.IncrementQuantity;' +
-              '    context.$PromptQuantity = {"numpad": qty};' +
-              '    break;' +
-              '  default:' +
-              '    goto("EndOfWorkflow");' +
-              '}');
-            Sender.RegisterWorkflowStep('CheckQuantity',
-              'if ((param.MaxQuantityAllowed) && (context.$PromptQuantity.numpad)) {' +
-              '  if (param.MaxQuantityAllowed != 0) {' +
-              '    if (Math.abs(context.$PromptQuantity.numpad) > param.MaxQuantityAllowed) { message(labels.CannotExceedMaxQty + " " + param.MaxQuantityAllowed); abort();}' +
-              '  }' +
-              '};');
-            Sender.RegisterWorkflowStep('PromptUnitPrice',
-              'if ((param.PromptUnitPriceOnNegativeInput) && (param.NegativeInput ? context.$PromptQuantity.numpad * -1 < 0 : context.$PromptQuantity.numpad < 0)) {' +
-              '  numpad({caption: labels.PriceCaption, value: data("15")})' +
-              '};');
-            Sender.RegisterWorkflowStep('AskForReturnReason', 'context.PromptForReason && respond();');
-            Sender.RegisterWorkflowStep('EndOfWorkflow', 'respond()');
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+            Sender.RegisterWorkflow20(GetActionJavascript());
 
-            Sender.RegisterWorkflow(true);
-            Sender.RegisterDataBinding();
-
-            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
             Sender.RegisterOptionParameter('InputType', 'Ask,Fixed,Increment', 'Ask');
             Sender.RegisterDecimalParameter('IncrementQuantity', 0);
             Sender.RegisterOptionParameter('Constraint', 'No Constraint,Positive Quantity Only,Negative Quantity Only', 'No Constraint');
@@ -80,81 +33,70 @@ codeunit 6150808 "NPR POS Action: Quantity"
         end;
     end;
 
+    local procedure GetActionJavascript(): Text
+    begin
+        exit(
+            //###NP_FILE_REPLACE:POSActionQuantity.Codeunit.js###
+            'await workflow.respond("AddPresetValuesToContext"); let saleLines = runtime.getData("BUILTIN_SALELINE"); let currentQty = parseFloat(saleLines._current[12]); if (($parameters.Constraint == $parameters.Constraint["Positive Quantity Only"]) && (currentQty < 0)) { popup.error($labels.MustBePositive); return; }; if (($parameters.Constraint == $parameters.Constraint["Negative Quantity Only"]) && (currentQty > 0)) { popup.error($labels.MustBeNegative); return; }; $context.PromptQuantity = ($parameters.InputType == $parameters.InputType["Ask"]) ? await popup.numpad({ caption: $labels.QtyCaption, value: currentQty }) : ($parameters.InputType == $parameters.InputType["Fixed"]) ? $parameters.ChangeToQuantity : ($parameters.InputType == $parameters.InputType["Increment"]) ? currentQty + $parameters.IncrementQuantity : null; if (!$context.PromptQuantity) { return; }; if ($parameters.MaxQuantityAllowed) { if (($parameters.MaxQuantityAllowed != 0) && (Math.abs($context.PromptQuantity) > $parameters.MaxQuantityAllowed)) { popup.error($labels.CannotExceedMaxQty + " " + $parameters.MaxQuantityAllowed); return; }; }; if (($parameters.PromptUnitPriceOnNegativeInput) && ($parameters.NegativeInput ? $context.PromptQuantity > 0 : $context.PromptQuantity < 0)) { $context.PromptUnitPrice = await popup.numpad({ caption: $labels.PriceCaption, value: saleLines._current[15] }); }; if ($context.PromptForReason) { await workflow.respond("AskForReturnReason"); }; workflow.respond();'
+          );
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    var
+        CannotExceedMaxQtyErr: Label 'Quantity cannot exceed the limit value.';
+        PriceCaptionLbl: Label 'Enter Unit Price';
+        QtyCaptionLbl: Label 'Enter Quantity';
     begin
-        Captions.AddActionCaption(ActionCode(), 'QtyCaption', QtyCaption);
-        Captions.AddActionCaption(ActionCode(), 'PriceCaption', PriceCaption);
-        Captions.AddActionCaption(ActionCode(), 'MustBePositive', MUST_BE_POSITIVE);
-        Captions.AddActionCaption(ActionCode(), 'MustBeNegative', MUST_BE_NEGATIVE);
+        Captions.AddActionCaption(ActionCode(), 'QtyCaption', QtyCaptionLbl);
+        Captions.AddActionCaption(ActionCode(), 'PriceCaption', PriceCaptionLbl);
+        Captions.AddActionCaption(ActionCode(), 'MustBePositive', MustBePositiveErr);
+        Captions.AddActionCaption(ActionCode(), 'MustBeNegative', MustBeNegativeErr);
         Captions.AddActionCaption(ActionCode(), 'CannotExceedMaxQty', CannotExceedMaxQtyErr);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, false)]
-    local procedure OnBeforeWorkflow(Action: Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
+    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        Context: Codeunit "NPR POS JSON Management";
-        NegativeInput: Boolean;
-        POSSetup: Codeunit "NPR POS Setup";
-        POSUnit: Record "NPR POS Unit";
-        POSAuditProfile: Record "NPR POS Audit Profile";
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        Context.InitializeJObjectParser(Parameters, FrontEnd);
-        Context.SetScopeRoot();
-        NegativeInput := Context.GetBooleanOrFail('NegativeInput', StrSubstNo(ReadingErr, ActionCode()));
-        if not NegativeInput then
-            exit;
-
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSUnit(POSUnit);
-        POSAuditProfile.Get(POSUnit."POS Audit Profile");
-        Context.SetContext('PromptForReason', POSAuditProfile."Require Item Return Reason");
-
-        FrontEnd.SetActionContext(ActionCode(), Context);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         SaleLinePOS: Record "NPR POS Sale Line";
-        JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
         Quantity: Decimal;
         UnitPrice: Decimal;
-        ConstraintOption: Integer;
+        ConstraintOption: Option "No Constraint","Positive Quantity Only","Negative Quantity Only";
         ReturnReasonCode: Code[20];
         NegativeInput: Boolean;
-        POSSalesLine: Record "NPR POS Entry Sales Line";
+        SaleMustBePositiveErr: Label 'Quantity must be positive on the sales line.';
+        SaleMustBeNegativeErr: Label 'Quantity must be negative on the sales line.';
+        WrongQuantityErr: Label 'The minimum number of units to sell must be greater than zero.';
+        WrongReturnQuantityErr: Label 'The maximum number of units to return for %1 is %2.', Comment = '%1 = item description, %2 = maximal allowed quantity for return';
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
-
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        if WorkflowStep = 'AskForReturnReason' then begin
-            ReturnReasonCode := SelectReturnReason();
-            JSON.SetContext('ReturnReasonCode', ReturnReasonCode);
-            FrontEnd.SetActionContext(ActionCode(), JSON);
-            exit;
+        CASE WorkflowStep OF
+            'AddPresetValuesToContext':
+                begin
+                    AddPresetValuesToContext(Context, POSSession);
+                    exit;
+                end;
+            'AskForReturnReason':
+                begin
+                    ReturnReasonCode := SelectReturnReason();
+                    Context.SetContext('ReturnReasonCode', ReturnReasonCode);
+                    exit;
+                end;
         end;
 
-        ReturnReasonCode := JSON.GetString('ReturnReasonCode');
-
-        ConstraintOption := JSON.GetIntegerParameterOrFail('Constraint', ActionCode());
-
-        NegativeInput := JSON.GetBooleanParameterOrFail('NegativeInput', ActionCode());
-        Quantity := GetDecimal(JSON, 'PromptQuantity');
-        UnitPrice := GetDecimal(JSON, 'PromptUnitPrice');
+        ReturnReasonCode := Context.GetString('ReturnReasonCode');
+        Quantity := Context.GetDecimalOrFail('PromptQuantity', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        UnitPrice := Context.GetDecimal('PromptUnitPrice');
+        ConstraintOption := Context.GetIntegerParameter('Constraint');
+        NegativeInput := Context.GetBooleanParameter('NegativeInput');
 
         if NegativeInput and (Quantity > 0) then
-            Quantity *= -1;
+            Quantity := -Quantity;
 
         POSSession.GetSaleLine(SaleLine);
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -164,24 +106,23 @@ codeunit 6150808 "NPR POS Action: Quantity"
             POSSalesLine.SetRange("Line No.", SaleLinePOS."Line No.");
             if POSSalesLine.FindFirst() then
                 if Abs(Quantity) > Abs(POSSalesLine.Quantity) then
-                    Error(WRONG_RETURN_QUANTITY, POSSalesLine.Description, Abs(POSSalesLine.Quantity));
+                    Error(WrongReturnQuantityErr, POSSalesLine.Description, Abs(POSSalesLine.Quantity));
         end;
 
         case ConstraintOption of
-            1: // Positive qty constraint
+            ConstraintOption::"Positive Quantity Only":
                 begin
                     if (Quantity = 0) then
-                        Error(WRONG_QUANTITY);
+                        Error(WrongQuantityErr);
                     if (Quantity < 0) then
-                        Error(SALE_MUST_BE_POSITIVE);
+                        Error(SaleMustBePositiveErr);
                 end;
-
-            2: // Negative qty constraint
+            ConstraintOption::"Negative Quantity Only":
                 begin
                     if (Quantity = 0) then
-                        Error(WRONG_QUANTITY);
+                        Error(WrongQuantityErr);
                     if (Quantity > 0) then
-                        Error(SALE_MUST_BE_NEGATIVE);
+                        Error(SaleMustBeNegativeErr);
                 end;
         end;
 
@@ -201,6 +142,21 @@ codeunit 6150808 "NPR POS Action: Quantity"
         POSSession.RequestRefreshData();
     end;
 
+    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        if not Context.GetBooleanParameter('NegativeInput') then
+            exit;
+
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if POSUnit.GetProfile(POSAuditProfile) then
+            Context.SetContext('PromptForReason', POSAuditProfile."Require Item Return Reason");
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]
     local procedure OnParameterValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     var
@@ -216,18 +172,9 @@ codeunit 6150808 "NPR POS Action: Quantity"
                         exit;
                     Evaluate(ValueAsDecimal, POSParameterValue.Value);
                     if ValueAsDecimal < 0 then
-                        Error(MUST_BE_POSITIVE);
+                        Error(MustBePositiveErr);
                 end;
         end;
-    end;
-
-    local procedure GetDecimal(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
-    begin
-        JSON.SetScopeRoot();
-        if (not JSON.SetScope('$' + Path)) then
-            exit(0);
-
-        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())));
     end;
 
     local procedure SelectReturnReason(): Code[10]
@@ -241,8 +188,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         Error(ReasonRequiredErr);
     end;
 
-    //--- Ean Box Event Handling ---
-
+    #region Ean Box Event Handling
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
@@ -302,4 +248,5 @@ codeunit 6150808 "NPR POS Action: Quantity"
     begin
         exit(Codeunit::"NPR POS Action: Quantity");
     end;
+    #endregion
 }
