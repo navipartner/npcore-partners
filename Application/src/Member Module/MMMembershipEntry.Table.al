@@ -184,6 +184,9 @@ table 6060129 "NPR MM Membership Entry"
         key(Key2; "Membership Entry No.")
         {
         }
+        key(Key3; "Receipt No.", "Line No.")
+        {
+        }
     }
 
     fieldgroups
