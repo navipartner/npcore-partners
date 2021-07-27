@@ -226,6 +226,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MemberCard2: Record "NPR MM Member Card";
     begin
 
+        if (not MembershipEntry.SetCurrentKey("Receipt No.")) then;
         MembershipEntry.SetFilter("Receipt No.", '=%1', SalesReceiptNo);
         if (not (MembershipEntry.FindSet())) then
             exit;
