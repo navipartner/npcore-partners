@@ -1,15 +1,7 @@
 table 6060110 "NPR TM Ticket Notif. Entry"
 {
-    // TM1.38/TSA/20181025  CASE 332109 Transport TM1.38 - 25 October 2018
-    // TM1.39/TSA /20190109 CASE 310057 Added field "Notification Group Id" and "Admission Code"
-    // TM1.45/TSA /20191107 CASE 374620 Added Notification Trigger::Stakeholder, "Admission Schedule Entry No.", "Det. Ticket Access Entry No.", "Ticket Trigger Type"
-    // TM1.45/TSA /20191204 CASE 380754 Added "Notification Trigger"::Waiting List and "Ticket Trigger Type"::Added to WL and "Ticket Trigger Type"::Notified by WL and Waiting List Reference Code
-    // TM90.1.46/TSA /20200127 CASE 387138 Added Published Ticket URL and options to "Notification Trigger", "Ticket Trigger Type"
-    // TM90.1.46/TSA /20200127 CASE 387138 extended "Waiting List Reference Code" to code 20
-
     Caption = 'Ticket Notification Entry';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Entry No."; Integer)
@@ -26,6 +18,11 @@ table 6060110 "NPR TM Ticket Notif. Entry"
         field(20; "Date To Notify"; Date)
         {
             Caption = 'Date To Notify';
+            DataClassification = CustomerContent;
+        }
+        field(21; "Time To Notify"; Time)
+        {
+            Caption = 'Time To Notify';
             DataClassification = CustomerContent;
         }
         field(30; "Notification Send Status"; Option)
@@ -49,12 +46,17 @@ table 6060110 "NPR TM Ticket Notif. Entry"
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionCaption = 'Not Applicable,eTicket Update,eTicket Create,Stakeholder,Waiting List,TicketServer';
-            OptionMembers = NA,ETICKET_UPDATE,ETICKET_CREATE,STAKEHOLDER,WAITINGLIST,TICKETSERVER;
+            OptionCaption = 'Not Applicable,eTicket Update,eTicket Create,Stakeholder,Waiting List,TicketServer,Reminder';
+            OptionMembers = NA,ETICKET_UPDATE,ETICKET_CREATE,STAKEHOLDER,WAITINGLIST,TICKETSERVER,REMINDER;
         }
         field(40; "Ticket Type Code"; Code[20])
         {
             Caption = 'Ticket Type Code';
+            DataClassification = CustomerContent;
+        }
+        field(45; "Template Code"; Code[10])
+        {
+            Caption = 'Template Code';
             DataClassification = CustomerContent;
         }
         field(47; "Notification Process Method"; Option)
@@ -181,6 +183,11 @@ table 6060110 "NPR TM Ticket Notif. Entry"
         field(115; "Det. Ticket Access Entry No."; Integer)
         {
             Caption = 'Det. Ticket Access Entry No.';
+            DataClassification = CustomerContent;
+        }
+        field(120; "Extra Text"; Text[200])
+        {
+            Caption = 'Extra Text';
             DataClassification = CustomerContent;
         }
         field(150; Section; Text[30])

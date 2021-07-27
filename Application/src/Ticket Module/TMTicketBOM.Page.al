@@ -130,6 +130,11 @@ page 6060121 "NPR TM Ticket BOM"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Revoke Policy field';
                 }
+                field("Notification Profile Code"; Rec."Notification Profile Code")
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of Notification Profile Code';
+                }
                 field("Refund Price %"; Rec."Refund Price %")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
