@@ -672,6 +672,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
+        NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
     begin
 
         AdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
@@ -692,6 +693,9 @@ codeunit 6059784 "NPR TM Ticket Management"
                     TicketAccessEntry."Customer No." := CustomerNo;
                     TicketAccessEntry.Modify();
                 end;
+
+                NotifyParticipant.CreateAdmissionReservationReminder(TicketAccessEntry);
+
             end;
 
         until (AdmissionBOM.Next() = 0);
@@ -878,6 +882,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
     begin
 
         if (not TicketAccessEntry.Get(TicketAccessEntryNo)) then
@@ -894,7 +899,9 @@ codeunit 6059784 "NPR TM Ticket Management"
         end;
 
         RegisterCancel_Worker(TicketAccessEntry."Entry No.");
+
         TicketRequestManager.OnAfterBlockTicketPublisher(Ticket."No.");
+        NotifyParticipant.CreateRevokeNotification(TicketAccessEntry);
 
     end;
 
@@ -1022,7 +1029,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
         TicketTypeForm.HideTickets();
         TicketTypeForm.LookupMode(true);
-        if (TicketTypeForm.RunModal() = ACTION::LookupOK) then begin
+        if (TicketTypeForm.RunModal() = Action::LookupOK) then begin
             TicketTypeForm.GetRecord(TicketType);
             TicketTypeCode := TicketType.Code;
         end;
@@ -1520,10 +1527,14 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+        FirstAdmission: Boolean;
     begin
 
         TicketAccessEntry.LockTable();
         TicketAccessEntry.Get(TicketAccessEntryNo);
+        FirstAdmission := (TicketAccessEntry."Access Date" = 0D);
+
         if (TicketAccessEntry."Access Date" = 0D) then begin
             TicketAccessEntry."Access Date" := Today();
             TicketAccessEntry."Access Time" := Time;
@@ -1543,6 +1554,9 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         OnDetailedTicketEvent(AdmittedTicketAccessEntry);
         CloseReservationEntry(AdmittedTicketAccessEntry);
+
+        if (FirstAdmission) then
+            NotifyParticipant.CreateFirstAdmissionNotification(TicketAccessEntry);
     end;
 
     local procedure RegisterReservation_Worker(Ticket: Record "NPR TM Ticket"; TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer): Integer

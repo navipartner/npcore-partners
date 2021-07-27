@@ -605,7 +605,15 @@
                 gShowDeliverTo := TicketType."eTicket Activated";
 
         TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
         TicketBOM.SetFilter("Publish Ticket URL", '<>%1', TicketBOM."Publish Ticket URL"::DISABLE);
+        if (not gShowDeliverTo) then
+            gShowDeliverTo := TicketBOM.FindFirst();
+
+        TicketBOM.Reset();
+        TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
+        TicketBOM.SetFilter("Notification Profile Code", '<>%1', '');
         if (not gShowDeliverTo) then
             gShowDeliverTo := TicketBOM.FindFirst();
     end;

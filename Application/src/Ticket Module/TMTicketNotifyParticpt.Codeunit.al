@@ -4,7 +4,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
     begin
-
         TicketNotificationEntry.Reset();
         TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::STAKEHOLDER);
         TicketNotificationEntry.SetFilter("Notification Process Method", '=%1', TicketNotificationEntry."Notification Process Method"::BATCH);
@@ -14,6 +13,20 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::WAITINGLIST);
         TicketNotificationEntry.SetFilter("Notification Process Method", '=%1', TicketNotificationEntry."Notification Process Method"::BATCH);
         SendGeneralNotification(TicketNotificationEntry);
+
+        TicketNotificationEntry.Reset();
+        TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::REMINDER);
+        TicketNotificationEntry.SetFilter("Notification Process Method", '=%1', TicketNotificationEntry."Notification Process Method"::BATCH);
+        TicketNotificationEntry.SetFilter("Date To Notify", '=%1', Today());
+        TicketNotificationEntry.SetFilter("Time To Notify", '<=%1', Time());
+        SendGeneralNotification(TicketNotificationEntry);
+
+        // this will catch those reminders that are scheduled closer to midnight than the frequency of the schedular
+        if (Time < 010000T) then begin
+            TicketNotificationEntry.SetFilter("Date To Notify", '=%1', CalcDate('<-1D>', TODAY));
+            TicketNotificationEntry.SetFilter("Time To Notify", '>%1', 230000T);
+            SendGeneralNotification(TicketNotificationEntry);
+        end;
     end;
 
     var
@@ -32,7 +45,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         Current: Integer;
         Window: Dialog;
     begin
-
         TicketParticipantWks.SetFilter("Notification Send Status", '=%1', TicketParticipantWks."Notification Send Status"::PENDING);
         TicketParticipantWks.SetFilter(Blocked, '=%1', false);
 
@@ -43,7 +55,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 exit;
 
             Current := 0;
-            if (GuiAllowed) then
+            if (GuiAllowed()) then
                 Window.Open(SEND_DIALOG);
 
             repeat
@@ -76,18 +88,18 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 end;
 
                 TicketParticipantWks2."Notification Sent At" := CurrentDateTime();
-                TicketParticipantWks2."Notification Sent By User" := UserId;
+                TicketParticipantWks2."Notification Sent By User" := UserId();
                 TicketParticipantWks2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketParticipantWks2."Failed With Message"));
                 TicketParticipantWks2.Modify();
                 Commit();
 
-                if (GuiAllowed) then
+                if (GuiAllowed()) then
                     Window.Update(1, Round(Current / MaxCount * 10000, 1));
                 Current += 1;
 
             until (TicketParticipantWks.Next() = 0);
 
-            if (GuiAllowed) then
+            if (GuiAllowed()) then
                 Window.Close();
 
         end;
@@ -127,7 +139,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             SMSMessage := SMSManagement.MakeMessage(SMSTemplateHeader, TicketParticipantWks);
             SMSManagement.SendSMS(TicketParticipantWks."Notification Address", SMSTemplateHeader.Description, SMSMessage);
         end else
-            ResponseMessage := StrSubstNo(NO_SMS_TEMPLATE, TicketParticipantWks.TableCaption);
+            ResponseMessage := StrSubstNo(NO_SMS_TEMPLATE, TicketParticipantWks.TableCaption());
 
         exit(ResponseMessage = '');
     end;
@@ -166,7 +178,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             SMSMessage := SMSManagement.MakeMessage(SMSTemplateHeader, TicketNotificationEntry);
             SMSManagement.SendSMS(TicketNotificationEntry."Notification Address", SMSTemplateHeader.Description, SMSMessage);
         end else
-            ResponseMessage := StrSubstNo(NO_SMS_TEMPLATE, TicketNotificationEntry.TableCaption);
+            ResponseMessage := StrSubstNo(NO_SMS_TEMPLATE, TicketNotificationEntry.TableCaption());
 
         exit(ResponseMessage = '');
 
@@ -244,8 +256,22 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 if (SuggestNotificationAddress = '') then
                     RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
             end;
-
         end;
+
+        // check if notify participant 
+        if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then begin
+            TicketAdmissionBOM.Reset();
+            TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
+            TicketAdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+            TicketAdmissionBOM.SetFilter("Notification Profile Code", '<>%1', '');
+            if (TicketAdmissionBOM.FindFirst()) then begin
+                AdmissionCode := TicketAdmissionBOM."Admission Code";
+                SuggestNotificationMethod := SuggestNotificationMethod::SMS;
+                if (SuggestNotificationAddress = '') then
+                    RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+            end;
+        end;
+
         if (not ForceDialog) then
             if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
                 exit(false);
@@ -273,7 +299,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         PageAction := DisplayTicketParticipant.RunModal();
 
         // Pick up the change
-        if (PageAction = ACTION::LookupOK) then
+        if (PageAction = Action::LookupOK) then
             TicketReservationRequest2.Get(TicketReservationRequest."Entry No.");
 
         TicketReservationRequest.FindSet();
@@ -282,11 +308,11 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
             TicketReservationRequest.Modify();
 
-            AttributeManagement.CopyEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", TicketReservationRequest2."Entry No.", TicketReservationRequest."Entry No.");
+            AttributeManagement.CopyEntryAttributeValue(Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest2."Entry No.", TicketReservationRequest."Entry No.");
 
         until (TicketReservationRequest.Next() = 0);
 
-        exit(PageAction = ACTION::LookupOK);
+        exit(PageAction = Action::LookupOK);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059784, 'OnDetailedTicketEvent', '', true, true)]
@@ -351,7 +377,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 end;
 
             DetTicketAccessEntry.Type::CANCELED_ADMISSION:
-                ; // Stakeholder notifications are for reservtions only.
+                ; // Stakeholder notifications are for reservations only.
 
             else
                 Message('Type %1 is not handled in stakeholder notification.', DetTicketAccessEntry.Type);
@@ -368,14 +394,14 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         if (SellOutEventType = 0) then
             exit;
 
-        Schedule.GET(AdmissionScheduleEntry."Schedule Code");
+        Schedule.Get(AdmissionScheduleEntry."Schedule Code");
 
         if (SellOutEventType = 1) then
-            if (Schedule."Notify Stakeholder On Sell-Out" IN [Schedule."Notify Stakeholder On Sell-Out"::TICKET, Schedule."Notify Stakeholder On Sell-Out"::BOTH]) then
+            if (Schedule."Notify Stakeholder On Sell-Out" in [Schedule."Notify Stakeholder On Sell-Out"::TICKET, Schedule."Notify Stakeholder On Sell-Out"::BOTH]) then
                 CreateStakeholderSellOutNotification(StakeholderNotificationGroupType::SELLOUT, Ticket, AdmissionScheduleEntry, AdmittedCount);
 
         if (SellOutEventType = 2) then
-            if (Schedule."Notify Stakeholder On Sell-Out" IN [Schedule."Notify Stakeholder On Sell-Out"::WAITINGLIST, Schedule."Notify Stakeholder On Sell-Out"::BOTH]) then
+            if (Schedule."Notify Stakeholder On Sell-Out" in [Schedule."Notify Stakeholder On Sell-Out"::WAITINGLIST, Schedule."Notify Stakeholder On Sell-Out"::BOTH]) then
                 CreateStakeholderSellOutNotification(StakeholderNotificationGroupType::WAITINGLIST, Ticket, AdmissionScheduleEntry, AdmittedCount);
     end;
 
@@ -446,12 +472,12 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        Admission.GET(AdmissionScheduleEntry."Admission Code");
+        Admission.Get(AdmissionScheduleEntry."Admission Code");
         if (Admission."Stakeholder (E-Mail/Phone No.)" = '') then
             exit;
 
-        Schedule.GET(AdmissionScheduleEntry."Schedule Code");
-        TicketReservationRequest.GET(Ticket."Ticket Reservation Entry No.");
+        Schedule.Get(AdmissionScheduleEntry."Schedule Code");
+        TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
         NotificationEntry."Entry No." := 0;
         NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::STAKEHOLDER;
@@ -478,17 +504,17 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
         NotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
         NotificationEntry."Relevant Time" := AdmissionScheduleEntry."Admission Start Time";
-        NotificationEntry."Relevant Datetime" := CREATEDATETIME(NotificationEntry."Relevant Date", NotificationEntry."Relevant Time");
+        NotificationEntry."Relevant Datetime" := CreateDateTime(NotificationEntry."Relevant Date", NotificationEntry."Relevant Time");
 
         NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::NA;
         if (STRPOS(Admission."Stakeholder (E-Mail/Phone No.)", '@') > 0) then
             NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::EMAIL;
 
-        if (STRLEN(DELCHR(NotificationEntry."Notification Address", '<=>', '+0123456789 ')) = 0) then
+        if (StrLen(DELCHR(NotificationEntry."Notification Address", '<=>', '+0123456789 ')) = 0) then
             NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::SMS;
 
         NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
-        NotificationEntry.INSERT();
+        NotificationEntry.Insert();
 
     end;
 
@@ -593,6 +619,266 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
     end;
 
+    procedure CreateTicketReservationReminder(Ticket: Record "NPR TM Ticket")
+    var
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+    begin
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        if (TicketAccessEntry.FindSet()) then begin
+            repeat
+                CreateAdmissionReservationReminder(TicketAccessEntry);
+            until (TicketAccessEntry.Next() = 0);
+        end;
+    end;
+
+    procedure CreateAdmissionReservationReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry") NotificationEntryNo: Integer
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        NotificationProfile: Record "NPR TM Notification Profile";
+        ProfileLine: Record "NPR TM Notif. Profile Line";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+    begin
+        if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
+            exit(0);
+
+        if (not TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then
+            exit(0);
+
+        if (TicketBOM."Notification Profile Code" = '') then
+            exit(0);
+
+        if (not NotificationProfile.Get(TicketBOM."Notification Profile Code")) then
+            exit(0);
+
+        if (NotificationProfile.Blocked) then
+            exit(0);
+
+        ProfileLine.SetFilter("Profile Code", '=%1', TicketBOM."Notification Profile Code");
+        ProfileLine.SetFilter("Notification Trigger", '=%1', ProfileLine."Notification Trigger"::RESERVATION);
+        ProfileLine.SetFilter(Blocked, '=%1', false);
+        if (not ProfileLine.FindSet()) then
+            exit(0);
+
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+        if (not DetTicketAccessEntry.FindFirst()) then
+            exit(0);
+
+        NotificationEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        NotificationEntry.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
+        NotificationEntry.SetFilter("Notification Trigger", '=%1', NotificationEntry."Notification Trigger"::REMINDER);
+        NotificationEntry.SetFilter("Notification Send Status", '=%1', NotificationEntry."Notification Send Status"::PENDING);
+        NotificationEntry.ModifyAll("Notification Send Status", NotificationEntry."Notification Send Status"::CANCELED);
+
+        repeat
+            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine);
+        until (ProfileLine.Next() = 0);
+    end;
+
+    procedure CreateFirstAdmissionNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry") NotificationEntryNo: Integer
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        NotificationProfile: Record "NPR TM Notification Profile";
+        ProfileLine: Record "NPR TM Notif. Profile Line";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
+            exit(0);
+
+        if (not TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then
+            exit(0);
+
+        if (TicketBOM."Notification Profile Code" = '') then
+            exit(0);
+
+        if (not NotificationProfile.Get(TicketBOM."Notification Profile Code")) then
+            exit(0);
+
+        if (NotificationProfile.Blocked) then
+            exit(0);
+
+        ProfileLine.SetFilter("Profile Code", '=%1', TicketBOM."Notification Profile Code");
+        ProfileLine.SetFilter("Notification Trigger", '=%1', ProfileLine."Notification Trigger"::FIRST_ADMISSION);
+        ProfileLine.SetFilter(Blocked, '=%1', false);
+        if (not ProfileLine.FindSet()) then
+            exit(0);
+
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
+        if (not DetTicketAccessEntry.FindFirst()) then
+            exit(0);
+
+        repeat
+            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine);
+        until (ProfileLine.Next() = 0);
+    end;
+
+    procedure CreateRevokeNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry") NotificationEntryNo: Integer
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        NotificationProfile: Record "NPR TM Notification Profile";
+        ProfileLine: Record "NPR TM Notif. Profile Line";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+    begin
+        NotificationEntry.SetFilter("Ticket No.", '=%1', TicketAccessEntry."Ticket No.");
+        NotificationEntry.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
+        NotificationEntry.SetFilter("Notification Trigger", '=%1', NotificationEntry."Notification Trigger"::REMINDER);
+        NotificationEntry.SetFilter("Notification Send Status", '=%1', NotificationEntry."Notification Send Status"::PENDING);
+        NotificationEntry.ModifyAll("Notification Send Status", NotificationEntry."Notification Send Status"::CANCELED);
+
+        if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
+            exit(0);
+
+        if (not TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then
+            exit(0);
+
+        if (TicketBOM."Notification Profile Code" = '') then
+            exit(0);
+
+        if (not NotificationProfile.Get(TicketBOM."Notification Profile Code")) then
+            exit(0);
+
+        if (NotificationProfile.Blocked) then
+            exit(0);
+
+        ProfileLine.SetFilter("Profile Code", '=%1', TicketBOM."Notification Profile Code");
+        ProfileLine.SetFilter("Notification Trigger", '=%1', ProfileLine."Notification Trigger"::REVOKE);
+        ProfileLine.SetFilter(Blocked, '=%1', false);
+        if (not ProfileLine.FindSet()) then
+            exit(0);
+
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+        if (not DetTicketAccessEntry.FindFirst()) then begin
+            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+            if (not DetTicketAccessEntry.FindFirst()) then
+                exit(0);
+        end;
+
+        repeat
+            NotificationEntryNo := CreateReminderNotification(DetTicketAccessEntry, ProfileLine);
+        until (ProfileLine.Next() = 0);
+    end;
+
+    local procedure CreateReminderNotification(DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; TicketNotProfileLine: Record "NPR TM Notif. Profile Line"): Integer
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
+        Admission: Record "NPR TM Admission";
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        CalcReminderTime: DateTime;
+    begin
+#pragma warning disable AA0217
+        Ticket.Get(DetTicketAccessEntry."Ticket No.");
+        TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
+
+        AdmSchEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
+        AdmSchEntry.SetFilter(Cancelled, '=%1', false);
+        AdmSchEntry.FindLast();
+
+        Admission.Get(AdmSchEntry."Admission Code");
+
+        NotificationEntry."Entry No." := 0;
+        NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::REMINDER;
+        NotificationEntry."Notification Address" := TicketReservationRequest."Notification Address";
+        if (NotificationEntry."Notification Address" = '') then
+            exit(0);
+
+        if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::RESERVATION) then begin
+            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::RESERVE;
+            // Schedule ahead of admission start
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
+                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<-%1D>', ABS(TicketNotProfileLine.Units)), AdmSchEntry."Admission Start Date");
+                NotificationEntry."Time To Notify" := AdmSchEntry."Admission Start Time";
+            end;
+
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
+                CalcReminderTime := CreateDateTime(AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");
+                CalcReminderTime -= ABS(TicketNotProfileLine.Units) * 3600 * 1000;
+                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+            end;
+        end;
+
+        if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::FIRST_ADMISSION) then begin
+            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADMIT;
+            // Schedule after admission end
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
+                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<%1D>', ABS(TicketNotProfileLine.Units)), AdmSchEntry."Admission End Date");
+                NotificationEntry."Time To Notify" := AdmSchEntry."Admission End Time";
+            end;
+
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
+                CalcReminderTime := CreateDateTime(AdmSchEntry."Admission End Date", AdmSchEntry."Admission End Time");
+                CalcReminderTime += ABS(TicketNotProfileLine.Units) * 3600 * 1000;
+                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+            end;
+        end;
+
+        if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::REVOKE) then begin
+            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::CANCEL_RESERVE;
+            // Schedule after NOW
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
+                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<%1D>', ABS(TicketNotProfileLine.Units)), TODAY);
+                NotificationEntry."Time To Notify" := Time();
+            end;
+
+            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
+                CalcReminderTime := CreateDateTime(TODAY, Time());
+                CalcReminderTime += ABS(TicketNotProfileLine.Units) * 3600 * 1000;
+                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+            end;
+        end;
+
+        if (NotificationEntry."Date To Notify" < Today()) then
+            exit(0);
+
+        NotificationEntry."Template Code" := TicketNotProfileLine."Template Code";
+        NotificationEntry."Extra Text" := TicketNotProfileLine."Notification Extra Text";
+
+        NotificationEntry."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
+        NotificationEntry."Admission Schedule Entry No." := AdmSchEntry."Entry No.";
+
+        NotificationEntry."Ticket Type Code" := Ticket."Ticket Type Code";
+        NotificationEntry."Ticket No." := Ticket."No.";
+        NotificationEntry."External Ticket No." := Ticket."External Ticket No.";
+        NotificationEntry."Ticket No. for Printing" := Ticket."External Ticket No.";
+        NotificationEntry."Admission Code" := Admission."Admission Code";
+        NotificationEntry."Adm. Event Description" := Admission.Description;
+        NotificationEntry."Quantity To Admit" := TicketReservationRequest.Quantity;
+
+        NotificationEntry."Ticket Holder E-Mail" := TicketReservationRequest."Notification Address";
+        NotificationEntry."External Order No." := TicketReservationRequest."External Order No.";
+
+        NotificationEntry."Relevant Date" := AdmSchEntry."Admission Start Date";
+        NotificationEntry."Relevant Time" := AdmSchEntry."Admission Start Time";
+        NotificationEntry."Relevant Datetime" := CreateDateTime(NotificationEntry."Relevant Date", NotificationEntry."Relevant Time");
+
+        NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::NA;
+        if (NotificationEntry."Notification Address" <> '') then begin
+            if (STRPOS(NotificationEntry."Notification Address", '@') > 0) then
+                NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::EMAIL;
+
+            if (StrLen(DelChr(NotificationEntry."Notification Address", '<=>', '+0123456789 ')) = 0) then
+                NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::SMS;
+        end;
+
+        NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
+        NotificationEntry.Insert();
+
+        exit(NotificationEntry."Entry No.");
+#pragma warning restore
+    end;
+
+
     procedure SendGeneralNotification(var TicketNotificationEntryFilters: Record "NPR TM Ticket Notif. Entry")
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
@@ -603,6 +889,9 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         Current: Integer;
     begin
 
+        if (not (TicketNotificationEntryFilters.HasFilter())) then
+            exit;
+
         TicketNotificationEntry.CopyFilters(TicketNotificationEntryFilters);
         TicketNotificationEntry.SetFilter("Notification Send Status", '=%1', TicketNotificationEntry."Notification Send Status"::PENDING);
 
@@ -610,7 +899,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             MaxCount := TicketNotificationEntry.Count();
 
             Current := 0;
-            if (GuiAllowed) then
+            if (GuiAllowed()) then
                 Window.Open(SEND_DIALOG);
 
             repeat
@@ -642,18 +931,18 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 end;
 
                 TicketNotificationEntry2."Notification Sent At" := CurrentDateTime();
-                TicketNotificationEntry2."Notification Sent By User" := UserId;
+                TicketNotificationEntry2."Notification Sent By User" := UserId();
                 TicketNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry2."Failed With Message"));
                 TicketNotificationEntry2.Modify();
                 Commit();
 
-                if (GuiAllowed) then
+                if (GuiAllowed()) then
                     Window.Update(1, Round(Current / MaxCount * 10000, 1));
                 Current += 1;
 
             until (TicketNotificationEntry.Next() = 0);
 
-            if (GuiAllowed) then
+            if (GuiAllowed()) then
                 Window.Close();
 
         end;

@@ -22,6 +22,11 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Date To Notify field';
                 }
+                field("Time To Notify"; Rec."Time To Notify")
+                {
+                    ToolTip = 'Specifies the value of the Time To Notify field';
+                    ApplicationArea = NPRTicketAdvanced;
+                }
                 field("Notification Send Status"; Rec."Notification Send Status")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -51,6 +56,16 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Type Code field';
+                }
+                field("Template Code"; Rec."Template Code")
+                {
+                    ToolTip = 'Specifies the value of the Template Code field';
+                    ApplicationArea = NPRTicketEssential;
+                }
+                field("Notification Process Method"; Rec."Notification Process Method")
+                {
+                    ToolTip = 'Specifies the value of the Notification Process Method field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket No."; Rec."Ticket No.")
                 {
@@ -211,6 +226,66 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Wallet Pass Combine URL field';
+                }
+                field("Authorization Code"; Rec."Authorization Code")
+                {
+                    ToolTip = 'Specifies the value of the Authorization Code field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Admission Code"; Rec."Admission Code")
+                {
+                    ToolTip = 'Specifies the value of the Admission Code field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Admission Schedule Entry No."; Rec."Admission Schedule Entry No.")
+                {
+                    ToolTip = 'Specifies the value of the Admission Schedule Entry No. field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Det. Ticket Access Entry No."; Rec."Det. Ticket Access Entry No.")
+                {
+                    ToolTip = 'Specifies the value of the Det. Ticket Access Entry No. field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("External Order No."; Rec."External Order No.")
+                {
+                    ToolTip = 'Specifies the value of the External Order No. field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Extra Text"; Rec."Extra Text")
+                {
+                    ToolTip = 'Specifies the value of the Extra Text field';
+                    ApplicationArea = NPRTicketAdvanced;
+                }
+                field("Ticket Item No."; Rec."Ticket Item No.")
+                {
+                    ToolTip = 'Specifies the value of the Ticket Item No. field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Ticket Variant Code"; Rec."Ticket Variant Code")
+                {
+                    ToolTip = 'Specifies the value of the Ticket Variant Code field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Ticket External Item No."; Rec."Ticket External Item No.")
+                {
+                    ToolTip = 'Specifies the value of the Ticket External Item No. field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Ticket Token"; Rec."Ticket Token")
+                {
+                    ToolTip = 'Specifies the value of the Ticket Token field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Notification Group Id"; Rec."Notification Group Id")
+                {
+                    ToolTip = 'Specifies the value of the Notification Group Id field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Published Ticket URL"; Rec."Published Ticket URL")
+                {
+                    ToolTip = 'Specifies the value of the Published Ticket URL field';
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
             }
         }
