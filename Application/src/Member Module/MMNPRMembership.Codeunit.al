@@ -936,7 +936,7 @@ codeunit 6060147 "NPR MM NPR Membership"
             MemberCardXml :=
               '<membercard>' +
                   StrSubstNo(XmlLbl, XmlSafe(MemberInfoCapture."External Card No.")) +
-                  StrSubstNo(Xml2Lbl, Format(MemberInfoCapture."Temporary Member Card", 0, 9)) +
+                  StrSubstNo(Xml2Lbl, Format(not MemberInfoCapture."Temporary Member Card", 0, 9)) +
                   StrSubstNo(Xml3Lbl, DateText) +
               '</membercard>';
 
