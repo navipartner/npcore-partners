@@ -303,14 +303,15 @@ page 6151504 "NPR Nc Import List"
                 trigger OnAction()
                 var
                     TempBlob: Codeunit "Temp Blob";
-                    FileMgt: Codeunit "File Management";
-                    Path: Text;
+                    TemplateInStream: InStream;
+                    DownloadLbl: Label 'Download file';
                 begin
                     Rec.CalcFields("Document Source");
                     TempBlob.FromRecord(Rec, Rec.FieldNo("Document Source"));
                     if not TempBlob.HasValue() then
                         exit;
-                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + Rec."Document Name", true);
+                    TempBlob.CreateInStream(TemplateInStream);
+                    DownloadFromStream(TemplateInStream, DownloadLbl, '', '', Rec."Document Name");
                 end;
             }
             action("Import File")
@@ -472,30 +473,14 @@ page 6151504 "NPR Nc Import List"
 
     local procedure ShowDocumentSource()
     var
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
         InStr: InStream;
-        Path: Text;
-        Content: Text;
-        tmp: Text;
+        TypeHelper: Codeunit "Type Helper";
     begin
         Rec.CalcFields("Document Source");
-        if Rec."Document Source".HasValue() then
-            if IsWebClient() then begin
-                Rec."Document Source".CreateInStream(InStr);
-                Content := '';
-                while not InStr.EOS()
-                do begin
-                    InStr.ReadText(tmp);
-                    Content += tmp + '\';
-                end;
-                Message(Content);
-            end else begin
-                TempBlob.FromRecord(Rec, Rec.FieldNo("Document Source"));
-                Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + Rec."Document Name", false);
-                HyperLink(Path);
-            end
-        else
+        if Rec."Document Source".HasValue() then begin
+            Rec."Document Source".CreateInStream(InStr);
+            Message(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
+        end else
             Message(NoInputTxt);
     end;
 

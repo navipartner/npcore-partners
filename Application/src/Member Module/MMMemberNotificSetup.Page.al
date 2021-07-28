@@ -207,12 +207,13 @@ page 6060142 "NPR MM Member Notific. Setup"
                 trigger OnAction()
                 var
                     TempBlob: Codeunit "Temp Blob";
-                    FileMgt: Codeunit "File Management";
                     MemberNotification: Codeunit "NPR MM Member Notification";
-                    Path: Text;
                     PassData: Text;
+                    FileName: Text;
                     TemplateOutStream: outstream;
+                    TemplateInStream: InStream;
                     FileNameLbl: Label '%1 - %2.json', Locked = true;
+                    DownloadLbl: Label 'Downloading template';
                 begin
                     Rec.CalcFields("PUT Passes Template");
                     if (not Rec."PUT Passes Template".HasValue()) then begin
@@ -226,8 +227,10 @@ page 6060142 "NPR MM Member Notific. Setup"
                     TempBlob.FromRecord(Rec, Rec.FieldNo("PUT Passes Template"));
                     if (not TempBlob.HasValue()) then
                         exit;
-                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo(FileNameLbl, Rec.Code, Rec.Description), true);
 
+                    TempBlob.CreateInStream(TemplateInStream);
+                    FileName := StrSubstNo(FileNameLbl, Rec.Code, Rec.Description);
+                    DownloadFromStream(TemplateInStream, DownloadLbl, '', 'Template Files (*.json)|*.json', FileName)
                 end;
             }
 

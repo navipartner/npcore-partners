@@ -266,7 +266,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
     var
         AlterationOption: Option " ",REGRET,RENEW,UPGRADE,EXTEND,CANCEL;
         CONFIRM_EXECUTE: Label '%1 lines are selected. Are you sure you want to make the selected changes? ';
-        GServerFileName: Text;
         GDateMask: Text;
         IMPORT_MESSAGE_DIALOG: Label 'Importing :\#1#######################################################';
         GLineCount: Integer;
@@ -356,7 +355,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         end;
 
         Membership.SetFilter("External Membership No.", '=%1', pExternalMembershipNo);
-        //Membership.FindFirst() ();
         if (not Membership.FindFirst()) then begin
             Membership.Reset();
             Membership.SetFilter("Customer No.", '=%1', pExternalMembershipNo);
@@ -365,7 +363,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Membership.Reset();
                 Membership.SetFilter("External Membership No.", '=%1', pExternalMembershipNo);
 
-                //Membership.FindFirst() ();
                 if (not Membership.FindFirst()) then begin
                     MemberInfoCapture."External Member No" := pExternalMembershipNo;
                     MemberInfoCapture."Response Message" := 'Invalid reference.';
@@ -492,39 +489,14 @@ page 6060073 "NPR MM Members. Alteration Jnl"
     local procedure ImportAlterationFromFile(SkipFirstLine: Boolean)
     var
         FileManagement: Codeunit "File Management";
-        SuggestFileName: Text[1024];
-        FileName: Text[1024];
-        Serverfilename: Text;
         TempBLOB: Codeunit "Temp Blob";
-        TempAttachment: Record Attachment temporary;
     begin
-        SuggestFileName := '';
-
-        Filename := FileManagement.BLOBImportWithFilter(TempBLOB, SELECT_FILE_CAPTION, SuggestFileName, FILE_FILTER, 'csv');
-
-        TempAttachment.SetAttachmentFileFromBlob(TempBLOB);
-        TempAttachment."Attachment File".Export(Filename);
-
-        if (SuggestFileName = FileName) then
-            Error('');
-
-        Serverfilename := FileName;
-        SetFileName(Serverfilename);
-
-        ImportFromFile(SkipFirstLine);
-
+        FileManagement.BLOBImportWithFilter(TempBLOB, SELECT_FILE_CAPTION, '', FILE_FILTER, 'csv');
+        ImportFromFile(TempBLOB, SkipFirstLine);
     end;
 
-    procedure SetFileName(PFileName: Text[250])
-    begin
-
-        GServerFileName := PFileName;
-
-    end;
-
-    procedure ImportFromFile(SkipFirstLine: Boolean)
+    procedure ImportFromFile(TempBLOB: Codeunit "Temp Blob"; SkipFirstLine: Boolean)
     var
-        TxtFile: File;
         IStream: InStream;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Fileline: Text;
@@ -536,9 +508,8 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
         GDateMask := 'YYYYMMDD'; // Should be setup or parameter
 
-        TxtFile.TextMode(true);
-        TxtFile.Open(GServerFileName);
-        TxtFile.CreateInStream(IStream);
+
+        TempBLOB.CreateInStream(IStream);
 
         if (not MemberInfoCapture.FindLast()) then;
 
@@ -548,11 +519,8 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         while (not IStream.EOS) do begin
 
             if (IStream.ReadText(Fileline) > 0) then begin
-                //Fileline := Ansi2Ascii (Fileline);
 
                 // UTF-8 files start with some bytes identifying the format, get rid of those bytes
-                //IF (lineCount = 1) THEN WHILE (fileline[1] <> '"') DO fileline := COPYSTR (fileline, 2);
-
                 DecodeLine(Fileline);
 
                 if GuiAllowed then
@@ -567,8 +535,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
             end;
 
         end;
-
-        TxtFile.Close();
         if GuiAllowed then
             Window.Close();
 

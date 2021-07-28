@@ -46,7 +46,6 @@ page 6151187 "NPR MM Member Comm. Setup"
     {
         area(Processing)
         {
-
             action(ExportSenderTemplateFile)
             {
                 Caption = 'Export Sender Template File';
@@ -58,12 +57,13 @@ page 6151187 "NPR MM Member Comm. Setup"
                 trigger OnAction()
                 var
                     TempBlob: Codeunit "Temp Blob";
-                    FileMgt: Codeunit "File Management";
                     MemberNotification: Codeunit "NPR MM Member Notification";
-                    Path: Text;
                     PassData: Text;
+                    FileName: Text;
                     TemplateOutStream: outstream;
+                    TemplateInStream: InStream;
                     FileNameLbl: Label '%1 - %2.json', Locked = true;
+                    DownloadLbl: Label 'Downloading template';
                 begin
                     Rec.CalcFields("Sender Template");
                     if (not REc."Sender Template".HasValue()) then begin
@@ -85,10 +85,12 @@ page 6151187 "NPR MM Member Comm. Setup"
                     TempBlob.FromRecord(Rec, Rec.FieldNo("Sender Template"));
                     if (not TempBlob.HasValue()) then
                         exit;
-                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo(FileNameLbl, Rec."Membership Code", Rec.Description), true);
-
+                    TempBlob.CreateInStream(TemplateInStream);
+                    FileName := StrSubstNo(FileNameLbl, Rec."Membership Code", Rec.Description);
+                    DownloadFromStream(TemplateInStream, DownloadLbl, '', 'Template Files (*.json)|*.json', FileName)
                 end;
             }
+
 
             action(ImportSenderTemplateFile)
             {

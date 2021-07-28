@@ -138,7 +138,7 @@
         FindNextWorkflowModule(NpCsDocument, NpCsWorkflowModule);
         case NotificationType of
             NotificationType::" ":
-                Erase(NotInitialized);
+                Error(NotInitialized);
             NotificationType::Email:
                 if NotifyStoreEmail(NpCsDocument, LogMessage) then
                     NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
@@ -316,7 +316,7 @@
 
         case NotificationType of
             NotificationType::" ":
-                Erase(NotInitialized);
+                Error(NotInitialized);
             NotificationType::Email:
                 if NotifyCustomerEmail(NpCsDocument, LogMessage) then
                     NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
