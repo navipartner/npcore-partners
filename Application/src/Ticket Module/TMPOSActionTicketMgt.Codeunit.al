@@ -1260,7 +1260,7 @@
         end;
 
         //EXIT (TicketNotifyParticipant.AquireTicketParticipant (Token, SuggestMethod, SuggestAddress));
-        exit(TicketNotifyParticipant.AquireTicketParticipantForce(Token, SuggestMethod, SuggestAddress, ForceDialog));
+        exit(TicketNotifyParticipant.AcquireTicketParticipantForce(Token, SuggestMethod, SuggestAddress, ForceDialog));
     end;
 
     local procedure AssignSameSchedule(Token: Text[100])

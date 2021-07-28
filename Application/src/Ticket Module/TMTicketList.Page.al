@@ -154,7 +154,7 @@ page 6059785 "NPR TM Ticket List"
             group(Manage)
             {
                 Caption = 'Manage';
-                action("Create eTicket")
+                Action("Create eTicket")
                 {
                     ToolTip = 'Create and send ticket to wallet';
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
@@ -169,7 +169,7 @@ page 6059785 "NPR TM Ticket List"
                         CreateETicket();
                     end;
                 }
-                action("Block/Unblock Tickets")
+                Action("Block/Unblock Tickets")
                 {
                     ToolTip = 'Prevents the tickets from being used (reversible).';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -185,7 +185,7 @@ page 6059785 "NPR TM Ticket List"
                         ToggleTicketBlock();
                     end;
                 }
-                action("Revoke Ticket")
+                Action("Revoke Ticket")
                 {
                     ToolTip = 'Prevents the tickets from being used (irreversible).';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -201,7 +201,7 @@ page 6059785 "NPR TM Ticket List"
                         RevokeTicket();
                     end;
                 }
-                action("Change Ticket Reservation")
+                Action("Change Ticket Reservation")
                 {
                     Caption = 'Change Ticket Reservation';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -217,7 +217,7 @@ page 6059785 "NPR TM Ticket List"
                         ChangeTicketReservation();
                     end;
                 }
-                action(Ticketholder)
+                Action(Ticketholder)
                 {
                     ToolTip = 'Edit ticket holder.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -237,7 +237,7 @@ page 6059785 "NPR TM Ticket List"
             group(NavigationGroup)
             {
                 Caption = 'Navigate';
-                action("Access Entries")
+                Action("Access Entries")
                 {
                     ToolTip = 'Navigate to ticket access entries.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -248,10 +248,10 @@ page 6059785 "NPR TM Ticket List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket AccessEntry List";
-                    RunPageLink = "Ticket No." = FIELD("No.");
+                    RunPageLink = "Ticket No." = field("No.");
                     Scope = Repeater;
                 }
-                action("Ticket Request")
+                Action("Ticket Request")
                 {
                     ToolTip = 'Navigate to Ticket Request.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -267,7 +267,7 @@ page 6059785 "NPR TM Ticket List"
                         DisplayTicketRequest(Rec."Ticket Reservation Entry No.");
                     end;
                 }
-                action("View Online Ticket")
+                Action("View Online Ticket")
                 {
                     ToolTip = 'Display the ticket as created on ticket server.';
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
@@ -284,7 +284,7 @@ page 6059785 "NPR TM Ticket List"
                         DIYTicketPrint.ViewOnlineSingleTicket(Rec."No.");
                     end;
                 }
-                action("View Ticket Notifications")
+                Action("View Ticket Notifications")
                 {
                     ToolTip = 'Navigate to ticket notification entries.';
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
@@ -294,9 +294,9 @@ page 6059785 "NPR TM Ticket List"
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "NPR TM Ticket Notif. Entry";
-                    RunPageLink = "Ticket No." = FIELD("No.");
+                    RunPageLink = "Ticket No." = field("No.");
                 }
-                action(Navigate)
+                Action(Navigate)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Find Sales Transaction';
@@ -313,16 +313,16 @@ page 6059785 "NPR TM Ticket List"
                     end;
                 }
             }
-            action(TicketBom)
+            Action(TicketBom)
             {
                 ToolTip = 'Navigate to ticket admission bill-of-material.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Admission BOM';
                 Image = BOM;
                 RunObject = Page "NPR TM Ticket BOM";
-                RunPageLink = "Item No." = FIELD("Item No.");
+                RunPageLink = "Item No." = field("Item No.");
             }
-            action("Print Selected Tickets")
+            Action("Print Selected Tickets")
             {
                 ToolTip = 'Print selected tickets.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -348,7 +348,7 @@ page 6059785 "NPR TM Ticket List"
                 end;
             }
 
-            action("Report Issued Tickets")
+            Action("Report Issued Tickets")
             {
                 ToolTip = 'Print a report of issued tickets.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -359,7 +359,7 @@ page 6059785 "NPR TM Ticket List"
                 PromotedCategory = "Report";
                 RunObject = Report "NPR Issued Tickets";
             }
-            action(Statistics)
+            Action(Statistics)
             {
                 ToolTip = 'Navigate to Ticket Statistics';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -370,7 +370,7 @@ page 6059785 "NPR TM Ticket List"
                 PromotedCategory = "Report";
                 RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
             }
-            action(Forecast)
+            Action(Forecast)
             {
                 ToolTip = 'Navigate to Admission Forecast.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -402,7 +402,7 @@ page 6059785 "NPR TM Ticket List"
     begin
 
         TicketReservationRequest.Get(Rec."Ticket Reservation Entry No.");
-        TicketNotifyParticipant.AquireTicketParticipantForce(TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
+        TicketNotifyParticipant.AcquireTicketParticipantForce(TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
 
     end;
 
@@ -456,7 +456,7 @@ page 6059785 "NPR TM Ticket List"
             repeat
                 AmountToReverse := 0;
                 QtyToReverse := 0;
-                TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", UserId, 0, AmountToReverse, QtyToReverse);
+                TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", UserId(), 0, AmountToReverse, QtyToReverse);
             until (Ticket.Next() = 0);
             TicketRequestManager.RevokeReservationTokenRequest(Token, false);
         end;
@@ -499,22 +499,22 @@ page 6059785 "NPR TM Ticket List"
     begin
 
         CurrPage.SETSELECTIONFILTER(Ticket);
-        Ticket.FINDFIRST();
+        Ticket.FindFirst();
 
-        TicketReservationRequest.GET(Rec."Ticket Reservation Entry No.");
-        if (NOT TicketRequestManager.CreateChangeRequest(Ticket."External Ticket No.",
+        TicketReservationRequest.Get(Rec."Ticket Reservation Entry No.");
+        if (not TicketRequestManager.CreateChangeRequest(Ticket."External Ticket No.",
                   TicketReservationRequest."Authorization Code", RequestToken, ResponseMessage)) then
-            ERROR(ResponseMessage);
+            Error(ResponseMessage);
 
-        COMMIT();
+        Commit();
 
-        Rec.RESET();
+        Rec.Reset();
         TicketMakeReservationPage.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
         TicketMakeReservationPage.LoadTicketRequest(RequestToken);
-        TicketMakeReservationPage.LOOKUPMODE(TRUE);
-        PageAction := TicketMakeReservationPage.RUNMODAL();
-        if (PageAction = ACTION::LookupOK) then begin
-            TicketMakeReservationPage.FinalizeChangeRequest(TRUE, ResponseMessage);
+        TicketMakeReservationPage.LookupMode(true);
+        PageAction := TicketMakeReservationPage.RunModal();
+        if (PageAction = Action::LookupOK) then begin
+            TicketMakeReservationPage.FinalizeChangeRequest(true, ResponseMessage);
         end;
 
     end;
@@ -525,22 +525,22 @@ page 6059785 "NPR TM Ticket List"
         TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
     begin
 
-        TicketReservationRequest.GET(RequestEntryNo);
+        TicketReservationRequest.Get(RequestEntryNo);
         AddRequestToTmp(TicketReservationRequest."Session Token ID", TempTicketReservationRequest);
 
-        TicketReservationRequest.CALCFIELDS("Is Superseeded");
+        TicketReservationRequest.CalcFields("Is Superseeded");
         repeat
             if (TicketReservationRequest."Is Superseeded") then begin
-                TicketReservationRequest.RESET();
-                TicketReservationRequest.SETFILTER("Superseeds Entry No.", '=%1', TicketReservationRequest."Entry No.");
-                TicketReservationRequest.FINDFIRST();
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetFilter("Superseeds Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                TicketReservationRequest.FindFirst();
                 AddRequestToTmp(TicketReservationRequest."Session Token ID", TempTicketReservationRequest);
 
-                TicketReservationRequest.CALCFIELDS("Is Superseeded");
+                TicketReservationRequest.CalcFields("Is Superseeded");
             end;
-        until (NOT TicketReservationRequest."Is Superseeded");
+        until (not TicketReservationRequest."Is Superseeded");
 
-        PAGE.RUN(PAGE::"NPR TM Ticket Request", TempTicketReservationRequest);
+        Page.Run(Page::"NPR TM Ticket Request", TempTicketReservationRequest);
     end;
 
     local procedure AddRequestToTmp(Token: Text[100]; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary);
@@ -548,12 +548,12 @@ page 6059785 "NPR TM Ticket List"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        TicketReservationRequest.SETFILTER("Session Token ID", '=%1', Token);
-        if (TicketReservationRequest.FINDSET()) then begin
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TicketReservationRequest.FindSet()) then begin
             repeat
-                TmpTicketReservationRequest.TRANSFERFIELDS(TicketReservationRequest, TRUE);
-                TmpTicketReservationRequest.INSERT();
-            until (TicketReservationRequest.NEXT() = 0);
+                TmpTicketReservationRequest.TRANSFERFIELDS(TicketReservationRequest, true);
+                TmpTicketReservationRequest.Insert();
+            until (TicketReservationRequest.Next() = 0);
         end;
     end;
 
@@ -576,14 +576,14 @@ page 6059785 "NPR TM Ticket List"
                 if (not SalesInvHeader.SetCurrentKey("NPR External Order No.")) then;
                 SalesInvHeader.SetFilter("NPR External Order No.", '%1', TicketReservationReq."External Order No.");
                 if (SalesInvHeader.FindFirst()) then begin
-                    PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
+                    Page.Run(Page::"Posted Sales Invoice", SalesInvHeader);
                     exit;
                 end;
 
                 SalesInvHeader.Reset();
                 SalesInvHeader.SetFilter("External Document No.", '%1', TicketReservationReq."External Order No.");
                 if (SalesInvHeader.FindFirst()) then begin
-                    PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
+                    Page.Run(Page::"Posted Sales Invoice", SalesInvHeader);
                     exit;
                 end;
             end;

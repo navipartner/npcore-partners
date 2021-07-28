@@ -295,7 +295,7 @@
     {
         area(processing)
         {
-            action("Select Schedule")
+            Action("Select Schedule")
             {
                 ToolTip = 'Select a schedule entry for admission.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -314,7 +314,7 @@
                     CurrPage.Update(false);
                 end;
             }
-            action("Update Schedule")
+            Action("Update Schedule")
             {
                 ToolTip = 'Append to the list of generated time slots.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -345,7 +345,7 @@
             else
                 gConfirmStatusText := STATUS_CONFIRMED;
 
-        gDisallowReschedule := NOT IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
+        gDisallowReschedule := not IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
     end;
 
     trigger OnModifyRecord(): Boolean
@@ -358,10 +358,10 @@
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
 
-        if (CloseAction = ACTION::LookupOK) then begin
+        if (CloseAction = Action::LookupOK) then begin
 
             if (gBatchTicketCreateMode) then
-                if (Rec."Payment Option" <> Rec."Payment Option"::DIRECT) then begin
+                if (Rec."Payment Option" <> Rec."Payment Option"::DIRECT) and (Rec."Entry Type" <> Rec."Entry Type"::CHANGE) then begin
                     Rec.TestField("External Order No.");
                     Rec.TestField("Customer No.");
                 end;
@@ -434,7 +434,7 @@
         PlaceHolderLbl: Label '%1', Locked = true;
     begin
 
-        if (NOT IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.")) then
+        if (not IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.")) then
             Error(RESCHEDULE_NOT_ALLOWED);
 
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', Rec."Admission Code");
@@ -457,7 +457,7 @@
         PageScheduleEntry.LookupMode(true);
         PageAction := PageScheduleEntry.RunModal();
 
-        if ((PageAction = ACTION::Yes) or (PageAction = ACTION::LookupOK)) then begin
+        if ((PageAction = Action::Yes) or (PageAction = Action::LookupOK)) then begin
             OldEntryNo := Rec."External Adm. Sch. Entry No.";
             PageScheduleEntry.GetRecord(AdmissionScheduleEntry);
 
@@ -719,9 +719,9 @@
 
         if (gDeliverTicketTo <> '') then begin
             Rec.Reset();
-            if (Rec.FINDSET()) then;
+            if (Rec.FindSet()) then;
             repeat
-                TicketReservationRequest.GET(Rec."Entry No.");
+                TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
@@ -729,43 +729,43 @@
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
 
                 TicketReservationRequest.Modify();
-            until (Rec.NEXT() = 0);
+            until (Rec.Next() = 0);
         end;
 
         Rec.Reset();
-        Rec.SETFILTER("Scheduled Time Description", '=%1', WAITING_LIST);
-        if (NOT (Rec.ISEMPTY())) then begin
+        Rec.SetFilter("Scheduled Time Description", '=%1', WAITING_LIST);
+        if (not (Rec.IsEmpty())) then begin
             ResponseMessage := 'Not in this version: It is not supported to change to a timeslot that is on a waitinglist.';
             exit(13);
         end;
 
         if (gReservationEdited) then begin
-            Rec.RESET();
+            Rec.Reset();
 
-            Rec.FINDSET();
+            Rec.FindSet();
             repeat
-                TicketReservationRequest.GET(Rec."Entry No.");
+                TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."External Adm. Sch. Entry No." := Rec."External Adm. Sch. Entry No.";
                 TicketReservationRequest."Scheduled Time Description" := Rec."Scheduled Time Description";
                 TicketReservationRequest.Modify();
-            until (Rec.NEXT() = 0);
+            until (Rec.Next() = 0);
 
-            Rec.RESET();
-            Rec.SETFILTER("Primary Request Line", '=%1', TRUE);
-            Rec.FINDFIRST();
+            Rec.Reset();
+            Rec.SetFilter("Primary Request Line", '=%1', true);
+            Rec.FindFirst();
             NewTicketRequestEntryNo := Rec."Entry No.";
 
-            Ticket.SETFILTER("Ticket Reservation Entry No.", '=%1', Rec."Superseeds Entry No.");
-            if (Ticket.FINDSET()) then begin
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', Rec."Superseeds Entry No.");
+            if (Ticket.FindSet()) then begin
                 repeat
-                    Rec.RESET();
-                    Rec.FINDSET();
+                    Rec.Reset();
+                    Rec.FindSet();
                     repeat
-                        TicketManagement.RescheduleTicketAdmission(Ticket."No.", Rec."External Adm. Sch. Entry No.", TRUE, Rec."Request Status Date Time");
-                    until (Rec.NEXT() = 0);
-                until (Ticket.NEXT() = 0);
+                        TicketManagement.RescheduleTicketAdmission(Ticket."No.", Rec."External Adm. Sch. Entry No.", true, Rec."Request Status Date Time");
+                    until (Rec.Next() = 0);
+                until (Ticket.Next() = 0);
 
-                Ticket.MODIFYALL("Ticket Reservation Entry No.", NewTicketRequestEntryNo, FALSE);
+                Ticket.ModifyAll("Ticket Reservation Entry No.", NewTicketRequestEntryNo, false);
             end;
 
             TicketRequestManager.ConfirmChangeRequest(Rec."Session Token ID");
@@ -850,11 +850,11 @@
         TicketManagement: Codeunit 6059784;
     begin
 
-        RescheduleAllowed := TRUE;
+        RescheduleAllowed := true;
 
         if (gChangeRequestMode) then begin
-            Ticket.SETFILTER("Ticket Reservation Entry No.", '=%1', gTicketRequestEntryNo);
-            if (Ticket.FINDFIRST()) then
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', gTicketRequestEntryNo);
+            if (Ticket.FindFirst()) then
                 RescheduleAllowed := TicketManagement.IsRescheduleAllowed(Ticket."External Ticket No.", ExtAdmSchEntryNo, CURRENTDATETIME());
         end;
 
