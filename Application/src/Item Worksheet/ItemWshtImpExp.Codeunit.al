@@ -3,7 +3,6 @@ codeunit 6060047 "NPR Item Wsht. Imp. Exp."
     var
         ItemWorksheet: Record "NPR Item Worksheet";
         IsExported: Boolean;
-        ItemWkshtXmlFile: File;
         XmlINStream: InStream;
         TextExportCancelledMsg: Label 'Export Cancelled.';
         TextExportCompleteMsg: Label 'Export Complete.';
@@ -13,22 +12,20 @@ codeunit 6060047 "NPR Item Wsht. Imp. Exp."
         ToFile: Text[250];
 
     procedure Export(ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    var
+        TempBlob: Codeunit "Temp Blob";
     begin
         if ItemWorksheet.Get(ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name") then begin
             ItemWorksheet.SetRange("Item Template Name", ItemWorksheetLine."Worksheet Template Name");
             ItemWorksheet.SetRange(Name, ItemWorksheetLine."Worksheet Name");
-            ItemWkshtXmlFile.Create(TemporaryPath + 'ItemWorkSheet.xml');
-            ItemWkshtXmlFile.CreateOutStream(XmlOUTStream);
+            TempBlob.CreateOutStream(XmlOUTStream);
             IsExported := XMLPORT.Export(XMLPORT::"NPR Item Worksh. Import/Export", XmlOUTStream, ItemWorksheet);
-            FromFile := ItemWkshtXmlFile.Name;
-            ToFile := 'ItemWorkSheet.xml';
-            ItemWkshtXmlFile.Close();
+            TempBlob.CreateInStream(XmlINStream);
             if IsExported then begin
-                if not Download(FromFile, 'Download file', 'C:\Temp', 'Xml file(*.xml)|*.xml', ToFile) then
+                if not DownloadFromStream(XmlINStream, 'Download file', 'C:\Temp', 'Xml file(*.xml)|*.xml', ToFile) then
                     Message(TextExportCancelledMsg)
                 else
                     Message(TextExportCompleteMsg);
-                Erase(FromFile);
             end else
                 Message(TextExportFailedMsg);
         end;

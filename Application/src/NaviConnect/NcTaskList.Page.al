@@ -413,7 +413,6 @@ page 6151502 "NPR Nc Task List"
         NcTaskOutput: Record "NPR Nc Task Output";
         FileMgt: Codeunit "File Management";
         InStr: InStream;
-        Path: Text;
         Content: Text;
         BufferText: Text;
     begin
@@ -423,9 +422,7 @@ page 6151502 "NPR Nc Task List"
             if NcTaskOutput.FindLast() and NcTaskOutput.Data.HasValue() then begin
                 NcTaskOutput.CalcFields(Data);
                 NcTaskOutput.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
-                Path := TemporaryPath + NcTaskOutput.Name;
-                DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(NcTaskOutput.Name), Path);
-                HyperLink(Path);
+                DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(NcTaskOutput.Name), NcTaskOutput.Name);
                 exit;
             end;
             Message(NoOutputMsg);

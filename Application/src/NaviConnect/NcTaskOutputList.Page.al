@@ -199,7 +199,6 @@ page 6151510 "NPR Nc Task Output List"
     var
         FileMgt: Codeunit "File Management";
         InStr: InStream;
-        Path: Text;
     begin
         Rec.CalcFields(Data);
         if not Rec.Data.HasValue() then begin
@@ -208,9 +207,7 @@ page 6151510 "NPR Nc Task Output List"
         end;
 
         Rec.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
-        Path := TemporaryPath + Rec.Name;
-        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(Rec.Name), Path);
-        HyperLink(Path);
+        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(Rec.Name), Rec.Name);
     end;
 
     local procedure UpdateResponseText()

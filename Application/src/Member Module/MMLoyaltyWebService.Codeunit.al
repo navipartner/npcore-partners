@@ -140,8 +140,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         POSEntry: Record "NPR POS Entry";
         Membership: Record "NPR MM Membership";
         UserPersonalization: Record "User Personalization";
-        Filename: Text;
         LanguageId: Integer;
+        RecRef: RecordRef;
+        TempBlob: Codeunit "Temp Blob";
+        oStream: OutStream;
+        Instr: InStream;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
 
         ReportSelections.SetFilter("Report Type", '=%1', ReportSelections."Report Type"::"Large Sales Receipt (POS Entry)");
@@ -157,20 +161,19 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         POSEntry.Get(ReceiptEntryNo);
         POSEntry.TestField("Customer No.", Membership."Customer No.");
         POSEntry.SetRecFilter();
-
-        Filename := TemporaryPath + 'Receipt-' + Format(ReceiptEntryNo, 0, 9) + '.pdf';
+        RecRef.GetTable(POSEntry);
 
         UserPersonalization.SetFilter("User ID", '%1', UserId);
         if (UserPersonalization.FindFirst()) then
             LanguageId := GlobalLanguage(UserPersonalization."Language ID");
 
-        REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, POSEntry);
-
+        TempBlob.CreateOutStream(oStream);
+        Report.SaveAs(ReportSelections."Report ID", '', ReportFormat::Pdf, oStream, RecRef);
+        TempBlob.CreateInStream(Instr);
         if (LanguageId <> 0) then
             GlobalLanguage(LanguageId);
 
-        PdfDoc := FileToBase64(Filename);
-        if (Erase(Filename)) then;
+        PdfDoc := Base64Convert.ToBase64(Instr);
 
         exit(PdfDoc);
     end;
@@ -716,20 +719,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
             exit(ImportType.Code);
 
         exit('');
-    end;
-
-    local procedure FileToBase64(Filename: Text) B64String: Text
-    var
-        InStr: InStream;
-        FileHandle: File;
-        Base64Convert: Codeunit "Base64 Convert";
-    begin
-        B64String := '';
-        FileHandle.Open(Filename);
-        FileHandle.CreateInStream(InStr);
-        B64String := Base64Convert.ToBase64(InStr);
-        FileHandle.Close();
-        exit(B64String);
     end;
 }
 

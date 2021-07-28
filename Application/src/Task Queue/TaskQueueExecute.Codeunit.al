@@ -4,20 +4,12 @@ codeunit 6059903 "NPR Task Queue Execute"
 
     trigger OnRun()
     var
-        CurrentFileName: Text[250];
-        CurrentFilePath: Text[250];
         TaskOutputLog: Record "NPR Task Output Log";
-        Printer: Record Printer;
         CurrLangID: Integer;
         RunOnRecRef: Boolean;
         RecRef: RecordRef;
         OutStr: OutStream;
     begin
-        //Cleanup
-        if Rec.TaskUsesPrinter() then begin
-            Printer.Get(Rec."Printer Name");//needs for testing if it exists
-        end;
-
         Rec.SetRecFilter();
 
         if (Rec."Language ID" <> 0) and (Rec."Language ID" <> GlobalLanguage) then begin
@@ -67,7 +59,7 @@ codeunit 6059903 "NPR Task Queue Execute"
                                 if RunOnRecRef then
                                     Error('Not Supported')
                                 else
-                                    REPORT.SaveAsHtml(Rec."Object No.", CurrentFilePath + CurrentFileName);
+                                    REPORT.SaveAs(Rec."Object No.", Rec.GetReportParameters(), REPORTFORMAT::Html, OutStr);
                             end;
                         Rec."Type Of Output"::PDFFile:
                             begin
@@ -103,18 +95,12 @@ codeunit 6059903 "NPR Task Queue Execute"
 
         if (CurrLangID <> 0) then
             GlobalLanguage(CurrLangID);
-
-        if Rec.TaskGenerateOutput() then begin
-            Rec.CalcFields("Report Name");
-            TaskOutputLog."File Name" := DelChr(Rec."Report Name", '=', '\/:*?"<>|') + Suffix(Rec);
-            TaskOutputLog.Modify();
-        end;
-
-        Clear(Printer);
-        //import files generated
         if not Rec."Disable File Logging" then
-            if CurrentFileName <> '' then
-                TaskOutputLog.AddFile(Rec, CurrentFilePath + CurrentFileName);
+            if Rec.TaskGenerateOutput() then begin
+                Rec.CalcFields("Report Name");
+                TaskOutputLog."File Name" := DelChr(Rec."Report Name", '=', '\/:*?"<>|') + Suffix(Rec);
+                TaskOutputLog.Modify();
+            end;
     end;
 
     procedure GetFileName(TaskLine: Record "NPR Task Line"): Text[1024]

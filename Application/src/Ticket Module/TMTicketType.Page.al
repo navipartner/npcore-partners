@@ -213,12 +213,13 @@ page 6059784 "NPR TM Ticket Type"
                 trigger OnAction()
                 var
                     TempBlob: Codeunit "Temp Blob";
-                    FileMgt: Codeunit "File Management";
                     TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-                    Path: Text;
                     PassData: Text;
+                    FileName: Text;
                     TemplateOutStream: outstream;
+                    TemplateInStream: InStream;
                     FileNameLbl: Label '%1 - %2.json', Locked = true;
+                    DownloadLbl: Label 'Downloading template';
                 begin
                     Rec.CalcFields("eTicket Template");
                     if (not Rec."eTicket Template".HasValue()) then begin
@@ -232,8 +233,9 @@ page 6059784 "NPR TM Ticket Type"
                     TempBlob.FromRecord(Rec, Rec.FieldNo("eTicket Template"));
                     if (not TempBlob.HasValue()) then
                         exit;
-                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo(FileNameLbl, Rec.Code, Rec.Description), true);
-
+                    TempBlob.CreateInStream(TemplateInStream);
+                    FileName := StrSubstNo(FileNameLbl, Rec.Code, Rec.Description);
+                    DownloadFromStream(TemplateInStream, DownloadLbl, '', 'Template Files (*.json)|*.json', FileName);
                 end;
             }
             action("Import File")

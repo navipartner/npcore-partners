@@ -3,17 +3,12 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
     procedure GetConfigurationText(PepperConfiguration: Record "NPR Pepper Config."; TextType: Option License,Configuration,AdditionalParameters): Text
     var
         PepperVersion: Record "NPR Pepper Version";
+        TempBlob: Codeunit "Temp Blob";
         StreamOut: OutStream;
         StreamIn: InStream;
-        TempFile: File;
         TextWhole: Text;
-        TextLine: Text[1024];
     begin
         TextWhole := '';
-        TempFile.TextMode(true);
-        TempFile.WriteMode(false);
-        TempFile.CreateTempFile();
-        TempFile.CreateOutStream(StreamOut);
         case TextType of
             TextType::License:
                 begin
@@ -21,14 +16,15 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                     if not PepperConfiguration."License File".HasValue() then
                         exit('');
                     PepperConfiguration."License File".CreateInStream(StreamIn, TEXTENCODING::UTF8);
-                    CopyStream(StreamOut, StreamIn);
                 end;
             TextType::Configuration:
                 begin
                     PepperConfiguration.TestField(Version);
                     PepperVersion.Get(PepperConfiguration.Version);
                     PepperVersion.TestField(PepperVersion."XMLport Configuration");
+                    TempBlob.CreateOutStream(StreamOut);
                     XMLPORT.Export(PepperVersion."XMLport Configuration", StreamOut);
+                    TempBlob.CreateInStream(StreamIn);
                 end;
             TextType::AdditionalParameters:
                 begin
@@ -36,15 +32,9 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                     if not PepperConfiguration."Additional Parameters".HasValue() then
                         exit('');
                     PepperConfiguration."Additional Parameters".CreateInStream(StreamIn, TEXTENCODING::UTF8);
-                    CopyStream(StreamOut, StreamIn);
                 end;
         end;
-        TempFile.Seek(0);
-        repeat
-            TempFile.Read(TextLine);
-            TextWhole := TextWhole + TextLine;
-        until TempFile.Pos = TempFile.Len;
-        TempFile.Close();
+        StreamIn.ReadText(TextWhole);
         exit(TextWhole);
     end;
 
@@ -77,7 +67,6 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                         PepperTerminal."Additional Parameters File".CreateInStream(StreamIn, TEXTENCODING::UTF8);
                     end;
                 end;
-            //-NPR5.25 [231481]
             TextType::License:
                 begin
                     PepperTerminal.CalcFields("License File");
@@ -97,7 +86,6 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                         PepperTerminal."License File".CreateInStream(StreamIn, TEXTENCODING::UTF8);
                     end;
                 end;
-        //+NPR5.25 [231481]
         end;
 
         repeat
@@ -224,13 +212,11 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
         PepperInstance: Record "NPR Pepper Instance";
         PepperConfiguration: Record "NPR Pepper Config.";
     begin
-        //-NPR5.25 [231481]
         if PepperTerminal."Customer ID" <> '' then
             exit(PepperTerminal."Customer ID");
         if PepperInstance.Get(PepperTerminal."Instance ID") then
             if PepperConfiguration.Get(PepperInstance."Configuration Code") then
                 exit(PepperConfiguration."Customer ID");
-        //+NPR5.25 [231481]
     end;
 
     procedure GetLicenseID(PepperTerminal: Record "NPR Pepper Terminal"): Text[8]
@@ -238,13 +224,11 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
         PepperInstance: Record "NPR Pepper Instance";
         PepperConfiguration: Record "NPR Pepper Config.";
     begin
-        //-NPR5.25 [231481]
         if PepperTerminal."License ID" <> '' then
             exit(PepperTerminal."License ID");
         if PepperInstance.Get(PepperTerminal."Instance ID") then
             if PepperConfiguration.Get(PepperInstance."Configuration Code") then
                 exit(PepperConfiguration."License ID");
-        //+NPR5.25 [231481]
     end;
 }
 

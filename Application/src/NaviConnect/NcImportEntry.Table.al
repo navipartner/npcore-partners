@@ -33,13 +33,6 @@ table 6151504 "NPR Nc Import Entry"
         {
             Caption = 'Document Source';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                CalcFields("Document Source");
-                "Document Source".Export(TemporaryPath + "Document Name");
-                HyperLink(TemporaryPath + "Document Name");
-            end;
         }
         field(9; Imported; Boolean)
         {
