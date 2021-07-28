@@ -78,7 +78,17 @@ table 6150620 "NPR POS Period Register"
             OptionMembers = Uncompressed,"Per POS Entry","Per POS Period";
 
             trigger OnValidate()
+            var
+                POSEntry: Record "NPR POS Entry";
             begin
+                POSEntry.SetCurrentKey("POS Store Code", "Post Entry Status");
+                POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
+                POSEntry.SetFilter("Post Entry Status", '%1|%2',
+                    POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting");
+                if not POSEntry.IsEmpty() then
+                    Error(PostingCompressionErr,
+                        Rec."POS Store Code", FieldCaption("Posting Compression"));
+
                 if "Posting Compression" > "Posting Compression"::"Per POS Entry" then
                     TestField("Document No.");
             end;
@@ -126,6 +136,9 @@ table 6150620 "NPR POS Period Register"
     fieldgroups
     {
     }
+
+    var
+        PostingCompressionErr: Label 'There are unposted entries in POS Entry table in POS Store %1. Please post then before updating %2.';
 
     trigger OnInsert()
     begin

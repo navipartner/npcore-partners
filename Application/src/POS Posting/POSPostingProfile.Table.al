@@ -4,7 +4,6 @@ table 6150653 "NPR POS Posting Profile"
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Posting Profiles";
     LookupPageID = "NPR POS Posting Profiles";
-
     fields
     {
         field(1; "Code"; Code[20])
@@ -176,6 +175,24 @@ table 6150653 "NPR POS Posting Profile"
             InitValue = "Per POS Entry";
             OptionCaption = 'Uncompressed,Per POS Entry,Per POS Period';
             OptionMembers = Uncompressed,"Per POS Entry","Per POS Period";
+
+            trigger OnValidate()
+            var
+                POSEntry: Record "NPR POS Entry";
+                POSStore: Record "NPR POS Store";
+            begin
+                POSStore.SetRange("POS Posting Profile", Rec.Code);
+                if POSStore.FindSet() then
+                    repeat
+                        POSEntry.SetCurrentKey("POS Store Code", "Post Entry Status");
+                        POSEntry.SetRange("POS Store Code", POSStore.Code);
+                        POSEntry.SetFilter("Post Entry Status", '%1|%2',
+                            POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting");
+                        if not POSEntry.IsEmpty() then
+                            Error(PostingCompressionErr,
+                                POSStore.Code, FieldCaption("Posting Compression"));
+                    until POSStore.Next() = 0;
+            end;
         }
         field(160; "POS Period Register No. Series"; Code[20])
         {
@@ -196,6 +213,8 @@ table 6150653 "NPR POS Posting Profile"
     {
     }
 
+    var
+        PostingCompressionErr: Label 'There are unposted entries in POS Entry table in POS Store %1. Please post then before updating %2.';
 
     procedure RoundingDirection(): Text[1]
     begin
