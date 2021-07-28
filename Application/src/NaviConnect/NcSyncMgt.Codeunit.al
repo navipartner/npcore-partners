@@ -94,7 +94,7 @@
         TempImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(TempImportEntry."Document Name"));
         TempImportEntry.Imported := false;
         TempImportEntry."Runtime Error" := false;
-        TempImportEntry."Document Source".CreateOutStream(OutStr);
+        TempImportEntry."Document Source".CreateOutStream(OutStr, TextEncoding::UTF8);
 
         FileContent := Base64Convert.FromBase64(JToken.AsValue().AsText());
         OutStr.WriteText(FileContent);
