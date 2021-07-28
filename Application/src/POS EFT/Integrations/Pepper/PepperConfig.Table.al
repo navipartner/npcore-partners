@@ -426,6 +426,7 @@ table 6184490 "NPR Pepper Config."
         TxtNoLicense: Label 'No license file is configured.';
         TxtNoAdditionalParameters: Label 'No addtional parameters are configured.';
         PepperVersion: Record "NPR Pepper Version";
+        TempBlob: Codeunit "Temp Blob";
         StreamIn: InStream;
         StreamOut: OutStream;
         ExportName: Text;
@@ -434,7 +435,6 @@ table 6184490 "NPR Pepper Config."
         TxtFilenameConfig: Label 'PepperConfiguration.xml';
         TxtTitle: Label 'XML File Export';
         TxtXMLFileFilter: Label 'XML Files (*.xml)|*.xml';
-        TempFile: File;
     begin
 
         case FileType of
@@ -452,12 +452,9 @@ table 6184490 "NPR Pepper Config."
                     TestField(Version);
                     PepperVersion.Get(Version);
                     PepperVersion.TestField(PepperVersion."XMLport Configuration");
-                    TempFile.TextMode(true);
-                    TempFile.WriteMode(false);
-                    TempFile.CreateTempFile();
-                    TempFile.CreateOutStream(StreamOut);
+                    TempBlob.CreateOutStream(StreamOut);
                     XMLPORT.Export(PepperVersion."XMLport Configuration", StreamOut);
-                    TempFile.CreateInStream(StreamIn);
+                    TempBlob.CreateInStream(StreamIn);
                     ExportName := TxtFilenameConfig;
                     DownloadFromStream(StreamIn, TxtTitle, '', TxtXMLFileFilter, ExportName);
                 end;

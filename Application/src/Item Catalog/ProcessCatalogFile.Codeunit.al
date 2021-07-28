@@ -1,6 +1,5 @@
 codeunit 6060062 "NPR Process Catalog File"
 {
-    // NPR5.39/BR  /20171212 CASE 295322 Object Created
 
     TableNo = "NPR Nc Import Entry";
 
@@ -17,14 +16,10 @@ codeunit 6060062 "NPR Process Catalog File"
     local procedure ProcessCSVFile(var NcImportEntry: Record "NPR Nc Import Entry")
     var
         TempBlob: Codeunit "Temp Blob";
-        FileManagement: Codeunit "File Management";
         ImportVendorCatalogFile: Codeunit "NPR Imp. Vendor Catalog File";
     begin
-        if Exists(TemporaryPath + NcImportEntry."Document Name") then
-            Erase(TemporaryPath + NcImportEntry."Document Name");
         NcImportEntry.CalcFields("Document Source");
         TempBlob.FromRecord(NcImportEntry, NcImportEntry.FieldNo("Document Source"));
-        FileManagement.BLOBImport(TempBlob, TemporaryPath + NcImportEntry."Document Name");
         ImportVendorCatalogFile.ReadFile('', TempBlob, false, true);
     end;
 
@@ -39,9 +34,6 @@ codeunit 6060062 "NPR Process Catalog File"
         InStr: InStream;
         OutStr: OutStream;
     begin
-        if Exists(TemporaryPath + GetZipFilename()) then
-            Erase(TemporaryPath + GetZipFilename());
-
         //Store blob as zipfile
         NcImportEntry.CalcFields("Document Source");
         TempBlob.FromRecord(NcImportEntry, NcImportEntry.FieldNo("Document Source"));
@@ -61,11 +53,6 @@ codeunit 6060062 "NPR Process Catalog File"
                 Clear(OutStr);
             end;
         end;
-    end;
-
-    local procedure GetZipFilename(): Text
-    begin
-        exit('TempCatalog.zip');
     end;
 
     local procedure GetExtension(Filename: Text): Text
