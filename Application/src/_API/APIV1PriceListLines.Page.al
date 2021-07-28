@@ -104,6 +104,11 @@ page 6014545 "NPR API V1 - Price List Lines"
                 {
                     Caption = 'Unit Price';
                 }
+
+                field(directUnitCost; Rec."Direct Unit Cost")
+                {
+                    Caption = 'Direct Unit Cost';
+                }
                 field(costFactor; Rec."Cost Factor")
                 {
                     Caption = 'Cost Factor';
