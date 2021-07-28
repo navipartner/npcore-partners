@@ -449,6 +449,9 @@ table 6150621 "NPR POS Entry"
         }
         key(Key8; "Fiscal No.")
         { }
+
+        key(Key9; "POS Store Code", "Post Entry Status")
+        { }
     }
 
     fieldgroups
