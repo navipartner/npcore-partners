@@ -2,13 +2,17 @@
 //       UI in this Codeunit can be replaced with Workflows 2.0 open dialog.
 //       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki?wikiVersion=GBwikiMaster&_a=edit&pagePath=%2FWorkflows%202.0%20Reference%2FFront%20End%20(JavaScript)%2FWorkflows%202.0%20Front%252Dend%20API%3A%20%60popup%60%20object&pageId=36&anchor=code-example%3A-%60open%60-dialog
 
+// Dereferenced Model
+
+#pragma warning disable AA0228, AA0137
+
 codeunit 6151131 "NPR TM Seating UI"
 {
     SingleInstance = true;
 
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        Model: DotNet NPRNetModel;
+        //***  Model: DotNet NPRNetModel;
         ActiveModelID: Guid;
         ReservationUpdateEntryNo: Integer;
         ShowExtAdmSchEntryNo: Integer;
@@ -52,10 +56,10 @@ codeunit 6151131 "NPR TM Seating UI"
                     exit(false);
         end;
 
-        Model := Model.Model();
-        Model.AddHtml(RenderSeatSelection(AdmissionCode, ExtAdmScheduleEntryNo));
-        Model.AddStyle(CSS());
-        Model.AddScript(Javascript());
+        // Model := Model.Model();
+        // Model.AddHtml(RenderSeatSelection(AdmissionCode, ExtAdmScheduleEntryNo));
+        // Model.AddStyle(CSS());
+        // Model.AddScript(Javascript());
 
         exit(true);
     end;
@@ -88,7 +92,7 @@ codeunit 6151131 "NPR TM Seating UI"
 
 
         // Asynchrounous
-        ActiveModelID := POSFrontEnd.ShowModel(Model);
+        // ActiveModelID := POSFrontEnd.ShowModel(Model);
 
         exit(true);
     end;
@@ -180,8 +184,8 @@ codeunit 6151131 "NPR TM Seating UI"
         case Sender of
             'ticketing-refresh-timer':
                 begin
-                    Model.AddScript(UpdateSeatReservationList(ShowExtAdmSchEntryNo));
-                    FrontEnd.UpdateModel(Model, ActiveModelID);
+                    // Model.AddScript(UpdateSeatReservationList(ShowExtAdmSchEntryNo));
+                    // FrontEnd.UpdateModel(Model, ActiveModelID);
                 end;
 
             'ticketing-make-reservation':
@@ -195,15 +199,15 @@ codeunit 6151131 "NPR TM Seating UI"
 
                         ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(TicketReservationRequest."Session Token ID", false, ResponseMessage);
                         if (ResponseCode <> 0) then begin
-                            FrontEnd.CloseModel(ActiveModelID);
+                            // FrontEnd.CloseModel(ActiveModelID);
                             Error(ResponseMessage);
                         end;
 
                     end;
                     SaveSeatReservation(TicketReservationRequest, EventName);
 
-                    FrontEnd.UpdateModel(Model, ActiveModelID);
-                    FrontEnd.CloseModel(ActiveModelID);
+                    // FrontEnd.UpdateModel(Model, ActiveModelID);
+                    // FrontEnd.CloseModel(ActiveModelID);
 
                     // Goto next ticket in BOM
                     if (TicketReservationRequest.Next() <> 0) then begin
@@ -221,8 +225,8 @@ codeunit 6151131 "NPR TM Seating UI"
                 begin
                     if (FindNextSchedule()) then begin
                         if (ConstructUI(ShowExtAdmSchEntryNo)) then begin
-                            FrontEnd.CloseModel(ActiveModelID);
-                            ActiveModelID := FrontEnd.ShowModel(Model);
+                            // FrontEnd.CloseModel(ActiveModelID);
+                            // ActiveModelID := FrontEnd.ShowModel(Model);
                         end;
                     end;
                 end;
@@ -231,16 +235,16 @@ codeunit 6151131 "NPR TM Seating UI"
                 begin
                     if (FindPrevSchedule()) then begin
                         if (ConstructUI(ShowExtAdmSchEntryNo)) then begin
-                            FrontEnd.CloseModel(ActiveModelID);
-                            ActiveModelID := FrontEnd.ShowModel(Model);
+                            // FrontEnd.CloseModel(ActiveModelID);
+                            // ActiveModelID := FrontEnd.ShowModel(Model);
                         end;
                     end;
                 end;
 
             'ticketing-abort':
                 begin
-                    FrontEnd.UpdateModel(Model, ActiveModelID);
-                    FrontEnd.CloseModel(ActiveModelID);
+                    // FrontEnd.UpdateModel(Model, ActiveModelID);
+                    // FrontEnd.CloseModel(ActiveModelID);
                 end;
 
             else
@@ -689,7 +693,7 @@ codeunit 6151131 "NPR TM Seating UI"
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
-        JObject: DotNet NPRNetJObject;
+        JObject: JsonObject;
         SeatId: Text;
         SeatList: Text;
     begin
@@ -698,7 +702,7 @@ codeunit 6151131 "NPR TM Seating UI"
             exit;
 
         //Name {"seatlist": "xx,xy,..."}
-        JObject := JObject.Parse(EventContents);
+        JObject.ReadFrom(EventContents);
         SeatList := GetStringValueFromJson(JObject, 'seatlist');
 
         SeatingReservationEntry.SetCurrentKey("Ticket Token");
@@ -728,16 +732,15 @@ codeunit 6151131 "NPR TM Seating UI"
     begin
     end;
 
-    local procedure GetStringValueFromJson(JObject: DotNet NPRNetJObject; "Key": Text): Text
+    local procedure GetStringValueFromJson(JObject: JsonObject; JKey: Text) JValue: Text
     var
-        JToken: DotNet NPRNetJToken;
+        JToken: JsonToken;
     begin
 
-        JToken := JObject.GetValue(Key);
-        if (IsNull(JToken)) then
+        if (not JObject.SelectToken(JKey, JToken)) then
             exit('');
 
-        exit(JToken.ToString());
+        JToken.WriteTo(JValue);
     end;
 
     local procedure NextElement(var VarLineOfText: Text): Text
@@ -946,3 +949,4 @@ codeunit 6151131 "NPR TM Seating UI"
     end;
 
 }
+#pragma warning restore AA0228, AA0137
