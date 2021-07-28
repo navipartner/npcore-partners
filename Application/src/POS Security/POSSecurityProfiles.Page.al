@@ -26,12 +26,6 @@ page 6014600 "NPR POS Security Profiles"
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Password on Unblock Discount"; Rec."Password on Unblock Discount")
-                {
-
-                    ToolTip = 'Specifies the value of the Administrator Password field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }
