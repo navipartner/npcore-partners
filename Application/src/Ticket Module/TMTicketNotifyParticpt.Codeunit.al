@@ -187,18 +187,18 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
     procedure AquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]): Boolean
     begin
 
-        exit(AquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, false));
+        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, false));
 
     end;
 
-    procedure AquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
+    procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
     begin
 
-        exit(AquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, ForceDialog));
+        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, ForceDialog));
 
     end;
 
-    local procedure AquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
+    local procedure AcquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
     var
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
