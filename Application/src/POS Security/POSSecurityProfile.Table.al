@@ -21,6 +21,7 @@ table 6014601 "NPR POS Security Profile"
         {
             Caption = 'Administrator Password';
             DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
         }
     }
 
