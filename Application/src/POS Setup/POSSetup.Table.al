@@ -1,14 +1,14 @@
 table 6150707 "NPR POS Setup"
 {
-    Caption = 'POS Setup';
+    Caption = 'POS Named Actions Profile';
     DataClassification = CustomerContent;
-    LookupPageID = "NPR POS Setup List";
+    LookupPageID = "NPR POS Named Actions Profiles";
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
-            Caption = 'Primary Key';
+            Caption = 'Code';
             DataClassification = CustomerContent;
         }
         field(10; Description; Text[30])
@@ -24,20 +24,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("Login Action Code") then
                     Validate("Login Action Code");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("Login Action Parameters");
-                //CopyActionParameters("Login Action Code",FIELDNO("Login Action Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Login Action Code"));
                 ParamMgt.CopyFromActionToField("Login Action Code", RecordId, FieldNo("Login Action Code"));
-                //+NPR5.40 [306347]
             end;
         }
         field(101; "Text Enter Action Code"; Code[20])
@@ -48,20 +42,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("Text Enter Action Code") then
                     Validate("Text Enter Action Code");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("Text Enter Action Parameters");
-                //CopyActionParameters("Text Enter Action Code",FIELDNO("Text Enter Action Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Text Enter Action Code"));
                 ParamMgt.CopyFromActionToField("Text Enter Action Code", RecordId, FieldNo("Text Enter Action Code"));
-                //+NPR5.40 [306347]
             end;
         }
         field(102; "Item Insert Action Code"; Code[20])
@@ -72,20 +60,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("Item Insert Action Code") then
                     Validate("Item Insert Action Code");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("Item Insert Action Parameters");
-                //CopyActionParameters("Item Insert Action Code",FIELDNO("Item Insert Action Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Item Insert Action Code"));
                 ParamMgt.CopyFromActionToField("Item Insert Action Code", RecordId, FieldNo("Item Insert Action Code"));
-                //+NPR5.40 [306347]
             end;
         }
         field(103; "Payment Action Code"; Code[20])
@@ -96,20 +78,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("Payment Action Code") then
                     Validate("Payment Action Code");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("Payment Action Parameters");
-                //CopyActionParameters("Payment Action Code",FIELDNO("Payment Action Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Payment Action Code"));
                 ParamMgt.CopyFromActionToField("Payment Action Code", RecordId, FieldNo("Payment Action Code"));
-                //+NPR5.40 [306347]
             end;
         }
         field(104; "Customer Action Code"; Code[20])
@@ -120,20 +96,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("Customer Action Code") then
                     Validate("Customer Action Code");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("Customer Action Parameters");
-                //CopyActionParameters("Customer Action Code",FIELDNO("Customer Action Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Customer Action Code"));
                 ParamMgt.CopyFromActionToField("Customer Action Code", RecordId, FieldNo("Customer Action Code"));
-                //+NPR5.40 [306347]
             end;
         }
         field(110; "Lock POS Action Code"; Code[20])
@@ -144,20 +114,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("Lock POS Action Code") then
                     Validate("Lock POS Action Code");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("Lock POS Action Parameters");
-                //CopyActionParameters("Lock POS Action Code",FIELDNO("Lock POS Action Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Lock POS Action Code"));
                 ParamMgt.CopyFromActionToField("Lock POS Action Code", RecordId, FieldNo("Lock POS Action Code"));
-                //+NPR5.40 [306347]
             end;
         }
         field(120; "Unlock POS Action Code"; Code[20])
@@ -168,20 +132,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("Unlock POS Action Code") then
                     Validate("Unlock POS Action Code");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("Unlock POS Action Parameters");
-                //CopyActionParameters("Unlock POS Action Code",FIELDNO("Unlock POS Action Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Unlock POS Action Code"));
                 ParamMgt.CopyFromActionToField("Unlock POS Action Code", RecordId, FieldNo("Unlock POS Action Code"));
-                //+NPR5.40 [306347]
             end;
         }
         field(130; "OnBeforePaymentView Action"; Code[20])
@@ -192,20 +150,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 if ActionMgt.LookupAction("OnBeforePaymentView Action") then
                     Validate("OnBeforePaymentView Action");
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.40 [306347]
-                //CLEAR("OnBeforePaymentView Parameters");
-                //CopyActionParameters("OnBeforePaymentView Action",FIELDNO("OnBeforePaymentView Parameters"));
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("OnBeforePaymentView Action"));
                 ParamMgt.CopyFromActionToField("OnBeforePaymentView Action", RecordId, FieldNo("OnBeforePaymentView Action"));
-                //+NPR5.40 [306347]
             end;
         }
         field(140; "Idle Timeout Action Code"; Code[20])
@@ -216,20 +168,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-
-                //-NPR5.54 [392121]
                 if ActionMgt.LookupAction("Idle Timeout Action Code") then
                     Validate("Idle Timeout Action Code");
-                //+NPR5.54 [392121]
             end;
 
             trigger OnValidate()
             begin
-
-                //-NPR5.54 [392121]
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Idle Timeout Action Code"));
                 ParamMgt.CopyFromActionToField("Idle Timeout Action Code", RecordId, FieldNo("Lock POS Action Code"));
-                //+NPR5.54 [392121]
             end;
         }
         field(150; "Admin Menu Action Code"; Code[20])
@@ -240,20 +186,14 @@ table 6150707 "NPR POS Setup"
 
             trigger OnLookup()
             begin
-
-                //-NPR5.55 [400734]
                 if ActionMgt.LookupAction("Admin Menu Action Code") then
                     Validate("Admin Menu Action Code");
-                //+NPR5.55 [400734]
             end;
 
             trigger OnValidate()
             begin
-
-                //-NPR5.55 [400734]
                 ParamMgt.ClearParametersForRecord(RecordId, FieldNo("Admin Menu Action Code"));
                 ParamMgt.CopyFromActionToField("Admin Menu Action Code", RecordId, FieldNo("Admin Menu Action Code"));
-                //+NPR5.55 [400734]
             end;
         }
     }
@@ -271,10 +211,7 @@ table 6150707 "NPR POS Setup"
 
     trigger OnDelete()
     begin
-
-        //-NPR5.54 [391850]
         TestField("Primary Key");
-        //+NPR5.54 [391850]
     end;
 
     var
@@ -283,16 +220,7 @@ table 6150707 "NPR POS Setup"
 
     procedure AssistEdit(ActionCode: Code[20]; "Field": Integer)
     begin
-        //-NPR5.40 [306347]
-        //RecRef.GETTABLE(Rec);
-        //FieldRef := RecRef.FIELD(Field);
-        //IF ParamMgt.EditParameters(FieldRef) THEN BEGIN
-        //  RecRef.SETTABLE(Rec);
-        //  EXIT(TRUE);
-        //END ELSE
-        //  EXIT(FALSE);
         ParamMgt.EditParametersForField(ActionCode, RecordId, Field);
-        //+NPR5.40 [306347]
     end;
 }
 

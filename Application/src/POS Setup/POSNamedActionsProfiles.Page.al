@@ -1,9 +1,10 @@
-page 6150738 "NPR POS Setup List"
+page 6150738 "NPR POS Named Actions Profiles"
 {
-    Caption = 'POS Setup List';
-    CardPageID = "NPR POS Setup";
+    Caption = 'POS Actions Profiles';
+    CardPageID = "NPR POS Named Actions Profile";
+    ApplicationArea = NPRRetail;
     PageType = List;
-    UsageCategory = None;
+    UsageCategory = Lists;
     SourceTable = "NPR POS Setup";
     Editable = false;
     layout

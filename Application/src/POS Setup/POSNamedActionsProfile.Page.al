@@ -1,7 +1,6 @@
-page 6150707 "NPR POS Setup"
+page 6150707 "NPR POS Named Actions Profile"
 {
-    Caption = 'POS Setup';
-    DeleteAllowed = false;
+    Caption = 'POS Named Actions Profile';
     PageType = Card;
     SourceTable = "NPR POS Setup";
     UsageCategory = None;
@@ -12,6 +11,12 @@ page 6150707 "NPR POS Setup"
         {
             group(General)
             {
+                field("Primary Key"; Rec."Primary Key")
+                {
+
+                    ToolTip = 'Specifies the value of the Code field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Description; Rec.Description)
                 {
 
@@ -195,9 +200,6 @@ page 6150707 "NPR POS Setup"
     var
         POSAction: Record "NPR POS Action";
     begin
-        if not Rec.Find() then
-            Rec.Insert();
-
         POSAction.DiscoverActions();
     end;
 
