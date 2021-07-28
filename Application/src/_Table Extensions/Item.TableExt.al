@@ -444,12 +444,12 @@ tableextension 6014427 "NPR Item" extends Item
         key("NPR Key1"; "NPR Group sale", "NPR Item Group")
         {
             ObsoleteState = Removed;
-            ObsoleteReason = 'Used field is obsoleted.';
+            ObsoleteReason = 'Not used anymore.';
         }
         key("NPR Key2"; "NPR Primary Key Length")
         {
             ObsoleteState = Removed;
-            ObsoleteReason = 'Used field is obsoleted.';
+            ObsoleteReason = 'Not used anymore.';
         }
         key("NPR Key3"; "NPR Replication Counter")
         {
