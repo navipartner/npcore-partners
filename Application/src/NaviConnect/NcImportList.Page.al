@@ -478,7 +478,7 @@ page 6151504 "NPR Nc Import List"
     begin
         Rec.CalcFields("Document Source");
         if Rec."Document Source".HasValue() then begin
-            Rec."Document Source".CreateInStream(InStr);
+            Rec."Document Source".CreateInStream(InStr, TextEncoding::UTF8);
             Message(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
         end else
             Message(NoInputTxt);
