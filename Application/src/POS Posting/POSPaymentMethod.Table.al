@@ -148,6 +148,195 @@ table 6150616 "NPR POS Payment Method"
             Caption = 'Match Sales Amount';
             DataClassification = CustomerContent;
         }
+        field(76; "Normal Sale in POS"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Amount Incl. VAT" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                                        "Document No." = FIELD("Document Filter"),
+                                                                        "Entry Date" = FIELD("Date Filter"),
+                                                                         Type = CONST(Item),
+                                                                         "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'Normal Sale in POS';
+            FieldClass = FlowField;
+        }
+        field(77; "Debit Sale in POS"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Amount Incl. VAT" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                                         "Document No." = FIELD("Document Filter"),
+                                                                         "Entry Date" = FIELD("Date Filter"),
+                                                                         Type = CONST(Item),
+                                                                         "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'Debit Sale in POS';
+            FieldClass = FlowField;
+        }
+        field(78; "No. of Sales in POS"; Integer)
+        {
+            CalcFormula = Count("NPR POS Entry Sales Line" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                    "Document No." = FIELD("Document Filter"),
+                                                    Type = CONST(Item),
+                                                    "Line No." = CONST(10000),
+                                                    "Entry Date" = FIELD("Date Filter"),
+                                                    "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'No. Sales in POS';
+            FieldClass = FlowField;
+        }
+        field(79; "Cost Amount in POS"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Unit Cost" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                       "Document No." = FIELD("Document Filter"),
+                                                       "Entry Date" = FIELD("Date Filter"),
+                                                       Type = CONST(Item),
+                                                       "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'Cost Amount in POS';
+            FieldClass = FlowField;
+        }
+        field(80; "Amount in POS Payment Line"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Payment Line"."Amount" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                                         "Document No." = FIELD("Document Filter"),
+                                                                         "Entry Date" = FIELD("Date Filter"),
+                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
+                                                                         "POS Payment Method Code" = FIELD(Code)));
+            Caption = 'Amount in POS Payment Line';
+            FieldClass = FlowField;
+        }
+        field(81; "No. of Items in POS"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Sales Line".Quantity WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                           "Document No." = FIELD("Document Filter"),
+                                                           "Entry Date" = FIELD("Date Filter"),
+                                                           Type = CONST(Item),
+                                                           "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                           "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                           "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'No. of Items in POS';
+            FieldClass = FlowField;
+        }
+        field(82; "No. of Sale Lines in POS"; Integer)
+        {
+            CalcFormula = Count("NPR POS Entry Sales Line" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                    "Document No." = FIELD("Document Filter"),
+                                                    "Entry Date" = FIELD("Date Filter"),
+                                                    "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'No. of Sale Lines in POS';
+            FieldClass = FlowField;
+        }
+        field(83; "No. of Item Lines in POS"; Integer)
+        {
+            CalcFormula = Count("NPR POS Entry Sales Line" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                    "Document No." = FIELD("Document Filter"),
+                                                    "No." = FILTER(<> ''),
+                                                    "Entry Date" = FIELD("Date Filter"),
+                                                    "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
+                                                    "Type" = Filter(Item)));
+            Caption = 'No. of Item Lines in POS';
+            FieldClass = FlowField;
+        }
+        field(84; "No. of Deb. Sales in POS"; Integer)
+        {
+            CalcFormula = Count("NPR POS Entry" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                    "Document No." = FIELD("Document Filter"),
+                                                    "Entry Type" = CONST("Direct Sale"),
+                                                    "Entry Date" = FIELD("Date Filter"),
+                                                    "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'No. of Deb. Sales in POS';
+            FieldClass = FlowField;
+        }
+        field(85; "Norm. Sales in POS Excl. VAT"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry"."Amount Excl. Tax" WHERE("Entry Date" = FIELD("Date Filter"),
+                                                         "POS Unit No." = FIELD("POS Unit Filter"),
+                                                         "Entry Type" = CONST(Other),
+                                                         "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'Norm. Sales in POS Excl. VAT';
+            FieldClass = FlowField;
+        }
+        field(86; "Debit Sales in POS Excl. VAT"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry"."Amount Excl. Tax" WHERE("Entry Date" = FIELD("Date Filter"),
+                                                         "POS Unit No." = FIELD("POS Unit Filter"),
+                                                         "Entry Type" = CONST("Credit Sale"),
+                                                         "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
+                                                         "Document No." = FIELD("Document Filter")));
+            Caption = 'Debit Sales in POS Excl. VAT';
+            FieldClass = FlowField;
+        }
+        field(87; "Unit Cost in POS Sale"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Unit Cost" WHERE("Entry Date" = FIELD("Date Filter"),
+                                                       "Document No." = FIELD("Document Filter"),
+                                                       Type = CONST(Item),
+                                                       "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
+                                                       "Document No." = FIELD("Document Filter")));
+            Caption = 'Unit Cost in POS Sale';
+            FieldClass = FlowField;
+        }
+        field(88; "Amount in POS"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Amount Incl. VAT" WHERE("POS Unit No." = FIELD("POS Unit Filter"),
+                                                                         "Document No." = FIELD("Document Filter"),
+                                                                         "Entry Date" = FIELD("Date Filter"),
+                                                                         "Salesperson Code" = FIELD("Salesperson Filter"),
+                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
+                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
+            Caption = 'Amount in POS';
+            FieldClass = FlowField;
+        }
+        field(89; "POS Unit Filter"; Code[10])
+        {
+            Caption = 'POS Unit Filter';
+            FieldClass = FlowFilter;
+        }
+        field(90; "Document Filter"; Code[20])
+        {
+            Caption = 'Document Filter';
+            FieldClass = FlowFilter;
+        }
+        field(91; "Date Filter"; Date)
+        {
+            Caption = 'Date Filter';
+            FieldClass = FlowFilter;
+        }
+        field(92; "Global Dimension Code 1 Filter"; Code[20])
+        {
+            CaptionClass = '1,3,1';
+            Caption = 'Global Dimension Code 1 Filter';
+            FieldClass = FlowFilter;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+        }
+        field(93; "Global Dimension Code 2 Filter"; Code[20])
+        {
+            CaptionClass = '1,3,2';
+            Caption = 'Global Dimension Code 2 Filter';
+            FieldClass = FlowFilter;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+        }
+        field(94; "Salesperson Filter"; Code[20])
+        {
+            Caption = 'Salesperson filter';
+            FieldClass = FlowFilter;
+            TableRelation = "Salesperson/Purchaser".Code;
+        }
         field(100; "Reverse Unrealized VAT"; Boolean)
         {
             Caption = 'Reverse Unrealized VAT';
