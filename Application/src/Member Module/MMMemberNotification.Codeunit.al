@@ -323,6 +323,14 @@ codeunit 6060136 "NPR MM Member Notification"
 
                 SendStatus := MemberNotificationEntry2."Notification Send Status"::FAILED;
 
+                MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
+                MemberNotificationEntry2."Notification Send Status" := SendStatus;
+                MemberNotificationEntry2."Notification Sent At" := CurrentDateTime();
+                MemberNotificationEntry2."Notification Sent By User" := CopyStr(UserId, 1, MaxStrLen(MemberNotificationEntry2."Notification Sent By User"));
+                MemberNotificationEntry2."Failed With Message" := 'Failed during processing of send message. (Preemptive message.)';
+                MemberNotificationEntry2.Modify();
+                Commit();
+
                 case MemberNotificationEntry."Notification Method" of
                     MemberNotificationEntry."Notification Method"::NONE:
                         begin
@@ -377,8 +385,6 @@ codeunit 6060136 "NPR MM Member Notification"
                 end;
 
                 MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
-                MemberNotificationEntry2."Notification Sent At" := CurrentDateTime();
-                MemberNotificationEntry2."Notification Sent By User" := CopyStr(UserId, 1, MaxStrLen(MemberNotificationEntry2."Notification Sent By User"));
                 MemberNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(MemberNotificationEntry2."Failed With Message"));
                 MemberNotificationEntry2."Notification Send Status" := SendStatus;
                 MemberNotificationEntry2.Modify();

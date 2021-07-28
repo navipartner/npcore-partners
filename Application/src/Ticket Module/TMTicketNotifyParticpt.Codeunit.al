@@ -62,6 +62,13 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
                 TicketParticipantWks2.Get(TicketParticipantWks."Entry No.");
                 TicketParticipantWks2."Notification Send Status" := TicketParticipantWks2."Notification Send Status"::FAILED;
+                TicketParticipantWks2."Notification Sent At" := CurrentDateTime();
+                TicketParticipantWks2."Notification Sent By User" := CopyStr(UserId, 1, MaxStrLen(TicketParticipantWks2."Notification Sent By User"));
+                TicketParticipantWks2."Failed With Message" := 'Failed during processing of send message. (Preemptive message.)';
+                TicketParticipantWks2.Modify();
+                Commit();
+
+
 
                 case TicketParticipantWks."Notification Method" of
                     TicketParticipantWks."Notification Method"::NA:
@@ -81,14 +88,10 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                             if (SendSms(TicketParticipantWks, ResponseMessage)) then
                                 TicketParticipantWks2."Notification Send Status" := TicketParticipantWks."Notification Send Status"::SENT;
                         end;
-
-
                     else
                         Error(NOT_IMPLEMENTED, TicketParticipantWks.FieldCaption("Notification Method"), TicketParticipantWks."Notification Method");
                 end;
 
-                TicketParticipantWks2."Notification Sent At" := CurrentDateTime();
-                TicketParticipantWks2."Notification Sent By User" := UserId();
                 TicketParticipantWks2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketParticipantWks2."Failed With Message"));
                 TicketParticipantWks2.Modify();
                 Commit();
@@ -905,7 +908,12 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             repeat
 
                 TicketNotificationEntry2.Get(TicketNotificationEntry."Entry No.");
+                TicketNotificationEntry2."Notification Sent At" := CurrentDateTime();
+                TicketNotificationEntry2."Notification Sent By User" := CopyStr(UserId, 1, MaxStrLen(TicketNotificationEntry2."Notification Sent By User"));
                 TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::FAILED;
+                TicketNotificationEntry2."Failed With Message" := 'Failed during processing of send message. (Preemptive message.)';
+                TicketNotificationEntry2.Modify();
+                Commit();
 
                 case TicketNotificationEntry2."Notification Method" of
                     TicketNotificationEntry2."Notification Method"::NA:
@@ -930,8 +938,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                         Error(NOT_IMPLEMENTED, TicketNotificationEntry2.FieldCaption("Notification Method"), TicketNotificationEntry2."Notification Method");
                 end;
 
-                TicketNotificationEntry2."Notification Sent At" := CurrentDateTime();
-                TicketNotificationEntry2."Notification Sent By User" := UserId();
                 TicketNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry2."Failed With Message"));
                 TicketNotificationEntry2.Modify();
                 Commit();
