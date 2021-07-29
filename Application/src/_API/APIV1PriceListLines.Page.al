@@ -105,10 +105,14 @@ page 6014545 "NPR API V1 - Price List Lines"
                     Caption = 'Unit Price';
                 }
 
+#IF BC17
+                // field does not exist in BC17, so do nothing.
+#ELSE
                 field(directUnitCost; Rec."Direct Unit Cost")
                 {
                     Caption = 'Direct Unit Cost';
                 }
+#ENDIF
                 field(costFactor; Rec."Cost Factor")
                 {
                     Caption = 'Cost Factor';
