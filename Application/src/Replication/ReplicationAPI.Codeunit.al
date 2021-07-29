@@ -15,8 +15,6 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 
         WebAPIErrorTxtG: Label 'Something went wrong:\\Error Status Code: %1;\\Description: %2';
 
-        InvalidUrlErr: Label 'The URL is not valid.';
-
         ReplicationJobQueueCategoryCode: Label 'REP', locked = true;
 
         ReplicationCounterEvaluateErr: Label 'Cannot evaluate Replication Counter value %1 into a BigInteger.';
@@ -211,7 +209,6 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 
     local procedure CreateJobQueueCategory(var JobQueueCategory: Record "Job Queue Category")
     begin
-        //JobQueueCategory.Code := CopyStr(ServiceSetup."API Version", 1, maxstrlen(JobQueueCategory.Code));
         JobQueueCategory.Code := ReplicationJobQueueCategoryCode;
         if JobQueueCategory.Find() then
             exit;
@@ -265,15 +262,11 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 
     procedure VerifyServiceURL(var ServiceURL: Text)
     var
-        Uri: DotNet Uri;
-        UriKind: DotNet UriKind;
+        WebRequestHelper: codeunit "Web Request Helper";
     begin
         if ServiceURL = '' then
             exit;
-
-        if not Uri.TryCreate(ServiceURL, UriKind.Absolute, Uri) then
-            Error(InvalidUrlErr);
-
+        WebRequestHelper.IsValidUri(ServiceURL);
         ServiceURL := ServiceURL.TrimEnd('/');
     end;
 
