@@ -110,10 +110,9 @@
 
                     trigger OnValidate()
                     begin
-                        //-TM1.45 [382535]
+
                         if (Rec."Admission Inclusion" = Rec."Admission Inclusion"::NOT_SELECTED) then
                             Error(QTY_NOT_EDITABLE);
-                        //+TM1.45 [382535]
 
                         if (Rec.Quantity < 1) then
                             Error(QTY_MUST_BE_GT_ZERO);
@@ -229,7 +228,6 @@
                         DateTimeLbl: Label '%1  - %2', Locked = true;
                     begin
 
-                        //-TM1.45 [380754]
                         if (Rec."Waiting List Reference Code" <> '') then
                             if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry(Rec."Waiting List Reference Code", CreateDateTime(Today, Time), false, AdmissionScheduleEntry, TicketWaitingList, ResponseMessage)) then
                                 Error(ResponseMessage);
@@ -306,7 +304,6 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
 
-
                 trigger OnAction()
                 begin
 
@@ -321,7 +318,6 @@
                 Caption = 'Update Schedule';
                 Image = "Action";
 
-
                 trigger OnAction()
                 var
                     AdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
@@ -335,7 +331,6 @@
     trigger OnAfterGetRecord()
     begin
         gVisualQueueUnfavorable := CalcVisualQueueUnfavorable(Rec);
-
 
         gConfirmStatusStyleFavorable := (not gVisualQueueUnfavorable);
 
@@ -392,7 +387,7 @@
         DIFFERENT_DATES_WARNING: Label 'Please note that the selected time schedules have different dates.';
         QTY_NOT_EDITABLE: Label 'Quantity can not be changed for admissions that are not included.';
         NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
-        NOT_REQUIRED: Label '%1 can not be chanegd to required when intial value was optional.';
+        NOT_REQUIRED: Label '%1 can not be changed to required when initial value was optional.';
         gIgnoreScheduleFilter: Boolean;
         gChangeRequestMode: Boolean;
         gPrimaryRequestMode: Boolean;
@@ -409,7 +404,6 @@
 
         gReservationEdited := true;
         gQuantityChanged := true;
-
 
         Rec.Reset();
         Rec.ModifyAll(Quantity, NewQuantity);
@@ -442,7 +436,7 @@
         AdmissionScheduleEntry.SetFilter("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::OPEN);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
 
-        if TMAdmission.Get(Rec."Admission Code") then begin
+        if (TMAdmission.Get(Rec."Admission Code")) then begin
             if (TMAdmission."POS Schedule Selection Date F." <> "0DF") then begin
                 ToDate := CalcDate(TMAdmission."POS Schedule Selection Date F.", Today);
 
@@ -668,6 +662,8 @@
 
         if (gReservationEdited) then begin
 
+            TicketRequestManager.DeleteReservationRequest(Rec."Session Token ID", false);
+
             Rec.Reset();
             if (Rec.FindFirst()) then;
             repeat
@@ -701,6 +697,7 @@
                     TicketReservationRequest.Modify();
 
             until (Rec.Next() = 0);
+
             TicketRequestManager.SetShowProgressBar(gBatchTicketCreateMode);
             exit(TicketRequestManager.IssueTicketFromReservationToken(Rec."Session Token ID", FailWithError, ResponseMessage));
         end;
@@ -788,7 +785,7 @@
         gBatchTicketCreateMode := true;
     end;
 
-    local procedure ConfirmOverlappingTimes(SelectedRequestEntryNo: Integer; SelectedExternaAdmSchEntryNo: Integer)
+    local procedure ConfirmOverlappingTimes(SelectedRequestEntryNo: Integer; SelectedExternalAdmSchEntryNo: Integer)
     var
         AdmissionScheduleEntry1: Record "NPR TM Admis. Schedule Entry";
         AdmissionScheduleEntry2: Record "NPR TM Admis. Schedule Entry";
@@ -796,7 +793,7 @@
         TimeOverlapIssue: Boolean;
     begin
 
-        AdmissionScheduleEntry1.SetFilter("External Schedule Entry No.", '=%1', SelectedExternaAdmSchEntryNo);
+        AdmissionScheduleEntry1.SetFilter("External Schedule Entry No.", '=%1', SelectedExternalAdmSchEntryNo);
         AdmissionScheduleEntry1.SetFilter(Cancelled, '=%1', false);
         AdmissionScheduleEntry1.FindFirst();
         Admission.Get(AdmissionScheduleEntry1."Admission Code");
@@ -808,7 +805,7 @@
         repeat
             TimeOverlapIssue := false;
 
-            if (Rec."External Adm. Sch. Entry No." <> SelectedExternaAdmSchEntryNo) then begin
+            if (Rec."External Adm. Sch. Entry No." <> SelectedExternalAdmSchEntryNo) then begin
                 if (Rec."External Adm. Sch. Entry No." <> 0) then begin
                     AdmissionScheduleEntry2.SetFilter("External Schedule Entry No.", '=%1', Rec."External Adm. Sch. Entry No.");
                     AdmissionScheduleEntry2.SetFilter(Cancelled, '=%1', false);
@@ -855,7 +852,7 @@
         if (gChangeRequestMode) then begin
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', gTicketRequestEntryNo);
             if (Ticket.FindFirst()) then
-                RescheduleAllowed := TicketManagement.IsRescheduleAllowed(Ticket."External Ticket No.", ExtAdmSchEntryNo, CURRENTDATETIME());
+                RescheduleAllowed := TicketManagement.IsRescheduleAllowed(Ticket."External Ticket No.", ExtAdmSchEntryNo, CurrentDateTime());
         end;
 
         exit(RescheduleAllowed);
@@ -869,4 +866,3 @@
         exit(StrSubstNo(DateTimeLbl, Today(), Time()));
     end;
 }
-
