@@ -22,27 +22,27 @@ page 6014508 "NPR APIV1 - Cust Fin Details"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field(number; "No.")
+                field(number; Rec."No.")
                 {
                     Caption = 'No.';
                     Editable = false;
                 }
-                field(balance; "Balance (LCY)")
+                field(balance; Rec."Balance (LCY)")
                 {
                     Caption = 'Balance';
                     Editable = false;
                 }
-                field(totalSalesExcludingTax; "Sales (LCY)")
+                field(totalSalesExcludingTax; Rec."Sales (LCY)")
                 {
                     Caption = 'Total Sales Excluding Tax';
                     Editable = false;
                 }
-                field(overdueAmount; "Balance Due (LCY)")
+                field(overdueAmount; Rec."Balance Due (LCY)")
                 {
                     Caption = 'Overdue Amount';
                     Editable = false;

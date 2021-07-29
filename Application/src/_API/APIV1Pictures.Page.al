@@ -21,32 +21,32 @@ page 6014536 "NPR APIV1 - Pictures"
         {
             repeater(Group)
             {
-                field(id; Id)
+                field(id; Rec.Id)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field(parentType; "Parent Type")
+                field(parentType; Rec."Parent Type")
                 {
                     Caption = 'Parent Type';
                     Editable = false;
                 }
-                field(width; Width)
+                field(width; Rec.Width)
                 {
                     Caption = 'Width';
                     Editable = false;
                 }
-                field(height; Height)
+                field(height; Rec.Height)
                 {
                     Caption = 'Height';
                     Editable = false;
                 }
-                field(contentType; "Mime Type")
+                field(contentType; Rec."Mime Type")
                 {
                     Caption = 'Content Type';
                     Editable = false;
                 }
-                field(pictureContent; Content)
+                field(pictureContent; Rec.Content)
                 {
                     Caption = 'Picture Content';
                 }
@@ -65,7 +65,7 @@ page 6014536 "NPR APIV1 - Pictures"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        DeletePictureWithParentType();
+        Rec.DeletePictureWithParentType();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -75,19 +75,19 @@ page 6014536 "NPR APIV1 - Pictures"
         ParentTypeFilter: Text;
     begin
         if not DataLoaded then begin
-            ParentIdFilter := GetFilter(Id);
-            ParentTypeFilter := GetFilter("Parent Type");
+            ParentIdFilter := Rec.GetFilter(Id);
+            ParentTypeFilter := Rec.GetFilter("Parent Type");
             if (ParentTypeFilter = '') or (ParentIdFilter = '') then begin
-                FilterGroup(4);
-                ParentIdFilter := GetFilter(Id);
-                ParentTypeFilter := GetFilter("Parent Type");
-                FilterGroup(0);
+                Rec.FilterGroup(4);
+                ParentIdFilter := Rec.GetFilter(Id);
+                ParentTypeFilter := Rec.GetFilter("Parent Type");
+                Rec.FilterGroup(0);
                 if (ParentTypeFilter = '') or (ParentIdFilter = '') then
                     Error(ParentNotSpecifiedErr)
             end;
             Evaluate(PictureEntityParentType, ParentTypeFilter);
-            LoadDataWithParentType(ParentIdFilter, PictureEntityParentType);
-            Insert(true);
+            Rec.LoadDataWithParentType(ParentIdFilter, PictureEntityParentType);
+            Rec.Insert(true);
         end;
 
         DataLoaded := true;
@@ -96,12 +96,12 @@ page 6014536 "NPR APIV1 - Pictures"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        SavePictureWithParentType();
+        Rec.SavePictureWithParentType();
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        SavePictureWithParentType();
+        Rec.SavePictureWithParentType();
     end;
 
     var

@@ -19,23 +19,23 @@ page 6014501 "NPR APIV1 - Items"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
 
-                field(number; "No.")
+                field(number; Rec."No.")
                 {
                     Caption = 'No.';
                 }
-                field(displayName; Description)
+                field(displayName; Rec.Description)
                 {
                     Caption = 'DisplayName';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Description));
+                        RegisterFieldSet(Rec.FieldNo(Description));
                     end;
                 }
 
@@ -48,13 +48,13 @@ page 6014501 "NPR APIV1 - Items"
                         RegisterFieldSet(Rec.FieldNo("Description 2"));
                     end;
                 }
-                field(type; Type)
+                field(type; Rec.Type)
                 {
                     Caption = 'Type';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Type));
+                        RegisterFieldSet(Rec.FieldNo(Type));
                     end;
                 }
 
@@ -97,63 +97,63 @@ page 6014501 "NPR APIV1 - Items"
                         RegisterFieldSet(Rec.FieldNo("Vendor Item No."));
                     end;
                 }
-                field(itemCategoryId; "Item Category Id")
+                field(itemCategoryId; Rec."Item Category Id")
                 {
                     Caption = 'Item Category Id';
 
                     trigger OnValidate()
                     begin
-                        if "Item Category Id" = BlankGUID then
-                            "Item Category Code" := ''
+                        if Rec."Item Category Id" = BlankGUID then
+                            Rec."Item Category Code" := ''
                         else begin
-                            if not ItemCategory.GetBySystemId("Item Category Id") then
+                            if not ItemCategory.GetBySystemId(Rec."Item Category Id") then
                                 Error(ItemCategoryIdDoesNotMatchAnItemCategoryGroupErr);
 
-                            "Item Category Code" := ItemCategory.Code;
+                            Rec."Item Category Code" := ItemCategory.Code;
                         end;
 
-                        RegisterFieldSet(FieldNo("Item Category Code"));
-                        RegisterFieldSet(FieldNo("Item Category Id"));
+                        RegisterFieldSet(Rec.FieldNo("Item Category Code"));
+                        RegisterFieldSet(Rec.FieldNo("Item Category Id"));
                     end;
                 }
-                field(itemCategoryCode; "Item Category Code")
+                field(itemCategoryCode; Rec."Item Category Code")
                 {
                     Caption = 'Item Category Code';
 
                     trigger OnValidate()
                     begin
                         if ItemCategory.Code <> '' then begin
-                            if ItemCategory.Code <> "Item Category Code" then
+                            if ItemCategory.Code <> Rec."Item Category Code" then
                                 Error(ItemCategoriesValuesDontMatchErr);
                             exit;
                         end;
 
-                        if "Item Category Code" = '' then
-                            "Item Category Id" := BlankGUID
+                        if Rec."Item Category Code" = '' then
+                            Rec."Item Category Id" := BlankGUID
                         else begin
-                            if not ItemCategory.Get("Item Category Code") then
+                            if not ItemCategory.Get(Rec."Item Category Code") then
                                 Error(ItemCategoryCodeDoesNotMatchATaxGroupErr);
 
-                            "Item Category Id" := ItemCategory.SystemId;
+                            Rec."Item Category Id" := ItemCategory.SystemId;
                         end;
                     end;
                 }
-                field(blocked; Blocked)
+                field(blocked; Rec.Blocked)
                 {
                     Caption = 'Blocked';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Blocked));
+                        RegisterFieldSet(Rec.FieldNo(Blocked));
                     end;
                 }
-                field(gtin; GTIN)
+                field(gtin; Rec.GTIN)
                 {
                     Caption = 'GTIN';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(GTIN));
+                        RegisterFieldSet(Rec.FieldNo(GTIN));
                     end;
                 }
                 field(inventory; InventoryValue)
@@ -162,16 +162,16 @@ page 6014501 "NPR APIV1 - Items"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Inventory));
+                        RegisterFieldSet(Rec.FieldNo(Inventory));
                     end;
                 }
-                field(unitPrice; "Unit Price")
+                field(unitPrice; Rec."Unit Price")
                 {
                     Caption = 'Unit Price';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Unit Price"));
+                        RegisterFieldSet(Rec.FieldNo("Unit Price"));
                     end;
                 }
 
@@ -181,19 +181,19 @@ page 6014501 "NPR APIV1 - Items"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Unit List Price"));
+                        RegisterFieldSet(Rec.FieldNo("Unit List Price"));
                     end;
                 }
-                field(priceIncludesTax; "Price Includes VAT")
+                field(priceIncludesTax; Rec."Price Includes VAT")
                 {
                     Caption = 'Price Includes Tax';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Price Includes VAT"));
+                        RegisterFieldSet(Rec.FieldNo("Price Includes VAT"));
                     end;
                 }
-                field(unitCost; "Unit Cost")
+                field(unitCost; Rec."Unit Cost")
                 {
                     Caption = 'Unit Cost';
 
@@ -223,48 +223,48 @@ page 6014501 "NPR APIV1 - Items"
                     end;
                 }
 
-                field(taxGroupId; "Tax Group Id")
+                field(taxGroupId; Rec."Tax Group Id")
                 {
                     Caption = 'Tax Group Id';
 
                     trigger OnValidate()
                     begin
-                        if "Tax Group Id" = BlankGUID then
-                            "Tax Group Code" := ''
+                        if Rec."Tax Group Id" = BlankGUID then
+                            Rec."Tax Group Code" := ''
                         else begin
-                            if not TaxGroup.GetBySystemId("Tax Group Id") then
+                            if not TaxGroup.GetBySystemId(Rec."Tax Group Id") then
                                 Error(TaxGroupIdDoesNotMatchATaxGroupErr);
 
-                            "Tax Group Code" := TaxGroup.Code;
+                            Rec."Tax Group Code" := TaxGroup.Code;
                         end;
 
                         RegisterFieldSet(FieldNo("Tax Group Code"));
                         RegisterFieldSet(FieldNo("Tax Group Id"));
                     end;
                 }
-                field(taxGroupCode; "Tax Group Code")
+                field(taxGroupCode; Rec."Tax Group Code")
                 {
                     Caption = 'Tax Group Code';
 
                     trigger OnValidate()
                     begin
                         if TaxGroup.Code <> '' then begin
-                            if TaxGroup.Code <> "Tax Group Code" then
+                            if TaxGroup.Code <> Rec."Tax Group Code" then
                                 Error(TaxGroupValuesDontMatchErr);
                             exit;
                         end;
 
-                        if "Tax Group Code" = '' then
-                            "Tax Group Id" := BlankGUID
+                        if Rec."Tax Group Code" = '' then
+                            Rec."Tax Group Id" := BlankGUID
                         else begin
-                            if not TaxGroup.Get("Tax Group Code") then
+                            if not TaxGroup.Get(Rec."Tax Group Code") then
                                 Error(TaxGroupCodeDoesNotMatchATaxGroupErr);
 
-                            "Tax Group Id" := TaxGroup.SystemId;
+                            Rec."Tax Group Id" := TaxGroup.SystemId;
                         end;
 
-                        RegisterFieldSet(FieldNo("Tax Group Code"));
-                        RegisterFieldSet(FieldNo("Tax Group Id"));
+                        RegisterFieldSet(Rec.FieldNo("Tax Group Code"));
+                        RegisterFieldSet(Rec.FieldNo("Tax Group Id"));
                     end;
                 }
 
@@ -277,22 +277,22 @@ page 6014501 "NPR APIV1 - Items"
                         RegisterFieldSet(Rec.FieldNo("Tariff No."));
                     end;
                 }
-                field(baseUnitOfMeasureId; "Unit of Measure Id")
+                field(baseUnitOfMeasureId; Rec."Unit of Measure Id")
                 {
                     Caption = 'Base Unit Of Measure Id';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Unit of Measure Id"));
+                        RegisterFieldSet(Rec.FieldNo("Unit of Measure Id"));
                     end;
                 }
-                field(baseUnitOfMeasureCode; "Base Unit of Measure")
+                field(baseUnitOfMeasureCode; Rec."Base Unit of Measure")
                 {
                     Caption = 'Base Unit Of Measure Code';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Base Unit of Measure"));
+                        RegisterFieldSet(Rec.FieldNo("Base Unit of Measure"));
                     end;
                 }
 
@@ -574,18 +574,25 @@ page 6014501 "NPR APIV1 - Items"
 
                 part(baseUnitOfMeasure; "NPR APIV1 - Units of Measure")
                 {
-                    // TO DO: waiting platform version 6.3 property: Caption = 'Unit Of Measure';
-                    //Multiplicity = ZeroOrOne;
+
+#IF BC17            // Multiplicity can be used only with platform version 6.3;
                     CaptionML = ENU = 'Multiplicity=ZeroOrOne';
+#ELSE
+                    Caption = 'Unit Of Measure';
+                    Multiplicity = ZeroOrOne;
+#ENDIF
                     EntityName = 'unitOfMeasure';
                     EntitySetName = 'unitsOfMeasure';
                     SubPageLink = SystemId = Field("Unit of Measure Id");
                 }
                 part(picture; "NPR APIV1 - Pictures")
                 {
-                    // TO DO: waiting platform version 6.3 property: Caption = 'Picture';;
-                    //Multiplicity = ZeroOrOne;
+#IF BC17            // Multiplicity can be used only with platform version 6.3;
                     CaptionML = ENU = 'Multiplicity=ZeroOrOne';
+#ELSE
+                    Caption = 'Picture';
+                    Multiplicity = ZeroOrOne;
+#ENDIF
                     EntityName = 'picture';
                     EntitySetName = 'pictures';
                     SubPageLink = Id = Field(SystemId), "Parent Type" = const(2);
@@ -649,17 +656,17 @@ page 6014501 "NPR APIV1 - Items"
         Item: Record Item;
     begin
 
-        if TempFieldSet.Get(Database::Item, FieldNo(Inventory)) then
+        if TempFieldSet.Get(Database::Item, Rec.FieldNo(Inventory)) then
             UpdateInventory();
 
-        Item.GetBySystemId(SystemId);
+        Item.GetBySystemId(Rec.SystemId);
 
-        if "No." = Item."No." then
-            Modify(true)
+        if Rec."No." = Item."No." then
+            Rec.Modify(true)
         else begin
             Item.TransferFields(Rec, false);
-            Item.Rename("No.");
-            TransferFields(Item, true);
+            Item.Rename(Rec."No.");
+            Rec.TransferFields(Item, true);
         end;
 
         SetCalculatedFields();
@@ -669,7 +676,7 @@ page 6014501 "NPR APIV1 - Items"
 
     trigger OnOpenPage()
     begin
-        SetAutoCalcFields(Inventory);
+        Rec.SetAutoCalcFields(Inventory);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -695,12 +702,12 @@ page 6014501 "NPR APIV1 - Items"
     local procedure SetCalculatedFields()
     begin
         // Inventory
-        InventoryValue := Inventory;
+        InventoryValue := Rec.Inventory;
     end;
 
     local procedure ClearCalculatedFields()
     begin
-        Clear(SystemId);
+        Clear(Rec.SystemId);
         Clear(InventoryValue);
         TempFieldSet.DeleteAll();
     end;
@@ -710,24 +717,24 @@ page 6014501 "NPR APIV1 - Items"
         ItemJnlLine: Record "Item Journal Line";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
     begin
-        calcfields(Inventory);
-        if Inventory = InventoryValue then
+        Rec.calcfields(Inventory);
+        if Rec.Inventory = InventoryValue then
             exit;
         ItemJnlLine.Init();
         ItemJnlLine.Validate("Posting Date", Today());
-        ItemJnlLine."Document No." := "No.";
+        ItemJnlLine."Document No." := Rec."No.";
 
         if Inventory < InventoryValue then
             ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Positive Adjmt.")
         else
             ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Negative Adjmt.");
 
-        ItemJnlLine.Validate("Item No.", "No.");
-        ItemJnlLine.Validate(Description, Description);
-        ItemJnlLine.Validate(Quantity, Abs(InventoryValue - Inventory));
+        ItemJnlLine.Validate("Item No.", Rec."No.");
+        ItemJnlLine.Validate(Description, Rec.Description);
+        ItemJnlLine.Validate(Quantity, Abs(InventoryValue - Rec.Inventory));
 
         ItemJnlPostLine.RunWithCheck(ItemJnlLine);
-        Get("No.");
+        Rec.Get(Rec."No.");
     end;
 
     local procedure RegisterFieldSet(FieldNo: Integer)
