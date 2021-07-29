@@ -135,6 +135,12 @@ codeunit 6014654 "NPR Rep. Price List Lines" implements "NPR Replication IEndpoi
 
         IF CheckFieldValue(PriceListLine, PriceListLine.FieldNo("Unit Cost"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.unitCost'), true) then
             FieldsChanged := true;
+#IF BC17
+
+#ELSE
+        IF CheckFieldValue(PriceListLine, PriceListLine.FieldNo("Direct Unit Cost"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.directUnitCost'), true) then
+            FieldsChanged := true;
+#ENDIF
 
         IF CheckFieldValue(PriceListLine, PriceListLine.FieldNo("Line Discount %"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.lineDiscount'), true) then
             FieldsChanged := true;
