@@ -28,19 +28,19 @@ page 6014464 "NPR APIV1 - Dimension Values"
                     Caption = 'Id';
                     Editable = false;
                 }
-                field("code"; Code)
+                field("code"; Rec.Code)
                 {
                     Caption = 'Code';
                 }
-                field(dimensionId; "Dimension Id")
+                field(dimensionId; Rec."Dimension Id")
                 {
                     Caption = 'Dimension Id';
                 }
-                field(displayName; Name)
+                field(displayName; Rec.Name)
                 {
                     Caption = 'Display Name';
                 }
-                field(lastModifiedDateTime; SystemModifiedAt)
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
                 }

@@ -72,8 +72,7 @@ page 6014517 "NPR APIV1 - Item Ledger Entry"
                 {
                     Caption = 'Country/Region Code', Locked = true;
                 }
-                field(sourceType;
-                Rec."Source Type")
+                field(sourceType; Rec."Source Type")
                 {
                     Caption = 'Source Type', Locked = true;
                 }

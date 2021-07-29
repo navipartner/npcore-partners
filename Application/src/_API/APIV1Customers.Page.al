@@ -19,16 +19,16 @@ page 6014507 "NPR APIV1 - Customers"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field(number; "No.")
+                field(number; Rec."No.")
                 {
                     Caption = 'No.';
                 }
-                field(displayName; Name)
+                field(displayName; Rec.Name)
                 {
                     Caption = 'Display Name';
                     ShowMandatory = true;
@@ -41,11 +41,11 @@ page 6014507 "NPR APIV1 - Customers"
                     end;
                 }
 
-                field(displayName2; "Name 2")
+                field(displayName2; Rec."Name 2")
                 {
                     Caption = 'Display Name 2';
                 }
-                field(type; "Contact Type")
+                field(type; Rec."Contact Type")
                 {
                     Caption = 'Type';
 
@@ -54,7 +54,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Contact Type"));
                     end;
                 }
-                field(addressLine1; Address)
+                field(addressLine1; Rec.Address)
                 {
                     Caption = 'Address Line 1';
 
@@ -63,7 +63,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Address"));
                     end;
                 }
-                field(addressLine2; "Address 2")
+                field(addressLine2; Rec."Address 2")
                 {
                     Caption = 'Address Line 2';
 
@@ -72,7 +72,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Address 2"));
                     end;
                 }
-                field(city; City)
+                field(city; Rec.City)
                 {
                     Caption = 'City';
 
@@ -81,7 +81,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("City"));
                     end;
                 }
-                field(state; County)
+                field(state; Rec.County)
                 {
                     Caption = 'State';
 
@@ -90,7 +90,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("County"));
                     end;
                 }
-                field(country; "Country/Region Code")
+                field(country; Rec."Country/Region Code")
                 {
                     Caption = 'Country/Region Code';
 
@@ -99,7 +99,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Country/Region Code"));
                     end;
                 }
-                field(postalCode; "Post Code")
+                field(postalCode; Rec."Post Code")
                 {
                     Caption = 'Post Code';
 
@@ -108,7 +108,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Post Code"));
                     end;
                 }
-                field(phoneNumber; "Phone No.")
+                field(phoneNumber; Rec."Phone No.")
                 {
                     Caption = 'Phone No.';
 
@@ -117,7 +117,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Phone No."));
                     end;
                 }
-                field(email; "E-Mail")
+                field(email; Rec."E-Mail")
                 {
                     Caption = 'Email';
 
@@ -126,7 +126,7 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("E-Mail"));
                     end;
                 }
-                field(website; "Home Page")
+                field(website; Rec."Home Page")
                 {
                     Caption = 'Website';
 
@@ -135,16 +135,16 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Home Page"));
                     end;
                 }
-                field(taxLiable; "Tax Liable")
+                field(taxLiable; Rec."Tax Liable")
                 {
                     Caption = 'Tax Liable';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Tax Liable"));
+                        RegisterFieldSet(Rec.FieldNo("Tax Liable"));
                     end;
                 }
-                field(taxAreaId; "Tax Area ID")
+                field(taxAreaId; Rec."Tax Area ID")
                 {
                     Caption = 'Tax Area Id';
 
@@ -170,28 +170,28 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'Tax Area Display Name';
                     Editable = false;
                 }
-                field(taxRegistrationNumber; "VAT Registration No.")
+                field(taxRegistrationNumber; Rec."VAT Registration No.")
                 {
                     Caption = 'Tax Registration No.';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("VAT Registration No."));
+                        RegisterFieldSet(Rec.FieldNo("VAT Registration No."));
                     end;
                 }
-                field(currencyId; "Currency Id")
+                field(currencyId; Rec."Currency Id")
                 {
                     Caption = 'Currency Id';
 
                     trigger OnValidate()
                     begin
-                        if "Currency Id" = BlankGUID then
-                            "Currency Code" := ''
+                        if Rec."Currency Id" = BlankGUID then
+                            Rec."Currency Code" := ''
                         else begin
-                            if not Currency.GetBySystemId("Currency Id") then
+                            if not Currency.GetBySystemId(Rec."Currency Id") then
                                 Error(CurrencyIdDoesNotMatchACurrencyErr);
 
-                            "Currency Code" := Currency.Code;
+                            Rec."Currency Code" := Currency.Code;
                         end;
 
                         RegisterFieldSet(FieldNo("Currency Id"));
@@ -227,19 +227,19 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(FieldNo("Currency Code"));
                     end;
                 }
-                field(paymentTermsId; "Payment Terms Id")
+                field(paymentTermsId; Rec."Payment Terms Id")
                 {
                     Caption = 'Payment Terms Id';
 
                     trigger OnValidate()
                     begin
-                        if "Payment Terms Id" = BlankGUID then
-                            "Payment Terms Code" := ''
+                        if Rec."Payment Terms Id" = BlankGUID then
+                            Rec."Payment Terms Code" := ''
                         else begin
-                            if not PaymentTerms.GetBySystemId("Payment Terms Id") then
+                            if not PaymentTerms.GetBySystemId(Rec."Payment Terms Id") then
                                 Error(PaymentTermsIdDoesNotMatchAPaymentTermsErr);
 
-                            "Payment Terms Code" := PaymentTerms.Code;
+                            Rec."Payment Terms Code" := PaymentTerms.Code;
                         end;
 
                         RegisterFieldSet(FieldNo("Payment Terms Id"));
@@ -251,19 +251,19 @@ page 6014507 "NPR APIV1 - Customers"
                 {
                     Caption = 'Payment Terms Code';
                 }
-                field(shipmentMethodId; "Shipment Method Id")
+                field(shipmentMethodId; Rec."Shipment Method Id")
                 {
                     Caption = 'Shipment Method Id';
 
                     trigger OnValidate()
                     begin
-                        if "Shipment Method Id" = BlankGUID then
-                            "Shipment Method Code" := ''
+                        if Rec."Shipment Method Id" = BlankGUID then
+                            Rec."Shipment Method Code" := ''
                         else begin
-                            if not ShipmentMethod.GetBySystemId("Shipment Method Id") then
+                            if not ShipmentMethod.GetBySystemId(Rec."Shipment Method Id") then
                                 Error(ShipmentMethodIdDoesNotMatchAShipmentMethodErr);
 
-                            "Shipment Method Code" := ShipmentMethod.Code;
+                            Rec."Shipment Method Code" := ShipmentMethod.Code;
                         end;
 
                         RegisterFieldSet(FieldNo("Shipment Method Id"));
@@ -275,19 +275,19 @@ page 6014507 "NPR APIV1 - Customers"
                 {
                     Caption = 'Shipment Method Code';
                 }
-                field(paymentMethodId; "Payment Method Id")
+                field(paymentMethodId; Rec."Payment Method Id")
                 {
                     Caption = 'Payment Method Id';
 
                     trigger OnValidate()
                     begin
-                        if "Payment Method Id" = BlankGUID then
-                            "Payment Method Code" := ''
+                        if Rec."Payment Method Id" = BlankGUID then
+                            Rec."Payment Method Code" := ''
                         else begin
-                            if not PaymentMethod.GetBySystemId("Payment Method Id") then
+                            if not PaymentMethod.GetBySystemId(Rec."Payment Method Id") then
                                 Error(PaymentMethodIdDoesNotMatchAPaymentMethodErr);
 
-                            "Payment Method Code" := PaymentMethod.Code;
+                            Rec."Payment Method Code" := PaymentMethod.Code;
                         end;
 
                         RegisterFieldSet(FieldNo("Payment Method Id"));
@@ -299,13 +299,13 @@ page 6014507 "NPR APIV1 - Customers"
                 {
                     Caption = 'Payment Method Code';
                 }
-                field(blocked; Blocked)
+                field(blocked; Rec.Blocked)
                 {
                     Caption = 'Blocked';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Blocked));
+                        RegisterFieldSet(Rec.FieldNo(Blocked));
                     end;
                 }
 
@@ -361,7 +361,7 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'Gen. Bus. Posting Group';
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Gen. Bus. Posting Group"));
+                        RegisterFieldSet(Rec.FieldNo("Gen. Bus. Posting Group"));
                     end;
                 }
 
@@ -370,7 +370,7 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'Customer Posting Group';
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Customer Posting Group"));
+                        RegisterFieldSet(Rec.FieldNo("Customer Posting Group"));
                     end;
                 }
 
@@ -379,7 +379,7 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'VAT Bus. Posting Group';
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("VAT Bus. Posting Group"));
+                        RegisterFieldSet(Rec.FieldNo("VAT Bus. Posting Group"));
                     end;
                 }
 
@@ -518,18 +518,24 @@ page 6014507 "NPR APIV1 - Customers"
 
                 part(customerFinancialDetails; "NPR APIV1 - Cust Fin Details")
                 {
-                    // TO DO: waiting platform version 6.3 property: Caption = 'Picture';;
-                    //Multiplicity = ZeroOrOne;
+#IF BC17            // Multiplicity can be used only with platform version 6.3;
                     CaptionML = ENU = 'Multiplicity=ZeroOrOne';
+#ELSE
+                    Caption = 'Customer Financial Details';
+                    Multiplicity = ZeroOrOne;
+#ENDIF
                     EntityName = 'customerFinancialDetail';
                     EntitySetName = 'customerFinancialDetails';
                     SubPageLink = SystemId = Field(SystemId);
                 }
                 part(picture; "NPR APIV1 - Pictures")
                 {
-                    // TO DO: waiting platform version 6.3 property: Caption = 'Picture';;
-                    //Multiplicity = ZeroOrOne;
+#IF BC17            // Multiplicity can be used only with platform version 6.3;
                     CaptionML = ENU = 'Multiplicity=ZeroOrOne';
+#ELSE
+                    Caption = 'Picture';
+                    Multiplicity = ZeroOrOne;
+#ENDIF
                     EntityName = 'picture';
                     EntitySetName = 'pictures';
                     SubPageLink = Id = Field(SystemId), "Parent Type" = const(1);
