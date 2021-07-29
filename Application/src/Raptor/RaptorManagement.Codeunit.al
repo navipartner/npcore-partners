@@ -1,9 +1,5 @@
 ﻿codeunit 6151491 "NPR Raptor Management"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         RaptorSetup: Record "NPR Raptor Setup";
         ActionDescrLbl_GetUserIDHistory: Label 'Browsing History Entries';
@@ -192,7 +188,6 @@
 
     local procedure GenerateUrlQueryString(var Parameters: Record "Name/Value Buffer") QueryString: Text
     var
-        TypeHelper: Codeunit "Type Helper";
         QueryStringLbl: Label '%1=%2', Locked = true;
     begin
         Parameters.SetFilter(Name, '<>%1', '_*');
@@ -204,8 +199,15 @@
                 else
                     QueryString := '?';
                 QueryString := QueryString +
-                    StrSubstNo(QueryStringLbl, TypeHelper.UrlEncode(Parameters.Name), TypeHelper.UrlEncode(Parameters.Value));
+                    StrSubstNo(QueryStringLbl, UrlEncode(Parameters.Name), UrlEncode(Parameters.Value));
             until Parameters.Next() = 0;
+    end;
+
+    local procedure UrlEncode(TextToEncode: Text): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+    begin
+        exit(TypeHelper.UrlEncode(TextToEncode));
     end;
 
     local procedure IsEnabled(DataFlowType: Option GetData,SendData): Boolean
