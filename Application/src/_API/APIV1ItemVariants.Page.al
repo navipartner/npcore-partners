@@ -34,14 +34,14 @@ page 6014506 "NPR APIV1 - Item Variants"
                             if Item.SystemId <> "Item Id" then
                                 Error(ItemValuesDontMatchErr);
 
-                        if GetFilter("Item Id") <> '' then
-                            if "Item Id" <> GetFilter("Item Id") then
+                        if Rec.GetFilter("Item Id") <> '' then
+                            if Rec."Item Id" <> Rec.GetFilter("Item Id") then
                                 Error(ItemValuesDontMatchErr);
 
-                        if "Item Id" = BlankGuid then
-                            "Item No." := ''
+                        if Rec."Item Id" = BlankGuid then
+                            Rec."Item No." := ''
                         else
-                            if not Item.GetBySystemId("Item Id") then
+                            if not Item.GetBySystemId(Rec."Item Id") then
                                 Error(ItemIdDoesNotMatchAnEmployeeErr);
                     end;
                 }
@@ -54,11 +54,11 @@ page 6014506 "NPR APIV1 - Item Variants"
                         if Rec."Item No." = '' then
                             Rec."Item Id" := BlankGuid
                         else
-                            if not Item.Get("Item No.") then
+                            if not Item.Get(Rec."Item No.") then
                                 Error(ItemNumberDoesNotMatchAnEmployeeErr);
 
                         if Rec.GetFilter("Item Id") <> '' then
-                            if Item.SystemId <> GetFilter("Item Id") then
+                            if Item.SystemId <> Rec.GetFilter("Item Id") then
                                 Error(ItemValuesDontMatchErr);
                     end;
                 }
@@ -75,66 +75,66 @@ page 6014506 "NPR APIV1 - Item Variants"
                 {
                     Caption = 'Description 2';
                 }
-                field(variety1; "NPR Variety 1")
+                field(variety1; Rec."NPR Variety 1")
                 {
                     Caption = 'Variety 1';
                 }
 
-                field(variety1Table; "NPR Variety 1 Table")
+                field(variety1Table; Rec."NPR Variety 1 Table")
                 {
                     Caption = 'Variety 1 Table';
                 }
 
-                field(variety1Value; "NPR Variety 1 Value")
+                field(variety1Value; Rec."NPR Variety 1 Value")
                 {
                     Caption = 'Variety 1 Value';
                 }
 
-                field(variety2; "NPR Variety 2")
+                field(variety2; Rec."NPR Variety 2")
                 {
                     Caption = 'Variety 2';
                 }
 
-                field(variety2Table; "NPR Variety 2 Table")
+                field(variety2Table; Rec."NPR Variety 2 Table")
                 {
                     Caption = 'Variety 2 Table';
                 }
 
-                field(variety2Value; "NPR Variety 2 Value")
+                field(variety2Value; Rec."NPR Variety 2 Value")
                 {
                     Caption = 'Variety 2 Value';
                 }
 
-                field(variety3; "NPR Variety 3")
+                field(variety3; Rec."NPR Variety 3")
                 {
                     Caption = 'Variety 3';
                 }
 
-                field(variety3Table; "NPR Variety 3 Table")
+                field(variety3Table; Rec."NPR Variety 3 Table")
                 {
                     Caption = 'Variety 3 Table';
                 }
 
-                field(variety3Value; "NPR Variety 3 Value")
+                field(variety3Value; Rec."NPR Variety 3 Value")
                 {
                     Caption = 'Variety 3 Value';
                 }
 
-                field(variety4; "NPR Variety 4")
+                field(variety4; Rec."NPR Variety 4")
                 {
                     Caption = 'Variety 4';
                 }
 
-                field(variety4Table; "NPR Variety 4 Table")
+                field(variety4Table; Rec."NPR Variety 4 Table")
                 {
                     Caption = 'Variety 4 Table';
                 }
 
-                field(variety4Value; "NPR Variety 4 Value")
+                field(variety4Value; Rec."NPR Variety 4 Value")
                 {
                     Caption = 'Variety 4 Value';
                 }
-                field(blocked; "NPR Blocked")
+                field(blocked; Rec."NPR Blocked")
                 {
                     Caption = 'Blocked';
                 }
@@ -164,8 +164,8 @@ page 6014506 "NPR APIV1 - Item Variants"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        if HasFilter() then
-            Validate("Item Id", GetFilter("Item Id"));
+        if Rec.HasFilter() then
+            Rec.Validate("Item Id", Rec.GetFilter("Item Id"));
     end;
 
     trigger OnModifyRecord(): Boolean
@@ -174,12 +174,12 @@ page 6014506 "NPR APIV1 - Item Variants"
     begin
         ItemVariant.GetBySystemId(Rec.SystemId);
 
-        if "Item No." = ItemVariant."Item No." then
-            Modify(true)
+        if Rec."Item No." = ItemVariant."Item No." then
+            Rec.Modify(true)
         else begin
             ItemVariant.TransferFields(Rec, false);
-            ItemVariant.Rename("Item No.", "Code");
-            TransferFields(ItemVariant, true);
+            ItemVariant.Rename(Rec."Item No.", Rec."Code");
+            Rec.TransferFields(ItemVariant, true);
         end;
         exit(false);
     end;

@@ -19,49 +19,49 @@ page 6014489 "NPR APIV1 - Units of Measure"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field("code"; Code)
+                field("code"; Rec.Code)
                 {
                     Caption = 'Code';
                     ShowMandatory = true;
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Code));
+                        RegisterFieldSet(Rec.FieldNo(Code));
                     end;
                 }
-                field(displayName; Description)
+                field(displayName; Rec.Description)
                 {
                     Caption = 'Display Name';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Description));
+                        RegisterFieldSet(Rec.FieldNo(Description));
                     end;
                 }
-                field(internationalStandardCode; "International Standard Code")
+                field(internationalStandardCode; Rec."International Standard Code")
                 {
                     Caption = 'International Standard Code';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("International Standard Code"));
+                        RegisterFieldSet(Rec.FieldNo("International Standard Code"));
                     end;
                 }
-                field(symbol; Symbol)
+                field(symbol; Rec.Symbol)
                 {
                     Caption = 'Symbol';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Symbol"));
+                        RegisterFieldSet(Rec.FieldNo("Symbol"));
                     end;
                 }
-                field(lastModifiedDateTime; SystemModifiedAt)
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
                 }
@@ -88,7 +88,7 @@ page 6014489 "NPR APIV1 - Units of Measure"
         GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
         RecRef: RecordRef;
     begin
-        Insert(true);
+        Rec.Insert(true);
 
         RecRef.GetTable(Rec);
         GraphMgtGeneralTools.ProcessNewRecordFromAPI(RecRef, TempFieldSet, CurrentDateTime());

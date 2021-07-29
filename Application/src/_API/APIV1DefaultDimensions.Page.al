@@ -19,38 +19,38 @@ page 6014503 "NPR APIV1 - Default Dimensions"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field(parentType; "Parent Type")
+                field(parentType; Rec."Parent Type")
                 {
                     Caption = 'Parent Type';
                 }
-                field(parentId; ParentId)
+                field(parentId; Rec.ParentId)
                 {
                     Caption = 'Parent Id';
                 }
-                field(dimensionId; DimensionId)
+                field(dimensionId; Rec.DimensionId)
                 {
                     Caption = 'Dimension Id';
                 }
-                field(dimensionCode; "Dimension Code")
+                field(dimensionCode; Rec."Dimension Code")
                 {
                     Caption = 'Dimension Code';
                     Editable = false;
                 }
-                field(dimensionValueId; DimensionValueId)
+                field(dimensionValueId; Rec.DimensionValueId)
                 {
                     Caption = 'Dimension Value Id';
                 }
-                field(dimensionValueCode; "Dimension Value Code")
+                field(dimensionValueCode; Rec."Dimension Value Code")
                 {
                     Caption = 'Dimension Value Code';
                     Editable = false;
                 }
-                field(postingValidation; "Value Posting")
+                field(postingValidation; Rec."Value Posting")
                 {
                     Caption = 'Posting Validation';
                 }
@@ -77,20 +77,20 @@ page 6014503 "NPR APIV1 - Default Dimensions"
         ParentIdFilter: Text;
         ParentTypeFilter: Text;
     begin
-        if "Parent Type" = "Parent Type"::" " then begin
-            ParentTypeFilter := GetFilter("Parent Type");
+        if Rec."Parent Type" = Rec."Parent Type"::" " then begin
+            ParentTypeFilter := Rec.GetFilter("Parent Type");
             if ParentTypeFilter = '' then
                 Error(ParentNotSpecifiedErr);
             Evaluate(DefaultDimensionParentType, ParentTypeFilter);
-            Validate("Parent Type", DefaultDimensionParentType);
+            Rec.Validate("Parent Type", DefaultDimensionParentType);
         end;
-        if IsNullGuid(ParentId) then begin
-            ParentIdFilter := GetFilter(ParentId);
+        if IsNullGuid(Rec.ParentId) then begin
+            ParentIdFilter := Rec.GetFilter(ParentId);
             if ParentIdFilter = '' then
                 Error(ParentNotSpecifiedErr);
-            Validate(ParentId, ParentIdFilter);
+            Rec.Validate(ParentId, ParentIdFilter);
         end else
-            Validate(ParentId); //AL: to populate also the Item No in Default Dimension record
+            Rec.Validate(ParentId); // to populate also the Item No in Default Dimension record
 
         exit(true);
     end;
