@@ -55,10 +55,12 @@ page 6014525 "NPR API V1 - Item Reference"
                 {
                     Caption = 'description2', Locked = true;
                 }
+#IF BC17
                 field(discontinueBarCode; Rec."Discontinue Bar Code")
                 {
                     Caption = 'discontinueBarCode', Locked = true;
                 }
+#ENDIF
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'lastModifiedDateTime', Locked = true;

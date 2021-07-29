@@ -94,8 +94,10 @@ codeunit 6014604 "NPR Rep. Get Item References" implements "NPR Replication IEnd
         IF CheckFieldValue(ItemReference, ItemReference.FieldNo("Description 2"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.description2'), false) then
             FieldsChanged := true;
 
+#IF BC17
         IF CheckFieldValue(ItemReference, ItemReference.FieldNo("Discontinue Bar Code"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.discontinueBarCode'), false) then
             FieldsChanged := true;
+#ENDIF
     end;
 
     local procedure CheckFieldValue(var ItemReference: Record "Item Reference"; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean): Boolean
