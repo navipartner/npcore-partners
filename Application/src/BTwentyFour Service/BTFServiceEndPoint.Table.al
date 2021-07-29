@@ -110,9 +110,10 @@ table 6014523 "NPR BTF Service EndPoint"
 
     trigger OnDelete()
     var
+        ImportType: Record "NPR Nc Import Type";
         ServiceAPI: Codeunit "NPR BTF Service API";
     begin
-        ServiceAPI.DeleteNcImportType(Rec."EndPoint ID");
+        ServiceAPI.DeleteNcImportType(CopyStr(Rec."EndPoint ID", 1, MaxStrlen(ImportType.Code)));
         ServiceAPI.CancelJob(Rec);
     end;
 
