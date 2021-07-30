@@ -334,7 +334,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
         UpperBound: Integer;
         RemDays: Integer;
         Date: Record Date;
-        NoOfDaysLbl: Label '%1D', Locked = true;
+        NoOfDaysLbl: Label '<%1D>', Locked = true;
     begin
         Clear(DateArray);
         Clear(DateColumnCaption);
@@ -471,11 +471,11 @@ page 6059833 "NPR Event Res. Avail. Overview"
     local procedure FindDateSet(Direction: Option Next,Previous)
     var
         FirstDate: Date;
-        NoOfDaysLbl: Label '-%1D', Locked = true;
+        NoOfDaysLbl: Label '<-%1D>', Locked = true;
     begin
         case Direction of
             Direction::Next:
-                FirstDate := CalcDate('1D', DateArray[ArrayLen(DateArray)]);
+                FirstDate := CalcDate('<1D>', DateArray[ArrayLen(DateArray)]);
             Direction::Previous:
                 begin
                     FirstDate := CalcDate(StrSubstNo(NoOfDaysLbl, ArrayLen(DateArray)), DateArray[1]);
