@@ -35,9 +35,9 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        if Name = '' then
+                        if Rec.Name = '' then
                             Error(BlankCustomerNameErr);
-                        RegisterFieldSet(FieldNo(Name));
+                        RegisterFieldSet(Rec.FieldNo(Name));
                     end;
                 }
 
@@ -51,7 +51,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Contact Type"));
+                        RegisterFieldSet(Rec.FieldNo("Contact Type"));
                     end;
                 }
                 field(addressLine1; Rec.Address)
@@ -60,7 +60,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Address"));
+                        RegisterFieldSet(Rec.FieldNo("Address"));
                     end;
                 }
                 field(addressLine2; Rec."Address 2")
@@ -69,7 +69,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Address 2"));
+                        RegisterFieldSet(Rec.FieldNo("Address 2"));
                     end;
                 }
                 field(city; Rec.City)
@@ -78,7 +78,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("City"));
+                        RegisterFieldSet(Rec.FieldNo("City"));
                     end;
                 }
                 field(state; Rec.County)
@@ -87,7 +87,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("County"));
+                        RegisterFieldSet(Rec.FieldNo("County"));
                     end;
                 }
                 field(country; Rec."Country/Region Code")
@@ -96,7 +96,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Country/Region Code"));
+                        RegisterFieldSet(Rec.FieldNo("Country/Region Code"));
                     end;
                 }
                 field(postalCode; Rec."Post Code")
@@ -105,7 +105,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Post Code"));
+                        RegisterFieldSet(Rec.FieldNo("Post Code"));
                     end;
                 }
                 field(phoneNumber; Rec."Phone No.")
@@ -114,7 +114,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Phone No."));
+                        RegisterFieldSet(Rec.FieldNo("Phone No."));
                     end;
                 }
                 field(email; Rec."E-Mail")
@@ -123,7 +123,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("E-Mail"));
+                        RegisterFieldSet(Rec.FieldNo("E-Mail"));
                     end;
                 }
                 field(website; Rec."Home Page")
@@ -132,7 +132,7 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Home Page"));
+                        RegisterFieldSet(Rec.FieldNo("Home Page"));
                     end;
                 }
                 field(taxLiable; Rec."Tax Liable")
@@ -152,12 +152,12 @@ page 6014507 "NPR APIV1 - Customers"
                     var
                         GeneralLedgerSetup: Record "General Ledger Setup";
                     begin
-                        RegisterFieldSet(FieldNo("Tax Area ID"));
+                        RegisterFieldSet(Rec.FieldNo("Tax Area ID"));
 
                         if not GeneralLedgerSetup.UseVat() then
-                            RegisterFieldSet(FieldNo("Tax Area Code"))
+                            RegisterFieldSet(Rec.FieldNo("Tax Area Code"))
                         else
-                            RegisterFieldSet(FieldNo("VAT Bus. Posting Group"));
+                            RegisterFieldSet(Rec.FieldNo("VAT Bus. Posting Group"));
                     end;
                 }
 
@@ -194,8 +194,8 @@ page 6014507 "NPR APIV1 - Customers"
                             Rec."Currency Code" := Currency.Code;
                         end;
 
-                        RegisterFieldSet(FieldNo("Currency Id"));
-                        RegisterFieldSet(FieldNo("Currency Code"));
+                        RegisterFieldSet(Rec.FieldNo("Currency Id"));
+                        RegisterFieldSet(Rec.FieldNo("Currency Code"));
                     end;
                 }
                 field(currencyCode; CurrencyCodeTxt)
@@ -204,27 +204,27 @@ page 6014507 "NPR APIV1 - Customers"
 
                     trigger OnValidate()
                     begin
-                        "Currency Code" :=
+                        Rec."Currency Code" :=
                           GraphMgtGeneralTools.TranslateCurrencyCodeToNAVCurrencyCode(
                             LCYCurrencyCode, COPYSTR(CurrencyCodeTxt, 1, MAXSTRLEN(LCYCurrencyCode)));
 
                         if Currency.Code <> '' then begin
-                            if Currency.Code <> "Currency Code" then
+                            if Currency.Code <> Rec."Currency Code" then
                                 Error(CurrencyValuesDontMatchErr);
                             exit;
                         end;
 
-                        if "Currency Code" = '' then
-                            "Currency Id" := BlankGUID
+                        if Rec."Currency Code" = '' then
+                            Rec."Currency Id" := BlankGUID
                         else begin
-                            if not Currency.Get("Currency Code") then
+                            if not Currency.Get(Rec."Currency Code") then
                                 Error(CurrencyCodeDoesNotMatchACurrencyErr);
 
-                            "Currency Id" := Currency.SystemId;
+                            Rec."Currency Id" := Currency.SystemId;
                         end;
 
-                        RegisterFieldSet(FieldNo("Currency Id"));
-                        RegisterFieldSet(FieldNo("Currency Code"));
+                        RegisterFieldSet(Rec.FieldNo("Currency Id"));
+                        RegisterFieldSet(Rec.FieldNo("Currency Code"));
                     end;
                 }
                 field(paymentTermsId; Rec."Payment Terms Id")
@@ -242,8 +242,8 @@ page 6014507 "NPR APIV1 - Customers"
                             Rec."Payment Terms Code" := PaymentTerms.Code;
                         end;
 
-                        RegisterFieldSet(FieldNo("Payment Terms Id"));
-                        RegisterFieldSet(FieldNo("Payment Terms Code"));
+                        RegisterFieldSet(Rec.FieldNo("Payment Terms Id"));
+                        RegisterFieldSet(Rec.FieldNo("Payment Terms Code"));
                     end;
                 }
 
@@ -266,8 +266,8 @@ page 6014507 "NPR APIV1 - Customers"
                             Rec."Shipment Method Code" := ShipmentMethod.Code;
                         end;
 
-                        RegisterFieldSet(FieldNo("Shipment Method Id"));
-                        RegisterFieldSet(FieldNo("Shipment Method Code"));
+                        RegisterFieldSet(Rec.FieldNo("Shipment Method Id"));
+                        RegisterFieldSet(Rec.FieldNo("Shipment Method Code"));
                     end;
                 }
 
@@ -290,8 +290,8 @@ page 6014507 "NPR APIV1 - Customers"
                             Rec."Payment Method Code" := PaymentMethod.Code;
                         end;
 
-                        RegisterFieldSet(FieldNo("Payment Method Id"));
-                        RegisterFieldSet(FieldNo("Payment Method Code"));
+                        RegisterFieldSet(Rec.FieldNo("Payment Method Id"));
+                        RegisterFieldSet(Rec.FieldNo("Payment Method Code"));
                     end;
                 }
 
@@ -506,7 +506,7 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'NPR To Anonymize On';
                 }
 
-                field(lastModifiedDateTime; SystemModifiedAt)
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
                 }
@@ -580,20 +580,20 @@ page 6014507 "NPR APIV1 - Customers"
         Customer: Record Customer;
         RecRef: RecordRef;
     begin
-        if Name = '' then
+        if Rec.Name = '' then
             Error(NotProvidedCustomerNameErr);
 
-        Customer.SetRange("No.", "No.");
+        Customer.SetRange("No.", Rec."No.");
         if not Customer.IsEmpty() then
-            Insert();
+            Rec.Insert();
 
-        Insert(true);
+        Rec.Insert(true);
 
         RecRef.GetTable(Rec);
         GraphMgtGeneralTools.ProcessNewRecordFromAPI(RecRef, TempFieldSet, CurrentDateTime());
         RecRef.SetTable(Rec);
 
-        Modify(true);
+        Rec.Modify(true);
         SetCalculatedFields();
         exit(false);
     end;
@@ -602,14 +602,14 @@ page 6014507 "NPR APIV1 - Customers"
     var
         Customer: Record Customer;
     begin
-        Customer.GetBySystemId(SystemId);
+        Customer.GetBySystemId(Rec.SystemId);
 
-        if "No." = Customer."No." then
-            Modify(true)
+        if Rec."No." = Customer."No." then
+            Rec.Modify(true)
         else begin
             Customer.TransferFields(Rec, false);
-            Customer.Rename("No.");
-            TransferFields(Customer);
+            Customer.Rename(Rec."No.");
+            Rec.TransferFields(Customer);
         end;
 
         SetCalculatedFields();
@@ -650,13 +650,13 @@ page 6014507 "NPR APIV1 - Customers"
     var
         TaxAreaBuffer: Record "Tax Area Buffer";
     begin
-        CurrencyCodeTxt := GraphMgtGeneralTools.TranslateNAVCurrencyCodeToCurrencyCode(LCYCurrencyCode, "Currency Code");
-        TaxAreaDisplayNameGlobal := TaxAreaBuffer.GetTaxAreaDisplayName("Tax Area ID");
+        CurrencyCodeTxt := GraphMgtGeneralTools.TranslateNAVCurrencyCodeToCurrencyCode(LCYCurrencyCode, Rec."Currency Code");
+        TaxAreaDisplayNameGlobal := TaxAreaBuffer.GetTaxAreaDisplayName(Rec."Tax Area ID");
     end;
 
     local procedure ClearCalculatedFields()
     begin
-        Clear(SystemId);
+        Clear(Rec.SystemId);
         Clear(TaxAreaDisplayNameGlobal);
         TempFieldSet.DeleteAll();
     end;

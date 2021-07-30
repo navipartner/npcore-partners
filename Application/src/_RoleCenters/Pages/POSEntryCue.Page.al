@@ -51,13 +51,13 @@ page 6151260 "NPR POS Entry Cue"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies Reconciliation EFT Errors in last 30 days';
                 }
-                field("Unfinished EFT Requests"; "Unfinished EFT Requests")
+                field("Unfinished EFT Requests"; Rec."Unfinished EFT Requests")
                 {
                     Caption = 'Unfinished EFT Requests';
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies Unfinished EFT Requests in last 30 days';
                 }
-                field("EFT Req. with unknown result"; "EFT Req. with unknown result")
+                field("EFT Req. with unknown result"; Rec."EFT Req. with unknown result")
                 {
                     Caption = 'EFT Requests with unknown result';
                     ApplicationArea = NPRRetail;
@@ -104,7 +104,7 @@ page 6151260 "NPR POS Entry Cue"
 
     trigger OnAfterGetRecord()
     begin
-        FailedItemTransExists := "Failed Item Transaction." > 0;
-        FailedGLPostTransExists := "Failed G/L Posting Trans." > 0;
+        FailedItemTransExists := Rec."Failed Item Transaction." > 0;
+        FailedGLPostTransExists := Rec."Failed G/L Posting Trans." > 0;
     end;
 }
