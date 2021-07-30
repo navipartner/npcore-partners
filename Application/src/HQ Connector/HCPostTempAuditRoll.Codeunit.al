@@ -104,7 +104,7 @@
             if TempPost."Amount Including VAT" <> 0 then begin
                 PostTransaction(GetPaymentPostingSetup(BetalingsValg, TempPost."Register No."), TempPost."Amount Including VAT", TempPost."Register No.", AccountType::"G/L",
                                 TempPost."Department Code", '', BogfDate, TempPost);
-                TempPost.SetFilter("Posting Date", '%1..', CalcDate('+1<D>', TempPost."Sale Date"));
+                TempPost.SetFilter("Posting Date", '%1..', CalcDate('<+1D>', TempPost."Sale Date"));
                 TempPost.CalcSums("Amount Including VAT");
                 if TempPost."Amount Including VAT" <> 0 then begin
                     TempCurrentPost := TempPost;

@@ -23,7 +23,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
                     trigger OnValidate()
                     begin
                         if (TempJobPlanningLine."Planning Date" <> 0D) and (TempJobPlanningLine."Planned Delivery Date" = 0D) then
-                            TempJobPlanningLine."Planned Delivery Date" := CalcDate('1D', TempJobPlanningLine."Planning Date");
+                            TempJobPlanningLine."Planned Delivery Date" := CalcDate('<1D>', TempJobPlanningLine."Planning Date");
                         CheckDate();
                     end;
                 }
@@ -37,7 +37,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
                     trigger OnValidate()
                     begin
                         if (TempJobPlanningLine."Planned Delivery Date" <> 0D) and (TempJobPlanningLine."Planning Date" = 0D) then
-                            TempJobPlanningLine."Planning Date" := CalcDate('-1D', TempJobPlanningLine."Planned Delivery Date");
+                            TempJobPlanningLine."Planning Date" := CalcDate('<-1D>', TempJobPlanningLine."Planned Delivery Date");
                         CheckDate();
                     end;
                 }

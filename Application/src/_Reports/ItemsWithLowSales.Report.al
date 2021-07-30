@@ -227,8 +227,8 @@ report 6014540 "NPR Items With Low Sales"
         i: Integer;
         RankQty: Integer;
         TxtPctTotalSales: Label '% of Total Sales';
-        TxtLastCM: Label '''<CM>''';
-        TxtFirstCM: Label '''<-CM>''';
+        TxtLastCM: Label '<CM>';
+        TxtFirstCM: Label '<-CM>';
         Text001: Label 'Grouping Items   #1##########';
         Item_descriptionCaptionLbl: Label 'Item description';
         TxtItemNoCaptionLbl: Label 'Item No.';
