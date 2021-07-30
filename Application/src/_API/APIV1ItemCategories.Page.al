@@ -132,17 +132,17 @@ page 6014537 "NPR APIV1 - Item Categories"
         GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
         RecRef: RecordRef;
     begin
-        ItemCategory.SetRange(Code, Code);
+        ItemCategory.SetRange(Code, Rec.Code);
         if not ItemCategory.IsEmpty() then
-            Insert();
+            Rec.Insert();
 
-        Insert(true);
+        Rec.Insert(true);
 
         RecRef.GetTable(Rec);
         GraphMgtGeneralTools.ProcessNewRecordFromAPI(RecRef, TempFieldSet, CurrentDateTime());
         RecRef.SetTable(Rec);
 
-        Modify(true);
+        Rec.Modify(true);
         exit(false);
     end;
 
@@ -150,14 +150,14 @@ page 6014537 "NPR APIV1 - Item Categories"
     var
         ItemCategory: Record "Item Category";
     begin
-        ItemCategory.GetBySystemId(SystemId);
+        ItemCategory.GetBySystemId(Rec.SystemId);
 
-        if Code = ItemCategory.Code then
-            Modify(true)
+        if Rec.Code = ItemCategory.Code then
+            Rec.Modify(true)
         else begin
             ItemCategory.TransferFields(Rec, false);
-            ItemCategory.Rename(Code);
-            TransferFields(ItemCategory);
+            ItemCategory.Rename(Rec.Code);
+            Rec.TransferFields(ItemCategory);
         end;
     end;
 

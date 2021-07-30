@@ -63,8 +63,8 @@ page 6014508 "NPR APIV1 - Cust Fin Details"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange("Date Filter", 0D, WorkDate() - 1);
-        CalcFields("Balance Due (LCY)", "Sales (LCY)", "Balance (LCY)");
+        Rec.SetRange(Rec."Date Filter", 0D, WorkDate() - 1);
+        Rec.CalcFields(Rec."Balance Due (LCY)", "Sales (LCY)", "Balance (LCY)");
     end;
 
 }

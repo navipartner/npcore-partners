@@ -199,7 +199,7 @@ page 6014501 "NPR APIV1 - Items"
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Unit Cost"));
+                        RegisterFieldSet(Rec.FieldNo("Unit Cost"));
                     end;
                 }
 
@@ -238,8 +238,8 @@ page 6014501 "NPR APIV1 - Items"
                             Rec."Tax Group Code" := TaxGroup.Code;
                         end;
 
-                        RegisterFieldSet(FieldNo("Tax Group Code"));
-                        RegisterFieldSet(FieldNo("Tax Group Id"));
+                        RegisterFieldSet(Rec.FieldNo("Tax Group Code"));
+                        RegisterFieldSet(Rec.FieldNo("Tax Group Id"));
                     end;
                 }
                 field(taxGroupCode; Rec."Tax Group Code")
@@ -642,7 +642,7 @@ page 6014501 "NPR APIV1 - Items"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        if TempFieldSet.Get(Database::Item, FieldNo(Inventory)) then
+        if TempFieldSet.Get(Database::Item, Rec.FieldNo(Inventory)) then
             Error(InventoryCannotBeChangedInAPostRequestErr);
 
         GraphCollectionMgtItem.InsertItem(Rec, TempFieldSet);
@@ -724,7 +724,7 @@ page 6014501 "NPR APIV1 - Items"
         ItemJnlLine.Validate("Posting Date", Today());
         ItemJnlLine."Document No." := Rec."No.";
 
-        if Inventory < InventoryValue then
+        if Rec.Inventory < InventoryValue then
             ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Positive Adjmt.")
         else
             ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Negative Adjmt.");
