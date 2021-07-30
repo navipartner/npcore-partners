@@ -298,6 +298,11 @@
             "justification": "You must use the FieldCaption method instead of the FieldName method and TableCaption method instead of TableName method."
         },
         {
+            "id": "AA0462",
+            "action":"Error",
+            "justification": "The CalcDate should only be used with DataFormula variables. Alternatively the string should be enclosed in <>."
+        },       
+        {
             "id": "AA0470",
             "action":"None",
             "justification": "Excluding Codecop rules to have few included."

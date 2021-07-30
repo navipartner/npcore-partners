@@ -127,6 +127,6 @@ report 6060052 "NPR Item Wise Sales Figures"
         FromDate: Date;
         ToDate: Date;
         Profit: Decimal;
-        MinusOneWeek: Label '-1W';
+        MinusOneWeek: Label '<-1W>';
 }
 

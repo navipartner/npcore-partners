@@ -28,9 +28,9 @@ page 6014411 "NPR Turnover Statistics"
     end;
 
     var
-        Text10600000: Label '-1W+1D';
-        Text10600001: Label '-1M+1D';
-        Text10600002: Label '-1Y+1D';
+        Text10600000: Label '<-1W+1D>';
+        Text10600001: Label '<-1M+1D>';
+        Text10600002: Label '<-1Y+1D>';
         DepartmentFilter: Code[50];
         DateFilter: Text[30];
         DateFilterLast: Text[30];
