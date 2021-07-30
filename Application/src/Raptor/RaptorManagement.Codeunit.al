@@ -340,7 +340,7 @@
         exit(NoOfDays * 86400000);
     end;
 
-    procedure SelectTrackingServiceType(var TrackingServiceType: Text): Boolean
+    procedure SelectTrackingServiceType(var TrackingServiceType: Text[30]): Boolean
     var
         TempListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
     begin
@@ -357,7 +357,7 @@
             exit(false);
     end;
 
-    procedure ValidateTrackingServiceType(TrackingServiceType: Text)
+    procedure ValidateTrackingServiceType(TrackingServiceType: Text[30])
     var
         TempListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
     begin
@@ -369,7 +369,7 @@
             Error(UnknownValue, RaptorSetup.FieldCaption("Tracking Service Type"), TrackingServiceType);
     end;
 
-    procedure GetDefaultTrackingServiceType(var TrackingServiceType: Text): Text
+    procedure GetDefaultTrackingServiceType(var TrackingServiceType: Text[30])
     var
         Handled: Boolean;
     begin
@@ -395,12 +395,12 @@
         OnGetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
     end;
 
-    procedure RaptorModule_GetUserIdHistory(): Text
+    procedure RaptorModule_GetUserIdHistory(): Text[50]
     begin
         exit('GetUserIdHistory');
     end;
 
-    procedure RaptorModule_GetUserRecommendations(): Text
+    procedure RaptorModule_GetUserRecommendations(): Text[50]
     begin
         exit('GetUserRecommendations');
     end;
@@ -480,7 +480,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetDefaultTrackingServiceType(var TrackingServiceType: Text; var Handled: Boolean)
+    procedure OnGetDefaultTrackingServiceType(var TrackingServiceType: Text[30]; var Handled: Boolean)
     begin
     end;
 }

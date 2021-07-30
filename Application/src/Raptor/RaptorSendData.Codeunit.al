@@ -40,12 +40,6 @@
             if RecRef.Get(TempDataLog."Record ID") then
                 if RecRef.Number = DATABASE::"Item Ledger Entry" then begin
                     RecRef.SetTable(ItemLedger);
-                    //-NPR5.55 [400925]-revoked
-                    //IF (ItemLedger."Entry Type" = ItemLedger."Entry Type"::Sale) AND
-                    //   (ItemLedger."Source Type" = ItemLedger."Source Type"::Customer) AND
-                    //   (ItemLedger."Source No." <> '')
-                    //THEN
-                    //+NPR5.55 [400925]-revoked
                     if ItemLedgerIsEligibleForSending(ItemLedger) then
                         SendItemLedgerEntry(ItemLedger, SessionGUID);
                 end;
@@ -67,11 +61,9 @@
         TempParameters: Record "Name/Value Buffer" temporary;
         DummySessionGUID: Guid;
     begin
-        //-NPR5.55 [400925]
         GenerateParameters(TempParameters, ItemLedger, DummySessionGUID);
         OnBeforeILESendRaptorTrackingRequest(TempParameters, ItemLedger, true);
         PAGE.RunModal(PAGE::"Name/Value Lookup", TempParameters);
-        //+NPR5.55 [400925]
     end;
 
     local procedure ItemLedgerIsEligibleForSending(ItemLedger: Record "Item Ledger Entry"): Boolean
@@ -80,7 +72,6 @@
         Eligible: Boolean;
         Handled: Boolean;
     begin
-        //-NPR5.55 [400925]
         OnCheckIfItemLedgerIsEligibleForSending(ItemLedger, Eligible, Handled);
         if Handled then
             exit(Eligible);
@@ -105,7 +96,6 @@
         end;
 
         exit(Eligible);
-        //+NPR5.55 [400925]
     end;
 
     procedure CreateTmpSalespersonList(var SalespersonTmp: Record "Salesperson/Purchaser")
@@ -113,7 +103,6 @@
         Salesperson: Record "Salesperson/Purchaser";
         EmptyNameML: Label '<w/out salesperson>';
     begin
-        //-NPR5.55 [400925]
         if not SalespersonTmp.IsTemporary then
             Error(IncorrectFunctionCallErr);
 
@@ -129,7 +118,6 @@
         SalespersonTmp.Name := CopyStr(EmptyNameML, 1, MaxStrLen(SalespersonTmp.Name));
         if not SalespersonTmp.Find() then
             SalespersonTmp.Insert();
-        //+NPR5.55 [400925]
     end;
 
     local procedure GenerateParameters(var Parameters: Record "Name/Value Buffer"; ItemLedger: Record "Item Ledger Entry"; SessionGUID: Guid)
@@ -159,8 +147,7 @@
         coid: Cookie Id (GUID)
         ruid: User Id (Base64 encoded)
         
-        Use parameters, which name starts with low line (underscore) character "_", to pass data between NAV
-        modules/subscribers. Those are not sent to Raptor.
+        Use parameters with names starting with low line (underscore) character "_" to pass data between NAV modules/subscribers. Those are not sent to Raptor.
         */
 
         AuxItemLedgerEntry.Get(ItemLedger."Entry No.");
@@ -182,11 +169,11 @@
 
     end;
 
-    procedure AddParameter(var Parameters: Record "Name/Value Buffer"; ID: Integer; Name: Text; Value: Text)
+    procedure AddParameter(var Parameters: Record "Name/Value Buffer"; ID: Integer; Name: Text; "Value": Text)
     begin
         Parameters.ID := ID;
-        Parameters.Name := Name;
-        Parameters.Value := Value;
+        Parameters.Name := CopyStr(Name, 1, MaxStrLen(Parameters.Name));
+        Parameters."Value" := CopyStr("Value", 1, MaxStrLen(Parameters."Value"));
         Parameters.Insert();
     end;
 
@@ -205,4 +192,3 @@
     begin
     end;
 }
-

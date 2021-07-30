@@ -4,12 +4,12 @@ codeunit 6150875 "NPR POS Action: Raptor"
     var
         ActionDescription: Label 'An action to run Raptor integration functions';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('RAPTOR');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -55,7 +55,7 @@ codeunit 6150875 "NPR POS Action: Raptor"
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
 
-        RaptorActionCode := Context.GetStringParameter('RaptorActionCode');
+        RaptorActionCode := CopyStr(Context.GetStringParameter('RaptorActionCode'), 1, MaxStrLen(RaptorActionCode));
         if RaptorActionCode <> '' then
             RaptorAction.Get(RaptorActionCode)
         else
