@@ -48,7 +48,7 @@
   "showMyCode": true,
   "runtime": "6.0",
   "target": "OnPrem",
-  "features": [ "TranslationFile" ],
+  "features": [ "TranslationFile", "NoImplicitWith" ],
   "keyVaultUrls": ["https://npcore.vault.azure.net/"],
   "applicationInsightsKey": "eed7264a-4861-43ac-88d1-dd554a6b5f08",
   "preprocessorSymbols": ["BC17"]

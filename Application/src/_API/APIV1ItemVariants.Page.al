@@ -31,7 +31,7 @@ page 6014506 "NPR APIV1 - Item Variants"
                     trigger OnValidate()
                     begin
                         if not IsNullGuid(Item.SystemId) then
-                            if Item.SystemId <> "Item Id" then
+                            if Item.SystemId <> Rec."Item Id" then
                                 Error(ItemValuesDontMatchErr);
 
                         if Rec.GetFilter("Item Id") <> '' then

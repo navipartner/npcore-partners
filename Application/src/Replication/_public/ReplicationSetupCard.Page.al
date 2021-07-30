@@ -180,7 +180,7 @@ page 6014495 "NPR Replication Setup Card"
                     ToolTip = 'Specifies the minutes between the Job Queue runs.';
                 }
 
-                field(JobQueueProcessImportList; JobQueueProcessImportList)
+                field(JobQueueProcessImportList; Rec.JobQueueProcessImportList)
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Add process_import_list param';
