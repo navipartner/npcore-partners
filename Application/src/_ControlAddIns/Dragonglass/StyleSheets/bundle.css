@@ -3352,12 +3352,6 @@
   to {
     transform: translate3d(0, 0, 0); } }
 
-.dragonglass .c-grid, .dragonglass .c-grid__row, .dragonglass .l-vertical,
-.dragonglass .l-horizontal, .dragonglass .l-views {
-  display: flex;
-  width: 100%;
-  height: 100%; }
-
 [data-simplebar] {
   position: relative;
   flex-direction: column;
@@ -3593,1634 +3587,6 @@ body {
     margin: 0; }
   .body.dragonglass img {
     max-width: 100%; }
-
-.dragonglass {
-  /* -------------------------------------------------
-        Datepicker cells
-    ------------------------------------------------- */
-  /* -------------------------------------------------
-        Datepicker
-    ------------------------------------------------- */
-  /* -------------------------------------------------
-        Navigation
-    ------------------------------------------------- */
-  /* -------------------------------------------------
-        Timepicker
-    ------------------------------------------------- */ }
-  .dragonglass .datepicker--cell-day.-other-month-,
-  .dragonglass .datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .datepicker--cell-day.-other-month-:hover,
-  .dragonglass .datepicker--cell-year.-other-decade-:hover {
-    color: #c5c5c5; }
-  .dragonglass .-disabled-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .-selected-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.datepicker--cell-year.-other-decade- {
-    color: #fff;
-    background: #a2ddf6; }
-  .dragonglass .-selected-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.-focus-.datepicker--cell-year.-other-decade- {
-    background: #8ad5f4; }
-  .dragonglass .-in-range-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.1);
-    color: #cccccc; }
-  .dragonglass .-in-range-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.-focus-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.2); }
-  .dragonglass .datepicker--cell-day.-other-month-:empty,
-  .dragonglass .datepicker--cell-year.-other-decade-:empty {
-    background: none;
-    border: none; }
-  .dragonglass .datepicker--cells {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap; }
-  .dragonglass .datepicker--cell {
-    border-radius: 4px;
-    box-sizing: border-box;
-    cursor: pointer;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    position: relative;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    height: 32px;
-    z-index: 1; }
-  .dragonglass .datepicker--cell.-focus- {
-    background: #f0f0f0; }
-  .dragonglass .datepicker--cell.-current- {
-    color: #4eb5e6; }
-  .dragonglass .datepicker--cell.-current-.-focus- {
-    color: #4a4a4a; }
-  .dragonglass .datepicker--cell.-current-.-in-range- {
-    color: #4eb5e6; }
-  .dragonglass .datepicker--cell.-in-range- {
-    background: rgba(92, 196, 239, 0.1);
-    color: #4a4a4a;
-    border-radius: 0; }
-  .dragonglass .datepicker--cell.-in-range-.-focus- {
-    background-color: rgba(92, 196, 239, 0.2); }
-  .dragonglass .datepicker--cell.-disabled- {
-    cursor: default;
-    color: #aeaeae; }
-  .dragonglass .datepicker--cell.-disabled-.-focus- {
-    color: #aeaeae; }
-  .dragonglass .datepicker--cell.-disabled-.-in-range- {
-    color: #a1a1a1; }
-  .dragonglass .datepicker--cell.-disabled-.-current-.-focus- {
-    color: #aeaeae; }
-  .dragonglass .datepicker--cell.-range-from- {
-    border: 1px solid rgba(92, 196, 239, 0.5);
-    background-color: rgba(92, 196, 239, 0.1);
-    border-radius: 4px 0 0 4px; }
-  .dragonglass .datepicker--cell.-range-to- {
-    border: 1px solid rgba(92, 196, 239, 0.5);
-    background-color: rgba(92, 196, 239, 0.1);
-    border-radius: 0 4px 4px 0; }
-  .dragonglass .datepicker--cell.-range-from-.-range-to- {
-    border-radius: 4px; }
-  .dragonglass .datepicker--cell.-selected- {
-    color: #fff;
-    border: none;
-    background: #5cc4ef; }
-  .dragonglass .datepicker--cell.-selected-.-current- {
-    color: #fff;
-    background: #5cc4ef; }
-  .dragonglass .datepicker--cell.-selected-.-focus- {
-    background: #45bced; }
-  .dragonglass .datepicker--cell:empty {
-    cursor: default; }
-  .dragonglass .datepicker--days-names {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    margin: 8px 0 3px; }
-  .dragonglass .datepicker--day-name {
-    color: #ff9a19;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    -webkit-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 0.8em; }
-  .dragonglass .datepicker--cell-day {
-    width: 14.28571%; }
-  .dragonglass .datepicker--cells-months {
-    height: 170px; }
-  .dragonglass .datepicker--cell-month {
-    width: 33.33%;
-    height: 25%; }
-  .dragonglass .datepicker--years {
-    height: 170px; }
-  .dragonglass .datepicker--cells-years {
-    height: 170px; }
-  .dragonglass .datepicker--cell-year {
-    width: 25%;
-    height: 33.33%; }
-  .dragonglass .datepicker--cell-day.-other-month-,
-  .dragonglass .datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .datepicker--cell-day.-other-month-:hover,
-  .dragonglass .datepicker--cell-year.-other-decade-:hover {
-    color: #c5c5c5; }
-  .dragonglass .-disabled-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .-selected-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.datepicker--cell-year.-other-decade- {
-    color: #fff;
-    background: #a2ddf6; }
-  .dragonglass .-selected-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.-focus-.datepicker--cell-year.-other-decade- {
-    background: #8ad5f4; }
-  .dragonglass .-in-range-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.1);
-    color: #cccccc; }
-  .dragonglass .-in-range-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.-focus-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.2); }
-  .dragonglass .datepicker--cell-day.-other-month-:empty,
-  .dragonglass .datepicker--cell-year.-other-decade-:empty {
-    background: none;
-    border: none; }
-  .dragonglass .datepickers-container {
-    position: absolute;
-    left: 0;
-    top: 0; }
-  @media print {
-    .dragonglass .datepickers-container {
-      display: none; } }
-  .dragonglass .datepicker {
-    background: var(--color-secondary-100);
-    border: 1px solid #dbdbdb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    box-sizing: content-box;
-    font-family: Tahoma, sans-serif;
-    font-size: 14px;
-    color: #4a4a4a;
-    width: 250px;
-    position: absolute;
-    left: -100000px;
-    opacity: 0;
-    transition: opacity 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
-    z-index: 100; }
-  .dragonglass .datepicker.-from-top- {
-    -webkit-transform: translateY(-8px);
-    transform: translateY(-8px); }
-  .dragonglass .datepicker.-from-right- {
-    -webkit-transform: translateX(8px);
-    transform: translateX(8px); }
-  .dragonglass .datepicker.-from-bottom- {
-    -webkit-transform: translateY(8px);
-    transform: translateY(8px); }
-  .dragonglass .datepicker.-from-left- {
-    -webkit-transform: translateX(-8px);
-    transform: translateX(-8px); }
-  .dragonglass .datepicker.active {
-    opacity: 1;
-    -webkit-transform: translate(0);
-    transform: translate(0);
-    transition: opacity 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease; }
-  .dragonglass .datepicker-inline .datepicker {
-    border-color: #d7d7d7;
-    box-shadow: none;
-    position: static;
-    left: auto;
-    right: auto;
-    opacity: 1;
-    -webkit-transform: none;
-    transform: none; }
-  .dragonglass .datepicker-inline .datepicker--pointer {
-    display: none; }
-  .dragonglass .datepicker--content {
-    box-sizing: content-box;
-    padding: 4px; }
-  .dragonglass .-only-timepicker- .datepicker--content {
-    display: none; }
-  .dragonglass .datepicker--pointer {
-    position: absolute;
-    background: var(--color-secondary-100);
-    border-top: 1px solid #dbdbdb;
-    border-right: 1px solid #dbdbdb;
-    width: 10px;
-    height: 10px;
-    z-index: -1; }
-  .dragonglass .-top-left- .datepicker--pointer,
-  .dragonglass .-top-center- .datepicker--pointer,
-  .dragonglass .-top-right- .datepicker--pointer {
-    top: calc(100% - 4px);
-    -webkit-transform: rotate(135deg);
-    transform: rotate(135deg); }
-  .dragonglass .-right-top- .datepicker--pointer,
-  .dragonglass .-right-center- .datepicker--pointer,
-  .dragonglass .-right-bottom- .datepicker--pointer {
-    right: calc(100% - 4px);
-    -webkit-transform: rotate(225deg);
-    transform: rotate(225deg); }
-  .dragonglass .-bottom-left- .datepicker--pointer,
-  .dragonglass .-bottom-center- .datepicker--pointer,
-  .dragonglass .-bottom-right- .datepicker--pointer {
-    bottom: calc(100% - 4px);
-    -webkit-transform: rotate(315deg);
-    transform: rotate(315deg); }
-  .dragonglass .-left-top- .datepicker--pointer,
-  .dragonglass .-left-center- .datepicker--pointer,
-  .dragonglass .-left-bottom- .datepicker--pointer {
-    left: calc(100% - 4px);
-    -webkit-transform: rotate(45deg);
-    transform: rotate(45deg); }
-  .dragonglass .-top-left- .datepicker--pointer,
-  .dragonglass .-bottom-left- .datepicker--pointer {
-    left: 10px; }
-  .dragonglass .-top-right- .datepicker--pointer,
-  .dragonglass .-bottom-right- .datepicker--pointer {
-    right: 10px; }
-  .dragonglass .-top-center- .datepicker--pointer,
-  .dragonglass .-bottom-center- .datepicker--pointer {
-    left: calc(50% - 10px / 2); }
-  .dragonglass .-left-top- .datepicker--pointer,
-  .dragonglass .-right-top- .datepicker--pointer {
-    top: 10px; }
-  .dragonglass .-left-bottom- .datepicker--pointer,
-  .dragonglass .-right-bottom- .datepicker--pointer {
-    bottom: 10px; }
-  .dragonglass .-left-center- .datepicker--pointer,
-  .dragonglass .-right-center- .datepicker--pointer {
-    top: calc(50% - 10px / 2); }
-  .dragonglass .datepicker--body {
-    display: none; }
-  .dragonglass .datepicker--body.active {
-    display: block; }
-  .dragonglass .datepicker--cell-day.-other-month-,
-  .dragonglass .datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .datepicker--cell-day.-other-month-:hover,
-  .dragonglass .datepicker--cell-year.-other-decade-:hover {
-    color: #c5c5c5; }
-  .dragonglass .-disabled-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .-selected-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.datepicker--cell-year.-other-decade- {
-    color: #fff;
-    background: #a2ddf6; }
-  .dragonglass .-selected-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.-focus-.datepicker--cell-year.-other-decade- {
-    background: #8ad5f4; }
-  .dragonglass .-in-range-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.1);
-    color: #cccccc; }
-  .dragonglass .-in-range-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.-focus-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.2); }
-  .dragonglass .datepicker--cell-day.-other-month-:empty,
-  .dragonglass .datepicker--cell-year.-other-decade-:empty {
-    background: none;
-    border: none; }
-  .dragonglass .datepicker--nav {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-justify-content: space-between;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--color-primary-300);
-    min-height: 32px;
-    padding: 4px; }
-  .dragonglass .-only-timepicker- .datepicker--nav {
-    display: none; }
-  .dragonglass .datepicker--nav-title,
-  .dragonglass .datepicker--nav-action {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    cursor: pointer;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
-    justify-content: center; }
-  .dragonglass .datepicker--nav-action {
-    width: 32px;
-    border-radius: 4px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none; }
-  .dragonglass .datepicker--nav-action:hover {
-    background: #f0f0f0; }
-  .dragonglass .datepicker--nav-action.-disabled- {
-    visibility: hidden; }
-  .dragonglass .datepicker--nav-action svg {
-    width: 32px;
-    height: 32px; }
-  .dragonglass .datepicker--nav-action path {
-    fill: none;
-    stroke: #9c9c9c;
-    stroke-width: 2px; }
-  .dragonglass .datepicker--nav-title {
-    border-radius: 4px;
-    padding: 0 8px; }
-  .dragonglass .datepicker--nav-title i {
-    font-style: normal;
-    color: #9c9c9c;
-    margin-left: 5px; }
-  .dragonglass .datepicker--nav-title:hover {
-    background: #f0f0f0; }
-  .dragonglass .datepicker--nav-title.-disabled- {
-    cursor: default;
-    background: none; }
-  .dragonglass .datepicker--buttons {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    padding: 4px;
-    border-top: 1px solid #efefef; }
-  .dragonglass .datepicker--button {
-    color: #4eb5e6;
-    cursor: pointer;
-    border-radius: 4px;
-    -webkit-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-    display: -webkit-inline-flex;
-    display: -ms-inline-flexbox;
-    display: inline-flex;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    height: 32px; }
-  .dragonglass .datepicker--button:hover {
-    color: #4a4a4a;
-    background: #f0f0f0; }
-  .dragonglass .datepicker--cell-day.-other-month-,
-  .dragonglass .datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .datepicker--cell-day.-other-month-:hover,
-  .dragonglass .datepicker--cell-year.-other-decade-:hover {
-    color: #c5c5c5; }
-  .dragonglass .-disabled-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .-selected-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.datepicker--cell-year.-other-decade- {
-    color: #fff;
-    background: #a2ddf6; }
-  .dragonglass .-selected-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.-focus-.datepicker--cell-year.-other-decade- {
-    background: #8ad5f4; }
-  .dragonglass .-in-range-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.1);
-    color: #cccccc; }
-  .dragonglass .-in-range-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.-focus-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.2); }
-  .dragonglass .datepicker--cell-day.-other-month-:empty,
-  .dragonglass .datepicker--cell-year.-other-decade-:empty {
-    background: none;
-    border: none; }
-  .dragonglass .datepicker--time {
-    border-top: 1px solid #efefef;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    padding: 4px;
-    position: relative; }
-  .dragonglass .datepicker--time.-am-pm- .datepicker--time-sliders {
-    -webkit-flex: 0 1 138px;
-    -ms-flex: 0 1 138px;
-    flex: 0 1 138px;
-    max-width: 138px; }
-  .dragonglass .-only-timepicker- .datepicker--time {
-    border-top: none; }
-  .dragonglass .datepicker--time-sliders {
-    -webkit-flex: 0 1 153px;
-    -ms-flex: 0 1 153px;
-    flex: 0 1 153px;
-    margin-right: 10px;
-    max-width: 153px; }
-  .dragonglass .datepicker--time-label {
-    display: none;
-    font-size: 12px; }
-  .dragonglass .datepicker--time-current {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-    font-size: 14px;
-    text-align: center;
-    margin: 0 0 0 10px; }
-  .dragonglass .datepicker--time-current-colon {
-    margin: 0 2px 3px;
-    line-height: 1; }
-  .dragonglass .datepicker--time-current-hours,
-  .dragonglass .datepicker--time-current-minutes {
-    line-height: 1;
-    font-size: 19px;
-    font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
-    position: relative;
-    z-index: 1; }
-  .dragonglass .datepicker--time-current-hours:after,
-  .dragonglass .datepicker--time-current-minutes:after {
-    content: "";
-    background: #f0f0f0;
-    border-radius: 4px;
-    position: absolute;
-    left: -2px;
-    top: -3px;
-    right: -2px;
-    bottom: -2px;
-    z-index: -1;
-    opacity: 0; }
-  .dragonglass .datepicker--time-current-hours.-focus-:after,
-  .dragonglass .datepicker--time-current-minutes.-focus-:after {
-    opacity: 1; }
-  .dragonglass .datepicker--time-current-ampm {
-    text-transform: uppercase;
-    -webkit-align-self: flex-end;
-    -ms-flex-item-align: end;
-    align-self: flex-end;
-    color: #9c9c9c;
-    margin-left: 6px;
-    font-size: 11px;
-    margin-bottom: 1px; }
-  .dragonglass .datepicker--time-row {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    font-size: 11px;
-    height: 17px;
-    background: linear-gradient(to right, #dedede, #dedede) left 50%/100% 1px no-repeat; }
-  .dragonglass .datepicker--time-row:first-child {
-    margin-bottom: 4px; }
-  .dragonglass .datepicker--time-row input[type="range"] {
-    background: none;
-    cursor: pointer;
-    -webkit-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    -webkit-appearance: none; }
-  .dragonglass .datepicker--time-row input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; }
-  .dragonglass .datepicker--time-row input[type="range"]::-ms-tooltip {
-    display: none; }
-  .dragonglass .datepicker--time-row input[type="range"]:hover::-webkit-slider-thumb {
-    border-color: #b8b8b8; }
-  .dragonglass .datepicker--time-row input[type="range"]:hover::-moz-range-thumb {
-    border-color: #b8b8b8; }
-  .dragonglass .datepicker--time-row input[type="range"]:hover::-ms-thumb {
-    border-color: #b8b8b8; }
-  .dragonglass .datepicker--time-row input[type="range"]:focus {
-    outline: none; }
-  .dragonglass .datepicker--time-row input[type="range"]:focus::-webkit-slider-thumb {
-    background: #5cc4ef;
-    border-color: #5cc4ef; }
-  .dragonglass .datepicker--time-row input[type="range"]:focus::-moz-range-thumb {
-    background: #5cc4ef;
-    border-color: #5cc4ef; }
-  .dragonglass .datepicker--time-row input[type="range"]:focus::-ms-thumb {
-    background: #5cc4ef;
-    border-color: #5cc4ef; }
-  .dragonglass .datepicker--time-row input[type="range"]::-webkit-slider-thumb {
-    box-sizing: border-box;
-    height: 12px;
-    width: 12px;
-    border-radius: 3px;
-    border: 1px solid #dedede;
-    background: var(--color-secondary-100);
-    cursor: pointer;
-    transition: background 0.2s; }
-  .dragonglass .datepicker--time-row input[type="range"]::-moz-range-thumb {
-    box-sizing: border-box;
-    height: 12px;
-    width: 12px;
-    border-radius: 3px;
-    border: 1px solid #dedede;
-    background: var(--color-secondary-100);
-    cursor: pointer;
-    transition: background 0.2s; }
-  .dragonglass .datepicker--time-row input[type="range"]::-ms-thumb {
-    box-sizing: border-box;
-    height: 12px;
-    width: 12px;
-    border-radius: 3px;
-    border: 1px solid #dedede;
-    background: var(--color-secondary-100);
-    cursor: pointer;
-    transition: background 0.2s; }
-  .dragonglass .datepicker--time-row input[type="range"]::-webkit-slider-thumb {
-    margin-top: -6px; }
-  .dragonglass .datepicker--time-row input[type="range"]::-webkit-slider-runnable-track {
-    border: none;
-    height: 1px;
-    cursor: pointer;
-    color: transparent;
-    background: transparent; }
-  .dragonglass .datepicker--time-row input[type="range"]::-moz-range-track {
-    border: none;
-    height: 1px;
-    cursor: pointer;
-    color: transparent;
-    background: transparent; }
-  .dragonglass .datepicker--time-row input[type="range"]::-ms-track {
-    border: none;
-    height: 1px;
-    cursor: pointer;
-    color: transparent;
-    background: transparent; }
-  .dragonglass .datepicker--time-row input[type="range"]::-ms-fill-lower {
-    background: transparent; }
-  .dragonglass .datepicker--time-row input[type="range"]::-ms-fill-upper {
-    background: transparent; }
-  .dragonglass .datepicker--time-row span {
-    padding: 0 12px; }
-  .dragonglass .datepicker--time-icon {
-    color: #9c9c9c;
-    border: 1px solid;
-    border-radius: 50%;
-    font-size: 16px;
-    position: relative;
-    margin: 0 5px -1px 0;
-    width: 1em;
-    height: 1em; }
-  .dragonglass .datepicker--time-icon:after,
-  .dragonglass .datepicker--time-icon:before {
-    content: "";
-    background: currentColor;
-    position: absolute; }
-  .dragonglass .datepicker--time-icon:after {
-    height: 0.4em;
-    width: 1px;
-    left: calc(50% - 1px);
-    top: calc(50% + 1px);
-    -webkit-transform: translateY(-100%);
-    transform: translateY(-100%); }
-  .dragonglass .datepicker--time-icon:before {
-    width: 0.4em;
-    height: 1px;
-    top: calc(50% + 1px);
-    left: calc(50% - 1px); }
-  .dragonglass .datepicker--cell-day.-other-month-,
-  .dragonglass .datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .datepicker--cell-day.-other-month-:hover,
-  .dragonglass .datepicker--cell-year.-other-decade-:hover {
-    color: #c5c5c5; }
-  .dragonglass .-disabled-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-disabled-.-focus-.datepicker--cell-year.-other-decade- {
-    color: #dedede; }
-  .dragonglass .-selected-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.datepicker--cell-year.-other-decade- {
-    color: #fff;
-    background: #a2ddf6; }
-  .dragonglass .-selected-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-selected-.-focus-.datepicker--cell-year.-other-decade- {
-    background: #8ad5f4; }
-  .dragonglass .-in-range-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.1);
-    color: #cccccc; }
-  .dragonglass .-in-range-.-focus-.datepicker--cell-day.-other-month-,
-  .dragonglass .-in-range-.-focus-.datepicker--cell-year.-other-decade- {
-    background-color: rgba(92, 196, 239, 0.2); }
-  .dragonglass .datepicker--cell-day.-other-month-:empty,
-  .dragonglass .datepicker--cell-year.-other-decade-:empty {
-    background: none;
-    border: none; }
-  .dragonglass #datepicker,
-  .dragonglass .datepicker-inline,
-  .dragonglass .datepicker,
-  .dragonglass .datepicker--content {
-    height: 100%;
-    display: flex;
-    flex-flow: column; }
-  .dragonglass .datepicker-inline {
-    height: 300px; }
-    .dragonglass .datepicker-inline .datepicker {
-      width: calc(100% - 20px);
-      margin-right: 20px;
-      font-family: "Segoe UI", Tahoma, "Geneva", Verdana, sans-serif; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--nav-title {
-        color: #fff; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--cells {
-        height: 100%; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--cell-day {
-        height: auto; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--body.active {
-        display: flex;
-        flex-flow: column;
-        height: 100%; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--nav {
-        background: #0277bd; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--nav-action path {
-        stroke: #fff; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--nav-action:hover {
-        background: #0267a4; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--cell.-selected- {
-        background: #0277bd; }
-        .dragonglass .datepicker-inline .datepicker .datepicker--cell.-selected-.-focus- {
-          background: #0267a4; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--day-name {
-        font-size: 14px;
-        font-weight: bold;
-        color: #309ce6; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--cell.-current- {
-        color: #000;
-        font-weight: bold; }
-        .dragonglass .datepicker-inline .datepicker .datepicker--cell.-current-.-selected- {
-          background: #0277bd; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--nav-title i {
-        color: #fff;
-        font-weight: bold; }
-      .dragonglass .datepicker-inline .datepicker .datepicker--nav-title:hover {
-        background: #0267a4; }
-
-.dragonglass .c-infobox {
-  height: calc(50% - 48px);
-  border-radius: 4px;
-  padding: 10px;
-  background: #f2f2f2; }
-
-.dragonglass .c-infobox__customer-total {
-  height: 70%; }
-
-.dragonglass .c-button-menu--infobox {
-  height: 30%; }
-
-.dragonglass .c-infobox__customer {
-  width: 60%; }
-
-.dragonglass .c-infobox__customer__details {
-  line-height: 20px;
-  font-size: 1.5rem;
-  padding: 10px 0 0 4px;
-  height: 70%; }
-
-.dragonglass .c-navigation {
-  position: relative;
-  height: 100%;
-  padding: 0 0 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center; }
-
-.dragonglass .c-navigation--button-menu {
-  border-bottom: 1px solid #c2d8f3;
-  height: 45px;
-  margin: 0 0 5px; }
-  .dragonglass .c-navigation--button-menu + .c-button-menu__content {
-    height: calc(100% - 50px); }
-
-.dragonglass .c-navigation__item {
-  display: inline-block;
-  padding: 10px 20px;
-  cursor: pointer;
-  text-transform: uppercase;
-  color: #bdbdbd;
-  position: relative; }
-  .dragonglass .c-navigation__item.is-active {
-    color: #0277bd; }
-
-.dragonglass .c-navigation__indicator {
-  background: #0277bd;
-  bottom: 0;
-  height: 4px;
-  padding: 0;
-  position: absolute;
-  transition: left 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-  left: -9999px; }
-
-.dragonglass .numpad {
-  display: flex;
-  height: 100%; }
-  .dragonglass .numpad .buttongrid {
-    display: flex;
-    flex: 1;
-    flex-flow: column nowrap;
-    width: 100%;
-    height: 100%; }
-    .dragonglass .numpad .buttongrid .buttongrid__row {
-      padding-bottom: 0.3em;
-      display: flex;
-      flex: 1;
-      min-height: 1%; }
-      .dragonglass .numpad .buttongrid .buttongrid__row .button {
-        touch-action: none;
-        display: flex;
-        flex: 1;
-        align-items: center;
-        flex-flow: column nowrap;
-        justify-content: center;
-        margin-right: 0.3em;
-        min-width: 0;
-        padding: 0;
-        position: relative;
-        text-align: center;
-        text-decoration: none;
-        width: 0; }
-        .dragonglass .numpad .buttongrid .buttongrid__row .button:active, .dragonglass .numpad .buttongrid .buttongrid__row .button.active {
-          transform: scale(0.98, 0.98);
-          transition: none; }
-        .dragonglass .numpad .buttongrid .buttongrid__row .button:last-child {
-          margin: 0; }
-        .dragonglass .numpad .buttongrid .buttongrid__row .button > div {
-          background: #0277bd;
-          border: none;
-          color: #fff;
-          cursor: pointer;
-          height: 100%;
-          outline: none;
-          padding: 0.5em;
-          transition: background-color 300ms ease-out;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center; }
-          .dragonglass .numpad .buttongrid .buttongrid__row .button > div:hover {
-            background: #0267a4; }
-
-.dragonglass .c-textbox--item-lookup {
-  height: 48px;
-  position: relative;
-  overflow: visible;
-  transition-property: all;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-out; }
-  .dragonglass .c-textbox--item-lookup.is-active .c-textbox__content {
-    margin: 8px;
-    width: calc(100% - 16px); }
-  .dragonglass .c-textbox--item-lookup.is-active .c-textbox__button-menu {
-    background: #cfcfcf;
-    opacity: 1;
-    height: 135px;
-    padding: 60px 10px 10px;
-    box-shadow: 4px 3px 15px -1px rgba(0, 0, 0, 0.4); }
-
-.dragonglass .c-textbox--customer-lookup {
-  height: 48px; }
-
-.dragonglass .c-textbox__button-menu {
-  position: absolute;
-  width: 100%;
-  height: 0;
-  padding: 0 5px 5px;
-  z-index: 9;
-  transition-property: all;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-out;
-  opacity: 1;
-  left: 0;
-  border-radius: 3px; }
-
-.dragonglass .c-textbox__content {
-  position: relative;
-  height: 100%;
-  padding: 5px 4px 0 4px;
-  width: 100%;
-  z-index: 10;
-  transition-property: all;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-out; }
-  .dragonglass .c-textbox__content.is-active .c-textbox__label {
-    left: 14px;
-    font-size: 1.1rem;
-    top: 5px; }
-  .dragonglass .c-textbox__content.is-active .c-button--reset {
-    opacity: 1; }
-
-.dragonglass .c-textbox__label {
-  background: none;
-  color: #8dbad9;
-  cursor: text;
-  font-size: 1.6rem;
-  left: 15px;
-  top: 13px;
-  padding: 0;
-  pointer-events: none;
-  position: absolute;
-  transition: all 0.2s ease-out; }
-
-.dragonglass .c-textbox__input {
-  border-radius: 3px;
-  border: none;
-  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
-  color: #595959;
-  font-size: 1.6rem;
-  height: 100%;
-  height: 40px;
-  outline: none;
-  padding: 8px 70px 0 10px;
-  width: 100%; }
-  .dragonglass .c-textbox__input:focus {
-    outline: none; }
-
-.dragonglass .c-navbar {
-  align-items: center;
-  background: #f5f5f5;
-  border-bottom: 1px solid #c2d8f3;
-  box-shadow: 0 0 3px #ccc;
-  display: flex;
-  height: 50px;
-  justify-content: center;
-  overflow: hidden;
-  padding: 0; }
-
-.dragonglass .c-logo {
-  padding: 0;
-  position: absolute;
-  left: 20px; }
-  .dragonglass .c-logo img {
-    height: 30px; }
-
-.dragonglass .c-button {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  background: #0277bd;
-  border-radius: 4px;
-  padding: 5px;
-  cursor: pointer;
-  border: none;
-  margin: 5px 0 0 0;
-  overflow: hidden;
-  width: 100%;
-  transition-duration: 0; }
-  .dragonglass .c-button:hover {
-    background: #0267a4; }
-  .dragonglass .c-button:active, .dragonglass .c-button:focus {
-    outline: none; }
-  .dragonglass .c-button:not(:first-child) {
-    margin-left: 5px; }
-  .dragonglass .c-button:active, .dragonglass .c-button.active {
-    transform: scale(0.98, 0.98);
-    transition: none; }
-
-.dragonglass .c-button--icon.c-button--text .c-button__icon {
-  height: 67%; }
-
-.dragonglass .c-button--icon.c-button--text .c-button__caption {
-  height: 33%; }
-  .dragonglass .c-button--icon.c-button--text .c-button__caption span {
-    white-space: nowrap; }
-
-.dragonglass .c-button__content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-flow: column; }
-
-.dragonglass .c-button__icon {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  height: 100%; }
-
-.dragonglass .c-button__caption {
-  font-size: 1.4rem;
-  text-align: center;
-  padding: 0;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.3;
-  width: 100%;
-  height: 100%; }
-  .dragonglass .c-button__caption span {
-    display: block;
-    text-overflow: ellipsis;
-    overflow: hidden; }
-
-.dragonglass .c-button--textbox {
-  padding: 0;
-  padding: 0;
-  border-radius: 0 3px 3px 0;
-  position: absolute;
-  top: 5px;
-  right: 4px;
-  width: 40px;
-  height: 40px; }
-  .dragonglass .c-button--textbox:not(:first-child) {
-    margin: 0; }
-  .dragonglass .c-button--textbox:active, .dragonglass .c-button--textbox.active {
-    transform: none; }
-
-.dragonglass .c-button--reset {
-  background: none;
-  height: auto;
-  opacity: 0;
-  padding: 0;
-  right: 50px;
-  top: 17px;
-  transition-duration: 0.2s;
-  transition-property: opacity;
-  transition-timing-function: ease-out;
-  width: auto; }
-  .dragonglass .c-button--reset:hover {
-    background: none; }
-
-.dragonglass .c-button__icon--reset {
-  background: none;
-  color: #595959;
-  font-size: 1.5rem;
-  height: auto;
-  width: auto; }
-
-.dragonglass .c-button__icon--search {
-  font-size: 1.9rem;
-  max-height: 40px; }
-  .dragonglass .c-button__icon--search:active, .dragonglass .c-button__icon--search.active {
-    transform: scale(0.96, 0.96); }
-
-.dragonglass .c-button-menu__content {
-  height: 100%; }
-  .dragonglass .c-button-menu__content > div {
-    height: 100%; }
-
-.dragonglass .c-grid--button-menu {
-  flex-flow: column nowrap;
-  overflow: hidden; }
-
-.dragonglass .c-grid__row--button-menu {
-  animation: slideInDown 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  opacity: 1; }
-  .dragonglass .c-grid__row--button-menu:nth-child(10) {
-    animation-delay: calc( ((10 / 100) * 10) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 10)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(10) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 10)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(9) {
-    animation-delay: calc( ((10 / 100) * 9) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 9)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(9) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 9)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(8) {
-    animation-delay: calc( ((10 / 100) * 8) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 8)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(8) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 8)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(7) {
-    animation-delay: calc( ((10 / 100) * 7) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 7)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(7) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 7)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(6) {
-    animation-delay: calc( ((10 / 100) * 6) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 6)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(6) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 6)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(5) {
-    animation-delay: calc( ((10 / 100) * 5) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 5)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(5) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 5)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(4) {
-    animation-delay: calc( ((10 / 100) * 4) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 4)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(4) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 4)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(3) {
-    animation-delay: calc( ((10 / 100) * 3) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 3)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(3) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 3)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(2) {
-    animation-delay: calc( ((10 / 100) * 2) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 2)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(2) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 2)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu:nth-child(1) {
-    animation-delay: calc( ((10 / 100) * 1) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(10) {
-      animation-delay: calc( ((10 / 100) * (10 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(9) {
-      animation-delay: calc( ((10 / 100) * (9 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(8) {
-      animation-delay: calc( ((10 / 100) * (8 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(7) {
-      animation-delay: calc( ((10 / 100) * (7 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(6) {
-      animation-delay: calc( ((10 / 100) * (6 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(5) {
-      animation-delay: calc( ((10 / 100) * (5 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(4) {
-      animation-delay: calc( ((10 / 100) * (4 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(3) {
-      animation-delay: calc( ((10 / 100) * (3 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(2) {
-      animation-delay: calc( ((10 / 100) * (2 + 1)) * 0.35s); }
-    .dragonglass .c-grid__row--button-menu:nth-child(1) .c-button:nth-child(1) {
-      animation-delay: calc( ((10 / 100) * (1 + 1)) * 0.35s); }
-  .dragonglass .c-grid__row--button-menu .c-button {
-    animation: slideInLeft 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeIn 0.35s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
-    opacity: 0; }
-
-.dragonglass .c-grid {
-  flex-wrap: nowrap;
-  justify-content: space-between; }
-
-.dragonglass .c-grid__cell {
-  display: flex;
-  min-width: 0;
-  padding-top: 5px; }
-
-.dragonglass .c-grid__no-lines {
-  animation: bounceInOut 10.6s cubic-bezier(0.5, 0.25, 0.5, 1) both infinite;
-  text-align: center; }
-
-.dragonglass .c-grid__content {
-  padding-bottom: 10px;
-  width: 100%; }
-  .dragonglass .c-grid__content:last-child {
-    float: right;
-    text-align: right; }
-
-.dragonglass .c-grid__caption,
-.dragonglass .c-grid__value {
-  display: block;
-  overflow: hidden;
-  padding-bottom: 5px;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap; }
-  @media only screen and (min-width: 1600px) {
-    .dragonglass .c-grid__caption,
-    .dragonglass .c-grid__value {
-      display: inline-block;
-      text-align: left;
-      padding-bottom: 0; } }
-
-.dragonglass .c-grid__caption {
-  font-size: 11px; }
-  @media only screen and (min-width: 1600px) {
-    .dragonglass .c-grid__caption {
-      padding-right: 20px; } }
-
-.dragonglass .c-grid__caption--name {
-  background: #f2f2f2;
-  border-radius: 4px 4px 0 0;
-  font-size: 18px;
-  line-height: 26px;
-  overflow: hidden;
-  padding: 10px;
-  position: relative;
-  transition-duration: 0.2s;
-  transition-property: all;
-  transition-timing-function: ease-out;
-  width: 100%;
-  z-index: 5; }
-  .dragonglass .c-grid__caption--name span {
-    float: left;
-    overflow: hidden;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 80%; }
-  .dragonglass .c-grid__caption--name .icon {
-    color: #fff;
-    display: none;
-    float: right;
-    font-size: 24px;
-    margin-left: 15px; }
-
-.dragonglass .c-grid--data {
-  height: 50%;
-  padding-bottom: 15px;
-  padding-top: 10px; }
-
-.dragonglass .c-grid--infobox {
-  font-size: 12px;
-  line-height: 20px;
-  padding-left: 20px;
-  text-align: right;
-  width: 40%; }
-  @media only screen and (min-width: 1280px) {
-    .dragonglass .c-grid--infobox {
-      font-size: 15px; } }
-
-.dragonglass .c-grid__row--infobox {
-  justify-content: flex-start; }
-
-.dragonglass .c-grid__cell--infobox {
-  flex: 0;
-  padding-top: 0; }
-  .dragonglass .c-grid__cell--infobox:first-child {
-    margin-bottom: 10px; }
-    @media screen and (min-height: 768px) {
-      .dragonglass .c-grid__cell--infobox:first-child {
-        margin-bottom: 20px; } }
-
-.dragonglass .c-grid__caption--infobox {
-  float: left;
-  font-size: 12px;
-  font-weight: 600;
-  overflow: hidden;
-  padding: 0;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 50%; }
-  @media only screen and (min-width: 1280px) {
-    .dragonglass .c-grid__caption--infobox {
-      font-size: 15px; } }
-
-.dragonglass .c-grid__value--infobox {
-  display: inline-block;
-  padding: 0;
-  text-align: right;
-  width: 50%; }
-
-.dragonglass .c-grid__row--data-item {
-  cursor: pointer;
-  animation: slide-up 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-  border-radius: 4px;
-  box-shadow: 4px 3px 10px 0px rgba(0, 0, 0, 0.2);
-  margin: 10px 15px 20px;
-  overflow: hidden;
-  user-select: none;
-  width: calc(100% - 30px);
-  background: #f2f2f2; }
-  .dragonglass .c-grid__row--data-item.is-active .c-grid__caption--name {
-    background: #0277bd;
-    color: #ffffff; }
-    .dragonglass .c-grid__row--data-item.is-active .c-grid__caption--name .icon {
-      display: block; }
-  .dragonglass .c-grid__row--data-item.is-active .c-grid__cell--edit {
-    transform: translateY(0) !important;
-    margin: 0; }
-
-.dragonglass .c-grid__row--data-item .c-grid__cell--data-item-info {
-  transition-property: all;
-  transition-duration: 0.6s;
-  transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1); }
-
-.dragonglass .c-grid__cell--data-item-info {
-  align-items: center;
-  background: #f2f2f2;
-  border-radius: 0 0 4px 4px;
-  font-size: 1.6rem;
-  height: 55px;
-  overflow: hidden;
-  padding: 0 10px;
-  position: relative;
-  z-index: 1; }
-
-.dragonglass .c-grid__cell--edit {
-  transform: translateY(-200px);
-  background: #0085dc;
-  color: #fff;
-  position: relative;
-  z-index: 1;
-  padding: 0; }
-
-.dragonglass .c-grid__cell--data-item-name {
-  padding: 0; }
-
-.dragonglass .c-grid__cell--edit {
-  transition-duration: 0.3s;
-  margin-top: -55px; }
-
-.dragonglass .c-grid__content--edit {
-  border-right: 1px solid #46a9ea;
-  padding: 10px;
-  text-align: center; }
-  .dragonglass .c-grid__content--edit:last-child {
-    border: none; }
-
-.dragonglass .c-grid__caption--edit,
-.dragonglass .c-grid__value--edit {
-  display: block;
-  padding: 0; }
-  @media only screen and (min-width: 1600px) {
-    .dragonglass .c-grid__caption--edit,
-    .dragonglass .c-grid__value--edit {
-      text-align: center; } }
-
-.dragonglass .c-grid--empty .simplebar-content {
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: center; }
-
-.dragonglass .dialog-host {
-  align-items: center;
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  position: absolute;
-  width: 100%;
-  z-index: 0;
-  pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1), pointer-events 0s; }
-  .dragonglass .dialog-host--show {
-    pointer-events: initial;
-    background: rgba(224, 224, 224, 0.3);
-    z-index: 1000;
-    backdrop-filter: blur(1px) grayscale(33%); }
-
-.dragonglass .dialog__container {
-  background-color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(4px) grayscale(25%);
-  border-radius: 4px;
-  box-shadow: 4px 3px 29px -1px rgba(0, 0, 0, 0.83);
-  padding: 48px 48px 32px 48px;
-  display: flex;
-  flex-direction: column;
-  max-height: 75%;
-  max-width: 60%;
-  min-width: 40%;
-  position: absolute; }
-
-.dragonglass .dialog__titlebar {
-  text-align: center;
-  align-self: center;
-  font-weight: 300;
-  font-size: 1.5em;
-  margin-bottom: 1em; }
-
-.dragonglass .dialog__body {
-  flex: 1; }
-
-.dragonglass .dialog__buttons {
-  display: flex;
-  margin-top: 48px;
-  flex-direction: row;
-  justify-content: center; }
-  .dragonglass .dialog__buttons .button {
-    width: auto; }
-    .dragonglass .dialog__buttons .button > div {
-      align-items: center;
-      background-color: #0277bd;
-      border-radius: 3px;
-      box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.55);
-      color: white;
-      display: flex;
-      justify-content: center;
-      margin-left: 16px;
-      margin-right: 16px;
-      padding: 16px;
-      width: 115px;
-      transition: 0.3s ease-out; }
-      .dragonglass .dialog__buttons .button > div.button--disabled {
-        background-color: #bdbdbd;
-        cursor: default; }
-        .dragonglass .dialog__buttons .button > div.button--disabled:hover {
-          background-color: #bdbdbd; }
-      .dragonglass .dialog__buttons .button > div:hover {
-        background: #0267a4; }
-
-.dragonglass .dialog__container--calendarpluslines {
-  width: 1000px;
-  height: 650px;
-  max-height: initial;
-  min-height: auto;
-  max-width: initial;
-  min-width: auto; }
-  .dragonglass .dialog__container--calendarpluslines .dialog__body {
-    display: flex;
-    height: 100%; }
-    .dragonglass .dialog__container--calendarpluslines .dialog__body .datepicker-host {
-      width: 35%; }
-    .dragonglass .dialog__container--calendarpluslines .dialog__body .grid {
-      width: 65%;
-      flex: 1;
-      flex-direction: column; }
-      .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table {
-        width: 100%;
-        overflow-y: auto;
-        flex: 1 1 auto; }
-        .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table {
-          border-collapse: collapse;
-          width: 100%;
-          table-layout: fixed; }
-          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table thead {
-            background-color: #0277bd;
-            color: #eeeeee; }
-          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table th,
-          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td {
-            float: left;
-            line-height: 1.6em;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            vertical-align: middle;
-            white-space: nowrap;
-            width: 11%; }
-            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table th:first-child,
-            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td:first-child {
-              width: 45%; }
-          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table th {
-            font-weight: 600;
-            height: 2em;
-            padding: 0.2em;
-            text-align: center; }
-          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td {
-            border-right: 1px solid #c1c4ca;
-            padding: 0.5% 1%;
-            justify-content: flex-end;
-            display: flex; }
-            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td:first-child {
-              justify-content: flex-start; }
-            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table td:last-child {
-              border: none; }
-          .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table tbody tr {
-            border-bottom: 1px solid #f1f4fa;
-            cursor: default;
-            display: flex; }
-            .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table table tbody tr.tr-highlight {
-              background-color: #cee5f9; }
-        .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table.grid__table--head {
-          flex: 0 0 auto;
-          overflow: hidden;
-          height: auto; }
-        .dragonglass .dialog__container--calendarpluslines .dialog__body .grid .grid__table.grid__table--body {
-          border: 1px solid #c1c4ca;
-          border-top: none;
-          flex-basis: 0;
-          height: auto; }
-
-.dragonglass .dialog__container--message .dialog__body span,
-.dragonglass .dialog__container--confirm .dialog__body span,
-.dragonglass .dialog__container--error .dialog__body span {
-  display: block; }
-
-.dragonglass .dialog-host .dialog__container--numpad {
-  min-width: auto;
-  min-height: auto;
-  max-height: initial;
-  width: 525px;
-  height: 650px; }
-  .dragonglass .dialog-host .dialog__container--numpad .dialog__body {
-    flex-flow: column;
-    display: flex;
-    height: calc(100% - 120px); }
-    .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input {
-      display: block;
-      margin-bottom: 0.5em;
-      margin-top: 1em;
-      width: 100%;
-      position: relative; }
-      .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder {
-        width: 100%;
-        display: flex; }
-        .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder input {
-          background: white;
-          font-size: 1em;
-          border-radius: 3px;
-          padding: 8px 50px 8px 8px;
-          box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.15);
-          border: 0px none;
-          flex: 1;
-          width: 100%; }
-          .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder input:focus {
-            box-shadow: 0px 0px 3px 2px rgba(71, 194, 255, 0.45);
-            outline: 0 none; }
-        .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder.input__holder--invalid input:focus {
-          box-shadow: 0px 0px 4px 0px rgba(255, 0, 0, 0.45); }
-        .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder .input__erase {
-          background-color: #0277bd;
-          border-radius: 3px;
-          color: #fff;
-          padding: 7px 10px;
-          position: absolute;
-          right: 0;
-          text-align: center;
-          width: 40px;
-          border: 1px solid transparent;
-          transition: background-color 300ms ease-out;
-          cursor: pointer; }
-          .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__holder .input__erase:hover {
-            background: #0267a4; }
-      .dragonglass .dialog-host .dialog__container--numpad .dialog__body .input .input__notification {
-        padding-top: 5px;
-        font-size: 14px; }
-    .dragonglass .dialog-host .dialog__container--numpad .dialog__body .button .button__caption {
-      font-size: 18px; }
-    .dragonglass .dialog-host .dialog__container--numpad .dialog__body .button .button--color-gray {
-      background: #a4b4c8; }
-      .dragonglass .dialog-host .dialog__container--numpad .dialog__body .button .button--color-gray:hover {
-        background: #76889c; }
-
-.dragonglass .l-horizontal .l-panel:first-child {
-  padding: 0 20px 0 0; }
-
-.dragonglass .l-vertical {
-  flex-flow: column nowrap; }
-
-.dragonglass .react-swipeable-view-container {
-  height: 100%; }
-
-.dragonglass .l-panel {
-  width: 50%; }
-
-.dragonglass .l-views {
-  padding: 20px;
-  height: calc(100% - 50px); }
 
 * {
   box-sizing: border-box; }
