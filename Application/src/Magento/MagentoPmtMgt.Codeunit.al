@@ -33,7 +33,70 @@
         PaymentEventType := PaymentEventTypeIn;
     end;
 
-    //[EventSubscriber(ObjectType::Codeunit, 6620, 'OnAfterCopySalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnAfterCopySalesDocument', '', true, true)]
+    local procedure CopySalesDoc(FromDocumentType: Option; FromDocumentNo: Code[20]; IncludeHeader: Boolean; var ToSalesHeader: Record "Sales Header")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        PaymentLine2: Record "NPR Magento Payment Line";
+        PaymentLineBal: Record "NPR Magento Payment Line";
+    begin
+        if not IncludeHeader then
+            exit;
+        if not ToSalesHeader.IsCreditDocType() then
+            exit;
+
+        case "Sales Document Type From".FromInteger(FromDocumentType) of
+            "Sales Document Type From"::Order:
+                begin
+                    PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+                    PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Order);
+                    PaymentLine.SetRange("Document No.", FromDocumentNo);
+                end;
+            "Sales Document Type From"::Invoice:
+                begin
+                    PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+                    PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Invoice);
+                    PaymentLine.SetRange("Document No.", FromDocumentNo);
+                end;
+            "Sales Document Type From"::"Posted Invoice":
+                begin
+                    PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+                    PaymentLine.SetRange("Document Type", 0);
+                    PaymentLine.SetRange("Document No.", FromDocumentNo);
+                end;
+            else
+                exit;
+        end;
+        if PaymentLine.IsEmpty() then
+            exit;
+
+        PaymentLine.FindSet();
+        repeat
+            if PaymentLine2.Get(Database::"Sales Header", ToSalesHeader."Document Type", ToSalesHeader."No.", PaymentLine."Line No.") then
+                PaymentLine2.Delete();
+            PaymentLine2.Init();
+            PaymentLine2 := PaymentLine;
+            PaymentLine2."Document Table No." := Database::"Sales Header";
+            PaymentLine2."Document Type" := ToSalesHeader."Document Type";
+            PaymentLine2."Document No." := ToSalesHeader."No.";
+            PaymentLine2.Posted := false;
+            PaymentLine2."Posting Date" := ToSalesHeader."Posting Date";
+            PaymentLine2.Insert(true);
+
+            if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine."Account No." <> '') and (PaymentLine.Amount <> 0) then
+                PaymentLineBal := PaymentLine;
+        until PaymentLine.Next() = 0;
+
+        if (ToSalesHeader."Applies-to Doc. No." <> '') or (ToSalesHeader."Applies-to ID" <> '') then
+            exit;
+
+        ToSalesHeader.Validate("Payment Method Code");
+        if PaymentLineBal."Account No." <> '' then begin
+            ToSalesHeader."Bal. Account Type" := PaymentLineBal."Account Type";
+            ToSalesHeader."Bal. Account No." := PaymentLineBal."Account No.";
+        end;
+        ToSalesHeader.Modify(true);
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure Cu80OnAfterPostSalesCrMemo(var SalesHeader: Record "Sales Header"; SalesCrMemoHdrNo: Code[20])
@@ -44,7 +107,7 @@
             exit;
         if not SalesCrMemoHeader.Get(SalesCrMemoHdrNo) then
             exit;
-        if not HasMagentoPayment(DATABASE::"Sales Cr.Memo Header", Enum::"Sales Document Type".FromInteger(0), SalesCrMemoHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Cr.Memo Header", Enum::"Sales Document Type".FromInteger(0), SalesCrMemoHeader."No.") then
             exit;
 
         RefundSalesCreditMemo(SalesCrMemoHeader);
@@ -59,32 +122,28 @@
         PostMagentoPayment(SalesHeader, GenJnlPostLine, SalesInvHdrNo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostCommitSalesDoc', '', true, true)]
-    local procedure Cu80OnBeforePostCommitSalesCrMemo(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean; ModifyHeader: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesLines', '', true, false)]
+    local procedure InsertRefundPaymentLinesSalesCrMemo(var SalesHeader: Record "Sales Header")
     begin
-        if PreviewMode then
-            exit;
-        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"]) then
+        if not SalesHeader.IsCreditDocType() then
             exit;
         if (not SalesHeader.Invoice) and (SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order") then
             exit;
-        if not HasMagentoPayment(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
 
         InsertRefundPaymentLines(SalesHeader);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostCommitSalesDoc', '', true, true)]
-    local procedure Cu80OnBeforePostCommitSalesInvoice(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean; ModifyHeader: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesLines', '', true, false)]
+    local procedure InsertPaymentLinesSalesInvoice(var SalesHeader: Record "Sales Header")
     begin
-        if PreviewMode then
-            exit;
         if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice]) then
             exit;
         if (not SalesHeader.Invoice) and (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) then
             exit;
         AdjustPaymentAmount(SalesHeader);
-        if not HasMagentoPayment(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
 
         InsertPaymentLines(SalesHeader);
@@ -97,7 +156,7 @@
             exit;
         if not SalesHeader.Invoice then
             exit;
-        if not HasMagentoPayment(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
 
         SalesHeader."Bal. Account No." := '';
@@ -111,10 +170,10 @@
     begin
         if Rec.IsTemporary then
             exit;
-        if not HasMagentoPayment(DATABASE::"Sales Header", Rec."Document Type", Rec."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", Rec."Document Type", Rec."No.") then
             exit;
 
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", Rec."Document Type");
         PaymentLine.SetRange("Document No.", Rec."No.");
         if PaymentLine.IsEmpty then
@@ -136,7 +195,7 @@
         PaymentAmt: Decimal;
         TotalAmountInclVAT: Decimal;
     begin
-        if not HasMagentoPayment(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
 
         if HasAllowAdjustAmount(SalesHeader) then
@@ -145,7 +204,7 @@
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
         SalesHeader.CalcFields("NPR Magento Payment Amount");
         PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetFilter(Amount, '<>%1', 0);
@@ -172,7 +231,7 @@
         PaymentLine: Record "NPR Magento Payment Line";
     begin
         PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetRange("Allow Adjust Amount", true);
@@ -195,7 +254,7 @@
         CustLedgerEntry: Record "Cust. Ledger Entry";
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        if (PaymentLine."Document Table No." <> DATABASE::"Sales Invoice Header") or (PaymentLine."Document No." = '') then
+        if (PaymentLine."Document Table No." <> Database::"Sales Invoice Header") or (PaymentLine."Document No." = '') then
             exit(false);
         if not SalesInvHeader.Get(PaymentLine."Document No.") then
             exit(false);
@@ -215,7 +274,7 @@
     begin
         if PaymentLine."Last Posting No." = '' then
             exit(false);
-        if PaymentLine."Document Table No." <> DATABASE::"Sales Header" then
+        if PaymentLine."Document Table No." <> Database::"Sales Header" then
             exit(false);
 
         case PaymentLine."Document Type" of
@@ -299,7 +358,7 @@
             exit;
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.CalcSums(Amount);
@@ -309,7 +368,7 @@
         AdjustmentAmt := TotalAmountInclVAT - PaymentLine.Amount;
 
         Clear(PaymentLine);
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetRange("Allow Adjust Amount", true);
@@ -333,7 +392,7 @@
             exit;
         end;
 
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Invoice Header"]) then
+        if not (PaymentLine."Document Table No." in [Database::"Sales Header", Database::"Sales Invoice Header"]) then
             exit;
 
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
@@ -362,7 +421,7 @@
         if SalesInvoiceHeader."Order No." = '' then
             exit;
 
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Invoice Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
         PaymentLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
         PaymentLine.SetRange("Date Captured", 0D);
@@ -383,7 +442,7 @@
         TotalAmountInclVAT: Decimal;
         DocNo: Code[20];
     begin
-        if not HasMagentoPayment(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
@@ -396,7 +455,7 @@
 
         PaymentAmt := 0;
         PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetFilter(Amount, '<>%1', 0);
@@ -407,11 +466,11 @@
                     PaymentLine."Last Amount" := 0;
                     PaymentLine."Last Posting No." := '';
                 end;
-                if PaymentLine2.Get(DATABASE::"Sales Invoice Header", 0, DocNo, PaymentLine."Line No.") then
+                if PaymentLine2.Get(Database::"Sales Invoice Header", 0, DocNo, PaymentLine."Line No.") then
                     PaymentLine2.Delete();
                 PaymentLine2.Init();
                 PaymentLine2 := PaymentLine;
-                PaymentLine2."Document Table No." := DATABASE::"Sales Invoice Header";
+                PaymentLine2."Document Table No." := Database::"Sales Invoice Header";
                 PaymentLine2."Document Type" := Enum::"Sales Document Type".FromInteger(0);
                 PaymentLine2."Document No." := DocNo;
                 PaymentLine2."Posting Date" := SalesHeader."Posting Date";
@@ -437,7 +496,7 @@
     var
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        if not HasMagentoPayment(DATABASE::"Sales Invoice Header", Enum::"Sales Document Type".FromInteger(0), SalesInvHdrNo) then
+        if not HasMagentoPayment(Database::"Sales Invoice Header", Enum::"Sales Document Type".FromInteger(0), SalesInvHdrNo) then
             exit;
 
         SalesInvHeader.Get(SalesInvHdrNo);
@@ -476,7 +535,7 @@
         OnBeforePostPaymentLine(PaymentLine);
 
         case PaymentLine."Document Table No." of
-            DATABASE::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 begin
                     SalesInvHeader.Get(PaymentLine."Document No.");
                     SetupGenJnlLineInvoice(SalesInvHeader, PaymentLine, GenJnlLine);
@@ -498,7 +557,7 @@
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
                 begin
-                    PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Invoice Header");
+                    PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
                     PaymentLine.SetRange("Document Type", 0);
                     PaymentLine.SetRange("Document No.", DocNo);
                     PaymentLine.SetFilter("Account No.", '<>%1', '');
@@ -516,7 +575,7 @@
         SourceCodeSetup: Record "Source Code Setup";
         SourceCode: Code[10];
     begin
-        PaymentLine.TestField("Document Table No.", DATABASE::"Sales Invoice Header");
+        PaymentLine.TestField("Document Table No.", Database::"Sales Invoice Header");
         SalesInvHeader.TestField("No.", PaymentLine."Document No.");
 
         SourceCodeSetup.Get();
@@ -576,7 +635,7 @@
         TotalAmountInclVAT: Decimal;
         DocNo: Code[20];
     begin
-        if not HasMagentoPayment(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
@@ -589,9 +648,10 @@
 
         RefundAmt := 0;
         PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetRange(Posted, false);
         PaymentLine.SetFilter(Amount, '<>%1', 0);
         if PaymentLine.FindSet(true) then
             repeat
@@ -600,11 +660,11 @@
                     PaymentLine."Last Amount" := 0;
                     PaymentLine."Last Posting No." := '';
                 end;
-                if PaymentLine2.Get(DATABASE::"Sales Cr.Memo Header", 0, DocNo, PaymentLine."Line No.") then
+                if PaymentLine2.Get(Database::"Sales Cr.Memo Header", 0, DocNo, PaymentLine."Line No.") then
                     PaymentLine2.Delete();
                 PaymentLine2.Init();
                 PaymentLine2 := PaymentLine;
-                PaymentLine2."Document Table No." := DATABASE::"Sales Cr.Memo Header";
+                PaymentLine2."Document Table No." := Database::"Sales Cr.Memo Header";
                 PaymentLine2."Document Type" := Enum::"Sales Document Type".FromInteger(0);
                 PaymentLine2."Document No." := DocNo;
                 PaymentLine2."Posting Date" := SalesHeader."Posting Date";
@@ -619,6 +679,7 @@
                     PaymentLine.Amount := 0;
                 PaymentLine."Last Amount" := PaymentLine2.Amount;
                 PaymentLine."Last Posting No." := DocNo;
+                PaymentLine.Posted := PaymentLine.Amount = 0;
                 PaymentLine.Modify();
 
                 RefundAmt += PaymentLine2.Amount;
@@ -627,7 +688,7 @@
 
     local procedure RefundSalesCreditMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
-        if not HasMagentoPayment(DATABASE::"Sales Cr.Memo Header", Enum::"Sales Document Type".FromInteger(0), SalesCrMemoHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Cr.Memo Header", Enum::"Sales Document Type".FromInteger(0), SalesCrMemoHeader."No.") then
             exit;
 
         RefundPaymentLines(SalesCrMemoHeader);
@@ -668,7 +729,7 @@
         PaymentLine: Record "NPR Magento Payment Line";
         PrevRec: Text;
     begin
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Cr.Memo Header");
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Cr.Memo Header");
         PaymentLine.SetRange("Document No.", SalesCrMemoHeader."No.");
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
         PaymentLine.SetRange("Date Refunded", 0D);
