@@ -256,7 +256,8 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     begin
         JobQueueEntry.Setrange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Import List Processing");
-        JobQueueEntry.SetRange("Job Queue Category Code", ServiceSetup."API Version");
+        JobQueueEntry.SetRange("Job Queue Category Code", ReplicationJobQueueCategoryCode);
+        JobQueueEntry.SetFilter("Parameter String", '%1', '@*' + ServiceSetup."API Version" + '*');
         Page.Run(0, JobQueueEntry);
     end;
 
