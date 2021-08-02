@@ -372,5 +372,9 @@ table 6151015 "NPR NpRv Sales Line"
             exit;
         end;
     end;
-}
 
+    procedure IsCreditDocType(): Boolean
+    begin
+        exit("Document Type" in ["Document Type"::"Return Order", "Document Type"::"Credit Memo"]);
+    end;
+}

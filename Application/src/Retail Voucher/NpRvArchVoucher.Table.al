@@ -52,7 +52,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(50; "Arch. No."; Code[20])
         {
-            Caption = 'Archivation No.';
+            Caption = 'Pre-archivation No.';
             DataClassification = CustomerContent;
         }
         field(55; "Account No."; Code[20])
@@ -268,8 +268,8 @@ table 6151018 "NPR NpRv Arch. Voucher"
             Caption = 'Issue Document Type';
             Editable = false;
             FieldClass = FlowField;
-            OptionCaption = 'POS Entry,Invoice';
-            OptionMembers = "Audit Roll",Invoice;
+            OptionCaption = 'POS Entry,Invoice,Credit Memo';
+            OptionMembers = "Audit Roll",Invoice,"Credit Memo";
         }
         field(1010; "Issue Document No."; Code[20])
         {
@@ -331,6 +331,8 @@ table 6151018 "NPR NpRv Arch. Voucher"
         key(Key3; "Reference No.")
         {
         }
+        key(Key4; "Arch. No.")
+        {
+        }
     }
 }
-

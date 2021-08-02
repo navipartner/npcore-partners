@@ -57,7 +57,7 @@
     begin
         NpRvSalesLine.Get(NpRvSalesLine.Id);
         NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
-        MagentoPaymentLine.Get(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
+        MagentoPaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
         NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
 
         NpRvVoucher.CalcFields(Amount);
@@ -77,7 +77,7 @@
         NpRvSalesLineNew.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
         if NpRvSalesLineNew.FindFirst() then begin
             ReturnLineExists := true;
-            MagentoPaymentLineNew.Get(DATABASE::"Sales Header", NpRvSalesLineNew."Document Type",
+            MagentoPaymentLineNew.Get(Database::"Sales Header", NpRvSalesLineNew."Document Type",
               NpRvSalesLineNew."Document No.", NpRvSalesLineNew."Document Line No.");
             ReturnAmount -= MagentoPaymentLineNew.Amount;
         end;
@@ -111,14 +111,14 @@
 
         NpRvVoucherMgt.GenerateTempVoucher(NpRvVoucherTypeNew, TempNpRvVoucher);
 
-        MagentoPaymentLineNew.SetRange("Document Table No.", DATABASE::"Sales Header");
+        MagentoPaymentLineNew.SetRange("Document Table No.", Database::"Sales Header");
         MagentoPaymentLineNew.SetRange("Document Type", SalesHeader."Document Type");
         MagentoPaymentLineNew.SetRange("Document No.", SalesHeader."No.");
         if MagentoPaymentLineNew.FindLast() then;
         LineNo := MagentoPaymentLineNew."Line No." + 10000;
 
         MagentoPaymentLineNew.Init();
-        MagentoPaymentLineNew."Document Table No." := DATABASE::"Sales Header";
+        MagentoPaymentLineNew."Document Table No." := Database::"Sales Header";
         MagentoPaymentLineNew."Document Type" := SalesHeader."Document Type";
         MagentoPaymentLineNew."Document No." := SalesHeader."No.";
         MagentoPaymentLineNew."Line No." := LineNo;
@@ -129,7 +129,7 @@
         MagentoPaymentLineNew."Account Type" := MagentoPaymentLineNew."Account Type"::"G/L Account";
         MagentoPaymentLineNew."Account No." := NpRvVoucherType."Account No.";
         MagentoPaymentLineNew.Description := TempNpRvVoucher.Description;
-        MagentoPaymentLineNew."Source Table No." := DATABASE::"NPR NpRv Voucher";
+        MagentoPaymentLineNew."Source Table No." := Database::"NPR NpRv Voucher";
         MagentoPaymentLineNew."Source No." := TempNpRvVoucher."No.";
         MagentoPaymentLineNew."Posting Date" := SalesHeader."Posting Date";
         MagentoPaymentLineNew.Insert(true);
@@ -170,13 +170,114 @@
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
         if NpRvSalesLine.FindSet() then
             repeat
-                if MagentoPaymentLine.Get(DATABASE::"Sales Header", NpRvSalesLine."Document Type",
+                if MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type",
                   NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.")
                 then
                     MagentoPaymentLine.Delete();
 
                 NpRvSalesLine.Delete(true);
             until NpRvSalesLine.Next() = 0;
+    end;
+
+    procedure InsertVoucherPaymentReturnSalesDoc(NpRvVoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        MagentoPaymentLineNew: Record "NPR Magento Payment Line";
+        NpRvReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
+        NpRvSalesLineNew: Record "NPR NpRv Sales Line";
+        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
+        NpRvVoucherTypeNew: Record "NPR NpRv Voucher Type";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        ReturnAmount: Decimal;
+        LineNo: Integer;
+        ReturnLineExists: Boolean;
+    begin
+        NpRvSalesLine.Find();
+        NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+        MagentoPaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
+        MagentoPaymentLine.Posted := true;
+        MagentoPaymentLine.Modify(true);
+
+        if not NpRvReturnVoucherType.Get(NpRvVoucherType.Code) or (NpRvReturnVoucherType."Return Voucher Type" = '') then
+            NpRvReturnVoucherType."Return Voucher Type" := NpRvVoucherType.Code;
+        NpRvVoucherTypeNew.Get(NpRvReturnVoucherType."Return Voucher Type");
+
+        ReturnAmount := MagentoPaymentLine.Amount;
+        NpRvSalesLineNew.SetRange("Parent Id", NpRvSalesLine.Id);
+        NpRvSalesLineNew.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+        NpRvSalesLineNew.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
+        ReturnLineExists := not NpRvSalesLineNew.IsEmpty();
+
+        if ReturnAmount <= 0 then begin
+            if ReturnLineExists then
+                RemoveReturnVoucher(NpRvSalesLine);
+            exit;
+        end;
+
+        if POSPaymentMethod.Get(NpRvVoucherTypeNew."Payment Type") then
+            if POSPaymentMethod."Rounding Precision" > 0 then
+                ReturnAmount := Round(ReturnAmount, POSPaymentMethod."Rounding Precision");
+
+        if ReturnLineExists then begin
+            if MagentoPaymentLineNew.Amount <> ReturnAmount then begin
+                MagentoPaymentLineNew.Amount := ReturnAmount;
+                MagentoPaymentLineNew.Modify(true);
+            end;
+            exit;
+        end;
+
+        NpRvVoucherMgt.GenerateTempVoucher(NpRvVoucherTypeNew, TempNpRvVoucher);
+
+        MagentoPaymentLineNew.SetRange("Document Table No.", Database::"Sales Header");
+        MagentoPaymentLineNew.SetRange("Document Type", SalesHeader."Document Type");
+        MagentoPaymentLineNew.SetRange("Document No.", SalesHeader."No.");
+        if not MagentoPaymentLineNew.FindLast() then
+            MagentoPaymentLineNew."Line No." := 0;
+        LineNo := MagentoPaymentLineNew."Line No." + 10000;
+
+        MagentoPaymentLineNew.Init();
+        MagentoPaymentLineNew."Document Table No." := Database::"Sales Header";
+        MagentoPaymentLineNew."Document Type" := SalesHeader."Document Type";
+        MagentoPaymentLineNew."Document No." := SalesHeader."No.";
+        MagentoPaymentLineNew."Line No." := LineNo;
+        MagentoPaymentLineNew."External Reference No." := SalesHeader."NPR External Order No.";
+        MagentoPaymentLineNew."Payment Type" := MagentoPaymentLineNew."Payment Type"::Voucher;
+        MagentoPaymentLineNew."No." := TempNpRvVoucher."Reference No.";
+        MagentoPaymentLineNew.Amount := ReturnAmount;
+        MagentoPaymentLineNew."Account Type" := MagentoPaymentLineNew."Account Type"::"G/L Account";
+        MagentoPaymentLineNew."Account No." := NpRvVoucherTypeNew."Account No.";
+        MagentoPaymentLineNew.Description := TempNpRvVoucher.Description;
+        MagentoPaymentLineNew."Source Table No." := Database::"NPR NpRv Voucher";
+        MagentoPaymentLineNew."Source No." := TempNpRvVoucher."No.";
+        MagentoPaymentLineNew."Posting Date" := SalesHeader."Posting Date";
+        MagentoPaymentLineNew.Insert(true);
+
+        NpRvSalesLineNew.Init();
+        NpRvSalesLineNew.Id := CreateGuid();
+        NpRvSalesLineNew."Parent Id" := NpRvSalesLine.Id;
+        NpRvSalesLineNew."Document Source" := NpRvSalesLineNew."Document Source"::"Payment Line";
+        NpRvSalesLineNew."Document Type" := MagentoPaymentLineNew."Document Type";
+        NpRvSalesLineNew."Document No." := MagentoPaymentLineNew."Document No.";
+        NpRvSalesLineNew."Document Line No." := MagentoPaymentLineNew."Line No.";
+        NpRvSalesLineNew."External Document No." := MagentoPaymentLineNew."External Reference No.";
+        NpRvSalesLineNew.Type := NpRvSalesLineNew.Type::"New Voucher";
+        NpRvSalesLineNew."Voucher Type" := TempNpRvVoucher."Voucher Type";
+        NpRvSalesLineNew."Voucher No." := TempNpRvVoucher."No.";
+        NpRvSalesLineNew."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLineNew.Description := TempNpRvVoucher.Description;
+        NpRvSalesLineNew.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
+        if (not NpRvSalesLineNew."Send via Print") and (not NpRvSalesLineNew."Send via SMS") and (NpRvSalesLineNew."E-mail" <> '') then
+            NpRvSalesLineNew."Send via E-mail" := true;
+        NpRvSalesLineNew.Insert(true);
+
+        NpRvSalesLineReference.Init();
+        NpRvSalesLineReference.Id := CreateGuid();
+        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
+        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLineNew.Id;
+        NpRvSalesLineReference.Insert(true);
     end;
 
     //--- Voucher Interface ---

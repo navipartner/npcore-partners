@@ -369,8 +369,8 @@ table 6151013 "NPR NpRv Voucher"
             Caption = 'Issue Document Type';
             Editable = false;
             FieldClass = FlowField;
-            OptionCaption = 'POS Entry,Invoice';
-            OptionMembers = "Audit Roll",Invoice;
+            OptionCaption = 'POS Entry,Invoice,Credit Memo';
+            OptionMembers = "Audit Roll",Invoice,"Credit Memo";
         }
         field(1010; "Issue Document No."; Code[20])
         {

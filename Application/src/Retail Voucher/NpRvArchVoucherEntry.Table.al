@@ -53,6 +53,11 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
             Caption = 'Open';
             DataClassification = CustomerContent;
         }
+        field(35; Correction; Boolean)
+        {
+            Caption = 'Correction';
+            DataClassification = CustomerContent;
+        }
         field(40; "Remaining Amount"; Decimal)
         {
             Caption = 'Remaining Amount';
@@ -69,12 +74,17 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'POS Entry,Invoice';
-            OptionMembers = "POS Entry",Invoice;
+            OptionCaption = 'POS Entry,Invoice,Credit Memo';
+            OptionMembers = "POS Entry",Invoice,"Credit Memo";
         }
         field(55; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            DataClassification = CustomerContent;
+        }
+        field(57; "Document Line No."; Integer)
+        {
+            Caption = 'Document Line No.';
             DataClassification = CustomerContent;
         }
         field(60; "External Document No."; Code[50])
@@ -134,6 +144,8 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         key(Key3; "Entry Type", "Register No.", "Document No.")
         {
         }
+        key(Key4; "Entry Type", "Document Type", "Document No.", "Document Line No.")
+        {
+        }
     }
 }
-

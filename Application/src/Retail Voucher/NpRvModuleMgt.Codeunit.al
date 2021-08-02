@@ -54,5 +54,9 @@ codeunit 6151011 "NPR NpRv Module Mgt."
     procedure OnRunApplyPaymentSalesDoc(VoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    procedure OnInsertVoucherPaymentReturnSalesDoc(VoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean);
+    begin
+    end;
+}

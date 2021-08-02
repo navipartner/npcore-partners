@@ -137,18 +137,18 @@
     procedure IssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
+        SignFactor: Integer;
         VoucherAmount: Decimal;
         VoucherQty: Decimal;
     begin
         if not (NpRvSalesLine.Type in [NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher"]) then
             exit;
 
+        SignFactor := 1;
         VoucherType.Get(NpRvSalesLine."Voucher Type");
         case NpRvSalesLine."Document Source" of
             NpRvSalesLine."Document Source"::POS:
@@ -168,20 +168,27 @@
                 end;
             NpRvSalesLine."Document Source"::"Sales Document":
                 begin
-                    if not SalesLine.Get(NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
+                    if not GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine, VoucherQty, VoucherAmount) then
                         exit;
-
-                    VoucherQty := SalesLine."Qty. to Invoice";
-                    VoucherAmount := SalesLine."Unit Price";
-                    if SalesHeader.Get(SalesHeader."Document Type", SalesLine."Document No.") and not SalesHeader."Prices Including VAT" then
-                        VoucherAmount *= 1 + SalesLine."VAT %" / 100;
+                    if NpRvSalesLine.IsCreditDocType() then
+                        SignFactor := -1;
                 end;
             NpRvSalesLine."Document Source"::"Payment Line":
                 begin
-                    if not MagentoPaymentLine.Get(DATABASE::"Sales Invoice Header", 0, NpRvSalesLine."Posting No.", NpRvSalesLine."Document Line No.") then begin
-                        if not MagentoPaymentLine.Get(DATABASE::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
+                    MagentoPaymentLine.SetFilter("Document Table No.", '%1|%2', Database::"Sales Invoice Header", Database::"Sales Cr.Memo Header");
+                    MagentoPaymentLine.SetRange("Document Type", 0);
+                    MagentoPaymentLine.SetRange("Document No.", NpRvSalesLine."Posting No.");
+                    MagentoPaymentLine.SetRange("Line No.", NpRvSalesLine."Document Line No.");
+                    if not MagentoPaymentLine.FindFirst() then begin
+                        MagentoPaymentLine.Reset();
+                        if not MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
                             exit;
                     end;
+                    if ((MagentoPaymentLine."Document Table No." = Database::"Sales Header") and
+                        (MagentoPaymentLine."Document Type" in [MagentoPaymentLine."Document Type"::"Credit Memo", MagentoPaymentLine."Document Type"::"Return Order"])) or
+                       (MagentoPaymentLine."Document Table No." = Database::"Sales Cr.Memo Header")
+                    then
+                        MagentoPaymentLine.Amount := -MagentoPaymentLine.Amount;
                     if MagentoPaymentLine.Amount >= 0 then
                         exit;
 
@@ -200,7 +207,7 @@
             NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
             if NpRvSalesLineReference.FindFirst() then;
 
-            IssueVoucher(VoucherType, VoucherAmount, NpRvSalesLine, NpRvSalesLineReference);
+            IssueVoucher(VoucherType, VoucherAmount * SignFactor, NpRvSalesLine, NpRvSalesLineReference);
         end;
     end;
 
@@ -209,13 +216,13 @@
         NpRvSalesLine2: Record "NPR NpRv Sales Line";
         Voucher: Record "NPR NpRv Voucher";
         PrevVoucher: Text;
-        NpRvSalesLineReferencePrev: Record "NPR NpRv Sales Line Ref.";
     begin
-        if VoucherAmount <= 0 then
-            exit;
+        case true of
+            (NpRvSalesLine."Document Source" = NpRvSalesLine."Document Source"::"Sales Document") and NpRvSalesLine.IsCreditDocType(),
+            NpRvSalesLine.Type = NpRvSalesLine.Type::"Top-up":
+                Voucher.Get(NpRvSalesLine."Voucher No.");
 
-        case NpRvSalesLine.Type of
-            NpRvSalesLine.Type::"New Voucher":
+            NpRvSalesLine.Type = NpRvSalesLine.Type::"New Voucher":
                 begin
                     if NpRvSalesLineReference."Reference No." = '' then
                         VoucherType.TestField("Reference No. Pattern");
@@ -250,17 +257,10 @@
                     if PrevVoucher <> Format(Voucher) then
                         Voucher.Modify(true);
                 end;
-            NpRvSalesLine.Type::"Top-up":
-                begin
-                    Voucher.Get(NpRvSalesLine."Voucher No.");
-                end;
         end;
 
-        if NpRvSalesLineReference.Find() then begin
-            NpRvSalesLineReferencePrev := NpRvSalesLineReference;
+        if NpRvSalesLineReference.Find() then
             NpRvSalesLineReference.Delete();
-            NpRvSalesLineReference := NpRvSalesLineReferencePrev;
-        end;
 
         PostIssueVoucher(Voucher, VoucherAmount, NpRvSalesLine);
 
@@ -268,6 +268,24 @@
             NpRvSalesLine2.Posted := true;
             NpRvSalesLine2.Modify();
         end;
+    end;
+
+    procedure GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine: Record "NPR NpRv Sales Line"; var VoucherQty: Decimal; var VoucherUnitPrice: Decimal): Boolean
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        VoucherQty := 0;
+        VoucherUnitPrice := 0;
+        if not SalesLine.Get(NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
+            exit(false);
+
+        VoucherQty := SalesLine."Qty. to Invoice";
+        VoucherUnitPrice := SalesLine."Unit Price";
+        if SalesHeader.Get(SalesHeader."Document Type", SalesLine."Document No.") and not SalesHeader."Prices Including VAT" then
+            VoucherUnitPrice := VoucherUnitPrice * (1 + SalesLine."VAT %" / 100);
+
+        exit(true);
     end;
 
     procedure InitialEntryExists(Voucher: Record "NPR NpRv Voucher"): Boolean
@@ -289,11 +307,14 @@
         VoucherEntry.Init();
         VoucherEntry."Entry No." := 0;
         VoucherEntry."Voucher No." := Voucher."No.";
+        VoucherEntry.Correction :=
+            (NpRvSalesLine."Document Source" = NpRvSalesLine."Document Source"::"Sales Document") and NpRvSalesLine.IsCreditDocType();
         case NpRvSalesLine.Type of
             NpRvSalesLine.Type::"New Voucher":
                 begin
-                    if InitialEntryExists(Voucher) then
-                        exit;
+                    if not VoucherEntry.Correction then
+                        if InitialEntryExists(Voucher) then
+                            exit;
 
                     VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
                 end;
@@ -303,8 +324,9 @@
                 end;
             NpRvSalesLine.Type::"Partner Issue Voucher":
                 begin
-                    if InitialEntryExists(Voucher) then
-                        exit;
+                    if not VoucherEntry.Correction then
+                        if InitialEntryExists(Voucher) then
+                            exit;
 
                     VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Partner Issue Voucher";
                 end;
@@ -322,16 +344,15 @@
                     VoucherEntry."Document Type" := VoucherEntry."Document Type"::"POS Entry";
                     VoucherEntry."Document No." := NpRvSalesLine."Sales Ticket No.";
                 end;
-            NpRvSalesLine."Document Source"::"Sales Document":
-                begin
-                    VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
-                    VoucherEntry."Document No." := NpRvSalesLine."Posting No.";
-                    VoucherEntry."External Document No." := NpRvSalesLine."External Document No.";
-                end;
+            NpRvSalesLine."Document Source"::"Sales Document",
             NpRvSalesLine."Document Source"::"Payment Line":
                 begin
-                    VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
+                    if NpRvSalesLine.IsCreditDocType() then
+                        VoucherEntry."Document Type" := VoucherEntry."Document Type"::"Credit Memo"
+                    else
+                        VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
                     VoucherEntry."Document No." := NpRvSalesLine."Posting No.";
+                    VoucherEntry."Document Line No." := NpRvSalesLine."Document Line No.";
                     VoucherEntry."External Document No." := NpRvSalesLine."External Document No.";
                 end;
         end;
@@ -340,6 +361,8 @@
         VoucherEntry."Closed by Entry No." := 0;
         OnBeforeInsertIssuedVoucherEntry(VoucherEntry, Voucher, NpRvSalesLine);
         VoucherEntry.Insert();
+
+        ApplyEntry(VoucherEntry);
     end;
 
 
@@ -461,13 +484,15 @@
                 end;
             NpRvSalesLine."Document Source"::"Payment Line":
                 begin
-                    if not MagentoPaymentLine.Get(DATABASE::"Sales Invoice Header", 0, NpRvSalesLine."Posting No.", NpRvSalesLine."Document Line No.") then begin
-                        if not MagentoPaymentLine.Get(DATABASE::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
+                    MagentoPaymentLine.SetFilter("Document Table No.", '%1|%2', Database::"Sales Invoice Header", Database::"Sales Cr.Memo Header");
+                    MagentoPaymentLine.SetRange("Document Type", 0);
+                    MagentoPaymentLine.SetRange("Document No.", NpRvSalesLine."Posting No.");
+                    MagentoPaymentLine.SetRange("Line No.", NpRvSalesLine."Document Line No.");
+                    if not MagentoPaymentLine.FindFirst() then begin
+                        MagentoPaymentLine.Reset();
+                        if not MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.") then
                             exit;
                     end;
-
-                    if MagentoPaymentLine.Amount <= 0 then
-                        exit;
                 end;
             else
                 exit;
@@ -491,10 +516,18 @@
                 end;
             NpRvSalesLine."Document Source"::"Payment Line":
                 begin
-                    VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
+                    if (MagentoPaymentLine."Document Table No." = Database::"Sales Cr.Memo Header") or
+                       (MagentoPaymentLine."Document Type" in [MagentoPaymentLine."Document Type"::"Credit Memo", MagentoPaymentLine."Document Type"::"Return Order"])
+                    then
+                        VoucherEntry."Document Type" := VoucherEntry."Document Type"::"Credit Memo"
+                    else
+                        VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
                     VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
                     VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
-                    VoucherEntry.Amount := -MagentoPaymentLine.Amount;
+                    if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
+                        VoucherEntry.Amount := MagentoPaymentLine.Amount
+                    else
+                        VoucherEntry.Amount := -MagentoPaymentLine.Amount;
                 end;
         end;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
@@ -502,6 +535,7 @@
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
+        VoucherEntry.Correction := VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo";
         if NpRvVoucherType.Get(Voucher."Voucher Type") then
             VoucherEntry."Partner Code" := NpRvVoucherType."Partner Code";
         OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
@@ -665,7 +699,7 @@
         ArchVoucher."Ending Date" := Voucher."Ending Date";
         ArchVoucher."No. Series" := Voucher."No. Series";
         ArchVoucher."Arch. No. Series" := Voucher."Arch. No. Series";
-        ArchVoucher."Arch. No." := Voucher."Arch. No.";
+        ArchVoucher."Arch. No." := Voucher."No.";
         ArchVoucher."Account No." := Voucher."Account No.";
         ArchVoucher."Provision Account No." := Voucher."Provision Account No.";
         ArchVoucher."Print Template Code" := Voucher."Print Template Code";
@@ -713,10 +747,12 @@
         ArchVoucherEntry."Document Type" := VoucherEntry."Document Type";
         ArchVoucherEntry."External Document No." := VoucherEntry."External Document No.";
         ArchVoucherEntry."Document No." := VoucherEntry."Document No.";
+        ArchVoucherEntry."Document Line No." := VoucherEntry."Document Line No.";
         ArchVoucherEntry."User ID" := VoucherEntry."User ID";
         ArchVoucherEntry."Partner Code" := VoucherEntry."Partner Code";
         ArchVoucherEntry."Closed by Partner Code" := VoucherEntry."Closed by Partner Code";
         ArchVoucherEntry."Partner Clearing" := VoucherEntry."Partner Clearing";
+        ArchVoucherEntry.Correction := VoucherEntry.Correction;
         ArchVoucherEntry."Closed by Entry No." := VoucherEntry."Closed by Entry No.";
         OnBeforeInsertArchiveEntry(ArchVoucherEntry, VoucherEntry);
         ArchVoucherEntry.Insert();
@@ -742,6 +778,84 @@
         end;
         NpRvArchSendingLog."Original Entry No." := NpRvSendingLog."Entry No.";
         NpRvArchSendingLog.Insert();
+    end;
+
+    procedure UnarchiveVoucher(ArchVoucherCode: Code[20]; RemoveLastEntry: Boolean)
+    var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        ArchVoucher.Get(ArchVoucherCode);
+
+        Voucher.Init();
+        Voucher.TransferFields(ArchVoucher);
+        Voucher."No." := ArchVoucher."Arch. No.";
+        if Voucher."No." = '' then
+            Voucher."No." := ArchVoucher."No.";
+        ArchVoucher.CalcFields(Barcode);
+        Voucher.Barcode := ArchVoucher.Barcode;
+        Voucher.Insert();
+
+        UnarchiveVoucherEntries(ArchVoucher."No.", Voucher."No.", RemoveLastEntry);
+        UnarchiveVoucherSendingLogs(ArchVoucher."No.", Voucher."No.");
+
+        ArchVoucher.Delete();
+    end;
+
+    local procedure UnarchiveVoucherEntries(ArchVoucherNo: Code[20]; RestoredVoucherNo: Code[20]; RemoveLastEntry: Boolean)
+    var
+        ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        SalesInvHeader: Record "Sales Invoice Header";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        LastEntry: Boolean;
+        CannotBeUnarchived: Label 'The Voucher %1 cannot be unarchived as the document it was last redeemed in has already been posted.', Comment = '%1 = Retail voucher number';
+    begin
+        ArchVoucherEntry.SetRange("Arch. Voucher No.", ArchVoucherNo);
+
+        if RemoveLastEntry then
+            if ArchVoucherEntry.FindLast() then begin
+                case ArchVoucherEntry."Document Type" of
+                    ArchVoucherEntry."Document Type"::Invoice:
+                        if SalesInvHeader.Get(ArchVoucherEntry."Document No.") then
+                            Error(CannotBeUnarchived, ArchVoucherNo);
+                    ArchVoucherEntry."Document Type"::"POS Entry":
+                        Error(CannotBeUnarchived, ArchVoucherNo);
+                end;
+            end;
+
+        if ArchVoucherEntry.FindSet(true) then
+            repeat
+                VoucherEntry.Init();
+                VoucherEntry.TransferFields(ArchVoucherEntry);
+                VoucherEntry."Entry No." := ArchVoucherEntry."Original Entry No.";
+                VoucherEntry."Voucher No." := RestoredVoucherNo;
+                VoucherEntry.Open := true;
+                LastEntry := ArchVoucherEntry.Next() = 0;
+                if not (LastEntry and RemoveLastEntry) then
+                    VoucherEntry.Insert();
+            until LastEntry;
+        ArchVoucherEntry.DeleteAll();
+    end;
+
+    local procedure UnarchiveVoucherSendingLogs(ArchVoucherNo: Code[20]; RestoredVoucherNo: Code[20])
+    var
+        ArchVoucherSendingLog: Record "NPR NpRv Arch. Sending Log";
+        VoucherSendingLog: Record "NPR NpRv Sending Log";
+    begin
+        ArchVoucherSendingLog.SetRange("Arch. Voucher No.", ArchVoucherNo);
+        if ArchVoucherSendingLog.FindSet(true) then
+            repeat
+                VoucherSendingLog.Init();
+                VoucherSendingLog.TransferFields(ArchVoucherSendingLog);
+                VoucherSendingLog."Entry No." := ArchVoucherSendingLog."Original Entry No.";
+                VoucherSendingLog."Voucher No." := RestoredVoucherNo;
+                if ArchVoucherSendingLog."Error Message".HasValue then begin
+                    ArchVoucherSendingLog.CalcFields("Error Message");
+                    VoucherSendingLog."Error Message" := ArchVoucherSendingLog."Error Message";
+                end;
+                VoucherSendingLog.Insert();
+            until ArchVoucherSendingLog.Next() = 0;
+        ArchVoucherSendingLog.DeleteAll();
     end;
 
     procedure FindVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher"): Boolean
