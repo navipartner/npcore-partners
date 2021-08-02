@@ -971,7 +971,7 @@
 
     local procedure GetImageContentAndExtension(DisplayContentLines: Record "NPR Display Content Lines"; var Base64: Text; var Extension: Text[10])
     var
-        Convert: DotNet NPRNetConvert;
+        Base64Convert: Codeunit "Base64 Convert";
         Bytes: DotNet NPRNetArray;
         InS: InStream;
         MemoryStream: DotNet NPRNetMemoryStream;
@@ -1020,7 +1020,7 @@
                                             if (ImageFormat.Wmf.Equals(Image.RawFormat)) then
                                                 Extension := 'wmf';
 
-            Base64 := Convert.ToBase64String(Bytes);
+            Base64 := Base64Convert.ToBase64(InS);
         end;
     end;
 
