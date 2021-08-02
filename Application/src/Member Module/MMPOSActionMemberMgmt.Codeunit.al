@@ -216,9 +216,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 TempMemberInfoCapture.Insert();
 
                 MembershipAppemptCreate.SetAttemptCreateMembershipForcedRollback();
-                if (not MembershipAppemptCreate.run(TempMemberInfoCapture)) then
+                if (not MembershipAppemptCreate.Run(TempMemberInfoCapture)) then
                     if (not MembershipAppemptCreate.WasSuccessful(ReasonText)) then
-                        error(ReasonText);
+                        Error(ReasonText);
 
             end;
         end;
@@ -537,6 +537,11 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
+    procedure AssignMembershipToPOSSale(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
+    begin
+        exit(AssignMembershipToPOSWorker(SalePOS, MembershipEntryNo, ExternalMemberCardNo));
+    end;
+
     local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
     var
         Membership: Record "NPR MM Membership";
@@ -649,7 +654,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         if (not Membership.FindFirst()) then
             exit;
 
-        PAGE.RunModal(PAGE::"NPR MM Membership Card", Membership);
+        Page.RunModal(Page::"NPR MM Membership Card", Membership);
 
     end;
 
@@ -794,7 +799,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     local procedure DoLookupMembershipEntry(LookupCaption: Text; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary) ItemNo: Code[20]
     var
-        SelectAlteration: page "NPR MM Select Alteration";
+        SelectAlteration: Page "NPR MM Select Alteration";
         PageAction: Action;
         TempMembershipEntryResponse: Record "NPR MM Membership Entry" temporary;
     begin
@@ -820,7 +825,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     var
         Member: Record "NPR MM Member";
     begin
-        if (ACTION::LookupOK <> PAGE.RunModal(0, Member)) then
+        if (Action::LookupOK <> Page.RunModal(0, Member)) then
             exit(false);
 
         ExtMemberNo := Member."External Member No.";
@@ -829,7 +834,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     local procedure SelectMemberUI(var Member: Record "NPR MM Member"): Boolean
     begin
-        if ACTION::LookupOK <> PAGE.RunModal(0, Member) then
+        if (Action::LookupOK <> Page.RunModal(0, Member)) then
             exit;
 
         exit(Member."External Member No." <> '');
@@ -843,7 +848,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberCardCount: Integer;
     begin
         Member.SetRange(Blocked, false);
-        if not SelectMemberUI(Member) then
+        if (not SelectMemberUI(Member)) then
             exit;
 
         MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -857,7 +862,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                     MemberCardList.SetTableView(MemberCard);
                     MemberCardList.Editable(false);
                     MemberCardList.LookupMode(true);
-                    if (ACTION::LookupOK <> MemberCardList.RunModal()) then
+                    if (Action::LookupOK <> MemberCardList.RunModal()) then
                         exit(false);
 
                     MemberCardList.GetRecord(MemberCard);
@@ -877,12 +882,12 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                                 MemberCardList.SetTableView(MemberCard);
                                 MemberCardList.Editable(false);
                                 MemberCardList.LookupMode(true);
-                                if ACTION::LookupOK <> MemberCardList.RunModal() then
+                                if (Action::LookupOK <> MemberCardList.RunModal()) then
                                     exit;
                                 MemberCardList.GetRecord(MemberCard);
                             end;
                         else begin
-                                if not MemberCard.FindFirst() then
+                                if (not MemberCard.FindFirst()) then
                                     exit;
                             end;
                     end;
@@ -915,9 +920,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             until (MemberInfoCapture.Next() = 0);
         end;
 
-        if POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0) then begin
+        if (POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0)) then begin
             POSSalesInfo."Receipt No." := NewSalesTicketNo;
-            if not POSSalesInfo.Insert() then;
+            if (not POSSalesInfo.Insert()) then;
         end;
 
         POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::LINE);
@@ -948,7 +953,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR MM POS Action: MemberMgmt.");
+        exit(Codeunit::"NPR MM POS Action: MemberMgmt.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnAfterLogin', '', true, true)]
@@ -988,7 +993,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 POSMemberCardEdit.SetRecord(Member);
                 POSMemberCardEdit.LookupMode(true);
                 ClearLastError();
-                if (POSMemberCardEdit.RunModal() = ACTION::LookupOK) then
+                if (POSMemberCardEdit.RunModal() = Action::LookupOK) then
                     MembershipSelected := AssignPOSMember(SalePOS, ExternalMemberNo);
 
             end;
@@ -1026,4 +1031,3 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 }
-
