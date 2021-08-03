@@ -1,11 +1,11 @@
 codeunit 6150685 "NPR NPRE RVA: Set Table Status"
 {
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_SET_TABLE_STATUS');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -37,8 +37,8 @@ codeunit 6150685 "NPR NPRE RVA: Set Table Status"
 
         Handled := true;
 
-        SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
-        NewStatusCode := Context.GetStringParameter('StatusCode');
+        SeatingCode := CopyStr(Context.GetStringParameterOrFail('SeatingCode', ActionCode()), 1, MaxStrLen(SeatingCode));
+        NewStatusCode := CopyStr(Context.GetStringParameter('StatusCode'), 1, MaxStrLen(NewStatusCode));
         if NewStatusCode = '' then
             exit;
 

@@ -1,11 +1,11 @@
 codeunit 6150684 "NPR NPRE RVA: Set WPad Status"
 {
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_SET_W/PAD_STATUS');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -37,8 +37,8 @@ codeunit 6150684 "NPR NPRE RVA: Set WPad Status"
 
         Handled := true;
 
-        WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
-        NewStatusCode := Context.GetStringParameter('StatusCode');
+        WaiterPad."No." := CopyStr(Context.GetStringParameterOrFail('WaiterPadCode', ActionCode()), 1, MaxStrLen(WaiterPad."No."));
+        NewStatusCode := CopyStr(Context.GetStringParameter('StatusCode'), 1, MaxStrLen(NewStatusCode));
         if NewStatusCode = '' then
             exit;
 

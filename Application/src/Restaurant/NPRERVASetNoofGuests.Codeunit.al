@@ -1,11 +1,11 @@
 codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
 {
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_SET_PARTYSIZE');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -35,7 +35,7 @@ codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
 
         Handled := true;
 
-        WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
+        WaiterPad."No." := CopyStr(Context.GetStringParameterOrFail('WaiterPadCode', ActionCode()), 1, MaxStrLen(WaiterPad."No."));
         Context.GetStringParameterOrFail('SeatingCode', ActionCode());
     end;
 }
