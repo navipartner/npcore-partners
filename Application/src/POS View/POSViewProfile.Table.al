@@ -195,27 +195,30 @@ table 6150651 "NPR POS View Profile"
         JsonMgt: Codeunit "NPR POS JSON Management";
         DayNames: JsonArray;
         Day: JsonToken;
+        DayNamesString: Text;
     begin
         if "Client Decimal Separator" = '' then
-            "Client Decimal Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberDecimalSeparator').AsValue().AsText();
+            "Client Decimal Separator" := CopyStr(JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberDecimalSeparator').AsValue().AsText(), 1, MaxStrLen("Client Decimal Separator"));
         if "Client Thousands Separator" = '' then
-            "Client Thousands Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberGroupSeparator').AsValue().AsText();
+            "Client Thousands Separator" := CopyStr(JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberGroupSeparator').AsValue().AsText(), 1, MaxStrLen("Client Thousands Separator"));
         if "Client Currency Symbol" = '' then
-            "Client Currency Symbol" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.CurrencySymbol').AsValue().AsText();
+            "Client Currency Symbol" := CopyStr(JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.CurrencySymbol').AsValue().AsText(), 1, MaxStrLen("Client Currency Symbol"));
         if "Client Number Decimal Digits" = 0 then
             "Client Number Decimal Digits" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberDecimalDigits').AsValue().AsInteger();
 
         if "Client Date Separator" = '' then
-            "Client Date Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.DateSeparator').AsValue().AsText();
+            "Client Date Separator" := CopyStr(JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.DateSeparator').AsValue().AsText(), 1, MaxStrLen("Client Date Separator"));
         if "Client Short Date Pattern" = '' then
-            "Client Short Date Pattern" := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.ShortDatePattern').AsValue().AsText();
+            "Client Short Date Pattern" := CopyStr(JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.ShortDatePattern').AsValue().AsText(), 1, MaxStrLen("Client Short Date Pattern"));
         if "Client Day Names" = '' then begin
             DayNames := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.DayNames').AsArray();
+            DayNamesString := '';
             foreach Day in DayNames do begin
-                "Client Day Names" += Day.AsValue().AsText() + ',';
+                if DayNamesString <> '' then
+                    DayNamesString := DayNamesString + ',';
+                DayNamesString += Day.AsValue().AsText();
             end;
-            if "Client Day Names" <> '' then
-                "Client Day Names" := CopyStr("Client Day Names", 1, StrLen("Client Day Names") - 1);
+            "Client Day Names" := CopyStr(DayNamesString, 1, MaxStrLen("Client Day Names"));
         end;
 
     end;

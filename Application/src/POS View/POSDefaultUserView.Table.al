@@ -36,8 +36,11 @@ table 6150712 "NPR POS Default User View"
             trigger OnValidate()
             var
                 UserSelection: Codeunit "User Selection";
+                UserNameToValidate: Code[50];
             begin
-                UserSelection.ValidateUserName("User Name");
+                UserNameToValidate := CopyStr("User Name", 1, MaxStrLen(UserNameToValidate));
+                UserSelection.ValidateUserName(UserNameToValidate);
+                "User Name" := UserNameToValidate;
             end;
         }
         field(5; "POS View Code"; Code[10])
@@ -67,7 +70,7 @@ table 6150712 "NPR POS Default User View"
                 exit;
             DefaultView.Type := Type;
             DefaultView."Register No." := RegisterNo;
-            DefaultView."User Name" := UserId;
+            DefaultView."User Name" := CopyStr(UserId, 1, MaxStrLen(DefaultView."User Name"));
             DefaultView.Insert();
         end;
 
