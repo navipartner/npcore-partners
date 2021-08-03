@@ -69,6 +69,7 @@ page 6014524 "NPR MM Member Search Fields"
         TempMember: Record "NPR MM Member" temporary;
         Member: Record "NPR MM Member";
         CappedResultSet: Label 'Only the first %1 members matching your query will be listed.';
+        NoResultSet: Label 'The search did no result in any members found. Do you want to search again?';
         PageAction: Action;
     begin
 
@@ -90,6 +91,8 @@ page 6014524 "NPR MM Member Search Fields"
         Member.SetFilter(Blocked, '=%1', false);
 
         if (Member.Find('-')) then begin
+            Clear(MemberListPage);
+
             repeat
                 TempMember.TransferFields(Member, true);
                 TempMember.Insert();
@@ -104,9 +107,15 @@ page 6014524 "NPR MM Member Search Fields"
             if (PageAction = Action::LookupOK) then begin
                 MemberListPage.GetRecord(TempSelectedMember);
                 TempSelectedMember.Insert();
+            end else begin
+                Error('');
             end;
 
             exit(true);
+
+        end else begin
+            if (Confirm(NoResultSet, true)) then
+                Error('');
         end;
 
     end;
