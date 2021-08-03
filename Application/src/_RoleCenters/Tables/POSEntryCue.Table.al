@@ -69,7 +69,7 @@ table 6151247 "NPR POS Entry Cue."
                                                                     "Amount Input" = Filter(<> 0)));
             FieldClass = FlowField;
         }
-        field(13; "EFT Req. with unknown result"; Integer)
+        field(13; "EFT Req. with Unknown Result"; Integer)
         {
             CalcFormula = Count("NPR EFT Transaction Request" where("External Result Known" = Filter(false),
                                                                     "Transaction Date" = Field("EFT Errors Date Filter"),

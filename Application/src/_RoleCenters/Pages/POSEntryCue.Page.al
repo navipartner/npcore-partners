@@ -57,9 +57,9 @@ page 6151260 "NPR POS Entry Cue"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies Unfinished EFT Requests in last 30 days';
                 }
-                field("EFT Req. with unknown result"; Rec."EFT Req. with unknown result")
+                field("EFT Req. with Unknown Result"; Rec."EFT Req. with Unknown Result")
                 {
-                    Caption = 'EFT Requests with unknown result';
+                    Caption = 'EFT Requests with Unknown Result';
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the EFT Requests with unknown result in last 30 days';
                 }
