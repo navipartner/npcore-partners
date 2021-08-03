@@ -263,11 +263,6 @@ table 6059902 "NPR Task Line"
             //TestTableRelation = false;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                PrinterLookup();
-            end;
         }
         field(52; "File Path"; Text[100])
         {
@@ -635,14 +630,6 @@ table 6059902 "NPR Task Line"
                                   "Type Of Output"::PDFFile,
                                   "Type Of Output"::Excel,
                                   "Type Of Output"::Word]);
-    end;
-
-    procedure PrinterLookup()
-    var
-        Printer: Record Printer;
-    begin
-        if PAGE.RunModal(PAGE::Printers, Printer) = ACTION::LookupOK then
-            "Printer Name" := Printer.Name;
     end;
 
     procedure GetExpectedDuration(): Duration
