@@ -1,11 +1,11 @@
 codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 {
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('RUN_W/PAD_ACTION');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -91,7 +91,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 
                 WPadAction::"Request Specific Serving":
                     begin
-                        ServingStepToRequest := JSON.GetStringParameter('ServingStep');
+                        ServingStepToRequest := CopyStr(JSON.GetStringParameter('ServingStep'), 1, MaxStrLen(ServingStepToRequest));
                         if ServingStepToRequest = '' then
                             if not LookupServingStep(ServingStepToRequest) then
                                 Error('');

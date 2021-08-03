@@ -3,12 +3,12 @@ codeunit 6150680 "NPR NPRE RVA: Get WPad"
     var
         NotFoundErr: Label 'The waiter pad "%1", was not found.';
 
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_GET_WAITER_PAD');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -35,7 +35,7 @@ codeunit 6150680 "NPR NPRE RVA: Get WPad"
 
         Handled := true;
 
-        WaiterPadCode := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
+        WaiterPadCode := CopyStr(Context.GetStringParameterOrFail('WaiterPadCode', ActionCode()), 1, MaxStrLen(WaiterPadCode));
 
         LoadWaiterPad(POSSession, FrontEnd, WaiterPadCode);
         SelectSalesView(POSSession);

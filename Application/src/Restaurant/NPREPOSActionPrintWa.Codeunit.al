@@ -4,12 +4,12 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa."
         Text000: Label 'Print waiterpad';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PRINT_WAITER_PAD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -170,7 +170,7 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa."
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
         JSON.SetScopeRoot();
-        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
+        WaiterPadNo := CopyStr(JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(WaiterPadNo));
         NPREWaiterPad.Get(WaiterPadNo);
         HospitalityPrint.PrintWaiterPadPreReceiptPressed(NPREWaiterPad);
     end;

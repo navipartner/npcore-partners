@@ -93,7 +93,7 @@ table 6150665 "NPR NPRE Seating"
             Caption = 'Multiple Waiter Pad';
             FieldClass = FlowField;
         }
-        field(102; "Current Waiter Pad Description"; Text[50])
+        field(102; "Current Waiter Pad Description"; Text[80])
         {
             Caption = 'Waiter Pad Description';
             DataClassification = CustomerContent;

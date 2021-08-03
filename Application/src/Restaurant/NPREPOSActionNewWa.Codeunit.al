@@ -8,12 +8,12 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         Text004: Label 'New Waiter Pad';
         NumberOfGuestsLbl: Label 'Number of guests';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('NEW_WAITER_PAD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -151,7 +151,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         OpenWaiterPad: Boolean;
         NoSeatingInContextErr: Label 'SeatingCode was not found in context';
     begin
-        SeatingCode := JSON.GetStringOrFail('seatingCode', NoSeatingInContextErr);
+        SeatingCode := CopyStr(JSON.GetStringOrFail('seatingCode', NoSeatingInContextErr), 1, MaxStrLen(SeatingCode));
         NumberOfGuests := JSON.GetInteger('numberOfGuests');
         Seating.Get(SeatingCode);
 
@@ -225,7 +225,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         exit(ConfirmString);
     end;
 
-    local procedure ThisDataSource(): Text
+    local procedure ThisDataSource(): Code[50]
     begin
         exit('BUILTIN_SALE');
     end;

@@ -1,11 +1,11 @@
 codeunit 6150682 "NPR NPRE RVA: New WPad"
 {
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_NEW_WAITER_PAD');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;
@@ -60,7 +60,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         NumberOfGuests: Integer;
         NotValidSettingErr: Label 'The provided seating code "%1" is invalid. A new waiterpad was not created.';
     begin
-        SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
+        SeatingCode := CopyStr(Context.GetStringParameterOrFail('SeatingCode', ActionCode()), 1, MaxStrLen(SeatingCode));
 
         if not Seating.Get(SeatingCode) then begin
             Message(NotValidSettingErr, SeatingCode);

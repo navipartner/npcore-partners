@@ -1,11 +1,11 @@
 codeunit 6150687 "NPR NPRE RVA: Select Table"
 {
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_SELECT_TABLE');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -48,7 +48,7 @@ codeunit 6150687 "NPR NPRE RVA: Select Table"
         case WorkflowStep of
             'SelectWaiterPad':
                 begin
-                    SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
+                    SeatingCode := CopyStr(Context.GetStringParameterOrFail('SeatingCode', ActionCode()), 1, MaxStrLen(SeatingCode));
                     Seating.Get(SeatingCode);
 
                     SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);

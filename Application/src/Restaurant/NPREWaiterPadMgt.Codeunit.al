@@ -90,7 +90,7 @@
         end;
     end;
 
-    procedure CreateNewWaiterPad(SeatingCode: Code[10]; NumberOfGuests: Integer; AssignedWaiterCode: Code[20]; Description: Text; var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
+    procedure CreateNewWaiterPad(SeatingCode: Code[20]; NumberOfGuests: Integer; AssignedWaiterCode: Code[20]; Description: Text; var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
@@ -118,7 +118,7 @@
         if RunInsert then WaiterPad.Insert(true);
     end;
 
-    procedure AddNewWaiterPadForSeating(SeatingCode: Code[10]; var WaiterPad: Record "NPR NPRE Waiter Pad"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"): Boolean
+    procedure AddNewWaiterPadForSeating(SeatingCode: Code[20]; var WaiterPad: Record "NPR NPRE Waiter Pad"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"): Boolean
     var
         Seating: Record "NPR NPRE Seating";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
