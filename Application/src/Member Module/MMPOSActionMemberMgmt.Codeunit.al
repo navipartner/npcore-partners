@@ -825,17 +825,35 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     var
         Member: Record "NPR MM Member";
     begin
-        if (Action::LookupOK <> Page.RunModal(0, Member)) then
-            exit(false);
+        ExtMemberNo := '';
 
-        ExtMemberNo := Member."External Member No.";
+        if (SelectMemberUI(Member)) then
+            ExtMemberNo := Member."External Member No.";
+
         exit(ExtMemberNo <> '');
     end;
 
     local procedure SelectMemberUI(var Member: Record "NPR MM Member"): Boolean
+    var
+        MemberSearch: Page "NPR MM Member Search Fields";
+        MemberList: Page "NPR MM Members";
+        PageAction: Action;
     begin
-        if (Action::LookupOK <> Page.RunModal(0, Member)) then
-            exit;
+
+        MemberSearch.LookupMode(true);
+        PageAction := MemberSearch.RunModal();
+
+        if (PageAction = Action::LookupOK) then begin
+            Member.SetFilter("External Member No.", '=%1', MemberSearch.GetSelectedMemberNumber());
+            if (Member.FindFirst()) then
+                ;
+        end else begin
+            MemberList.LookupMode(true);
+            MemberList.SetTableView(Member);
+            PageAction := MemberList.RunModal();
+            if (PageAction = Action::LookupOK) then
+                MemberList.GetRecord(Member);
+        end;
 
         exit(Member."External Member No." <> '');
     end;

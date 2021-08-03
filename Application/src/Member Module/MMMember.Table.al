@@ -1,11 +1,10 @@
 table 6060126 "NPR MM Member"
 {
-
     Caption = 'Member';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR MM Members";
     LookupPageID = "NPR MM Members";
-
+    DataCaptionFields = "External Member No.";
     fields
     {
         field(1; "Entry No."; Integer)
@@ -48,7 +47,7 @@ table 6060126 "NPR MM Member"
                 "Blocked By" := '';
                 if (Blocked) then begin
                     "Blocked At" := CurrentDateTime();
-                    "Blocked By" := UserId;
+                    "Blocked By" := UserId();
                 end;
 
                 MembershipRole.SetFilter("Member Entry No.", '=%1', "Entry No.");
@@ -117,7 +116,7 @@ table 6060126 "NPR MM Member"
                 PostCode: Record "Post Code";
                 CountryRegion: Record "Country/Region";
             begin
-                PostCode.ValidatePostCode(City, "Post Code Code", County, "Country Code", (CurrFieldNo <> 0) and GuiAllowed);
+                PostCode.ValidatePostCode(City, "Post Code Code", County, "Country Code", (CurrFieldNo <> 0) and GuiAllowed());
                 if (CountryRegion.Get("Country Code")) then
                     Country := CountryRegion.Name;
             end;
@@ -149,7 +148,7 @@ table 6060126 "NPR MM Member"
             Caption = 'Birthday';
             DataClassification = CustomerContent;
         }
-        field(32; Picture; BLOB)
+        field(32; Picture; Blob)
         {
             Caption = 'Picture';
             DataClassification = CustomerContent;
@@ -268,7 +267,8 @@ table 6060126 "NPR MM Member"
 
     trigger OnModify()
     begin
-        UpdateContactFromMember();
+        if (not Rec.IsTemporary()) then
+            UpdateContactFromMember();
     end;
 
     procedure UpdateContactFromMember()
@@ -289,10 +289,11 @@ table 6060126 "NPR MM Member"
     // procedure GetImageContent(var TenantMedia: Record "Tenant Media")
     // begin
     //     TenantMedia.Init();
-    //     if not Image.HasValue() then
+    //     if (not Image.HasValue()) then
     //         exit;
-    //     if TenantMedia.Get(Image.MediaId()) then
+    //     if (TenantMedia.Get(Image.MediaId())) then
     //         TenantMedia.CalcFields(Content);
     // end;
 }
+
 
