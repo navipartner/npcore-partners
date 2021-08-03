@@ -1,11 +1,11 @@
 codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
 {
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_RUN_W/PAD_ACTION');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -62,7 +62,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
         ServingStepToRequest: Code[10];
         WPadIsOpenedInPOSSale: Label 'The waiter pad is opened in a POS sale at the moment and might have unsaved changes. Are you sure you want to continue on running the action?';
     begin
-        WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
+        WaiterPad."No." := CopyStr(Context.GetStringParameterOrFail('WaiterPadCode', ActionCode()), 1, MaxStrLen(WaiterPad."No."));
         WPadAction := Context.GetIntegerParameterOrFail('WaiterPadAction', ActionCode());
 
         WaiterPad.Find();
@@ -91,7 +91,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
 
             WPadAction::"Request Specific Serving":
                 begin
-                    ServingStepToRequest := Context.GetStringParameter('ServingStep');
+                    ServingStepToRequest := CopyStr(Context.GetStringParameter('ServingStep'), 1, MaxStrLen(ServingStepToRequest));
                     if ServingStepToRequest = '' then
                         if not LookupServingStep(ServingStepToRequest) then
                             Error('');

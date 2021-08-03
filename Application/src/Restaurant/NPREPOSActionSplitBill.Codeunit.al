@@ -3,12 +3,12 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
     var
         ReadingErr: Label 'reading in %1 of %2';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SPLIT_BILL');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -116,14 +116,14 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         WPadContextUpdated: Boolean;
     begin
         POSSession.GetSetup(POSSetup);
-        Seating.Code := Context.GetStringParameter('SeatingCode');
+        Seating.Code := CopyStr(Context.GetStringParameter('SeatingCode'), 1, MaxStrLen(Seating.Code));
         if Seating.Code <> '' then
             if Seating.Find() then begin
                 Context.SetContext('seatingCode', Seating.Code);
                 SeatingContextUpdated := true;
                 SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
             end;
-        WaiterPad."No." := Context.GetStringParameter('WaiterPadCode');
+        WaiterPad."No." := CopyStr(Context.GetStringParameter('WaiterPadCode'), 1, MaxStrLen(WaiterPad."No."));
         if WaiterPad."No." <> '' then
             if WaiterPad.Find() then begin
                 Context.SetContext('waiterPadNo', WaiterPad."No.");
@@ -207,10 +207,10 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         IncludeAllWPads: Option No,Yes,Ask;
         IncludeAllWPadsQ: Label 'There are multiple waiter pads assigned to the seating %1. Do you want them all to be included in the scope?';
     begin
-        WaiterPadCode := Context.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        WaiterPadCode := CopyStr(Context.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, 'OnAction', ActionCode())), 1, MaxStrLen(WaiterPadCode));
         IncludeAllWPads := Context.GetIntegerParameter('IncludeAllWPads');
         if IncludeAllWPads IN [IncludeAllWPads::Yes, IncludeAllWPads::Ask] then begin
-            SeatingCode := Context.GetString('seatingCode');
+            SeatingCode := CopyStr(Context.GetString('seatingCode'), 1, MaxStrLen(SeatingCode));
             if SeatingCode = '' then
                 IncludeAllWPads := IncludeAllWPads::No
             else begin

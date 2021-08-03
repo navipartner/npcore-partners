@@ -1,11 +1,11 @@
 ﻿codeunit 6150683 "NPR NPRE RVA: Save Layout"
 {
-    local procedure ActionCode(): Text;
+    local procedure ActionCode(): Code[20]
     begin
         exit('RV_SAVE_LAYOUT');
     end;
 
-    local procedure ActionVersion(): Text;
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;
@@ -108,7 +108,7 @@
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
         LocationLayout.Init();
-        LocationLayout.Code := GetStringValue(ComponentObject, 'id', MaxStrLen(LocationLayout.Code));
+        LocationLayout.Code := CopyStr(GetStringValue(ComponentObject, 'id'), 1, MaxStrLen(LocationLayout.Code));
         if LocationLayout.Find() then begin
             RestaurantSetup.Get();
             if RestaurantSetup."Component No. Series" = '' then begin
@@ -132,7 +132,7 @@
     var
         LocationLayout: Record "NPR NPRE Location Layout";
     begin
-        if not LocationLayout.Get(GetStringValue(ComponentObject, 'id', MaxStrLen(LocationLayout.Code))) then begin
+        if not LocationLayout.Get(CopyStr(GetStringValue(ComponentObject, 'id'), 1, MaxStrLen(LocationLayout.Code))) then begin
             NewComponent(ComponentObject);
             exit;
         end;
@@ -149,11 +149,11 @@
         OutStr: OutStream;
         NewSeating: Boolean;
     begin
-        SeatingLocation.Get(GetStringValue(ComponentObject, 'locationId', MaxStrLen(Seating."Seating Location")));
+        SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location")));
 
-        LocationLayout.Type := GetStringValue(ComponentObject, 'type', MaxStrLen(LocationLayout.Type));
-        LocationLayout.Description := GetStringValue(ComponentObject, 'caption', MaxStrLen(LocationLayout.Description));
-        LocationLayout."Seating Location" := GetStringValue(ComponentObject, 'locationId', MaxStrLen(LocationLayout."Seating Location"));
+        LocationLayout.Type := CopyStr(GetStringValue(ComponentObject, 'type'), 1, MaxStrLen(LocationLayout.Type));
+        LocationLayout.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(LocationLayout.Description));
+        LocationLayout."Seating Location" := CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(LocationLayout."Seating Location"));
         LocationLayout."Frontend Properties".CreateOutStream(OutStr);
         OutStr.Write(GetJsonToken(ComponentObject, 'blob').AsValue().AsText());
 
@@ -177,10 +177,10 @@
         SeatingLocation: Record "NPR NPRE Seating Location";
         JToken: JsonToken;
     begin
-        SeatingLocation.Get(GetStringValue(ComponentObject, 'locationId', MaxStrLen(Seating."Seating Location")));
+        SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location")));
 
-        Seating.Description := GetStringValue(ComponentObject, 'caption', MaxStrLen(Seating.Description));
-        Seating."Seating Location" := GetStringValue(ComponentObject, 'locationId', MaxStrLen(Seating."Seating Location"));
+        Seating.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(Seating.Description));
+        Seating."Seating Location" := CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location"));
         if ComponentObject.get('capacity', JToken) then
             Seating.Capacity := JToken.AsValue().AsInteger();
     end;
@@ -209,15 +209,15 @@
         Restaurant: Record "NPR NPRE Restaurant";
         SeatingLocation: Record "NPR NPRE Seating Location";
     begin
-        if SeatingLocation.Get(GetStringValue(ComponentObject, 'id', MaxStrLen(SeatingLocation.Code))) then begin
+        if SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'id'), 1, MaxStrLen(SeatingLocation.Code))) then begin
             ModifyLocation(ComponentObject);
             exit;
         end;
 
-        Restaurant.Get(GetStringValue(ComponentObject, 'restaurantId', MaxStrLen(SeatingLocation."Restaurant Code")));
+        Restaurant.Get(CopyStr(GetStringValue(ComponentObject, 'restaurantId'), 1, MaxStrLen(SeatingLocation."Restaurant Code")));
 
-        SeatingLocation.Code := GetStringValue(ComponentObject, 'id', MaxStrLen(SeatingLocation.Code));
-        SeatingLocation.Description := GetStringValue(ComponentObject, 'caption', MaxStrLen(SeatingLocation.Description));
+        SeatingLocation.Code := CopyStr(GetStringValue(ComponentObject, 'id'), 1, MaxStrLen(SeatingLocation.Code));
+        SeatingLocation.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(SeatingLocation.Description));
         SeatingLocation."Restaurant Code" := Restaurant.Code;
         SeatingLocation.TestField(Code);
         SeatingLocation.Insert(true);
@@ -229,14 +229,14 @@
         SeatingLocation: Record "NPR NPRE Seating Location";
         Restaurant: Record "NPR NPRE Restaurant";
     begin
-        if not SeatingLocation.Get(GetStringValue(ComponentObject, 'id', MaxStrLen(SeatingLocation.Code))) then begin
+        if not SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'id'), 1, MaxStrLen(SeatingLocation.Code))) then begin
             ModifyLocation(ComponentObject);
             exit;
         end;
 
-        Restaurant.Get(GetStringValue(ComponentObject, 'restaurantId', MaxStrLen(SeatingLocation."Restaurant Code")));
+        Restaurant.Get(CopyStr(GetStringValue(ComponentObject, 'restaurantId'), 1, MaxStrLen(SeatingLocation."Restaurant Code")));
 
-        SeatingLocation.Description := GetStringValue(ComponentObject, 'caption', MaxStrLen(SeatingLocation.Description));
+        SeatingLocation.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(SeatingLocation.Description));
         SeatingLocation."Restaurant Code" := Restaurant.Code;
         SeatingLocation.Modify(true);
         SetUpdatedRestaurant(SeatingLocation."Restaurant Code");
@@ -262,9 +262,9 @@
         SeatingLocation.Delete(true);
     end;
 
-    local procedure GetStringValue(JObject: JsonObject; KeyValue: Text; MaxLength: Integer): Text;
+    local procedure GetStringValue(JObject: JsonObject; KeyValue: Text): Text
     begin
-        exit(CopyStr(GetJsonToken(JObject, KeyValue).AsValue().AsText(), 1, MaxLength));
+        exit(GetJsonToken(JObject, KeyValue).AsValue().AsText());
     end;
 
     local procedure GetJsonToken(JObject: JsonObject; TokenKey: Text) JToken: JsonToken

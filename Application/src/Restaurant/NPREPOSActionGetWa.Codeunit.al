@@ -5,12 +5,12 @@ codeunit 6150667 "NPR NPRE POSAction: Get Wa."
         ConfirmTableCaption: Label 'Are you sure you want to retrieve from %1?';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('GET_WAITER_PAD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;
@@ -136,7 +136,7 @@ codeunit 6150667 "NPR NPRE POSAction: Get Wa."
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
         JSON.SetScopeRoot();
-        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
+        WaiterPadNo := CopyStr(JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(WaiterPadNo));
         NPREWaiterPad.Get(WaiterPadNo);
 
         NPREWaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(NPREWaiterPad, POSSession);
