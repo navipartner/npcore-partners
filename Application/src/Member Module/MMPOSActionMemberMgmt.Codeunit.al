@@ -838,6 +838,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberSearch: Page "NPR MM Member Search Fields";
         MemberList: Page "NPR MM Members";
         PageAction: Action;
+        FullTextSearch: Label 'Are you not finding what you are looking for? Do you want to do a full text member search?';
     begin
 
         MemberSearch.LookupMode(true);
@@ -848,6 +849,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             if (Member.FindFirst()) then
                 ;
         end else begin
+            if (not Confirm(FullTextSearch, false)) then
+                exit(false);
+
             MemberList.LookupMode(true);
             MemberList.SetTableView(Member);
             PageAction := MemberList.RunModal();
