@@ -373,10 +373,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         begin
-                            IF Rec."NPR Seo Link" <> '' THEN
-                                IF NOT CONFIRM(Text6151400, FALSE) THEN
-                                    EXIT;
-                            Rec.VALIDATE("NPR Seo Link", Rec."NPR Magento Name");
+                            NPR_ValidateSEOLink();
                         end;
                     }
                     field("NPR Magento Description"; Format(Rec."NPR Magento Description".HasValue))
@@ -430,6 +427,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         Visible = MagentoEnabledBrand;
                         ToolTip = 'Specifies the value of the NPR Magento Brand field';
                         ApplicationArea = NPRRetail;
+
+                        trigger OnValidate()
+                        begin
+                            NPR_ValidateSEOLink();
+                        end;
                     }
                     field("NPR NPR_MagentoUnitPrice"; Rec."Unit Price")
                     {
@@ -1289,5 +1291,23 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         MagentoPictureVarietyTypeVisible :=
           (MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety) and
           (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
+    end;
+
+    local procedure NPR_GetMagentoBrandName(Brand: Code[10]): Text
+    var
+        NPRMagentoBrand: Record "NPR Magento Brand";
+    begin
+        if not NPRMagentoBrand.Get(Brand) then
+            exit('');
+
+        exit(NPRMagentoBrand.Name);
+    end;
+
+    local procedure NPR_ValidateSEOLink()
+    begin
+        if Rec."NPR Seo Link" <> '' then
+            if not Confirm(Text6151400, false) then
+                exit;
+        Rec.Validate("NPR Seo Link", NPR_GetMagentoBrandName(rec."NPR Magento Brand") + ' ' + Rec."NPR Magento Name");
     end;
 }
