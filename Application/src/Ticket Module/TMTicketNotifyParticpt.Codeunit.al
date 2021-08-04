@@ -875,6 +875,9 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         end;
 
         NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
+        if (TicketNotProfileLine."Notification Engine" = TicketNotProfileLine."Notification Engine"::NPR_EXTERNAL) then
+            NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::EXTERNAL;
+
         NotificationEntry.Insert();
 
         exit(NotificationEntry."Entry No.");
