@@ -28,7 +28,6 @@ page 6059966 "NPR POS Tax Free Profile"
                 {
 
                     ToolTip = 'Specifies the value of the Handler ID field';
-                    ValuesAllowed = PREMIER_PI, GLOBALBLUE_I2;
                     ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)

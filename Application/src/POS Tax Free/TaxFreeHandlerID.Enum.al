@@ -10,5 +10,8 @@ enum 6014418 "NPR Tax Free Handler ID" implements "NPR Tax Free Handler Interfac
     {
         Implementation = "NPR Tax Free Handler Interface" = "NPR Tax Free GB I2";
     }
-
+    value(2; "CUSTOM CASH")
+    {
+        Implementation = "NPR Tax Free Handler Interface" = "NPR Tax Free CC";
+    }
 }
