@@ -1,19 +1,21 @@
 codeunit 6151197 "NPR NpCs Send Order"
 {
     var
-        Text000: Label 'Create Collect Sales Order in Store';
-        Text001: Label 'Order %1 sent to Store %2';
+        CreateCollectOrderLbl: Label 'Create Collect Sales Order in Store';
+        OrderSentToStoreLbl: Label 'Order %1 sent to Store %2', Comment = '%1=NpCsDocument."Document No.";%2=NpCsDocument."To Store Code"';
 
-    [EventSubscriber(ObjectType::Codeunit, 6151196, 'SendOrder', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpCs Workflow Mgt.", 'SendOrder', '', true, true)]
     local procedure SendOrder(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     var
         NpCsStore: Record "NPR NpCs Store";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Client: HttpClient;
-        RequestContent: HttpContent;
-        ContentHeader: HttpHeaders;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
+        RequestHeaders: HttpHeaders;
         ContentText: Text;
-        Response: HttpResponseMessage;
+        ResponseMessage: HttpResponseMessage;
+        RequestMessage: HttpRequestMessage;
         Document: XmlDocument;
         Node: XmlNode;
         ExceptionMessage: Text;
@@ -21,24 +23,30 @@ codeunit 6151197 "NPR NpCs Send Order"
         if not (NpCsDocument."Send Order Module" in ['', WorkflowCode()]) then
             exit;
 
-        LogMessage := StrSubstNo(Text001, NpCsDocument."Document No.", NpCsDocument."To Store Code");
+        LogMessage := StrSubstNo(OrderSentToStoreLbl, NpCsDocument."Document No.", NpCsDocument."To Store Code");
 
         InitReqBody(NpCsDocument, ContentText);
         NpCsStore.Get(NpCsDocument."To Store Code");
 
-        RequestContent.WriteFrom(ContentText);
-        RequestContent.GetHeaders(ContentHeader);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Clear();
+        Content.WriteFrom(ContentText);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'text/xml;charset=UTF-8');
+        RequestMessage.Content(Content);
 
-        ContentHeader.Clear();
-        ContentHeader.Remove('Content-Type');
-        ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
-        ContentHeader.Add('SOAPAction', 'ImportSalesDocuments');
+        RequestMessage.SetRequestUri(NpCsStore."Service Url");
+        RequestMessage.Method('POST');
+
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Add('SOAPAction', 'ImportSalesDocuments');
 
         Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
-        Client.Post(NpCsStore."Service Url", RequestContent, Response);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode then begin
-            Response.Content().ReadAs(ExceptionMessage);
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ResponseMessage.Content().ReadAs(ExceptionMessage);
             if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
                     ExceptionMessage := Node.AsXmlElement().InnerText();
@@ -239,7 +247,7 @@ codeunit 6151197 "NPR NpCs Send Order"
         NpCsWorkflowModule.Init();
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
         NpCsWorkflowModule.Code := WorkflowCode();
-        NpCsWorkflowModule.Description := CopyStr(Text000, 1, MaxStrLen(NpCsWorkflowModule.Description));
+        NpCsWorkflowModule.Description := CopyStr(CreateCollectOrderLbl, 1, MaxStrLen(NpCsWorkflowModule.Description));
         NpCsWorkflowModule."Event Codeunit ID" := CurrCodeunitId();
         NpCsWorkflowModule.Insert(true);
     end;
