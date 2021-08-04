@@ -32,11 +32,11 @@
         Document: XmlDocument;
         Node: XmlNode;
         Client: HttpClient;
-        RequestContent: HttpContent;
-        ContentHeader: HttpHeaders;
-        Request: HttpRequestMessage;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
         RequestHeaders: HttpHeaders;
-        Response: HttpResponseMessage;
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
         ContentText: Text;
         ErrorMessage: Text;
         ResponseText: Text;
@@ -55,27 +55,29 @@
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        Request.GetHeaders(RequestHeaders);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Clear();
+        Content.WriteFrom(ContentText);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'text/xml;charset=UTF-8');
+        RequestMessage.Content(Content);
+
+        RequestMessage.SetRequestUri(NpCsStore."Service Url");
+        RequestMessage.Method('POST');
+
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Add('SOAPAction', 'GetCollectStores');
         RequestHeaders.Remove('Connection');
 
-        Request.Method('POST');
-        Request.SetRequestUri(NpCsStore."Service Url");
-
-        RequestContent.WriteFrom(ContentText);
-        RequestContent.GetHeaders(ContentHeader);
-
-        ContentHeader.Clear();
-        ContentHeader.Remove('Content-Type');
-        ContentHeader.Add('Content-Type', 'application/xml; charset=utf-8');
-        ContentHeader.Add('SOAPAction', 'GetCollectStores');
-        ContentHeader := Client.DefaultRequestHeaders();
+        RequestMessage.Method('POST');
+        RequestMessage.SetRequestUri(NpCsStore."Service Url");
 
         Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
-        Request.Content := RequestContent;
-        Client.Send(Request, Response);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode then begin
-            ErrorMessage := Response.ReasonPhrase;
+        if not ResponseMessage.IsSuccessStatusCode() then begin
+            ErrorMessage := ResponseMessage.ReasonPhrase();
             if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
                     ErrorMessage := Node.AsXmlElement().InnerText();
@@ -83,7 +85,7 @@
             Error(ErrorMessage);
         end;
 
-        Response.Content.ReadAs(ResponseText);
+        ResponseMessage.Content.ReadAs(ResponseText);
         if not XmlDocument.ReadFrom(ResponseText, Document) then
             Error(ResponseText);
 
@@ -261,9 +263,11 @@
         Document: XmlDocument;
         Node: XmlNode;
         Client: HttpClient;
-        RequestContent: HttpContent;
-        ContentHeader: HttpHeaders;
-        Response: HttpResponseMessage;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
+        RequestHeaders: HttpHeaders;
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
         ReqBody: Text;
         ResponseText: Text;
     begin
@@ -273,7 +277,7 @@
             exit;
 
         NpCsStoreInventoryBuffer.SetRange("Store Code", NpCsStore.Code);
-        if NpCsStoreInventoryBuffer.IsEmpty then
+        if NpCsStoreInventoryBuffer.IsEmpty() then
             exit;
 
         ReqBody :=
@@ -296,23 +300,28 @@
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        RequestContent.WriteFrom(ReqBody);
-        RequestContent.GetHeaders(ContentHeader);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Clear();
+        Content.WriteFrom(ReqBody);
+        Content.GetHeaders(ContentHeaders);
+        ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'text/xml;charset=UTF-8');
+        RequestMessage.Content(Content);
 
-        ContentHeader.Clear();
-        ContentHeader.Remove('Content-Type');
-        ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
-        ContentHeader.Add('SOAPAction', 'GetLocalInventory');
-        ContentHeader.Remove('Connection');
-        ContentHeader := Client.DefaultRequestHeaders();
+        RequestMessage.SetRequestUri(NpCsStore."Service Url");
+        RequestMessage.Method('POST');
+
+        RequestMessage.GetHeaders(RequestHeaders);
+        RequestHeaders.Add('SOAPAction', 'GetLocalInventory');
+        RequestHeaders.Remove('Connection');
 
         Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
-        Client.Post(NpCsStore."Service Url", RequestContent, Response);
+        Client.Send(RequestMessage, ResponseMessage);
 
-        if not Response.IsSuccessStatusCode then
-            Error(Response.ReasonPhrase);
+        if not ResponseMessage.IsSuccessStatusCode() then
+            Error(ResponseMessage.ReasonPhrase());
 
-        Response.Content.ReadAs(ResponseText);
+        ResponseMessage.Content.ReadAs(ResponseText);
         ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
         if not XmlDocument.ReadFrom(ResponseText, Document) then
             exit;

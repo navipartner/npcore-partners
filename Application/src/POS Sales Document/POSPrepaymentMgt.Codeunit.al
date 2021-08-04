@@ -1,16 +1,5 @@
 codeunit 6014408 "NPR POS Prepayment Mgt."
 {
-    // NPR5.52/MMV /20190911 CASE 352473 Created object
-    // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
-    // NPR5.53/MMV /20191106 CASE 352473 Changed how prepayment amount is spread across lines.
-    // NPR5.53/MMV /20191113 CASE 375290 Removed unused function.
-    // NPR5.55/ALPO/20201416 CASE 391568 Exclude lines with "Line Amount" = 0 from prepayment calculations
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure GetPrepaymentAmountToDeductInclVAT(SalesHeader: Record "Sales Header"): Decimal
     var
         TempSalesLine: Record "Sales Line" temporary;
@@ -59,14 +48,13 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetFilter("No.", '<>%1', '');
-        SalesLine.SetFilter("Line Amount", '<>%1', 0);  //NPR5.55 [391568]
+        SalesLine.SetFilter("Line Amount", '<>%1', 0);
         SalesLine.SetHideValidationDialog(true);
-        SalesLine.SuspendStatusCheck(true);  //NPR5.53 [360297]
+        SalesLine.SuspendStatusCheck(true);
 
         if not SalesLine.FindSet(true) then
             exit;
 
-        //-NPR5.53 [352473]
         repeat
             SalesLine.Validate("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv."); //Set prepayment amount back to invoiced, in case someone modified it without posting.
             RemainingDocumentAmount += (SalesLine."Line Amount" - SalesLine."Prepmt Amt Deducted" - SalesLine."Prepmt Amt to Deduct");
@@ -91,25 +79,6 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
             if Persist then
                 SalesLine.Modify(true);
         until SalesLine.Next() = 0;
-
-        // LineCount := SalesLine.Count();
-        // RemainingAmount := Amount;
-
-        // REPEAT
-        //  i += 1;
-        //  SalesLine.VALIDATE("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv."); //Set prepayment amount back to invoiced, in case someone modified it without posting.
-        //
-        //  IF (i <> LineCount) THEN BEGIN
-        //    SalesLine.VALIDATE("Prepmt. Line Amount", SalesLine."Prepmt. Line Amount" + ROUND(Amount / LineCount, Currency."Amount Rounding Precision"));
-        //    RemainingAmount -= ROUND(Amount / LineCount, Currency."Amount Rounding Precision");
-        //  END ELSE BEGIN
-        //    SalesLine.VALIDATE("Prepmt. Line Amount", SalesLine."Prepmt. Line Amount" + RemainingAmount);
-        //  END;
-        //
-        //  IF Persist THEN
-        //    SalesLine.MODIFY(TRUE);
-        // UNTIL SalesLine.Next() = 0;
-        //+NPR5.53 [352473]
     end;
 
     procedure SetPrepaymentPercentageToPay(SalesHeader: Record "Sales Header"; Persist: Boolean; Percent: Decimal): Decimal
@@ -123,14 +92,12 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
             SalesHeader.TestField("Currency Code", GLSetup."LCY Code");
         end;
 
-        SalesHeader.TestField("Prices Including VAT", true);
-
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetFilter("No.", '<>%1', '');
-        SalesLine.SetFilter("Line Amount", '<>%1', 0);  //NPR5.55 [391568]
+        SalesLine.SetFilter("Line Amount", '<>%1', 0);
         SalesLine.SetHideValidationDialog(true);
-        SalesLine.SuspendStatusCheck(true);  //NPR5.53 [360297]
+        SalesLine.SuspendStatusCheck(true);
 
         if SalesLine.FindSet(true) then
             repeat
@@ -144,6 +111,20 @@ codeunit 6014408 "NPR POS Prepayment Mgt."
             until SalesLine.Next() = 0;
 
         exit(PrepaymentAmountDiff);
+    end;
+
+    procedure GetPrepaymentAmountToPay(SalesHeader: Record "Sales Header"): Decimal
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter("No.", '<>%1', '');
+        SalesLine.SetFilter("Line Amount", '<>%1', 0);
+        if not SalesLine.IsEmpty() then begin
+            SalesLine.CalcSums("Prepmt. Line Amount", "Prepmt. Amt. Inv.");
+            exit(SalesLine."Prepmt. Line Amount" - SalesLine."Prepmt. Amt. Inv.");
+        end;
     end;
 }
 

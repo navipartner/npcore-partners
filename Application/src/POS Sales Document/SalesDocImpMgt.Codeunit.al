@@ -5,8 +5,8 @@
         DOCUMENT_IMPORTED_DELETED: Label '%1 %2 was imported in POS. The document has been deleted.';
         DOCUMENT_IMPORTED: Label '%1 %2 was imported in POS.';
         ERR_DOCUMENT_POSTED_LINE: Label '%1 %2 has partially posted lines. Aborting action.';
-        DOCUMENT_FULL_AMOUNT: Label 'Remaining Amount for %1 %2';
-        DOCUMENT_SPLIT_AMOUNT: Label 'Amount for %1 %2';
+        DocumentFullAmountLbl: Label 'Remaining Amount for %1 %2', Comment = '%1=SalesHeader."Document Type";%2=SalesHeader."No."';
+        DocumentSplitAmountLbl: Label 'Amount for %1 %2', Comment = '%1=SalesHeader."Document Type";%2=SalesHeader."No."';
 
     procedure SalesDocumentToPOS(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header")
     begin
@@ -131,20 +131,29 @@
             SalePOS.Modify(true);
             POSSale.RefreshCurrent();
         end;
-
         PaymentAmount := GetTotalAmountToBeInvoiced(SalesHeader);
-
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        SalesHeader.Invoice := Invoice;
+        SalesHeader.Ship := Ship;
+        SalesHeader."Print Posted Documents" := Print;
+        SalesHeader.Receive := Receive;
+        SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount, SaleLinePOS, SalesHeader, Pdf2Nav, Send, SyncPost);
+        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+    end;
+
+    procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
+    begin
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
         SaleLinePOS.Type := SaleLinePOS.Type::Customer;
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("No.", SalesHeader."Bill-to Customer No.");
         SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
         SaleLinePOS."Sales Document No." := SalesHeader."No.";
-        SaleLinePOS."Sales Document Invoice" := Invoice;
-        SaleLinePOS."Sales Document Ship" := Ship;
-        SaleLinePOS."Sales Document Print" := Print;
-        SaleLinePOS."Sales Document Receive" := Receive;
+        SaleLinePOS."Sales Document Invoice" := SalesHeader.Invoice;
+        SaleLinePOS."Sales Document Ship" := SalesHeader.Ship;
+        SaleLinePOS."Sales Document Print" := SalesHeader."Print Posted Documents";
+        SaleLinePOS."Sales Document Receive" := SalesHeader.Receive;
         SaleLinePOS."Sales Document Sync. Posting" := SyncPost;
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
@@ -153,12 +162,20 @@
         else
             SaleLinePOS.Validate("Unit Price", PaymentAmount);
         if DocumentIsSetToFullPosting(SalesHeader) then begin
-            SaleLinePOS.Description := StrSubstNo(DOCUMENT_FULL_AMOUNT, SalesHeader."Document Type", SalesHeader."No.")
+            SaleLinePOS.Description := StrSubstNo(DocumentFullAmountLbl, SalesHeader."Document Type", SalesHeader."No.")
         end else begin
-            SaleLinePOS.Description := StrSubstNo(DOCUMENT_SPLIT_AMOUNT, SalesHeader."Document Type", SalesHeader."No.");
+            SaleLinePOS.Description := StrSubstNo(DocumentSplitAmountLbl, SalesHeader."Document Type", SalesHeader."No.");
         end;
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+    end;
+
+    procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesInvoiceHeader: Record "Sales Invoice Header"; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
+    begin
+        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
+        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS.Validate(Quantity, 1);
+        SaleLinePOS.Validate("No.", SalesInvoiceHeader."Bill-to Customer No.");
+        SaleLinePOS.Validate("Unit Price", PaymentAmount);
+        SaleLinePOS.Description := StrSubstNo(DocumentFullAmountLbl, SalesInvoiceHeader.TableCaption(), SalesInvoiceHeader."No.");
     end;
 
     procedure SelectSalesDocument(TableView: Text; var SalesHeader: Record "Sales Header"): Boolean
@@ -216,7 +233,7 @@
         exit(false);
     end;
 
-    local procedure GetTotalAmountToBeInvoiced(SalesHeader: Record "Sales Header"): Decimal
+    procedure GetTotalAmountToBeInvoiced(SalesHeader: Record "Sales Header"): Decimal
     var
         SalesPost: Codeunit "Sales-Post";
         TempSalesLine: Record "Sales Line" temporary;
@@ -243,6 +260,12 @@
         end else begin
             exit(TotalSalesLine."Amount Including VAT");
         end;
+    end;
+
+    procedure GetTotalAmountToBeInvoiced(SalesInvoiceHeader: Record "Sales Invoice Header"): Decimal
+    begin
+        SalesInvoiceHeader.CalcFields("Remaining Amount");
+        exit(SalesInvoiceHeader."Remaining Amount");
     end;
 
     procedure SynchronizePOSSaleWithDocument(SalePOS: Record "NPR POS Sale")
