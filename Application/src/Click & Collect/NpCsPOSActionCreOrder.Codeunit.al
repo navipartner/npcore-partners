@@ -1,9 +1,12 @@
 ﻿codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 {
     var
-        Text000: Label 'Create Collect in Store Order';
-        Text001: Label 'All Items might not be in stock in %1\\Do you still wish to continue?';
-        Text002: Label 'Sale was exported correctly but prepayment in new sale failed: %1';
+        ActionDescriptionLbl: Label 'This built-in action create collect order from one to another store.';
+        MissingStockInCompanyLbl: Label 'All Items might not be in stock in %1. Do you still wish to continue?', Comment = '%1="NPR NpCs Store"."Company Name';
+        PrepaymentFailedLbl: Label 'Sale was exported correctly but prepayment in new sale failed: %1', Comment = '%1=GetLastErrorText()';
+        ConfirmMissingStockLbl: Label 'Confirm Missing Stock';
+        PrepaymentPercantageLbl: Label 'Enter Prepayment Percentage';
+        OptionsFromStoreCodeLbl: Label 'POS Relation,Store Code Parameter,Location Filter Parameter';
 
     local procedure ActionCode(): Text
     begin
@@ -12,42 +15,98 @@
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
     begin
-        if not Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple) then
-            exit;
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+            Sender.RegisterWorkflow20(
+                'switch($parameters.fromStoreCode + "") {' +
+                '  case "0":' +
+                '    await workflow.respond("SelectFromStoreCodeFromPOSRelation");' +
+                '    break;' +
+                '  case "1":' +
+                '    await workflow.respond("SelectFromStoreCodeFromStoreCodeParameter");' +
+                '    break;' +
+                '  case "2":' +
+                '    await workflow.respond("SelectFromStoreCodeFromLocationFilterParameter");' +
+                '    break;' +
+                '}' +
+                'if (!$context.fromStoreCode) {return}' +
 
-        Sender.RegisterWorkflowStep('select_from_store_code', 'respond();');
-        Sender.RegisterWorkflowStep('select_to_store_code', 'if (context.from_store_code) { respond(); }');
-        Sender.RegisterWorkflowStep('select_workflow', 'if (context.to_store_code) { respond(); }');
-        Sender.RegisterWorkflowStep('select_customer', 'if (context.workflow_code) { respond(); }');
-        Sender.RegisterWorkflowStep('create_collect_order', 'if ((context.from_store_code) && (context.to_store_code) && (context.workflow_code) && (context.customer_no)) { respond(); }');
-        Sender.RegisterWorkflow(false);
-        Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
+                'if (!$context.toStoreCode) {' +
+                '    await workflow.respond("SelectToStoreCode");' +
+                '    if ($context.ConfirmMissingStock) {' +
+                '        if ($context.MissingStockInCompanyLbl.length > 0) {' +
+                '            if (!(await popup.confirm({ title: $labels.ConfirmSetStoreForMissingStock, caption: $context.MissingStockInCompanyLbl }))) {' +
+                '                return;' +
+                '            }' +
+                '        }' +
+                '    }' +
+                '}' +
+                'if (!$context.toStoreCode) { return }' +
 
-        Sender.RegisterOptionParameter('Store Code From', StoreFromCodeOptionString(-1), StoreFromCodeOptionString(0));
-        Sender.RegisterTextParameter('Store Code', '');
-        Sender.RegisterTextParameter('Location Filter', '');
-        Sender.RegisterBooleanParameter('Check Customer Credit', true);
+                'if (!$context.workflowCode) {' +
+                '    await workflow.respond("SelectWorkflow")' +
+                '}' +
+                'if (!$context.workflowCode) { return }' +
+
+                'if (!$context.customerNo) {' +
+                '    await workflow.respond("SelectCustomer")' +
+                '}' +
+                'if (!$context.customerNo) { return }' +
+
+                'if (!$context.prepaymentPercent) {' +
+                '   $context.prepaymentPercent = await popup.numpad({caption: $labels.SetPrepaymentPercentage,value: $parameters.prepaymentPercent});' +
+                '}' +
+
+                'await workflow.respond("CreateCollectOrder");' +
+
+                'if ($context.HandlePrepaymentFailed) {' +
+                '    if ($context.HandlePrepaymentFailReasonMsg.length > 0) {' +
+                '        await popup.message($context.HandlePrepaymentFailReasonMsg);' +
+                '    }' +
+                '}'
+                );
+
+            Sender.RegisterOptionParameter('fromStoreCode', 'POS Relation,Store Code Parameter,Location Filter Parameter', 'POS Relation');
+            Sender.RegisterTextParameter('storeCode', '');
+            Sender.RegisterTextParameter('locationFilter', '');
+            Sender.RegisterDecimalParameter('prepaymentPercent', 0);
+            Sender.RegisterBooleanParameter('checkCustomerCredit', true);
+            Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
+    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        CASE POSParameterValue.Name OF
+            'fromStoreCore':
+                Caption := OptionsFromStoreCodeLbl;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, false)]
+    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    begin
+        Captions.AddActionCaption(ActionCode(), 'SetPrepaymentPercentage', PrepaymentPercantageLbl);
+        Captions.AddActionCaption(ActionCode(), 'ConfirmSetStoreForMissingStock', ConfirmMissingStockLbl);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
     local procedure OnLookupStoreCode(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         NpCsStore: Record "NPR NpCs Store";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
-        if POSParameterValue.Name <> 'Store Code' then
+        if POSParameterValue.Name <> 'storeCode' then
             exit;
         if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
             exit;
@@ -62,14 +121,14 @@
             POSParameterValue.Value := NpCsStore.Code;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, true)]
     local procedure OnValidateStoreCode(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         NpCsStore: Record "NPR NpCs Store";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
-        if POSParameterValue.Name <> 'Store Code' then
+        if POSParameterValue.Name <> 'storeCode' then
             exit;
         if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
             exit;
@@ -88,14 +147,14 @@
         NpCsStore.TestField("Local Store");
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
     local procedure OnLookupLocationFilter(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         Location: Record Location;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
-        if POSParameterValue.Name <> 'Location Filter' then
+        if POSParameterValue.Name <> 'locationFilter' then
             exit;
         if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
             exit;
@@ -109,14 +168,14 @@
             POSParameterValue.Value := Location.Code;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, true)]
     local procedure OnValidateLocationFilter(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         Location: Record Location;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
-        if POSParameterValue.Name <> 'Location Filter' then
+        if POSParameterValue.Name <> 'locationFilter' then
             exit;
         if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
             exit;
@@ -132,74 +191,53 @@
         end;
     end;
 
-    //--- OnAction ---
-
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
+    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
-        if Handled then
-            exit;
         if not Action.IsThisAction(ActionCode()) then
             exit;
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
-            'select_from_store_code':
+            'SelectFromStoreCodeFromPOSRelation':
                 begin
-                    OnActionSelectFromStoreCode(JSON, POSSession, FrontEnd);
+                    SelectPOSRelation(Context, POSSession);
                 end;
-            'select_to_store_code':
+            'SelectFromStoreCodeFromStoreCodeParameter':
                 begin
-                    OnActionSelectToStoreCode(JSON, POSSession, FrontEnd);
+                    SelectStoreCodeParameter(Context);
                 end;
-            'select_workflow':
+            'SelectFromStoreCodeFromLocationFilterParameter':
                 begin
-                    OnActionSelectWorkflowCode(JSON, FrontEnd);
+                    SelectLocationFilterParameter(Context);
                 end;
-            'select_customer':
+            'SelectToStoreCode':
                 begin
-                    OnActionSelectCustomer(FrontEnd);
+                    SelectToStoreCode(Context, POSSession);
                 end;
-            'create_collect_order':
+            'SelectWorkflow':
                 begin
-                    OnActionCreateCollectOrder(JSON, POSSession);
+                    SelectWorkflow(Context);
+                end;
+            'SelectCustomer':
+                begin
+                    SelectCustomer(Context);
+                end;
+            'CreateCollectOrder':
+                begin
+                    CreateCollectOrder(Context, POSSession);
                     POSSession.RequestRefreshData();
                 end;
         end;
     end;
 
-    local procedure OnActionSelectFromStoreCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        StoreCodeFrom: Text;
-    begin
-        StoreCodeFrom := StoreFromCodeOptionString(JSON.GetIntegerParameter('Store Code From'));
-        case StoreCodeFrom of
-            StoreFromCodeOptionString(0):
-                begin
-                    OnActionSelectFromStoreCodePOSRelation(POSSession, FrontEnd);
-                end;
-            StoreFromCodeOptionString(1):
-                begin
-                    OnActionSelectFromStoreCodeStoreCodeParameter(JSON, FrontEnd);
-                end;
-            StoreFromCodeOptionString(2):
-                begin
-                    OnActionSelectFromStoreCodeLocationFilterParameter(JSON, FrontEnd);
-                end;
-        end;
-    end;
-
-    local procedure OnActionSelectFromStoreCodePOSRelation(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SelectPOSRelation(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         NpCsStore: Record "NPR NpCs Store";
         TempNpCsStore: Record "NPR NpCs Store" temporary;
         NpCsStorePOSRelation: Record "NPR NpCs Store POS Relation";
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
-        JSON: Codeunit "NPR POS JSON Management";
         POSSetup: Codeunit "NPR POS Setup";
         LastRec: Text;
         StoreCode: Code[20];
@@ -210,7 +248,6 @@
         NpCsStorePOSRelation.SetRange("No.", POSUnit."No.");
         if not NpCsStorePOSRelation.FindLast() then begin
             POSSetup.GetPOSStore(POSStore);
-
             NpCsStorePOSRelation.SetRange(Type, NpCsStorePOSRelation.Type::"POS Store");
             NpCsStorePOSRelation.SetRange("No.", POSStore.Code);
         end;
@@ -236,29 +273,27 @@
             StoreCode := TempNpCsStore.Code;
         end;
 
-        JSON.SetContext('from_store_code', StoreCode);
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Context.SetContext('fromStoreCode', StoreCode);
     end;
 
-    local procedure OnActionSelectFromStoreCodeStoreCodeParameter(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SelectStoreCodeParameter(Context: Codeunit "NPR POS JSON Management")
     var
         NpCsStore: Record "NPR NpCs Store";
         StoreCode: Text;
     begin
-        StoreCode := UpperCase(JSON.GetStringParameter('Store Code'));
+        StoreCode := UpperCase(Context.GetStringParameter('storeCode'));
         NpCsStore.Get(StoreCode);
 
-        JSON.SetContext('from_store_code', NpCsStore.Code);
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Context.SetContext('fromStoreCode', NpCsStore.Code);
     end;
 
-    local procedure OnActionSelectFromStoreCodeLocationFilterParameter(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SelectLocationFilterParameter(Context: Codeunit "NPR POS JSON Management")
     var
         NpCsStore: Record "NPR NpCs Store";
         LocationFilter: Text;
         LastRec: Text;
     begin
-        LocationFilter := UpperCase(JSON.GetStringParameter('Location Filter'));
+        LocationFilter := UpperCase(Context.GetStringParameter('locationFilter'));
         NpCsStore.SetRange("Local Store", true);
         NpCsStore.SetFilter("Location Code", LocationFilter);
         NpCsStore.FindLast();
@@ -270,11 +305,10 @@
                 exit;
         end;
 
-        JSON.SetContext('from_store_code', NpCsStore.Code);
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Context.SetContext('fromStoreCode', NpCsStore.Code);
     end;
 
-    local procedure OnActionSelectToStoreCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SelectToStoreCode(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         FromNpCsStore: Record "NPR NpCs Store";
         TempNpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
@@ -288,7 +322,7 @@
         FromStoreCode: Text;
         PrevRec: Text;
     begin
-        FromStoreCode := UpperCase(JSON.GetString('from_store_code'));
+        FromStoreCode := UpperCase(Context.GetString('fromStoreCode'));
         FromNpCsStore.Get(FromStoreCode);
 
         POSSession.GetSale(POSSale);
@@ -354,12 +388,10 @@
         NpCsStoresbyDistance.GetRecord(TempNpCsStore);
         TempNpCsStore.Find();
         if not TempNpCsStore."In Stock" then begin
-            if not Confirm(Text001, true, TempNpCsStore."Company Name") then
-                exit;
+            Context.SetContext('ConfirmMissingStock', true);
+            Context.SetContext('MissingStockInCompanyLbl', Strsubstno(MissingStockInCompanyLbl, TempNpCsStore."Company Name"));
         end;
-
-        JSON.SetContext('to_store_code', TempNpCsStore.Code);
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Context.SetContext('toStoreCode', TempNpCsStore.Code);
     end;
 
     local procedure FindItemPosLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
@@ -392,7 +424,7 @@
         Clear(TempSaleLinePOS);
     end;
 
-    local procedure OnActionSelectWorkflowCode(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SelectWorkflow(JSON: Codeunit "NPR POS JSON Management")
     var
         NpCsStore: Record "NPR NpCs Store";
         NpCsStoreWorkflowRelation: Record "NPR NpCs Store Workflow Rel.";
@@ -402,7 +434,7 @@
         LastRec: Text;
         WorkflowCode: Text;
     begin
-        StoreCode := UpperCase(JSON.GetString('to_store_code'));
+        StoreCode := UpperCase(JSON.GetString('toStoreCode'));
         NpCsStore.Get(StoreCode);
 
         NpCsStoreWorkflowRelation.SetRange("Store Code", NpCsStore.Code);
@@ -428,14 +460,12 @@
             WorkflowCode := TempNpCsWorkflow.Code;
         end;
 
-        JSON.SetContext('workflow_code', WorkflowCode);
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        JSON.SetContext('workflowCode', WorkflowCode);
     end;
 
-    local procedure OnActionSelectCustomer(FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SelectCustomer(Context: Codeunit "NPR POS JSON Management")
     var
         SalePOS: Record "NPR POS Sale";
-        JSON: Codeunit "NPR POS JSON Management";
         Customer: Record Customer;
     begin
         if (SalePOS."Customer No." <> '') and (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) then
@@ -446,11 +476,10 @@
                 exit;
         end;
 
-        JSON.SetContext('customer_no', Customer."No.");
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Context.SetContext('customerNo', Customer."No.");
     end;
 
-    local procedure OnActionCreateCollectOrder(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure CreateCollectOrder(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         NpCsDocument: Record "NPR NpCs Document";
         FromNpCsStore: Record "NPR NpCs Store";
@@ -461,44 +490,47 @@
         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         FromStoreCode: Text;
         ToStoreCode: Text;
         WorkflowCode: Text;
         PrepaymentPct: Decimal;
     begin
-        FromStoreCode := UpperCase(JSON.GetString('from_store_code'));
+        FromStoreCode := UpperCase(Context.GetString('fromStoreCode'));
         FromNpCsStore.Get(FromStoreCode);
-        ToStoreCode := UpperCase(JSON.GetString('to_store_code'));
+        ToStoreCode := UpperCase(Context.GetString('toStoreCode'));
         ToNpCsStore.Get(ToStoreCode);
-        WorkflowCode := UpperCase(JSON.GetString('workflow_code'));
+        WorkflowCode := UpperCase(Context.GetString('workflowCode'));
         NpCsWorkflow.Get(WorkflowCode);
+        PrepaymentPct := Context.GetDecimal('prepaymentPercent');
 
-        ExportToDocument(JSON, POSSession, RetailSalesDocMgt);
+        ExportToDocument(Context, POSSession, RetailSalesDocMgt);
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
 
         NpCsCollectMgt.InitSendToStoreDocument(SalesHeader, ToNpCsStore, NpCsWorkflow, NpCsDocument);
         NpCsDocument."From Store Code" := FromNpCsStore.Code;
         NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
         NpCsDocument.Modify(true);
-        Commit();
 
-        NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+        POSSession.GetSale(POSSale);
 
-        Commit();
         if PrepaymentPct > 0 then begin
             //End sale, auto start new sale, and insert prepayment line.
-            POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
             POSSession.StartTransaction();
             POSSession.ChangeViewSale();
-            HandlePrepayment(POSSession, RetailSalesDocMgt, PrepaymentPct, true, SalePOS);
+            HandlePrepayment(Context, POSSession, RetailSalesDocMgt, PrepaymentPct, true, SalePOS);
+            NpCsDocument."Prepaid Amount" := POSPrepaymentMgt.GetPrepaymentAmountToPay(SalesHeader);
+            NpCsDocument.Modify();
         end else
             //End sale
             POSSale.SelectViewForEndOfSale(POSSession);
+
+        NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
-    local procedure ExportToDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
+    local procedure ExportToDocument(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
     var
         SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -514,7 +546,7 @@
 
         SalePOS."External Document No." := SalePOS."Sales Ticket No.";
         SalePOS.Reference := SalePOS."Sales Ticket No.";
-        CustomerNo := JSON.GetString('customer_no');
+        CustomerNo := Context.GetString('customerNo');
         SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Ord);
         SalePOS.Validate("Customer No.", CustomerNo);
         SalePOS.TestField("Customer No.");
@@ -523,12 +555,12 @@
             SalePOS.Modify(true);
         Commit();
 
-        SetParameters(POSSaleLine, RetailSalesDocMgt, JSON);
+        SetParameters(POSSaleLine, RetailSalesDocMgt, Context);
         RetailSalesDocMgt.TestSalePOS(SalePOS);
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
     end;
 
-    local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
+    local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; Context: Codeunit "NPR POS JSON Management")
     var
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
@@ -547,13 +579,13 @@
         RetailSalesDocMgt.SetTransferDimensions(true);
         RetailSalesDocMgt.SetTransferTaxSetup(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
-        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('Check Customer Credit'));
+        RetailSalesDocMgt.SetCustomerCreditCheck(Context.GetBooleanParameter('checkCustomerCredit'));
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
         RetailSalesDocMgt.SetDocumentTypeOrder();
     end;
 
-    local procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR POS Sale")
+    local procedure HandlePrepayment(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR POS Sale")
     var
         HandlePrepmtCU: Codeunit "NPR NpCs Cr.Ord: Handle Prepmt";
     begin
@@ -562,20 +594,9 @@
         ClearLastError();
         Clear(HandlePrepmtCU);
         HandlePrepmtCU.SetParameters(POSSession, RetailSalesDocMgt, PrepaymentPct, PrintPrepaymentInvoice, PreviousSalePOS);
-        if not HandlePrepmtCU.Run() then
-            Message(Text002, GetLastErrorText);
-    end;
-
-    //--- Aux ---
-
-    local procedure StoreFromCodeOptionString(Index: Integer) OptionStr: Text
-    begin
-        OptionStr := 'POS Relation,Store Code Parameter,Location Filter Parameter';
-        if Index < 0 then
-            exit(OptionStr);
-
-        OptionStr := SelectStr(Index + 1, OptionStr);
-
-        exit(OptionStr);
+        if not HandlePrepmtCU.Run() then begin
+            Context.SetContext('HandlePrepaymentFailed', true);
+            Context.SetContext('HandlePrepaymentFailReasonMsg', Strsubstno(PrepaymentFailedLbl, GetLastErrorText()));
+        end;
     end;
 }
