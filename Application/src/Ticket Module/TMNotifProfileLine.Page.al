@@ -60,7 +60,6 @@ page 6014563 "NPR TM Notif. Profile Line"
                 {
                     ToolTip = 'Specifies the value of the Notification Engine field';
                     ApplicationArea = NRTTicketAdvanced;
-                    Visible = false;
                 }
                 field("Notification Extra Text"; Rec."Notification Extra Text")
                 {
