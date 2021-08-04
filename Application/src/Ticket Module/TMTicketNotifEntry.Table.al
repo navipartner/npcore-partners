@@ -25,12 +25,10 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Time To Notify';
             DataClassification = CustomerContent;
         }
-        field(30; "Notification Send Status"; Option)
+        field(30; "Notification Send Status"; Enum "NPR TM Not. Send Status")
         {
             Caption = 'Notification Send Status';
             DataClassification = CustomerContent;
-            OptionCaption = 'Pending,Sent,Canceled,Failed,Not Sent';
-            OptionMembers = PENDING,SENT,CANCELED,FAILED,NOT_SENT;
         }
         field(31; "Notification Sent At"; DateTime)
         {
@@ -42,12 +40,10 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Notification Sent By User';
             DataClassification = CustomerContent;
         }
-        field(35; "Notification Trigger"; Option)
+        field(35; "Notification Trigger"; Enum "NPR TM Not. Trigger")
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionCaption = 'Not Applicable,eTicket Update,eTicket Create,Stakeholder,Waiting List,TicketServer,Reminder';
-            OptionMembers = NA,ETICKET_UPDATE,ETICKET_CREATE,STAKEHOLDER,WAITINGLIST,TICKETSERVER,REMINDER;
         }
         field(40; "Ticket Type Code"; Code[20])
         {
@@ -59,12 +55,11 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Template Code';
             DataClassification = CustomerContent;
         }
-        field(47; "Notification Process Method"; Option)
+
+        field(47; "Notification Process Method"; Enum "NPR TM Not. Process Method")
         {
             Caption = 'Notification Process Method';
             DataClassification = CustomerContent;
-            OptionCaption = 'Manual,Inline,Batch';
-            OptionMembers = MANUAL,INLINE,BATCH;
         }
         field(50; "Ticket Token"; Text[100])
         {
@@ -107,12 +102,10 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Admission";
         }
-        field(80; "Notification Method"; Option)
+        field(80; "Notification Method"; Enum "NPR TM Not. Method")
         {
             Caption = 'Notification Method';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,E-Mail,SMS';
-            OptionMembers = NA,EMAIL,SMS;
         }
         field(81; "Notification Address"; Text[100])
         {
@@ -260,12 +253,10 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Failed With Message';
             DataClassification = CustomerContent;
         }
-        field(210; "Ticket Trigger Type"; Option)
+        field(210; "Ticket Trigger Type"; Enum "NPR TM Not. Trigger Type")
         {
             Caption = 'Ticket Trigger Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Reservation,Cancelation,Admitted,Departed,Added to Waiting List,Waitinglist Notification,Sales,Not Applicable,SellOut,Capacity to Waiting List';
-            OptionMembers = RESERVE,CANCEL_RESERVE,ADMIT,DEPART,ADDED_TO_WL,NOTIFIED_BY_WL,SALES,NA,SELLOUT,CAPACITY_TO_WL;
         }
         field(405; "eTicket Type Code"; Text[30])
         {
@@ -313,10 +304,12 @@ table 6060110 "NPR TM Ticket Notif. Entry"
         key(Key4; "Ticket Token")
         {
         }
+        key(Key5; SystemModifiedAt)
+        {
+        }
     }
 
     fieldgroups
     {
     }
 }
-
