@@ -458,9 +458,19 @@
             "justification": "Obsolete Reason must be set."
         },
         {
+            "id": "AS0078",
+            "action":"Hidden",
+            "justification": "Adding or removing a var modifier in public procedures is not allowed as it might break the runtime behavior of extensions calling it."
+        },
+        {
             "id": "AS0080",
             "action":"Hidden",
             "justification": "Decreasing the length of a field is not allowed. This might break the upgrade of existing installations and dependent extensions. If the field part of the primary key, the field length cannot change."
+        },
+        {
+            "id": "AS0081",
+            "action":"Hidden",
+            "justification": "The InternalsVisibleTo setting will expose your internal objects to any extension with the given name, publisher, and ID. Access modifiers are not designed to be used as a security boundary, but for API development."
         },
         {
             "id": "AS0082",
@@ -496,6 +506,11 @@
             "id": "AS0091",
             "action":"Hidden",
             "justification": "One or more dependencies of the previous version of the extension could not be found."
+        },
+        {
+            "id": "AS0094",
+            "action":"Hidden",
+            "justification": "Permission sets should not be defined in XML. Instead, use the dedicated AL object for 'PermissionSet'."
         },
         {
             "id": "AW0004",
