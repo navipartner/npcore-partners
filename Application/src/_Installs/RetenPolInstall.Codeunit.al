@@ -54,8 +54,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
 
         AddAllowedTable(Database::"NPR Nc Task", RtnPeriodEnum::"28 Days");
 
-        AddAllowedTable(Database::"NPR Data Log Record", RtnPeriodEnum::"1 Month");
-        AddAllowedTable(Database::"NPR Data Log Field", RtnPeriodEnum::"1 Month");
+        AddAllowedTable(Database::"NPR Data Log Record", RtnPeriodEnum::"1 Week");
+        AddAllowedTable(Database::"NPR Data Log Field", RtnPeriodEnum::"1 Week");
 
         AddAllowedTable(Database::"NPR POS Entry Output Log", RtnPeriodEnum::"3 Months");
         AddAllowedTable(Database::"NPR Nc Import Entry", RtnPeriodEnum::"3 Months");
