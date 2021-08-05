@@ -16,6 +16,7 @@ codeunit 6014570 "NPR POS Lookup Method"
         Skip: Integer;
         BatchSize: Integer;
         CheckOnly: Boolean;
+        LoadAll: Boolean;
         RetrievingLookupTypeLbl: Label 'Retrieving lookup type during LookupFromPOS';
     begin
         if Method <> 'LookupFromPOS' then
@@ -31,11 +32,12 @@ codeunit 6014570 "NPR POS Lookup Method"
         Skip := Json.GetInteger('skip');
         BatchSize := Json.GetInteger('batchSize');
         CheckOnly := Json.GetBoolean('checkOnly');
-        if BatchSize = 0 then
+        LoadAll := Json.GetBoolean('loadAll');
+        if BatchSize <= 0 then
             BatchSize := 120;
 
         Data.SetLookupType(LookupTypeText);
-        ProcessLookup(Generation, Skip, BatchSize, CheckOnly, LookupTypeEnum, Data);
+        ProcessLookup(Generation, Skip, BatchSize, LoadAll, CheckOnly, LookupTypeEnum, Data);
 
         FrontEnd.RespondToFrontEndMethod(Context, Data.GetJson(), FrontEnd);
     end;
@@ -49,10 +51,11 @@ codeunit 6014570 "NPR POS Lookup Method"
     /// <param name="FrontEndGeneration">Data generation "known" to the front end</param>
     /// <param name="Skip">Number of records to skip (this is the count of records already retrieved by the front end)</param>
     /// <param name="BatchSize">Size of batch. The result data set won't contain more than this many records.</param>
+    /// <param name="LoadAll">Indicates whether all records must be loaded regardless of the batch size.</param>
     /// <param name="CheckOnly">Indicates whether this call is a pre-emptive check for new generations.</param>
     /// <param name="LookupTypeEnum">Lookup type to use for processing</param>
     /// <param name="Data">Resulting data set instance to populate data into</param>
-    local procedure ProcessLookup(FrontEndGeneration: Integer; Skip: Integer; BatchSize: Integer; CheckOnly: Boolean; LookupTypeEnum: Enum "NPR POS Lookup Type"; Data: Codeunit "NPR POS Lookup Data Set")
+    local procedure ProcessLookup(FrontEndGeneration: Integer; Skip: Integer; BatchSize: Integer; LoadAll: Boolean; CheckOnly: Boolean; LookupTypeEnum: Enum "NPR POS Lookup Type"; Data: Codeunit "NPR POS Lookup Data Set")
     var
         LookupTypeGeneration: Record "NPR POS Lookup Type Generation";
         RecRef: RecordRef;
@@ -73,6 +76,10 @@ codeunit 6014570 "NPR POS Lookup Method"
             end;
             // else... when CheckOnly is true, we are safe to start from scratch, so we keep BatchSize at specified value, but still reset Skip
             Skip := 0;
+        end else begin
+            // If full refresh is not needed (same generations) and we are checking only, then we do not need to return anything
+            if CheckOnly then
+                exit;
         end;
 
         if not RecRef.FindSet(false) then
@@ -88,7 +95,7 @@ codeunit 6014570 "NPR POS Lookup Method"
             Data.AddRow(Row);
             ReadCount += 1;
             HasMore := RecRef.Next() <> 0;
-            if (ReadCount = BatchSize) or (not HasMore) then
+            if ((ReadCount = BatchSize) and (not LoadAll)) or (not HasMore) then
                 break;
         end;
 
