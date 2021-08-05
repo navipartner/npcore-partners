@@ -854,6 +854,13 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (not Community.Get(CommunityCode)) then
             exit(-1);
 
+        if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::FOREIGN) then begin
+            Member.SetFilter("External Member No.", '=%1', MemberInfoCapture."External Member No");
+            if (not Member.FindFirst()) then
+                exit(0);
+            exit(Member."Entry No.");
+        end;
+
         case Community."Member Unique Identity" of
             Community."Member Unique Identity"::NONE:
                 Member.SetFilter("Entry No.", '=%1', -1); // This should never match a current user
