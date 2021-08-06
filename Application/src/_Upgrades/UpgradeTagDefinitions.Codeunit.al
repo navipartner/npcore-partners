@@ -115,7 +115,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
             Codeunit::"NPR Reten. Pol. Install":
                 exit('NPR-RetenPolTables-20210224-02');
             Codeunit::"NPR Job Queue Install":
-                exit('NPRJobQueueInstall-20210324');
+                exit('NPRJobQueueInstall-20210716');
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210618');
             Codeunit::"NPR UPG Pos Menus":

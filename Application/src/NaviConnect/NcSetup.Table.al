@@ -21,8 +21,6 @@ table 6151500 "NPR Nc Setup"
             DataClassification = CustomerContent;
             Description = 'NC1.11,NC1.12,NC1.16,NC1.17';
             TableRelation = "NPR Task Worker Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(305; "Task Worker Group"; Code[10])
@@ -31,8 +29,6 @@ table 6151500 "NPR Nc Setup"
             DataClassification = CustomerContent;
             Description = 'NC1.09,NC1.11,NC1.12,NC1.17';
             TableRelation = "NPR Task Worker Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(310; "Max Task Count per Batch"; Integer)
@@ -50,4 +46,3 @@ table 6151500 "NPR Nc Setup"
         }
     }
 }
-

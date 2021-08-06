@@ -41,9 +41,10 @@
         TaskProcesLine: Record "NPR Nc Task Proces. Line";
         TempDataLogRecord: Record "NPR Data Log Record" temporary;
         TempTask: Record "NPR Nc Task" temporary;
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
         if TaskProcessor.Code = '' then
-            TaskProcessor.Code := 'NC';
+            TaskProcessor.Code := NcSetupMgt.NaviConnectDefaultTaskProcessorCode();
         Initialize();
         Clear(TempDataLogRecord);
         Clear(TempTask);

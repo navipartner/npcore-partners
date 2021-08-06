@@ -1,6 +1,7 @@
 enum 6151500 "NPR Nc IL Update Handler" implements "NPR Nc Import List IUpdate"
 {
     Extensible = true;
+    DefaultImplementation = "NPR Nc Import List IUpdate" = "NPR Nc IL Update Default";
 
     value(0; Default)
     {

@@ -70,6 +70,28 @@ page 6151500 "NPR Nc Setup"
                     NaviConnectMgt.SetupTaskQueue();
                 end;
             }
+            action("Setup Job Queue")
+            {
+                Caption = 'Setup Job Queue';
+                Image = Setup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ApplicationArea = All;
+                ToolTip = 'Sets up Job Queue Entry for Task List Processing';
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    NaviConnectMgt: Codeunit "NPR Nc Setup Mgt.";
+                begin
+                    CurrPage.SaveRecord();
+                    NaviConnectMgt.SetupTaskProcessingJobQueue(JobQueueEntry, false);
+                    if not IsNullGuid(JobQueueEntry.ID) then
+                        Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
+                end;
+            }
         }
     }
 
@@ -82,4 +104,3 @@ page 6151500 "NPR Nc Setup"
             NaviConnectMgt.InitNaviConnectSetup();
     end;
 }
-

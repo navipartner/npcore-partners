@@ -367,7 +367,7 @@ page 6151502 "NPR Nc Task List"
     var
         TaskProcessor: Record "NPR Nc Task Processor";
     begin
-        if not TaskProcessor.FindSet() then begin
+        if TaskProcessor.IsEmpty then begin
             SyncMgt.UpdateTaskProcessor(TaskProcessor);
             Commit();
         end;
