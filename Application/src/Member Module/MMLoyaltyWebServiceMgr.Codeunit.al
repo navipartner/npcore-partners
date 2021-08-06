@@ -9,7 +9,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         FunctionName: Text[100];
     begin
 
-        if Rec.LoadXmlDoc(XmlDoc) then begin
+        if (Rec.LoadXmlDoc(XmlDoc)) then begin
             FunctionName := GetWebserviceFunction(Rec."Import Type");
             case FunctionName of
                 'GetLoyaltyPoints':
@@ -22,6 +22,8 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
                 else
                     Error('Implementation for %1 %2 missing in codeunit 6060142', Rec."Import Type", FunctionName);
             end;
+
+            ClearLastError();
 
         end;
     end;
@@ -119,4 +121,3 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         exit(ImportType."Webservice Function");
     end;
 }
-

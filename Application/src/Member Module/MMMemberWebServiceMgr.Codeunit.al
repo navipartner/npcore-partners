@@ -73,6 +73,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                     Error(MISSING_CASE, Rec."Import Type", FunctionName);
             end;
 
+            ClearLastError();
+
         end;
     end;
 
