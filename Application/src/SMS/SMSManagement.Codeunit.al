@@ -663,45 +663,43 @@
     end;
     #endregion Subscribers
     #region Job functions
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
+    local procedure CreateMessageJob_OnCompanyInitialize()
+    begin
+        if not TaskScheduler.CanCreateTask() then
+            exit;
+        CreateMessageJob('');
+    end;
+
     procedure CreateMessageJob(JobCategory: Code[10])
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NotBeforeDateTime: DateTime;
+        JobQueueDescrLbl: Label 'SMS sending handler';
     begin
         if not (JobQueueEntry.ReadPermission and JobQueueEntry.WritePermission) then
             Error(PermissionErr);
 
         if JobCategory = '' then
             JobCategory := GetJobQueueCategoryCode();
+        NotBeforeDateTime := JobQueueMgt.NowWithDelayInSeconds(60);
 
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Send SMS Job Handler");
-        JobQueueEntry.SetRange("Job Queue Category Code", JobCategory);
-        if not JobQueueEntry.FindFirst() then begin
-            Clear(JobQueueEntry);
-            JobQueueEntry.Init();
-            JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
-            JobQueueEntry."Earliest Start Date/Time" := CurrentDateTime;
-            JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-            JobQueueEntry."Object ID to Run" := Codeunit::"NPR Send SMS Job Handler";
-            JobQueueEntry."Job Queue Category Code" := JobCategory;
-            JobQueueEntry."Run in User Session" := false;
-            JobQueueEntry."Recurring Job" := true;
-            JobQueueEntry."Run on Mondays" := true;
-            JobQueueEntry."Run on Tuesdays" := true;
-            JobQueueEntry."Run on Wednesdays" := true;
-            JobQueueEntry."Run on Thursdays" := true;
-            JobQueueEntry."Run on Fridays" := true;
-            JobQueueEntry."Run on Saturdays" := true;
-            JobQueueEntry."Run on Sundays" := true;
-            JobQueueEntry."Maximum No. of Attempts to Run" := 10000;
-            JobQueueEntry."No. of Minutes between Runs" := 1;
-            JobQueueEntry.Insert(true);
-            CODEUNIT.Run(CODEUNIT::"Job Queue - Enqueue", JobQueueEntry);
-        end;
-        if not (JobQueueEntry.Status In [JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process"]) then begin
-            JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR Send SMS Job Handler",
+            '',
+            JobQueueDescrLbl,
+            NotBeforeDateTime,
+            1,
+            JobCategory,
+            JobQueueEntry)
+        then begin
+            JobQueueEntry."Maximum No. of Attempts to Run" := 10000;  //Why so big number?
             JobQueueEntry.Modify();
-        end;
 
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+        end;
     end;
 
     procedure DeleteMessageJob(JobCategory: Code[10])

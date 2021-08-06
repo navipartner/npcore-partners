@@ -1,6 +1,5 @@
 codeunit 6150631 "NPR POS Post via Task Queue"
 {
-
     TableNo = "Job Queue Entry";
 
     var
@@ -144,5 +143,89 @@ codeunit 6150631 "NPR POS Post via Task Queue"
         JobQueueEntry.Modify();
         Commit();
         Error(EmptyParamsErr);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
+    local procedure InitPOSPostViaJobQueue_OnCompanyInitialize()
+    begin
+        if not TaskScheduler.CanCreateTask() then
+            exit;
+        AddPosItemPostingJobQueue();
+        AddPosPostingJobQueue();
+    end;
+
+    procedure AddPosItemPostingJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NotBeforeDateTime: DateTime;
+        JobQueueDescrLbl: Label 'POS Entry Item posting', MaxLength = 250;
+    begin
+        NotBeforeDateTime := JobQueueMgt.NowWithDelayInSeconds(360);
+        AddJobQueueCategory();
+
+        // POS Item posting, every minute, every day, compressed and no stopping on error.
+        JQParamStrMgt.ClearParamDict();
+        JQParamStrMgt.AddToParamDict(ParamItemPosting());
+        JQParamStrMgt.AddToParamDict(ParamCompressed());
+
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR POS Post via Task Queue",
+            JQParamStrMgt.GetParamListAsCSString(),
+            JobQueueDescrLbl,
+            NotBeforeDateTime,
+            1,
+            JQCategoryCode(),
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+    end;
+
+    procedure AddPosPostingJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NotBeforeDateTime: DateTime;
+        NextRunDateFormula: DateFormula;
+        JobQueueDescrLbl: Label 'POS Entry posting', MaxLength = 250;
+    begin
+        NotBeforeDateTime := CreateDateTime(Today, 230000T);
+        if NotBeforeDateTime < JobQueueMgt.NowWithDelayInSeconds(360) then
+            NotBeforeDateTime := CreateDateTime(Today + 1, 230000T);
+        Evaluate(NextRunDateFormula, '<1D>');
+        AddJobQueueCategory();
+
+        // POS posting, every day at 23:00, compressed and no stopping on error.
+        JQParamStrMgt.ClearParamDict();
+        JQParamStrMgt.AddToParamDict(ParamPosPosting());
+        JQParamStrMgt.AddToParamDict(ParamCompressed());
+
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR POS Post via Task Queue",
+            JQParamStrMgt.GetParamListAsCSString(),
+            JobQueueDescrLbl,
+            NotBeforeDateTime,
+            DT2Time(NotBeforeDateTime),
+            0T,
+            NextRunDateFormula,
+            JQCategoryCode(),
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+    end;
+
+    local procedure AddJobQueueCategory()
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        JobCategoryDescrLbl: Label 'Posting related tasks', MaxLength = 30;
+    begin
+        JobQueueCategory.InsertRec(JQCategoryCode(), JobCategoryDescrLbl);
+    end;
+
+    local procedure JQCategoryCode(): Code[10]
+    begin
+        exit('NPR-POST');
     end;
 }

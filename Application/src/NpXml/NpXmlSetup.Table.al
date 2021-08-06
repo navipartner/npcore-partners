@@ -22,9 +22,12 @@ table 6151550 "NPR NpXml Setup"
             Description = 'NC1.21';
 
             trigger OnValidate()
+            var
+                NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+                InvalidVersionTagErr: Label 'Invalid version tag';
             begin
-                if (StrPos("Template Version Prefix", 'NC') = 1) then
-                    Error(Text100);
+                if (StrPos("Template Version Prefix", NcSetupMgt.NaviConnectDefaultTaskProcessorCode()) = 1) then
+                    Error(InvalidVersionTagErr);
             end;
         }
         field(65; "Template Version No."; Integer)
@@ -44,8 +47,4 @@ table 6151550 "NPR NpXml Setup"
         {
         }
     }
-
-    var
-        Text100: Label 'Invalid version tag';
 }
-

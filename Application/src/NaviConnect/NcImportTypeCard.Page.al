@@ -30,6 +30,11 @@ page 6151509 "NPR Nc Import Type Card"
 
                     ToolTip = 'Specifies the update handler, which will be used for getting new entries into import list';
                     ApplicationArea = NPRNaviConnect;
+
+                    trigger OnValidate()
+                    begin
+                        UpdateControls();
+                    end;
                 }
                 field("Keep Import Entries for"; Rec."Keep Import Entries for")
                 {
@@ -210,12 +215,13 @@ page 6151509 "NPR Nc Import Type Card"
         {
             action(ShowSetup)
             {
-                Caption = 'Show Setup Page';
+                Caption = 'Update Handler Setup Page';
                 Image = Setup;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                Visible = not IsDefaultUpdateHandler;
 
                 ToolTip = 'Shows setup page for the update handler, which will be used for getting new entries into import list';
                 ApplicationArea = NPRNaviConnect;
@@ -227,6 +233,28 @@ page 6151509 "NPR Nc Import Type Card"
                 begin
                     if NcDependencyFactory.CreateNcImportListUpdater(ImportListUpdater, Rec) then
                         ImportListUpdater.ShowSetup(Rec);
+                end;
+            }
+            action(SetupJobQueue)
+            {
+                Caption = 'Setup Job Queue';
+                Image = Setup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Sets up a Job Queue Entry to automate creation and processing of import list entries of selected import type';
+                ApplicationArea = NPRNaviConnect;
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    JobQueueMgt: Codeunit "NPR Job Queue Management";
+                begin
+                    CurrPage.SaveRecord();
+                    JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, Rec.Code, '');
+                    if not IsNullGuid(JobQueueEntry.ID) then
+                        Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
                 end;
             }
             action("Download Ftp")
@@ -278,7 +306,6 @@ page 6151509 "NPR Nc Import Type Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = (Rec."Send E-mail on Error");
-
                 ToolTip = 'Executes the Send Test Error E-mail action';
                 ApplicationArea = NPRNaviConnect;
 
@@ -292,7 +319,7 @@ page 6151509 "NPR Nc Import Type Card"
         }
     }
 
-    trigger OnAfterGetRecord()
+    trigger OnAfterGetCurrRecord()
     begin
         Rec.CalcFields("XML Stylesheet");
 
@@ -302,6 +329,23 @@ page 6151509 "NPR Nc Import Type Card"
             Rec."XML Stylesheet".CreateInStream(IStream);
             IStream.Read(XMLStylesheetData, MaxStrLen(XMLStylesheetData));
         end;
+
+        UpdateControls();
+    end;
+
+    trigger OnOpenPage()
+    begin
+        UpdateControls();
+    end;
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        UpdateControls();
+    end;
+
+    local procedure UpdateControls()
+    begin
+        IsDefaultUpdateHandler := Rec."Import List Update Handler" = Rec."Import List Update Handler"::Default;
     end;
 
     var
@@ -309,4 +353,5 @@ page 6151509 "NPR Nc Import Type Card"
         IStream: InStream;
         OStream: OutStream;
         Request: BigText;
+        IsDefaultUpdateHandler: Boolean;
 }

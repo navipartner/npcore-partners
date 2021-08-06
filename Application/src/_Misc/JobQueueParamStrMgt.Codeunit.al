@@ -9,7 +9,7 @@ codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
         KeyValueList: List of [Text];
         KeyValuePair: Text;
     begin
-        Clear(ParamDict);
+        ClearParamDict();
 
         ParamString := _ParamString;
 
@@ -32,37 +32,47 @@ codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
         exit(ParamDict.Count() > 0);
     end;
 
-    procedure ContainsParam(Param: Text): Boolean
+    procedure ContainsParam(ParamKey: Text): Boolean
     begin
-        exit(ParamDict.ContainsKey(Param));
+        exit(ParamDict.ContainsKey(ParamKey));
     end;
 
-    procedure GetText(Param: Text) V: Text
+    procedure GetText(ParamKey: Text) ParamValue: Text
     begin
-        V := '';
-        if ParamDict.ContainsKey(Param) then
-            exit(ParamDict.Get(Param));
+        ParamValue := '';
+        if ParamDict.ContainsKey(ParamKey) then
+            exit(ParamDict.Get(ParamKey));
     end;
 
-    procedure GetBoolean(Param: Text) V: Boolean
+    procedure GetBoolean(ParamKey: Text) ParamValue: Boolean
     var
         R: Text;
     begin
-        V := false;
-        if ParamDict.ContainsKey(Param) then begin
-            R := ParamDict.Get(Param);
+        ParamValue := false;
+        if ParamDict.ContainsKey(ParamKey) then begin
+            R := ParamDict.Get(ParamKey);
             if R = '' then // if only parameter name is present
-                V := true
+                ParamValue := true
             else
-                evaluate(V, ParamDict.Get(Param));
+                evaluate(ParamValue, ParamDict.Get(ParamKey));
         end;
     end;
 
-    procedure GetInteger(Param: Text) V: Integer
+    procedure GetInteger(ParamKey: Text) ParamValue: Integer
     begin
-        V := 0;
-        if ParamDict.ContainsKey(Param) then
-            evaluate(V, ParamDict.Get(Param));
+        ParamValue := 0;
+        if ParamDict.ContainsKey(ParamKey) then
+            evaluate(ParamValue, ParamDict.Get(ParamKey));
+    end;
+
+    procedure ClearParamDict()
+    begin
+        Clear(ParamDict);
+    end;
+
+    procedure AddToParamDict(KeyValuePair: Text)
+    begin
+        AddToParamDict(KeyValuePair, ParamDict);
     end;
 
     local procedure AddToParamDict(KeyValuePair: Text; ParamDict: Dictionary of [Text, Text])
@@ -81,5 +91,26 @@ codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
 
         if not ParamDict.ContainsKey(K) then
             ParamDict.Add(K, V);
+    end;
+
+    procedure GetParamListAsCSString(): Text
+    var
+        KeyList: List of [Text];
+        ParamKey: Text;
+        ParamValue: Text;
+        ResultString: Text;
+    begin
+        KeyList := ParamDict.Keys;
+        foreach ParamKey in KeyList do
+            if ParamKey <> '' then begin
+                if ResultString <> '' then
+                    ResultString := ResultString + ',';
+                ResultString := ResultString + ParamKey;
+                if ParamDict.Get(ParamKey, ParamValue) then
+                    if ParamValue <> '' then
+                        ResultString := ResultString + '=' + ParamValue;
+            end;
+
+        exit(ResultString);
     end;
 }
