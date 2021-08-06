@@ -165,7 +165,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         exit(CODEUNIT::"NPR Nc Import List Processing");
     end;
 
-    local procedure ParamImportType(): Text
+    procedure ParamImportType(): Text
     begin
         exit('import_type');
     end;
@@ -175,7 +175,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         exit('download_ftp');
     end;
 
-    local procedure ParamProcessImport(): Text
+    procedure ParamProcessImport(): Text
     begin
         exit('process_import_list');
     end;

@@ -151,6 +151,28 @@ page 6151505 "NPR Nc Import Types"
                         ImportListUpdater.ShowSetup(Rec);
                 end;
             }
+            action(SetupJobQueue)
+            {
+                Caption = 'Setup Job Queue';
+                Image = Setup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Sets up a Job Queue Entry to automate creation and processing of import list entries for selected import type';
+                ApplicationArea = NPRNaviConnect;
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    JobQueueMgt: Codeunit "NPR Job Queue Management";
+                begin
+                    CurrPage.SaveRecord();
+                    JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, Rec.Code, '');
+                    if not IsNullGuid(JobQueueEntry.ID) then
+                        Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
+                end;
+            }
         }
         area(Navigation)
         {

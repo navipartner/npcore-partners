@@ -136,6 +136,7 @@
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
         NcTaskSetup: Record "NPR Nc Task Setup";
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
         NcTaskSetup.SetRange("Table No.", DATABASE::"NPR POS Entry");
@@ -143,10 +144,10 @@
         if NcTaskSetup.FindFirst() then
             exit(NcTaskSetup."Task Processor Code");
 
-        if not NcTaskProcessor.FindFirst() then begin
+        NcTaskProcessor.Code := NcSetupMgt.NaviConnectDefaultTaskProcessorCode();
+        if not NcTaskProcessor.Find() then begin
             NcSyncMgt.UpdateTaskProcessor(NcTaskProcessor);
             Commit();
-            NcTaskProcessor.FindFirst();
         end;
 
         NcTaskSetup.Init();

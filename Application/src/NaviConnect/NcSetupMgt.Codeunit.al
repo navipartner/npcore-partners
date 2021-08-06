@@ -11,7 +11,7 @@
         end;
 
         NaviConnectSetup."Keep Tasks for" := CreateDateTime(Today, 000000T) - CreateDateTime(CalcDate('<-7D>', Today), 000000T);
-        NaviConnectSetup."Task Worker Group" := 'NC';
+        NaviConnectSetup."Task Worker Group" := NaviConnectDefaultTaskProcessorCode();
         NaviConnectSetup.Modify(true);
     end;
 
@@ -253,5 +253,52 @@
         if TaskLine.FindLast() then;
         LineNo := TaskLine."Line No." + 10000;
     end;
-}
 
+    procedure SetupTaskProcessingJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        NcTaskProcessor: Record "NPR Nc Task Processor";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        JobCategoryDescrLbl: Label 'NaviConnect related tasks';
+    begin
+        NcTaskProcessor.Code := NaviConnectDefaultTaskProcessorCode();
+        if not NcTaskProcessor.Find() then begin
+            NcSyncMgt.UpdateTaskProcessor(NcTaskProcessor);
+            Commit();
+        end;
+        JobQueueCategory.InsertRec(JQCategoryCode(), JobCategoryDescrLbl);
+        JobQueueMgt.SetShowAutoCreatedClause(Autocreated);
+        JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTaskProcessor.Code, true, JobQueueCategory.Code);
+    end;
+
+    procedure SetupDefaultNcImportListProcessingJobQueue(Autocreated: Boolean)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+    begin
+        JobQueueMgt.SetShowAutoCreatedClause(Autocreated);
+        JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, '', '');
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
+    local procedure AddDefaultNCJobQueues_OnCompanyInitialize()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        if not TaskScheduler.CanCreateTask() then
+            exit;
+        SetupTaskProcessingJobQueue(JobQueueEntry, true);
+        SetupDefaultNcImportListProcessingJobQueue(true);
+    end;
+
+    procedure NaviConnectDefaultTaskProcessorCode(): Code[10]
+    begin
+        exit('NC');
+    end;
+
+    local procedure JQCategoryCode(): Code[10]
+    begin
+        exit('NPR-NC');
+    end;
+}

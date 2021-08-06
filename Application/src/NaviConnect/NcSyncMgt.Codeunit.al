@@ -1,7 +1,6 @@
 ﻿codeunit 6151505 "NPR Nc Sync. Mgt."
 {
     var
-        NaviConnectDefaultTxt: Label 'NaviConnect Default';
         FtpBackupErr: Label 'Error during Ftp Backup (%1):\\%2', Comment = '%1=Filename;%2=GetLastErrorText()';
         FileIsNotValidErr: Label 'File %1 is not valid', Comment = '%1=FileName';
         SyncEndTime: DateTime;
@@ -314,17 +313,20 @@
         Commit();
     end;
 
-    procedure UpdateTaskProcessor(TaskProcessor: Record "NPR Nc Task Processor")
+    procedure UpdateTaskProcessor(var TaskProcessor: Record "NPR Nc Task Processor")
+    var
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        TaskProcDescrLbl: Label 'NaviConnect Default';
     begin
         if TaskProcessor.Find() then
             exit;
 
-        if TaskProcessor.Code in ['', 'NC'] then begin
+        if TaskProcessor.Code in ['', NcSetupMgt.NaviConnectDefaultTaskProcessorCode()] then begin
             TaskProcessor.Init();
-            TaskProcessor.Code := 'NC';
-            TaskProcessor.Description := CopyStr(NaviConnectDefaultTxt, 1, MaxStrLen(TaskProcessor.Description));
-            TaskProcessor.Insert(true);
+            TaskProcessor.Code := NcSetupMgt.NaviConnectDefaultTaskProcessorCode();
+            TaskProcessor.Description := TaskProcDescrLbl;
         end;
+        TaskProcessor.Insert(true);
     end;
     #endregion "Status Mgt."
 

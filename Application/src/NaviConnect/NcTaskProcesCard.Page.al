@@ -2,9 +2,8 @@ page 6151507 "NPR Nc Task Proces. Card"
 {
     Caption = 'NaviConnect Task Processor';
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Nc Task Processor";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {
@@ -34,4 +33,3 @@ page 6151507 "NPR Nc Task Proces. Card"
         }
     }
 }
-
