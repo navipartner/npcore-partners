@@ -39,6 +39,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         end;
 
         Commit();
+        ClearLastError();
     end;
 
     var
