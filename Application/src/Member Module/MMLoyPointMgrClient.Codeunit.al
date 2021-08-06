@@ -321,7 +321,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
 
         XmlResponseDoc.WriteTo(XmlAsText);
-        XmlDomMgt.RemoveNameSpaces(XmlAsText);
+        XmlAsText := XmlDomMgt.RemoveNameSpaces(XmlAsText);
         XmlDocument.ReadFrom(XmlAsText, XmlResponseDoc);
 
         if (not XmlResponseDoc.GetRoot(Element)) then
@@ -382,7 +382,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     begin
 
         XmlResponseDoc.WriteTo(XmlAsText);
-        XmlDomMgt.RemoveNameSpaces(XmlAsText);
+        XmlAsText := XmlDomMgt.RemoveNameSpaces(XmlAsText);
         XmlDocument.ReadFrom(XmlAsText, XmlResponseDoc);
 
         if (not XmlResponseDoc.GetRoot(Element)) then
