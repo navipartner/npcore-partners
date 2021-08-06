@@ -104,4 +104,43 @@ codeunit 6014460 "NPR Aux. Tables Event Subs."
             AuxGLAccount.Rename(Rec."No.");
     end;
     #endregion
+
+    #region G/L Entry
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Line", 'OnAfterInsertGlobalGLEntry', '', false, false)]
+    local procedure InsertAuxGLEntryOnAfterInsertGlobalGLEntry(var GLEntry: Record "G/L Entry"; var TempGLEntryBuf: Record "G/L Entry"; var NextEntryNo: Integer)
+    var
+        AuxTablesMgt: Codeunit "NPR Aux. Tables Mgt.";
+    begin
+        IF GLEntry.IsTemporary() then
+            Exit;
+
+        AuxTablesMgt.CopyGLEntryToAux(GLEntry);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure GLEntryOnAfterDelete(var Rec: Record "G/L Entry")
+    var
+        AuxGLEntry: Record "NPR Aux. G/L Entry";
+    begin
+        // some report or correction process could delete GL Entry --> delete also Auxiliary Entry
+        if Rec.IsTemporary() then
+            exit;
+
+        if AuxGLEntry.Get(Rec."Entry No.") then
+            AuxGLEntry.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterRenameEvent', '', false, false)]
+    local procedure GLEntryOnAfterRename(var Rec: Record "G/L Entry"; var xRec: Record "G/L Entry")
+    var
+        AuxGLEntry: Record "NPR Aux. G/L Entry";
+    begin
+        // some report or correction process could rename GL Entry --> rename also Auxiliary Entry
+        if Rec.IsTemporary() then
+            exit;
+
+        if AuxGLEntry.Get(xRec."Entry No.") then
+            AuxGLEntry.Rename(Rec."Entry No.");
+    end;
+    #endregion
 }

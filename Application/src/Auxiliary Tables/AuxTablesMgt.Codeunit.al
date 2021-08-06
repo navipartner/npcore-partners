@@ -72,4 +72,13 @@ codeunit 6014440 "NPR Aux. Tables Mgt."
         AuxItemLedgerEntry."Invoiced Quantity" := ItemLedgerEntry."Invoiced Quantity";
         AuxItemLedgerEntry.Modify();
     end;
+
+    procedure CopyGLEntryToAux(GLEntry: Record "G/L Entry")
+    var
+        AuxGLEntry: Record "NPR Aux. G/L Entry";
+    begin
+        AuxGLEntry.Init();
+        AuxGLEntry.TransferFields(GLEntry);
+        AuxGLEntry.Insert();
+    end;
 }

@@ -1337,6 +1337,53 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux. G/L Entry", 'OnAfterInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterInsertAuxGLEntry(var Rec: Record "NPR Aux. G/L Entry"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux. G/L Entry", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyAuxGLEntry(var Rec: Record "NPR Aux. G/L Entry"; var xRec: Record "NPR Aux. G/L Entry"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Aux. G/L Entry", 'OnAfterRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterRenameAuxGLEntry(var Rec: Record "NPR Aux. G/L Entry"; var xRec: Record "NPR Aux. G/L Entry"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
     #endregion
 
 }
