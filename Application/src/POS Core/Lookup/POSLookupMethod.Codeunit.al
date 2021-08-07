@@ -15,7 +15,7 @@ codeunit 6014570 "NPR POS Lookup Method"
         Generation: Integer;
         Skip: Integer;
         BatchSize: Integer;
-        CheckOnly: Boolean;
+        FetchType: Integer;
         LoadAll: Boolean;
         RetrievingLookupTypeLbl: Label 'Retrieving lookup type during LookupFromPOS';
     begin
@@ -31,13 +31,13 @@ codeunit 6014570 "NPR POS Lookup Method"
         LookupTypeEnum := LookupTypeFromTextToEnum(LookupTypeText, FrontEnd);
         Skip := Json.GetInteger('skip');
         BatchSize := Json.GetInteger('batchSize');
-        CheckOnly := Json.GetBoolean('checkOnly');
+        FetchType := Json.GetInteger('fetchType');
         LoadAll := Json.GetBoolean('loadAll');
         if BatchSize <= 0 then
             BatchSize := 120;
 
         Data.SetLookupType(LookupTypeText);
-        ProcessLookup(Generation, Skip, BatchSize, LoadAll, CheckOnly, LookupTypeEnum, Data);
+        ProcessLookup(Generation, Skip, BatchSize, LoadAll, FetchType, LookupTypeEnum, Data);
 
         FrontEnd.RespondToFrontEndMethod(Context, Data.GetJson(), FrontEnd);
     end;
@@ -52,10 +52,10 @@ codeunit 6014570 "NPR POS Lookup Method"
     /// <param name="Skip">Number of records to skip (this is the count of records already retrieved by the front end)</param>
     /// <param name="BatchSize">Size of batch. The result data set won't contain more than this many records.</param>
     /// <param name="LoadAll">Indicates whether all records must be loaded regardless of the batch size.</param>
-    /// <param name="CheckOnly">Indicates whether this call is a pre-emptive check for new generations.</param>
+    /// <param name="FetchType">Specifies how data is to be fetched. Different fetch types are invoked from different places in the front-end (check Dragonglass project documentation, constant FETCH_TYPE for more details.</param>
     /// <param name="LookupTypeEnum">Lookup type to use for processing</param>
     /// <param name="Data">Resulting data set instance to populate data into</param>
-    local procedure ProcessLookup(FrontEndGeneration: Integer; Skip: Integer; BatchSize: Integer; LoadAll: Boolean; CheckOnly: Boolean; LookupTypeEnum: Enum "NPR POS Lookup Type"; Data: Codeunit "NPR POS Lookup Data Set")
+    local procedure ProcessLookup(FrontEndGeneration: Integer; Skip: Integer; BatchSize: Integer; LoadAll: Boolean; FetchType: Option FetchFirstBatch,UpdateIfNeeded,FetchNextBatch; LookupTypeEnum: Enum "NPR POS Lookup Type"; Data: Codeunit "NPR POS Lookup Data Set")
     var
         LookupTypeGeneration: Record "NPR POS Lookup Type Generation";
         RecRef: RecordRef;
@@ -70,15 +70,18 @@ codeunit 6014570 "NPR POS Lookup Method"
         LookupType.InitializeDataRead(RecRef);
         BackEndGeneration := LookupTypeGeneration.GetGeneration(LookupTypeEnum);
         if Data.ShouldDoFullRefresh(BackEndGeneration, FrontEndGeneration) then begin
-            if not CheckOnly then begin
-                // When CheckOnly is false, we must include all the already-known rows in the update to avoid scroll flickering
-                BatchSize += Skip;
+            // If full refresh is needed (generations are different) then we must modify the BatchSize and Skip parameter values!
+            case FetchType of
+                FetchType::UpdateIfNeeded:
+                    BatchSize := Skip; // We only update known rows, but don't fetch more
+                FetchType::FetchNextBatch:
+                    BatchSize += Skip; // We update known rows, and fetch one more batch
             end;
-            // else... when CheckOnly is true, we are safe to start from scratch, so we keep BatchSize at specified value, but still reset Skip
-            Skip := 0;
+            Skip := 0; // And finally we reset the starting position to make sure to start reading from the first row
         end else begin
-            // If full refresh is not needed (same generations) and we are checking only, then we do not need to return anything
-            if CheckOnly then
+            // If this is the first batch requested by the front end, and front-end and back-end generations are equal, no update is needed
+            // Keep in mind that for the very first front-end call (empty redux lookup cache), front-end generation is always -1 so full refresh will have been requested, so this else block cannot happen
+            if FetchType = FetchType::FetchFirstBatch then
                 exit;
         end;
 
