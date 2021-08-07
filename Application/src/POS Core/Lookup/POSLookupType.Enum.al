@@ -14,4 +14,22 @@ enum 6014470 "NPR POS Lookup Type" implements "NPR IPOSLookupType"
         Caption = 'Bank Deposit Bin Code';
         Implementation = "NPR IPOSLookupType" = "NPR Lookup: BankDepositBinCode";
     }
+
+    /// <summary>
+    /// Item (for lookup dialogs)
+    /// </summary>
+    value(1; Item)
+    {
+        Caption = 'Item';
+        Implementation = "NPR IPOSLookupType" = "NPR Lookup: Item";
+    }
+
+    /// <summary>
+    /// Customer (for lookup dialogs)
+    /// </summary>
+    value(2; Customer)
+    {
+        Caption = 'Customer';
+        Implementation = "NPR IPOSLookupType" = "NPR Lookup: Customer";
+    }
 }

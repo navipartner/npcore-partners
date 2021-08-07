@@ -59,7 +59,8 @@ table 6014549 "NPR POS Lookup Type Generation"
     var
         CanModify: Boolean;
     begin
-        CanModify := Rec.Get(LookupType);
+        Rec."Lookup Type" := LookupType;
+        CanModify := Rec.Find('=');
         Rec.Generation += 1;
         if CanModify then
             Rec.Modify()
