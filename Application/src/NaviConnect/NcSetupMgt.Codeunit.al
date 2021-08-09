@@ -256,29 +256,25 @@
 
     procedure SetupTaskProcessingJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
     var
-        JobQueueCategory: Record "Job Queue Category";
         NcTaskProcessor: Record "NPR Nc Task Processor";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        JobCategoryDescrLbl: Label 'NaviConnect related tasks';
     begin
         NcTaskProcessor.Code := NaviConnectDefaultTaskProcessorCode();
         if not NcTaskProcessor.Find() then begin
             NcSyncMgt.UpdateTaskProcessor(NcTaskProcessor);
             Commit();
         end;
-        JobQueueCategory.InsertRec(JQCategoryCode(), JobCategoryDescrLbl);
         JobQueueMgt.SetShowAutoCreatedClause(Autocreated);
-        JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTaskProcessor.Code, true, JobQueueCategory.Code);
+        JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTaskProcessor.Code, true, '');
     end;
 
     procedure SetupDefaultNcImportListProcessingJobQueue(Autocreated: Boolean)
     var
-        JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         JobQueueMgt.SetShowAutoCreatedClause(Autocreated);
-        JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, '', '');
+        JobQueueMgt.ScheduleNcImportListProcessing('', '');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
@@ -297,8 +293,35 @@
         exit('NC');
     end;
 
-    local procedure JQCategoryCode(): Code[10]
+    procedure DefaultNCJQCategoryCode(CodeunitID: Integer): Code[10]
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        ImportListJQCategoryCode: Label 'NPR-NC-IMP', MaxLength = 10, Locked = true;
+        ImportListJQCategoryDescrLbl: Label 'NaviConnect import list proc.', MaxLength = 30;
+        TaskListJQCategoryCode: Label 'NPR-NC-TSK', MaxLength = 10, Locked = true;
+        TaskListJQCategoryDescrLbl: Label 'NaviConnect task list proc.', MaxLength = 30;
     begin
-        exit('NPR-NC');
+        case CodeunitID of
+            TaskListProcessingCodeunit():
+                begin
+                    JobQueueCategory.InsertRec(TaskListJQCategoryCode, TaskListJQCategoryDescrLbl);
+                    exit(JobQueueCategory.Code);
+                end;
+            ImportListProcessingCodeunit():
+                begin
+                    JobQueueCategory.InsertRec(ImportListJQCategoryCode, ImportListJQCategoryDescrLbl);
+                    exit(JobQueueCategory.Code);
+                end;
+        end;
+    end;
+
+    procedure ImportListProcessingCodeunit(): Integer
+    begin
+        exit(Codeunit::"NPR Nc Import List Processing");
+    end;
+
+    procedure TaskListProcessingCodeunit(): Integer
+    begin
+        exit(Codeunit::"NPR Nc Task List Processing");
     end;
 }

@@ -2,8 +2,16 @@ codeunit 6014663 "NPR Job Queue Management"
 {
     var
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         ShowAutoCreatedClause: Boolean;
         ParamNameAndValueLbl: Label '%1=%2';
+
+    procedure ScheduleNcTaskProcessing(TaskProcessorCode: Code[20]; EnableTaskListUpdate: Boolean; JobQueueCatagoryCode: Code[10])
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        ScheduleNcTaskProcessing(JobQueueEntry, TaskProcessorCode, EnableTaskListUpdate, JobQueueCatagoryCode, 0);
+    end;
 
     procedure ScheduleNcTaskProcessing(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; EnableTaskListUpdate: Boolean; JobQueueCatagoryCode: Code[10])
     begin
@@ -18,6 +26,9 @@ codeunit 6014663 "NPR Job Queue Management"
         Handled: Boolean;
         JobQueueDescrLbl: Label '%1 Task List processing';
     begin
+        if JobQueueCatagoryCode = '' then
+            JobQueueCatagoryCode := NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.TaskListProcessingCodeunit());
+
         Clear(JobQueueEntry);
         OnBeforeScheduleNcTaskProcessing(JobQueueEntry, TaskProcessorCode, EnableTaskListUpdate, JobQueueCatagoryCode, Handled);
         if Handled then
@@ -41,7 +52,7 @@ codeunit 6014663 "NPR Job Queue Management"
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR Nc Task List Processing",
+            NcSetupMgt.TaskListProcessingCodeunit(),
             JQParamStrMgt.GetParamListAsCSString(),
             JobQueueDescription,
             NotBeforeDateTime,
@@ -50,6 +61,13 @@ codeunit 6014663 "NPR Job Queue Management"
             JobQueueEntry)
         then
             StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+    end;
+
+    procedure ScheduleNcImportListProcessing(ImportTypeCode: Code[20]; JobQueueCatagoryCode: Code[10])
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        ScheduleNcImportListProcessing(JobQueueEntry, ImportTypeCode, JobQueueCatagoryCode, 0);
     end;
 
     procedure ScheduleNcImportListProcessing(var JobQueueEntry: Record "Job Queue Entry"; ImportTypeCode: Code[20]; JobQueueCatagoryCode: Code[10])
@@ -65,6 +83,9 @@ codeunit 6014663 "NPR Job Queue Management"
         Handled: Boolean;
         JobQueueDescrLbl: Label 'Import List entry processing';
     begin
+        if JobQueueCatagoryCode = '' then
+            JobQueueCatagoryCode := NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.ImportListProcessingCodeunit());
+
         OnBeforeScheduleNcImportListProcessing(JobQueueEntry, ImportTypeCode, JobQueueCatagoryCode, Handled);
         if Handled then
             exit;
@@ -87,7 +108,7 @@ codeunit 6014663 "NPR Job Queue Management"
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR Nc Import List Processing",
+            NcSetupMgt.ImportListProcessingCodeunit(),
             JQParamStrMgt.GetParamListAsCSString(),
             JobQueueDescription,
             NotBeforeDateTime,
