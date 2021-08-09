@@ -84,7 +84,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         SendHttpRequest(RequestMessage, ResponseText);
 
         Response.ReadFrom(ResponseText);
-        paymentline."Charge ID" := GetJsonText(Response, 'chargeId', 0);
+        paymentline."Charge ID" := CopyStr(GetJsonText(Response, 'chargeId', 0), 1, MaxStrLen(paymentline."Charge ID"));
         PaymentLine."Date Captured" := Today();
         PaymentLine.Modify(true);
     end;

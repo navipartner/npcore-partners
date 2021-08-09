@@ -35,7 +35,7 @@ table 6151416 "NPR Magento Brand"
             begin
                 PictureName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::Brand, Picture);
                 if PictureName <> '' then
-                    Picture := PictureName;
+                    Picture := CopyStr(PictureName, 1, MaxStrLen(Picture));
             end;
         }
         field(9; Description; BLOB)
@@ -50,7 +50,7 @@ table 6151416 "NPR Magento Brand"
 
             trigger OnValidate()
             begin
-                "Seo Link" := MagentoFunctions.SeoFormat("Seo Link");
+                "Seo Link" := CopyStr(MagentoFunctions.SeoFormat("Seo Link"), 1, MaxStrLen("Seo Link"));
             end;
         }
         field(15; "Short Description"; BLOB)
@@ -68,7 +68,7 @@ table 6151416 "NPR Magento Brand"
             begin
                 PictureName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::Brand, "Logo Picture");
                 if PictureName <> '' then
-                    "Logo Picture" := PictureName;
+                    "Logo Picture" := CopyStr(PictureName, 1, MaxStrLen("Logo Picture"));
             end;
         }
         field(105; "Sorting"; Integer)
@@ -124,7 +124,7 @@ table 6151416 "NPR Magento Brand"
 
         if "Seo Link" = '' then
             "Seo Link" := Name;
-        "Seo Link" := MagentoFunctions.SeoFormat("Seo Link");
+        "Seo Link" := CopyStr(MagentoFunctions.SeoFormat("Seo Link"), 1, MaxStrLen("Seo Link"));
     end;
 
     trigger OnModify()
@@ -138,7 +138,7 @@ table 6151416 "NPR Magento Brand"
 
         if "Seo Link" = '' then
             "Seo Link" := Name;
-        "Seo Link" := MagentoFunctions.SeoFormat("Seo Link");
+        "Seo Link" := CopyStr(MagentoFunctions.SeoFormat("Seo Link"), 1, MaxStrLen("Seo Link"));
     end;
 
     trigger OnRename()

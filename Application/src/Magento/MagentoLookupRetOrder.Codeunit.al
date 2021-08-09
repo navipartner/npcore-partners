@@ -46,7 +46,7 @@
 
         foreach Node in XmlNodeList do begin
             if Node.AsXmlElement().Attributes().Get('return_order_no', ReturnOrderNoAttribute) then
-                ReturnOrderNo := ReturnOrderNoAttribute.Value;
+                ReturnOrderNo := CopyStr(ReturnOrderNoAttribute.Value, 1, MaxStrLen(ReturnOrderNo));
             if (ReturnOrderNo <> '') and (StrLen(ReturnOrderNo) <= MaxStrLen(SalesHeader."NPR External Order No.")) then begin
                 SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
                 SalesHeader.SetRange("NPR External Order No.", ReturnOrderNo);

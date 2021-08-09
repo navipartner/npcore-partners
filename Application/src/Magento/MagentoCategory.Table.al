@@ -87,7 +87,7 @@ table 6151414 "NPR Magento Category"
             begin
                 IconName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::"Item Group", Icon);
                 if IconName <> '' then
-                    Icon := IconName;
+                    Icon := CopyStr(IconName, 1, MaxStrLen(Icon));
             end;
         }
         field(130; "Short Description"; BLOB)
@@ -124,7 +124,7 @@ table 6151414 "NPR Magento Category"
             begin
                 PictureName := NaviConnectFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::"Item Group", Picture);
                 if PictureName <> '' then
-                    Picture := PictureName;
+                    Picture := CopyStr(PictureName, 1, MaxStrLen(Picture));
             end;
         }
         field(6059808; "Sorting"; Integer)
@@ -155,7 +155,7 @@ table 6151414 "NPR Magento Category"
 
             trigger OnValidate()
             begin
-                "Seo Link" := NaviConnectFunctions.SeoFormat("Seo Link");
+                "Seo Link" := CopyStr(NaviConnectFunctions.SeoFormat("Seo Link"), 1, MaxStrLen("Seo Link"));
             end;
         }
         field(6060021; "Meta Title"; Text[100])
@@ -259,7 +259,7 @@ table 6151414 "NPR Magento Category"
     begin
         MagentoCategory.SetRange("Parent Category Id", Id);
         if not MagentoCategory.FindLast() then
-            exit(Id + '00');
+            exit(CopyStr(Id + '00', 1, MaxStrLen(NewChildGroupNo)));
 
         exit(IncStr(MagentoCategory.Id));
     end;
@@ -271,7 +271,7 @@ table 6151414 "NPR Magento Category"
         MagentoCategoryPath := Id;
         if MagentoCategory.Get("Parent Category Id") then
             repeat
-                MagentoCategoryPath := MagentoCategory.Id + '/' + MagentoCategoryPath;
+                MagentoCategoryPath := CopyStr(MagentoCategory.Id + '/' + MagentoCategoryPath, 1, MaxStrLen(MagentoCategoryPath));
             until (not MagentoCategory.Get(MagentoCategory."Parent Category Id")) or (MagentoCategory.Id = '');
 
         exit(MagentoCategoryPath);
@@ -305,7 +305,7 @@ table 6151414 "NPR Magento Category"
             repeat
                 NewPath := Path + '/' + MagentoCategory.Id;
                 if (MagentoCategory.Path <> NewPath) or (MagentoCategory."Root No." <> "Root No.") then begin
-                    MagentoCategory.Path := NewPath;
+                    MagentoCategory.Path := CopyStr(NewPath, 1, MaxStrLen(MagentoCategory.Path));
                     MagentoCategory."Root No." := "Root No.";
                     MagentoCategory.Modify();
                 end;

@@ -111,7 +111,7 @@
         Initialize();
         ExternalCustomerNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'customer_no', false);
         if IsContactCustomer then begin
-            if GetContactCustomer(ExternalCustomerNo, Customer) then
+            if GetContactCustomer(CopyStr(ExternalCustomerNo, 1, 20), Customer) then
                 exit;
         end;
 
@@ -122,7 +122,7 @@
 
             Customer.Init();
             Customer."No." := '';
-            Customer."NPR External Customer No." := ExternalCustomerNo;
+            Customer."NPR External Customer No." := CopyStr(ExternalCustomerNo, 1, MaxStrLen(Customer."NPR External Customer No."));
             Customer.Insert(true);
             CustTemplateCode := MagentoMgt.GetCustTemplate(Customer);
             if CustTemplateCode <> '' then begin
@@ -154,20 +154,20 @@
             RecRef.SetTable(Customer);
         end;
 
-        Customer.Name := NpXmlDomMgt.GetXmlText(XmlElement, 'name', MaxStrLen(Customer.Name), true);
-        Customer."Name 2" := NpXmlDomMgt.GetXmlText(XmlElement, 'name_2', MaxStrLen(Customer."Name 2"), false);
-        Customer.Address := NpXmlDomMgt.GetXmlText(XmlElement, 'address', MaxStrLen(Customer.Address), true);
-        Customer."Address 2" := NpXmlDomMgt.GetXmlText(XmlElement, 'address_2', MaxStrLen(Customer.Address), false);
-        Customer."Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'post_code', MaxStrLen(Customer."Post Code"), true));
-        Customer.City := NpXmlDomMgt.GetXmlText(XmlElement, 'city', MaxStrLen(Customer.City), true);
-        Customer."Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'country_code', MaxStrLen(Customer."Country/Region Code"), false));
-        Customer.Contact := NpXmlDomMgt.GetXmlText(XmlElement, 'contact', MaxStrLen(Customer.Contact), false);
-        Customer."E-Mail" := NpXmlDomMgt.GetXmlText(XmlElement, 'email', MaxStrLen(Customer."E-Mail"), true);
-        Customer."Phone No." := NpXmlDomMgt.GetXmlText(XmlElement, 'phone', MaxStrLen(Customer."Phone No."), false);
+        Customer.Name := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'name', MaxStrLen(Customer.Name), true), 1, MaxStrLen(Customer.Name));
+        Customer."Name 2" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'name_2', MaxStrLen(Customer."Name 2"), false), 1, MaxStrLen(Customer."Name 2"));
+        Customer.Address := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'address', MaxStrLen(Customer.Address), true), 1, MaxStrLen(Customer.Address));
+        Customer."Address 2" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'address_2', MaxStrLen(Customer.Address), false), 1, MaxStrLen(Customer."Address 2"));
+        Customer."Post Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'post_code', MaxStrLen(Customer."Post Code"), true)), 1, MaxStrLen(Customer."Post Code"));
+        Customer.City := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'city', MaxStrLen(Customer.City), true), 1, MaxStrLen(Customer.City));
+        Customer."Country/Region Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'country_code', MaxStrLen(Customer."Country/Region Code"), false)), 1, MaxStrLen(Customer."Country/Region Code"));
+        Customer.Contact := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'contact', MaxStrLen(Customer.Contact), false), 1, MaxStrLen(Customer.Contact));
+        Customer."E-Mail" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'email', MaxStrLen(Customer."E-Mail"), true), 1, MaxStrLen(Customer."E-Mail"));
+        Customer."Phone No." := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'phone', MaxStrLen(Customer."Phone No."), false), 1, MaxStrLen(Customer."Phone No."));
         RecRef.GetTable(Customer);
         SetFieldText(RecRef, 13600, NpXmlDomMgt.GetXmlText(XmlElement, 'ean', 13, false));
         RecRef.SetTable(Customer);
-        Customer."VAT Registration No." := NpXmlDomMgt.GetXmlText(XmlElement, 'vat_registration_no', MaxStrLen(Customer."VAT Registration No."), false);
+        Customer."VAT Registration No." := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'vat_registration_no', MaxStrLen(Customer."VAT Registration No."), false), 1, MaxStrLen(Customer."VAT Registration No."));
         Customer."Prices Including VAT" := true;
 
         if PrevCust = Format(Customer) then
@@ -208,7 +208,7 @@
         PaymentLine."Payment Type" := PaymentLine."Payment Type"::"Payment Method";
         PaymentLine."Account Type" := PaymentMethod."Bal. Account Type";
         PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
-        PaymentLine."No." := TransactionId;
+        PaymentLine."No." := CopyStr(TransactionId, 1, MaxStrLen(PaymentLine."No."));
         PaymentLine."Posting Date" := SalesHeader."Posting Date";
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
@@ -247,7 +247,7 @@
     begin
         Initialize();
         Clear(SalesHeader);
-        OrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'return_order_no', true);
+        OrderNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'return_order_no', true), 1, MaxStrLen(OrderNo));
 
         if not XmlElement.SelectSingleNode('.//*[local-name()="sell_to_customer"]', Node) then
             Error(Error001);
@@ -256,7 +256,7 @@
         SalesHeader."Document Type" := SalesHeader."Document Type"::"Return Order";
         SalesHeader."No." := '';
         SalesHeader."NPR External Order No." := CopyStr(OrderNo, 1, MaxStrLen(SalesHeader."NPR External Order No."));
-        SalesHeader."External Document No." := NpXmlDomMgt.GetXmlText(XmlElement, 'external_document_no', MaxStrLen(SalesHeader."External Document No."), false);
+        SalesHeader."External Document No." := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'external_document_no', MaxStrLen(SalesHeader."External Document No."), false), 1, MaxStrLen(SalesHeader."External Document No."));
         if SalesHeader."External Document No." = '' then
             SalesHeader."External Document No." := SalesHeader."NPR External Order No.";
         SalesHeader.Insert(true);
@@ -264,14 +264,14 @@
         SalesHeader."Prices Including VAT" := true;
 
         if XmlElement.SelectSingleNode('.//*[local-name()="ship_to_customer"]', Node) then begin
-            SalesHeader."Ship-to Name" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', MaxStrLen(SalesHeader."Ship-to Name"), true);
-            SalesHeader."Ship-to Name 2" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name_2', MaxStrLen(SalesHeader."Ship-to Name 2"), false);
-            SalesHeader."Ship-to Address" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address', MaxStrLen(SalesHeader."Ship-to Address"), true);
-            SalesHeader."Ship-to Address 2" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address_2', MaxStrLen(SalesHeader."Ship-to Address 2"), false);
-            SalesHeader."Ship-to Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'post_code', MaxStrLen(SalesHeader."Ship-to Post Code"), true));
-            SalesHeader."Ship-to City" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'city', MaxStrLen(SalesHeader."Ship-to City"), true);
-            SalesHeader."Ship-to Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'country_code', MaxStrLen(SalesHeader."Ship-to Country/Region Code"), false));
-            SalesHeader."Ship-to Contact" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'contact', MaxStrLen(SalesHeader."Ship-to Contact"), false);
+            SalesHeader."Ship-to Name" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', MaxStrLen(SalesHeader."Ship-to Name"), true), 1, MaxStrLen(SalesHeader."Ship-to Name"));
+            SalesHeader."Ship-to Name 2" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name_2', MaxStrLen(SalesHeader."Ship-to Name 2"), false), 1, MaxStrLen(SalesHeader."Ship-to Name 2"));
+            SalesHeader."Ship-to Address" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address', MaxStrLen(SalesHeader."Ship-to Address"), true), 1, MaxStrLen(SalesHeader."Ship-to Address"));
+            SalesHeader."Ship-to Address 2" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address_2', MaxStrLen(SalesHeader."Ship-to Address 2"), false), 1, MaxStrLen(SalesHeader."Ship-to Address 2"));
+            SalesHeader."Ship-to Post Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'post_code', MaxStrLen(SalesHeader."Ship-to Post Code"), true)), 1, MaxStrLen(SalesHeader."Ship-to Post Code"));
+            SalesHeader."Ship-to City" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'city', MaxStrLen(SalesHeader."Ship-to City"), true), 1, MaxStrLen(SalesHeader."Ship-to City"));
+            SalesHeader."Ship-to Country/Region Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'country_code', MaxStrLen(SalesHeader."Ship-to Country/Region Code"), false)), 1, MaxStrLen(SalesHeader."Ship-to Country/Region Code"));
+            SalesHeader."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'contact', MaxStrLen(SalesHeader."Ship-to Contact"), false), 1, MaxStrLen(SalesHeader."Ship-to Contact"));
         end;
 
         SalesHeader.Validate("Salesperson Code", MagentoSetup."Salesperson Code");
@@ -307,13 +307,13 @@
             end;
         end;
 
-        WebsiteCode := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'website_code', true);
+        WebsiteCode := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'website_code', true), 1, MaxStrLen(WebsiteCode));
         if (MagentoWebsite.Get(WebsiteCode)) and (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
             SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");
             SalesHeader.Validate("Shortcut Dimension 2 Code", MagentoWebsite."Global Dimension 2 Code");
         end;
         SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
-        SalesHeader.Validate("Currency Code", GetCurrencyCode(NpXmlDomMgt.GetElementCode(XmlElement, 'currency_code', MaxStrLen(SalesHeader."Currency Code"), false)));
+        SalesHeader.Validate("Currency Code", GetCurrencyCode(CopyStr(NpXmlDomMgt.GetElementCode(XmlElement, 'currency_code', MaxStrLen(SalesHeader."Currency Code"), false), 1, MaxStrLen(SalesHeader."Currency Code"))));
         SalesHeader.Modify(true);
     end;
 
@@ -378,7 +378,7 @@
                     SalesLine."Line No." := LineNo;
                     SalesLine.Insert(true);
                     SalesLine.Validate(Type, SalesLine.Type::" ");
-                    SalesLine.Description := NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true);
+                    SalesLine.Description := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
                     SalesLine.Modify(true);
                 end;
             'item':
@@ -386,14 +386,14 @@
                     ExternalItemNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_no', true);
                     Position := StrPos(ExternalItemNo, '_');
                     if Position = 0 then begin
-                        ItemNo := CopyStr(ExternalItemNo, 1, MaxStrLen(SalesHeader."No."));
+                        ItemNo := CopyStr(ExternalItemNo, 1, MaxStrLen(ItemNo));
                         VariantCode := '';
                     end else begin
-                        ItemNo := CopyStr(CopyStr(ExternalItemNo, 1, Position - 1), 1, MaxStrLen(SalesHeader."No."));
-                        VariantCode := CopyStr(CopyStr(ExternalItemNo, Position + 1), 1, MaxStrLen(SalesHeader."No."));
+                        ItemNo := CopyStr(CopyStr(ExternalItemNo, 1, Position - 1), 1, MaxStrLen(ItemNo));
+                        VariantCode := CopyStr(CopyStr(ExternalItemNo, Position + 1), 1, MaxStrLen(VariantCode));
                     end;
                     if not Item.Get(ItemNo) then
-                        if not (TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, TableId)) then
+                        if not (TranslateBarcodeToItemVariant(CopyStr(ExternalItemNo, 1, 50), ItemNo, VariantCode, TableId)) then
                             Error(Error002, ItemNo, TableId);
 
                     if VariantCode <> '' then
@@ -440,7 +440,7 @@
                         SalesCommentLine."Document Line No." := 0;
                         SalesCommentLine."Line No." := LineNo;
                         SalesCommentLine.Date := Today();
-                        SalesCommentLine.Comment := NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true);
+                        SalesCommentLine.Comment := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesCommentLine.Comment));
                         SalesCommentLine.Insert(true);
                     end else begin
                         LineNo += 10000;
@@ -457,7 +457,7 @@
                             SalesLine.Validate(Quantity, Quantity2);
                         Evaluate(UnitPrice2, NpXmlDomMgt.GetXmlText(XmlElement, 'unit_price_incl_vat', 0, true), 9);
                         SalesLine.Validate("Unit Price", UnitPrice2);
-                        SalesLine.Description := NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true);
+                        SalesLine.Description := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
                         SalesLine.Modify(true);
                     end;
                 end;
@@ -567,7 +567,7 @@
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         OrderNo: Code[20];
     begin
-        OrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'return_order_no', true);
+        OrderNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'return_order_no', true), 1, MaxStrLen(OrderNo));
         if OrderNo = '' then
             exit(true);
 

@@ -251,7 +251,7 @@ codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
 
         if not EFTShopperRecognition.Get(EFTAdyenCloudIntegration.IntegrationType(), PaymentLine."Payment Gateway Shopper Ref.") then begin
             EFTShopperRecognition.Init();
-            EFTShopperRecognition."Integration Type" := EFTAdyenCloudIntegration.IntegrationType();
+            EFTShopperRecognition."Integration Type" := CopyStr(EFTAdyenCloudIntegration.IntegrationType(), 1, MaxStrLen(EFTShopperRecognition."Integration Type"));
             EFTShopperRecognition."Shopper Reference" := PaymentLine."Payment Gateway Shopper Ref.";
             EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
             EFTShopperRecognition."Entity Key" := SalesHeader."Sell-to Customer No.";
