@@ -91,4 +91,17 @@ enum 6014474 "NPR Replication EndPoint Meth" implements "NPR Replication IEndpoi
         Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Mixed Disc.";
     }
 
+    value(60; "Get Dimensions")
+    {
+        Caption = 'Get Dimensions';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Dimensions";
+
+    }
+
+    value(65; "Get Dimension Values")
+    {
+        Caption = 'Get Dimension Values';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Dimension Values";
+    }
+
 }

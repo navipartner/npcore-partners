@@ -684,6 +684,15 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Executes the Client Attributes action';
                     ApplicationArea = NPRRetail;
                 }
+
+                action("Replication API Setup")
+                {
+                    Caption = 'Replication API Setup List';
+                    RunObject = Page "NPR Replication Setup List";
+
+                    ToolTip = 'Executes the Replication API Setup List action';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group("Posting Setup")
             {
