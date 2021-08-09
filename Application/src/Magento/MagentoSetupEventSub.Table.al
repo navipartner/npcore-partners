@@ -26,7 +26,7 @@ table 6151418 "NPR Magento Setup Event Sub."
                     exit;
 
                 "Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Function Name" := EventSubscription."Subscriber Function";
+                "Function Name" := CopyStr(EventSubscription."Subscriber Function", 1, MaxStrLen("Function Name"));
             end;
 
             trigger OnValidate()
@@ -58,7 +58,7 @@ table 6151418 "NPR Magento Setup Event Sub."
                     exit;
 
                 "Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Function Name" := EventSubscription."Subscriber Function";
+                "Function Name" := CopyStr(EventSubscription."Subscriber Function", 1, MaxStrLen("Function Name"));
             end;
 
             trigger OnValidate()

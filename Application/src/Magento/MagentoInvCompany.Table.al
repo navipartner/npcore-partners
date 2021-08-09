@@ -88,7 +88,7 @@ table 6151410 "NPR Magento Inv. Company"
         Position: Integer;
     begin
         if "Api Url" = '' then begin
-            "Api Url" := GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"NPR Magento Webservice");
+            "Api Url" := CopyStr(GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"NPR Magento Webservice"), 1, MaxStrLen("Api Url"));
             if StrPos(LowerCase("Api Url"), 'https://') = 1 then begin
                 Position := StrPos(CopyStr("Api Url", StrLen('https://')), ':');
                 "Api Url" := 'https://localhost.dynamics-retail.com:' + CopyStr("Api Url", StrLen('https://') + Position);

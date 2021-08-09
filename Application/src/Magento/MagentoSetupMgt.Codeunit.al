@@ -27,25 +27,25 @@
 
         if XmlElement.SelectNodes('stores/store', XNodeList) then begin
             foreach XNodeChild in XNodeList do begin
-                RootItemGroupNo := NpXmlDomMgt.GetXmlText(XmlElement, 'root_category', MaxStrLen(RootItemGroupNo), true);
+                RootItemGroupNo := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'root_category', MaxStrLen(RootItemGroupNo), true), 1, MaxStrLen(RootItemGroupNo));
                 if not XmlElement.SelectSingleNode('root_category', XNodeSibling) then
                     Error(Text000, MagentoWebsite.Code);
-                RootItemGroupNo := NpXmlDomMgt.GetXmlAttributeText(XNodeSibling, 'external_id', true);
+                RootItemGroupNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XNodeSibling, 'external_id', true), 1, MaxStrLen(RootItemGroupNo));
                 CreateRootItemGroup(RootItemGroupNo, CopyStr(MagentoWebsite.Name, 1, 50));
 
                 XNodeChild.AsXmlElement().Attributes().Get('code', XAttribute);
 
                 if not MagentoStore.Get(UpperCase(XAttribute.Value)) then begin
                     MagentoStore.Init();
-                    MagentoStore.Code := UpperCase(XAttribute.Value);
+                    MagentoStore.Code := CopyStr(UpperCase(XAttribute.Value), 1, MaxStrLen(MagentoStore.Code));
                     MagentoStore."Website Code" := MagentoWebsite.Code;
-                    MagentoStore.Name := XNodeChild.AsXmlElement().InnerText;
+                    MagentoStore.Name := CopyStr(XNodeChild.AsXmlElement().InnerText, 1, MaxStrLen(MagentoStore.Name));
                     MagentoStore."Root Item Group No." := RootItemGroupNo;
                     MagentoStore.Insert(true);
                 end else
                     if (MagentoStore."Website Code" <> MagentoWebsite.Code) or (MagentoStore.Name <> XNodeChild.AsXmlElement().InnerText) or (MagentoStore."Root Item Group No." <> RootItemGroupNo) then begin
                         MagentoStore."Website Code" := MagentoWebsite.Code;
-                        MagentoStore.Name := XNodeChild.AsXmlElement().InnerText;
+                        MagentoStore.Name := CopyStr(XNodeChild.AsXmlElement().InnerText, 1, MaxStrLen(MagentoStore.Name));
                         MagentoStore."Root Item Group No." := RootItemGroupNo;
                         MagentoStore.Modify(true);
                     end;
@@ -226,11 +226,11 @@
             if GroupCode <> '' then
                 if not MagentoCustomerGroup.Get(GroupCode) then begin
                     MagentoCustomerGroup.Init();
-                    MagentoCustomerGroup.Code := GroupCode;
-                    MagentoCustomerGroup."Magento Tax Class" := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'tax_class_code', 0, false);
+                    MagentoCustomerGroup.Code := CopyStr(GroupCode, 1, MaxStrLen(MagentoCustomerGroup.Code));
+                    MagentoCustomerGroup."Magento Tax Class" := CopyStr(NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'tax_class_code', 0, false), 1, MaxStrLen(MagentoCustomerGroup."Magento Tax Class"));
                     MagentoCustomerGroup.Insert(true);
                 end else begin
-                    MagentoCustomerGroup."Magento Tax Class" := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'tax_class_code', 0, false);
+                    MagentoCustomerGroup."Magento Tax Class" := CopyStr(NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'tax_class_code', 0, false), 1, MaxStrLen(MagentoCustomerGroup."Magento Tax Class"));
                     MagentoCustomerGroup.Modify(true);
                 end;
         end;
@@ -295,12 +295,12 @@
             XNode.AsXmlElement().Attributes().Get('code', XAttribute);
             if not MagentoWebsite.Get(XAttribute.Value) then begin
                 MagentoWebsite.Init();
-                MagentoWebsite.Code := UpperCase(XAttribute.Value);
-                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'name', 0, false);
+                MagentoWebsite.Code := CopyStr(UpperCase(XAttribute.Value), 1, MaxStrLen(MagentoWebsite.Code));
+                MagentoWebsite.Name := CopyStr(NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'name', 0, false), 1, MaxStrLen(MagentoWebsite.Name));
                 MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'is_default', 0, false) = '1';
                 MagentoWebsite.Insert(true);
             end else begin
-                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'name', 0, false);
+                MagentoWebsite.Name := CopyStr(NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'name', 0, false), 1, MaxStrLen(MagentoWebsite.Name));
                 MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'is_default', 0, false) = '1';
                 MagentoWebsite.Modify(true);
             end;
@@ -335,9 +335,9 @@
         XmlDoc.SelectNodes('//payment_method', XNodeList);
         foreach XNode in XNodeList do begin
             XNode.AsXmlElement().Attributes().Get('code', XAttribute);
-            PaymentCode := XAttribute.Value;
+            PaymentCode := CopyStr(XAttribute.Value, 1, MaxStrLen(PaymentCode));
             XNode.AsXmlElement().Attributes().Get('type', XAttribute);
-            PaymentType := XAttribute.Value;
+            PaymentType := CopyStr(XAttribute.Value, 1, MaxStrLen(PaymentCode));
 
             if not PaymentMapping.Get(PaymentCode, PaymentType) then begin
                 PaymentMapping.Init();
@@ -367,7 +367,7 @@
         XmlDoc.SelectNodes('//shipping_method', XNodeList);
         foreach XNode in XNodeList do begin
             XNode.AsXmlElement().Attributes().Get('carrier', XAttribute);
-            ShipmentCode := XAttribute.Value;
+            ShipmentCode := CopyStr(XAttribute.Value, 1, MaxStrLen(ShipmentCode));
             if not ShipmentMapping.Get(ShipmentCode) then begin
                 ShipmentMapping.Init();
                 ShipmentMapping."External Shipment Method Code" := ShipmentCode;

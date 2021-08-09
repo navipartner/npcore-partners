@@ -14,14 +14,14 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         LineNo += 10000;
         TempGenericSetupBuffer.Init();
         TempGenericSetupBuffer."Line No." := LineNo;
-        TempGenericSetupBuffer.Name := XmlElement.Name;
+        TempGenericSetupBuffer.Name := CopyStr(XmlElement.Name, 1, MaxStrLen(TempGenericSetupBuffer.Name));
         TempGenericSetupBuffer."Node Path" := TempGenericSetupBuffer.Name;
         if ParentNodePath <> '' then
-            TempGenericSetupBuffer."Node Path" := ParentNodePath + '/' + TempGenericSetupBuffer."Node Path";
+            TempGenericSetupBuffer."Node Path" := CopyStr(ParentNodePath + '/' + TempGenericSetupBuffer."Node Path", 1, MaxStrLen(TempGenericSetupBuffer."Node Path"));
         TempGenericSetupBuffer.Container := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.ElementType"(), false) = "ElementType.Container"();
         if not TempGenericSetupBuffer.Container then begin
-            TempGenericSetupBuffer."Data Type" := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.FieldType"(), false);
-            TempGenericSetupBuffer.Value := XmlElement.InnerText;
+            TempGenericSetupBuffer."Data Type" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.FieldType"(), false), 1, MaxStrLen(TempGenericSetupBuffer."Data Type"));
+            TempGenericSetupBuffer.Value := CopyStr(XmlElement.InnerText, 1, MaxStrLen(TempGenericSetupBuffer.Value));
         end;
 
         TempGenericSetupBuffer.Level := Level;

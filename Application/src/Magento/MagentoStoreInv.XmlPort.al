@@ -247,7 +247,7 @@
             if not TempNpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Search Description") then begin
                 TempNpCsStoreInventoryBuffer.Init();
                 TempNpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
-                TempNpCsStoreInventoryBuffer.Sku := TempItem."Search Description";
+                TempNpCsStoreInventoryBuffer.Sku := CopyStr(TempItem."Search Description", 1, MaxStrLen(TempNpCsStoreInventoryBuffer.Sku));
                 TempNpCsStoreInventoryBuffer.Quantity := TempItem."Reorder Quantity";
                 TempNpCsStoreInventoryBuffer.Insert();
             end;
@@ -288,7 +288,7 @@
                         LocalItemNo := IncStr(LocalItemNo);
                         TempItem.Init();
                         TempItem."No." := LocalItemNo;
-                        TempItem."Search Description" := Sku;
+                        TempItem."Search Description" := CopyStr(Sku, 1, MaxStrLen(TempItem."Search Description"));
                         TempItem.Description := ItemVariant."Item No.";
                         TempItem."Description 2" := ItemVariant.Code;
                         TempItem."Reorder Quantity" := 1;
@@ -299,7 +299,7 @@
                     LocalItemNo := IncStr(LocalItemNo);
                     TempItem.Init();
                     TempItem."No." := LocalItemNo;
-                    TempItem."Search Description" := Sku;
+                    TempItem."Search Description" := CopyStr(Sku, 1, MaxStrLen(TempItem."Search Description"));
                     TempItem.Description := Item."No.";
                     TempItem."Description 2" := '';
                     TempItem."Reorder Quantity" := 1;

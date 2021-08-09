@@ -36,7 +36,7 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
         CaptureString += AppendText('splitpay', 'true');
         CaptureString += AppendText('close', 'false');
 
-        SetupWebRequest(PaymentGateway."Api Url", HttpWebRequest, "RequestMethod.Post"(), CaptureString);
+        SetupWebRequest(PaymentGateway."Api Url", HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), CaptureString);
         SendWebRequest(HttpWebRequest);
     end;
 

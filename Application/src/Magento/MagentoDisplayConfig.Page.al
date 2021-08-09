@@ -167,7 +167,7 @@ page 6151443 "NPR Magento Display Config"
             end else
                 ItemTypeFilter := ItemTypeFilter::None;
 
-            NumberFilter := Rec.GetFilter("No.");
+            NumberFilter := CopyStr(Rec.GetFilter("No."), 1, MaxStrLen(NumberFilter));
         end;
     end;
 
@@ -205,13 +205,13 @@ page 6151443 "NPR Magento Display Config"
         case ItemTypeFilter of
             ItemTypeFilter::Item:
                 begin
-                    SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 27);
-                    Item."No." := NumberFilter;
+                    SourceTableName := CopyStr(ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 27), 1, MaxStrLen(SourceTableName));
+                    Item."No." := CopyStr(NumberFilter, 1, MaxStrLen(Item."No."));
                 end;
             ItemTypeFilter::"Item Group":
                 begin
-                    SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 6059852);
-                    ItemGroup.Id := NumberFilter;
+                    SourceTableName := CopyStr(ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 6059852), 1, MaxStrLen(SourceTableName));
+                    ItemGroup.Id := CopyStr(NumberFilter, 1, MaxStrLen(ItemGroup.Id));
                 end;
         end;
 

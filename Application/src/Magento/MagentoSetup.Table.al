@@ -112,7 +112,7 @@ table 6151401 "NPR Magento Setup"
             begin
                 if "Intercompany Inventory Enabled" and not MagentoInventoryCompany.Get(CompanyName) then begin
                     MagentoInventoryCompany.Init();
-                    MagentoInventoryCompany."Company Name" := CompanyName;
+                    MagentoInventoryCompany."Company Name" := CopyStr(CompanyName, 1, MaxStrLen(MagentoInventoryCompany."Company Name"));
                     MagentoInventoryCompany."Location Filter" := "Inventory Location Filter";
                     MagentoInventoryCompany.Insert(true);
                 end;
@@ -851,7 +851,7 @@ table 6151401 "NPR Magento Setup"
         case "Api Username Type" of
             "Api Username Type"::Automatic:
                 begin
-                    exit(NpXmlMgt.GetAutomaticUsername());
+                    exit(CopyStr(NpXmlMgt.GetAutomaticUsername(), 1, 250));
                 end;
             else
                 exit("Api Username");
@@ -865,11 +865,11 @@ table 6151401 "NPR Magento Setup"
         case "Magento Version" of
             "Magento Version"::"2":
                 begin
-                    "Api Url" := "Magento Url" + 'rest/all/V1/naviconnect/';
+                    "Api Url" := CopyStr("Magento Url" + 'rest/all/V1/naviconnect/', 1, MaxStrLen("Api Url"));
                     exit;
                 end;
         end;
-        "Api Url" := "Magento Url" + 'api/rest/naviconnect/';
+        "Api Url" := CopyStr("Magento Url" + 'api/rest/naviconnect/', 1, MaxStrLen("Api Url"));
         if not HasApiPassword() then
             SetApiPassword(CryptographyManagement.GenerateHash(Format(CurrentDateTime, 0, 9), 0));
     end;
@@ -916,7 +916,7 @@ table 6151401 "NPR Magento Setup"
                 exit;
 
         BaseURL := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplateFileName.Substring(1, XmlTemplateFileName.LastIndexOf('/'));
-        NpXmlTemplateMgt.ImportNpXmlTemplateUrl(TemplateCode, BaseURL);
+        NpXmlTemplateMgt.ImportNpXmlTemplateUrl(CopyStr(TemplateCode, 1, 20), BaseURL);
     end;
 
     procedure UpdateXmlEnabledFields()

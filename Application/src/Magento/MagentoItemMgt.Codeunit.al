@@ -46,7 +46,7 @@
             Item."NPR Magento Name" := Item.Description;
 
         if AutoUpdateSeoLink(Item) then
-            Item."NPR Seo Link" := MagentoFunctions.SeoFormat(Item."NPR Magento Name");
+            Item."NPR Seo Link" := CopyStr(MagentoFunctions.SeoFormat(Item."NPR Magento Name"), 1, MaxStrLen(Item."NPR Seo Link"));
         if not Item."NPR Magento Item" then
             exit;
 
@@ -205,7 +205,7 @@
         if Rec.IsTemporary then
             exit;
 
-        Rec."NPR Seo Link" := MagentoFunctions.SeoFormat(Rec."NPR Seo Link");
+        Rec."NPR Seo Link" := CopyStr(MagentoFunctions.SeoFormat(Rec."NPR Seo Link"), 1, MaxStrLen(Rec."NPR Seo Link"));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterInsertEvent', '', true, true)]
@@ -418,7 +418,7 @@
             NpXmlTemplateTrigger."Modify Trigger" := TriggerOnModify;
             NpXmlTemplateTrigger."Delete Trigger" := TriggerOnDelete;
             NpXmlTemplateTrigger."Generic Parent Codeunit ID" := CurrCodeunitId();
-            NpXmlTemplateTrigger."Generic Parent Function" := GetTriggerStockFunctionName();
+            NpXmlTemplateTrigger."Generic Parent Function" := CopyStr(GetTriggerStockFunctionName(), 1, MaxStrLen(NpXmlTemplateTrigger."Generic Parent Function"));
             NpXmlTemplateTrigger.Insert();
         end else begin
             NpXmlTemplateTrigger."Parent Table No." := NpXmlTemplate."Table No.";
@@ -427,7 +427,7 @@
             NpXmlTemplateTrigger."Modify Trigger" := TriggerOnModify;
             NpXmlTemplateTrigger."Delete Trigger" := TriggerOnDelete;
             NpXmlTemplateTrigger."Generic Parent Codeunit ID" := CurrCodeunitId();
-            NpXmlTemplateTrigger."Generic Parent Function" := GetTriggerStockFunctionName();
+            NpXmlTemplateTrigger."Generic Parent Function" := CopyStr(GetTriggerStockFunctionName(), 1, MaxStrLen(NpXmlTemplateTrigger."Generic Parent Function"));
             NpXmlTemplateTrigger.Modify();
         end;
 
@@ -568,7 +568,7 @@
         exit(true)
     end;
 
-    local procedure CreatePriceListHeader(WorksheetTemplateName: Code[10]; SalesPriceStartDate: Date; SalesPriceEndDate: Date)
+    local procedure CreatePriceListHeader(WorksheetTemplateName: Code[20]; SalesPriceStartDate: Date; SalesPriceEndDate: Date)
     var
         PriceListHeader: Record "Price List Header";
     begin
