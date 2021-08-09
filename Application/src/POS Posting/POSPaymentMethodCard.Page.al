@@ -252,6 +252,26 @@ page 6150619 "NPR POS Payment Method Card"
                     ToolTip = 'Action opens POS Payment Lines for selected POS Payment Method.';
                     ApplicationArea = NPRRetail;
                 }
+                action(Statistics)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ShortCutKey = 'F7';
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+
+                    trigger OnAction()
+                    var
+                        POSEntryStatistics: Record "NPR POS Entry Statistics";
+                    begin
+                        POSEntryStatistics.Calculate(Rec);
+                        POSEntryStatistics.SetFilter("POS Payment Method Filter", Rec.Code);
+                        Page.Run(POSEntryStatistics.GetPageId(), POSEntryStatistics);
+                    end;
+                }
             }
         }
     }
