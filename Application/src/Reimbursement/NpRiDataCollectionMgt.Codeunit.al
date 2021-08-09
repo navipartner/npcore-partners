@@ -261,10 +261,10 @@
         NpRiReimbursementEntry."Entry Type" := NpRiReimbursementEntry."Entry Type"::"Data Collection";
         NpRiReimbursementEntry."Source Company Name" := NpRiReimbursement."Data Collection Company";
         if NpRiReimbursementEntry."Source Company Name" = '' then
-            NpRiReimbursementEntry."Source Company Name" := CompanyName;
+            NpRiReimbursementEntry."Source Company Name" := CopyStr(CompanyName, 1, MaxStrLen(NpRiReimbursementEntry."Source Company Name"));
         NpRiReimbursementEntry."Source Record ID" := RecRef.RecordId;
         NpRiReimbursementEntry."Source Table No." := RecRef.Number;
-        NpRiReimbursementEntry."Source Record Position" := RecRef.GetPosition(false);
+        NpRiReimbursementEntry."Source Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NpRiReimbursementEntry."Source Record Position"));
         if DataTypeMgt.FindFieldByName(RecRef, FieldRef, 'Entry No.') then
             NpRiReimbursementEntry."Source Entry No." := FieldRef.Value;
         if DataTypeMgt.FindFieldByName(RecRef, FieldRef, 'Description') then
