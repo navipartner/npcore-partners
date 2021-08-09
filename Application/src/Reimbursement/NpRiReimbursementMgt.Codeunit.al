@@ -71,9 +71,9 @@
         NpRiReimbursementEntryApply."Document No." := '';
         NpRiReimbursementEntryApply.Insert(true);
 
-        NpRiReimbursementEntryApply."Source Company Name" := CompanyName;
+        NpRiReimbursementEntryApply."Source Company Name" := CopyStr(CompanyName, 1, MaxStrLen(NpRiReimbursementEntryApply."Source Company Name"));
         NpRiReimbursementEntryApply."Source Table No." := DATABASE::"NPR NpRi Reimbursement Entry";
-        NpRiReimbursementEntryApply."Source Record Position" := NpRiReimbursementEntryApply.GetPosition(false);
+        NpRiReimbursementEntryApply."Source Record Position" := CopyStr(NpRiReimbursementEntryApply.GetPosition(false), 1, MaxStrLen(NpRiReimbursementEntryApply."Source Record Position"));
         NpRiReimbursementEntryApply."Source Entry No." := NpRiReimbursementEntryApply."Entry No.";
         NpRiReimbursementEntryApply.Modify();
     end;
@@ -146,9 +146,9 @@
         NpRiReimbursementEntryApply."Document No." := '';
         NpRiReimbursementEntryApply.Insert(true);
 
-        NpRiReimbursementEntryApply."Source Company Name" := CompanyName;
+        NpRiReimbursementEntryApply."Source Company Name" := CopyStr(CompanyName, 1, MaxStrLen(NpRiReimbursementEntryApply."Source Company Name"));
         NpRiReimbursementEntryApply."Source Table No." := DATABASE::"NPR NpRi Reimbursement Entry";
-        NpRiReimbursementEntryApply."Source Record Position" := NpRiReimbursementEntryApply.GetPosition(false);
+        NpRiReimbursementEntryApply."Source Record Position" := CopyStr(NpRiReimbursementEntryApply.GetPosition(false), 1, MaxStrLen(NpRiReimbursementEntryApply."Source Record Position"));
         NpRiReimbursementEntryApply."Source Entry No." := NpRiReimbursementEntryApply."Entry No.";
         NpRiReimbursementEntryApply.Modify();
     end;
@@ -266,7 +266,7 @@
         NpRiReimbursementEntryApply."Party No." := NpRiReimbursement."Party No.";
         NpRiReimbursementEntryApply."Template Code" := NpRiReimbursement."Template Code";
         NpRiReimbursementEntryApply.Description := NpRiReimbursementTemplate."Posting Description";
-        NpRiReimbursementEntryApply."Source Company Name" := CompanyName;
+        NpRiReimbursementEntryApply."Source Company Name" := CopyStr(CompanyName, 1, MaxStrLen(NpRiReimbursementEntryApply."Source Company Name"));
         NpRiReimbursementEntryApply.Amount := Amount;
         NpRiReimbursementEntryApply.Positive := NpRiReimbursementEntryApply.Amount > 0;
         NpRiReimbursementEntryApply.Open := true;
