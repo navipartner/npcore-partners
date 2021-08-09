@@ -33,7 +33,7 @@ table 6151431 "NPR Magento Item Attr. Value"
             begin
                 PictureName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::Customer, Picture);
                 if PictureName <> '' then
-                    Picture := PictureName;
+                    Picture := CopyStr(PictureName, 1, MaxStrLen(Picture));
             end;
         }
         field(10; "Attribute Set ID"; Integer)

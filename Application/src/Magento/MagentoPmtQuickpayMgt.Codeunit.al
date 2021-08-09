@@ -42,7 +42,7 @@
         JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
         JsonBody.Add("RequestParameter.Amount"(), ConvertToQuickPayAmount(PaymentLine.Amount));
         JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post"(), PaymentLine, "ServiceName.Capture"(), RequestBodyText);
+        SetupHttpWebRequest(HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), PaymentLine, "ServiceName.Capture"(), RequestBodyText);
         SendWebRequest(HttpWebRequest);
     end;
 
@@ -55,7 +55,7 @@
         JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
         JsonBody.Add("RequestParameter.Amount"(), ConvertToQuickPayAmount(PaymentLine.Amount));
         JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, "RequestMethod.Post"(), PaymentLine, "ServiceName.Refund"(), RequestBodyText);
+        SetupHttpWebRequest(HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), PaymentLine, "ServiceName.Refund"(), RequestBodyText);
         SendWebRequest(HttpWebRequest);
     end;
 

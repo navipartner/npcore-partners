@@ -72,7 +72,7 @@ table 6151420 "NPR Magento Store Item"
             var
                 MagentoFunctions: Codeunit "NPR Magento Functions";
             begin
-                "Seo Link" := MagentoFunctions.SeoFormat("Seo Link");
+                "Seo Link" := CopyStr(MagentoFunctions.SeoFormat("Seo Link"), 1, MaxStrLen("Seo Link"));
             end;
         }
         field(131; "Seo Link Enabled"; Boolean)

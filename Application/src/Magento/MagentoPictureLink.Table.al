@@ -130,7 +130,7 @@ table 6151412 "NPR Magento Picture Link"
             begin
                 PictureName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::Item, "Picture Name");
                 if PictureName <> '' then begin
-                    "Picture Name" := PictureName;
+                    "Picture Name" := CopyStr(PictureName, 1, MaxStrLen("Picture Name"));
                     if "Short Text" = '' then
                         "Short Text" := "Picture Name";
                 end;

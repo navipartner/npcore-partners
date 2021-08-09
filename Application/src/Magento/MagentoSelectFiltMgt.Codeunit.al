@@ -48,9 +48,9 @@ codeunit 6151411 "NPR Magento Select. Filt. Mgt."
                 if SelectionFilter <> '' then
                     SelectionFilter := SelectionFilter + '|';
                 if FirstRecRef = LastRecRef then
-                    SelectionFilter := SelectionFilter + AddQuotes(FirstRecRef)
+                    SelectionFilter := SelectionFilter + AddQuotes(CopyStr(FirstRecRef, 1, 1024))
                 else
-                    SelectionFilter := SelectionFilter + AddQuotes(FirstRecRef) + '..' + AddQuotes(LastRecRef);
+                    SelectionFilter := SelectionFilter + AddQuotes(CopyStr(FirstRecRef, 1, 1024)) + '..' + AddQuotes(CopyStr(LastRecRef, 1, 1024));
                 if TempRecRefCount > 0 then
                     TempRecRef.Next();
             end;

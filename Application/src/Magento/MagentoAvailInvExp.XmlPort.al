@@ -32,7 +32,7 @@
                     var
                         MagentoInventoryCompany: Record "NPR Magento Inv. Company";
                     begin
-                        MagentoInventoryCompany."Location Filter" := LocationFilter;
+                        MagentoInventoryCompany."Location Filter" := CopyStr(LocationFilter, 1, MaxStrLen(MagentoInventoryCompany."Location Filter"));
                         inventory := Format(MagentoItemMgt.GetStockQty3(TempItemVariant."Item No.", TempItemVariant.Code, MagentoInventoryCompany), 0, 9);
                     end;
                 }
