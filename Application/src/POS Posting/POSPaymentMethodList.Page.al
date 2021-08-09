@@ -129,9 +129,28 @@ page 6150618 "NPR POS Payment Method List"
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Pmt. Line List";
                     RunPageLink = "POS Payment Method Code" = FIELD(Code);
-
                     ToolTip = 'Executes the POS Payment Lines action';
                     ApplicationArea = NPRRetail;
+                }
+                action(Statistics)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ShortCutKey = 'F7';
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+
+                    trigger OnAction()
+                    var
+                        POSEntryStatistics: Record "NPR POS Entry Statistics";
+                    begin
+                        POSEntryStatistics.Calculate(Rec);
+                        POSEntryStatistics.SetFilter("POS Payment Method Filter", Rec.Code);
+                        Page.Run(POSEntryStatistics.GetPageId(), POSEntryStatistics);
+                    end;
                 }
             }
         }

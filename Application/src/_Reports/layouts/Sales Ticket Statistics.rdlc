@@ -10134,230 +10134,35 @@ End Function
         <Field Name="COMPANYNAME">
           <DataField>COMPANYNAME</DataField>
         </Field>
-        <Field Name="RegisterFilter_Periode">
-          <DataField>RegisterFilter_Periode</DataField>
+        <Field Name="POSUnitFilter_POSEntryStatistics">
+          <DataField>POSUnitFilter_POSEntryStatistics</DataField>
         </Field>
-        <Field Name="DateFilter_Periode">
-          <DataField>DateFilter_Periode</DataField>
+        <Field Name="DateFilter_POSEntryStatistics">
+          <DataField>DateFilter_POSEntryStatistics</DataField>
         </Field>
-        <Field Name="No_PaymentTypePeriod">
-          <DataField>No_PaymentTypePeriod</DataField>
+        <Field Name="Code_PaymentMethodGeneral">
+          <DataField>Code_PaymentMethodGeneral</DataField>
         </Field>
-        <Field Name="SalesQty1_PaymentTypePeriod">
-          <DataField>SalesQty1_PaymentTypePeriod</DataField>
+        <Field Name="Description_PaymentMethodGeneral">
+          <DataField>Description_PaymentMethodGeneral</DataField>
         </Field>
-        <Field Name="Turnover1_PaymentTypePeriod">
-          <DataField>Turnover1_PaymentTypePeriod</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsPerUnit">
+          <DataField>PaymentAmount_POSEntryStatisticsPerUnit</DataField>
         </Field>
-        <Field Name="Turnover1_PaymentTypePeriodFormat">
-          <DataField>Turnover1_PaymentTypePeriodFormat</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsPerUnitFormat">
+          <DataField>PaymentAmount_POSEntryStatisticsPerUnitFormat</DataField>
         </Field>
-        <Field Name="DebitSales1_PaymentTypePeriod">
-          <DataField>DebitSales1_PaymentTypePeriod</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsPerUnit">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsPerUnit</DataField>
         </Field>
-        <Field Name="DebitSales1_PaymentTypePeriodFormat">
-          <DataField>DebitSales1_PaymentTypePeriodFormat</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsPerUnitFormat">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsPerUnitFormat</DataField>
         </Field>
-        <Field Name="SalesQty2_PaymentTypePeriod">
-          <DataField>SalesQty2_PaymentTypePeriod</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsPerUnit">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsPerUnit</DataField>
         </Field>
-        <Field Name="Turnover2_PaymentTypePeriod">
-          <DataField>Turnover2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="Turnover2_PaymentTypePeriodFormat">
-          <DataField>Turnover2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="DebitSales2_PaymentTypePeriod">
-          <DataField>DebitSales2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="DebitSales2_PaymentTypePeriodFormat">
-          <DataField>DebitSales2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="SalesTotal1_PaymentTypePeriod">
-          <DataField>SalesTotal1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="SalesTotal1_PaymentTypePeriodFormat">
-          <DataField>SalesTotal1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="SalesTotal2_PaymentTypePeriod">
-          <DataField>SalesTotal2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="SalesTotal2_PaymentTypePeriodFormat">
-          <DataField>SalesTotal2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemCost1_PaymentTypePeriod">
-          <DataField>ItemCost1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemCost1_PaymentTypePeriodFormat">
-          <DataField>ItemCost1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemCost2_PaymentTypePeriod">
-          <DataField>ItemCost2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemCost2_PaymentTypePeriodFormat">
-          <DataField>ItemCost2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="SalesTotalExcVAT_PaymentTypePeriod">
-          <DataField>SalesTotalExcVAT_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="SalesTotalExcVAT_PaymentTypePeriodFormat">
-          <DataField>SalesTotalExcVAT_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ClickandCollect1_">
-          <DataField>ClickandCollect1_</DataField>
-        </Field>
-        <Field Name="ClickandCollect1_Format">
-          <DataField>ClickandCollect1_Format</DataField>
-        </Field>
-        <Field Name="ClickandCollect2_">
-          <DataField>ClickandCollect2_</DataField>
-        </Field>
-        <Field Name="ClickandCollect2_Format">
-          <DataField>ClickandCollect2_Format</DataField>
-        </Field>
-        <Field Name="SalesExVatLYr">
-          <DataField>SalesExVatLYr</DataField>
-        </Field>
-        <Field Name="SalesExVatLYrFormat">
-          <DataField>SalesExVatLYrFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY1_PaymentTypePeriod">
-          <DataField>Profit_LCY1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="Profit_LCY1_PaymentTypePeriodFormat">
-          <DataField>Profit_LCY1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCYAmt1_PaymentTypePeriod">
-          <DataField>Profit_LCYAmt1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="Profit_LCYAmt1_PaymentTypePeriodFormat">
-          <DataField>Profit_LCYAmt1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY2_PaymentTypePeriod">
-          <DataField>Profit_LCY2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="Profit_LCY2_PaymentTypePeriodFormat">
-          <DataField>Profit_LCY2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY2Pct_PaymentTypePeriod">
-          <DataField>Profit_LCY2Pct_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="Profit_LCY2Pct_PaymentTypePeriodFormat">
-          <DataField>Profit_LCY2Pct_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="Turnover_avg1_PaymentTypePeriod">
-          <DataField>Turnover_avg1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="Turnover_avg1_PaymentTypePeriodFormat">
-          <DataField>Turnover_avg1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="Turnover_avg2_PaymentTypePeriod">
-          <DataField>Turnover_avg2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="Turnover_avg2_PaymentTypePeriodFormat">
-          <DataField>Turnover_avg2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemQty1_PaymentTypePeriod">
-          <DataField>ItemQty1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemQty1_PaymentTypePeriodFormat">
-          <DataField>ItemQty1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemQty2_PaymentTypePeriod">
-          <DataField>ItemQty2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemQty2_PaymentTypePeriodFormat">
-          <DataField>ItemQty2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemQtySale1_PaymentTypePeriod">
-          <DataField>ItemQtySale1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemQtySale1_PaymentTypePeriodFormat">
-          <DataField>ItemQtySale1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemQtySale2_PaymentTypePeriod">
-          <DataField>ItemQtySale2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemQtySale2_PaymentTypePeriodFormat">
-          <DataField>ItemQtySale2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemLines1_PaymentTypePeriod">
-          <DataField>ItemLines1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemLines1_PaymentTypePeriodFormat">
-          <DataField>ItemLines1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemLines2_PaymentTypePeriod">
-          <DataField>ItemLines2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemLines2_PaymentTypePeriodFormat">
-          <DataField>ItemLines2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemQtyLine1_PaymentTypePeriod">
-          <DataField>ItemQtyLine1_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemQtyLine1_PaymentTypePeriodFormat">
-          <DataField>ItemQtyLine1_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemQtyLine2_PaymentTypePeriod">
-          <DataField>ItemQtyLine2_PaymentTypePeriod</DataField>
-        </Field>
-        <Field Name="ItemQtyLine2_PaymentTypePeriodFormat">
-          <DataField>ItemQtyLine2_PaymentTypePeriodFormat</DataField>
-        </Field>
-        <Field Name="ItemCost1_Adj">
-          <DataField>ItemCost1_Adj</DataField>
-        </Field>
-        <Field Name="ItemCost1_AdjFormat">
-          <DataField>ItemCost1_AdjFormat</DataField>
-        </Field>
-        <Field Name="ItemCost2_Adj">
-          <DataField>ItemCost2_Adj</DataField>
-        </Field>
-        <Field Name="SalesTotalExcVAT_PaymentTypePeriod_Adj">
-          <DataField>SalesTotalExcVAT_PaymentTypePeriod_Adj</DataField>
-        </Field>
-        <Field Name="SalesTotalExcVAT_PaymentTypePeriod_AdjFormat">
-          <DataField>SalesTotalExcVAT_PaymentTypePeriod_AdjFormat</DataField>
-        </Field>
-        <Field Name="SalesExVatLYr_Adj">
-          <DataField>SalesExVatLYr_Adj</DataField>
-        </Field>
-        <Field Name="SalesExVatLYr_AdjFormat">
-          <DataField>SalesExVatLYr_AdjFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY1_PaymentTypePeriod_Adj">
-          <DataField>Profit_LCY1_PaymentTypePeriod_Adj</DataField>
-        </Field>
-        <Field Name="Profit_LCY1_PaymentTypePeriod_AdjFormat">
-          <DataField>Profit_LCY1_PaymentTypePeriod_AdjFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCYAmt1_PaymentTypePeriod_Adj">
-          <DataField>Profit_LCYAmt1_PaymentTypePeriod_Adj</DataField>
-        </Field>
-        <Field Name="Profit_LCYAmt1_PaymentTypePeriod_AdjFormat">
-          <DataField>Profit_LCYAmt1_PaymentTypePeriod_AdjFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY2_PaymentTypePeriod_Adj">
-          <DataField>Profit_LCY2_PaymentTypePeriod_Adj</DataField>
-        </Field>
-        <Field Name="Profit_LCY2_PaymentTypePeriod_AdjFormat">
-          <DataField>Profit_LCY2_PaymentTypePeriod_AdjFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY2Pct_PaymentTypePeriod_Adj">
-          <DataField>Profit_LCY2Pct_PaymentTypePeriod_Adj</DataField>
-        </Field>
-        <Field Name="Profit_LCY2Pct_PaymentTypePeriod_AdjFormat">
-          <DataField>Profit_LCY2Pct_PaymentTypePeriod_AdjFormat</DataField>
-        </Field>
-        <Field Name="ShowAdj">
-          <DataField>ShowAdj</DataField>
-        </Field>
-        <Field Name="No_PaymentLastYr">
-          <DataField>No_PaymentLastYr</DataField>
-        </Field>
-        <Field Name="DateFilter_PaymentLastYr">
-          <DataField>DateFilter_PaymentLastYr</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsPerUnitFormat">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsPerUnitFormat</DataField>
         </Field>
         <Field Name="Code_SalespersonPurchaser">
           <DataField>Code_SalespersonPurchaser</DataField>
@@ -10365,188 +10170,221 @@ End Function
         <Field Name="Name_SalespersonPurchaser">
           <DataField>Name_SalespersonPurchaser</DataField>
         </Field>
-        <Field Name="Eksp1_SalespersonPurchaser">
-          <DataField>Eksp1_SalespersonPurchaser</DataField>
+        <Field Name="DebitAmtExclTax_POSEntryStatisticsSalesperson">
+          <DataField>DebitAmtExclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="Eksp1_PaymentTypePOS">
-          <DataField>Eksp1_PaymentTypePOS</DataField>
+        <Field Name="DebitAmtExclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>DebitAmtExclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="Eksp1_PaymentTypePOSFormat">
-          <DataField>Eksp1_PaymentTypePOSFormat</DataField>
+        <Field Name="DebitTaxAmt">
+          <DataField>DebitTaxAmt</DataField>
         </Field>
-        <Field Name="Sale1_SalespersonPurchaser">
-          <DataField>Sale1_SalespersonPurchaser</DataField>
+        <Field Name="DebitTaxAmtFormat">
+          <DataField>DebitTaxAmtFormat</DataField>
         </Field>
-        <Field Name="Sale1_SalespersonPurchaserFormat">
-          <DataField>Sale1_SalespersonPurchaserFormat</DataField>
+        <Field Name="DebitAmtInclTax_POSEntryStatisticsSalesperson">
+          <DataField>DebitAmtInclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="Sale1_PaymentTypePOS">
-          <DataField>Sale1_PaymentTypePOS</DataField>
+        <Field Name="DebitAmtInclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>DebitAmtInclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="Sale1_PaymentTypePOSFormat">
-          <DataField>Sale1_PaymentTypePOSFormat</DataField>
+        <Field Name="CreditAmtExclTax_POSEntryStatisticsSalesperson">
+          <DataField>CreditAmtExclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="AverageAmt_SalespersonPurchaser">
-          <DataField>AverageAmt_SalespersonPurchaser</DataField>
+        <Field Name="CreditAmtExclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>CreditAmtExclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="AverageAmt_SalespersonPurchaserFormat">
-          <DataField>AverageAmt_SalespersonPurchaserFormat</DataField>
+        <Field Name="CreditTaxAmt">
+          <DataField>CreditTaxAmt</DataField>
         </Field>
-        <Field Name="Credit1_SalespersonPurchaser">
-          <DataField>Credit1_SalespersonPurchaser</DataField>
+        <Field Name="CreditTaxAmtFormat">
+          <DataField>CreditTaxAmtFormat</DataField>
         </Field>
-        <Field Name="Credit1_SalespersonPurchaserFormat">
-          <DataField>Credit1_SalespersonPurchaserFormat</DataField>
+        <Field Name="CreditAmountInclTax_POSEntryStatisticsSalesperson">
+          <DataField>CreditAmountInclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="Debit1_PaymentTypePOS">
-          <DataField>Debit1_PaymentTypePOS</DataField>
+        <Field Name="CreditAmountInclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>CreditAmountInclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="Debit1_PaymentTypePOSFormat">
-          <DataField>Debit1_PaymentTypePOSFormat</DataField>
+        <Field Name="DirectAmtExclTax_POSEntryStatisticsSalesperson">
+          <DataField>DirectAmtExclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="Total1_SalespersonPurchaser">
-          <DataField>Total1_SalespersonPurchaser</DataField>
+        <Field Name="DirectAmtExclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>DirectAmtExclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="Total1_SalespersonPurchaserFormat">
-          <DataField>Total1_SalespersonPurchaserFormat</DataField>
+        <Field Name="DirectTaxAmt">
+          <DataField>DirectTaxAmt</DataField>
         </Field>
-        <Field Name="Eksp2_SalespersonPurchaser">
-          <DataField>Eksp2_SalespersonPurchaser</DataField>
+        <Field Name="DirectTaxAmtFormat">
+          <DataField>DirectTaxAmtFormat</DataField>
         </Field>
-        <Field Name="Eksp2_SalespersonPurchaserFormat">
-          <DataField>Eksp2_SalespersonPurchaserFormat</DataField>
+        <Field Name="DirectAmtInclTax_POSEntryStatisticsSalesperson">
+          <DataField>DirectAmtInclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="Sale2_SalespersonPurchaser">
-          <DataField>Sale2_SalespersonPurchaser</DataField>
+        <Field Name="DirectAmtInclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>DirectAmtInclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="Sale2_SalespersonPurchaserFormat">
-          <DataField>Sale2_SalespersonPurchaserFormat</DataField>
+        <Field Name="BalancingAmtExclTax_POSEntryStatisticsSalesperson">
+          <DataField>BalancingAmtExclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="Credit2_SalespersonPurchaser">
-          <DataField>Credit2_SalespersonPurchaser</DataField>
+        <Field Name="BalancingAmtExclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>BalancingAmtExclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="Credit2_SalespersonPurchaserFormat">
-          <DataField>Credit2_SalespersonPurchaserFormat</DataField>
+        <Field Name="BalancingTaxAmt">
+          <DataField>BalancingTaxAmt</DataField>
         </Field>
-        <Field Name="Total2_SalespersonPurchaser">
-          <DataField>Total2_SalespersonPurchaser</DataField>
+        <Field Name="BalancingTaxAmtFormat">
+          <DataField>BalancingTaxAmtFormat</DataField>
         </Field>
-        <Field Name="Total2_SalespersonPurchaserFormat">
-          <DataField>Total2_SalespersonPurchaserFormat</DataField>
+        <Field Name="BalancingAmtInclTax_POSEntryStatisticsSalesperson">
+          <DataField>BalancingAmtInclTax_POSEntryStatisticsSalesperson</DataField>
         </Field>
-        <Field Name="Eksp3_SalespersonPurchaser">
-          <DataField>Eksp3_SalespersonPurchaser</DataField>
+        <Field Name="BalancingAmtInclTax_POSEntryStatisticsSalespersonFormat">
+          <DataField>BalancingAmtInclTax_POSEntryStatisticsSalespersonFormat</DataField>
         </Field>
-        <Field Name="Eksp3_SalespersonPurchaserFormat">
-          <DataField>Eksp3_SalespersonPurchaserFormat</DataField>
+        <Field Name="Code_PaymentMethodCash">
+          <DataField>Code_PaymentMethodCash</DataField>
         </Field>
-        <Field Name="Sale3_SalespersonPurchaser">
-          <DataField>Sale3_SalespersonPurchaser</DataField>
+        <Field Name="Description_PaymentMethodCash">
+          <DataField>Description_PaymentMethodCash</DataField>
         </Field>
-        <Field Name="Sale3_SalespersonPurchaserFormat">
-          <DataField>Sale3_SalespersonPurchaserFormat</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsCash">
+          <DataField>PaymentAmount_POSEntryStatisticsCash</DataField>
         </Field>
-        <Field Name="Credit3_SalespersonPurchaser">
-          <DataField>Credit3_SalespersonPurchaser</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsCashFormat">
+          <DataField>PaymentAmount_POSEntryStatisticsCashFormat</DataField>
         </Field>
-        <Field Name="Credit3_SalespersonPurchaserFormat">
-          <DataField>Credit3_SalespersonPurchaserFormat</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsCash">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsCash</DataField>
         </Field>
-        <Field Name="Total3_SalespersonPurchaser">
-          <DataField>Total3_SalespersonPurchaser</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsCashFormat">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsCashFormat</DataField>
         </Field>
-        <Field Name="Total3_SalespersonPurchaserFormat">
-          <DataField>Total3_SalespersonPurchaserFormat</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsCash">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsCash</DataField>
         </Field>
-        <Field Name="No_POSPaymentMethodCash">
-          <DataField>No_POSPaymentMethodCash</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsCashFormat">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsCashFormat</DataField>
         </Field>
-        <Field Name="RegisterNo_POSPaymentMethodCash">
-          <DataField>RegisterNo_POSPaymentMethodCash</DataField>
+        <Field Name="Code_PaymentMethodVoucher">
+          <DataField>Code_PaymentMethodVoucher</DataField>
         </Field>
-        <Field Name="Description_POSPaymentMethodCash">
-          <DataField>Description_POSPaymentMethodCash</DataField>
+        <Field Name="Description_PaymentMethodVoucher">
+          <DataField>Description_PaymentMethodVoucher</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodCash">
-          <DataField>Amountinauditroll_POSPaymentMethodCash</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsVoucher">
+          <DataField>PaymentAmount_POSEntryStatisticsVoucher</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodCashFormat">
-          <DataField>Amountinauditroll_POSPaymentMethodCashFormat</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsVoucherFormat">
+          <DataField>PaymentAmount_POSEntryStatisticsVoucherFormat</DataField>
         </Field>
-        <Field Name="No_POSPaymentMethodVoucher">
-          <DataField>No_POSPaymentMethodVoucher</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsVoucher">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsVoucher</DataField>
         </Field>
-        <Field Name="RegisterNo_POSPaymentMethodVoucher">
-          <DataField>RegisterNo_POSPaymentMethodVoucher</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsVoucherFormat">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsVoucherFormat</DataField>
         </Field>
-        <Field Name="Description_POSPaymentMethodVoucher">
-          <DataField>Description_POSPaymentMethodVoucher</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsVoucher">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsVoucher</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodVoucher">
-          <DataField>Amountinauditroll_POSPaymentMethodVoucher</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsVoucherFormat">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsVoucherFormat</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodVoucherFormat">
-          <DataField>Amountinauditroll_POSPaymentMethodVoucherFormat</DataField>
+        <Field Name="Code_PaymentMethodFrnVoucher">
+          <DataField>Code_PaymentMethodFrnVoucher</DataField>
         </Field>
-        <Field Name="No_POSPaymentMethodForeignVoucher">
-          <DataField>No_POSPaymentMethodForeignVoucher</DataField>
+        <Field Name="Description_PaymentMethodFrnVoucher">
+          <DataField>Description_PaymentMethodFrnVoucher</DataField>
         </Field>
-        <Field Name="RegisterNo_POSPaymentMethodForeignVoucher">
-          <DataField>RegisterNo_POSPaymentMethodForeignVoucher</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsFrnVoucher">
+          <DataField>PaymentAmount_POSEntryStatisticsFrnVoucher</DataField>
         </Field>
-        <Field Name="Description_POSPaymentMethodForeignVoucher">
-          <DataField>Description_POSPaymentMethodForeignVoucher</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsFrnVoucherFormat">
+          <DataField>PaymentAmount_POSEntryStatisticsFrnVoucherFormat</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodForeignVoucher">
-          <DataField>Amountinauditroll_POSPaymentMethodForeignVoucher</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsFrnVoucher">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsFrnVoucher</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodForeignVoucherFormat">
-          <DataField>Amountinauditroll_POSPaymentMethodForeignVoucherFormat</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsFrnVoucherFormat">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsFrnVoucherFormat</DataField>
         </Field>
-        <Field Name="No_POSPaymentMethodEFT">
-          <DataField>No_POSPaymentMethodEFT</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsFrnVoucher">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsFrnVoucher</DataField>
         </Field>
-        <Field Name="RegisterNo_POSPaymentMethodEFT">
-          <DataField>RegisterNo_POSPaymentMethodEFT</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsFrnVoucherFormat">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsFrnVoucherFormat</DataField>
         </Field>
-        <Field Name="Description_POSPaymentMethodEFT">
-          <DataField>Description_POSPaymentMethodEFT</DataField>
+        <Field Name="Code_PaymentMethodEFT">
+          <DataField>Code_PaymentMethodEFT</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodEFT">
-          <DataField>Amountinauditroll_POSPaymentMethodEFT</DataField>
+        <Field Name="Description_PaymentMethodEFT">
+          <DataField>Description_PaymentMethodEFT</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodEFTFormat">
-          <DataField>Amountinauditroll_POSPaymentMethodEFTFormat</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsEFT">
+          <DataField>PaymentAmount_POSEntryStatisticsEFT</DataField>
         </Field>
-        <Field Name="No_POSPaymentMethodCheck">
-          <DataField>No_POSPaymentMethodCheck</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsEFTFormat">
+          <DataField>PaymentAmount_POSEntryStatisticsEFTFormat</DataField>
         </Field>
-        <Field Name="RegisterNo_POSPaymentMethodCheck">
-          <DataField>RegisterNo_POSPaymentMethodCheck</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsEFT">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsEFT</DataField>
         </Field>
-        <Field Name="Description_POSPaymentMethodCheck">
-          <DataField>Description_POSPaymentMethodCheck</DataField>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsEFTFormat">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsEFTFormat</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodCheck">
-          <DataField>Amountinauditroll_POSPaymentMethodCheck</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsEFT">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsEFT</DataField>
         </Field>
-        <Field Name="Amountinauditroll_POSPaymentMethodCheckFormat">
-          <DataField>Amountinauditroll_POSPaymentMethodCheckFormat</DataField>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsEFTFormat">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsEFTFormat</DataField>
         </Field>
-        <Field Name="No_PaymentMethodPayout">
-          <DataField>No_PaymentMethodPayout</DataField>
+        <Field Name="Code_PaymentMethodCheck">
+          <DataField>Code_PaymentMethodCheck</DataField>
         </Field>
-        <Field Name="RegisterNo_PaymentMethodPayout">
-          <DataField>RegisterNo_PaymentMethodPayout</DataField>
+        <Field Name="Description_PaymentMethodCheck">
+          <DataField>Description_PaymentMethodCheck</DataField>
+        </Field>
+        <Field Name="PaymentAmount_POSEntryStatisticsCheck">
+          <DataField>PaymentAmount_POSEntryStatisticsCheck</DataField>
+        </Field>
+        <Field Name="PaymentAmount_POSEntryStatisticsCheckFormat">
+          <DataField>PaymentAmount_POSEntryStatisticsCheckFormat</DataField>
+        </Field>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsCheck">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsCheck</DataField>
+        </Field>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsCheckFormat">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsCheckFormat</DataField>
+        </Field>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsCheck">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsCheck</DataField>
+        </Field>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsCheckFormat">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsCheckFormat</DataField>
+        </Field>
+        <Field Name="Code_PaymentMethodPayout">
+          <DataField>Code_PaymentMethodPayout</DataField>
         </Field>
         <Field Name="Description_PaymentMethodPayout">
           <DataField>Description_PaymentMethodPayout</DataField>
         </Field>
-        <Field Name="Amountinauditroll_PaymentMethodPayout">
-          <DataField>Amountinauditroll_PaymentMethodPayout</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsPayout">
+          <DataField>PaymentAmount_POSEntryStatisticsPayout</DataField>
         </Field>
-        <Field Name="Amountinauditroll_PaymentMethodPayoutFormat">
-          <DataField>Amountinauditroll_PaymentMethodPayoutFormat</DataField>
+        <Field Name="PaymentAmount_POSEntryStatisticsPayoutFormat">
+          <DataField>PaymentAmount_POSEntryStatisticsPayoutFormat</DataField>
+        </Field>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsPayout">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsPayout</DataField>
+        </Field>
+        <Field Name="TaxPaymentAmount_POSEntryStatisticsPayoutFormat">
+          <DataField>TaxPaymentAmount_POSEntryStatisticsPayoutFormat</DataField>
+        </Field>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsPayout">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsPayout</DataField>
+        </Field>
+        <Field Name="TaxPaymentBaseAmount_POSEntryStatisticsPayoutFormat">
+          <DataField>TaxPaymentBaseAmount_POSEntryStatisticsPayoutFormat</DataField>
         </Field>
       </Fields>
       <Query>
