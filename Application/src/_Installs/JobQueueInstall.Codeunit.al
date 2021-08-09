@@ -25,6 +25,7 @@ codeunit 6014438 "NPR Job Queue Install"
             exit;
         end;
 
+        UpdateNaviConnectJobQueueCategories();
         AddNcTaskListProcessingJobQueue();
         AddImportListProcessingJobQueue();
         AddJQLogEntryCleanupJobQueue();
@@ -94,5 +95,26 @@ codeunit 6014438 "NPR Job Queue Install"
         SMSSetup."Discard Msg. Older Than [Hrs]" := 24;
         SMSSetup."Auto Send Attempts" := 3;
         SMSSetup.Insert();
+    end;
+
+    local procedure UpdateNaviConnectJobQueueCategories()
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        JobQueueEntry: Record "Job Queue Entry";
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+    begin
+        if JobQueueCategory.Get('NPR-NC') then
+            JobQueueCategory.Delete();
+
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
+        JobQueueEntry.SetFilter("Job Queue Category Code", '<>%1', NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.TaskListProcessingCodeunit()));
+        if not JobQueueEntry.IsEmpty then
+            JobQueueEntry.ModifyAll("Job Queue Category Code", NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.TaskListProcessingCodeunit()));
+
+        JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.ImportListProcessingCodeunit());
+        JobQueueEntry.SetFilter("Job Queue Category Code", '<>%1', NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.ImportListProcessingCodeunit()));
+        if not JobQueueEntry.IsEmpty then
+            JobQueueEntry.ModifyAll("Job Queue Category Code", NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.ImportListProcessingCodeunit()));
     end;
 }
