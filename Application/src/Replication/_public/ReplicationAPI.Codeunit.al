@@ -1,7 +1,7 @@
 codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 {
 
-    Access = Internal;
+    Access = Public;
 
     var
         APIIntegrationLbl: Label 'Replication API Integration - %1', Comment = '%1=API Version';

@@ -36,6 +36,37 @@ page 6014469 "NPR APIV1 - Dimensions"
                 {
                     Caption = 'Display Name';
                 }
+
+                field(codeCaption; Rec."Code Caption")
+                {
+                    Caption = 'Code Caption';
+                }
+
+                field(filterCaption; Rec."Filter Caption")
+                {
+                    Caption = 'Filter Caption';
+                }
+
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description';
+                }
+
+                field(blocked; Rec.Blocked)
+                {
+                    Caption = 'Blocked';
+                }
+
+                field(consolidationCode; Rec."Consolidation Code")
+                {
+                    Caption = 'Consolidation Code';
+                }
+
+                field(mapToICDimensionCode; Rec."Map-to IC Dimension Code")
+                {
+                    Caption = 'Map-to IC Dimension Code';
+                }
+
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
