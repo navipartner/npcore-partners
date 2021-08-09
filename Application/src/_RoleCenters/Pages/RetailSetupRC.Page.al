@@ -660,14 +660,6 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Executes the Configuration Packages action';
                     ApplicationArea = NPRRetail;
                 }
-                action("Configuration Questionnaire")
-                {
-                    Caption = 'Configuration Questionnaire';
-                    RunObject = Page "Config. Questionnaire";
-
-                    ToolTip = 'Executes the Configuration Questionnaire action';
-                    ApplicationArea = NPRRetail;
-                }
                 action("No. Series")
                 {
                     Caption = 'No. Series';
