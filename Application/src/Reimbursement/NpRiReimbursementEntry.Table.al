@@ -176,13 +176,13 @@ table 6151103 "NPR NpRi Reimbursement Entry"
 
     trigger OnInsert()
     begin
-        "Last modified by" := UserId;
+        "Last modified by" := CopyStr(UserId, 1, MaxStrLen("Last modified by"));
         "Last modified at" := CurrentDateTime;
     end;
 
     trigger OnModify()
     begin
-        "Last modified by" := UserId;
+        "Last modified by" := CopyStr(UserId, 1, MaxStrLen("Last modified by"));
         "Last modified at" := CurrentDateTime;
     end;
 }

@@ -248,7 +248,7 @@
                     NpRiReimbursementEntry.Description := SalesInvHeader."Posting Description";
                     NpRiReimbursementEntry."Source Record ID" := SalesInvHeader.RecordId;
                     NpRiReimbursementEntry."Source Table No." := DATABASE::"Sales Invoice Header";
-                    NpRiReimbursementEntry."Source Record Position" := SalesInvHeader.GetPosition(false);
+                    NpRiReimbursementEntry."Source Record Position" := CopyStr(SalesInvHeader.GetPosition(false), 1, MaxStrLen(NpRiReimbursementEntry."Source Record Position"));
                     NpRiReimbursementEntry."Document Type" := NpRiReimbursementEntry."Document Type"::Invoice;
                     NpRiReimbursementEntry."Document No." := SalesInvHeader."No.";
                     NpRiReimbursementEntry."Account Type" := NpRiReimbursementEntry."Account Type"::Customer;
@@ -289,7 +289,7 @@
         NpRiReimbursementEntryApply.Open := false;
         NpRiReimbursementEntryApply."Remaining Amount" := 0;
         NpRiReimbursementEntryApply."Closed by Entry No." := NpRiReimbursementEntry."Entry No.";
-        NpRiReimbursementEntry."Source Company Name" := CompanyName;
+        NpRiReimbursementEntry."Source Company Name" := CopyStr(CompanyName, 1, MaxStrLen(NpRiReimbursementEntry."Source Company Name"));
         NpRiReimbursementEntryApply.Insert(true);
 
         NpRiReimbursementEntry.Open := false;
@@ -316,7 +316,7 @@
 
         NpRiReimbursementEntry."Source Record ID" := SalesHeader.RecordId;
         NpRiReimbursementEntry."Source Table No." := DATABASE::"Sales Header";
-        NpRiReimbursementEntry."Source Record Position" := SalesHeader.GetPosition(false);
+        NpRiReimbursementEntry."Source Record Position" := CopyStr(SalesHeader.GetPosition(false), 1, MaxStrLen(NpRiReimbursementEntry."Source Record Position"));
         NpRiReimbursementEntry."Document Type" := NpRiReimbursementEntry."Document Type"::Invoice;
         NpRiReimbursementEntry."Document No." := SalesHeader."No.";
         NpRiReimbursementEntry."Account Type" := NpRiReimbursementEntry."Account Type"::Customer;

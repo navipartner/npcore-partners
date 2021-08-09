@@ -205,7 +205,7 @@
     begin
         NpRiReimbursementEntryApply."Source Table No." := DATABASE::"G/L Entry";
         NpRiReimbursementEntryApply."Source Record ID" := GLEntry.RecordId;
-        NpRiReimbursementEntryApply."Source Record Position" := GLEntry.GetPosition(false);
+        NpRiReimbursementEntryApply."Source Record Position" := CopyStr(GLEntry.GetPosition(false), 1, MaxStrLen(NpRiReimbursementEntryApply."Source Record Position"));
         NpRiReimbursementEntryApply."Source Entry No." := GLEntry."Entry No.";
         NpRiReimbursementEntryApply."Reimbursement Amount" := ReimbursementAmount;
         NpRiReimbursementEntryApply."Document Type" := NpRiReimbursementEntryApply."Document Type"::" ";
