@@ -36,10 +36,57 @@ page 6014464 "NPR APIV1 - Dimension Values"
                 {
                     Caption = 'Dimension Id';
                 }
+
+                field(dimensionCode; Rec."Dimension Code")
+                {
+                    Caption = 'Dimension Code';
+                }
+
                 field(displayName; Rec.Name)
                 {
                     Caption = 'Display Name';
                 }
+
+                field(dimensionValueType; Rec."Dimension Value Type")
+                {
+                    Caption = 'Dimension Value Type';
+                }
+
+                field(totaling; Rec.Totaling)
+                {
+                    Caption = 'Totaling';
+                }
+
+                field(blocked; Rec.Blocked)
+                {
+                    Caption = 'Blocked';
+                }
+
+                field(consolidationCode; Rec."Consolidation Code")
+                {
+                    Caption = 'Consolidation Code';
+                }
+
+                field(indentation; Rec.Indentation)
+                {
+                    Caption = 'Indentation';
+                }
+
+                field(globalDimensionNo; Rec."Global Dimension No.")
+                {
+                    Caption = 'Global Dimension No.';
+                }
+
+                field(mapToICDimensionCode; Rec."Map-to IC Dimension Code")
+                {
+                    Caption = 'Map-to IC Dimension Code';
+                }
+
+                field(mapToICDimensionValueCode; Rec."Map-to IC Dimension Value Code")
+                {
+                    Caption = 'Map-to IC Dimension Value Code';
+                }
+
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
