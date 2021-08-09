@@ -67,6 +67,7 @@
     begin
         if not RecRefchange.Get(DataLogRecord."Record ID") then
             exit(false);
+        DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
         RecReftemp.Open(RecRefchange.Number, true);
         NcCollectorFilter.Reset();
         NcCollectorFilter.SetRange("Collector Code", NcCollectorCode);
@@ -102,13 +103,13 @@
             exit(true);
         if DataLogSetupTable."Log Modification" = DataLogSetupTable."Log Modification"::Simple then
             exit(true);
+        DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
         NcCollectorFilter.Reset();
         NcCollectorFilter.SetRange("Collector Code", NcCollectorCode);
         NcCollectorFilter.SetRange("Table No.", DataLogRecord."Table ID");
         NcCollectorFilter.SetRange("Collect When Modified", true);
         if NcCollectorFilter.FindSet() then begin
             repeat
-                DataLogField.Reset();
                 DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
                 DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
                 DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");

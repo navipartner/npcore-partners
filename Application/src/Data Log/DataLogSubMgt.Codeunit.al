@@ -349,6 +349,7 @@
             exit(false);
 
         DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
+        DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
         DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
         DataLogField.SetAutoCalcFields("Obsolete State");
         if not DataLogField.FindSet() then begin

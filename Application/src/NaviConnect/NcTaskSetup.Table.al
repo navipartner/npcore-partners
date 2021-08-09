@@ -96,6 +96,7 @@ table 6151501 "NPR Nc Task Setup"
             DataLogSubscriber2.Delete(true);
         end else begin
             Clear(DataLogRecord);
+            DataLogRecord.SetCurrentKey("Table ID");
             DataLogRecord.SetRange("Table ID", TableNo);
             if DataLogRecord.FindLast() then;
             LastLogEntryNo := DataLogRecord."Entry No.";
