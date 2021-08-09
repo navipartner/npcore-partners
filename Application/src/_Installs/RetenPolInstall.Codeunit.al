@@ -52,18 +52,18 @@ codeunit 6014496 "NPR Reten. Pol. Install"
 
         // if additional filters are needed on record, see codeunit 3999 procedure AddChangeLogEntryToAllowedTables() in Base App
 
-        AddAllowedTable(Database::"NPR Nc Task", RtnPeriodEnum::"28 Days");
+        AddAllowedTable(Database::"NPR Nc Task", RtnPeriodEnum::"1 Week");
 
         AddAllowedTable(Database::"NPR Data Log Record", RtnPeriodEnum::"1 Week");
         AddAllowedTable(Database::"NPR Data Log Field", RtnPeriodEnum::"1 Week");
 
         AddAllowedTable(Database::"NPR POS Entry Output Log", RtnPeriodEnum::"3 Months");
-        AddAllowedTable(Database::"NPR Nc Import Entry", RtnPeriodEnum::"3 Months");
+        AddAllowedTable(Database::"NPR Nc Import Entry", RtnPeriodEnum::"1 Month");
 
         AddAllowedTable(Database::"NPR POS Posting Log", RtnPeriodEnum::"6 Months");
 
-        AddAllowedTable(Database::"NPR POS Saved Sale Entry", RtnPeriodEnum::"1 Year");
-        AddAllowedTable(Database::"NPR POS Saved Sale Line", RtnPeriodEnum::"1 Year");
+        AddAllowedTable(Database::"NPR POS Saved Sale Entry", RtnPeriodEnum::"3 Months");
+        AddAllowedTable(Database::"NPR POS Saved Sale Line", RtnPeriodEnum::"3 Months");
         AddAllowedTable(Database::"NPR NpCs Arch. Document", RtnPeriodEnum::"1 Year");
 
         AddAllowedTable(Database::"NPR Exchange Label", RtnPeriodEnum::"5 Years");

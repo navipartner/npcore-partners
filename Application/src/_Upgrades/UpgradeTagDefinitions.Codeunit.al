@@ -113,7 +113,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
             Codeunit::"NPR Upgrade Magento Passwords":
                 exit('Magento_Password_IsolatedStorage_20210129');
             Codeunit::"NPR Reten. Pol. Install":
-                exit('NPR-RetenPolTables-20210224-02');
+                exit('NPR-RetenPolTables-20210809');
             Codeunit::"NPR Job Queue Install":
                 exit('NPRJobQueueInstall-20210809');
             Codeunit::"NPR New Prices Install":
