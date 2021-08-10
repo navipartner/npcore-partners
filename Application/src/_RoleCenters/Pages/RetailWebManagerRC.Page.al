@@ -8,8 +8,6 @@ page 6151244 "NPR Retail Web Manager RC"
     {
         area(rolecenter)
         {
-
-
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
                 ApplicationArea = NPRRetail;
@@ -24,528 +22,829 @@ page 6151244 "NPR Retail Web Manager RC"
             part(Control6014400; "NPR My Reports")
             {
                 ApplicationArea = NPRRetail;
-
             }
             part(Control6150616; "NPR Web Manager Activ.")
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control1901377608; MyNotes)
             {
                 ApplicationArea = NPRRetail;
-
             }
             part(PowerBi; "Power BI Report Spinner Part")
             {
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
 
     actions
     {
-        area(reporting)
+        area(sections)
         {
-            group("Report")
+            group("Magento Integration")
             {
-                Caption = 'Reports';
-                action("Discount Statistics")
-                {
-                    Caption = 'Discount Statistics';
-                    Image = "Report";
-                    RunObject = Report "NPR Discount Statistics";
-
-                    ToolTip = 'Executes the Discount Statistics action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Customer Analysis")
-                {
-                    Caption = 'Customer Analysis';
-                    Image = "Report";
-                    RunObject = Report "NPR Customer Analysis";
-
-                    ToolTip = 'Executes the Customer Analysis action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Sale Statistics per Vendor")
-                {
-                    Caption = 'Sale Statistics per Vendor';
-                    Image = "Report";
-                    RunObject = Report "NPR Sale Statistics per Vendor";
-
-                    ToolTip = 'Executes the Sale Statistics per Vendor action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Vendor/Salesperson")
-                {
-                    Caption = 'Vendor/Salesperson';
-                    Image = "Report";
-                    RunObject = Report "NPR Vendor/Salesperson";
-
-                    ToolTip = 'Executes the Vendor/Salesperson action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Item Group Overview")
-                {
-                    Caption = 'Item Group Overview';
-                    Image = "Report";
-                    RunObject = Report "NPR Item Group Overview";
-
-                    ToolTip = 'Executes the Item Group Overview action';
-                    ApplicationArea = NPRRetail;
-                }
-            }
-        }
-        area(Processing)
-        {
-
-            group("Setup Group")
-            {
-                Caption = 'Set up';
-                action("Magento Setup")
-
+                Caption = 'Magento Integration';
+                action("MagentoSetup")
                 {
                     Caption = 'Magento Setup';
                     Image = List;
-                    RunObject = Page "NPR Magento Setup";
-
+                    RunObject = page "NPR Magento Setup";
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Magento Setup action';
-                    ApplicationArea = NPRRetail;
                 }
-                action(Websites)
+                action("Magento Websites Setup")
                 {
-                    Caption = 'Websites';
-                    Image = Setup;
-                    RunObject = Page "NPR Magento Website List";
-
-                    ToolTip = 'Executes the Websites action';
+                    Caption = 'Magento Websites Setup';
+                    Image = List;
+                    RunObject = page "NPR Magento Websites";
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Websites Setup action';
                 }
-                action(Pictures)
+                action("Magento Stores")
                 {
-                    Caption = 'Pictures';
-                    Image = Setup;
-                    RunObject = Page "NPR Magento Pictures";
-
-                    ToolTip = 'Executes the Pictures action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Shipping Method Mapping")
-                {
-                    Caption = 'Shipping Method Mapping';
-                    Image = Setup;
-                    RunObject = Page "NPR Magento Shipment Mapping";
-
-                    ToolTip = 'Executes the Shipping Method Mapping action';
-                    ApplicationArea = NPRRetail;
-                }
-
-                action("Payment Method Mapping")
-                {
-                    Caption = 'Payment Method Mapping';
-                    Image = Setup;
-                    RunObject = page "NPR Magento Payment Mapping";
-
-                    ToolTip = 'Executes the Payment Method Mapping action';
-                    ApplicationArea = NPRRetail;
-                }
-
-                action("Payment Gateways")
-                {
-                    Caption = 'Payment Gateways';
-                    Image = Setup;
-                    RunObject = page "NPR Magento Payment Gateways";
-
-                    ToolTip = 'Executes the Payment Gateways action';
-                    ApplicationArea = NPRRetail;
-                }
-
-                action("VAT Business Posting Groups")
-                {
-                    Caption = 'VAT Business Posting Groups';
-                    Image = Setup;
-                    RunObject = page "VAT Business Posting Groups";
-
-                    ToolTip = 'Executes the VAT Business Posting Groups action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("VAT Product Posting Groups")
-                {
-                    Caption = 'VAT Product Posting Groups';
-                    Image = Setup;
-                    RunObject = page "VAT Product Posting Groups";
-
-                    ToolTip = 'Executes the VAT Product Posting Groups action';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Tax Classes")
-                {
-                    Caption = 'Tax Classes';
-                    Image = Setup;
-                    RunObject = page "NPR Magento Tax Classes";
-
-                    ToolTip = 'Executes the Tax Classes action';
-                    ApplicationArea = NPRRetail;
-                }
-
-                action(Webshops)
-                {
-                    Caption = 'Webshops';
+                    Caption = 'Magento Stores';
                     Image = List;
                     RunObject = page "NPR Magento Store List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Stores action';
+                }
+                action("Magento Tax Classes")
+                {
+                    Caption = 'Magento Tax Classes';
+                    Image = List;
+                    RunObject = page "NPR Magento Tax Classes";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Tax Classes action';
+                }
+                action("VAT Business Posting Groups Mapping")
+                {
+                    Caption = 'VAT Business Posting Groups Mapping';
+                    Image = List;
+                    RunObject = page "NPR Magento VAT Bus. Groups";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the VAT Business Posting Groups Mapping action';
+                }
+                action("VAT Product Posting Groups Mapping")
+                {
+                    Caption = 'VAT Product Posting Groups Mapping';
+                    Image = List;
+                    RunObject = page "NPR Magento VAT Prod. Groups";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the VAT Product Posting Groups Mapping action';
+                }
+                action("Magento Shipment Method Mapping")
+                {
+                    Caption = 'Magento Shipment Method Mapping';
+                    Image = List;
+                    RunObject = page "NPR Magento Shipment Mapping";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Shipment Method Mapping action';
+                }
+                action("Magento Payment Method Mapping")
+                {
+                    Caption = 'Magento Payment Method Mapping';
+                    Image = List;
+                    RunObject = page "NPR Magento Payment Mapping";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Payment Method Mapping action';
+                }
+                action("Payment Gateway Setup")
+                {
+                    Caption = 'Payment Gateway Setup';
+                    Image = List;
+                    RunObject = page "NPR Magento Payment Gateways";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Payment Gateway Setup action';
+                }
+            }
+            group("Magento Items")
+            {
+                Caption = 'Magento Items';
+                action("Item List")
+                {
+                    Caption = 'Item List';
+                    RunObject = Page "Item List";
 
-                    ToolTip = 'Executes the Webshops action';
+                    ToolTip = 'Executes the Item List action';
                     ApplicationArea = NPRRetail;
                 }
-
-                action("Customer Mapping")
+                action("Magento Categories")
                 {
-                    Caption = 'Magento Customer Mapping';
+                    Caption = 'Magento Categories';
+                    Image = List;
+                    RunObject = page "NPR Magento Categories";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Categories action';
+                }
+                action("Magento Brands")
+                {
+                    Caption = 'Magento Brands';
+                    Image = List;
+                    RunObject = page "NPR Magento Brands";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Brands action';
+                }
+                action("Magento Attributes")
+                {
+                    Caption = 'Magento Attributes';
+                    Image = List;
+                    RunObject = page "NPR Magento Attributes";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Attributes action';
+                }
+                action("Magento Attribute Groups")
+                {
+                    Caption = 'Magento Attribute Groups';
+                    Image = List;
+                    RunObject = page "NPR Magento Attr. Group List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Attribute Groups action';
+                }
+                action("Magento Attribute Sets")
+                {
+                    Caption = 'Magento Attribute Sets';
+                    Image = List;
+                    RunObject = page "NPR Magento Attribute Sets";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Attribute Sets action';
+                }
+                action("Magento Custom Options")
+                {
+                    Caption = 'Magento Custom Options';
+                    Image = List;
+                    RunObject = page "NPR Magento Custom Option List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Custom Options action';
+                }
+                action("Magento Pictures")
+                {
+                    Caption = 'Magento Pictures';
+                    Image = List;
+                    RunObject = page "NPR Magento Pictures";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Magento Pictures action';
+                }
+            }
+            group("Magento Sales")
+            {
+                Caption = 'Magento Sales';
+                action("Sales Orders")
+                {
+                    Caption = 'Sales Orders';
+                    Image = List;
+                    RunObject = page "Sales Orders";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Sales Orders action';
+                }
+                action("Sales Invoices")
+                {
+                    Caption = 'Sales Invoices';
+                    Image = List;
+                    RunObject = page "Posted Sales Invoices";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Sales Invoices action';
+                }
+                action("Sales Shipments")
+                {
+                    Caption = 'Sales Shipments';
+                    Image = List;
+                    RunObject = page "Posted Sales Shipments";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Sales Shipments action';
+                }
+                action("Sales Credit Memos")
+                {
+                    Caption = 'Sales Credit Memos';
+                    Image = List;
+                    RunObject = page "Posted Sales Credit Memos";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Sales Credit Memos action';
+                }
+                action("Payment Lines")
+                {
+                    Caption = 'Payment Lines';
+                    Image = List;
+                    RunObject = page "NPR Magento Payment Line List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Payment Lines action';
+                }
+                action("Sales Return Orders")
+                {
+                    Caption = 'Sales Return Orders';
+                    Image = List;
+                    RunObject = page "Sales Return Order List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Sales Return Orders action';
+                }
+            }
+            group("Magento Customers")
+            {
+                Caption = 'Magento Customers';
+                action("Customer")
+                {
+                    Caption = 'Customers';
+                    Image = List;
+                    RunObject = page "Customer List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Customers action';
+                }
+                action("Contact")
+                {
+                    Caption = 'Contacts';
+                    Image = List;
+                    RunObject = page "Contact List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Contacts action';
+                }
+                action("CustomerMapping")
+                {
+                    Caption = 'Customer Mapping';
                     Image = List;
                     RunObject = page "NPR Magento Customer Mapping";
-
-                    ToolTip = 'Executes the Magento Customer Mapping action';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Customer Mapping action';
                 }
-            }
-
-            group(Content)
-            {
-                Caption = 'Content';
-                group(Lists)
+                action("Customer Config. Templates")
                 {
-                    Caption = 'Lists';
+                    Caption = 'Customer Config. Templates';
                     Image = List;
-                    action(Items)
-                    {
-                        Caption = 'Items';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Items action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(ItemGroups)
-                    {
-                        Caption = 'Items Groups';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Items Groups action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(Brands)
-                    {
-                        Caption = 'Brands';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Brands action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(CustomOptions)
-                    {
-                        Caption = 'Customer Options';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Customer Options action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(AttributeSets)
-                    {
-                        Caption = 'Attribute Sets';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Attribute Sets action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(AttributeGroup)
-                    {
-                        Caption = 'Attribute Group';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Attribute Group action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(Attributes)
-                    {
-                        Caption = 'Attributes';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Attributes action';
-                        ApplicationArea = NPRRetail;
-                    }
+                    RunObject = page "Config. Template List";
+                    RunPageLink = "Table ID" = const(18);
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Customer Config. Templates action';
                 }
-
-                group(Business2Business)
+                action("Post Code")
                 {
-                    Caption = 'Business2Business';
-                    Image = BusinessRelation;
-                    action(DisplayGroups)
-                    {
-                        Caption = 'Display Group';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Display Group action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(DisplayConfig)
-                    {
-                        Caption = 'Display Config';
-                        Image = List;
-                        RunObject = page "Item List";
-
-                        ToolTip = 'Executes the Display Config action';
-                        ApplicationArea = NPRRetail;
-                    }
+                    Caption = 'Post Code';
+                    Image = List;
+                    RunObject = page "Post Codes";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Post Code action';
+                }
+                action("Customer GDPR")
+                {
+                    Caption = 'Customer GDPR';
+                    Image = List;
+                    RunObject = page "NPR Customer GDPR Setup";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Customer GDPR action';
                 }
             }
-
-            Group(Sales)
+            group("Retail Vouchers")
             {
-                group(OrderProcessing)
+                Caption = 'Retail Vouchers';
+                action("Vouchers")
                 {
-                    Caption = 'Order Processing';
-                    Image = Order;
-                    action(Contacts)
-                    {
-                        Caption = 'Contacts';
-                        Image = List;
-                        RunObject = page "Contact List";
-
-                        ToolTip = 'Executes the Contacts action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(Customersales)
-                    {
-                        Caption = 'Customers';
-                        Image = List;
-                        RunObject = page "Customer List";
-
-                        ToolTip = 'Executes the Customers action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(SalesOrders)
-                    {
-                        Caption = 'Sales Orders';
-                        Image = List;
-                        RunObject = page "Sales Order List";
-
-                        ToolTip = 'Executes the Sales Orders action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(PaymentLineList)
-                    {
-                        Caption = 'Payment Line List';
-                        Image = List;
-                        RunObject = page "NPR Magento Payment Line List";
-
-                        ToolTip = 'Executes the Payment Line List action';
-                        ApplicationArea = NPRRetail;
-                    }
+                    Caption = 'Vouchers';
+                    Image = List;
+                    RunObject = page "NPR NpRv Vouchers";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Vouchers action';
                 }
-                group(Tasks)
+                action("Archived Vouchers")
                 {
-                    Caption = 'Tasks';
-                    Image = Task;
-                    action(ImportList)
-                    {
-                        Caption = 'Import List';
-                        Image = List;
-
-                        RunObject = page "NPR Nc Import List";
-
-                        ToolTip = 'Executes the Import List action';
-                        ApplicationArea = NPRRetail;
-                    }
-
-                    action("Task List")
-                    {
-                        Caption = 'Task List';
-                        Image = List;
-                        RunObject = page "Task List";
-
-                        ToolTip = 'Executes the Task List action';
-                        ApplicationArea = NPRRetail;
-                    }
-
-                    action(UnProcessedImportList)
-                    {
-                        Caption = 'Unprocessed Import List';
-                        Image = List;
-
-                        RunObject = page "NPR Nc Import List";
-                        RunPageView = WHERE("Runtime Error" = const(true));
-
-                        ToolTip = 'Executes the Unprocessed Import List action';
-                        ApplicationArea = NPRRetail;
-                    }
-
-                    action("UnProcessedTask List")
-                    {
-                        Caption = 'Unprocessed Task List';
-                        Image = List;
-                        RunObject = page "NPR Nc Task List";
-                        RunPageView = WHERE("Process Error" = const(true));
-
-                        ToolTip = 'Executes the Unprocessed Task List action';
-                        ApplicationArea = NPRRetail;
-                    }
+                    Caption = 'Archived Vouchers';
+                    Image = List;
+                    RunObject = page "NPR NpRv Arch. Vouchers";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Archived Vouchers action';
                 }
-                group(Archive)
+                action("Voucher Types")
                 {
-                    Caption = 'Archive';
-                    Image = Archive;
-                    action(PostedSalesInv)
-                    {
-                        Caption = 'Posted Sales Invoices';
-                        Image = List;
-                        RunObject = page "Posted Sales Invoice";
-
-                        ToolTip = 'Executes the Posted Sales Invoices action';
-                        ApplicationArea = NPRRetail;
-                    }
-                    action(PostedSalesShipments)
-                    {
-                        Caption = 'Posted Sales Shipments';
-                        Image = List;
-                        RunObject = page "Posted Sales Shipment";
-
-                        ToolTip = 'Executes the Posted Sales Shipments action';
-                        ApplicationArea = NPRRetail;
-                    }
+                    Caption = 'Voucher Types';
+                    Image = List;
+                    RunObject = page "NPR NpRv Voucher Types";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Voucher Types action';
+                }
+                action("Voucher Modules")
+                {
+                    Caption = 'Voucher Modules';
+                    Image = List;
+                    RunObject = page "NPR NpRv Voucher Modules";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Voucher Modules action';
+                }
+                action("Retail Voucher Partners")
+                {
+                    Caption = 'Retail Voucher Partners';
+                    Image = List;
+                    RunObject = page "NPR NpRv Partners";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Retail Voucher Partners action';
                 }
             }
-            Group(NaviConnectSetup)
+            group("NaviConnect")
             {
-                Caption = 'NaviConnect Setup';
-                action(NaviConnectSetupAction)
+                Caption = 'NaviConnect';
+                action("NaviConnect Setup")
                 {
                     Caption = 'NaviConnect Setup';
-                    Image = Setup;
+                    Image = List;
                     RunObject = page "NPR Nc Setup";
-
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the NaviConnect Setup action';
-                    ApplicationArea = NPRRetail;
                 }
-                action(NpXmlSetup)
+                action("NpXml Templates Setup")
                 {
-                    Caption = 'NpXml Setup';
-                    Image = Setup;
+                    Caption = 'NpXml Templates Setup';
+                    Image = List;
                     RunObject = page "NPR NpXml Setup";
-
-                    ToolTip = 'Executes the NpXml Setup action';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the NpXml Templates Setup action';
                 }
-
-                action(TaskProcessors)
+                action("Task Processors")
                 {
                     Caption = 'Task Processors';
                     Image = List;
                     RunObject = page "NPR Nc Task Proces. List";
-
-                    ToolTip = 'Executes the Task Processors action';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Task Processors action';
                 }
-                action(TaskSetup)
+                action("Task Setup")
                 {
                     Caption = 'Task Setup';
-                    Image = Setup;
-                    RunObject = page "NPR NpXml Setup";
-
-                    ToolTip = 'Executes the Task Setup action';
+                    Image = List;
+                    RunObject = page "NPR Nc Task Setup";
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Task Setup action';
                 }
-                action(ImportTypes)
+                action("Import Types")
                 {
                     Caption = 'Import Types';
                     Image = List;
                     RunObject = page "NPR Nc Import Types";
-
-                    ToolTip = 'Executes the Import Types action';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Import Types action';
                 }
-                action(DataLogSetup)
+                action("Web Services")
+                {
+                    Caption = 'Web Services';
+                    Image = List;
+                    RunObject = page "Web Services";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Web Services action';
+                }
+                action("NpXml Template")
+                {
+                    Caption = 'NpXml Template';
+                    Image = List;
+                    RunObject = page "NPR NpXml Template List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the NpXml Template action';
+                }
+                action("Data Log Setup")
                 {
                     Caption = 'Data Log Setup';
-                    Image = SetupLines;
+                    Image = List;
                     RunObject = page "NPR Data Log Setup";
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Data Log Setup action';
                 }
-
+                action("TaskList")
+                {
+                    Caption = 'Task List';
+                    Image = List;
+                    RunObject = page "NPR Nc Task List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Task List action';
+                }
+                action("Import List")
+                {
+                    Caption = 'Import List';
+                    Image = List;
+                    RunObject = page "NPR Nc Import List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Import List action';
+                }
+                action("Email Templates")
+                {
+                    Caption = 'Email Templates';
+                    Image = List;
+                    RunObject = page "NPR E-mail Templates";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Email Templates action';
+                }
             }
-        }
-        area(embedding)
-        {
-            action("Item List")
+            group("Collect Store")
             {
-                Caption = 'Item List';
-                RunObject = Page "Item List";
-
-                ToolTip = 'Executes the Item List action';
-                ApplicationArea = NPRRetail;
+                Caption = 'Collect Store';
+                action("Sent to Store Orders")
+                {
+                    Caption = 'Sent to Store Orders';
+                    Image = List;
+                    RunObject = page "NPR NpCs Send to Store Orders";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Sent to Store Orders action';
+                }
+                action("Collect in Store Orders")
+                {
+                    Caption = 'Collect in Store Orders';
+                    Image = List;
+                    RunObject = page "NPR NpCs Coll. Store Orders";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Collect in Store Orders action';
+                }
+                action("Archived Collect Document List")
+                {
+                    Caption = 'Archived Collect Document List';
+                    Image = List;
+                    RunObject = page "NPR NpCs Arch. Doc. List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Archived Collect Document List action';
+                }
+                action("Collect Stores")
+                {
+                    Caption = 'Collect Stores';
+                    Image = List;
+                    RunObject = page "NPR NpCs Stores";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Collect Stores action';
+                }
+                action("Collect Workflows")
+                {
+                    Caption = 'Collect Workflows';
+                    Image = List;
+                    RunObject = page "NPR NpCs Workflows";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Collect Workflows action';
+                }
+                action("Collect Store Opening Hour Sets")
+                {
+                    Caption = 'Collect Store Opening Hour Sets';
+                    Image = List;
+                    RunObject = page "NPR NpCs Open. Hour Sets";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Collect Store Opening Hour Sets action';
+                }
+                action("Collect Workflows Modules")
+                {
+                    Caption = 'Collect Workflows Modules';
+                    Image = List;
+                    RunObject = page "NPR NpCs Workflow Modules";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Collect Workflows Modules action';
+                }
+                action("Collect Document Mapping")
+                {
+                    Caption = 'Collect Document Mapping';
+                    Image = List;
+                    RunObject = page "NPR NpCs Document Mapping";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Collect Document Mapping action';
+                }
             }
-            action("Item Groups")
+            group("Tickets")
             {
-                Caption = 'Item Groups';
-                RunObject = Page "NPR Magento Categories";
+                Caption = 'Tickets';
 
-                ToolTip = 'Executes the Item Groups action';
-                ApplicationArea = NPRRetail;
+                action("Issued Tickets")
+                {
+                    Caption = 'Issued Tickets';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Issued Tickets action';
+                }
+                action("Ticket Requests")
+                {
+                    Caption = 'Ticket Requests';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Request";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Requests action';
+                }
+                action("Offline Ticket Validation")
+                {
+                    Caption = 'Offline Ticket Validation';
+                    Image = List;
+                    RunObject = page "NPR TM Offline Ticket Valid.";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Offline Ticket Validation action';
+                }
+                action("ImportLists")
+                {
+                    Caption = 'Import List';
+                    Image = List;
+                    RunObject = page "NPR Nc Import List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Import List action';
+                }
+                action("Ticket Access Statistics Matrix")
+                {
+                    Caption = 'Ticket Access Statistics Matrix';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Acc. Stat. Mtrx";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Access Statistics Matrix action';
+                }
+                action("Sales Ticket Statistics")
+                {
+                    Caption = 'Sales Ticket Statistics';
+                    Image = List;
+                    RunObject = page "NPR Sales Ticket Statistics";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Sales Ticket Statistics action';
+                }
+                action("Issued/Admitted Ticket Statistics")
+                {
+                    Caption = 'Issued/Admitted Ticket Statistics';
+                    Image = List;
+                    RunObject = report "NPR Issued/Admit. Ticket Stats";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Issued/Admitted Ticket Statistics action';
+                }
+                action("Ticket Access Entry List")
+                {
+                    Caption = 'Ticket Access Entry List';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket AccessEntry List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Access Entry List action';
+                }
+                action("Ticket Access Facts")
+                {
+                    Caption = 'Ticket Access Facts';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Access Facts";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Access Facts action';
+                }
+                action("Ticket Access Statistics")
+                {
+                    Caption = 'Ticket Access Statistics';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Access Stats";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Access Statistics action';
+                }
+                action("Visiting Report")
+                {
+                    Caption = 'Visiting Report';
+                    Image = List;
+                    RunObject = report "NPR TM Visiting Report";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Visiting Report action';
+                }
+                action("Admission Forecast Matrix")
+                {
+                    Caption = 'Admission Forecast Matrix';
+                    Image = List;
+                    RunObject = page "NPR TM Admis. Forecast Matrix";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Admission Forecast Matrix action';
+                }
+                action("Ticket Setup Wizard")
+                {
+                    Caption = 'Ticket Setup Wizard';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Wizard";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Setup Wizard action';
+                }
+                action("Ticket Type")
+                {
+                    Caption = 'Ticket Type';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Type";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Type action';
+                }
+                action("Ticket Admission BOM")
+                {
+                    Caption = 'Ticket Admission BOM';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket BOM";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Admission BOM action';
+                }
+                action("Ticket Schedules")
+                {
+                    Caption = 'Ticket Schedules';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Schedules";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Schedules action';
+                }
+                action("Ticket Admissions")
+                {
+                    Caption = 'Ticket Admissions';
+                    Image = List;
+                    RunObject = page "NPR TM Ticket Admissions";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Admissions action';
+                }
+                action("Ticket Admission Object Schedules")
+                {
+                    Caption = 'Ticket Admission Object Schedules';
+                    Image = List;
+                    RunObject = page "NPR TM Admis. Schedule Lines";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Ticket Admission Object Schedules action';
+                }
             }
-            action("Sale Orders")
+            group("Membership")
             {
-                Caption = 'Sale Orders';
-                RunObject = Page "Sales Order List";
-
-                ToolTip = 'Executes the Sale Orders action';
-                ApplicationArea = NPRRetail;
+                Caption = 'Membership';
+                action("Members")
+                {
+                    Caption = 'Members';
+                    Image = List;
+                    RunObject = page "NPR MM Members";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Members action';
+                }
+                action("Memberships")
+                {
+                    Caption = 'Memberships';
+                    Image = List;
+                    RunObject = page "NPR MM Memberships";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Memberships action';
+                }
+                action("Member Cards")
+                {
+                    Caption = 'Member Cards';
+                    Image = List;
+                    RunObject = page "NPR MM Member Card List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Member Cards action';
+                }
+                action("MCS Person")
+                {
+                    Caption = 'MCS Person';
+                    Image = List;
+                    RunObject = page "NPR MCS Person";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the MCS Person action';
+                }
+                action("MCS Faces")
+                {
+                    Caption = 'MCS Faces';
+                    Image = List;
+                    RunObject = page "NPR MCS Faces";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the MCS Faces action';
+                }
+                action("MCS Person Business Entries")
+                {
+                    Caption = 'MCS Person Business Entries';
+                    Image = List;
+                    RunObject = page "NPR MCS Person Bus. Entities";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the MCS Person Business Entries action';
+                }
+                action("Create Membership")
+                {
+                    Caption = 'Create Membership';
+                    Image = List;
+                    RunObject = page "NPR MM Create Membership";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Create Membership action';
+                }
+                action("Membership Alteration Journal")
+                {
+                    Caption = 'Membership Alteration Journal';
+                    Image = List;
+                    RunObject = page "NPR MM Members. Alteration Jnl";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Alteration Journal action';
+                }
+                action("Membership Auto Renew List")
+                {
+                    Caption = 'Membership Auto Renew List';
+                    Image = List;
+                    RunObject = page "NPR MM Members. AutoRenew List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Auto Renew List action';
+                }
+                action("Membership Offline Print Journal")
+                {
+                    Caption = 'Membership Offline Print Journal';
+                    Image = List;
+                    RunObject = page "NPR MM Membership Print Jnl";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Offline Print Journal action';
+                }
+                action("Membership Status")
+                {
+                    Caption = 'Membership Status';
+                    Image = List;
+                    RunObject = report "NPR MM Membership Status";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Status action';
+                }
+                action("Membership Not Renewed")
+                {
+                    Caption = 'Membership Not Renewed';
+                    Image = List;
+                    RunObject = report "NPR MM Membership Not Renewed";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Not Renewed action';
+                }
+                action("Membership Sales Setup")
+                {
+                    Caption = 'Membership Sales Setup';
+                    Image = List;
+                    RunObject = page "NPR MM Membership Sales Setup";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Sales Setup action';
+                }
+                action("Membership Alteration")
+                {
+                    Caption = 'Membership Alteration';
+                    Image = List;
+                    RunObject = page "NPR MM Membership Alter.";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Alteration action';
+                }
+                action("Member Community")
+                {
+                    Caption = 'Member Community';
+                    Image = List;
+                    RunObject = page "NPR MM Member Community";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Member Community action';
+                }
+                action("Membership Setup")
+                {
+                    Caption = 'Membership Setup';
+                    Image = List;
+                    RunObject = page "NPR MM Membership Setup";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Membership Setup action';
+                }
+                action("MCS Person Group Setup")
+                {
+                    Caption = 'MCS Person Group Setup';
+                    Image = List;
+                    RunObject = page "NPR MCS Person Group Setup";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the MCS Person Group Setup action';
+                }
+                action("MCS Person Groups")
+                {
+                    Caption = 'MCS Person Groups';
+                    Image = List;
+                    RunObject = page "NPR MCS Person Groups";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the MCS Person Groups action';
+                }
             }
-
-
-            action("POS Entry List")
+            group("Discount Coupons")
             {
-                Caption = 'POS Entry List';
-                RunObject = Page "NPR POS Entry List";
-
-                ToolTip = 'Executes the POS Entry List action';
-                ApplicationArea = NPRRetail;
-            }
-            action("Contacts ")
-            {
-                Caption = 'Contact List';
-                RunObject = Page "Contact List";
-
-                ToolTip = 'Executes the Contact List action';
-                ApplicationArea = NPRRetail;
-            }
-            action(Customers)
-            {
-                Caption = 'Customer List';
-                RunObject = Page "Customer List";
-
-                ToolTip = 'Executes the Customer List action';
-                ApplicationArea = NPRRetail;
-            }
-
-            action("Xml Templates")
-            {
-                Caption = 'Xml Templates';
-                RunObject = Page "NPR NpXml Template List";
-
-                ToolTip = 'Executes the Xml Templates action';
-                ApplicationArea = NPRRetail;
+                Caption = 'Discount Coupons';
+                action("Coupons")
+                {
+                    Caption = 'Coupons';
+                    Image = List;
+                    RunObject = page "NPR NpDc Coupons";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Coupons action';
+                }
+                action("Coupon Types")
+                {
+                    Caption = 'Coupon Types';
+                    Image = List;
+                    RunObject = page "NPR NpDc Coupon Types";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Coupon Types action';
+                }
+                action("Open/Archived Coupon Statistics")
+                {
+                    Caption = 'Open/Archived Coupon Statistics';
+                    Image = List;
+                    RunObject = report "NPR Open/Archive Coupon Stat.";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Open/Archived Coupon Statistics action';
+                }
+                action("Archived Coupons")
+                {
+                    Caption = 'Archived Coupons';
+                    Image = List;
+                    RunObject = page "NPR NpDc Arch. Coupons";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Archived Coupons action';
+                }
+                action("Coupon Setup")
+                {
+                    Caption = 'Coupon Setup';
+                    Image = List;
+                    RunObject = page "NPR NpDc Coupon Setup";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Coupon Setup action';
+                }
+                action("Coupon Modules")
+                {
+                    Caption = 'Coupon Modules';
+                    Image = List;
+                    RunObject = page "NPR NpDc Coupon Modules";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the Coupon Modules action';
+                }
             }
         }
     }
 }
-
