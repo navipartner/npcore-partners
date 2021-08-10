@@ -233,7 +233,7 @@ table 6151591 "NPR NpDc Coupon"
     var
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
-        "Reference No." := CouponMgt.GenerateReferenceNo(Rec);
+        "Reference No." := CopyStr(CouponMgt.GenerateReferenceNo(Rec), 1, MaxStrLen("Reference No."));
     end;
 
     local procedure TestReferenceNo()
