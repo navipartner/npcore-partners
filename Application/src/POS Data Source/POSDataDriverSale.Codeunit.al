@@ -106,14 +106,14 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
 
         Sale.GetCurrentSale(SalePOS);
 
-        clear(POSUnit);
-        if POSUnit.Get(SalePOS."Register No.") then;
-        Clear(Customer);
-        if Customer.Get(SalePOS."Customer No.") then;
+        if not POSUnit.Get(SalePOS."Register No.") then
+            clear(POSUnit);
+        if not Customer.Get(SalePOS."Customer No.") then
+            Clear(Customer);
         Clear(Contact);
-        if Contact.Get(SalePOS."Contact No.") then begin
-        end else
+        if not Contact.Get(SalePOS."Contact No.") then
             if Customer."No." <> '' then begin
+                ContactBusinessRelation.SetCurrentKey("Link to Table", "No.");
                 ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
                 ContactBusinessRelation.SetRange("No.", Customer."No.");
                 if ContactBusinessRelation.FindFirst() then
