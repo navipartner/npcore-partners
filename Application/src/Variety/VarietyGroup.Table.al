@@ -335,11 +335,11 @@ table 6059976 "NPR Variety Group"
 
         TestField("Copy Naming Variety 1");
         if "Copy Naming Variety 1" = "Copy Naming Variety 1"::TableCodeAndItemNo then
-            exit("Variety 1 Table" + '-' + Item."No.");
+            exit(CopyStr("Variety 1 Table" + '-' + Item."No.", 1, 40));
 
         TestField("No. Series");
 
-        exit("Variety 1 Table" + '-' + GetNextNo());
+        exit(CopyStr("Variety 1 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
     procedure GetVariety2Table(Item: Record Item): Code[40]
@@ -349,11 +349,11 @@ table 6059976 "NPR Variety Group"
 
         TestField("Copy Naming Variety 2");
         if "Copy Naming Variety 2" = "Copy Naming Variety 2"::TableCodeAndItemNo then
-            exit("Variety 2 Table" + '-' + Item."No.");
+            exit(CopyStr("Variety 2 Table" + '-' + Item."No.", 1, 40));
 
         TestField("No. Series");
 
-        exit("Variety 2 Table" + '-' + GetNextNo());
+        exit(CopyStr("Variety 2 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
     procedure GetVariety3Table(Item: Record Item): Code[40]
@@ -363,11 +363,11 @@ table 6059976 "NPR Variety Group"
 
         TestField("Copy Naming Variety 3");
         if "Copy Naming Variety 3" = "Copy Naming Variety 3"::TableCodeAndItemNo then
-            exit("Variety 3 Table" + '-' + Item."No.");
+            exit(CopyStr("Variety 3 Table" + '-' + Item."No.", 1, 40));
 
         TestField("No. Series");
 
-        exit("Variety 3 Table" + '-' + GetNextNo());
+        exit(CopyStr("Variety 3 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
     procedure GetVariety4Table(Item: Record Item): Code[40]
@@ -377,11 +377,11 @@ table 6059976 "NPR Variety Group"
 
         TestField("Copy Naming Variety 4");
         if "Copy Naming Variety 4" = "Copy Naming Variety 4"::TableCodeAndItemNo then
-            exit("Variety 4 Table" + '-' + Item."No.");
+            exit(CopyStr("Variety 4 Table" + '-' + Item."No.", 1, 40));
 
         TestField("No. Series");
 
-        exit("Variety 4 Table" + '-' + GetNextNo());
+        exit(CopyStr("Variety 4 Table" + '-' + GetNextNo(), 1, 40));
     end;
 
     procedure GetNextNo(): Code[20]
@@ -548,11 +548,11 @@ table 6059976 "NPR Variety Group"
     begin
         //-NPR5.43 [317108]
         if "Variant Code Part 1 Length" > 1 then
-            NewVar1Code := CopyStr(Value1, 1, "Variant Code Part 1 Length");
+            NewVar1Code := CopyStr(CopyStr(Value1, 1, "Variant Code Part 1 Length"), 1, MaxStrLen(NewVar1Code));
         if "Variant Code Part 2 Length" > 1 then
-            NewVar2Code := CopyStr(Value2, 1, "Variant Code Part 2 Length");
+            NewVar2Code := CopyStr(CopyStr(Value2, 1, "Variant Code Part 2 Length"), 1, MaxStrLen(NewVar2Code));
         if "Variant Code Part 3 Length" > 1 then
-            NewVar3Code := CopyStr(Value3, 1, "Variant Code Part 3 Length");
+            NewVar3Code := CopyStr(CopyStr(Value3, 1, "Variant Code Part 3 Length"), 1, MaxStrLen(NewVar3Code));
 
         CurrentLength := StrLen(NewVar1Code) + StrLen(NewVar2Code) + StrLen(NewVar3Code) + StrLen("Variant Code Seperator 1") + StrLen("Variant Code Seperator 2");
         if CurrentLength > 10 then
@@ -576,6 +576,4 @@ table 6059976 "NPR Variety Group"
         end;
         //+NPR5.43 [317108]
     end;
-
 }
-

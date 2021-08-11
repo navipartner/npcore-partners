@@ -479,9 +479,9 @@ table 6059975 "NPR Variety Field Setup"
                 VRTFieldsSetup.Validate("Secondary Field No.", FieldNo2);
                 VRTFieldsSetup.Validate("Variety Matrix Subscriber 1", MatrixSubscriber1);
                 VRTFieldsSetup.Validate("Variety Matrix Subscriber 2", MatrixSubscriber2);
-                VRTFieldsSetup."OnLookup Subscriber" := MatrixSubscriberOnLookup;
+                VRTFieldsSetup."OnLookup Subscriber" := CopyStr(MatrixSubscriberOnLookup, 1, MaxStrLen(VRTFieldsSetup."OnLookup Subscriber"));
                 VRTFieldsSetup."Use OnLookup Return Value" := UseOnLookupValue;
-                VRTFieldsSetup."OnDrillDown Subscriber" := MatrixSubscriberOnDrillDown;
+                VRTFieldsSetup."OnDrillDown Subscriber" := CopyStr(MatrixSubscriberOnDrillDown, 1, MaxStrLen(VRTFieldsSetup."OnDrillDown Subscriber"));
                 VRTFieldsSetup."Use OnDrillDown Return Value" := UseOnDrillDownalue;
                 VRTFieldsSetup.Modify();
             end;
@@ -504,9 +504,9 @@ table 6059975 "NPR Variety Field Setup"
         //-NPR5.47 [327541]
         VRTFieldsSetup.Validate("Variety Matrix Subscriber 1", MatrixSubscriber1);
         VRTFieldsSetup.Validate("Variety Matrix Subscriber 2", MatrixSubscriber2);
-        VRTFieldsSetup."OnLookup Subscriber" := MatrixSubscriberOnLookup;
+        VRTFieldsSetup."OnLookup Subscriber" := CopyStr(MatrixSubscriberOnLookup, 1, MaxStrLen(VRTFieldsSetup."OnLookup Subscriber"));
         VRTFieldsSetup."Use OnLookup Return Value" := UseOnLookupValue;
-        VRTFieldsSetup."OnDrillDown Subscriber" := MatrixSubscriberOnDrillDown;
+        VRTFieldsSetup."OnDrillDown Subscriber" := CopyStr(MatrixSubscriberOnDrillDown, 1, MaxStrLen(VRTFieldsSetup."OnDrillDown Subscriber"));
         VRTFieldsSetup."Use OnDrillDown Return Value" := UseOnDrillDownalue;
         //+NPR5.47 [327541]
 
@@ -536,8 +536,7 @@ table 6059975 "NPR Variety Field Setup"
     begin
         if not VRTFieldsSetup.Get(Type, TableNo, FieldNo) then
             exit;
-        VRTFieldsSetup.Description := NewDescription;
+        VRTFieldsSetup.Description := CopyStr(NewDescription, 1, MaxStrLen(VRTFieldsSetup.Description));
         VRTFieldsSetup.Modify();
     end;
 }
-

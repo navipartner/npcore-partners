@@ -21,12 +21,12 @@
             SetRecordDefault(MRecref);
     end;
 
-    procedure GetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[250]
+    procedure GetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[1024]
     var
         RecRef: RecordRef;
         FRef: FieldRef;
         ItemVariant: Record "Item Variant";
-        TextValue2: Text;
+        TextValue2: Text[1024];
     begin
         TempVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
         if TempVRTBuffer."Variant Code" = '' then
@@ -265,7 +265,7 @@
         VRTFieldSetup."Use Global Dim 1 Filter" := VRTFieldSetup."Use Global Dim 1 Filter (Sec)";
         VRTFieldSetup."Use Global Dim 2 Filter" := VRTFieldSetup."Use Global Dim 2 Filter (Sec)";
 
-        exit(' (' + GetIntFunc(VRTFieldSetup, LocationFilter, GD1, GD2) + ')');
+        exit(CopyStr(' (' + GetIntFunc(VRTFieldSetup, LocationFilter, GD1, GD2) + ')', 1, 250));
     end;
 
     procedure SetValueIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
@@ -288,7 +288,7 @@
                         TempVRTBuffer."Variant Code" := '';
                         TempVRTBuffer.Modify();
                     end else begin
-                        VRTCloneData.SetupVariant(Item, TempVRTBuffer, NewValue);
+                        VRTCloneData.SetupVariant(Item, TempVRTBuffer, CopyStr(NewValue, 1, 50));
                         TempVRTBuffer.Modify();
                     end;
                 end;
@@ -304,7 +304,7 @@
                     ItemRef."Item No." := TempVRTBuffer."Item No.";
                     ItemRef."Variant Code" := TempVRTBuffer."Variant Code";
                     ItemRef."Unit of Measure" := '';
-                    ItemRef."Reference No." := NewValue;
+                    ItemRef."Reference No." := CopyStr(NewValue, 1, MaxStrLen(ItemRef."Reference No."));
                     ItemRef.Description := Item.Description;
                     ItemRef.Insert();
                 end;
