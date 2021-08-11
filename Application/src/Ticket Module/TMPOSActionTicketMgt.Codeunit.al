@@ -819,7 +819,7 @@
         TicketAccessEntry.Get(TicketAccessEntryNo);
         Ticket.Get(TicketAccessEntry."Ticket No.");
 
-
+        TicketReservationRequest.SetCurrentKey("External Ticket Number");
         TicketReservationRequest.SetFilter("External Ticket Number", '=%1', Ticket."External Ticket No.");
         TicketReservationRequest.SetFilter("Revoke Ticket Request", '=%1', true);
         TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::CANCELED); // in progress

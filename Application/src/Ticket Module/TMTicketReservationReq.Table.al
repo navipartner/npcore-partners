@@ -235,7 +235,9 @@ table 6060116 "NPR TM Ticket Reservation Req."
         }
         key(Key5; "Superseeds Entry No.")
         {
-
+        }
+        key(Key6; "External Ticket Number")
+        {
         }
     }
 
