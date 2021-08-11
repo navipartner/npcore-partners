@@ -510,6 +510,8 @@ codeunit 6150725 "NPR POS Action: Payment"
             exit(true);
 
         if (not EFTTransactionRequest.Successful) then begin
+            if (not SecondaryEFTTransactionRequest.SetCurrentKey("Initiated from Entry No.")) then
+                ;
             SecondaryEFTTransactionRequest.SetFilter("Initiated from Entry No.", '=%1', EFTTransactionRequest."Entry No.");
             if SecondaryEFTTransactionRequest.FindLast() then begin
                 if ((SecondaryEFTTransactionRequest."Pepper Transaction Type Code" = EFTTransactionRequest."Pepper Transaction Type Code") and
