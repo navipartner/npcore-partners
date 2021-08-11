@@ -1077,8 +1077,8 @@ page 6059974 "NPR Variety Matrix"
         ShowVariety4: Boolean;
         MATRIX_MatrixRecords: array[30] of Record "NPR Variety Buffer" temporary;
         MATRIX_CaptionSet: array[30] of Text[1024];
-        MATRIX_CaptionRange: Text[1024];
-        MATRIX_PrimKeyFirstCaptionInCu: Text[1024];
+        MATRIX_CaptionRange: Text;
+        MATRIX_PrimKeyFirstCaptionInCu: Text;
         MATRIX_CurrentNoOfColumns: Integer;
         HideInactive: Boolean;
         Initialized: Boolean;

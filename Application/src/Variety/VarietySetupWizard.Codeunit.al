@@ -100,7 +100,7 @@
     begin
         TempBusinessChoiceSelectionBuffer.Init();
         TempBusinessChoiceSelectionBuffer.Code := BusinessCode;
-        TempBusinessChoiceSelectionBuffer.Description := BusinessDescription;
+        TempBusinessChoiceSelectionBuffer.Description := CopyStr(BusinessDescription, 1, MaxStrLen(TempBusinessChoiceSelectionBuffer.Description));
         TempBusinessChoiceSelectionBuffer.Insert();
     end;
 
@@ -108,7 +108,7 @@
     begin
         TempProductChoiceSelectionBuffer.Init();
         TempProductChoiceSelectionBuffer.Code := ProductCode;
-        TempProductChoiceSelectionBuffer.Description := ProductDescription;
+        TempProductChoiceSelectionBuffer.Description := CopyStr(ProductDescription, 1, MaxStrLen(TempProductChoiceSelectionBuffer.Description));
         TempProductChoiceSelectionBuffer.Insert();
     end;
 
@@ -120,7 +120,7 @@
             exit;
         VarietyGroup.Init();
         VarietyGroup.Code := GroupCode;
-        VarietyGroup.Description := GroupDescription;
+        VarietyGroup.Description := CopyStr(GroupDescription, 1, MaxStrLen(VarietyGroup.Description));
         VarietyGroup."Variety 1" := V1Type;
         VarietyGroup."Variety 1 Table" := V1Table;
         VarietyGroup."Create Copy of Variety 1 Table" := V1CreateCopy;
@@ -152,9 +152,9 @@
 
         Variety.Init();
         Variety.Code := VrtType;
-        Variety.Description := Desc;
+        Variety.Description := CopyStr(Desc, 1, MaxStrLen(Variety.Description));
         Variety."Use in Variant Description" := true;
-        Variety."Pre tag In Variant Description" := PreTag;
+        Variety."Pre tag In Variant Description" := CopyStr(PreTag, 1, MaxStrLen(Variety."Pre tag In Variant Description"));
         Variety.Insert();
     end;
 
@@ -169,7 +169,7 @@
         VarietyTable.SetupNewLine();
         VarietyTable.Type := VrtType;
         VarietyTable.Code := VrtTable;
-        VarietyTable.Description := Desc;
+        VarietyTable.Description := CopyStr(Desc, 1, MaxStrLen(VarietyTable.Description));
         VarietyTable."Lock Table" := LockTableParm;
         VarietyTable.Insert();
     end;
@@ -184,7 +184,7 @@
         VarietyValue.Type := VrtType;
         VarietyValue.Table := VrtTable;
         VarietyValue.Value := VrtValue;
-        VarietyValue.Description := Desc;
+        VarietyValue.Description := CopyStr(Desc, 1, MaxStrLen(VarietyValue.Description));
         VarietyValue.AssignSortOrder();
         VarietyValue.Insert(false);
     end;
