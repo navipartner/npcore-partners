@@ -194,7 +194,6 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 RunPageLink = "Applies To Schedule Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Applies To Schedule Entry No.")
                               ORDER(Ascending);
-
             }
             action("Waiting List")
             {
@@ -205,6 +204,7 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Category4;
+                Scope = Repeater;
                 RunObject = Page "NPR TM Ticket Waiting List";
                 RunPageLink = "External Schedule Entry No." = FIELD("External Schedule Entry No.");
 
@@ -219,10 +219,28 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 trigger OnAction()
                 begin
                     NotifyTicketHolders();
+                end;
+            }
+            action("List of Attendees")
+            {
+                ToolTip = 'Create a list of attendees for this time entry.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Attendee List';
+                Image = Approval;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Category4;
+                Scope = Repeater;
+                trigger OnAction()
+                var
+                    AttendeePage: Page "NPR TM Attendee List";
+                begin
+                    AttendeePage.LoadPageBuffer(Rec);
+                    AttendeePage.Run();
                 end;
             }
         }
