@@ -701,7 +701,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         until (AdmissionBOM.Next() = 0);
     end;
 
-    procedure AttemptChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer; ResponseMessage: Text): Boolean
+    procedure AttemptChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer; var ResponseMessage: Text): Boolean
     var
         AttemptTicket: Codeunit "NPR Ticket Attempt Create";
     begin
