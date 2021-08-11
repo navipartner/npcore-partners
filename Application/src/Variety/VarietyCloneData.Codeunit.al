@@ -44,7 +44,7 @@
         case MRecref.Number of
             DATABASE::"Item Variant":
                 begin
-                    SetupVariant(Item, TMPVRTBuffer, NewValue);
+                    SetupVariant(Item, TMPVRTBuffer, CopyStr(NewValue, 1, 50));
                 end;
             DATABASE::"Sales Line":
                 begin
@@ -502,7 +502,7 @@
         if StrLen(RefNo) <> 12 then
             Error(Text001, 12);
 
-        exit(RefNo + Format(StrCheckSum(RefNo, '131313131313')));
+        exit(CopyStr(RefNo + Format(StrCheckSum(RefNo, '131313131313')), 1, MaxStrLen(Barcode)));
     end;
 
     procedure CreateBarcodeEAN8(RefNo: Code[20]) Barcode: Code[13]
@@ -510,7 +510,7 @@
         if StrLen(RefNo) <> 7 then
             Error(Text001, 7);
 
-        exit(RefNo + Format(StrCheckSum(RefNo, '3131313')));
+        exit(CopyStr(RefNo + Format(StrCheckSum(RefNo, '3131313')), 1, MaxStrLen(Barcode)));
     end;
 
     procedure GetVRTSetup(): Boolean
@@ -524,8 +524,8 @@
 
     procedure CreateEAN13BarcodeNoSeries(IsInternal: Boolean)
     var
-        Prefix: Code[3];
-        CompNo: Code[8];
+        Prefix: Code[20];
+        CompNo: Code[20];
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
         LineNo: Integer;
@@ -655,7 +655,7 @@
         Clear(VRTTable);
 
         //Create the new table
-        NewTableCode := TempVRTTable.Code + '-' + Item."No.";
+        NewTableCode := CopyStr(TempVRTTable.Code + '-' + Item."No.", 1, MaxStrLen(NewTableCode));
         VRTGroup.CopyTable2NewTable(TempVRTTable.Type, TempVRTTable.Code, NewTableCode);
 
         //Change the item
@@ -739,7 +739,7 @@
         ReferenceNo := InputBarcode.GetBarcode();
         if ReferenceNo = '' then
             exit;
-        InsertItemRef(ItemNo, '', ReferenceNo, Enum::"Item Reference Type"::"Bar Code", '');
+        InsertItemRef(ItemNo, '', CopyStr(ReferenceNo, 1, 20), Enum::"Item Reference Type"::"Bar Code", '');
     end;
 
     procedure AssignBarcodes(Item: Record Item)

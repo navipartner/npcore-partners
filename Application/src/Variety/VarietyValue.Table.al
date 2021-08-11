@@ -38,9 +38,9 @@ table 6059973 "NPR Variety Value"
 
                 if Description = '' then begin
                     if StrLen(Value) = 1 then
-                        Description := Value
+                        Description := CopyStr(Value, 1, MaxStrLen(Description))
                     else
-                        Description := CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2));
+                        Description := CopyStr(CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2)), 1, MaxStrLen(Description));
                 end;
             end;
         }
@@ -133,9 +133,9 @@ table 6059973 "NPR Variety Value"
             //convert '.' with ',' so we can use the number correct
             DecSep := GetDecimalSeperator();
             if DecSep = '.' then
-                Value2 := ConvertStr(Value, ',', DecSep)
+                Value2 := CopyStr(ConvertStr(Value, ',', DecSep), 1, MaxStrLen(Value2))
             else
-                Value2 := ConvertStr(Value, '.', DecSep);
+                Value2 := CopyStr(ConvertStr(Value, '.', DecSep), 1, MaxStrLen(Value2));
             Evaluate(Dec, Value2);
 
             //number 10 will be 100. Number 10,5 will be 105

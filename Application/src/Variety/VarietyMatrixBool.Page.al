@@ -1792,8 +1792,8 @@ page 6059978 "NPR Variety Matrix Bool"
         ShowVariety4: Boolean;
         MATRIX_MatrixRecords: array[100] of Record "NPR Variety Buffer" temporary;
         MATRIX_CaptionSet: array[100] of Text[1024];
-        MATRIX_CaptionRange: Text[1024];
-        MATRIX_PrimKeyFirstCaptionInCu: Text[1024];
+        MATRIX_CaptionRange: Text;
+        MATRIX_PrimKeyFirstCaptionInCu: Text;
         MATRIX_CurrentNoOfColumns: Integer;
         HideInactive: Boolean;
         Initialized: Boolean;
@@ -2076,7 +2076,7 @@ page 6059978 "NPR Variety Matrix Bool"
     begin
         RecRef := RecRef2;
         Item := Item2;
-        LocationFilter := Item2.GetFilter("Location Filter");
+        LocationFilter := CopyStr(Item2.GetFilter("Location Filter"), 1, MaxStrLen(LocationFilter));
         VRTMatrixMgt.SetRecord(RecRef2, Item."No.");
         CurrVRTField.SetRange("Table No.", RecRef.Number);
 

@@ -360,22 +360,22 @@ table 6059974 "NPR Variety Buffer"
                                         TMPVRTBuffer."Item No." := ItemNo;
 
                                         if TempVRT1.Description = '' then
-                                            VRT1Desc := TempVRT1.Value
+                                            VRT1Desc := CopyStr(TempVRT1.Value, 1, MaxStrLen(VRT1Desc))
                                         else
                                             VRT1Desc := TempVRT1.Description;
 
                                         if TempVRT2.Description = '' then
-                                            VRT2Desc := TempVRT2.Value
+                                            VRT2Desc := CopyStr(TempVRT2.Value, 1, MaxStrLen(VRT2Desc))
                                         else
                                             VRT2Desc := TempVRT2.Description;
 
                                         if TempVRT3.Description = '' then
-                                            VRT3Desc := TempVRT3.Value
+                                            VRT3Desc := CopyStr(TempVRT3.Value, 1, MaxStrLen(VRT3Desc))
                                         else
                                             VRT3Desc := TempVRT3.Description;
 
                                         if TempVRT4.Description = '' then
-                                            VRT4Desc := TempVRT4.Value
+                                            VRT4Desc := CopyStr(TempVRT4.Value, 1, MaxStrLen(VRT4Desc))
                                         else
                                             VRT4Desc := TempVRT4.Description;
 
@@ -689,22 +689,22 @@ table 6059974 "NPR Variety Buffer"
                                         TMPVRTBuffer."Item No." := Item."No.";
 
                                         if TempVRT1.Description = '' then
-                                            VRT1Desc := TempVRT1.Value
+                                            VRT1Desc := CopyStr(TempVRT1.Value, 1, MaxStrLen(VRT1Desc))
                                         else
                                             VRT1Desc := TempVRT1.Description;
 
                                         if TempVRT2.Description = '' then
-                                            VRT2Desc := TempVRT2.Value
+                                            VRT2Desc := CopyStr(TempVRT2.Value, 1, MaxStrLen(VRT2Desc))
                                         else
                                             VRT2Desc := TempVRT2.Description;
 
                                         if TempVRT3.Description = '' then
-                                            VRT3Desc := TempVRT3.Value
+                                            VRT3Desc := CopyStr(TempVRT3.Value, 1, MaxStrLen(VRT3Desc))
                                         else
                                             VRT3Desc := TempVRT3.Description;
 
                                         if TempVRT4.Description = '' then
-                                            VRT4Desc := TempVRT4.Value
+                                            VRT4Desc := CopyStr(TempVRT4.Value, 1, MaxStrLen(VRT4Desc))
                                         else
                                             VRT4Desc := TempVRT4.Description;
 
@@ -836,7 +836,7 @@ table 6059974 "NPR Variety Buffer"
         //+NPR5.36 [285733]
     end;
 
-    local procedure SetBufferValues(var BufferSortOrder: Integer; var BufferDescription: Text; VarietyType: Code[10]; VarietyTable: Code[40]; VarietyValue: Code[20])
+    local procedure SetBufferValues(var BufferSortOrder: Integer; var BufferDescription: Text[92]; VarietyType: Code[10]; VarietyTable: Code[40]; VarietyValue: Code[20])
     var
         VRTValue: Record "NPR Variety Value";
     begin
