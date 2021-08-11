@@ -248,9 +248,8 @@
                     ShowQuickStatistics(AdmissionCode);
                 1:
                     begin
-                        SetGroupTicketConfirmedQuantity(JSON, ExternalTicketNumber, AdmissionCode);
-                        RegisterArrival(ExternalTicketNumber, AdmissionCode, POSUnitNo, WithTicketPrint);
-
+                        if (SetGroupTicketConfirmedQuantity(JSON, ExternalTicketNumber, AdmissionCode)) then
+                            RegisterArrival(ExternalTicketNumber, AdmissionCode, POSUnitNo, WithTicketPrint);
                     end;
                 2:
                     RevokeTicketReservation(POSSession, ExternalTicketNumber);
@@ -352,9 +351,8 @@
                 ShowQuickStatistics(AdmissionCode);
             1:
                 begin
-                    SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, AdmissionCode);
-                    // RegisterArrival (ExternalTicketNumber, AdmissionCode);
-                    RegisterArrival(ExternalTicketNumber, AdmissionCode, PosUnitNo, WithTicketPrint);
+                    if (SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, AdmissionCode)) then
+                        RegisterArrival(ExternalTicketNumber, AdmissionCode, PosUnitNo, WithTicketPrint);
                 end;
             2:
                 RevokeTicketReservation(POSSession, ExternalTicketNumber);
@@ -990,7 +988,7 @@
         exit(TicketMaxQty);
     end;
 
-    local procedure SetGroupTicketConfirmedQuantity(JSON: Codeunit "NPR POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])
+    local procedure SetGroupTicketConfirmedQuantity(JSON: Codeunit "NPR POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]): Boolean
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         Ticket: Record "NPR TM Ticket";
@@ -1006,8 +1004,8 @@
         Ticket.TestField(Blocked, false);
 
         NewTicketQty := GetInteger(JSON, 'ticketquantity');
-        if (NewTicketQty = 0) then
-            exit;
+        if (NewTicketQty <= 0) then
+            exit(true); // Accept current quantity on ticket. 
 
         QtyChanged := TicketManagement.AttemptChangeConfirmedTicketQuantity(Ticket."No.", AdmissionCode, NewTicketQty, ResponseMessage);
 
@@ -1016,6 +1014,7 @@
         if (not QtyChanged) then
             JSON.SetContext('VerboseMessage', ResponseMessage);
 
+        exit(QtyChanged);
     end;
 
     local procedure PickupPreConfirmedTicket(POSSession: Codeunit "NPR POS Session"; TicketReference: Code[30])
