@@ -137,24 +137,32 @@
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
+        NoMoreEntries: Boolean;
         LastSaleDateLbl: Label '%1 | %2', Locked = true;
     begin
         if not LastSaleRetrieved then begin
+            POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
             POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
             POSEntry.SetRange("POS Unit No.", Rec."Register No.");
-            POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
-            if not POSEntry.FindLast() then
+            if not POSEntry.Find('+') then
+                exit;
+            repeat
+                LastSaleRetrieved := POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale"];
+                if not LastSaleRetrieved then
+                    NoMoreEntries := POSEntry.Next(-1) = 0;
+            until NoMoreEntries or LastSaleRetrieved;
+            if not LastSaleRetrieved then
                 exit;
 
             LastReceiptNoOut := POSEntry."Fiscal No.";
             LastSaleDateTextOut := StrSubstNo(LastSaleDateLbl, POSEntry."Entry Date", POSEntry."Ending Time");
 
             POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-            if POSSalesLine.Findset() then
-                repeat
-                    LastSaleTotalOut += POSSalesLine."Amount Incl. VAT (LCY)";
-                until POSSalesLine.Next() = 0;
+            POSSalesLine.CalcSums("Amount Incl. VAT (LCY)");
+            LastSaleTotalOut := POSSalesLine."Amount Incl. VAT (LCY)";
 
+            LastSalePaymentOut := 0;
+            LastSaleReturnAmountOut := 0;
             POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
             if POSPaymentLine.FindSet() then
                 repeat
@@ -164,7 +172,6 @@
                         LastSaleReturnAmountOut += POSPaymentLine."Amount (LCY)";
                 until POSPaymentLine.Next() = 0;
         end;
-        LastSaleRetrieved := true;
     end;
 
     procedure GetModified() Result: Boolean
