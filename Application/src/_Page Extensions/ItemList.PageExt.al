@@ -341,7 +341,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 trigger OnAction()
                 var
                     InputDialog: Page "NPR Input Dialog";
-                    Validering: Text;
+                    Validering: Text[50];
                     BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
                     ItemNo: Code[20];
                     VariantCode: Code[10];
