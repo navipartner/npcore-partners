@@ -18,6 +18,7 @@ codeunit 6150702 "NPR POS UI Management"
         Language.Get(GlobalLanguage);
         ConfigureCaptions(Captions);
 
+        Caption.SetCurrentKey("Language Code", "Caption ID");
         Caption.SetFilter("Caption ID", '<>%1', '');
         Caption.SetFilter("Language Code", '%1|%2', '', Language."Abbreviated Name");
         if Caption.FindSet() then
@@ -78,6 +79,7 @@ codeunit 6150702 "NPR POS UI Management"
 
         PreloadParameters(TempPOSParameterValue);
 
+        Menu.SetCurrentKey(Blocked, "Register Type", "Register No.", "Salesperson Code");
         Menu.SetRange(Blocked, false);
         Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
         Menu.SetFilter("Register No.", '%1|%2', POSUnit."No.", '');
@@ -99,11 +101,12 @@ codeunit 6150702 "NPR POS UI Management"
         POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
         InitializeMenuObject(Menu, MenuObj);
 
+        MenuButton.SetCurrentKey("Menu Code", "Parent ID", Blocked, "Register Type", "Register No.");
         MenuButton.SetRange("Menu Code", Menu.Code);
+        MenuButton.SetRange("Parent ID", 0);
         MenuButton.SetRange(Blocked, false);
         Menu.CopyFilter("Register Type", MenuButton."Register Type");
         Menu.CopyFilter("Register No.", MenuButton."Register No.");
-        MenuButton.SetRange("Parent ID", 0);
 
         InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
     end;
@@ -120,7 +123,7 @@ codeunit 6150702 "NPR POS UI Management"
     var
         SubMenuButton: Record "NPR POS Menu Button";
     begin
-        SubMenuButton.CopyFilters(MenuButton);
+        SubMenuButton.Copy(MenuButton);
         SubMenuButton.SetRange("Parent ID", MenuButton.ID);
         InitializeMenuButtons(SubMenuButton, ISubMenu, POSSession, tmpPOSParameterValue);
     end;
@@ -232,6 +235,7 @@ codeunit 6150702 "NPR POS UI Management"
         Templates: JsonArray;
         Template: JsonObject;
     begin
+        AdminTemplateScope.SetCurrentKey("Applies To", "Applies To Code");
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::All);
         if AdminTemplateScope.FindSet() then
             repeat

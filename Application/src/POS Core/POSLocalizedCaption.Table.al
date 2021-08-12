@@ -1,8 +1,5 @@
 table 6150702 "NPR POS Localized Caption"
 {
-    // NPR5.37/VB /20171013  CASE 290485 Providing localization support for button captions (and other data)
-    // NPR5.48/JDH /20181109 CASE 334163 Added caption to field From Original Table
-
     Caption = 'Localized Caption';
     DataClassification = CustomerContent;
 
@@ -76,6 +73,7 @@ table 6150702 "NPR POS Localized Caption"
         key(Key1; "Record ID", "Field No.", "Caption ID", "Language Code")
         {
         }
+        key(Key2; "Language Code", "Caption ID") { }
     }
 
     fieldgroups

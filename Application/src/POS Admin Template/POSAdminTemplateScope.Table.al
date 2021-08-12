@@ -1,7 +1,5 @@
 table 6150734 "NPR POS Admin. Template Scope"
 {
-    // NPR5.51/JAKUBV/20190903  CASE 352582 Transport NPR5.51 - 3 September 2019
-
     Caption = 'POS Admin. Template Scope';
     DataClassification = CustomerContent;
 
@@ -42,6 +40,7 @@ table 6150734 "NPR POS Admin. Template Scope"
         key(Key1; "POS Admin. Template Id", "Applies To", "Applies To Code")
         {
         }
+        key(Key2; "Applies To", "Applies To Code") { }
     }
 
     fieldgroups

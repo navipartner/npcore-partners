@@ -260,6 +260,7 @@ table 6150701 "NPR POS Menu Button"
         key(Key2; "Menu Code", Ordinal)
         {
         }
+        key(Key3; "Menu Code", "Parent ID", Blocked, "Register Type", "Register No.") { }
     }
 
     fieldgroups
