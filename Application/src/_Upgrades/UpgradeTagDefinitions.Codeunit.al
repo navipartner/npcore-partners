@@ -41,12 +41,12 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
-    procedure GetUpgradeTag(UpgradeCodeunitID: Integer): Text
+    procedure GetUpgradeTag(UpgradeCodeunitID: Integer): Text[250]
     begin
         exit(GetUpgradeTag(UpgradeCodeunitID, ''));
     end;
 
-    procedure GetUpgradeTag(UpgradeCodeunitID: Integer; UpgradeStep: Text): Text
+    procedure GetUpgradeTag(UpgradeCodeunitID: Integer; UpgradeStep: Text): Text[250]
     var
         POSViewProfile: Record "NPR POS View Profile";
     begin
