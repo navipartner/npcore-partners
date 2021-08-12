@@ -126,7 +126,7 @@ report 6014495 "NPR Whse. - Shipment"
         Location: Record Location;
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
         BarcodeSimbiology: Enum "Barcode Symbology";
-        BarCodeText: Text;
+        BarCodeText: Code[250];
         BarCodeEncodedText: Text;
         CurrReportPageNoCaptionLbl: Label 'Page';
         QtyPickedCaptionLbl: Label 'Qty. Picked';
