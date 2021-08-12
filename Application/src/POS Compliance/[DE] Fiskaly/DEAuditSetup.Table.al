@@ -38,7 +38,10 @@ table 6014529 "NPR DE Audit Setup"
     [NonDebuggable]
     procedure SetApiKey(NewKey: Text)
     begin
-        IsolatedStorage.Set(ApiKeyLbl, NewKey, DataScope::Company);
+        if not EncryptionEnabled() then
+            IsolatedStorage.Set(ApiKeyLbl, NewKey, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted(ApiKeyLbl, NewKey, DataScope::Company);
     end;
 
     [NonDebuggable]
@@ -61,7 +64,10 @@ table 6014529 "NPR DE Audit Setup"
     [NonDebuggable]
     procedure SetApiSecret(NewSecret: Text)
     begin
-        IsolatedStorage.Set(ApiSecretLbl, NewSecret, DataScope::Company);
+        if not EncryptionEnabled() then
+            IsolatedStorage.Set(ApiSecretLbl, NewSecret, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted(ApiSecretLbl, NewSecret, DataScope::Company);
     end;
 
     [NonDebuggable]

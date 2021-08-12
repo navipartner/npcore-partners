@@ -130,7 +130,11 @@ table 6151413 "NPR Magento Payment Gateway"
     begin
         if IsNullGuid("Api Password Key") then
             "Api Password Key" := CreateGuid();
-        IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company);
+
+        if not EncryptionEnabled() then
+            IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted("Api Password Key", NewPassword, DataScope::Company);
     end;
 
     [NonDebuggable]
