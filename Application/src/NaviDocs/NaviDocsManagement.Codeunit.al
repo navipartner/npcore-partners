@@ -21,7 +21,6 @@
     var
         NaviDocsSetup: Record "NPR NaviDocs Setup";
         MailAndDocumentHandling: Codeunit "NPR E-mail Management";
-        NPRDocumentLocalization: Codeunit "NPR Doc. Localization Proxy";
         DevMsgNotTemporaryErr: Label 'This function can only be used when the record is temporary.';
         Error003: Label 'No report for printing the %1 found.';
         Error004: Label 'E-mail Address is missing.';
@@ -799,7 +798,6 @@
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesHeader: Record "Sales Header";
         RecRef: RecordRef;
-        VariantVar: Variant;
     begin
         case NaviDocsEntry."Table No." of
             DATABASE::"Sales Header":
@@ -811,33 +809,21 @@
                 if SalesInvoiceHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(SalesInvoiceHeader);
                     NaviDocsEntry."Printed Qty." := SalesInvoiceHeader."No. Printed";
-                    NPRDocumentLocalization.T112_GetFieldValue(SalesInvoiceHeader, 'Electronic Invoice Created', VariantVar);
-                    if VariantVar.IsBoolean then
-                        NaviDocsEntry."OIO Sent" := VariantVar;
                 end;
             DATABASE::"Sales Cr.Memo Header":
                 if SalesCrMemoHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(SalesCrMemoHeader);
                     NaviDocsEntry."Printed Qty." := SalesCrMemoHeader."No. Printed";
-                    NPRDocumentLocalization.T114_GetFieldValue(SalesCrMemoHeader, 'Electronic Credit Memo Created', VariantVar);
-                    if VariantVar.IsBoolean then
-                        NaviDocsEntry."OIO Sent" := VariantVar;
                 end;
             DATABASE::"Issued Reminder Header":
                 if IssuedReminderHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(IssuedReminderHeader);
                     NaviDocsEntry."Printed Qty." := IssuedReminderHeader."No. Printed";
-                    NPRDocumentLocalization.T297_GetFieldValue(IssuedReminderHeader, 'Electronic Reminder Created', VariantVar);
-                    if VariantVar.IsBoolean then
-                        NaviDocsEntry."OIO Sent" := VariantVar;
                 end;
             DATABASE::"Issued Fin. Charge Memo Header":
                 if IssuedFinChargeMemoHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(IssuedFinChargeMemoHeader);
                     NaviDocsEntry."Printed Qty." := IssuedFinChargeMemoHeader."No. Printed";
-                    NPRDocumentLocalization.T304_GetFieldValue(IssuedFinChargeMemoHeader, 'Elec. Fin. Charge Memo Created', VariantVar);
-                    if VariantVar.IsBoolean then
-                        NaviDocsEntry."OIO Sent" := VariantVar;
                 end;
         end;
 
