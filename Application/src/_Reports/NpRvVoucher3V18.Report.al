@@ -176,7 +176,7 @@ report 6151015 "NPR NpRv Voucher 3"
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
         BarcodeSimbiology: Enum "Barcode Symbology";
 
-        BarCodeText: Text;
+        BarCodeText: Code[250];
         BarCodeEncodedText: Text;
         EndingDate: Text;
         IssuedDate: Text;

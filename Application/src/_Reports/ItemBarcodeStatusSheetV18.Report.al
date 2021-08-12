@@ -184,7 +184,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
         ShowVariantInfo: Integer;
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
         BarcodeSimbiology: Enum "Barcode Symbology";
-        BarCodeText: Text;
+        BarCodeText: Code[250];
         BarCodeEncodedText: Text;
         i: Integer;
         LineNo: Integer;

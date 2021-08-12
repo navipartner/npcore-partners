@@ -179,7 +179,7 @@ report 6014428 "NPR Shelf Labels"
         ItemCategory: Record "Item Category";
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
         BarcodeSimbiology: Enum "Barcode Symbology";
-        BarCodeText: Text;
+        BarCodeText: code[250];
         BarCodeEncodedText: Text;
         CurrencyChar: Char;
         TMPBeforeUnitPrice: Decimal;
@@ -210,10 +210,10 @@ report 6014428 "NPR Shelf Labels"
         Clear(NPRAttributeTextArrayText);
         NPRAttributeMgr.GetMasterDataAttributeValue(NPRAtrributeTextArray, DATABASE::Item, ItemRec."No.");
         for NPRAttrCount := 1 to 1 do begin
-            NPRAttributeTextArrayText[NPRAttrCount] := CaptionClassTranslate(StrSubstNo(TextCaptionClass, Format(NPRAttrCount)));
+            NPRAttributeTextArrayText[NPRAttrCount] := CopyStr(CaptionClassTranslate(StrSubstNo(TextCaptionClass, Format(NPRAttrCount))), 1, 50);
             NPRAttrPosition := StrPos(NPRAtrributeTextArray[NPRAttrCount], '-');
             if NPRAttrPosition > 0 then
-                NPRAtrributeTextArray[NPRAttrCount] := CopyStr(NPRAtrributeTextArray[NPRAttrCount], NPRAttrPosition + 1);
+                NPRAtrributeTextArray[NPRAttrCount] := CopyStr(NPRAtrributeTextArray[NPRAttrCount], NPRAttrPosition + 1, 50);
             if (NPRAttributeTextArrayText[NPRAttrCount] = StrSubstNo(TextAttrNotDefined, Format(NPRAttrCount))) or (NPRAtrributeTextArray[NPRAttrCount] = '') then
                 NPRAttributeTextArrayText[NPRAttrCount] := '';
         end;
