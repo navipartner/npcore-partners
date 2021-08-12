@@ -26,7 +26,10 @@ table 6059955 "NPR MCS API Setup"
                 if IsolatedStorage.Contains("Key 1 GUID") then
                     IsolatedStorage.Delete("Key 1 GUID");
                 if "Key 1" <> '' then begin
-                    IsolatedStorage.Set("Key 1 GUID", "Key 1");
+                    if not EncryptionEnabled() then
+                        IsolatedStorage.Set("Key 1 GUID", "Key 1")
+                    else
+                        IsolatedStorage.SetEncrypted("Key 1 GUID", "Key 1");
                     "Key 1" := '*';
                 end;
             end;
@@ -42,7 +45,10 @@ table 6059955 "NPR MCS API Setup"
                 if IsolatedStorage.Contains("Key 2 GUID") then
                     IsolatedStorage.Delete("Key 2 GUID");
                 if "Key 2" <> '' then begin
-                    IsolatedStorage.Set("Key 2 GUID", "Key 2");
+                    if not EncryptionEnabled() then
+                        IsolatedStorage.Set("Key 2 GUID", "Key 2")
+                    else
+                        IsolatedStorage.SetEncrypted("Key 2 GUID", "Key 2");
                     "Key 2" := '*';
                 end;
             end;

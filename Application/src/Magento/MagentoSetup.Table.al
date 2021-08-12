@@ -797,7 +797,10 @@ table 6151401 "NPR Magento Setup"
     begin
         if IsNullGuid("Api Password Key") then
             "Api Password Key" := CreateGuid();
-        IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company);
+        if not EncryptionEnabled() then
+            IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted("Api Password Key", NewPassword, DataScope::Company);
     end;
 
     [NonDebuggable]
@@ -823,7 +826,10 @@ table 6151401 "NPR Magento Setup"
     begin
         if IsNullGuid("Managed Nav Api Password Key") then
             "Managed Nav Api Password Key" := CreateGuid();
-        IsolatedStorage.Set("Managed Nav Api Password Key", NewPassword, DataScope::Company);
+        if not EncryptionEnabled() then
+            IsolatedStorage.Set("Managed Nav Api Password Key", NewPassword, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted("Managed Nav Api Password Key", NewPassword, DataScope::Company);
     end;
 
     [NonDebuggable]

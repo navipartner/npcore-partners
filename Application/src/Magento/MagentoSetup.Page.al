@@ -1000,5 +1000,5 @@ page 6151401 "NPR Magento Setup"
         PictureVarietyType: Boolean;
         Text003: Label 'Category update initiated';
         Text004: Label 'Brand update initiated';
-        Password: Text;
+        Password: Text[200];
 }

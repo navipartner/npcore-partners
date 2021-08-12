@@ -94,7 +94,7 @@ page 6014624 "NPR Pmt. Gateways Select"
     end;
 
     var
-        Password: Text;
+        Password: Text[200];
 
     procedure SetRec(var TempPaymentGateway: Record "NPR Magento Payment Gateway")
     begin
