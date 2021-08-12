@@ -79,6 +79,7 @@ table 6150700 "NPR POS Menu"
         key(Key1; "Code")
         {
         }
+        key(Key2; Blocked, "Register Type", "Register No.", "Salesperson Code") { }
     }
 
     fieldgroups
