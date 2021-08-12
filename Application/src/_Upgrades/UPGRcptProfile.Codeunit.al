@@ -56,7 +56,7 @@ codeunit 6150935 "NPR UPG Rcpt. Profile"
             ReceiptFooterMgt.SetDefaultBreakLineNumberOfCharacters(POSUnitRcptTxtProfile);
             if ReceiptText <> '' then begin
                 ReceiptText := CopyStr(ReceiptText, 1, StrLen(ReceiptText) - 1);
-                POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text" := ReceiptText;
+                POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text" := CopyStr(ReceiptText, 1, MaxStrLen(POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text"));
             end;
             POSUnitRcptTxtProfile.Modify();
         until POSUnitRcptTxtProfile.Next() = 0;
@@ -86,7 +86,7 @@ codeunit 6150935 "NPR UPG Rcpt. Profile"
                 until RetailComment.next() = 0;
                 if ReceiptText <> '' then begin
                     ReceiptText := CopyStr(ReceiptText, 1, StrLen(ReceiptText) - 1);
-                    POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text" := ReceiptText;
+                    POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text" := CopyStr(ReceiptText, 1, MaxStrLen(POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text"));
                 end;
                 POSUnitRcptTxtProfile.Modify();
             end;
