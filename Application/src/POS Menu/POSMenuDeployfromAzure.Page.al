@@ -35,8 +35,8 @@ page 6150709 "NPR POS Menu Deploy from Azure"
 
                     foreach package in packageList do begin
                         TempRetailList.Number += 1;
-                        TempRetailList.Value := package;
-                        TempRetailList.Choice := package;
+                        TempRetailList.Value := CopyStr(package, 1, MaxStrLen(TempRetailList.Value));
+                        TempRetailList.Choice := CopyStr(package, 1, MaxStrLen(TempRetailList.Choice));
                         TempRetailList.Insert();
                     end;
 
