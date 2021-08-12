@@ -99,5 +99,5 @@ page 6151453 "NPR Magento Payment Gateways"
     end;
 
     var
-        Password: Text;
+        Password: Text[200];
 }

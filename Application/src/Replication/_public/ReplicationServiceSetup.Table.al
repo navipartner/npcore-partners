@@ -259,7 +259,11 @@ table 6014588 "NPR Replication Service Setup"
     begin
         if IsNullGuid("Api Password Key") then
             Rec."Api Password Key" := CreateGuid();
-        IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company);
+
+        if not EncryptionEnabled() then
+            IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted("Api Password Key", NewPassword, DataScope::Company);
     end;
 
     [NonDebuggable]

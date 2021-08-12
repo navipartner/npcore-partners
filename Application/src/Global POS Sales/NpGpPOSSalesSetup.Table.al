@@ -87,8 +87,10 @@ table 6151170 "NPR NpGp POS Sales Setup"
             "Service Password" := CreateGuid();
             Modify();
         end;
-        IsolatedStorage.Set("Service Password", Password, DataScope::Company);
-
+        if not EncryptionEnabled() then
+            IsolatedStorage.Set("Service Password", Password, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted("Service Password", Password, DataScope::Company);
     end;
 }
 

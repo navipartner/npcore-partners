@@ -117,6 +117,6 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
     var
         Text000: Label 'Error in Global POS Sales Setup\\Close anway?';
         Text001: Label 'Global POS Sales Setup validated successfully';
-        Password: Text;
+        Password: Text[200];
 }
 

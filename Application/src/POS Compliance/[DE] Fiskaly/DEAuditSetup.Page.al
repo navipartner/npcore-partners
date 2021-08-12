@@ -116,6 +116,6 @@ page 6014421 "NPR DE Audit Setup"
     end;
 
     var
-        ApiKeyField: Text;
-        ApiSecretField: Text;
+        ApiKeyField: Text[200];
+        ApiSecretField: Text[200];
 }

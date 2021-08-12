@@ -302,6 +302,6 @@ page 6151242 "NPR Retail Magento Setup List"
     end;
 
     var
-        Password: Text;
+        Password: Text[200];
         NavPassword: Text;
 }

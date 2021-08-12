@@ -161,7 +161,7 @@ page 6014528 "NPR Payment Gateways WP"
     end;
 
     var
-        Password: Text;
+        Password: Text[200];
 
     procedure CreateMagentoPaymentGatewayData()
     var

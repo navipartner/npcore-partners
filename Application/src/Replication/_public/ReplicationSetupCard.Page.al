@@ -349,7 +349,7 @@ page 6014495 "NPR Replication Setup Card"
 
     var
         [InDataSet]
-        pw: Text;
+        pw: Text[200];
 
         [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible, IsExternalDB : Boolean;
