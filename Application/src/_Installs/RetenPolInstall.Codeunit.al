@@ -13,6 +13,7 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         tabledata "NPR POS Saved Sale Line" = rd,
         tabledata "NPR NpCs Arch. Document" = rd,
         tabledata "NPR Nc Task" = rd,
+        tabledata "NPR Task Log (Task)" = rd,
         tabledata "NPR Exchange Label" = rd,
         tabledata "NPR NpGp POS Sales Entry" = rd,
         tabledata "NPR POS Entry Output Log" = rd,
@@ -53,6 +54,7 @@ codeunit 6014496 "NPR Reten. Pol. Install"
         // if additional filters are needed on record, see codeunit 3999 procedure AddChangeLogEntryToAllowedTables() in Base App
 
         AddAllowedTable(Database::"NPR Nc Task", RtnPeriodEnum::"1 Week");
+        AddAllowedTable(Database::"NPR Task Log (Task)", RtnPeriodEnum::"1 Week");
 
         AddAllowedTable(Database::"NPR Data Log Record", RtnPeriodEnum::"1 Week");
         AddAllowedTable(Database::"NPR Data Log Field", RtnPeriodEnum::"1 Week");
@@ -172,6 +174,7 @@ codeunit 6014496 "NPR Reten. Pol. Install"
             Database::"NPR POS Saved Sale Line",
             Database::"NPR NpCs Arch. Document",
             Database::"NPR Nc Task",
+            Database::"NPR Task Log (Task)",
             Database::"NPR Exchange Label",
             Database::"NPR NpGp POS Sales Entry",
             Database::"NPR POS Entry Output Log",
