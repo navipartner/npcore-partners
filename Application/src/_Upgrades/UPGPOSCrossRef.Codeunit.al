@@ -30,7 +30,7 @@ codeunit 6014653 "NPR UPG POS Cross Ref"
     var
         RetailCrossRefSetup: Record "NPR Retail Cross Ref. Setup";
         POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
-        TableName: Text;
+        TableName: Text[30];
     begin
         if not POSCrossRefSetup.IsEmpty() then
             exit;
@@ -47,7 +47,7 @@ codeunit 6014653 "NPR UPG POS Cross Ref"
             until RetailCrossRefSetup.next() = 0;
     end;
 
-    local procedure FindTableName(TableId: Integer): Text
+    local procedure FindTableName(TableId: Integer): Text[30]
     var
         AllObjWithCaption: Record AllObjWithCaption;
     begin
