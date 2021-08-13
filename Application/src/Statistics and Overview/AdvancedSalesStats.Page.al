@@ -452,7 +452,7 @@ page 6014585 "NPR Advanced Sales Stats"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(PeriodFormMan.FindDate(Which, Rec, Day));
+        exit(PeriodFormMan.FindDate(CopyStr(Which, 1, 3), Rec, Day));
     end;
 
     trigger OnInit()

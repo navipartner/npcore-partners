@@ -469,7 +469,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
 
     procedure EmptyCodeValue(): Code[10]
     begin
-        exit(UpperCase(EmtpyCodeValueTxt));
+        exit(CopyStr(UpperCase(EmtpyCodeValueTxt), 1, 10));
     end;
 
     local procedure AdjustMatrixRecordCode("Code": Code[10]): Code[10]

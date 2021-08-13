@@ -137,7 +137,7 @@ page 6014468 "NPR Sales Ticket Statistics"
     trigger OnFindRecord(Which: Text): Boolean
     begin
 
-        exit(PeriodFormMgt.FindDate(Which, Rec, VendPeriodLength));
+        exit(PeriodFormMgt.FindDate(CopyStr(Which, 1, 3), Rec, VendPeriodLength));
     end;
 
     trigger OnInit()
