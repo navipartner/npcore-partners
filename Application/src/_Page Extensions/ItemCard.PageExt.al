@@ -33,7 +33,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter("Unit Cost")
         {
-            field("NPR NPR_AverageCostACY"; AverageCostACY)
+            field("NPR AverageCostACY"; AverageCostACY)
             {
 
                 Caption = 'Average Cost ACY';
@@ -125,7 +125,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addbefore("Cost Details")
         {
-            group("NPR NPR_Dimensions")
+            group("NPR Dimensions")
             {
                 Caption = 'Dimensions';
                 field("NPR Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
@@ -146,7 +146,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter("VAT Bus. Posting Gr. (Price)")
         {
-            group("NPR NPR_DiscountonPOS")
+            group("NPR DiscountonPOS")
             {
                 Caption = 'Discounts on POS';
                 field("NPR Has Mixed Discount"; Rec."NPR Has Mixed Discount")
@@ -208,7 +208,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter("Prices & Sales")
         {
-            group("NPR NPR_Variety")
+            group("NPR Variety")
             {
                 Caption = 'Variety';
                 field("NPR Has Variants"; Rec."NPR Has Variants")
@@ -280,7 +280,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             }
             group("NPR Properties")
             {
-                group("NPR NPR_Control6150684")
+                group("NPR Group1")
                 {
                     ShowCaption = false;
 
@@ -298,7 +298,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     }
                 }
 
-                group("NPR NPR_Control6150669")
+                group("NPR Group2")
                 {
                     ShowCaption = false;
 
@@ -340,12 +340,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 }
             }
 
-            group("NPR NPR_MagentoEnabled")
+            group("NPR MagentoEnabled")
             {
                 Caption = 'Magento';
                 Visible = MagentoEnabled;
 
-                group("NPR NPR_Control6014404")
+                group("NPR Group3")
                 {
                     ShowCaption = true;
                     field("NPR Magento Item"; Rec."NPR Magento Item")
@@ -433,7 +433,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                             NPR_ValidateSEOLink();
                         end;
                     }
-                    field("NPR NPR_MagentoUnitPrice"; Rec."Unit Price")
+                    field("NPR MagentoUnitPrice"; Rec."Unit Price")
                     {
 
                         Importance = Promoted;
@@ -558,7 +558,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     }
                 }
 
-                group("NPR NPR_Control6151430")
+                group("NPR Group4")
                 {
                     ShowCaption = false;
                     Visible = MagentoPictureVarietyTypeVisible;
@@ -770,7 +770,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         }
         addafter("Va&riants")
         {
-            action("NPR VarietyMatrix")
+            action("NPR NPR_VarietyMatrix")
             {
                 Caption = 'Variety Matrix';
                 Image = ItemAvailability;
@@ -809,7 +809,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter("Item Journal")
         {
-            action("NPR NPR_RetailItemJournal")
+            action("NPR RetailItemJournal")
             {
                 Caption = 'Retail Item Journal';
                 Image = Journals;
@@ -822,7 +822,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ApplicationArea = NPRRetail;
             }
 
-            action("NPR NPR_RetailItemReclassJnl")
+            action("NPR RetailItemReclassJnl")
             {
                 Caption = 'Retail Item Reclassification Journal';
                 Image = Journals;
@@ -838,12 +838,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter("Item Tracing")
         {
-            group("NPR NPR_TransferTo")
+            group("NPR TransferTo")
             {
                 Caption = 'Transfer to';
                 Image = Action;
 
-                action("NPR NPR_TransfertoRetailJounal")
+                action("NPR TransfertoRetailJounal")
                 {
                     Caption = 'Transfer to Retail Journal';
                     Image = TransferToGeneralJournal;
@@ -888,12 +888,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 }
             }
 
-            group("NPR NPR_Print")
+            group("NPR Print")
             {
                 Caption = 'Print';
                 Image = Print;
 
-                action("NPR NPR_PriceLabel")
+                action("NPR PriceLabel")
                 {
                     Caption = 'Price Label';
                     Promoted = true;
@@ -916,12 +916,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 }
             }
 
-            group("NPR NPR_Variant")
+            group("NPR Variant")
             {
                 Caption = 'Variant';
                 Description = 'Action';
                 Image = Setup;
-                action("NPR NPR_VarietyMatrix")
+                action("NPR VarietyMatrix")
                 {
                     Caption = 'Variety Matrix';
                     Promoted = True;
@@ -942,7 +942,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
                 }
 
-                action("NPR NPR_VarietyMaintenance")
+                action("NPR VarietyMaintenance")
                 {
                     Caption = 'Variety Maintenance';
                     Promoted = true;
@@ -961,7 +961,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
                 }
 
-                action("NPRMissingBarcode")
+                action("NPR NPRMissingBarcode")
                 {
                     Caption = 'Add missing Barcode(s)';
                     Promoted = true;
@@ -978,7 +978,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         VRTCloneData.AssignBarcodes(Rec);
                     end;
                 }
-                action("NPRCreateBarcode")
+                action("NPR NPRCreateBarcode")
                 {
                     Caption = 'Create Barcode';
                     Promoted = true;
@@ -996,10 +996,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
                 }
             }
-            group("NPR NPR_Related")
+            group("NPR Related")
             {
                 Caption = 'Related';
-                action("NPR NPR_Accessories")
+                action("NPR Accessories")
                 {
                     Caption = 'Accessories';
                     Image = Allocations;
@@ -1022,7 +1022,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                 separator(NPR_Separator61514222)
                 { }
-                action("NPR NPR_POSInfo")
+                action("NPR POSInfo")
                 {
                     Caption = 'POS Info';
                     Image = Info;
@@ -1036,10 +1036,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         }
         addafter(SalesPriceListsDiscounts)
         {
-            group("NPR NPR_PriceManagement")
+            group("NPR PriceManagement")
             {
                 Caption = 'Price Management';
-                action("NPR NPR_MultipleUnitPrices")
+                action("NPR MultipleUnitPrices")
                 {
                     Caption = 'Multiple Unit Prices';
                     Image = Price;
@@ -1052,7 +1052,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     ToolTip = 'Executes the Multiple Unit Prices action';
                     ApplicationArea = NPRRetail;
                 }
-                action("NPR NPR_PeriodDiscount")
+                action("NPR PeriodDiscount")
                 {
                     Caption = 'Period Discount';
                     Image = Period;
@@ -1077,7 +1077,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         CampaignDiscountLines.RunModal();
                     end;
                 }
-                action("NPR NPR_MixDiscount")
+                action("NPR MixDiscount")
                 {
                     Caption = 'Mix Discount';
                     Image = Discount;
@@ -1109,10 +1109,10 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter(Resources)
         {
-            group("NPR NPR_Magento")
+            group("NPR Magento")
             {
                 Caption = 'Magento';
-                action("NPR NPR_Pictures")
+                action("NPR Pictures")
                 {
                     Caption = 'Pictures';
                     Promoted = true;
@@ -1136,7 +1136,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
                 }
 
-                action("NPR NPR_Videos")
+                action("NPR Videos")
                 {
                     Caption = 'Videos';
                     Promoted = true;
@@ -1151,7 +1151,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     ApplicationArea = NPRRetail;
                 }
 
-                action("NPR NPR_Webshops")
+                action("NPR Webshops")
                 {
                     Caption = 'Webshops';
                     Promoted = true;
@@ -1177,7 +1177,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     end;
 
                 }
-                action("NPR NPR_DisplayConfig")
+                action("NPR DisplayConfig")
                 {
                     Caption = 'Display Config';
                     Promoted = true;
@@ -1293,7 +1293,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
           (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
     end;
 
-    local procedure NPR_GetMagentoBrandName(Brand: Code[10]): Text
+    local procedure NPR_GetMagentoBrandName(Brand: Code[20]): Text
     var
         NPRMagentoBrand: Record "NPR Magento Brand";
     begin
@@ -1308,6 +1308,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         if Rec."NPR Seo Link" <> '' then
             if not Confirm(Text6151400, false) then
                 exit;
-        Rec.Validate("NPR Seo Link", NPR_GetMagentoBrandName(rec."NPR Magento Brand") + ' ' + Rec."NPR Magento Name");
+        Rec.Validate("NPR Seo Link", NPR_GetMagentoBrandName(Rec."NPR Magento Brand") + ' ' + Rec."NPR Magento Name");
     end;
 }

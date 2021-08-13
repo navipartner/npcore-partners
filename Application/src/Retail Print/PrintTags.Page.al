@@ -62,7 +62,7 @@ page 6014417 "NPR Print Tags"
         Pick: Boolean;
         TagText: Text[100];
 
-    procedure ToText(): Text
+    procedure ToText(): Text[100]
     var
         TagString: Text;
         Tagged: Boolean;

@@ -36,8 +36,8 @@ pageextension 6014407 "NPR Payment Journal" extends "Payment Journal"
     }
     var
         GenJnlManagement: Codeunit GenJnlManagement;
-        AccountName: Text;
-        BalancingAccountName: Text;
+        AccountName: Text[100];
+        BalancingAccountName: Text[100];
 
     trigger OnAfterGetRecord()
     begin

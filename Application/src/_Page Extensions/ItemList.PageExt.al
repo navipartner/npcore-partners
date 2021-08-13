@@ -162,10 +162,10 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
         addafter(Resources)
         {
-            group("NPR NPR_Magento")
+            group("NPR Magento")
             {
                 Caption = 'Magento';
-                action("NPR NPR_Pictures")
+                action("NPR Pictures")
                 {
                     Caption = 'Pictures';
                     Image = Picture;
@@ -189,7 +189,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                         MagentoVariantPictureList.Run();
                     end;
                 }
-                action("NPR NPR_Webshops")
+                action("NPR Webshops")
                 {
                     Caption = 'Webshops';
                     Image = Web;
@@ -213,7 +213,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                         PAGE.Run(PAGE::"NPR Magento Store Items", MagentoStoreItem);
                     end;
                 }
-                action("NPR NPR_DisplayConfig")
+                action("NPR DisplayConfig")
                 {
                     Caption = 'Display Config';
                     Image = ViewPage;
@@ -242,7 +242,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
         addafter(Functions)
         {
-            group("NPR NPR_Print")
+            group("NPR Print")
             {
                 Caption = 'Print';
                 action("NPR Price Label")
@@ -329,7 +329,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
         addafter("Adjust Cost - Item Entries")
         {
-            action("NPR NPR_SearchItem")
+            action("NPR SearchItem")
             {
                 Caption = 'Search Item';
                 Image = Find;
@@ -352,8 +352,9 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     InputDialog.LookupMode(true);
                     if InputDialog.RunModal() <> ACTION::LookupOK then
                         exit;
+# pragma warning enable AA0139
                     InputDialog.InputText(1, Validering);
-
+# pragma warning restore
                     if BarcodeLibrary.TranslateBarcodeToItemVariant(Validering, ItemNo, VariantCode, ResolvingTable, true) then begin
                         Rec.Get(ItemNo);
                         exit;
@@ -362,7 +363,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Error(Error_NoBarcodeMatch, Validering);
                 end;
             }
-            action("NPR NPR_FilterSearchItem")
+            action("NPR FilterSearchItem")
             {
                 Caption = 'Filter Search Items';
                 Image = "Filter";
