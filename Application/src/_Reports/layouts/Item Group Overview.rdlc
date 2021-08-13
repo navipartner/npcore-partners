@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>6d79bcaf-bc4c-4c5a-9fa8-b1ceab12ef84</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -21,7 +22,7 @@
                   <Width>0.90625in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.53961in</Width>
+                  <Width>2.40819in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.77083in</Width>
@@ -31,9 +32,6 @@
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.69294in</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>0.81667in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.66748in</Width>
@@ -214,43 +212,6 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox17</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                            <BottomBorder>
-                              <Color>Black</Color>
-                              <Style>Solid</Style>
-                              <Width>1pt</Width>
-                            </BottomBorder>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox18">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Parameters!GenBusPostingGrp_Caption.Value</Value>
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox18</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -504,37 +465,6 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Item_Group_Gen_Bus_Posting_Group_">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Item_Group_Gen_Bus_Posting_Group_.Value</Value>
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Item_Group_Gen_Bus_Posting_Group_</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
                         <Textbox Name="Item_Group_Gen_Prod_Posting_Group_">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -608,7 +538,6 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
-                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -626,7 +555,7 @@
             <Top>0.07167in</Top>
             <Left>0.06125in</Left>
             <Height>0.55333in</Height>
-            <Width>6.89584in</Width>
+            <Width>6.94775in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1011,6 +940,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>147f1096-b108-4621-9881-2548d79e0d3d</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
