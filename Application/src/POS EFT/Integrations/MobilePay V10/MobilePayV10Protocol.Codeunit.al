@@ -519,28 +519,30 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     internal procedure CreateCancelDeadTransactionsTask(WithPrompt: Boolean)
     var
         JobQueueEntry: Record "Job Queue Entry";
-        RecId: RecordId;
         JobQueueCategory: Record "Job Queue Category";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NextRunDateFormula: DateFormula;
     begin
         if (WithPrompt) then begin
             if not Confirm(CREATE_DEAD_TRANSACTIONS_JOBQUEUE_ENTRY_Qst, true) then
                 Error(CANCELED_BY_USER_Err);
         end;
 
-        JobQueueCategory.Init();
-        JobQueueCategory.Code := MobilePayJobQueueCategoryCode_Lbl;
-        JobQueueCategory.Description := MobilePayJobQueueCategoryDescription_Lbl;
-        if not JobQueueCategory.Insert() then;
-
-        JobQueueEntry.Init();
-        JobQueueEntry.Description := CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION_Lbl;
-        JobQueueEntry.Insert(true);
-        JobQueueEntry.ScheduleRecurrentJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MobilePayV10 CancelDead", RecId);
-        JobQueueEntry.validate("Starting Time", 020000T);
-        JobQueueEntry.validate("Ending Time", 030000T);
-        JobQueueEntry."No. of Minutes between Runs" := 15;
-        JobQueueEntry."Job Queue Category Code" := JobQueueCategory.Code;
-        JobQueueEntry.Modify(True);
+        Evaluate(NextRunDateFormula, '<1D>');
+        JobQueueCategory.InsertRec(MobilePayJobQueueCategoryCode_Lbl, MobilePayJobQueueCategoryDescription_Lbl);
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR MobilePayV10 CancelDead",
+            '',
+            CANCEL_DEAD_TRANSACTIONS_JOBQUEUE_DESCRIPTION_Lbl,
+            CurrentDateTime(),
+            020000T,
+            030000T,
+            NextRunDateFormula,
+            JobQueueCategory.Code,
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
     local procedure TransactionIsCurrentlyActive(response: Text): Boolean

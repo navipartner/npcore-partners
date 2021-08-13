@@ -1,5 +1,10 @@
 codeunit 6014663 "NPR Job Queue Management"
 {
+    Permissions =
+        tabledata "Error Message" = rimd,
+        tabledata "Error Message Register" = rimd,
+        tabledata "Job Queue Entry" = rimd;
+
     var
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
@@ -36,7 +41,7 @@ codeunit 6014663 "NPR Job Queue Management"
 
         NotBeforeDateTime := NowWithDelayInSeconds(5);
         if NoOfMinutesBetweenRuns <= 0 then
-            NoOfMinutesBetweenRuns := 1;
+            NoOfMinutesBetweenRuns := 2;
 
         Clear(JQParamStrMgt);
         JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcTaskListProcessing.ParamProcessor(), TaskProcessorCode));
@@ -92,7 +97,7 @@ codeunit 6014663 "NPR Job Queue Management"
 
         NotBeforeDateTime := NowWithDelayInSeconds(5);
         if NoOfMinutesBetweenRuns <= 0 then
-            NoOfMinutesBetweenRuns := 1;
+            NoOfMinutesBetweenRuns := 2;
 
         Clear(JQParamStrMgt);
         if ImportTypeCode <> '' then
@@ -121,30 +126,54 @@ codeunit 6014663 "NPR Job Queue Management"
 
     procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; NoOfMinutesBetweenRuns: Integer; JobQueueCatagoryCode: Code[10]; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
     var
+        RecordIdToProcess: RecordId;
         BlankDateFormula: DateFormula;
     begin
-        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, 0T, 0T, NoOfMinutesBetweenRuns, BlankDateFormula, JobQueueCatagoryCode, JobQueueEntryOut));
+        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, 0T, 0T, NoOfMinutesBetweenRuns, BlankDateFormula, JobQueueCatagoryCode, RecordIdToProcess, JobQueueEntryOut));
+    end;
+
+    procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; NoOfMinutesBetweenRuns: Integer; JobQueueCatagoryCode: Code[10]; RecordIdToProcess: RecordId; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
+    var
+        BlankDateFormula: DateFormula;
+    begin
+        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, 0T, 0T, NoOfMinutesBetweenRuns, BlankDateFormula, JobQueueCatagoryCode, RecordIdToProcess, JobQueueEntryOut));
     end;
 
     procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; StartingTime: Time; EndingTime: Time; NoOfMinutesBetweenRuns: Integer; JobQueueCatagoryCode: Code[10]; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
     var
+        RecordIdToProcess: RecordId;
         BlankDateFormula: DateFormula;
     begin
-        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, StartingTime, EndingTime, NoOfMinutesBetweenRuns, BlankDateFormula, JobQueueCatagoryCode, JobQueueEntryOut));
+        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, StartingTime, EndingTime, NoOfMinutesBetweenRuns, BlankDateFormula, JobQueueCatagoryCode, RecordIdToProcess, JobQueueEntryOut));
+    end;
+
+    procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; StartingTime: Time; EndingTime: Time; NoOfMinutesBetweenRuns: Integer; JobQueueCatagoryCode: Code[10]; RecordIdToProcess: RecordId; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
+    var
+        BlankDateFormula: DateFormula;
+    begin
+        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, StartingTime, EndingTime, NoOfMinutesBetweenRuns, BlankDateFormula, JobQueueCatagoryCode, RecordIdToProcess, JobQueueEntryOut));
     end;
 
     procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; StartingTime: Time; EndingTime: Time; NextRunDateFormula: DateFormula; JobQueueCatagoryCode: Code[10]; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
+    var
+        RecordIdToProcess: RecordId;
     begin
-        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, StartingTime, EndingTime, 0, NextRunDateFormula, JobQueueCatagoryCode, JobQueueEntryOut));
+        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, StartingTime, EndingTime, 0, NextRunDateFormula, JobQueueCatagoryCode, RecordIdToProcess, JobQueueEntryOut));
     end;
 
-    local procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; StartingTime: Time; EndingTime: Time; NoOfMinutesBetweenRuns: Integer; NextRunDateFormula: DateFormula; JobQueueCatagoryCode: Code[10]; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
+    procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; StartingTime: Time; EndingTime: Time; NextRunDateFormula: DateFormula; JobQueueCatagoryCode: Code[10]; RecordIdToProcess: RecordId; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
+    begin
+        exit(InitRecurringJobQueueEntry(ObjectTypeToRun, ObjectIdToRun, ParameterString, JobDescription, EarliestStartDateTime, StartingTime, EndingTime, 0, NextRunDateFormula, JobQueueCatagoryCode, RecordIdToProcess, JobQueueEntryOut));
+    end;
+
+    local procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; StartingTime: Time; EndingTime: Time; NoOfMinutesBetweenRuns: Integer; NextRunDateFormula: DateFormula; JobQueueCatagoryCode: Code[10]; RecordIdToProcess: RecordId; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
     var
         Parameters: Record "Job Queue Entry";
     begin
         clear(Parameters);
         Parameters."Object Type to Run" := ObjectTypeToRun;
         Parameters."Object ID to Run" := ObjectIdToRun;
+        Parameters."Record ID to Process" := RecordIdToProcess;
         Parameters."Earliest Start Date/Time" := EarliestStartDateTime;
         Parameters."Starting Time" := StartingTime;
         Parameters."Ending Time" := EndingTime;
@@ -174,6 +203,10 @@ codeunit 6014663 "NPR Job Queue Management"
         Handled: Boolean;
         Success: Boolean;
     begin
+        if not TaskScheduler.CanCreateTask() then
+            exit;
+        CheckRequiredPermissions();
+
         Clear(JobQueueEntryOut);
         OnBeforeInitRecurringJobQueueEntry(Parameters, JobQueueEntryOut, Success, Handled);
         if Handled then
@@ -220,10 +253,10 @@ codeunit 6014663 "NPR Job Queue Management"
         end;
         JobQueueEntry."Maximum No. of Attempts to Run" := Parameters."Maximum No. of Attempts to Run";
         if JobQueueEntry."Maximum No. of Attempts to Run" <= 0 then
-            JobQueueEntry."Maximum No. of Attempts to Run" := 3;
+            JobQueueEntry."Maximum No. of Attempts to Run" := 5;
         JobQueueEntry."Rerun Delay (sec.)" := Parameters."Rerun Delay (sec.)";
         if JobQueueEntry."Rerun Delay (sec.)" <= 0 then
-            JobQueueEntry."Rerun Delay (sec.)" := 60;
+            JobQueueEntry."Rerun Delay (sec.)" := 180;
         JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
         if Parameters."Parameter String" <> '' then
@@ -236,6 +269,11 @@ codeunit 6014663 "NPR Job Queue Management"
 
         JobQueueEntryOut := JobQueueEntry;
         exit(true);
+    end;
+
+    procedure StartJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        StartJobQueueEntry(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time");
     end;
 
     procedure StartJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime)
@@ -259,6 +297,23 @@ codeunit 6014663 "NPR Job Queue Management"
         JobQueueEntry.Restart();
     end;
 
+    local procedure CheckRequiredPermissions()
+    var
+        ErrorMessage: Record "Error Message";
+        ErrorMessageRegister: Record "Error Message Register";
+        JobQueueLogEntry: Record "Job Queue Log Entry";
+        NoPermissionsErr: Label 'You are not allowed to schedule background tasks. Ask your system administrator to give you permission to do so. Specifically, you need at least indirect Insert, Modify and Delete Permissions for the %1 table.', Comment = '%1 Table Name';
+    begin
+        if not JobQueueLogEntry.WritePermission() then
+            Error(NoPermissionsErr, JobQueueLogEntry.TableName());
+
+        if not ErrorMessageRegister.WritePermission() then
+            Error(NoPermissionsErr, ErrorMessageRegister.TableName());
+
+        if not ErrorMessage.WritePermission() then
+            Error(NoPermissionsErr, ErrorMessage.TableName());
+    end;
+
     procedure NowWithDelayInSeconds(NoOfSeconds: Integer): DateTime
     begin
         exit(CurrentDateTime() + NoOfSeconds * 1000);
@@ -274,6 +329,15 @@ codeunit 6014663 "NPR Job Queue Management"
     procedure SetShowAutoCreatedClause(Set: Boolean)
     begin
         ShowAutoCreatedClause := Set;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
+    local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        if (JobQueueEntry."Maximum No. of Attempts to Run" <= 0) or (JobQueueEntry."Maximum No. of Attempts to Run" = 3) then  //3 - default value in MS standard application
+            JobQueueEntry."Maximum No. of Attempts to Run" := 5;
+        if (JobQueueEntry."Rerun Delay (sec.)" <= 0) or (JobQueueEntry."Rerun Delay (sec.)" = 60) then  //60 - default value in MS standard application
+            JobQueueEntry."Rerun Delay (sec.)" := 180;
     end;
 
     [IntegrationEvent(false, false)]

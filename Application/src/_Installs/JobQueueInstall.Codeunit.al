@@ -26,6 +26,7 @@ codeunit 6014438 "NPR Job Queue Install"
         end;
 
         UpdateNaviConnectJobQueueCategories();
+        UpdateJobQueueEntries();
         AddNcTaskListProcessingJobQueue();
         AddImportListProcessingJobQueue();
         AddJQLogEntryCleanupJobQueue();
@@ -116,5 +117,33 @@ codeunit 6014438 "NPR Job Queue Install"
         JobQueueEntry.SetFilter("Job Queue Category Code", '<>%1', NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.ImportListProcessingCodeunit()));
         if not JobQueueEntry.IsEmpty then
             JobQueueEntry.ModifyAll("Job Queue Category Code", NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.ImportListProcessingCodeunit()));
+    end;
+
+    local procedure UpdateJobQueueEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        xJobQueueEntry: Record "Job Queue Entry";
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        RecomMaxNoOfAttempts: Integer;
+        RecomRerunDelay: Integer;
+    begin
+        RecomMaxNoOfAttempts := 5;
+        RecomRerunDelay := 180;
+
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                xJobQueueEntry := JobQueueEntry;
+                if JobQueueEntry."Maximum No. of Attempts to Run" < RecomMaxNoOfAttempts then
+                    JobQueueEntry."Maximum No. of Attempts to Run" := RecomMaxNoOfAttempts;
+                if JobQueueEntry."Rerun Delay (sec.)" < RecomRerunDelay then
+                    JobQueueEntry."Rerun Delay (sec.)" := RecomRerunDelay;
+
+                if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and (JobQueueEntry."No. of Minutes between Runs" < 2) then
+                    if (JobQueueEntry."Object ID to Run" in [NcSetupMgt.ImportListProcessingCodeunit(), NcSetupMgt.TaskListProcessingCodeunit()]) then
+                        JobQueueEntry."No. of Minutes between Runs" := 2;
+
+                if Format(xJobQueueEntry) <> Format(JobQueueEntry) then
+                    JobQueueEntry.Modify();
+            until JobQueueEntry.Next() = 0;
     end;
 }

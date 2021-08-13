@@ -695,45 +695,48 @@
 
     local procedure EnableJobQueueEntry(CustomerGDPRSetup: Record "NPR Customer GDPR SetUp"; ParameterCheckPeriod: Boolean; ParameterNoOfCustomers: Integer)
     var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueCategory: Record "Job Queue Category";
         JObject: JsonObject;
         JobQueueParameterString: Text;
     begin
         JObject.Add(CheckPeriodLbl, ParameterCheckPeriod);
         JObject.Add(NoOfCustomersLbl, ParameterNoOfCustomers);
         JObject.WriteTo(JobQueueParameterString);
-        JobQueueCategory.InsertRec(DefJobCategoryCodeLbl, DefJobCategoryDescLbl);
-        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR NP GDPR Management", CurrentDateTime() + 360 * 1000, JobQueueCategory.Code, JobQueueParameterString);
-        UpdateJobQueueEntryAsRecurring(JobQueueEntry, CustomerGDPRSetup);
+        ScheduleJobQueueEntry(CustomerGDPRSetup, JobQueueParameterString);
     end;
 
     local procedure EnableJobQueueEntry(CustomerGDPRSetup: Record "NPR Customer GDPR SetUp"; ParameterCheckPeriod: Boolean)
     var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueCategory: Record "Job Queue Category";
         JObject: JsonObject;
         JobQueueParameterString: Text;
     begin
         JObject.Add(CheckPeriodLbl, ParameterCheckPeriod);
         JObject.WriteTo(JobQueueParameterString);
-        JobQueueCategory.InsertRec(DefJobCategoryCodeLbl, DefJobCategoryDescLbl);
-        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR NP GDPR Management", CurrentDateTime() + 360 * 1000, JobQueueCategory.Code, JobQueueParameterString);
-        UpdateJobQueueEntryAsRecurring(JobQueueEntry, CustomerGDPRSetup);
+        ScheduleJobQueueEntry(CustomerGDPRSetup, JobQueueParameterString);
     end;
 
-    local procedure UpdateJobQueueEntryAsRecurring(var JobQueueEntry: Record "Job Queue Entry"; CustomerGDPRSetup: Record "NPR Customer GDPR SetUp")
+    local procedure ScheduleJobQueueEntry(CustomerGDPRSetup: Record "NPR Customer GDPR SetUp"; JobQueueParameterString: Text)
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NextRunDateFormula: DateFormula;
     begin
-        JobQueueEntry."Record ID to Process" := CustomerGDPRSetup.RecordId();
-        JobQueueEntry.validate("Run on Mondays", true);
-        JobQueueEntry.validate("Run on Tuesdays", true);
-        JobQueueEntry.validate("Run on Wednesdays", true);
-        JobQueueEntry.validate("Run on Thursdays", true);
-        JobQueueEntry.validate("Run on Fridays", true);
-        JobQueueEntry.validate("Run on Saturdays", true);
-        JobQueueEntry.validate("Run on Sundays", true);
-        JobQueueEntry."No. of Minutes between Runs" := 1440;
-        JobQueueEntry.Modify(true);
+        Evaluate(NextRunDateFormula, '<1D>');
+        JobQueueCategory.InsertRec(DefJobCategoryCodeLbl, DefJobCategoryDescLbl);
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR NP GDPR Management",
+            JobQueueParameterString,
+            DefJobCategoryDescLbl,
+            JobQueueMgt.NowWithDelayInSeconds(360),
+            230000T,
+            235959T,
+            NextRunDateFormula,
+            JobQueueCategory.Code,
+            CustomerGDPRSetup.RecordId(),
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
     local procedure GetJobQueueParameters(var ParameterCheckPeriod: Boolean; var ParameterNoOfCustomers: Integer; ParameterString: Text)

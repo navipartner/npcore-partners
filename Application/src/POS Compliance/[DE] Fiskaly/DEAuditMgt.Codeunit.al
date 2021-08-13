@@ -367,6 +367,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
     local procedure CheckTssJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
     begin
         JobQueueEntry.Reset();
@@ -375,17 +376,23 @@ codeunit 6014444 "NPR DE Audit Mgt."
         if JobQueueEntry.FindFirst() then
             exit;
 
-        JobQueueEntry.InitRecurringJob(10);
-        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-        JobQueueEntry."Object ID to Run" := Codeunit::"NPR DE Fiskaly Job";
-        JobQueueEntry."User ID" := CopyStr(UserId, 1, 65);
-        JobQueueEntry.Description := JobDescLbl;
-        JobQueueEntry.Insert(true);
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR DE Fiskaly Job",
+            '',
+            JobDescLbl,
+            CurrentDateTime(),
+            10,
+            '',
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
     local procedure CheckDSFINVKJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         JobDescLbl: Label 'Auto-created for sending DSFINVK', Locked = true;
     begin
         JobQueueEntry.Reset();
@@ -394,12 +401,17 @@ codeunit 6014444 "NPR DE Audit Mgt."
         if JobQueueEntry.FindFirst() then
             exit;
 
-        JobQueueEntry.InitRecurringJob(10);
-        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-        JobQueueEntry."Object ID to Run" := Codeunit::"NPR DE Fiskaly DSFINVK Job";
-        JobQueueEntry."User ID" := CopyStr(UserId, 1, 65);
-        JobQueueEntry.Description := JobDescLbl;
-        JobQueueEntry.Insert(true);
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR DE Fiskaly DSFINVK Job",
+            '',
+            JobDescLbl,
+            CurrentDateTime(),
+            10,
+            '',
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
     procedure GetJwtToken(var AccessTokenPar: Text): Boolean
