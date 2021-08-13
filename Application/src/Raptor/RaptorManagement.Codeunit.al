@@ -281,23 +281,32 @@
 
     procedure SetupJobQueue(Enabled: Boolean)
     var
+        JobQueueCategory: Record "Job Queue Category";
         JobQueueEntry: Record "Job Queue Entry";
-        DummyRecId: RecordID;
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         if Enabled then begin
             AddDataLogSubscribers();
 
-            JobQueueEntry.ScheduleRecurrentJobQueueEntry(
-                JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Raptor Send Data", DummyRecId);
-            JobQueueEntry.Description := CopyStr(SendDataToRaptrorLbl, 1, MaxStrLen(JobQueueEntry.Description));
-            JobQueueEntry."Starting Time" := 070000T;
-            JobQueueEntry."Ending Time" := 230000T;
-            JobQueueEntry."No. of Minutes between Runs" := 10;
-            JobQueueEntry.Modify();
-            Commit();
+            JobQueueCategory.InsertRec('RAPTOR', CopyStr(SendDataToRaptrorLbl, 1, MaxStrLen(JobQueueEntry.Description)));
+            if JobQueueMgt.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                CODEUNIT::"NPR Raptor Send Data",
+                '',
+                SendDataToRaptrorLbl,
+                JobQueueMgt.NowWithDelayInSeconds(60),
+                070000T,
+                230000T,
+                10,
+                JobQueueCategory.Code,
+                JobQueueEntry)
+            then begin
+                JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+                Commit();
 
-            if Confirm(DailyUpdateQst) then
-                PAGE.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
+                if Confirm(DailyUpdateQst) then
+                    PAGE.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
+            end;
         end else
             if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Raptor Send Data") then
                 JobQueueEntry.Cancel();
