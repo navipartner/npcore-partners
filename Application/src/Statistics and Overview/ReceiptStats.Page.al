@@ -84,7 +84,7 @@ page 6014491 "NPR Receipt Stats"
     trigger OnFindRecord(Which: Text): Boolean
     begin
 
-        exit(PeriodFormMgt.FindDate(Which, Rec, VendPeriodLength));
+        exit(PeriodFormMgt.FindDate(CopyStr(Which, 1, 3), Rec, VendPeriodLength));
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
