@@ -25,11 +25,17 @@ page 6151255 "NPR Activities"
                 }
                 field("Task List"; Rec."Task List")
                 {
-
                     Caption = 'Task List';
-                    DrillDownPageId = "NPR Nc Task List";
                     ToolTip = 'Specifies the value of the Task List field';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        NcTaskList: Page "NPR Nc Task List";
+                    begin
+                        NcTaskList.SetShowProcessed(false);
+                        NcTaskList.Run();
+                    end;
                 }
             }
             cuegroup(Control6150624)

@@ -305,8 +305,12 @@ page 6151502 "NPR Nc Task List"
 
     trigger OnOpenPage()
     begin
-        ShowProcessed := false;
         SetPresetFilters();
+    end;
+
+    procedure SetShowProcessed(ShowProcessedPar: Boolean)
+    begin
+        ShowProcessed := ShowProcessedPar;
     end;
 
     var
