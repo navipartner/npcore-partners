@@ -6,6 +6,7 @@ report 6014406 "NPR Sales Person Top 20"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
     dataset
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
