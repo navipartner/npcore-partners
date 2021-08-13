@@ -183,7 +183,7 @@
         DummyRecordId: RecordID;
     begin
         OnBeforeScheduleTask(CodeunitId);
-        if not TASKSCHEDULER.CanCreateTask() then
+        if not TaskScheduler.CanCreateTask() then
             exit;
         if not JobQueueEntry.WritePermission then
             exit;

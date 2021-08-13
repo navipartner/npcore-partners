@@ -1,13 +1,6 @@
 codeunit 6184601 "NPR Consignor Mgt."
 {
-    // NPR5.55/MHA /20200506  CASE 403383 Object created - schedules Job Queue Entry for Consignor Task Processing
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6184601, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Consignor Entry", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnAfterInsertConsignorEntry(var Rec: Record "NPR Consignor Entry"; RunTrigger: Boolean)
     begin
         if not RunTrigger then
@@ -22,6 +15,7 @@ codeunit 6184601 "NPR Consignor Mgt."
     var
         JobQueueEntry: Record "Job Queue Entry";
         NpXmlTemplate: Record "NPR NpXml Template";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         if not JobQueueEntry.WritePermission then
             exit;
@@ -40,22 +34,7 @@ codeunit 6184601 "NPR Consignor Mgt."
 
         JobQueueEntry.FindSet();
         repeat
-            ScheduleJobQueueEntry(JobQueueEntry);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, JobQueueMgt.NowWithDelayInSeconds(1));
         until JobQueueEntry.Next() = 0;
     end;
-
-    local procedure ScheduleJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
-    begin
-        if (JobQueueEntry."Earliest Start Date/Time" <= CurrentDateTime) and
-          (JobQueueEntry.Status in [JobQueueEntry.Status::"In Process", JobQueueEntry.Status::Ready])
-        then
-            exit;
-
-        JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-
-        JobQueueEntry."Earliest Start Date/Time" := CurrentDateTime + 1000;
-        JobQueueEntry.Modify(true);
-        JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
-    end;
 }
-

@@ -171,40 +171,53 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategory: Record "Job Queue Category";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         ParamWithProcessImportList: Label '%1=%2,%3';
         ParamWithoutProcessImportList: Label '%1=%2';
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Import List Processing");
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Nc Import List Processing");
         JobQueueEntry.SetRange("Record ID to Process", ServiceSetup.RecordId());
         if JobQueueEntry.FindFirst() then
             exit;
 
-        JobQueueEntry.ScheduleRecurrentJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Nc Import List Processing", ServiceSetup.RecordId());
-        JobQueueEntry.Description := CopyStr(Strsubstno(APIIntegrationLbl, ServiceSetup."API Version"), 1, MaxStrLen(JobQueueEntry.Description));
-        JobQueueEntry."Starting Time" := 070000T;
-        JobQueueEntry."Ending Time" := 230000T;
-        JobQueueEntry."No. of Minutes between Runs" := 10;
+        clear(JobQueueEntry);
         IF ServiceSetup.JobQueueStartTime > 0T then
-            JobQueueEntry."Starting Time" := ServiceSetup.JobQueueStartTime;
+            JobQueueEntry."Starting Time" := ServiceSetup.JobQueueStartTime
+        else
+            JobQueueEntry."Starting Time" := 070000T;
         IF ServiceSetup.JobQueueEndTime > 0T then
-            JobQueueEntry."Ending Time" := ServiceSetup.JobQueueEndTime;
+            JobQueueEntry."Ending Time" := ServiceSetup.JobQueueEndTime
+        else
+            JobQueueEntry."Ending Time" := 230000T;
         IF ServiceSetup.JobQueueMinutesBetweenRun > 0 THEN
-            JobQueueEntry."No. of Minutes between Runs" := ServiceSetup.JobQueueMinutesBetweenRun;
-        JobQueueEntry."Maximum No. of Attempts to Run" := 3;
-        JobQueueEntry."Rerun Delay (sec.)" := 180;
-
+            JobQueueEntry."No. of Minutes between Runs" := ServiceSetup.JobQueueMinutesBetweenRun
+        else
+            JobQueueEntry."No. of Minutes between Runs" := 10;
         IF ServiceSetup.JobQueueProcessImportList THEN
             JobQueueEntry."Parameter String" := StrSubstNo(ParamWithProcessImportList, ImportTypeParameterLbl, ServiceSetup."API Version", ProcessImportListLbl)
         else
             JobQueueEntry."Parameter String" := StrSubstNo(ParamWithoutProcessImportList, ImportTypeParameterLbl, ServiceSetup."API Version");
 
         CreateJobQueueCategory(JobQueueCategory);
-        JobQueueEntry."Job Queue Category Code" := JobQueueCategory.Code;
-        if not ServiceSetup.Enabled then
-            JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-        JobQueueEntry.Modify();
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR Nc Import List Processing",
+            JobQueueEntry."Parameter String",
+            CopyStr(Strsubstno(APIIntegrationLbl, ServiceSetup."API Version"), 1, MaxStrLen(JobQueueEntry.Description)),
+            CurrentDateTime(),
+            JobQueueEntry."Starting Time",
+            JobQueueEntry."Ending Time",
+            JobQueueEntry."No. of Minutes between Runs",
+            JobQueueCategory.Code,
+            ServiceSetup.RecordId(),
+            JobQueueEntry)
+        then begin
+            if not ServiceSetup.Enabled then
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold")
+            else
+                JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+        end;
     end;
 
     local procedure CreateJobQueueCategory(var JobQueueCategory: Record "Job Queue Category")

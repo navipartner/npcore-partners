@@ -262,6 +262,7 @@ codeunit 6014641 "NPR BTF Service API"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategory: Record "Job Queue Category";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         PlaceHolder5Lbl: Label '%1=%2,%3=%4,%5', locked = true;
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
@@ -270,25 +271,25 @@ codeunit 6014641 "NPR BTF Service API"
         if JobQueueEntry.FindFirst() then
             exit;
 
-        JobQueueEntry.ScheduleRecurrentJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Nc Import List Processing", ServiceEndPoint.RecordId());
-        JobQueueEntry.Description := CopyStr(Strsubstno(APIIntegrationLbl, ServiceEndPoint."EndPoint ID"), 1, MaxStrLen(JobQueueEntry.Description));
-        JobQueueEntry."Starting Time" := 070000T;
-        JobQueueEntry."Ending Time" := 230000T;
-        JobQueueEntry."No. of Minutes between Runs" := 10;
-        JobQueueEntry."Maximum No. of Attempts to Run" := 3;
-        JobQueueEntry."Rerun Delay (sec.)" := 180;
-
-        JobQueueEntry."Parameter String" :=
-                            StrSubstNo(PlaceHolder5Lbl,
-                                        ImportTypeParameterLbl, ServiceEndPoint."EndPoint ID",
-                                        ServiceEndPoint.TableName(), ServiceEndPoint.RecordId(),
-                                        ProcessImportListLbl);
         CreateJobQueueCategory(JobQueueCategory, ServiceEndPoint);
-        JobQueueEntry."Job Queue Category Code" := JobQueueCategory.Code;
-        if not ServiceEndPoint.Enabled then
-            JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-        JobQueueEntry.Modify();
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            CODEUNIT::"NPR Nc Import List Processing",
+            StrSubstNo(PlaceHolder5Lbl, ImportTypeParameterLbl, ServiceEndPoint."EndPoint ID", ServiceEndPoint.TableName(), ServiceEndPoint.RecordId(), ProcessImportListLbl),
+            CopyStr(Strsubstno(APIIntegrationLbl, ServiceEndPoint."EndPoint ID"), 1, MaxStrLen(JobQueueEntry.Description)),
+            CurrentDateTime(),
+            070000T,
+            230000T,
+            10,
+            JobQueueCategory.Code,
+            ServiceEndPoint.RecordId(),
+            JobQueueEntry)
+        then begin
+            if not ServiceEndPoint.Enabled then
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold")
+            else
+                JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+        end;
     end;
 
     local procedure CreateJobQueueCategory(var JobQueueCategory: Record "Job Queue Category"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
