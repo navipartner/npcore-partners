@@ -703,6 +703,18 @@ page 6151241 "NPR Retail Manager Role Center"
                     ApplicationArea = NPRRetail;
 
                 }
+                action("EFT Transaction Request")
+                {
+                    Caption = 'EFT Transaction Request';
+                    Image = RegisteredDocs;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    RunObject = page "NPR EFT Transaction Requests";
+                    ToolTip = 'View EFT Transaction Requests.';
+                    ApplicationArea = NPRRetail;
+
+                }
 
                 action(POSQuotes)
                 {
