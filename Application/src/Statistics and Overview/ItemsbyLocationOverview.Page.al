@@ -247,9 +247,9 @@ page 6060066 "NPR Items by Location Overview"
         LocationFilter: Code[250];
         VariantFilter: Code[250];
         VarietyValueFilter: array[4] of Code[250];
-        MATRIX_CaptionRange: Text[1024];
+        MATRIX_CaptionRange: Text;
         MATRIX_CaptionSet: array[32] of Text[80];
-        MATRIX_PKFirstRecInCurrSet: Text[1024];
+        MATRIX_PKFirstRecInCurrSet: Text;
         ShowColumnName: Boolean;
         ShowInTransit: Boolean;
 
