@@ -31,7 +31,7 @@
         UnitVirtualComCaption: Label 'COM Port';
         UnitVirtualComDesc: Label 'Virtual COM Port number for USB connected terminal';
 
-    local procedure IntegrationType(): Text
+    local procedure IntegrationType(): Code[20]
     begin
         exit('MOCK_CLIENT_SIDE');
     end;

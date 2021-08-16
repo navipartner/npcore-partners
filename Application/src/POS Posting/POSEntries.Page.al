@@ -386,6 +386,7 @@ page 6150650 "NPR POS Entries"
                     var
                         EFTTransactionRequest: Record "NPR EFT Transaction Request";
                     begin
+                        EFTTransactionRequest.SetCurrentKey("Sales Ticket No.");
                         EFTTransactionRequest.SetRange("Sales Ticket No.", Rec."Document No.");
                         EFTTransactionRequest.SetRange("Register No.", Rec."POS Unit No.");
                         if EFTTransactionRequest.FindSet() then

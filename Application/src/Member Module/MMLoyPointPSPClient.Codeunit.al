@@ -10,7 +10,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         FailMessage: Label 'Transaction was declined with reason code %1 - %2. ';
         NoMember: Label 'This payment type requires that there is a member assigned to the sales prior to payment and that loyalty was setup and enabled for the membership.';
 
-    procedure IntegrationName(): Text
+    procedure IntegrationName(): Code[20]
     begin
         exit('MM_LOYALTY_PWP');
     end;
@@ -213,12 +213,12 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-
-        EFTTransactionRequest.SetFilter("Integration Type", '=%1', IntegrationName());
-        EFTTransactionRequest.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-        EFTTransactionRequest.SetFilter("Processing Type", '=%1', EFTTransactionRequest."Processing Type"::AUXILIARY);
-        EFTTransactionRequest.SetFilter("Auxiliary Operation ID", '=%1', 1);
-        EFTTransactionRequest.SetFilter("Result Code", '=%1', 119);
+        EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Integration Type", "Processing Type");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        EFTTransactionRequest.SetRange("Integration Type", IntegrationName());
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::AUXILIARY);
+        EFTTransactionRequest.SetRange("Auxiliary Operation ID", 1);
+        EFTTransactionRequest.SetRange("Result Code", 119);
         if (EFTTransactionRequest.FindFirst()) then begin
             LoyaltyPointsMgrClient.MakeServiceRequest(EFTTransactionRequest);
             EFTTransactionRequest.PrintReceipts(false);

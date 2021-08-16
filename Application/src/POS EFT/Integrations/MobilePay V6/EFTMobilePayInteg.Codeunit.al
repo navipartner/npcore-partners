@@ -51,7 +51,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSUnit: Record "NPR POS Unit";
 
-    procedure IntegrationType(): Text
+    procedure IntegrationType(): Code[20]
     begin
         exit('MOBILEPAY');
     end;

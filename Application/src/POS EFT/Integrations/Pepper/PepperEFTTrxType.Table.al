@@ -12,7 +12,7 @@ table 6184488 "NPR Pepper EFT Trx Type"
 
     fields
     {
-        field(5; "Integration Type"; Code[10])
+        field(5; "Integration Type"; Code[20])
         {
             Caption = 'Integration Type';
             DataClassification = CustomerContent;

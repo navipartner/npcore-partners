@@ -563,7 +563,7 @@ table 6184495 "NPR EFT Transaction Request"
         until CreditCardTransaction.Next() = 0;
     end;
 
-    procedure IsType(Type: Text): Boolean
+    procedure IsType(Type: Code[20]): Boolean
     begin
         exit(Type = "Integration Type");
     end;

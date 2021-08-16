@@ -27,7 +27,7 @@
         DISABLE_CONTRACT: Label 'Disable Shopper Recurring Contract';
         DISABLE_SHOPPER_SUCCESS: Label 'Shopper Reference Disabled: %1';
 
-    procedure IntegrationType(): Text
+    procedure IntegrationType(): Code[20]
     begin
         exit('ADYEN_CLOUD');
     end;

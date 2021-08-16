@@ -16,7 +16,7 @@ codeunit 6184543 "NPR EFT Test Mock Integrat."
         SurchargeAmount: Decimal;
         LookupAmount: Decimal;
 
-    procedure IntegrationType(): Text
+    procedure IntegrationType(): Code[20]
     begin
         exit('TEST_MOCK');
     end;

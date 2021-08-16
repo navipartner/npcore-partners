@@ -22,7 +22,7 @@
         RECONCILE_SUCCESS: Label 'NETS Terminal Reconciliation Success';
         RECONCILIATION: Label 'Reconciliation';
 
-    procedure IntegrationType(): Text
+    procedure IntegrationType(): Code[20]
     begin
         exit('NETS_BAXI_NET');
     end;

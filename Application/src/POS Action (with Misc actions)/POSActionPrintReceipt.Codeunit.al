@@ -229,6 +229,7 @@
         end;
 
         if JSON.GetBooleanOrFail('Print Terminal Receipt', StrSubstNo(ReadingErr, ActionCode())) then begin
+            EFTTransactionRequest.SetCurrentKey("Sales Ticket No.");
             EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
             EFTTransactionRequest.SetRange("Register No.", RegisterNo);
             if EFTTransactionRequest.FindSet() then
