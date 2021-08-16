@@ -139,6 +139,7 @@
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
+        NcTaskSetup.SetCurrentKey("Table No.");
         NcTaskSetup.SetRange("Table No.", DATABASE::"NPR POS Entry");
         NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpGp POS Sales Sync Mgt.");
         if NcTaskSetup.FindFirst() then

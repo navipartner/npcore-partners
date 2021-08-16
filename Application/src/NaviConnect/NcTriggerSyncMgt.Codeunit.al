@@ -29,6 +29,7 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
         FldRef: FieldRef;
         NcTaskProcessor: Record "NPR Nc Task Processor";
     begin
+        NcTaskSetup.SetCurrentKey("Table No.");
         NcTaskSetup.SetRange("Table No.", Recref.Number);
         if not NcTaskSetup.FindFirst() then
             InsertSetup(NcTaskSetup, Recref);

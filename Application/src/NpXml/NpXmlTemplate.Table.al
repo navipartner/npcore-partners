@@ -662,9 +662,10 @@ table 6151551 "NPR NpXml Template"
         if NpXmlTemplateTrigger.FindSet() then
             repeat
                 if NpXmlTemplateTrigger."Insert Trigger" or NpXmlTemplateTrigger."Modify Trigger" or NpXmlTemplateTrigger."Delete Trigger" then begin
+                    NaviConnectTaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
+                    NaviConnectTaskSetup.SetRange("Task Processor Code", "Task Processor Code");
                     NaviConnectTaskSetup.SetRange("Table No.", NpXmlTemplateTrigger."Table No.");
                     NaviConnectTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpXml Task Mgt.");
-                    NaviConnectTaskSetup.SetRange("Task Processor Code", "Task Processor Code");
                     if not NaviConnectTaskSetup.FindFirst() then begin
                         NaviConnectTaskSetup.Init();
                         NaviConnectTaskSetup."Entry No." := 0;
