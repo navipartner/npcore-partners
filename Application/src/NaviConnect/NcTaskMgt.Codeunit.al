@@ -215,6 +215,7 @@
         end;
         if TempDataLogRecord.FindSet() then begin
             DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
+            TaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
             TaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
             if TaskSetup.FindSet() then
                 repeat

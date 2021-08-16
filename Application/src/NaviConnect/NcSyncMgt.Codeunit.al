@@ -210,6 +210,7 @@
     begin
         OnBeforeProcessTask(Task);
         TaskReset(Task);
+        TaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
         TaskSetup.SetRange("Task Processor Code", Task."Task Processor Code");
         TaskSetup.SetRange("Table No.", Task."Table No.");
         if TaskSetup.FindSet() then
@@ -232,6 +233,7 @@
         if MaxRetry < 1 then
             MaxRetry := 1;
 
+        Task.SetCurrentKey("Task Processor Code", Processed);
         Task.SetRange("Task Processor Code", TaskProcessor.Code);
         Task.SetRange(Processed, false);
         Task.SetFilter("Process Count", '<%1', MaxRetry);

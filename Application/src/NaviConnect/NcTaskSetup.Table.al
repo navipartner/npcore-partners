@@ -57,8 +57,8 @@ table 6151501 "NPR Nc Task Setup"
         key(Key2; "Table No.")
         {
             MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
         }
+        key(Key3; "Task Processor Code", "Table No.", "Codeunit ID") { }
     }
 
     trigger OnInsert()

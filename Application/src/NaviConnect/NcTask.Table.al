@@ -147,6 +147,7 @@ table 6151502 "NPR Nc Task"
         key(Key4; "Record Value")
         {
         }
+        key(Key5; "Task Processor Code", Processed) { }
     }
 
     trigger OnDelete()

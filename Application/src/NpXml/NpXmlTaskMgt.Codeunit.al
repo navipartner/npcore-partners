@@ -162,6 +162,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
         if not (NpXmlSetup.Get() and NpXmlSetup."NpXml Enabled") then
             exit(false);
 
+        NcTaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
         NcTaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
         NcTaskSetup.SetRange("Table No.", Task."Table No.");
         NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpXml Task Mgt.");
