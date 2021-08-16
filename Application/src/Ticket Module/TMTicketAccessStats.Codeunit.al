@@ -705,7 +705,7 @@
         end;
     end;
 
-    local procedure AddAccessStatistic(var tmpTicketStatistics: Record "NPR TM Ticket Access Stats"; TicketAccessEntry: Record "NPR TM Ticket Access Entry"; Ticket: Record "NPR TM Ticket"; AdmissionEntryNo: Integer; AdmissionType: Option; IsReEntry: Boolean)
+    internal procedure AddAccessStatistic(var TicketStatistics: Record "NPR TM Ticket Access Stats"; TicketAccessEntry: Record "NPR TM Ticket Access Entry"; Ticket: Record "NPR TM Ticket"; MaxAdmissionEntryNo: Integer; AdmissionType: Option; IsReEntry: Boolean)
     var
         ItemFactCode: Code[20];
         TicketTypeFactCode: Code[20];
@@ -741,34 +741,36 @@
 
         Evaluate(AdmissionHour, Format(TicketAccessEntry."Access Time", 0, '<Hours24>'));
 
-        tmpTicketStatistics.Reset();
-        tmpTicketStatistics.SetFilter("Item No.", '=%1', ItemFactCode);
-        tmpTicketStatistics.SetFilter("Ticket Type", '=%1', TicketTypeFactCode);
-        tmpTicketStatistics.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
-        tmpTicketStatistics.SetFilter("Admission Date", '=%1', TicketAccessEntry."Access Date");
-        tmpTicketStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
-        tmpTicketStatistics.SetFilter("Variant Code", '=%1', VariantFactCode);
+        TicketStatistics.Reset();
+        TicketStatistics.SetFilter("Item No.", '=%1', ItemFactCode);
+        TicketStatistics.SetFilter("Ticket Type", '=%1', TicketTypeFactCode);
+        TicketStatistics.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
+        TicketStatistics.SetFilter("Admission Date", '=%1', TicketAccessEntry."Access Date");
+        TicketStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
+        TicketStatistics.SetFilter("Variant Code", '=%1', VariantFactCode);
 
-        if (tmpTicketStatistics.FindFirst()) then begin
-            SetAdmissionCount(tmpTicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
+        if (TicketStatistics.FindFirst()) then begin
+            SetAdmissionCount(TicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
 
-            tmpTicketStatistics."Highest Access Entry No." := AdmissionEntryNo;
-            tmpTicketStatistics.Modify();
+            TicketStatistics."Highest Access Entry No." := MaxAdmissionEntryNo;
+            TicketStatistics.Modify();
         end else begin
             EntryNoIndex += 1;
-            tmpTicketStatistics.Init();
-            tmpTicketStatistics."Entry No." := EntryNoIndex;
-            tmpTicketStatistics."Item No." := ItemFactCode;
-            tmpTicketStatistics."Ticket Type" := TicketTypeFactCode;
-            tmpTicketStatistics."Admission Code" := TicketAccessEntry."Admission Code";
-            tmpTicketStatistics."Admission Date" := TicketAccessEntry."Access Date";
-            tmpTicketStatistics."Admission Hour" := AdmissionHour;
-            tmpTicketStatistics."Variant Code" := VariantFactCode;
+            TicketStatistics.Init();
+            TicketStatistics."Entry No." := 0;
+            if (TicketStatistics.IsTemporary()) then
+                TicketStatistics."Entry No." := EntryNoIndex;
+            TicketStatistics."Item No." := ItemFactCode;
+            TicketStatistics."Ticket Type" := TicketTypeFactCode;
+            TicketStatistics."Admission Code" := TicketAccessEntry."Admission Code";
+            TicketStatistics."Admission Date" := TicketAccessEntry."Access Date";
+            TicketStatistics."Admission Hour" := AdmissionHour;
+            TicketStatistics."Variant Code" := VariantFactCode;
 
-            SetAdmissionCount(tmpTicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
+            SetAdmissionCount(TicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
 
-            tmpTicketStatistics."Highest Access Entry No." := AdmissionEntryNo;
-            tmpTicketStatistics.Insert();
+            TicketStatistics."Highest Access Entry No." := MaxAdmissionEntryNo;
+            TicketStatistics.Insert();
         end;
     end;
 

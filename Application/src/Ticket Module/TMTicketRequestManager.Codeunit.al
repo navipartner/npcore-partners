@@ -66,11 +66,18 @@
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
+        TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
+        TicketNotification: Record "NPR TM Ticket Notif. Entry";
     begin
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Request Status", '<>%1 & <>%2', TicketReservationRequest."Request Status"::RESERVED, TicketReservationRequest."Request Status"::WAITINGLIST);
+
+        TicketAccessStatistics.SetCurrentKey("Highest Access Entry No.");
+        TicketAccessStatistics.LockTable();
+        if (not TicketAccessStatistics.FindLast()) then
+            TicketAccessStatistics.Init();
 
         if (TicketReservationRequest.FindSet(true, false)) then begin
 
@@ -84,13 +91,31 @@
 
                     if (Ticket.FindSet(true, true)) then begin
                         repeat
-                            Ticket.Delete();
+
+                            DetailedTicketAccessEntry.SetCurrentKey("Ticket No.");
+                            DetailedTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                            if (DetailedTicketAccessEntry.Find('-')) then begin
+                                if (DetailedTicketAccessEntry."Entry No." > TicketAccessStatistics."Highest Access Entry No.") then begin // Not yet aggregated to statistics
+                                    DetailedTicketAccessEntry.DeleteAll();
+                                end else begin
+                                    repeat
+                                        ReverseInitialEntryStatistics(DetailedTicketAccessEntry, TicketAccessStatistics."Highest Access Entry No.");
+
+                                    until (DetailedTicketAccessEntry.Next() = 0)
+                                end;
+                            end;
+
+                            TicketAccessEntry.SetCurrentKey("Ticket No.");
                             TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                             if (not TicketAccessEntry.IsEmpty()) then
                                 TicketAccessEntry.DeleteAll();
-                            DetailedTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-                            if (not DetailedTicketAccessEntry.IsEmpty()) then
-                                DetailedTicketAccessEntry.DeleteAll();
+
+                            TicketNotification.SetCurrentKey("Ticket No.");
+                            TicketNotification.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                            TicketNotification.DeleteAll();
+
+                            Ticket.Delete();
+
                         until (Ticket.Next() = 0);
                     end;
 
@@ -116,6 +141,29 @@
             until (TicketReservationRequest.Next() = 0);
 
         end;
+    end;
+
+    local procedure ReverseInitialEntryStatistics(DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; MaxAccessEntryNo: Integer)
+    var
+        TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        AggregateStatistics: Codeunit "NPR TM Ticket Access Stats";
+    begin
+        if (DetailedTicketAccessEntry.type <> DetailedTicketAccessEntry.type::INITIAL_ENTRY) then
+            exit;
+
+        if (not TicketAccessEntry.Get(DetailedTicketAccessEntry."Ticket Access Entry No.")) then
+            exit;
+
+        if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
+            exit;
+
+        TicketAccessEntry."Access Date" := DT2Date(DetailedTicketAccessEntry."Created Datetime");
+        TicketAccessEntry."Access Time" := DT2Time(DetailedTicketAccessEntry."Created Datetime");
+        TicketAccessEntry.Quantity *= -1;
+        AggregateStatistics.AddAccessStatistic(TicketAccessStatistics, TicketAccessEntry, Ticket, MaxAccessEntryNo, DetailedTicketAccessEntry.Type, false);
+
     end;
 
     procedure IssueTicketFromReservationToken(Token: Text[100]; FailWithError: Boolean; var ResponseMessage: Text) ResponseCode: Integer
