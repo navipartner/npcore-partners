@@ -211,6 +211,7 @@ xmlport 6060128 "NPR MM Add Member"
         tmpMember.TransferFields(Member, true);
         tmpMember.Insert();
 
+        MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         MemberCard.SetFilter(Blocked, '=%1', false);
         if (MemberCard.FindFirst()) then begin

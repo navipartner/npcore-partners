@@ -686,6 +686,8 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         if (not Member.FindFirst()) then
             exit(false);
 
+
+        MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
         MemberCard.SetFilter(Blocked, '=%1', false);
         MemberCard.SetFilter("Valid Until", '=%1|>=%2', 0D, Today);

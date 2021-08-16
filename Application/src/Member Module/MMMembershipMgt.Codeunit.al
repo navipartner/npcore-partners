@@ -1041,6 +1041,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MemberCard: Record "NPR MM Member Card";
     begin
 
+        MemberCard.SetCurrentKey("Membership Entry No.", "Member Entry No.");
         MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         if (MemberCard.FindSet()) then begin
@@ -4986,6 +4987,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         if (ReferenceDate < Today) then
             ReferenceDate := Today();
 
+        MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         MemberCard.SetFilter(Blocked, '=%1', false);
 
