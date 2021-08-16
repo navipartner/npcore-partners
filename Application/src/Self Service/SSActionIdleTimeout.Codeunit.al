@@ -3,13 +3,13 @@ codeunit 6151287 "NPR SS Action: Idle Timeout"
     var
         ActionDescription: Label 'This built in function handles idle timeout in self service POS';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-IDLE-TIMEOUT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.0');

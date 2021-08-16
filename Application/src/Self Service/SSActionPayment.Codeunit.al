@@ -4,12 +4,12 @@ codeunit 6151291 "NPR SS Action: Payment"
     var
         ActionDescription: Label 'Unattended payment';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
         exit('SS-PAYMENT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

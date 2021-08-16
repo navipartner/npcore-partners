@@ -1,12 +1,12 @@
 ﻿codeunit 6151292 "NPR SS Action: NpRv Apply"
 {
     //this action is a SelfService variant of 'SCAN_VOUCHER' action (codeunit 6151014 "NPR NpRv Scan POSAction Mgt.")
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
         exit('SS-VOUCHER-APPLY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -168,7 +168,7 @@
         TempNpRvVoucherBuffer.Init();
         TempNpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
         TempNpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
-        TempNpRvVoucherBuffer."Reference No." := ReferenceNo;
+        TempNpRvVoucherBuffer."Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen(TempNpRvVoucherBuffer."Reference No."));
         TempNpRvVoucherBuffer."Redeem Date" := SalePOS.Date;
         TempNpRvVoucherBuffer."Redeem Partner Code" := VoucherType."Partner Code";
         TempNpRvVoucherBuffer."Redeem Register No." := SalePOS."Register No.";

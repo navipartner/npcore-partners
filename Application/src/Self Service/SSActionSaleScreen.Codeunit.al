@@ -4,13 +4,13 @@ codeunit 6151288 "NPR SS Action - Sale Screen"
     var
         ActionDescription: Label 'This built in function changes to sale view';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-SALE-SCREEN');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.0');

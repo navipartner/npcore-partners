@@ -3,12 +3,12 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
     var
         ActionDescription: Label 'This built in function deletes sales or payment line from the POS';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
         exit('SS-DELETE-LINE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
