@@ -352,7 +352,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     InputDialog.LookupMode(true);
                     if InputDialog.RunModal() <> ACTION::LookupOK then
                         exit;
-# pragma warning enable AA0139
+# pragma warning disable AA0139
                     InputDialog.InputText(1, Validering);
 # pragma warning restore
                     if BarcodeLibrary.TranslateBarcodeToItemVariant(Validering, ItemNo, VariantCode, ResolvingTable, true) then begin
