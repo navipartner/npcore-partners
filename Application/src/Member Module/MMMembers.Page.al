@@ -1,6 +1,7 @@
 page 6060126 "NPR MM Members"
 {
     Caption = 'Members';
+    AdditionalSearchTerms = 'Member List';
     CardPageID = "NPR MM Member Card";
     DataCaptionExpression = Rec."External Member No.";
     DeleteAllowed = false;
@@ -27,39 +28,9 @@ page 6060126 "NPR MM Members"
                     ToolTip = 'Specifies the value of the First Name field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Middle Name"; Rec."Middle Name")
-                {
-                    ToolTip = 'Specifies the value of the Middle Name field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Last Name"; Rec."Last Name")
                 {
                     ToolTip = 'Specifies the value of the Last Name field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Blocked; Rec.Blocked)
-                {
-                    ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Gender; Rec.Gender)
-                {
-                    ToolTip = 'Specifies the value of the Gender field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Birthday; Rec.Birthday)
-                {
-                    ToolTip = 'Specifies the value of the Birthday field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Contact No."; Rec."Contact No.")
-                {
-                    ToolTip = 'Specifies the value of the Contact No. field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("E-Mail News Letter"; Rec."E-Mail News Letter")
-                {
-                    ToolTip = 'Specifies the value of the E-Mail News Letter field';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
@@ -72,186 +43,21 @@ page 6060126 "NPR MM Members"
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Address; Rec.Address)
-                {
-                    ToolTip = 'Specifies the value of the Address field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Post Code Code"; Rec."Post Code Code")
-                {
-                    ToolTip = 'Specifies the value of the ZIP Code field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(City; Rec.City)
-                {
-                    ToolTip = 'Specifies the value of the City field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Country; Rec.Country)
-                {
-                    ToolTip = 'Specifies the value of the Country field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Display Name"; Rec."Display Name")
-                {
-                    ToolTip = 'Specifies the value of the Display Name field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Store Code"; Rec."Store Code")
-                {
-                    ToolTip = 'Specifies the value of the Store Code field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
-                {
-                    CaptionClass = GetAttributeCaptionClass(1);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible01;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(1);
-
-                    end;
-                }
-                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
-                {
-                    CaptionClass = GetAttributeCaptionClass(2);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible02;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(2);
-
-                    end;
-                }
-                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
-                {
-                    CaptionClass = GetAttributeCaptionClass(3);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible03;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(3);
-
-                    end;
-                }
-                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
-                {
-                    CaptionClass = GetAttributeCaptionClass(4);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible04;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(4);
-
-                    end;
-                }
-                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
-                {
-                    CaptionClass = GetAttributeCaptionClass(5);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible05;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(5);
-
-                    end;
-                }
-                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
-                {
-                    CaptionClass = GetAttributeCaptionClass(6);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible06;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(6);
-
-                    end;
-                }
-                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
-                {
-                    CaptionClass = GetAttributeCaptionClass(7);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible07;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(7);
-
-                    end;
-                }
-                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
-                {
-                    CaptionClass = GetAttributeCaptionClass(8);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible08;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(8);
-
-                    end;
-                }
-                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
-                {
-                    CaptionClass = GetAttributeCaptionClass(9);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible09;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(9);
-
-                    end;
-                }
-                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
-                {
-                    CaptionClass = GetAttributeCaptionClass(10);
-                    Editable = NPRAttrEditable;
-                    Visible = NPRAttrVisible10;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-
-                        SetMasterDataAttributeValue(10);
-
-                    end;
-                }
+            }
+        }
+        area(factboxes)
+        {
+            part(MemberFactBox; "NPR MM Member FactBox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Member Details';
+                SubPageLink = "Entry No." = FIELD("Entry No.");
+            }
+            part(MemberAttributeFactBox; "NPR MM Member Attr FactBox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Attributes';
+                SubPageLink = "Entry No." = FIELD("Entry No.");
             }
         }
     }
@@ -334,7 +140,6 @@ page 6060126 "NPR MM Members"
                 PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                Visible = AttributesVisible;
                 ToolTip = 'Executes the Set Client Attribute Filter action';
                 ApplicationArea = NPRRetail;
 
@@ -439,83 +244,20 @@ page 6060126 "NPR MM Members"
         }
     }
 
-    trigger OnAfterGetRecord()
-    begin
-        GetMasterDataAttributeValue();
-    end;
+
 
     trigger OnOpenPage()
     var
         RaptorSetup: Record "NPR Raptor Setup";
-        i: Integer;
     begin
-        NPRAttrManagement.GetAttributeVisibility(GetAttributeTableId(), NPRAttrVisibleArray);
-        NPRAttrVisible01 := NPRAttrVisibleArray[1];
-        NPRAttrVisible02 := NPRAttrVisibleArray[2];
-        NPRAttrVisible03 := NPRAttrVisibleArray[3];
-        NPRAttrVisible04 := NPRAttrVisibleArray[4];
-        NPRAttrVisible05 := NPRAttrVisibleArray[5];
-        NPRAttrVisible06 := NPRAttrVisibleArray[6];
-        NPRAttrVisible07 := NPRAttrVisibleArray[7];
-        NPRAttrVisible08 := NPRAttrVisibleArray[8];
-        NPRAttrVisible09 := NPRAttrVisibleArray[9];
-        NPRAttrVisible10 := NPRAttrVisibleArray[10];
-
-        for i := 1 to ArrayLen(NPRAttrVisibleArray) do
-            AttributesVisible := AttributesVisible or NPRAttrVisibleArray[i];
-
         RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
-
     end;
 
     var
-        NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
-        NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array[40] of Boolean;
-        NPRAttrVisible01: Boolean;
-        NPRAttrVisible02: Boolean;
-        NPRAttrVisible03: Boolean;
-        NPRAttrVisible04: Boolean;
-        NPRAttrVisible05: Boolean;
-        NPRAttrVisible06: Boolean;
-        NPRAttrVisible07: Boolean;
-        NPRAttrVisible08: Boolean;
-        NPRAttrVisible09: Boolean;
-        NPRAttrVisible10: Boolean;
-        AttributesVisible: Boolean;
         RaptorEnabled: Boolean;
         ConfirmContactSynchQst: Label 'Do you want to sync the contacts for %1 members?', Comment = '%1=Member.Count()';
         EntriesNotFoundForMemberErr: Label 'No entries found for member %1.', Comment = '%1=Rec."External Member No."';
-
-    local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
-    begin
-
-        NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, Rec."Entry No.", NPRAttrTextArray[AttributeNumber]);
-
-    end;
-
-    local procedure GetMasterDataAttributeValue()
-    begin
-        if AttributesVisible then begin
-            NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
-            NPRAttrEditable := CurrPage.Editable();
-        end;
-    end;
-
-    local procedure GetAttributeTableId(): Integer
-    begin
-
-        exit(DATABASE::"NPR MM Member");
-
-    end;
-
-    local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
-    var
-        PlaceHolderLbl: Label '6014555,%1,%2,2', Locked = true;
-    begin
-        exit(StrSubstNo(PlaceHolderLbl, GetAttributeTableId(), AttributeNumber));
-    end;
 
     local procedure SyncContact()
     var
