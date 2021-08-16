@@ -178,7 +178,7 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         tmpRetailList.Number += 1;
-        tmpRetailList.Choice := HandlerCode();
+        tmpRetailList.Choice := CopyStr(HandlerCode(), 1, MaxStrLen(tmpRetailList.Choice));
         tmpRetailList.Insert();
     end;
 
@@ -234,13 +234,16 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
         Node: XmlNode;
         EnumAsText: Text;
         DataElement: XmlElement;
+        ResponseValue: Text;
     begin
         if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
             DataElement := Node.AsXmlElement();
             GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Code', EnumAsText);
             evaluate(CleanCashResponse."Fault Code", EnumAsText);
-            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:ShortMessage', CleanCashResponse."Fault Short Description");
-            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Message', CleanCashResponse."Fault Description");
+            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:ShortMessage', ResponseValue);
+            CleanCashResponse."Fault Short Description" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."Fault Short Description"));
+            GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Message', ResponseValue);
+            CleanCashResponse."Fault Description" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."Fault Description"));
         end;
     end;
 

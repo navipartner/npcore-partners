@@ -43,7 +43,7 @@ codeunit 85040 "NPR Library FR NF525"
         FRAuditSetup."Auto Archive URL" := 'http://localhost';
         FRAuditSetup."Auto Archive SAS" := 'N/A';
         FRAuditSetup."Auto Archive API Key" := 'N/A';
-        FRAuditSetup."Item VAT Identifier Filter" := ItemVATIdentifierFilter;
+        FRAuditSetup.SetVATIDFilter(ItemVATIdentifierFilter);
         TempBlob.CreateInStream(InStream);
         FRAuditSetup."Signing Certificate".CreateOutStream(OutStream);
         CopyStream(OutStream, InStream);

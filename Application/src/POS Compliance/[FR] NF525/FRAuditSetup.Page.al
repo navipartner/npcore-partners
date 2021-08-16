@@ -75,20 +75,29 @@ page 6184850 "NPR FR Audit Setup"
                     ToolTip = 'Specifies the value of the Auto Archive SAS field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Item VAT Identifier Filter"; Rec."Item VAT Identifier Filter")
+                field("Item VAT Identifier Filter"; VATIDFilter)
                 {
 
                     ToolTip = 'Specifies the value of the Item VAT Identifier Filter field';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Item VAT Identifier Filter';
+                    trigger OnValidate()
+                    begin
+                        Rec.SetVATIDFilter(VATIDFilter);
+                        Rec.Modify();
+                    end;
 
                     trigger OnAssistEdit()
                     var
                         FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
                         NewFilter: Text;
                     begin
-                        NewFilter := FRAuditMgt.GetItemVATIdentifierFilter(Rec."Item VAT Identifier Filter");
-                        if NewFilter <> '' then
-                            Rec."Item VAT Identifier Filter" := NewFilter;
+                        NewFilter := FRAuditMgt.GetItemVATIdentifierFilter(VATIDFilter);
+                        if NewFilter <> '' then begin
+                            VATIDFilter := NewFilter;
+                            Rec.SetVATIDFilter(NewFilter);
+                            Rec.Modify();
+                        end;
                     end;
                 }
             }
@@ -157,7 +166,7 @@ page 6184850 "NPR FR Audit Setup"
                 var
                     POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
                     POSUnit: Record "NPR POS Unit";
-                    DescriptionOut: Text[250];
+                    DescriptionOut: Text;
                     InputDialog: Page "NPR Input Dialog";
                     ID: Integer;
                 begin
@@ -177,7 +186,7 @@ page 6184850 "NPR FR Audit Setup"
                     if DescriptionOut = '' then
                         exit;
 
-                    POSAuditLogMgt.LogPartnerModification(POSUnit."No.", DescriptionOut);
+                    POSAuditLogMgt.LogPartnerModification(POSUnit."No.", CopyStr(DescriptionOut, 1, 250));
                 end;
             }
             action(UnitNoSeries)
@@ -215,8 +224,10 @@ page 6184850 "NPR FR Audit Setup"
             Rec.Init();
             Rec.Insert();
         end;
+        VATIDFilter := Rec.GetItemVATIDFilter();
     end;
 
     var
         CAPTION_PARTNER_MOD: Label 'Modification description';
+        VATIDFilter: Text;
 }

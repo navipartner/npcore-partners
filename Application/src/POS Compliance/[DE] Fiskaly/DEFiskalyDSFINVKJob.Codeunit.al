@@ -92,7 +92,7 @@ codeunit 6014487 "NPR DE Fiskaly DSFINVK Job"
 
             DSFINVKClosing.Init();
             DSFINVKClosing."DSFINVK Closing No." := NextClosingId;
-            DSFINVKClosing."POS Unit No." := PosUnit;
+            DSFINVKClosing."POS Unit No." := POSEntry."POS Unit No.";
             DSFINVKClosing."POS Entry No." := POSEntry."Entry No.";
             DSFINVKClosing."Closing Date" := WorkDate();
             DSFINVKClosing.Insert();

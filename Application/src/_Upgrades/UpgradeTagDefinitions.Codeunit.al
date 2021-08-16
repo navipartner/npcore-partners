@@ -26,6 +26,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Azure Functions Data"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Salesperson Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS Tax Free Data Upgrade"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG FR Audit Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Payment Type POS Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR MCS Data Upgrade"));
@@ -91,6 +92,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRSalespersonUpgrade-20210414-01');
             Codeunit::"NPR POS Tax Free Data Upgrade":
                 exit('NPR_POS_Tax_Free_Data_Upgrade');
+            Codeunit::"NPR UPG FR Audit Setup":
+                exit('NPR_UPG_FR_Audit_Setup_Upgrade-20200816');
             Codeunit::"NPR Payment Type POS Upgrade":
                 exit('PaymentTypePOS_MoveToPOSPaymentMethod');
             Codeunit::"NPR New Prices Upgrade":

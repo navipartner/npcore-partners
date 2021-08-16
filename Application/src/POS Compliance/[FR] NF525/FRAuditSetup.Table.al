@@ -75,6 +75,13 @@ table 6184850 "NPR FR Audit Setup"
         {
             Caption = 'Item VAT Identifier Filter';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'New Field Item VAT ID Filter BLOB Type';
+        }
+        field(61; "Item VAT ID Filter"; Blob)
+        {
+            Caption = 'Item VAT Identifier Filter';
+            DataClassification = CustomerContent;
         }
     }
 
@@ -84,4 +91,22 @@ table 6184850 "NPR FR Audit Setup"
         {
         }
     }
+    procedure GetItemVATIDFilter(): Text
+    var
+        VATIDFilter: Text;
+        InStr: InStream;
+    begin
+        "Item VAT ID Filter".CreateInStream(InStr, TextEncoding::UTF8);
+        CalcFields("Item VAT ID Filter");
+        InStr.Read(VATIDFilter);
+        exit(VATIDFilter);
+    end;
+
+    procedure SetVATIDFilter(VATIDFilter: Text)
+    var
+        OutStr: OutStream;
+    begin
+        "Item VAT ID Filter".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.Write(VATIDFilter);
+    end;
 }
