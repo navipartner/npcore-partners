@@ -383,12 +383,6 @@ page 6059785 "NPR TM Ticket List"
             }
         }
     }
-
-    trigger OnOpenPage()
-    begin
-        Rec.SetFilter(Blocked, '=%1', false);
-    end;
-
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         CONFIRM_REVOKE_TICKET: Label 'Are you sure you want to revoke %1 ticket(s)?';
