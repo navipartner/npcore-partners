@@ -64,8 +64,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         success := mobilePayStartPaymentRequest.Run(EftTrxRequest);
         EftTrxRequest.Find();
 
-        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to start trx', mobilePayStartPaymentRequest.GetRequestResponse());
-        Commit();
+        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to start trx', mobilePayStartPaymentRequest.GetRequestResponse(), true);
 
         if not success then begin
             if mobilePayStartPaymentRequest.GetResponseHttpCode() <> 0 then begin
@@ -112,8 +111,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         success := mobilePayStartRefundRequest.Run(EftTrxRequest);
         EftTrxRequest.Find();
 
-        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to start trx', mobilePayStartRefundRequest.GetRequestResponse());
-        Commit();
+        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to start trx', mobilePayStartRefundRequest.GetRequestResponse(), true);
 
         if not success then begin
             if mobilePayStartRefundRequest.GetResponseHttpCode() <> 0 then begin
@@ -222,7 +220,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             EftTrxRequest.Modify();
         end;
 
-        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get auth token', mobilePayAuthRequest.GetRequestResponse());
+        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get auth token', mobilePayAuthRequest.GetRequestResponse(), true);
         mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
@@ -243,7 +241,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             EftTrxRequest.Modify();
         end;
 
-        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayCreatePOSRequest.GetRequestResponse());
+        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayCreatePOSRequest.GetRequestResponse(), true);
         mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
@@ -264,7 +262,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             EftTrxRequest.Modify();
         end;
 
-        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayDeletePOSRequest.GetRequestResponse());
+        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayDeletePOSRequest.GetRequestResponse(), true);
         mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
@@ -290,7 +288,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             EftTrxRequest.Modify();
         end;
 
-        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayFindActivePayment.GetRequestResponse());
+        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayFindActivePayment.GetRequestResponse(), true);
         mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
@@ -311,7 +309,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             EftTrxRequest.Modify();
         end;
 
-        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayFindActiveRefund.GetRequestResponse());
+        WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API', mobilePayFindActiveRefund.GetRequestResponse(), true);
         mobilePayIntegration.HandleProtocolResponse(EftTrxRequest);
     end;
 
@@ -361,12 +359,12 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             procEftTrxRequest."Processing Type"::PAYMENT:
                 begin
                     success := mobilePayPollPaymentRequest.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to poll', mobilePayPollPaymentRequest.GetRequestResponse());
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to poll', mobilePayPollPaymentRequest.GetRequestResponse(), true);
                 end;
             procEftTrxRequest."Processing Type"::REFUND:
                 begin
                     success := mobilePayPollRefundRequest.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to poll', mobilePayPollRefundRequest.GetRequestResponse());
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to poll', mobilePayPollRefundRequest.GetRequestResponse(), true);
                 end;
             else begin
                     Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
@@ -391,12 +389,12 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             EftTrxRequest."Processing Type"::PAYMENT:
                 begin
                     success := mobilePayCapturePaymentRequest.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to capture', mobilePayCapturePaymentRequest.GetRequestResponse());
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to capture', mobilePayCapturePaymentRequest.GetRequestResponse(), true);
                 end;
             EftTrxRequest."Processing Type"::REFUND:
                 begin
                     success := mobilePayCaptureRefundRequest.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to capture', mobilePayCaptureRefundRequest.GetRequestResponse());
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to capture', mobilePayCaptureRefundRequest.GetRequestResponse(), true);
                 end;
         end;
         EftTrxRequest.Find();
@@ -422,12 +420,12 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
             procEftTrxRequest."Processing Type"::PAYMENT:
                 begin
                     success := mobilePayCancelPayment.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelPayment.GetRequestResponse());
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelPayment.GetRequestResponse(), true);
                 end;
             procEftTrxRequest."Processing Type"::REFUND:
                 begin
                     success := mobilePayCancelRefund.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelRefund.GetRequestResponse());
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelRefund.GetRequestResponse(), true);
                 end;
             else begin
                     Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
@@ -466,7 +464,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         exit('1.0.0');
     end;
 
-    internal procedure WriteLogEntry(EFTSetup: Record "NPR EFT Setup"; IsError: Boolean; EntryNo: Integer; Description: Text; LogContents: Text)
+    internal procedure WriteLogEntry(EFTSetup: Record "NPR EFT Setup"; IsError: Boolean; EntryNo: Integer; Description: Text; LogContents: Text; CommitChanges: Boolean)
     var
         mobilePayPaymentSetup: Record "NPR MobilePayV10 Payment Setup";
         EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
@@ -481,6 +479,10 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
             mobilePayPaymentSetup."Log Level"::All:
                 EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, LogContents);
+        end;
+
+        if (CommitChanges) then begin
+            Commit();
         end;
     end;
 
@@ -766,9 +768,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                         format(originalEftTrxRequest."Entry No."),
                         format(originalEftTrxRequest."Hardware ID")));
                     success := mobilePayFindPaymentReq.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get trx ID', mobilePayFindPaymentReq.GetRequestResponse());
-
-                    Commit();
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get trx ID', mobilePayFindPaymentReq.GetRequestResponse(), true);
 
                     if (success) then begin
                         GetPaymentDetails(tempMobilePayV10Payment, EftSetup);
@@ -810,9 +810,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                     mobilePayFindRefundReq.SetFilter(StrSubstNo(PymIdLbl,
                         paymentEftTrxRequest."Reference Number Output"));
                     success := mobilePayFindRefundReq.Run(EftTrxRequest);
-                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get trx ID', mobilePayFindRefundReq.GetRequestResponse());
-
-                    Commit();
+                    WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to get trx ID', mobilePayFindRefundReq.GetRequestResponse(), true);
 
                     if (success) then begin
                         tempMobilePayV10Refund.Reset();
@@ -858,7 +856,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
                 mobilePayV10GetPayment.SetPaymentDetailBuffer(tempMobilePayV10Payment2);
                 success := mobilePayV10GetPayment.Run(eftTransRequest);
 
-                WriteLogEntry(eftSetup, not success, eftTransRequest."Entry No.", 'Invoked API to get trx ID', mobilePayV10GetPayment.GetRequestResponse());
+                WriteLogEntry(eftSetup, not success, eftTransRequest."Entry No.", 'Invoked API to get trx ID', mobilePayV10GetPayment.GetRequestResponse(), true);
 
             until tempMobilePayV10Payment.Next() = 0;
         end;
@@ -882,8 +880,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         if eftTrxRequest.Successful then begin
             //We found an active payment. Attempt to cancel it.
             success := mobilePayCancelPayment.Run(EftTrxRequest);
-            WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelPayment.GetRequestResponse());
-            Commit();
+            WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelPayment.GetRequestResponse(), true);
             exit(success);
         end;
         clear(eftTrxRequest);
@@ -897,8 +894,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         if eftTrxRequest.Successful then begin
             //We found an active refund. Attempt to cancel it.
             success := mobilePayCancelRefund.Run(EftTrxRequest);
-            WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelRefund.GetRequestResponse());
-            Commit();
+            WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelRefund.GetRequestResponse(), true);
             exit(success);
         end;
     end;

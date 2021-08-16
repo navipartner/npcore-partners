@@ -87,8 +87,8 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
                     "NPR MobilePayV10 Result Code"::Reserved:
                         begin
                             success := mobilePayCancelPayment.Run(eftTransRequest);
-                            mobilePayProtocol.WriteLogEntry(eftSetup, not success, eftTransRequest."Entry No.", 'Invoked API to get trx ID', mobilePayCancelPayment.GetRequestResponse());
-                            Commit();
+                            mobilePayProtocol.WriteLogEntry(eftSetup, not success, eftTransRequest."Entry No.", 'Invoked API to get trx ID',
+                                mobilePayCancelPayment.GetRequestResponse(), true);
                         end;
                 end;
 
@@ -156,8 +156,8 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
                     "NPR MobilePayV10 Result Code"::Reserved:
                         begin
                             success := mobilePayCancelRefund.Run(eftTransRequest);
-                            mobilePayProtocol.WriteLogEntry(eftSetup, not success, eftTransRequest."Entry No.", 'Invoked API to get trx ID', mobilePayCancelRefund.GetRequestResponse());
-                            Commit();
+                            mobilePayProtocol.WriteLogEntry(eftSetup, not success, eftTransRequest."Entry No.", 'Invoked API to get trx ID',
+                                mobilePayCancelRefund.GetRequestResponse(), true);
                         end;
                 end;
 
