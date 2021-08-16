@@ -114,7 +114,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         CleanCashTransaction."Receipt DateTime" := CreateDateTime(PosEntry."Document Date", PosEntry."Ending Time");
         CleanCashTransaction."Receipt Type" := ReceiptType;
 
-        CleanCashTransaction."Receipt Id" := NoSeriesManagement.GetNextNo(CleanCashSetup."CleanCash No. Series", Today, true);
+        CleanCashTransaction."Receipt Id" := CopyStr(NoSeriesManagement.GetNextNo(CleanCashSetup."CleanCash No. Series", Today, true), 1, MaxStrLen(CleanCashTransaction."Receipt Id"));
         CleanCashTransaction."Organisation No." := CleanCashSetup."Organization ID";
         CleanCashTransaction."Pos Id" := CleanCashSetup."CleanCash Register No.";
 
@@ -210,6 +210,7 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
         Element: XmlElement;
         NamespaceManager: XmlNamespaceManager;
         Node: XmlNode;
+        ResponseValue: Text;
     begin
 
         CleanCashResponse.SetFilter("Request Entry No.", '=%1', CleanCashTransactionRequest."Entry No.");
@@ -231,8 +232,10 @@ codeunit 6014459 "NPR CleanCash Receipt Msg." implements "NPR CleanCash XCCSP In
 
             if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
                 DataElement := Node.AsXmlElement();
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:Code', CleanCashResponse."CleanCash Code");
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitId', CleanCashResponse."CleanCash Unit Id");
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:Code', ResponseValue);
+                CleanCashResponse."CleanCash Code" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."CleanCash Code"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitId', ResponseValue);
+                CleanCashResponse."CleanCash Unit Id" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
 
                 CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:RegisterResult/cc:UnitMainStatus', EnumAsText);
                 if (not Evaluate(CleanCashResponse."CleanCash Main Status", EnumAsText)) then

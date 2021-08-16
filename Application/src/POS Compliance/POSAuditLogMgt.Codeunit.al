@@ -85,12 +85,12 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
 
         POSAuditLog."Record ID" := RecordIDIn;
         POSAuditLog."Action Type" := Type;
-        POSAuditLog."Action Custom Subtype" := CustomType;
+        POSAuditLog."Action Custom Subtype" := CopyStr(CustomType, 1, MaxStrLen(POSAuditLog."Action Custom Subtype"));
         POSAuditLog."Acted on POS Entry No." := ActedOnPOSEntryNo;
         POSAuditLog."Acted on POS Entry Fiscal No." := ActedOnPOSEntryFiscalNo;
         POSAuditLog."Acted on POS Unit No." := ActedOnPOSUnitNo;
         POSAuditLog."Log Timestamp" := CurrentDateTime;
-        POSAuditLog."User ID" := UserId;
+        POSAuditLog."User ID" := CopyStr(UserId, 1, MaxStrLen(POSAuditLog."User ID"));
         POSAuditLog."External Description" := CopyStr(Description, 1, MaxStrLen(POSAuditLog."External Description"));
         POSAuditLog."Additional Information" := CopyStr(AddInfo, 1, MaxStrLen(POSAuditLog."Additional Information"));
         if Format(RecordIDIn) <> '' then begin
@@ -126,10 +126,10 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         OnLookupAuditHandler(TempRetailList);
         if PAGE.RunModal(0, TempRetailList) <> ACTION::LookupOK then
             exit;
-        POSAuditProfile."Audit Handler" := TempRetailList.Choice;
+        POSAuditProfile."Audit Handler" := CopyStr(TempRetailList.Choice, 1, MaxStrLen(POSAuditProfile."Audit Handler"));
     end;
 
-    procedure LogPartnerModification(POSUnitNo: Text; Description: Text[250])
+    procedure LogPartnerModification(POSUnitNo: Text[10]; Description: Text[250])
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         RecordID: RecordID;
@@ -140,7 +140,7 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         POSAuditLogMgt.CreateEntryExtended(RecordID, POSAuditLog."Action Type"::PARTNER_MODIFICATION, 0, '', POSUnitNo, '', Description);
     end;
 
-    procedure InitializeLog(POSUnitNo: Text)
+    procedure InitializeLog(POSUnitNo: Text[10])
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
