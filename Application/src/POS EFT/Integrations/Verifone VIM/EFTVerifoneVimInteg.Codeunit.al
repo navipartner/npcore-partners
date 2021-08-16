@@ -19,7 +19,7 @@
         RECONCILIATION: Label 'Acquirer Reconciliation';
         BALANCE_PROMPT: Label 'Balance: %1 %2\Expiry Date: %3';
 
-    local procedure IntegrationType(): Text
+    local procedure IntegrationType(): Code[20]
     begin
         exit('VERIFONE_VIM');
     end;

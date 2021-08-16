@@ -241,8 +241,9 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
                 TempRegisterSalesLines.Insert();
             until (SaleLinePOS.Next() = 0);
 
-        EFTTransactionRequest2.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
-        EFTTransactionRequest2.SetFilter("Integration Type", '=%1', LoyaltyPointsPSPClient.IntegrationName());
+        EFTTransactionRequest2.SetCurrentKey("Sales Ticket No.");
+        EFTTransactionRequest2.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+        EFTTransactionRequest2.SetRange("Integration Type", LoyaltyPointsPSPClient.IntegrationName());
         EFTTransactionRequest2.SetFilter("Processing Type", '=%1|%2', EFTTransactionRequest2."Processing Type"::PAYMENT, EFTTransactionRequest2."Processing Type"::REFUND);
         if (EFTTransactionRequest2.FindSet()) then begin
             repeat

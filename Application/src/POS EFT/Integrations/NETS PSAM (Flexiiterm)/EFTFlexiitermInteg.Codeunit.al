@@ -15,7 +15,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         Description: Label 'NETS PSAM integration via Flexiiterm';
         ZERO_AMOUNT_ERROR: Label 'Cannot start EFT Request for zero amount';
 
-    procedure IntegrationType(): Text
+    procedure IntegrationType(): Code[20]
     begin
         exit('FLEXIITERM');
     end;
