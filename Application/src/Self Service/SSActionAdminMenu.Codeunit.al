@@ -3,13 +3,13 @@ codeunit 6151290 "NPR SS Action: Admin Menu"
     var
         ActionDescription: Label 'This built- in action displays the self-service admin menu.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-ADMIN-MENU');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

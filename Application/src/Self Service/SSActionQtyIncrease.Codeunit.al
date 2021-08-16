@@ -3,13 +3,13 @@ codeunit 6151280 "NPR SS Action - Qty Increase"
     var
         ActionDescription: Label 'This is a build in function to change quantity.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-QTY+');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.0');

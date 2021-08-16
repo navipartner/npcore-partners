@@ -5,13 +5,13 @@
         ActionDescription: Label 'This built in function sets the item addon values';
         CommentCaption: Label 'Comment';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-ITEM-ADDON');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('2.3');
@@ -307,8 +307,8 @@
             exit;
 
         SelectionValue.ReadFrom(Value);
-        ItemNo := GetValueAsString(SelectionValue, 'item');
-        VariantCode := GetValueAsString(SelectionValue, 'variant');
+        ItemNo := CopyStr(GetValueAsString(SelectionValue, 'item'), 1, MaxStrLen(ItemNo));
+        VariantCode := CopyStr(GetValueAsString(SelectionValue, 'variant'), 1, MaxStrLen(VariantCode));
 
         ItemAddOnLineOption.SetFilter("AddOn No.", '=%1', NpIaItemAddOnLine."AddOn No.");
         ItemAddOnLineOption.SetFilter("AddOn Line No.", '=%1', NpIaItemAddOnLine."Line No.");

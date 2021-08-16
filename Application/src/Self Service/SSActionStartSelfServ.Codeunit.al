@@ -3,13 +3,13 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
     var
         ActionDescription: Label 'This built in actions starts the POS in SelfService mode';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-START-POS');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.2');
@@ -44,9 +44,9 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
 
         Handled := true;
 
-        SalesPersonCode := Context.GetStringParameterOrFail('SalespersonCode', ActionCode());
+        SalesPersonCode := CopyStr(Context.GetStringParameterOrFail('SalespersonCode', ActionCode()), 1, MaxStrLen(SalespersonCode));
 
-        LanguageCode := Context.GetStringParameter('LanguageCode');
+        LanguageCode := CopyStr(Context.GetStringParameter('LanguageCode'), 1, MaxStrLen(LanguageCode));
         StartSelfService(POSSession, SalesPersonCode, LanguageCode);
     end;
 

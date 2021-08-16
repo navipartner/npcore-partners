@@ -4,13 +4,13 @@ codeunit 6151284 "NPR SS Action: Payment Screen"
     var
         ActionDescription: Label 'This built in function changes to payment view';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-PAY-SCREEN');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.0');
