@@ -12,7 +12,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     end;
 
     var
-        Tok_INTEGRATIONTYPE: Label 'MOBILEPAY_V10', Locked = true;
+        Tok_INTEGRATIONTYPE: Label 'MOBILEPAY_V10', Locked = true, MaxLength = 20;
         Lbl_DESCRIPTION: Label 'MobilePay V10 Integration';
         Lbl_NO_CASHBACK: Label 'Cashback is not supported for MobilePay';
         Lbl_POS_CREATION_SUCCESS: Label 'Created POS in MobilePay backend successfully';

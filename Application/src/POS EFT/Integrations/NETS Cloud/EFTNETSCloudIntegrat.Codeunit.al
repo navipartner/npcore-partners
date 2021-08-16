@@ -23,7 +23,7 @@
         OPERATION_SUCCESS: Label '%1 %2 Success';
         RECONCILE_SUCCESS: Label 'NETS Terminal Reconciliation Success';
 
-    procedure IntegrationType(): Text
+    procedure IntegrationType(): Code[20]
     begin
         exit('NETS_CLOUD');
     end;
