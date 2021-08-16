@@ -8,13 +8,13 @@ codeunit 6151283 "NPR SS Action: Login Screen"
         REQUIRES_ATTENTION: Label 'Your order must be handled by an attendant. It has reference number %1.';
         CANCEL_SALE: Label 'Sale was canceled %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
 
         exit('SS-LOGIN-SCREEN');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.2');

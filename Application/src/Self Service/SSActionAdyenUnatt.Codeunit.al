@@ -5,12 +5,12 @@
         DIALOG_CAPTION: Label 'Continue on terminal';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
         exit('ADYEN_CLOUD_SS');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.4');
     end;
