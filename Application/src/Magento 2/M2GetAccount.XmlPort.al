@@ -528,7 +528,7 @@ xmlport 6151152 "NPR M2 Get Account"
             TmpContactResponse.TransferFields(TmpContactIn, true);
             TmpContactResponse.Insert();
 
-            if (not MembershipRole.SetCurrentKey("Contact No.")) then;
+            MembershipRole.SetCurrentKey("Contact No.");
             MembershipRole.SetFilter("Contact No.", '=%1', TmpContactIn."No.");
             MembershipRole.SetFilter(Blocked, '=%1', false);
             if (MembershipRole.FindFirst()) then begin

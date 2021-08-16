@@ -253,21 +253,6 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
                 end;
             until MembershipRole.Next() = 0;
         end;
-
-        // MembershipRole.RESET ();
-        // MembershipRole.SetFilter ("Membership Entry No.", '<>%1', MembershipEntryNo);
-        // MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
-        // IF (MembershipRole.FindSet() ()) THEN BEGIN
-        //  IF (MembershipRole."Member Role" = MembershipRole."Member Role"::GUARDIAN) THEN BEGIN
-        //    TmpGuardians.TransferFields (MembershipRole, TRUE);
-        //    //IF (TmpGuardians.Insert ()) THEN ;
-        //  END;
-        //
-        //  IF (MembershipRole."Member Role" <> MembershipRole."Member Role"::GUARDIAN) THEN BEGIN
-        //    TmpDependents.TransferFields (MembershipRole, TRUE);
-        //    //IF (Tmpdependents.Insert ()) THEN ;
-        //  END;
-        // END;
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)

@@ -1475,6 +1475,7 @@ page 6060134 "NPR MM Member Info Capture"
         if (MemberEntryNo = 0) then
             exit;
 
+        MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         MemberCard.SetFilter(Blocked, '=%1', false);
         if (not MemberCard.FindSet()) then

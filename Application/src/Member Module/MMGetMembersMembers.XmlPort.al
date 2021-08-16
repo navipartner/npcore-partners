@@ -53,9 +53,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                             var
                                 MembershipRole: Record "NPR MM Membership Role";
                             begin
-                                MembershipRole.SetFilter("Membership Entry No.", '=%1', tmpMemberInfoResponse."Membership Entry No.");
-                                MembershipRole.SetFilter("Member Entry No.", '=%1', tmpMemberInfoResponse."Member Entry No");
-                                if (MembershipRole.FindFirst()) then
+                                if (MembershipRole.Get(tmpMemberInfoResponse."Membership Entry No.", tmpMemberInfoResponse."Member Entry No")) then
                                     MemberRole := Format(MembershipRole."Member Role");
                             end;
                         }
@@ -217,11 +215,9 @@ xmlport 6060130 "NPR MM Get Members. Members"
 
                 tmpMemberInfoResponse.TransferFields(Member, true);
 
+                MemberCard.SetCurrentKey("Member Entry No.");
                 MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
-
-                //MemberCard.SetFilter ("Valid Until", '>=%1', TODAY);
                 MemberCard.SetFilter("Valid Until", '>=%1|=%2', Today, 0D);
-
                 MemberCard.SetFilter(Blocked, '=%1', false);
                 if (MemberCard.FindFirst()) then begin
                     tmpMemberInfoResponse."External Card No." := MemberCard."External Card No.";

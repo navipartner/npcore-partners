@@ -269,6 +269,7 @@ codeunit 6151121 "NPR MM GDPR Management"
 
         Member.Modify(true);
 
+        MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         if (MemberCard.FindSet()) then begin
             repeat

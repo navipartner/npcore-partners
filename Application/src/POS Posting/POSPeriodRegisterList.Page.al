@@ -137,6 +137,7 @@ page 6150651 "NPR POS Period Register List"
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                     POSEntryToPost: Record "NPR POS Entry";
                 begin
+                    POSEntryToPost.SetCurrentKey("POS Period Register No.");
                     POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
@@ -159,6 +160,7 @@ page 6150651 "NPR POS Period Register List"
                     POSEntryToPost: Record "NPR POS Entry";
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
+                    POSEntryToPost.SetCurrentKey("POS Period Register No.");
                     POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);
@@ -181,6 +183,7 @@ page 6150651 "NPR POS Period Register List"
                     POSEntryToPost: Record "NPR POS Entry";
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
+                    POSEntryToPost.SetCurrentKey("POS Period Register No.");
                     POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
                     POSPostEntries.SetPostItemEntries(true);
                     POSPostEntries.SetPostPOSEntries(true);

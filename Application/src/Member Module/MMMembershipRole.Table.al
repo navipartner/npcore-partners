@@ -205,6 +205,10 @@ table 6060128 "NPR MM Membership Role"
         key(Key2; "Member Entry No.", "Membership Entry No.")
         {
         }
+        key(Key3; "Contact No.")
+        {
+
+        }
     }
 
     fieldgroups
