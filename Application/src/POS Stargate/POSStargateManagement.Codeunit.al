@@ -233,18 +233,24 @@ codeunit 6150716 "NPR POS Stargate Management"
         StargatePackage: Record "NPR POS Stargate Package";
         Package: DotNet NPRNetPackage;
         Request: DotNet NPRNetPackageRequest;
+        IOFile: DotNet NPRNetFile;
+        TempFile: File;
+        TempFileName: Text;
         State: Option SendingRequest,InstallingAssemblies,RepeatingRequest;
-        StargatePackageJSON: Text;
     begin
         SetState(ActionName, State::InstallingAssemblies);
 
         if (not StargateMethod.Get(Method)) or (not StargatePackage.Get(StargateMethod."Package Name")) then
             ThrowUnsupportedStargateMethodError(FrontEnd, Method, ActionName);
+        TempFile.CreateTempFile();
+        TempFileName := TempFile.Name;
+        TempFile.Close();
         StargatePackage.CalcFields(JSON);
-        StargatePackage.JSON.Export(StargatePackageJSON);
-        Package := Package.FromJsonString(StargatePackageJSON);
+        StargatePackage.JSON.Export(TempFileName);
+        Package := Package.FromJsonString(IOFile.ReadAllText(TempFileName));
         Package.Name := StargatePackage.Name;
         Package.Version := StargatePackage.Version;
+        Erase(TempFileName);
 
         Request := Package.ToRequest();
         FrontEnd.InvokeDeviceInternal(Request, ActionName, Step, false);
