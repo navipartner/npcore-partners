@@ -1217,6 +1217,7 @@
         MemberEntryNo: Integer;
         ReasonText: Text;
     begin
+        MembershipRole.SetCurrentKey("Contact No.");
         MembershipRole.SetFilter("Contact No.", '=%1', CorporateContactNo);
         if (not MembershipRole.FindFirst()) then
             exit(false);
@@ -1247,6 +1248,7 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Member: Record "NPR MM Member";
     begin
+        MembershipRole.SetCurrentKey("Contact No.");
         MembershipRole.SetFilter("Contact No.", '=%1', TmpContact."No.");
         if (not MembershipRole.FindFirst()) then
             exit(false);
@@ -1270,6 +1272,7 @@
         MembershipRole: Record "NPR MM Membership Role";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin
+        MembershipRole.SetCurrentKey("Contact No.");
         MembershipRole.SetFilter("Contact No.", '=%1', Contact."No.");
         if (not MembershipRole.FindFirst()) then
             exit(false);

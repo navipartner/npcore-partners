@@ -73,6 +73,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 begin
                     ExternalMemberCardNo := '';
                     if (UI.MemberSearchWithFacialRecognition(MemberEntryNo)) then begin
+                        MemberCard.SetCurrentKey("Member Entry No.");
                         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
                         MemberCard.SetFilter(Blocked, '=%1', false);
                         MemberCard.SetFilter("Valid Until", '>=%1', Today);

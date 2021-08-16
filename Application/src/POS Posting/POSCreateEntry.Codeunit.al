@@ -1272,6 +1272,7 @@
                 POSPeriodRegister.SetFilter("Document No.", DocNoFilter);
                 if (POSPeriodRegister.FindFirst()) then begin
                     POSEntry.Reset();
+                    POSEntry.SetCurrentKey("POS Period Register No.");
                     POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegister."No.");
                     POSEntry.SetFilter("System Entry", '=%1', false);
                     RecordCount := InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR POS Entry", 2, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());

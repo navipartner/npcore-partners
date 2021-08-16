@@ -174,6 +174,10 @@ table 6060131 "NPR MM Member Card"
         key(Key3; "Membership Entry No.", "Member Entry No.")
         {
         }
+        key(Key4; "Member Entry No.")
+        {
+
+        }
     }
 
     fieldgroups

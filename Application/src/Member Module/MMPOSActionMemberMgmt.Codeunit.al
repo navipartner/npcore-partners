@@ -7,6 +7,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberNumberPrompt: Label 'Enter Member Number';
         MembershipNumberPrompt: Label 'Enter Membership Number';
         MembershipTitle: Label '%1 - Membership Management.';
+        SelectingMemberError: Label 'There was an error selecting member %1:\\%2';
         RENEW_NOT_VALID: Label 'There are no valid renewal products for this membership at this time.';
         EXTEND_NOT_VALID: Label 'There are no valid extend products for this membership at this time.';
         UPGRADE_NOT_VALID: Label 'There are no valid upgrade products for this membership at this time.';
@@ -873,6 +874,8 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         if (not SelectMemberUI(Member)) then
             exit;
 
+
+        MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
         MemberCard.SetFilter(Blocked, '=%1', false);
         MemberCard.SetFilter("Valid Until", '=%1|>=%2', 0D, Today());
@@ -1021,7 +1024,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             end;
 
             if (not MembershipSelected) then begin
-                Message('There was an error selecting member %1:\\%2', ExternalMemberNo, GetLastErrorText);
+                Message(SelectingMemberError, ExternalMemberNo, GetLastErrorText);
                 ExternalMemberNo := '';
             end;
 
