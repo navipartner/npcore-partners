@@ -20,7 +20,7 @@
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
         CAPTION_SIGNATURES_VALID: Label 'Chained signatures of %1 entries verified successfully';
 
-    local procedure HandlerCode(): Text
+    local procedure HandlerCode(): Text[8]
     begin
         exit('FR_NF525');
     end;
@@ -82,7 +82,7 @@
         exit(POSAuditLogOut.FindLast());
     end;
 
-    local procedure GetNextEventNoSeries(EventType: Option JET,Reprint,Period,MonthPeriod,YearPeriod; POSUnitNo: Code[10]): Text
+    local procedure GetNextEventNoSeries(EventType: Option JET,Reprint,Period,MonthPeriod,YearPeriod; POSUnitNo: Code[10]): Code[20]
     var
         FRCertificationNoSeries: Record "NPR FR Audit No. Series";
         NoSeriesManagement: Codeunit NoSeriesManagement;
@@ -233,7 +233,7 @@
 
         POSAuditLog."Signature Base Value".CreateOutStream(OutStream);
         OutStream.WriteText(BaseValue);
-        POSAuditLog."Signature Base Hash" := EncodeBase64URL(CalculateHash(BaseValue));
+        POSAuditLog."Signature Base Hash" := CopyStr(EncodeBase64URL(CalculateHash(BaseValue)), 1, MaxStrLen(POSAuditLog."Signature Base Hash"));
 
         if IsInitialHandling then begin
             POSAuditLog."Original Signature Base Hash" := POSAuditLog."Signature Base Hash";
@@ -657,11 +657,12 @@
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSTaxAmountLine2: Record "NPR POS Entry Tax Line";
         TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
+        VATIDFilter: Text;
     begin
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if OnlyIncludeItems then begin
-            POSTaxAmountLine.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
-        end;
+        VATIDFilter := FRCertificationSetup.GetItemVATIDFilter();
+        if OnlyIncludeItems then
+            POSTaxAmountLine.SetFilter("VAT Identifier", VATIDFilter);
 
         if POSTaxAmountLine.FindSet() then
             repeat
@@ -675,9 +676,9 @@
 
                     POSTaxAmountLine2.SetRange("POS Entry No.", POSEntry."Entry No.");
                     POSTaxAmountLine2.SetRange("Tax %", POSTaxAmountLine."Tax %");
-                    if OnlyIncludeItems then begin
-                        POSTaxAmountLine2.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
-                    end;
+                    if OnlyIncludeItems then
+                        POSTaxAmountLine2.SetFilter("VAT Identifier", VATIDFilter);
+
                     POSTaxAmountLine2.CalcSums("Amount Including Tax");
 
                     if TaxBreakdown <> '' then
@@ -756,11 +757,13 @@
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
         POSWorkshiftTaxCheckpoint2: Record "NPR POS Worksh. Tax Checkp.";
         TempPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
+        VATIDFilter: Text;
     begin
         //Implied only include item amounts as per audit requirements.
 
         POSWorkshiftTaxCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
-        POSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
+        VATIDFilter := FRCertificationSetup.GetItemVATIDFilter();
+        POSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", VATIDFilter);
         if POSWorkshiftTaxCheckpoint.FindSet() then
             repeat
                 //Select distinct tax % total
@@ -773,7 +776,7 @@
 
                     POSWorkshiftTaxCheckpoint2.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
                     POSWorkshiftTaxCheckpoint2.SetRange("Tax %", POSWorkshiftTaxCheckpoint."Tax %");
-                    POSWorkshiftTaxCheckpoint2.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
+                    POSWorkshiftTaxCheckpoint2.SetFilter("VAT Identifier", VATIDFilter);
                     POSWorkshiftTaxCheckpoint2.CalcSums("Amount Including Tax");
 
                     if TaxBreakdown <> '' then
@@ -881,17 +884,17 @@
         exit(PadStr('', Length - InputLength, PadChar) + Text);
     end;
 
-    local procedure MonthlyPeriodType(): Text
+    local procedure MonthlyPeriodType(): Code[20]
     begin
         exit('FR_NF525_MONTH');
     end;
 
-    local procedure YearlyPeriodType(): Text
+    local procedure YearlyPeriodType(): Code[20]
     begin
         exit('FR_NF525_YEAR');
     end;
 
-    local procedure ImplementationCode(): Text
+    local procedure ImplementationCode(): Text[30]
     begin
         exit(HandlerCode() + '_V4');
     end;
@@ -1247,6 +1250,8 @@
         CompanyInformation: Record "Company Information";
         RecRef: RecordRef;
         FieldRef: FieldRef;
+        VATIDFilter: Text;
+        NoVATIDFilterErr: Label '%1 must not be empty.';
     begin
         //Error upon POS login if any configuration is missing or clearly not set according to compliance
 
@@ -1267,7 +1272,11 @@
         FRAuditSetup.TestField("Signing Certificate Thumbprint");
         FRAuditSetup.TestField("Auto Archive URL");
         FRAuditSetup.TestField("Auto Archive API Key");
-        FRAuditSetup.TestField("Item VAT Identifier Filter");
+
+        VATIDFilter := FRAuditSetup.GetItemVATIDFilter();
+        if VATIDFilter = '' then
+            Error(NoVATIDFilterErr, FRAuditSetup.FieldCaption("Item VAT ID Filter"));
+
 
         FRAuditNoSeries.Get(POSUnit."No.");
         FRAuditNoSeries.TestField("Reprint No. Series");

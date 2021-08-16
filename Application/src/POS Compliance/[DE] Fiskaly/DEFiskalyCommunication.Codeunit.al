@@ -83,7 +83,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         ResponseJson.ReadFrom(BodyTxt);
 
         ResponseJson.SelectToken('latest_revision', LastRevisionToken);
-        LastRevision := LastRevisionToken.AsValue().AsText();
+        LastRevision := CopyStr(LastRevisionToken.AsValue().AsText(), 1, MaxStrLen(LastRevision));
     end;
 
     local procedure EndTransaction(DocumentJsonObjectPar: JsonObject) ResponseJson: JsonObject
@@ -117,7 +117,7 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         ResponseJson.ReadFrom(BodyTxt);
 
         ResponseJson.SelectToken('latest_revision', LastRevisionToken);
-        LastRevision := LastRevisionToken.AsValue().AsText();
+        LastRevision := CopyStr(LastRevisionToken.AsValue().AsText(), 1, MaxStrLen(LastRevision));
     end;
 
     procedure CreateTSSClient(PosUnitAuxDEPar: Record "NPR DE POS Unit Aux. Info")
@@ -345,6 +345,6 @@ codeunit 6014445 "NPR DE Fiskaly Communication"
         LastRevisionToken: JsonToken;
         TransactionID: Text;
         LastContext: Text;
-        LastRevision: Text;
+        LastRevision: Text[5];
         BearerToken: Label 'Bearer %1', Locked = true;
 }

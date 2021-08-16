@@ -19,7 +19,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterEndWorkshift(Mode: Option; UnitNo: Code[20]; Successful: Boolean; PosEntryNo: Integer)
+    local procedure OnAfterEndWorkshift(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     begin
         // Mode:          XREPORT = 0, ZREPORT = 1, CLOSEWORKSHIFT = 2
         // Unit No.:      The POS Unit being balanced

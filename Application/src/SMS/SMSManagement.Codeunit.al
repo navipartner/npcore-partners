@@ -620,7 +620,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
-    local procedure CodeUnit6150627OnAfterEndWorkshift(Mode: Option; UnitNo: Code[20]; Successful: Boolean; PosEntryNo: Integer)
+    local procedure CodeUnit6150627OnAfterEndWorkshift(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     var
         RecRef: RecordRef;
         SMSTemplateHeader: Record "NPR SMS Template Header";

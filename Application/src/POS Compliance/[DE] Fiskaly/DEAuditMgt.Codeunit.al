@@ -38,7 +38,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
     local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         tmpRetailList.Number += 1;
-        tmpRetailList.Choice := HandlerCode();
+        tmpRetailList.Choice := CopyStr(HandlerCode(), 1, MaxStrLen(tmpRetailList.Choice));
         tmpRetailList.Insert();
     end;
 
@@ -209,11 +209,11 @@ codeunit 6014444 "NPR DE Audit Mgt."
         DeAuditAux."Finish Time" := TypeHelper.EvaluateUnixTimestamp(ResponseTokenList.Get(3).AsValue().AsBigInteger());
 
         ResponseTokenList.Get(12).SelectToken('timestamp_format', Token);
-        DeAuditAux."Time Format" := Token.AsValue().AsText();
+        DeAuditAux."Time Format" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."Time Format"));
         ResponseTokenList.Get(13).SelectToken('counter', Token);
         DeAuditAux."Signature Count" := Token.AsValue().AsInteger();
         ResponseTokenList.Get(13).SelectToken('algorithm', Token);
-        DeAuditAux."Signature Algorithm" := Token.AsValue().AsText();
+        DeAuditAux."Signature Algorithm" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."Signature Algorithm"));
         ResponseTokenList.Get(13).SelectToken('value', Token);
         DeAuditAux.Signature.CreateOutStream(OutStr);
         OutStr.Write(Token.AsValue().AsText());
@@ -287,7 +287,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
-    local procedure OnAfterEndWorkshiftDeFiscaly(Mode: Option; UnitNo: Code[20]; Successful: Boolean; PosEntryNo: Integer)
+    local procedure OnAfterEndWorkshiftDeFiscaly(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     var
         POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSUnit: Record "NPR POS Unit";

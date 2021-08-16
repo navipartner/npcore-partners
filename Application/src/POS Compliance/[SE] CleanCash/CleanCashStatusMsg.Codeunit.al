@@ -68,6 +68,7 @@ codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Int
         Element: XmlElement;
         NamespaceManager: XmlNamespaceManager;
         Node: XmlNode;
+        ResponseValue: Text;
     begin
 
         CleanCashResponse.SetFilter("Request Entry No.", '=%1', CleanCashTransactionRequest."Entry No.");
@@ -89,9 +90,12 @@ codeunit 6014461 "NPR CleanCash Status Msg." implements "NPR CleanCash XCCSP Int
 
             if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
                 DataElement := Node.AsXmlElement();
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Id', CleanCashResponse."CleanCash Unit Id");
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Firmware', CleanCashResponse."CleanCash Firmware");
-                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:InstalledLicenses', CleanCashResponse."Installed Licenses");
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Id', ResponseValue);
+                CleanCashResponse."CleanCash Unit Id" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:Firmware', ResponseValue);
+                CleanCashResponse."CleanCash Firmware" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."CleanCash Firmware"));
+                CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:InstalledLicenses', ResponseValue);
+                CleanCashResponse."Installed Licenses" := CopyStr(ResponseValue, 1, MaxStrLen(CleanCashResponse."Installed Licenses"));
 
                 CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Status/cc:MainStatus', EnumAsText);
                 evaluate(CleanCashResponse."CleanCash Main Status", EnumAsText);
