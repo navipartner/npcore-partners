@@ -83,9 +83,10 @@
     var
         NcTaskSetup: Record "NPR Nc Task Setup";
     begin
+        NcTaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
+        NcTaskSetup.SetRange("Task Processor Code", NcRapidConnectSetup."Task Processor Code");
         NcTaskSetup.SetRange("Table No.", NcRapidConnectTrigger."Table ID");
         NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR Nc RapidConn. Exp. Mgt.");
-        NcTaskSetup.SetRange("Task Processor Code", NcRapidConnectSetup."Task Processor Code");
         if NcTaskSetup.FindFirst() then
             exit;
 
