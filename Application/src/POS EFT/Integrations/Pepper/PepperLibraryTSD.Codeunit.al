@@ -826,7 +826,7 @@
             FrontEnd.ResumeWorkflow();
     end;
 
-    procedure GetIntegrationType(): Code[20]
+    procedure GetIntegrationType(): Code[10]
     begin
 
         exit('PEPPER');
