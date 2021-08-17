@@ -1,10 +1,5 @@
 table 6184489 "NPR Pepper EFT Result Code"
 {
-    // NPR5.20/BR  /20160316  CASE 231481 Object Created
-    // NPR5.28/BR  /20161128  CASE 259563 Added field for "Open Terminal and Retry"
-    // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT, added Fields Integration Type and Transaction Subtype fields, changed field Result Code to Code
-    // NPR5.46/MMV /20180714 CASE 290734 Renamed
-
     Caption = 'Pepper EFT Result Code';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Pepper EFT Result Codes";
@@ -12,7 +7,7 @@ table 6184489 "NPR Pepper EFT Result Code"
 
     fields
     {
-        field(5; "Integration Type"; Code[20])
+        field(5; "Integration Type"; Code[10])
         {
             Caption = 'Integration Type';
             DataClassification = CustomerContent;
@@ -52,10 +47,8 @@ table 6184489 "NPR Pepper EFT Result Code"
 
             trigger OnValidate()
             begin
-                //-NPR5.28 [259563]
                 if Successful then
                     TestField("Open Terminal and Retry", false);
-                //+NPR5.28 [259563]
             end;
         }
         field(50; "Open Terminal and Retry"; Boolean)
@@ -66,10 +59,8 @@ table 6184489 "NPR Pepper EFT Result Code"
 
             trigger OnValidate()
             begin
-                //-NPR5.28 [259563]
                 if "Open Terminal and Retry" then
                     TestField(Successful, false);
-                //+NPR5.28 [259563]
             end;
         }
     }
@@ -85,4 +76,3 @@ table 6184489 "NPR Pepper EFT Result Code"
     {
     }
 }
-
