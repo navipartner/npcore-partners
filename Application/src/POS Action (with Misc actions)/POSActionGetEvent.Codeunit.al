@@ -18,6 +18,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
             Sender.RegisterWorkflowStep('textfield', 'if (param.DialogType == param.DialogType["TextField"]) {input(labels.prompt).respond();}');
             Sender.RegisterWorkflowStep('list', 'if (param.DialogType == param.DialogType["List"]) {respond();}');
             Sender.RegisterOptionParameter('DialogType', 'TextField,List', 'TextField');
+            Sender.RegisterIntegerParameter('LookAheadPeriod', 0);
             Sender.RegisterWorkflow(false);
         end;
     end;
@@ -35,7 +36,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
@@ -48,17 +49,17 @@ codeunit 6060160 "NPR POS Action: Get Event"
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
+        JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
             'list':
                 begin
                     Handled := true;
-                    if not SelectEvent(EventNo) then
+                    if not SelectEvent(EventNo, JSON) then
                         exit;
                 end;
             'textfield':
                 begin
                     Handled := true;
-                    JSON.InitializeJObjectParser(Context, FrontEnd);
                     EventNo := CopyStr(JSON.GetStringOrFail('value', StrSubstNo(ExecutingErr, ActionCode())), 1, MaxStrLen(EventNo));
                 end;
         end;
@@ -66,14 +67,20 @@ codeunit 6060160 "NPR POS Action: Get Event"
         ImportEvent(POSSession, EventNo);
     end;
 
-    local procedure SelectEvent(var EventNo: Code[20]): Boolean
+    local procedure SelectEvent(var EventNo: Code[20]; JSON: Codeunit "NPR POS JSON Management"): Boolean
     var
         Job: Record Job;
         EventList: Page "NPR Event List";
+        LookAheadPeriodDays: Integer;
+        DateFormulaPlaceholderString: Label '<%1D>', Comment = '%1 - number of days';
     begin
+        LookAheadPeriodDays := JSON.GetIntegerParameter('LookAheadPeriod');
+
         Job.SetRange("NPR Event", true);
         Job.SetRange("NPR Event Status", Job."NPR Event Status"::Order);
         Job.SetRange(Blocked, Job.Blocked::" ");
+        if LookAheadPeriodDays > 0 then
+            Job.SetRange("Starting Date", WorkDate(), CalcDate(StrSubstNo(DateFormulaPlaceholderString, LookAheadPeriodDays), WorkDate()));
         EventList.SetTableView(Job);
         EventList.LookupMode := true;
         if EventList.RunModal() = ACTION::LookupOK then begin
@@ -153,5 +160,32 @@ codeunit 6060160 "NPR POS Action: Get Event"
 
         POSSession.RequestRefreshData();
     end;
-}
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        CaptionLookAheadPeriod: Label 'Look-ahead Period (Days)';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'LookAheadPeriod':
+                Caption := CaptionLookAheadPeriod;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        DescLookAheadPeriod: Label 'Number of days ahead to show the future events for. System will apply the filter to the "Starting Date" field. Set the parameter to zero, if you do not want to enforce any starting date limitations.';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'LookAheadPeriod':
+                Caption := DescLookAheadPeriod;
+        end;
+    end;
+}
