@@ -89,7 +89,7 @@ table 6014584 "NPR Replication Error Log"
         Rec."Endpoint ID" := pEndpointID;
         Rec.Method := pMethod;
         Rec.URL := copyStr(pURL, 1, 250);
-        Rec."User ID" := UserId;
+        Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
         Rec.Insert(true);
         Rec.Request.CreateOutStream(oStr);
         oStr.WriteText(pRequest);

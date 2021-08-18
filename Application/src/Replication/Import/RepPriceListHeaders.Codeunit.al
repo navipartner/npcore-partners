@@ -48,13 +48,13 @@ codeunit 6014592 "NPR Rep. Price List Headers" implements "NPR Replication IEndp
         PriceListHeader: Record "Price List Header";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        PriceListCode: Text;
+        PriceListCode: Code[20];
         PriceListId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        PriceListCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        PriceListCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(PriceListCode));
         PriceListId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
 
         IF PriceListId <> '' then
@@ -142,7 +142,7 @@ codeunit 6014592 "NPR Rep. Price List Headers" implements "NPR Replication IEndp
         end;
     end;
 
-    local procedure InsertNewRec(var PriceListHeader: Record "Price List Header"; PriceListCode: Text; PriceListId: text)
+    local procedure InsertNewRec(var PriceListHeader: Record "Price List Header"; PriceListCode: Code[20]; PriceListId: text)
     begin
         PriceListHeader.Init();
         PriceListHeader.Code := PriceListCode;
@@ -158,6 +158,21 @@ codeunit 6014592 "NPR Rep. Price List Headers" implements "NPR Replication IEndp
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

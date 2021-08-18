@@ -10,7 +10,6 @@ page 6014499 "NPR Replication Setup List"
     SourceTable = "NPR Replication Service Setup";
     UsageCategory = Administration;
 
-
     layout
     {
         area(content)

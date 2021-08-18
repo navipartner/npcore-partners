@@ -118,7 +118,7 @@ codeunit 6014637 "NPR Rep. Get Item Categories" implements "NPR Replication IEnd
         ReplicationAPI: Codeunit "NPR Replication API";
     begin
         ItemCat.Init();
-        ItemCat.Code := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        ItemCat.Code := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(ItemCat.Code));
         IF ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id') <> '' THEN begin
             IF Evaluate(ItemCat.SystemId, ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id')) Then
                 ItemCat.Insert(true, true)
@@ -131,6 +131,21 @@ codeunit 6014637 "NPR Rep. Get Item Categories" implements "NPR Replication IEnd
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

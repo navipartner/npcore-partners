@@ -46,17 +46,17 @@ codeunit 6014642 "NPR Rep. Get Variety Values" implements "NPR Replication IEndp
         VarietyValue: Record "NPR Variety Value";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        VarietyValueType: Text;
-        VarietyValueTable: Text;
-        VarietyValueValue: Text;
+        VarietyValueType: Code[10];
+        VarietyValueTable: Code[40];
+        VarietyValueValue: Code[50];
         VarietyValueId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        VarietyValueType := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.type');
-        VarietyValueTable := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.table');
-        VarietyValueValue := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.value');
+        VarietyValueType := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.type'), 1, Maxstrlen(VarietyValueType));
+        VarietyValueTable := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.table'), 1, MaxStrLen(VarietyValueTable));
+        VarietyValueValue := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.value'), 1, MaxStrLen(VarietyValueValue));
         VarietyValueId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF VarietyValueId <> '' then
@@ -101,7 +101,7 @@ codeunit 6014642 "NPR Rep. Get Variety Values" implements "NPR Replication IEndp
         end;
     end;
 
-    local procedure InsertNewRec(var VarietyValue: Record "NPR Variety Value"; VarietyValueType: Text; VarietyValueTable: Text; VarietyValueValue: Text; VarietyTableId: text)
+    local procedure InsertNewRec(var VarietyValue: Record "NPR Variety Value"; VarietyValueType: Code[10]; VarietyValueTable: Code[40]; VarietyValueValue: Code[50]; VarietyTableId: text)
     begin
         VarietyValue.Init();
         VarietyValue.Type := VarietyValueType;
@@ -119,6 +119,21 @@ codeunit 6014642 "NPR Rep. Get Variety Values" implements "NPR Replication IEndp
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

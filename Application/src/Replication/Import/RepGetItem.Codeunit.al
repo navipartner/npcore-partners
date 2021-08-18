@@ -48,13 +48,13 @@ codeunit 6014623 "NPR Rep. Get Item" implements "NPR Replication IEndpoint Meth"
         Item: Record Item;
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        ItemNo: Text;
+        ItemNo: Code[20];
         ItemId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        ItemNo := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.number');
+        ItemNo := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.number'), 1, MaxStrLen(ItemNo));
         ItemId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
 
         IF ItemId <> '' then
@@ -291,7 +291,7 @@ codeunit 6014623 "NPR Rep. Get Item" implements "NPR Replication IEndpoint Meth"
         end;
     end;
 
-    local procedure InsertNewRec(var Item: Record Item; ItemNo: Text; ItemId: text)
+    local procedure InsertNewRec(var Item: Record Item; ItemNo: Code[20]; ItemId: text)
     begin
         Item.Init();
         Item."No." := ItemNo;
@@ -307,6 +307,21 @@ codeunit 6014623 "NPR Rep. Get Item" implements "NPR Replication IEndpoint Meth"
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

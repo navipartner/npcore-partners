@@ -48,6 +48,13 @@ page 6014500 "NPR Replication Endpoints"
                     ApplicationArea = NPRRetail;
                     Caption = 'OData Max. Page Size';
                 }
+                field("Skip Import Entry No Data Resp"; Rec."Skip Import Entry No Data Resp")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Skip No Data Response';
+                    ToolTip = 'Specifies if Import Entry creation will be skipped in case the response contains no new or modified records to be replicated.';
+                }
+
                 field(Enabled; Rec.Enabled)
                 {
                     ToolTip = 'Specifies if the Endpoint is Enabled. If Disabled system will not execute import for this record.';

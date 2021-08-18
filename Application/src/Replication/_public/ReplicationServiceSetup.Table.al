@@ -31,7 +31,7 @@ table 6014588 "NPR Replication Service Setup"
                 ServiceAPI: Codeunit "NPR Replication API";
             begin
                 Rec.TestField(Enabled, false);
-                ServiceAPI.VerifyServiceURL(Rec."Service URL");
+                Rec."Service URL" := COPYSTR(ServiceAPI.VerifyServiceURL(Rec."Service URL"), 1, MaxStrLen(Rec."Service URL"));
             end;
         }
         field(15; Enabled; Boolean)
@@ -44,7 +44,7 @@ table 6014588 "NPR Replication Service Setup"
                 Auth: Interface "NPR Replication API IAuthorization";
             begin
                 IF Enabled then begin
-                    ReplicationAPI.VerifyServiceURL(Rec."Service URL");
+                    Rec."Service URL" := COPYSTR(ReplicationAPI.VerifyServiceURL(Rec."Service URL"), 1, MaxStrLen(Rec."Service URL"));
                     CheckFromCompany();
                     Auth := Rec.AuthType;
                     Auth.CheckMandatoryValues(Rec);
@@ -285,7 +285,7 @@ table 6014588 "NPR Replication Service Setup"
         Clear("Api Password Key");
     end;
 
-    procedure RegisterService(pAPIVersion: Code[20]; pServiceUrl: Text; pName: Text; pEnabled: Boolean; pAuthType: Enum "NPR Replication API Auth. Type"; pTenant: Text[50])
+    procedure RegisterService(pAPIVersion: Code[20]; pServiceUrl: Text[100]; pName: Text[100]; pEnabled: Boolean; pAuthType: Enum "NPR Replication API Auth. Type"; pTenant: Text[50])
     begin
         Rec."API Version" := pAPIVersion;
         IF Rec.FIND() then
@@ -408,7 +408,7 @@ table 6014588 "NPR Replication Service Setup"
         for i := 0 to JArray.Count - 1 do begin
             JArray.Get(i, JToken);
             TempCompany.Init();
-            TempCompany.Name := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.name');
+            TempCompany.Name := CopyStr(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.name'), 1, MaxStrLen(TempCompany.Name));
             TempCompany.Id := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
             TempCompany.Insert();
         end;
@@ -442,7 +442,7 @@ table 6014588 "NPR Replication Service Setup"
         Response: Codeunit "Temp Blob";
         OutStr: OutStream;
     begin
-        ReplicationAPI.VerifyServiceURL(Rec."Service URL");
+        Rec."Service URL" := COPYSTR(ReplicationAPI.VerifyServiceURL(Rec."Service URL"), 1, MaxStrLen(Rec."Service URL"));
         CheckFromCompany();
         iAuth := Rec.AuthType;
         iAuth.CheckMandatoryValues(Rec);

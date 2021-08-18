@@ -153,6 +153,19 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
+    }
+
+    keys
+    {
+        key("NPR Key1"; "NPR Replication Counter")
+        {
+        }
     }
 
     trigger OnAfterDelete()

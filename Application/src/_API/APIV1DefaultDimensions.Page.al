@@ -21,39 +21,63 @@ page 6014503 "NPR APIV1 - Default Dimensions"
             {
                 field(id; Rec.SystemId)
                 {
-                    Caption = 'Id';
+                    Caption = 'Id', Locked = true;
+                    Editable = false;
+                }
+                field(tableID; Rec."Table ID")
+                {
+                    Caption = 'Table Id', Locked = true;
+                }
+                field(no; Rec."No.")
+                {
+                    Caption = 'No.', Locked = true;
+                }
+                field(dimensionCode; Rec."Dimension Code")
+                {
+                    Caption = 'Dimension Code', Locked = true;
                     Editable = false;
                 }
                 field(parentType; Rec."Parent Type")
                 {
-                    Caption = 'Parent Type';
+                    Caption = 'Parent Type', Locked = true;
                 }
                 field(parentId; Rec.ParentId)
                 {
-                    Caption = 'Parent Id';
+                    Caption = 'Parent Id', Locked = true;
                 }
                 field(dimensionId; Rec.DimensionId)
                 {
-                    Caption = 'Dimension Id';
-                }
-                field(dimensionCode; Rec."Dimension Code")
-                {
-                    Caption = 'Dimension Code';
-                    Editable = false;
+                    Caption = 'Dimension Id', Locked = true;
                 }
                 field(dimensionValueId; Rec.DimensionValueId)
                 {
-                    Caption = 'Dimension Value Id';
+                    Caption = 'Dimension Value Id', Locked = true;
                 }
                 field(dimensionValueCode; Rec."Dimension Value Code")
                 {
-                    Caption = 'Dimension Value Code';
+                    Caption = 'Dimension Value Code', Locked = true;
                     Editable = false;
                 }
                 field(postingValidation; Rec."Value Posting")
                 {
-                    Caption = 'Posting Validation';
+                    Caption = 'Posting Validation', Locked = true;
                 }
+
+                field("tableCaption"; Rec."Table Caption")
+                {
+                    Caption = 'Table Caption', Locked = true;
+                }
+
+                field(multiSelectionAction; Rec."Multi Selection Action")
+                {
+                    Caption = 'Multi Selection Action', Locked = true;
+                }
+
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                }
+
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;
