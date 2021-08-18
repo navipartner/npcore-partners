@@ -83,5 +83,15 @@ tableextension 6014437 "NPR Contact" extends Contact
             DataClassification = CustomerContent;
         }
     }
+
+    keys
+    {
+#if BC18
+        key("NPR Key1"; "E-Mail")
+        {
+            
+        }
+#endif
+    }
 }
 
