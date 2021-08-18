@@ -329,5 +329,25 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 }
             }
         }
+        addafter(Documents)
+        {
+            action("NPR TransferOrders")
+            {
+                ApplicationArea = All;
+                Promoted = true;
+                PromotedCategory = Category12;
+                Caption = 'Transfer Orders';
+                ToolTip = 'Displays Transfer Orders which have External Document No. equal as Order No.';
+                Image = TransferOrder;
+
+                trigger OnAction()
+                var
+                    TransferHeader: Record "Transfer Header";
+                begin
+                    TransferHeader.SetRange("External Document No.", Rec."No.");
+                    Page.Run(Page::"Transfer Orders", TransferHeader);
+                end;
+            }
+        }
     }
 }

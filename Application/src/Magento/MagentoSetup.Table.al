@@ -517,6 +517,39 @@ table 6151401 "NPR Magento Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header" WHERE("Table No." = CONST(36));
         }
+        field(790; "Auto Transfer Order Enabled"; Boolean)
+        {
+            Caption = 'Automatic Transfer Order Enabled';
+            DataClassification = CustomerContent;
+        }
+        field(795; "Auto Create Req. Lines"; Boolean)
+        {
+            Caption = 'Auto Create Req. Lines';
+            DataClassification = CustomerContent;
+        }
+        field(796; "Req. Worsheet Template Code"; Code[10])
+        {
+            Caption = 'Req. Worsheet Template Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Req. Wksh. Template";
+        }
+        field(797; "Req. Worsheet Jnl. Batch Name"; Code[10])
+        {
+            Caption = 'Req. Worsheet Journal Batch Name';
+            DataClassification = CustomerContent;
+            TableRelation = "Requisition Wksh. Name".Name WHERE("Worksheet Template Name" = FIELD("Req. Worsheet Template Code"));
+        }
+        field(798; "Include Projected Quantities"; Boolean)
+        {
+            Caption = 'Include Projected Quantities';
+            DataClassification = CustomerContent;
+        }
+        field(799; "Projected. Qty. Within Period"; DateFormula)
+        {
+            Caption = 'Projected. Qty. Within Period';
+            DataClassification = CustomerContent;
+            InitValue = '1M';
+        }
         field(800; "Stock Calculation Method"; Enum "NPR Stock Calculation Method")
         {
             Caption = 'Stock Calculation Method';

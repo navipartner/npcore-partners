@@ -24,6 +24,8 @@
         Error001: Label 'Xml Element sell_to_customer is missing';
         Error002: Label 'Item %1 does not exist in %2';
         Error003: Label 'Error during E-mail Confirmation: %1';
+        Error004: Label 'When "Auto Transfer Order" is Enabled on Magento Setup, you must configure Magento website and location code in it. Website "%1" is missing!', Comment = '%1 = WebSite Code';
+        Error005: Label 'When "Auto Create Req. Lines" is not Enabled on Magento Setup, you must insert at least one Replenishment Transfer Mapping for Location "%1".', Comment = '%1 = Location Code';
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
@@ -474,6 +476,13 @@
         OrderNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'order_no', true), 1, MaxStrLen(OrderNo));
         if MagentoWebsite.Get(NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'website_code', MaxStrLen(MagentoWebsite.Code), true)) then;
 
+        if MagentoSetup."Auto Transfer Order Enabled" then begin
+            if MagentoWebsite.IsEmpty() then
+                Error(Error004, NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'website_code', MaxStrLen(MagentoWebsite.Code), true));
+
+            MagentoWebsite.TestField("Location Code");
+        end;
+
         if not XmlElement.SelectSingleNode('sell_to_customer', XNode) then
             Error(Error001);
         XmlElement2 := XNode.AsXmlElement();
@@ -785,8 +794,202 @@
         else
             SalesLine."Line Amount" := LineAmount;
         SalesLine.Modify(true);
+
+        CheckForAutomaticTransferOrder(SalesLine);
     end;
 
+    local procedure CheckForAutomaticTransferOrder(SalesLine: Record "Sales Line")
+    var
+        StockQty: Decimal;
+        NeededQty: Decimal;
+    begin
+        MagentoSetup.Get();
+        if not MagentoSetup."Auto Transfer Order Enabled" then
+            exit;
+
+        StockQty := CalcStockQtyNEW(SalesLine."No.", SalesLine."Variant Code", SalesLine."Location Code");
+
+        if MagentoSetup."Include Projected Quantities" then
+            StockQty += SalesLine.Quantity;
+
+        if StockQty < 0 then
+            StockQty := 0;
+
+        NeededQty := StockQty - SalesLine.Quantity;
+        if NeededQty < 0 then
+            CreateTransferOrders(SalesLine, Abs(NeededQty));
+    end;
+
+    local procedure CalcStockQtyNEW(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text): Decimal
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        VariantStockQty: Decimal;
+        StockQty: Decimal;
+    begin
+        Item.Get(ItemNo);
+        VariantFilter := UpperCase(VariantFilter);
+        LocationFilter := UpperCase(LocationFilter);
+
+        if VariantFilter <> '' then begin
+            Item.SetFilter("Variant Filter", VariantFilter);
+            Item.SetFilter("Location Filter", LocationFilter);
+            exit(CalcInventory(Item));
+        end;
+
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if ItemVariant.FindSet() then begin
+            StockQty := 0;
+            VariantStockQty := 0;
+            repeat
+                Item.SetFilter("Variant Filter", ItemVariant.Code);
+                Item.SetFilter("Location Filter", LocationFilter);
+                VariantStockQty := CalcInventory(Item);
+                StockQty += VariantStockQty;
+            until ItemVariant.Next() = 0;
+
+            exit(StockQty);
+        end;
+
+        Item.SetFilter("Location Filter", LocationFilter);
+        exit(CalcInventory(Item));
+    end;
+
+    local procedure CalcInventory(var Item: Record Item): Decimal
+    var
+        ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
+        GrossRequirement: Decimal;
+        PlannedOrderRcpt: Decimal;
+        ScheduledRcpt: Decimal;
+        PlannedOrderReleases: Decimal;
+        ProjAvailableBalance: Decimal;
+        ExpectedInventory: Decimal;
+        QtyAvailable: Decimal;
+    begin
+        if MagentoSetup."Include Projected Quantities" then begin
+            MagentoSetup.TestField("Projected. Qty. Within Period");
+            Item.Setrange("Date Filter", 0D, CalcDate(MagentoSetup."Projected. Qty. Within Period", WorkDate()));
+            ItemAvailFormsMgt.CalcAvailQuantities(Item, true, GrossRequirement, PlannedOrderRcpt, ScheduledRcpt, PlannedOrderReleases, ProjAvailableBalance, ExpectedInventory, QtyAvailable);
+            exit(ProjAvailableBalance);
+        end;
+
+        Item.CalcFields(Inventory);
+        exit(Item.Inventory);
+    end;
+
+    local procedure CreateTransferOrders(SalesLine: Record "Sales Line"; NeededQty: Decimal)
+    var
+        Item: Record Item;
+        ReplenishmentTransferMapping: Record "NPR Ret. Repl. Transfer Mapp.";
+        ReqWkshTemplate: Record "Req. Wksh. Template";
+        RequisitionLine: Record "Requisition Line";
+        AvailableQty: Decimal;
+        LineNo: Integer;
+        ReplTransferMappingCount: Integer;
+    begin
+        ReplenishmentTransferMapping.SetCurrentKey("To Location", Priority);
+        ReplenishmentTransferMapping.SetRange("To Location", SalesLine."Location Code");
+        ReplTransferMappingCount := ReplenishmentTransferMapping.Count();
+        if (ReplTransferMappingCount = 0) and (not MagentoSetup."Auto Create Req. Lines") then
+            Error(Error005, SalesLine."Location Code");
+
+        if ReplTransferMappingCount > 0 then begin
+            ReplenishmentTransferMapping.FindSet();
+            repeat
+                AvailableQty := CalcStockQtyNEW(SalesLine."No.", SalesLine."Variant Code", ReplenishmentTransferMapping."From Location");
+                if AvailableQty > 0 then
+                    if AvailableQty > NeededQty then begin
+                        CreateTransferOrder(ReplenishmentTransferMapping."To Location", ReplenishmentTransferMapping."From Location", SalesLine."Document No.", SalesLine."No.", SalesLine."Variant Code", NeededQty);
+                        NeededQty := 0;
+                    end else begin
+                        CreateTransferOrder(ReplenishmentTransferMapping."To Location", ReplenishmentTransferMapping."From Location", SalesLine."Document No.", SalesLine."No.", SalesLine."Variant Code", AvailableQty);
+                        NeededQty -= AvailableQty;
+                    end;
+            until (ReplenishmentTransferMapping.Next() = 0) or (NeededQty = 0);
+        end;
+
+        if (NeededQty > 0) and MagentoSetup."Auto Create Req. Lines" then begin
+            Item.Get(SalesLine."No.");
+            If Item."Replenishment System" = Item."Replenishment System"::"Prod. Order" then
+                exit;
+
+            MagentoSetup.TestField("Req. Worsheet Template Code");
+            MagentoSetup.TestField("Req. Worsheet Jnl. Batch Name");
+            ReqWkshTemplate.Get(MagentoSetup."Req. Worsheet Template Code");
+
+            RequisitionLine.SetRange("Worksheet Template Name", ReqWkshTemplate.Name);
+            RequisitionLine.SetRange("Journal Batch Name", MagentoSetup."Req. Worsheet Jnl. Batch Name");
+            if RequisitionLine.FindLast() then;
+            LineNo := RequisitionLine."Line No." + 10000;
+
+            RequisitionLine.SetRange(Type, RequisitionLine.Type::Item);
+            RequisitionLine.SetRange("No.", SalesLine."No.");
+            RequisitionLine.SetRange("Location Code", SalesLine."Location Code");
+            RequisitionLine.SetRange("Variant Code", SalesLine."Variant Code");
+            if RequisitionLine.FindFirst() then begin
+                RequisitionLine.Validate(RequisitionLine.Quantity, RequisitionLine.Quantity + NeededQty);
+                RequisitionLine.Modify();
+            end else begin
+                RequisitionLine.Init();
+                RequisitionLine."Worksheet Template Name" := ReqWkshTemplate.Name;
+                RequisitionLine."Journal Batch Name" := MagentoSetup."Req. Worsheet Jnl. Batch Name";
+                RequisitionLine."Line No." := LineNo;
+                RequisitionLine.Validate(Type, RequisitionLine.Type::Item);
+                RequisitionLine.Validate("No.", SalesLine."No.");
+                RequisitionLine.Validate("Location Code", SalesLine."Location Code");
+                RequisitionLine.Validate("Variant Code", SalesLine."Variant Code");
+                RequisitionLine.Validate(Quantity, NeededQty);
+                RequisitionLine.Validate("Vendor No.", Item."Vendor No.");
+                RequisitionLine."Vendor Item No." := Item."Vendor Item No.";
+                RequisitionLine.Validate("Replenishment System", Item."Replenishment System");
+                RequisitionLine.Insert();
+            end;
+        end;
+    end;
+
+    local procedure CreateTransferOrder(ToCode: Code[10]; FromCode: Code[10]; OrderNo: Code[20]; ItemNo: Code[20]; VariantCode: Code[20]; NeededQty: Decimal)
+    var
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        InvtSetup: Record "Inventory Setup";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        LineNo: Integer;
+    begin
+        TransferHeader.SetRange("Transfer-from Code", FromCode);
+        TransferHeader.SetRange("Transfer-to Code", ToCode);
+        TransferHeader.SetRange("External Document No.", OrderNo);
+        if not TransferHeader.FindFirst() then begin
+            InvtSetup.Get();
+            InvtSetup.TestField("Transfer Order Nos.");
+            TransferHeader.Init();
+            TransferHeader."No." := NoSeriesMgt.GetNextNo(InvtSetup."Transfer Order Nos.", WorkDate(), true);
+            TransferHeader.Validate("External Document No.", OrderNo);
+            TransferHeader.Validate("Transfer-from Code", FromCode);
+            TransferHeader.Validate("Transfer-to Code", ToCode);
+            TransferHeader.Validate("Shipment Date", WorkDate());
+            TransferHeader."Posting Date" := WorkDate();
+            TransferHeader.Insert();
+        end;
+
+        TransferLine.SetRange("Document No.", TransferHeader."No.");
+        if TransferLine.FindLast() then;
+        LineNo := TransferLine."Line No." + 10000;
+
+        TransferLine.SetRange("Item No.", ItemNo);
+        TransferLine.SetRange("Variant Code", VariantCode);
+        if not TransferLine.FindFirst() then begin
+            TransferLine.Init();
+            TransferLine."Document No." := TransferHeader."No.";
+            TransferLine."Line No." := LineNo;
+            TransferLine.Validate("Item No.", ItemNo);
+            TransferLine.Validate(Quantity, NeededQty);
+            TransferLine.Validate("Variant Code", VariantCode);
+            TransferLine.Insert(true);
+        end else begin
+            TransferLine.Quantity += NeededQty;
+            TransferLine.Modify(true);
+        end;
+    end;
 
     local procedure InsertSalesLineFee(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
