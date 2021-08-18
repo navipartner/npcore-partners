@@ -321,9 +321,9 @@ codeunit 6060136 "NPR MM Member Notification"
             Commit();
             repeat
 
-                SendStatus := MemberNotificationEntry2."Notification Send Status"::FAILED;
-
                 MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
+
+                SendStatus := MemberNotificationEntry2."Notification Send Status"::FAILED;
                 MemberNotificationEntry2."Notification Send Status" := SendStatus;
                 MemberNotificationEntry2."Notification Sent At" := CurrentDateTime();
                 MemberNotificationEntry2."Notification Sent By User" := CopyStr(UserId, 1, MaxStrLen(MemberNotificationEntry2."Notification Sent By User"));
@@ -331,60 +331,54 @@ codeunit 6060136 "NPR MM Member Notification"
                 MemberNotificationEntry2.Modify();
                 Commit();
 
-                case MemberNotificationEntry."Notification Method" of
-                    MemberNotificationEntry."Notification Method"::NONE:
+                case MemberNotificationEntry2."Notification Method" of
+                    MemberNotificationEntry2."Notification Method"::NONE:
                         begin
                             SendStatus := MemberNotificationEntry2."Notification Send Status"::NOT_SENT;
                         end;
 
-                    MemberNotificationEntry."Notification Method"::EMAIL:
+                    MemberNotificationEntry2."Notification Method"::EMAIL:
                         begin
-
-                            if (MemberNotificationEntry."Include NP Pass") then begin
-                                CreateNpPass(MemberNotificationEntry);
-                                MemberNotificationEntry.Modify();
-                                if (MemberNotificationEntry."Notification Trigger" = MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
+                            if (MemberNotificationEntry2."Include NP Pass") then begin
+                                CreateNpPass(MemberNotificationEntry2);
+                                MemberNotificationEntry2.Modify();
+                                if (MemberNotificationEntry2."Notification Trigger" = MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
 
-                            if (MemberNotificationEntry."Notification Trigger" <> MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
-                                if (SendMail(MemberNotificationEntry, ResponseMessage)) then
+                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
+                                if (SendMail(MemberNotificationEntry2, ResponseMessage)) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
-
                         end;
 
-                    MemberNotificationEntry."Notification Method"::SMS:
+                    MemberNotificationEntry2."Notification Method"::SMS:
                         begin
-
-                            if (MemberNotificationEntry."Include NP Pass") then begin
-                                CreateNpPass(MemberNotificationEntry);
-                                MemberNotificationEntry.Modify();
-                                if (MemberNotificationEntry."Notification Trigger" = MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
+                            if (MemberNotificationEntry2."Include NP Pass") then begin
+                                CreateNpPass(MemberNotificationEntry2);
+                                MemberNotificationEntry2.Modify();
+                                if (MemberNotificationEntry2."Notification Trigger" = MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
 
-                            if (MemberNotificationEntry."Notification Trigger" <> MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
-                                if (SendSMS(MemberNotificationEntry, ResponseMessage)) then
+                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
+                                if (SendSMS(MemberNotificationEntry2, ResponseMessage)) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
-
                         end;
 
-                    MemberNotificationEntry."Notification Method"::MANUAL:
+                    MemberNotificationEntry2."Notification Method"::MANUAL:
                         begin
-
-                            if (MemberNotificationEntry."Include NP Pass") then begin
-                                CreateNpPass(MemberNotificationEntry);
-                                MemberNotificationEntry.Modify();
+                            if (MemberNotificationEntry2."Include NP Pass") then begin
+                                CreateNpPass(MemberNotificationEntry2);
+                                MemberNotificationEntry2.Modify();
                             end;
 
                             SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                         end;
 
                     else
-                        Error(NOT_IMPLEMENTED, MemberNotificationEntry.FieldCaption("Notification Method"), MemberNotificationEntry."Notification Method");
+                        Error(NOT_IMPLEMENTED, MemberNotificationEntry2.FieldCaption("Notification Method"), MemberNotificationEntry2."Notification Method");
                 end;
 
-                MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
                 MemberNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(MemberNotificationEntry2."Failed With Message"));
                 MemberNotificationEntry2."Notification Send Status" := SendStatus;
                 MemberNotificationEntry2.Modify();
