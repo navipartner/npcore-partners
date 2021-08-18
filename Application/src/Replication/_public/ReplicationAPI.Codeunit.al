@@ -115,8 +115,10 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
                 ErrLog.InsertLog(ServiceEndPoint."Service Code", ServiceEndPoint."EndPoint ID", Method, URI, Response);
                 Exit;
             end else begin
-                InsertImportEntry(ImportEntry, ImportType.Code, BatchId, Response, ServiceEndPoint);
-                Commit();
+                IF Not SkipImportEntryCreationForNoDataResponse(ServiceEndPoint, Response) then begin
+                    InsertImportEntry(ImportEntry, ImportType.Code, BatchId, Response, ServiceEndPoint);
+                    Commit();
+                end;
             end;
         until NextLinkURI = ''; // for handling pagination
     end;
@@ -149,6 +151,17 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             RecRef.SetTable(ImportEntry);
         end;
         ImportEntry.Insert(true);
+    end;
+
+    local procedure SkipImportEntryCreationForNoDataResponse(ServiceEndPoint: Record "NPR Replication Endpoint"; Response: Codeunit "Temp Blob"): Boolean
+    var
+        EndPoint: Interface "NPR Replication IEndpoint Meth";
+    begin
+        IF Not ServiceEndPoint."Skip Import Entry No Data Resp" then
+            exit(false);
+
+        EndPoint := ServiceEndPoint."Endpoint Method";
+        Exit(NOT EndPoint.CheckResponseContainsData(Response));
     end;
 
     procedure RegisterNcImportType(ImportTypeCode: Code[20])
@@ -274,14 +287,14 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         Page.Run(0, JobQueueEntry);
     end;
 
-    procedure VerifyServiceURL(var ServiceURL: Text)
+    procedure VerifyServiceURL(ServiceURL: Text) NewServiceURL: Text;
     var
         WebRequestHelper: codeunit "Web Request Helper";
     begin
         if ServiceURL = '' then
             exit;
         WebRequestHelper.IsValidUri(ServiceURL);
-        ServiceURL := ServiceURL.TrimEnd('/');
+        NewServiceURL := ServiceURL.TrimEnd('/');
     end;
 
     procedure UpdateReplicationCounter(JTokenEntity: JsonToken; ReplicationEndPoint: Record "NPR Replication Endpoint")
@@ -446,12 +459,27 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     end;
 
     procedure GetBCAPIResponse(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; URI: Text; var NextLinkURI: Text)
+    begin
+        // method to get main api response
+        GetBCAPIResponse(ReplicationSetup, ReplicationEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI, false);
+    end;
+
+    procedure GetBCAPIResponseImage(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; URI: Text)
+    var
+        DummyMethod: Code[10];
+        DummyNextLinkURL: Text;
+    begin
+        // method to get api response for image url
+        GetBCAPIResponse(ReplicationSetup, ReplicationEndPoint, Client, Response, StatusCode, DummyMethod, URI, DummyNextLinkURL, true);
+    end;
+
+    procedure GetBCAPIResponse(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; URI: Text; var NextLinkURI: Text; ImportImageRequest: Boolean)
     var
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
         OutStr: OutStream;
-        ResponseText: Text;
+        ResponseStream: InStream;
         iAuth: Interface "NPR Replication API IAuthorization";
         ErrorTxt: Text;
         JTokenMainObject: JsonToken;
@@ -464,19 +492,21 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
         Headers.Add('Authorization', iAuth.GetAuthorizationValue(ReplicationSetup));
-        Headers.Add('Prefer', 'odata.maxpagesize=' + Format(GetODataMaxPageSize(ReplicationEndPoint)));
+
+        IF Not ImportImageRequest then
+            Headers.Add('Prefer', 'odata.maxpagesize=' + Format(GetODataMaxPageSize(ReplicationEndPoint)));
 
         IF not IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt, StatusCode) then begin
             CreateInternalErrorResponse('internal_bc_error', ErrorTxt, Response);
             exit;
         end;
 
-        ResponseMessage.Content.ReadAs(ResponseText);
-        IF JTokenMainObject.ReadFrom(ResponseText) then
-            NextLinkURI := SelectJsonToken(JTokenMainObject.AsObject(), '$.[''@odata.nextLink'']', true); // get NextLink if there is a next page
+        ResponseMessage.Content.ReadAs(ResponseStream);
         Clear(Response);
         Response.CreateOutStream(OutStr);
-        OutStr.WriteText(ResponseText);
+        CopyStream(OutStr, ResponseStream);
+        IF JTokenMainObject.ReadFrom(ResponseStream) then
+            NextLinkURI := SelectJsonToken(JTokenMainObject.AsObject(), '$.[''@odata.nextLink'']', true); // get NextLink if there is a next page                                                                                                
     end;
 
     procedure CheckFieldValue(RecRef: RecordRef; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean) ValueChanged: Boolean

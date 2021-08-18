@@ -29,7 +29,7 @@ table 6014589 "NPR Replication Endpoint"
             trigger OnValidate()
             begin
                 Rec.TestField(Enabled, false);
-                Path := Path.TrimEnd('/');
+                Path := CopyStr(Path.TrimEnd('/'), 1, MaxStrLen(Path));
             end;
         }
 
@@ -68,6 +68,17 @@ table 6014589 "NPR Replication Endpoint"
             Caption = 'Odata Max Page Size';
         }
 
+        field(17; "Skip Import Entry No Data Resp"; Boolean)
+        {
+            Caption = 'Skip Import Entry No Data Response';
+            DataClassification = CustomerContent;
+            InitValue = true;
+            trigger OnValidate()
+            begin
+                Rec.TestField(Enabled, false);
+            end;
+        }
+
         field(20; "Replication Counter"; BigInteger)
         {
             DataClassification = CustomerContent;
@@ -99,7 +110,7 @@ table 6014589 "NPR Replication Endpoint"
         Rec.TestField(Enabled, false);
     end;
 
-    procedure RegisterServiceEndPoint(pServiceCode: Code[20]; pEndPointID: Text; pPath: Text; pDescription: Text; pEnabled: Boolean; pSeqOrder: Integer; pEndPointMethod: Enum "NPR Replication EndPoint Meth"; pReplicationCounter: BigInteger; pOdataMaxPageSize: Integer)
+    procedure RegisterServiceEndPoint(pServiceCode: Code[20]; pEndPointID: Text[50]; pPath: Text[250]; pDescription: Text[100]; pEnabled: Boolean; pSeqOrder: Integer; pEndPointMethod: Enum "NPR Replication EndPoint Meth"; pReplicationCounter: BigInteger; pOdataMaxPageSize: Integer)
     begin
         Rec."Service Code" := pServiceCode;
         Rec."EndPoint ID" := pEndPointID;
@@ -114,6 +125,7 @@ table 6014589 "NPR Replication Endpoint"
         Rec."Endpoint Method" := pEndPointMethod;
         Rec."odata.maxpagesize" := pOdataMaxPageSize;
         Rec."Replication Counter" := pReplicationCounter;
+        Rec."Skip Import Entry No Data Resp" := true;
 
         OnRegisterServiceEndPointOnBeforeInsert();
 

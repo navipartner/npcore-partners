@@ -47,23 +47,23 @@ codeunit 6014604 "NPR Rep. Get Item References" implements "NPR Replication IEnd
         ItemReference: Record "Item Reference";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        ItemNo: Text;
-        VariantCode: Text;
-        UOMCode: Text;
+        ItemNo: Code[20];
+        VariantCode: Code[10];
+        UOMCode: Code[10];
         ReferenceType: ENUM "Item Reference Type";
-        ReferenceTypeNo: Text;
-        ReferenceNo: Text;
+        ReferenceTypeNo: Code[20];
+        ReferenceNo: Code[50];
         ItemReferenceId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        ItemNo := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.itemNo');
-        VariantCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.variantCode');
-        UOMCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.unitofMeasure');
+        ItemNo := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.itemNo'), 1, MaxStrLen(ItemNo));
+        VariantCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.variantCode'), 1, MaxStrLen(VariantCode));
+        UOMCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.unitofMeasure'), 1, MaxStrLen(UOMCode));
         IF Evaluate(ReferenceType, ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.referenceType')) then;
-        ReferenceTypeNo := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.referenceTypeNo');
-        ReferenceNo := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.referenceNo');
+        ReferenceTypeNo := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.referenceTypeNo'), 1, MaxStrLen(ReferenceTypeNo));
+        ReferenceNo := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.referenceNo'), 1, MaxStrLen(ReferenceNo));
         ItemReferenceId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF ItemReferenceId <> '' then
@@ -115,7 +115,7 @@ codeunit 6014604 "NPR Rep. Get Item References" implements "NPR Replication IEnd
         end;
     end;
 
-    local procedure InsertNewRec(var ItemReference: Record "Item Reference"; ItemNo: Text; VariantCode: Text; UOMCode: text; ReferenceType: Enum "Item Reference Type"; ReferenceTypeNo: Text; ReferenceNo: Text; ReferenceId: text)
+    local procedure InsertNewRec(var ItemReference: Record "Item Reference"; ItemNo: Code[20]; VariantCode: Code[10]; UOMCode: Code[10]; ReferenceType: Enum "Item Reference Type"; ReferenceTypeNo: Code[20]; ReferenceNo: Code[50]; ReferenceId: text)
     begin
         ItemReference.Init();
         ItemReference."Item No." := ItemNo;
@@ -136,6 +136,21 @@ codeunit 6014604 "NPR Rep. Get Item References" implements "NPR Replication IEnd
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

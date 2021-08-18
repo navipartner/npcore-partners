@@ -47,15 +47,15 @@ codeunit 6014606 "NPR Rep. Get Item UOM" implements "NPR Replication IEndpoint M
         ItemUOM: Record "Item Unit of Measure";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        ItemNo: Text;
-        UOMCode: Text;
+        ItemNo: Code[20];
+        UOMCode: Code[10];
         ItemUOMId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        ItemNo := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.itemNumber');
-        UOMCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        ItemNo := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.itemNumber'), 1, MaxStrLen(ItemNo));
+        UOMCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(UOMCode));
         ItemUOMId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
 
         IF ItemUOMId <> '' then
@@ -112,7 +112,7 @@ codeunit 6014606 "NPR Rep. Get Item UOM" implements "NPR Replication IEndpoint M
         end;
     end;
 
-    local procedure InsertNewRec(var ItemUOM: Record "Item Unit of Measure"; ItemNo: Text; UOMCode: Text; ItemUOMId: text)
+    local procedure InsertNewRec(var ItemUOM: Record "Item Unit of Measure"; ItemNo: Code[20]; UOMCode: Code[10]; ItemUOMId: text)
     begin
         ItemUOM.Init();
         ItemUOM."Item No." := ItemNo;
@@ -129,6 +129,21 @@ codeunit 6014606 "NPR Rep. Get Item UOM" implements "NPR Replication IEndpoint M
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

@@ -47,7 +47,7 @@ codeunit 6014656 "NPR Rep. Get Periodic Disc." implements "NPR Replication IEndp
         PeriodicDiscount: Record "NPR Period Discount";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        DiscountCode: Text;
+        DiscountCode: Code[20];
         DiscountId: Text;
         JArrayLines: JsonArray;
         JTokenLine: JsonToken;
@@ -56,7 +56,7 @@ codeunit 6014656 "NPR Rep. Get Periodic Disc." implements "NPR Replication IEndp
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        DiscountCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        DiscountCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(DiscountCode));
         DiscountId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF DiscountId <> '' then
@@ -89,14 +89,14 @@ codeunit 6014656 "NPR Rep. Get Periodic Disc." implements "NPR Replication IEndp
         PeriodicDiscountLine: Record "NPR Period Discount Line";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        DiscountCode: Text;
-        ItemNo: Text;
-        VariantCode: Text;
+        DiscountCode: Code[20];
+        ItemNo: Code[20];
+        VariantCode: Code[10];
         DiscountLineId: Text;
     begin
-        DiscountCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
-        ItemNo := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.itemNo');
-        VariantCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.variantCode');
+        DiscountCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(DiscountCode));
+        ItemNo := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.itemNo'), 1, MaxStrLen(ItemNo));
+        VariantCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.variantCode'), 1, MaxStrLen(VariantCode));
         DiscountLineId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF PeriodicDiscountLine.GetBySystemId(DiscountLineId) then begin
@@ -280,7 +280,7 @@ codeunit 6014656 "NPR Rep. Get Periodic Disc." implements "NPR Replication IEndp
         end;
     end;
 
-    local procedure InsertNewRec(var PeriodicDiscount: Record "NPR Period Discount"; DiscountCode: Text; DiscountId: text)
+    local procedure InsertNewRec(var PeriodicDiscount: Record "NPR Period Discount"; DiscountCode: Code[20]; DiscountId: text)
     begin
         PeriodicDiscount.Init();
         PeriodicDiscount.Code := DiscountCode;
@@ -293,7 +293,7 @@ codeunit 6014656 "NPR Rep. Get Periodic Disc." implements "NPR Replication IEndp
             PeriodicDiscount.Insert(false);
     end;
 
-    local procedure InsertNewRecLine(var PeriodicDiscountLine: Record "NPR Period Discount Line"; DiscountCode: Text; ItemCode: Text; VariantCode: Text; DiscountLineId: text)
+    local procedure InsertNewRecLine(var PeriodicDiscountLine: Record "NPR Period Discount Line"; DiscountCode: Code[20]; ItemCode: Code[20]; VariantCode: Code[10]; DiscountLineId: text)
     begin
         PeriodicDiscountLine.Init();
         PeriodicDiscountLine.Code := DiscountCode;
@@ -311,6 +311,21 @@ codeunit 6014656 "NPR Rep. Get Periodic Disc." implements "NPR Replication IEndp
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

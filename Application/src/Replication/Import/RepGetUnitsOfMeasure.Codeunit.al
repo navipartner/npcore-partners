@@ -47,13 +47,13 @@ codeunit 6014605 "NPR Rep. Get Units Of Measure" implements "NPR Replication IEn
         UOM: Record "Unit of Measure";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        UOMCode: Text;
+        UOMCode: Code[10];
         UOMId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        UOMCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        UOMCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(UOMCode));
         UOMId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
 
         IF UOMId <> '' then
@@ -100,7 +100,7 @@ codeunit 6014605 "NPR Rep. Get Units Of Measure" implements "NPR Replication IEn
             RecRef.SetTable(UOM);
     end;
 
-    local procedure InsertNewRec(var UOM: Record "Unit of Measure"; UOMCode: Text; UOMId: text)
+    local procedure InsertNewRec(var UOM: Record "Unit of Measure"; UOMCode: Code[10]; UOMId: text)
     begin
         UOM.Init();
         UOM.Code := UOMCode;
@@ -116,6 +116,21 @@ codeunit 6014605 "NPR Rep. Get Units Of Measure" implements "NPR Replication IEn
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

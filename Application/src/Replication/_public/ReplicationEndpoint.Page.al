@@ -49,6 +49,13 @@ page 6014504 "NPR Replication Endpoint"
                     ToolTip = 'Specifies the maximum number of records per page returned by the endpoint request.';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Skip Import Entry No Data Resp"; Rec."Skip Import Entry No Data Resp")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if Import Entry creation will be skipped in case the response contains no new or modified records to be replicated.';
+                }
+
                 field(Enabled; Rec.Enabled)
                 {
                     ToolTip = 'Specifies if the Endpoint is Enabled. If Disabled system will not execute import for this record.';
