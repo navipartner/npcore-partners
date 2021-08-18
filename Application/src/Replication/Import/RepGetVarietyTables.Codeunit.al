@@ -46,15 +46,15 @@ codeunit 6014648 "NPR Rep. Get Variety Tables" implements "NPR Replication IEndp
         VarietyTable: Record "NPR Variety Table";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        VarietyTableType: Text;
-        VarietyTableCode: Text;
+        VarietyTableType: Code[10];
+        VarietyTableCode: Code[40];
         VarietyTableId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        VarietyTableType := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.type');
-        VarietyTableCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        VarietyTableType := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.type'), 1, MaxStrLen(VarietyTableType));
+        VarietyTableCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(VarietyTableCode));
         VarietyTableId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF VarietyTableId <> '' then
@@ -114,7 +114,7 @@ codeunit 6014648 "NPR Rep. Get Variety Tables" implements "NPR Replication IEndp
         end;
     end;
 
-    local procedure InsertNewRec(var VarietyTable: Record "NPR Variety Table"; VarietyTableType: Text; VarietyTableCode: Text; VarietyTableId: text)
+    local procedure InsertNewRec(var VarietyTable: Record "NPR Variety Table"; VarietyTableType: Code[10]; VarietyTableCode: Code[40]; VarietyTableId: text)
     begin
         VarietyTable.Init();
         VarietyTable.Type := VarietyTableType;
@@ -131,6 +131,21 @@ codeunit 6014648 "NPR Rep. Get Variety Tables" implements "NPR Replication IEndp
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

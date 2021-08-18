@@ -4,6 +4,7 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
 
     var
         DefaultFileNameLbl: Label 'GetCustomers_%1', Comment = '%1=Current Date and Time';
+        ImageCouldNotBeReadErr: Label 'Image for Customer %1 could not be read. Please check Replication Error Log Entry No. %2 for more details';
 
     procedure SendRequest(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; var URI: Text; var NextLinkURI: Text)
     var
@@ -48,13 +49,13 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
         Customer: Record Customer;
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        CustNo: Text;
+        CustNo: Code[20];
         CustId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        CustNo := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.number');
+        CustNo := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.number'), 1, MaxStrLen(CustNo));
         CustId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
 
         IF CustId <> '' then
@@ -69,13 +70,14 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
             IF NOT Customer.Get(CustNo) then
                 InsertNewRec(Customer, CustNo, CustId);
 
-        IF CheckFieldsChanged(Customer, JToken) then
+        IF CheckFieldsChanged(Customer, JToken, ReplicationEndPoint) then
             Customer.Modify(true);
     end;
 
-    local procedure CheckFieldsChanged(var Customer: Record Customer; JToken: JsonToken) FieldsChanged: Boolean
+    local procedure CheckFieldsChanged(var Customer: Record Customer; JToken: JsonToken; ReplicationEndPoint: Record "NPR Replication Endpoint") FieldsChanged: Boolean
     var
         ReplicationAPI: Codeunit "NPR Replication API";
+        PictureJToken: JsonToken;
     begin
         IF CheckFieldValue(Customer, Customer.FieldNo(Name), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.displayName'), true) then
             FieldsChanged := true;
@@ -251,6 +253,10 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
         IF CheckFieldValue(Customer, Customer.FieldNo("NPR To Anonymize On"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.nprToAnonymizeOn'), false) then
             FieldsChanged := true;
 
+        IF STRPOS(ReplicationEndPoint.Path, 'picture') > 0 then
+            IF JToken.SelectToken('$.picture', PictureJToken) then
+                If CheckImage(PictureJToken, Customer, ReplicationEndPoint) then
+                    FieldsChanged := true;
     end;
 
     local procedure CheckFieldValue(var Customer: Record Customer; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean): Boolean
@@ -268,7 +274,91 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
         end;
     end;
 
-    local procedure InsertNewRec(var Customer: Record Customer; CustNo: Text; CustId: text)
+    local procedure CheckImage(PictureJToken: JsonToken; var Customer: Record Customer; ReplicationEndPoint: Record "NPR Replication Endpoint"): Boolean
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        ErrLog: Record "NPR Replication Error Log";
+        TempCust: Record Customer temporary;
+        ReplicationAPI: Codeunit "NPR Replication API";
+        Response: Codeunit "Temp Blob";
+        Client: HttpClient;
+        StatusCode: Integer;
+        NewImageIStr: InStream;
+        TempBlobNewImage: Codeunit "Temp Blob";
+        TempBlobExistingImage: Codeunit "Temp Blob";
+        NewImageURL: Text;
+        MimeType: Text;
+        ImageWidth: Integer;
+        ImageHeight: Integer;
+    begin
+        NewImageURL := ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.[''pictureContent@odata.mediaReadLink'']');
+        IF NewImageURL = '' then
+            Exit(false);
+
+        IF EValuate(ImageWidth, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.width')) then;
+        IF Evaluate(ImageHeight, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.height')) then;
+        MimeType := ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.contentType');
+
+        IF (ImageWidth > 0) AND (ImageHeight > 0) and (MimeType <> '') then begin
+            ServiceSetup.Get(ReplicationEndPoint."Service Code");
+            ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, NewImageURL);
+
+            IF ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then begin
+                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', NewImageURL, Response);
+                Commit();
+                Error(ImageCouldNotBeReadErr, Customer."No.", ErrLog."Entry No.");
+            end;
+
+            Response.CreateInStream(NewImageIStr);
+            UpdateImage(TempCust, NewImageIStr, MimeType);
+            ReadImage(TempCust, TempBlobNewImage); // if use directly the InStream data(without read from temptable) sometimes the hash of 2 same png images is different.
+            ReadImage(Customer, TempBlobExistingImage);
+
+            If GetImageHash(TempBlobNewImage) <> GetImageHash(TempBlobExistingImage) then begin
+                UpdateImage(Customer, NewImageIStr, MimeType);
+                Exit(true);
+            end;
+        end else begin // no image
+            if Customer.Image.HasValue THEN begin
+                Clear(Customer.Image); // remove existing image
+                Exit(true);
+            end;
+        end;
+
+        exit(false);
+    end;
+
+    local procedure ReadImage(var Customer: Record Customer; var TempBlob: Codeunit "Temp Blob")
+    var
+        OStr: OutStream;
+
+    begin
+        IF Customer.Image.HasValue then begin
+            TempBlob.CreateOutStream(OStr);
+            Customer.Image.ExportStream(OStr);
+        end;
+    end;
+
+    local procedure UpdateImage(var Customer: Record Customer; IStr: InStream; MimeType: Text)
+    begin
+        Clear(Customer.Image);
+        Customer.Image.ImportStream(IStr, Customer.Name, MimeType);
+    end;
+
+    local procedure GetImageHash(var TempBlob: Codeunit "Temp Blob"): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        Crypto: Codeunit "Cryptography Management";
+        IStr: InStream;
+    begin
+        IF NOT TempBlob.HasValue() then
+            exit('');
+
+        TempBlob.CreateInStream(IStr);
+        Exit(Crypto.GenerateHash(Base64Convert.ToBase64(IStr), 2));
+    end;
+
+    local procedure InsertNewRec(var Customer: Record Customer; CustNo: Text[20]; CustId: text)
     begin
         Customer.Init();
         Customer."No." := CustNo;
@@ -284,6 +374,21 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

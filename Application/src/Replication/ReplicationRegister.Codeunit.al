@@ -90,6 +90,24 @@ codeunit 6014608 "NPR Replication Register"
         SalePriceListLinesEndPointDescriptionLbl: Label 'Gets Sales Price List Lines from related company.', Locked = true;
 
         SalePriceListLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/priceListLines/?$filter=(priceType eq Microsoft.NAV.priceType''Sale'') and (replicationCounter gt %2)&$orderby=replicationCounter$schemaVersion=2.0', Locked = true;
+
+        SalespersonsPurchasersEndPointIDLbl: Label 'GetSalespersons/Purchasers', Locked = true;
+
+        SalespersonsPurchasersEndPointDescriptionLbl: Label 'Gets Salespersons/Purchasers from related company.', Locked = true;
+
+        SalespersonsPurchasersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/salespersonsPurchasers/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        CustPriceGroupsEndPointIDLbl: Label 'GetCustPriceGroups', Locked = true;
+
+        CustPriceGroupsEndPointDescriptionLbl: Label 'Gets Customer Price Groups from related company.', Locked = true;
+
+        CustPriceGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/custPriceGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        CustDiscGroupsEndPointIDLbl: Label 'GetCustDiscountGroups', Locked = true;
+
+        CustDiscGroupsEndPointDescriptionLbl: Label 'Gets Customer Discount Groups from related company.', Locked = true;
+
+        CustDiscGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/custDiscountGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         #endregion
 
         #region NP RETAIL endpoints data
@@ -105,6 +123,9 @@ codeunit 6014608 "NPR Replication Register"
 
         MixedDiscountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscounts/?$expand=mixedDiscountTimeIntervals,mixedDiscountLevels,mixedDiscountLines&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
+        #endregion
+
+        #region DIMENSIONS endpoints data
         DimensionsEndPointIDLbl: Label 'GetDimensions', Locked = true;
 
         DimensionsEndPointDescriptionLbl: Label 'Gets Dimensions from related company.', Locked = true;
@@ -116,6 +137,13 @@ codeunit 6014608 "NPR Replication Register"
         DimensionValuesEndPointDescriptionLbl: Label 'Gets Dimension Values from related company.', Locked = true;
 
         DimensionValuesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/dimensionValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        DefaultDimensionsEndPointIDLbl: Label 'GetDefaultDimensions', Locked = true;
+
+        DefaultDimensionsEndPointDescriptionLbl: Label 'Gets Default Dimensions from related company.', Locked = true;
+
+        DefaultDimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/defaultDimensions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
     #endregion
 
     #region Register Service with EndPoints
@@ -232,6 +260,12 @@ codeunit 6014608 "NPR Replication Register"
         if ServiceSetup.IsEmpty() then
             exit;
 
+        ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, CustPriceGroupsEndPointIDLbl, CustPriceGroupsPathLbl,
+                            CustPriceGroupsEndPointDescriptionLbl, true, 400, "NPR Replication EndPoint Meth"::"Get Customer Price Groups", 0, 1000);
+
+        ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, CustDiscGroupsEndPointIDLbl, CustDiscGroupsPathLbl,
+                            CustDiscGroupsEndPointDescriptionLbl, true, 410, "NPR Replication EndPoint Meth"::"Get Customer Discount Groups", 0, 1000);
+
         ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, CustomersEndPointIDLbl, CustomersPathLbl,
                             CustomersEndPointDescriptionLbl, true, 500, "NPR Replication EndPoint Meth"::"Get Customers", 0, 1000);
 
@@ -240,6 +274,9 @@ codeunit 6014608 "NPR Replication Register"
 
         ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, SalePriceListLinesEndPointIDLbl, SalePriceListLinesPathLbl,
                             SalePriceListLinesEndPointDescriptionLbl, true, 610, "NPR Replication EndPoint Meth"::"Get Price List Lines", 0, 10000);
+
+        ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, SalespersonsPurchasersEndPointIDLbl, SalespersonsPurchasersPathLbl,
+                            SalespersonsPurchasersEndPointDescriptionLbl, true, 700, "NPR Replication EndPoint Meth"::"Get Salespersons/Purchasers", 0, 10000);
 
         OnAfterRegisterServiceEndPoint(ServiceEndPoint);
     end;
@@ -276,6 +313,9 @@ codeunit 6014608 "NPR Replication Register"
 
         ServiceEndPoint.RegisterServiceEndPoint(DimensionsServiceCodeLbl, DimensionValuesEndPointIDLbl, DimensionValuesPathLbl,
                            DimensionValuesEndPointDescriptionLbl, true, 150, "NPR Replication EndPoint Meth"::"Get Dimension Values", 0, 1000);
+
+        ServiceEndPoint.RegisterServiceEndPoint(DimensionsServiceCodeLbl, DefaultDimensionsEndPointIDLbl, DefaultDimensionsPathLbl,
+                           DefaultDimensionsEndPointDescriptionLbl, true, 200, "NPR Replication EndPoint Meth"::"Get Default Dimensions", 0, 1000);
 
     end;
     #endregion

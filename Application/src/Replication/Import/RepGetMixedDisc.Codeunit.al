@@ -47,7 +47,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         MixedDiscount: Record "NPR Mixed Discount";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        DiscountCode: Text;
+        DiscountCode: Code[20];
         DiscountId: Text;
         JArrayLines: JsonArray;
         JTokenLine: JsonToken;
@@ -56,7 +56,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        DiscountCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        DiscountCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(DiscountCode));
         DiscountId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF DiscountId <> '' then
@@ -74,7 +74,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         IF CheckFieldsChanged(MixedDiscount, JToken) then
             MixedDiscount.Modify(true);
 
-        // handle mixedDiscountTimeIntervals: to do
+        // handle mixedDiscountTimeIntervals
         IF ReplicationAPI.GetJsonArrayFromJsonToken(JToken, '$.mixedDiscountTimeIntervals', JArrayLines) then begin
             for i := 0 to JArrayLines.Count - 1 do begin
                 JArrayLines.Get(i, JTokenLine);
@@ -84,7 +84,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         Clear(JArrayLines);
         Clear(JTokenLine);
 
-        // handle mixedDiscountLevels:
+        // handle mixedDiscountLevels
         IF ReplicationAPI.GetJsonArrayFromJsonToken(JToken, '$.mixedDiscountLevels', JArrayLines) then begin
             for i := 0 to JArrayLines.Count - 1 do begin
                 JArrayLines.Get(i, JTokenLine);
@@ -109,16 +109,16 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        DiscountCode: Text;
+        DiscountCode: Code[20];
         GroupingType: Enum "NPR Disc. Grouping Type";
-        No: Text;
-        VariantCode: Text;
+        No: Code[20];
+        VariantCode: Code[10];
         DiscountLineId: Text;
     begin
-        DiscountCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        DiscountCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(DiscountCode));
         IF Evaluate(GroupingType, ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.discGroupingType')) then;
-        No := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.no');
-        VariantCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.variantCode');
+        No := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.no'), 1, MaxStrLen(No));
+        VariantCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.variantCode'), 1, MaxStrLen(VariantCode));
         DiscountLineId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF MixedDiscountLine.GetBySystemId(DiscountLineId) then begin
@@ -142,11 +142,11 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         MixedDiscountLevel: Record "NPR Mixed Discount Level";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        DiscountCode: Text;
+        DiscountCode: Code[20];
         DiscountQty: Decimal;
         DiscountLevelId: Text;
     begin
-        DiscountCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.mixedDiscountCode');
+        DiscountCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.mixedDiscountCode'), 1, MaxStrLen(DiscountCode));
         IF Evaluate(DiscountQty, ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.quantity')) then;
         DiscountLevelId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
@@ -170,11 +170,11 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         MixedDiscountTimeInterval: Record "NPR Mixed Disc. Time Interv.";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        DiscountCode: Text;
+        DiscountCode: Code[20];
         LineNo: Integer;
         DiscountTimeIntervalId: Text;
     begin
-        DiscountCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.mixCode');
+        DiscountCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.mixCode'), 1, MaxStrLen(DiscountCode));
         IF Evaluate(LineNo, ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.lineNo')) then;
         DiscountTimeIntervalId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
@@ -429,7 +429,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
         end;
     end;
 
-    local procedure InsertNewRec(var MixedDiscount: Record "NPR Mixed Discount"; DiscountCode: Text; DiscountId: text)
+    local procedure InsertNewRec(var MixedDiscount: Record "NPR Mixed Discount"; DiscountCode: Code[20]; DiscountId: text)
     begin
         MixedDiscount.Init();
         MixedDiscount.Code := DiscountCode;
@@ -442,7 +442,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
             MixedDiscount.Insert(false);
     end;
 
-    local procedure InsertNewRecLine(var MixedDiscountLine: Record "NPR Mixed Discount Line"; DiscountCode: Text; GroupingType: Enum "NPR Disc. Grouping Type"; No: Text; VariantCode: Text; DiscountLineId: text)
+    local procedure InsertNewRecLine(var MixedDiscountLine: Record "NPR Mixed Discount Line"; DiscountCode: Code[20]; GroupingType: Enum "NPR Disc. Grouping Type"; No: Code[20]; VariantCode: Code[10]; DiscountLineId: text)
     begin
         MixedDiscountLine.Init();
         MixedDiscountLine.Code := DiscountCode;
@@ -458,7 +458,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
             MixedDiscountLine.Insert(false);
     end;
 
-    local procedure InsertNewRecLevel(var MixedDiscountLevel: Record "NPR Mixed Discount Level"; DiscountCode: Text; DiscountQty: Decimal; DiscountLevelId: text)
+    local procedure InsertNewRecLevel(var MixedDiscountLevel: Record "NPR Mixed Discount Level"; DiscountCode: Code[20]; DiscountQty: Decimal; DiscountLevelId: text)
     begin
         MixedDiscountLevel.Init();
         MixedDiscountLevel."Mixed Discount Code" := DiscountCode;
@@ -472,7 +472,7 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
             MixedDiscountLevel.Insert(false);
     end;
 
-    local procedure InsertNewRecTimeInterval(var MixedDiscountTimeInterval: Record "NPR Mixed Disc. Time Interv."; DiscountCode: Text; LineNo: Integer; DiscountTimeIntervalId: text)
+    local procedure InsertNewRecTimeInterval(var MixedDiscountTimeInterval: Record "NPR Mixed Disc. Time Interv."; DiscountCode: Code[20]; LineNo: Integer; DiscountTimeIntervalId: text)
     begin
         MixedDiscountTimeInterval.Init();
         MixedDiscountTimeInterval."Mix Code" := DiscountCode;
@@ -489,6 +489,21 @@ codeunit 6014657 "NPR Rep. Get Mixed Disc." implements "NPR Replication IEndpoin
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

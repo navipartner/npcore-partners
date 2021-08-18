@@ -46,13 +46,13 @@ codeunit 6014625 "NPR Rep. Get Variety Groups" implements "NPR Replication IEndp
         VarietyGroup: Record "NPR Variety Group";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        GroupCode: Text;
+        GroupCode: Code[20];
         GroupId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        GroupCode := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code');
+        GroupCode := CopyStr(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(GroupCode));
         GroupId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.systemId');
 
         IF GroupId <> '' then
@@ -170,7 +170,7 @@ codeunit 6014625 "NPR Rep. Get Variety Groups" implements "NPR Replication IEndp
         end
     end;
 
-    local procedure InsertNewRec(var VarietyGroup: Record "NPR Variety Group"; GroupCode: Text; GroupId: text)
+    local procedure InsertNewRec(var VarietyGroup: Record "NPR Variety Group"; GroupCode: Code[20]; GroupId: text)
     begin
         VarietyGroup.Init();
         VarietyGroup.Code := GroupCode;
@@ -186,6 +186,21 @@ codeunit 6014625 "NPR Rep. Get Variety Groups" implements "NPR Replication IEndp
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
     begin
         exit(StrSubstNo(DefaultFileNameLbl, format(Today(), 0, 9)));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
     end;
 
 }

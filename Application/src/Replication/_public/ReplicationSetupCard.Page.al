@@ -151,7 +151,7 @@ page 6014495 "NPR Replication Setup Card"
                 field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies if the Setup is Enabled. If Disabled system will not execute import for the endpoints related to this Setup ';
+                    ToolTip = 'Specifies if the Setup is Enabled. If Disabled system will not execute import for the endpoints related to this Setup.';
                 }
 
             }

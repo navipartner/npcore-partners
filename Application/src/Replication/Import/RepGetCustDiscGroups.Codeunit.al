@@ -1,17 +1,17 @@
-codeunit 6014667 "NPR Rep. Get Dimensions" implements "NPR Replication IEndpoint Meth"
+codeunit 6014678 "NPR Rep. Get Cust Disc. Groups" implements "NPR Replication IEndpoint Meth"
 {
     Access = Internal;
 
     var
-        DefaultFileNameLbl: Label 'GetDimensions_%1', Comment = '%1=Current Date and Time';
+        DefaultFileNameLbl: Label 'GetCustomerDiscountGroups_%1', Comment = '%1=Current Date and Time';
 
     procedure SendRequest(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; var URI: Text; var NextLinkURI: Text)
     var
     begin
-        GetDimensions(ReplicationSetup, ReplicationEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
+        GetCustomerDiscountGroups(ReplicationSetup, ReplicationEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
     end;
 
-    local procedure GetDimensions(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; var URI: Text; var NextLinkURI: Text)
+    local procedure GetCustomerDiscountGroups(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; var URI: Text; var NextLinkURI: Text)
     var
         ReplicationAPI: Codeunit "NPR Replication API";
     begin
@@ -45,87 +45,68 @@ codeunit 6014667 "NPR Rep. Get Dimensions" implements "NPR Replication IEndpoint
 
     local procedure HandleArrayElementEntity(JToken: JsonToken; ReplicationEndPoint: Record "NPR Replication Endpoint")
     var
-        Dimension: Record Dimension;
+        CustomerDiscountGroup: Record "Customer Discount Group";
         ReplicationAPI: Codeunit "NPR Replication API";
         RecFoundBySystemId: Boolean;
-        DimensionCode: Code[20];
-        DimensionId: Text;
+        GroupCode: Code[20];
+        GroupId: Text;
     begin
         IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
-        DimensionCode := CopyStr(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(DimensionCode));
-        DimensionId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
+        GroupCode := COPYSTR(ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.code'), 1, MaxStrLen(GroupCode));
+        GroupId := ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.id');
 
-        IF DimensionId <> '' then
-            IF Dimension.GetBySystemId(DimensionId) then begin
+        IF GroupId <> '' then
+            IF CustomerDiscountGroup.GetBySystemId(GroupId) then begin
                 RecFoundBySystemId := true;
-                If Dimension."Code" <> DimensionCode then // rename!
-                    if NOT Dimension.Rename(DimensionCode) then // maybe another rec with same pk already exists...
+                If CustomerDiscountGroup.Code <> GroupCode then // rename!
+                    if NOT CustomerDiscountGroup.Rename(GroupCode) then // maybe another rec with same pk already exists...
                         RecFoundBySystemId := false;
             end;
 
         IF Not RecFoundBySystemId then
-            IF NOT Dimension.Get(DimensionCode) then
-                InsertNewRec(Dimension, DimensionCode, DimensionId);
+            IF NOT CustomerDiscountGroup.Get(GroupCode) then
+                InsertNewRec(CustomerDiscountGroup, GroupCode, GroupId);
 
-        IF CheckFieldsChanged(Dimension, JToken) then
-            Dimension.Modify(true);
+        IF CheckFieldsChanged(CustomerDiscountGroup, JToken) then
+            CustomerDiscountGroup.Modify(true);
     end;
 
-    local procedure CheckFieldsChanged(var Dimension: Record Dimension; JToken: JsonToken) FieldsChanged: Boolean
+    local procedure CheckFieldsChanged(var CustomerDiscountGroup: Record "Customer Discount Group"; JToken: JsonToken) FieldsChanged: Boolean
     var
         ReplicationAPI: Codeunit "NPR Replication API";
     begin
-        IF CheckFieldValue(Dimension, Dimension.FieldNo(Name), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.displayName'), true) then
+        IF CheckFieldValue(CustomerDiscountGroup, CustomerDiscountGroup.FieldNo(Description), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.description'), true) then
             FieldsChanged := true;
-
-        IF CheckFieldValue(Dimension, Dimension.FieldNo("Code Caption"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.codeCaption'), true) then
-            FieldsChanged := true;
-
-        IF CheckFieldValue(Dimension, Dimension.FieldNo("Filter Caption"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.filterCaption'), true) then
-            FieldsChanged := true;
-
-        IF CheckFieldValue(Dimension, Dimension.FieldNo(Description), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.description'), true) then
-            FieldsChanged := true;
-
-        IF CheckFieldValue(Dimension, Dimension.FieldNo(Blocked), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.blocked'), true) then
-            FieldsChanged := true;
-
-        IF CheckFieldValue(Dimension, Dimension.FieldNo("Consolidation Code"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.consolidationCode'), true) then
-            FieldsChanged := true;
-
-        IF CheckFieldValue(Dimension, Dimension.FieldNo("Map-to IC Dimension Code"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.mapToICDimensionCode'), true) then
-            FieldsChanged := true;
-
     end;
 
-    local procedure CheckFieldValue(var Dimension: Record Dimension; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean): Boolean
+    local procedure CheckFieldValue(var CustomerDiscountGroup: Record "Customer Discount Group"; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean): Boolean
     var
         ReplicationAPI: Codeunit "NPR Replication API";
         DataTypMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        if not DataTypMgmt.GetRecordRef(Dimension, RecRef) then
+        if not DataTypMgmt.GetRecordRef(CustomerDiscountGroup, RecRef) then
             exit;
 
         IF ReplicationAPI.CheckFieldValue(RecRef, FieldNo, SourceTxt, WithValidation) then begin
-            RecRef.SetTable(Dimension);
+            RecRef.SetTable(CustomerDiscountGroup);
             exit(true);
         end;
     end;
 
-    local procedure InsertNewRec(var Dimension: Record Dimension; DimensionCode: Code[20]; DimensionId: text)
+    local procedure InsertNewRec(var CustomerDiscountGroup: Record "Customer Discount Group"; GroupCode: Code[20]; GroupId: text)
     begin
-        Dimension.Init();
-        Dimension.Code := DimensionCode;
-        IF DimensionId <> '' THEN begin
-            IF Evaluate(Dimension.SystemId, DimensionId) Then
-                Dimension.Insert(false, true)
+        CustomerDiscountGroup.Init();
+        CustomerDiscountGroup.Code := GroupCode;
+        IF GroupId <> '' THEN begin
+            IF Evaluate(CustomerDiscountGroup.SystemId, GroupId) Then
+                CustomerDiscountGroup.Insert(false, true)
             Else
-                Dimension.Insert(false);
+                CustomerDiscountGroup.Insert(false);
         end else
-            Dimension.Insert(false);
+            CustomerDiscountGroup.Insert(false);
     end;
 
     procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text
