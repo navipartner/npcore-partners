@@ -5,6 +5,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {
