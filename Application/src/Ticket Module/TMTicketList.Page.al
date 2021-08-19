@@ -2,7 +2,7 @@ page 6059785 "NPR TM Ticket List"
 {
     Caption = 'Ticket List';
     DeleteAllowed = false;
-    Editable = false;
+    Editable = true;
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
@@ -15,10 +15,51 @@ page 6059785 "NPR TM Ticket List"
 
     layout
     {
+
         area(content)
         {
+            field(Search; _TurboSearch)
+            {
+                Editable = true;
+                Caption = 'Fast Search';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'This search is optimized to search relevant columns only.';
+                trigger OnValidate()
+                var
+                    Ticket: Record "NPR TM Ticket";
+                begin
+                    Rec.Reset();
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
+                    if (_TurboSearch = '') then begin
+                        CurrPage.Update(false);
+                        exit;
+                    end;
+
+                    Ticket.FilterGroup := -1;
+                    Ticket.SetFilter("No.", '%1', _TurboSearch);
+                    Ticket.SetFilter("External Ticket No.", '%1', _TurboSearch);
+                    Ticket.SetFilter("Sales Receipt No.", '%1', _TurboSearch);
+                    Ticket.SetFilter("Item No.", '%1', _TurboSearch);
+                    Ticket.SetFilter("External Member Card No.", '%1', _TurboSearch);
+                    Ticket.FilterGroup := 0;
+
+                    Ticket.SetLoadFields("No.");
+                    if (Ticket.FindSet()) then
+                        repeat
+                            Ticket.Mark(true);
+                        until (Ticket.Next() = 0);
+
+                    Rec.Copy(Ticket);
+                    Rec.SetLoadFields();
+                    Rec.MarkedOnly(true);
+                    CurrPage.Update(false);
+                end;
+            }
+
             repeater(Group)
             {
+                Editable = false;
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -388,6 +429,7 @@ page 6059785 "NPR TM Ticket List"
         CONFIRM_REVOKE_TICKET: Label 'Are you sure you want to revoke %1 ticket(s)?';
         ETICKET_SENT: Label 'eTicket sent.';
         CONFIRM_ETICKET: Label 'Are you sure you want to create and send %1 eTickets?';
+        _TurboSearch: Code[100];
 
     local procedure ChangeTicketHolder()
     var
