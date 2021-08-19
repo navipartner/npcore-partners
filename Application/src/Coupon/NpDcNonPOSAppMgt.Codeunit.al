@@ -88,26 +88,38 @@
 
     local procedure InsertSalePOS(var SalePOS: Record "NPR POS Sale")
     var
+        POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
+        Setup: Record "NPR POS Setup";
         UserSetup: Record "User Setup";
         SalesTicketNo: Code[20];
+        DummyCodeTxt: Label '-_-', Locked = true, MaxLength = 10;
     begin
-        if not POSUnit.Get('-_-') then begin
+        if not POSStore.Get(DummyCodeTxt) then begin
+            POSStore.Init();
+            POSStore.Code := DummyCodeTxt;
+            POSStore.Insert();
+        end;
+
+        if not POSUnit.Get(DummyCodeTxt) then begin
             POSUnit.Init();
-            POSUnit."No." := '-_-';
+            POSUnit."No." := DummyCodeTxt;
             POSUnit.Insert();
         end;
+        if not Setup.Get(POSUnit."POS Named Actions Profile") then begin
+            Setup.FindFirst();
+            POSUnit."POS Named Actions Profile" := Setup."Primary Key";
+        end;
+        POSUnit."POS Store Code" := POSStore.Code;
+        POSUnit.Modify();
 
         if not UserSetup.Get(UserId) then begin
             UserSetup.Init();
             UserSetup."User ID" := UserId;
-            UserSetup."NPR POS Unit No." := POSUnit."No.";
             UserSetup.Insert();
-        end else
-            if UserSetup."NPR POS Unit No." = '' then begin
-                UserSetup."NPR POS Unit No." := POSUnit."No.";
-                UserSetup.Modify();
-            end;
+        end;
+        UserSetup."NPR POS Unit No." := POSUnit."No.";
+        UserSetup.Modify();
 
         SalesTicketNo := DelChr(Format(CurrentDateTime, 0, 9), '=', ' -:.ZT');
         while SalePOS.Get(POSUnit."No.", '-' + SalesTicketNo) do
@@ -236,6 +248,8 @@
         POSSession.GetSale(POSSale);
         POSSale.SetPosition(SalePOS.GetPosition(false));
         POSSession.GetSaleLine(POSSaleLine);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.Initialize();
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, POSSetup, POSFrontEndMgt);
         TempNpDcExtCouponBuffer.FindSet();
         repeat
