@@ -274,7 +274,7 @@ codeunit 6014437 "NPR Phone Lookup"
             exit;
 
         ContactBusinessRelation.Init();
-        ContactBusinessRelation."Contact No." := TempTDCNamesNumbersBuffer."Phone No.";
+        ContactBusinessRelation."Contact No." := Copystr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(ContactBusinessRelation."Contact No."));
         ContactBusinessRelation."Business Relation Code" := '';
         ContactBusinessRelation."Link to Table" := LinkToTable;
         ContactBusinessRelation.Insert();

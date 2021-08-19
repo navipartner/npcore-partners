@@ -72,19 +72,19 @@ codeunit 6184550 "NPR TDC Phone Lookup"
                         end;
 
                         TMPPhoneLookupBuf.Init();
-                        TMPPhoneLookupBuf.ID := DelPreSpaces(Format(StringArray[1]));
-                        TMPPhoneLookupBuf.Title := DelPreSpaces(Format(StringArray[2]));
-                        TMPPhoneLookupBuf.Name := DelPreSpaces(Format(StringArray[3]));
-                        TMPPhoneLookupBuf.Name += ' ' + DelPreSpaces(Format(StringArray[4]));
-                        TMPPhoneLookupBuf."First Name" := CopyStr(DelPreSpaces(DelPreSpaces(Format(StringArray[3]))), 1, 50);
-                        TMPPhoneLookupBuf."Last Name" := CopyStr(DelPreSpaces(DelPreSpaces(Format(StringArray[4]))), 1, 50);
-                        TMPPhoneLookupBuf."Post Code" := DelPreSpaces(Format(StringArray[6]));
-                        TMPPhoneLookupBuf.City := DelPreSpaces(Format(StringArray[7]));
-                        TMPPhoneLookupBuf.Address := DelPreSpaces(Format(StringArray[8]));
-                        TMPPhoneLookupBuf."Phone No." := DelPreSpaces(Format(StringArray[17]));
-                        TMPPhoneLookupBuf."E-Mail" := DelPreSpaces(Format(StringArray[20]));
-                        TMPPhoneLookupBuf."Home Page" := DelPreSpaces(Format(StringArray[21]));
-                        TMPPhoneLookupBuf."Country/Region Code" := DelPreSpaces(Format(StringArray[22]));
+                        TMPPhoneLookupBuf.ID := CopyStr(DelPreSpaces(Format(StringArray[1])), 1, MaxStrLen(TMPPhoneLookupBuf.ID));
+                        TMPPhoneLookupBuf.Title := CopyStr(DelPreSpaces(Format(StringArray[2])), 1, MaxStrLen(TMPPhoneLookupBuf.Title));
+                        TMPPhoneLookupBuf.Name := CopyStr(DelPreSpaces(Format(StringArray[3])), 1, MaxStrLen(TMPPhoneLookupBuf.Name));
+                        TMPPhoneLookupBuf.Name += CopyStr(' ' + DelPreSpaces(Format(StringArray[4])), 1, MaxStrLen(TMPPhoneLookupBuf.Name));
+                        TMPPhoneLookupBuf."First Name" := CopyStr(DelPreSpaces(DelPreSpaces(Format(StringArray[3]))), 1, MaxStrLen(TMPPhoneLookupBuf."First Name"));
+                        TMPPhoneLookupBuf."Last Name" := CopyStr(DelPreSpaces(DelPreSpaces(Format(StringArray[4]))), 1, MaxStrLen(TMPPhoneLookupBuf."Last Name"));
+                        TMPPhoneLookupBuf."Post Code" := CopyStr(DelPreSpaces(Format(StringArray[6])), 1, MaxStrLen(TMPPhoneLookupBuf."Post Code"));
+                        TMPPhoneLookupBuf.City := CopyStr(DelPreSpaces(Format(StringArray[7])), 1, MaxStrLen(TMPPhoneLookupBuf.City));
+                        TMPPhoneLookupBuf.Address := CopyStr(DelPreSpaces(Format(StringArray[8])), 1, MaxStrLen(TMPPhoneLookupBuf.Address));
+                        TMPPhoneLookupBuf."Phone No." := CopyStr(DelPreSpaces(Format(StringArray[17])), 1, MaxStrLen(TMPPhoneLookupBuf."Phone No."));
+                        TMPPhoneLookupBuf."E-Mail" := CopyStr(DelPreSpaces(Format(StringArray[20])), 1, MaxStrLen(TMPPhoneLookupBuf."E-Mail"));
+                        TMPPhoneLookupBuf."Home Page" := CopyStr(DelPreSpaces(Format(StringArray[21])), 1, MaxStrLen(TMPPhoneLookupBuf."Home Page"));
+                        TMPPhoneLookupBuf."Country/Region Code" := CopyStr(DelPreSpaces(Format(StringArray[22])), 1, MaxStrLen(TMPPhoneLookupBuf."Country/Region Code"));
                         TMPPhoneLookupBuf.Insert();
                         IndexOf := 1;
                     end;
@@ -103,7 +103,7 @@ codeunit 6184550 "NPR TDC Phone Lookup"
 
         repeat
             if CopyStr(TxtResult, 1, 1) = ' ' then
-                TxtResult := CopyStr(TxtResult, 2)
+                TxtResult := CopyStr(TxtResult, 2, MaxStrLen(TxtResult))
             else
                 Out := true;
         until Out;
