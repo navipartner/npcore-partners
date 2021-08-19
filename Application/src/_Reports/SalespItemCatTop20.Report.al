@@ -1,8 +1,8 @@
-report 6014405 "NPR Salesperson/Item Group Top"
+report 6014405 "NPR Salesp./Item Cat Top 20"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/SalespersonItem Group Top.rdlc';
-    Caption = 'Salesperson/Item Group Top';
+    RDLCLayout = './src/_Reports/layouts/Salesperson Item Category Top 20.rdlc';
+    Caption = 'Salesperson/Item Category Top';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     dataset
@@ -26,7 +26,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
             column(SalesPersonFilters; "Salesperson/Purchaser".GetFilters)
             {
             }
-            column(ItemGroupFilters; "Item Category".GetFilters)
+            column(ItemCategoryFilters; "Item Category".GetFilters)
             {
             }
             column(sorteringstext; SortingText)
@@ -50,7 +50,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
             column(DBCaption; DBCaptionLbl)
             {
             }
-            column(ItemGroupCaption; ItemGroupCaptionLbl)
+            column(ItemCategoryCaption; ItemCategoryCaptionLbl)
             {
             }
             column(DescriptionCaption; DescriptionCaptionLbl)
@@ -97,22 +97,22 @@ report 6014405 "NPR Salesperson/Item Group Top"
                 CalcFields = "NPR Sales (LCY)", "NPR Consumption (Amount)";
                 DataItemLink = "NPR Salesperson/Purch. Filter" = FIELD(Code), "NPR Date Filter" = FIELD("Date Filter");
                 DataItemTableView = SORTING("Code");
-                column(No_ItemGroup; "Item Category"."Code")
+                column(No_ItemCategory; "Item Category"."Code")
                 {
                 }
-                column(Description_ItemGroup; "Item Category".Description)
+                column(Description_ItemCategory; "Item Category".Description)
                 {
                 }
-                column(SaleLCY_ItemGroup; SalesLCYGP)
+                column(SaleLCY_ItemCategory; SalesLCYGP)
                 {
                 }
                 column(SalesPct; SalesPct)
                 {
                 }
-                column(CB_ItemGroup; SalesLCYGP - CogsLCYGP)
+                column(CB_ItemCategory; SalesLCYGP - CogsLCYGP)
                 {
                 }
-                column(dg_ItemGroup; dg)
+                column(dg_ItemCategory; dg)
                 {
                 }
 
@@ -161,7 +161,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
 
                 trigger OnPreDataItem()
                 begin
-                    "Item Category".SetFilter("Code", SPItemGroupFilter);
+                    "Item Category".SetFilter("Code", SPItemCategoryFilter);
                 end;
             }
             dataitem("Integer"; "Integer")
@@ -170,22 +170,22 @@ report 6014405 "NPR Salesperson/Item Group Top"
                 column(Number_Integer; Integer.Number)
                 {
                 }
-                column(No1_ItemGroup; "Item Category"."Code")
+                column(No1_ItemCategory; "Item Category"."Code")
                 {
                 }
-                column(Description1_ItemGroup; "Item Category".Description)
+                column(Description1_ItemCategory; "Item Category".Description)
                 {
                 }
-                column(SaleLCY1_ItemGroup; SalesLCYGPINT)
+                column(SaleLCY1_ItemCategory; SalesLCYGPINT)
                 {
                 }
                 column(SalesPct1; SalesPct)
                 {
                 }
-                column(CB1_ItemGroup; SalesLCYGPINT - CogsLCYGPINT)
+                column(CB1_ItemCategory; SalesLCYGPINT - CogsLCYGPINT)
                 {
                 }
-                column(dg1_ItemGroup; dg)
+                column(dg1_ItemCategory; dg)
                 {
                 }
 
@@ -270,7 +270,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                     SortingText := '';
                 SPDateFilter := "Salesperson/Purchaser".GetFilter("Date Filter");
                 SPGlobalDim1Filter := "Salesperson/Purchaser".GetFilter("Global Dimension 1 Code");
-                SPItemGroupFilter := "Salesperson/Purchaser".GetFilter("NPR Item Category Filter");
+                SPItemCategoryFilter := "Salesperson/Purchaser".GetFilter("NPR Item Category Filter");
             end;
         }
     }
@@ -378,7 +378,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
         CRPctCaptionLbl: Label 'CR%';
         DBCaptionLbl: Label 'DB';
         DescriptionCaptionLbl: Label 'Description';
-        ItemGroupCaptionLbl: Label 'Itemgroup';
+        ItemCategoryCaptionLbl: Label 'Item Category';
         NameCaptionLbl: Label 'Name';
         NoCaptionLbl: Label 'No.';
         PageCaptionLbl: Label 'Page';
@@ -389,7 +389,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
         TurnoverCaptionLbl: Label 'Turnover';
         SPDateFilter: Text;
         SPGlobalDim1Filter: Text;
-        SPItemGroupFilter: Text;
+        SPItemCategoryFilter: Text;
         SortingText: Text[30];
 }
 

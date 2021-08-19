@@ -245,13 +245,13 @@ page 6151241 "NPR Retail Manager Role Center"
                             ToolTip = 'Executes the NPR Sales Person Top 20 action';
                             ApplicationArea = NPRRetail;
                         }
-                        action("NPR Sales code/Item group top")
+                        action("NPR Sales code/Item Category top")
                         {
-                            Caption = 'Sales code/Item group top';
+                            Caption = 'Sales code/Item category top';
                             Image = Report2;
-                            RunObject = Report "NPR Salesperson/Item Group Top";
+                            RunObject = Report "NPR Salesp./Item Cat Top 20";
 
-                            ToolTip = 'Executes the NPR  Sales code/Item group top action';
+                            ToolTip = 'Executes the NPR  Sales code/Item category top action';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Sale Statistics per Vendor")

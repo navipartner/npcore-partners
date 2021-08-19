@@ -2178,8 +2178,8 @@ End Function
         <Field Name="SalesPersonFilters">
           <DataField>SalesPersonFilters</DataField>
         </Field>
-        <Field Name="ItemGroupFilters">
-          <DataField>ItemGroupFilters</DataField>
+        <Field Name="ItemCategoryFilters">
+          <DataField>ItemCategoryFilters</DataField>
         </Field>
         <Field Name="sorteringstext">
           <DataField>sorteringstext</DataField>
@@ -2202,8 +2202,8 @@ End Function
         <Field Name="DBCaption">
           <DataField>DBCaption</DataField>
         </Field>
-        <Field Name="ItemGroupCaption">
-          <DataField>ItemGroupCaption</DataField>
+        <Field Name="ItemCategoryCaption">
+          <DataField>ItemCategoryCaption</DataField>
         </Field>
         <Field Name="DescriptionCaption">
           <DataField>DescriptionCaption</DataField>
@@ -2256,17 +2256,17 @@ End Function
         <Field Name="ShowQty">
           <DataField>ShowQty</DataField>
         </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
+        <Field Name="No_ItemCategory">
+          <DataField>No_ItemCategory</DataField>
         </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
+        <Field Name="Description_ItemCategory">
+          <DataField>Description_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroup">
-          <DataField>SaleLCY_ItemGroup</DataField>
+        <Field Name="SaleLCY_ItemCategory">
+          <DataField>SaleLCY_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCY_ItemGroupFormat">
-          <DataField>SaleLCY_ItemGroupFormat</DataField>
+        <Field Name="SaleLCY_ItemCategoryFormat">
+          <DataField>SaleLCY_ItemCategoryFormat</DataField>
         </Field>
         <Field Name="SalesPct">
           <DataField>SalesPct</DataField>
@@ -2274,32 +2274,32 @@ End Function
         <Field Name="SalesPctFormat">
           <DataField>SalesPctFormat</DataField>
         </Field>
-        <Field Name="CB_ItemGroup">
-          <DataField>CB_ItemGroup</DataField>
+        <Field Name="CB_ItemCategory">
+          <DataField>CB_ItemCategory</DataField>
         </Field>
-        <Field Name="CB_ItemGroupFormat">
-          <DataField>CB_ItemGroupFormat</DataField>
+        <Field Name="CB_ItemCategoryFormat">
+          <DataField>CB_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="dg_ItemGroup">
-          <DataField>dg_ItemGroup</DataField>
+        <Field Name="dg_ItemCategory">
+          <DataField>dg_ItemCategory</DataField>
         </Field>
-        <Field Name="dg_ItemGroupFormat">
-          <DataField>dg_ItemGroupFormat</DataField>
+        <Field Name="dg_ItemCategoryFormat">
+          <DataField>dg_ItemCategoryFormat</DataField>
         </Field>
         <Field Name="Number_Integer">
           <DataField>Number_Integer</DataField>
         </Field>
-        <Field Name="No1_ItemGroup">
-          <DataField>No1_ItemGroup</DataField>
+        <Field Name="No1_ItemCategory">
+          <DataField>No1_ItemCategory</DataField>
         </Field>
-        <Field Name="Description1_ItemGroup">
-          <DataField>Description1_ItemGroup</DataField>
+        <Field Name="Description1_ItemCategory">
+          <DataField>Description1_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCY1_ItemGroup">
-          <DataField>SaleLCY1_ItemGroup</DataField>
+        <Field Name="SaleLCY1_ItemCategory">
+          <DataField>SaleLCY1_ItemCategory</DataField>
         </Field>
-        <Field Name="SaleLCY1_ItemGroupFormat">
-          <DataField>SaleLCY1_ItemGroupFormat</DataField>
+        <Field Name="SaleLCY1_ItemCategoryFormat">
+          <DataField>SaleLCY1_ItemCategoryFormat</DataField>
         </Field>
         <Field Name="SalesPct1">
           <DataField>SalesPct1</DataField>
@@ -2307,17 +2307,17 @@ End Function
         <Field Name="SalesPct1Format">
           <DataField>SalesPct1Format</DataField>
         </Field>
-        <Field Name="CB1_ItemGroup">
-          <DataField>CB1_ItemGroup</DataField>
+        <Field Name="CB1_ItemCategory">
+          <DataField>CB1_ItemCategory</DataField>
         </Field>
-        <Field Name="CB1_ItemGroupFormat">
-          <DataField>CB1_ItemGroupFormat</DataField>
+        <Field Name="CB1_ItemCategoryFormat">
+          <DataField>CB1_ItemCategoryFormat</DataField>
         </Field>
-        <Field Name="dg1_ItemGroup">
-          <DataField>dg1_ItemGroup</DataField>
+        <Field Name="dg1_ItemCategory">
+          <DataField>dg1_ItemCategory</DataField>
         </Field>
-        <Field Name="dg1_ItemGroupFormat">
-          <DataField>dg1_ItemGroupFormat</DataField>
+        <Field Name="dg1_ItemCategoryFormat">
+          <DataField>dg1_ItemCategoryFormat</DataField>
         </Field>
       </Fields>
       <Query>
