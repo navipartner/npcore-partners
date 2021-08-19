@@ -512,14 +512,18 @@ codeunit 6150725 "NPR POS Action: Payment"
         if (not EFTTransactionRequest.Successful) then begin
             if (not SecondaryEFTTransactionRequest.SetCurrentKey("Initiated from Entry No.")) then
                 ;
+
+            // IsEmpty has a covering index and should be fast.
             SecondaryEFTTransactionRequest.SetFilter("Initiated from Entry No.", '=%1', EFTTransactionRequest."Entry No.");
-            if SecondaryEFTTransactionRequest.FindLast() then begin
-                if ((SecondaryEFTTransactionRequest."Pepper Transaction Type Code" = EFTTransactionRequest."Pepper Transaction Type Code") and
-                  (SecondaryEFTTransactionRequest."Pepper Trans. Subtype Code" = EFTTransactionRequest."Pepper Trans. Subtype Code") and
-                  (SecondaryEFTTransactionRequest."Amount Input" = EFTTransactionRequest."Amount Input")) then begin
-                    SetEftError(SecondaryEFTTransactionRequest, POSSession); //TODO: Remove workaround to BC17 message bug
-                    exit(not SecondaryEFTTransactionRequest.Successful);
-                end;
+            if (SecondaryEFTTransactionRequest.IsEmpty()) then
+                exit(false);
+
+            SecondaryEFTTransactionRequest.FindLast();
+            if ((SecondaryEFTTransactionRequest."Pepper Transaction Type Code" = EFTTransactionRequest."Pepper Transaction Type Code") and
+              (SecondaryEFTTransactionRequest."Pepper Trans. Subtype Code" = EFTTransactionRequest."Pepper Trans. Subtype Code") and
+              (SecondaryEFTTransactionRequest."Amount Input" = EFTTransactionRequest."Amount Input")) then begin
+                SetEftError(SecondaryEFTTransactionRequest, POSSession); //TODO: Remove workaround to BC17 message bug
+                exit(not SecondaryEFTTransactionRequest.Successful);
             end;
 
             SetEftError(EFTTransactionRequest, POSSession);  //TODO: Remove workaround to BC17 message bug
