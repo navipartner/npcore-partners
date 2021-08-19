@@ -163,18 +163,27 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
     local procedure OnBeforeLogInStart()
     var
-        NewSessionID: Integer;
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
-        if not GuiAllowed then
-            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Client Diagn. NpCase Mgt.', 'OnBeforeLogInStart');
 
-        if NavApp.IsInstalling() then
+        if not GuiAllowed then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
-        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
+        if NavApp.IsInstalling() then begin
+            LogMessageStopwatch.LogFinish();
             exit;
+        end;
 
-        StartSession(NewSessionID, Codeunit::"NPR Client Diagn. NpCase Mgt.", CompanyName);
+        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        if Run() then;
+        LogMessageStopwatch.LogFinish();
     end;
 }
 
