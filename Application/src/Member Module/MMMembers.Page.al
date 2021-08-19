@@ -6,6 +6,7 @@ page 6060126 "NPR MM Members"
     DataCaptionExpression = Rec."External Member No.";
     DeleteAllowed = false;
     InsertAllowed = false;
+    Editable = true;
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Member";
@@ -16,8 +17,47 @@ page 6060126 "NPR MM Members"
     {
         area(content)
         {
+            field(Search; _TurboSearch)
+            {
+                Editable = true;
+                Caption = 'Fast Search';
+                ApplicationArea = NPRRetail;
+                ToolTip = 'This search is optimized to search relevant columns only.';
+                trigger OnValidate()
+                var
+                    Member: Record "NPR MM Member";
+                begin
+                    Rec.Reset();
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
+                    if (_TurboSearch = '') then begin
+                        CurrPage.Update(false);
+                        exit;
+                    end;
+
+                    Member.FilterGroup := -1;
+                    Member.SetFilter("External Member No.", '%1', UpperCase(_TurboSearch));
+                    Member.SetFilter("First Name", '%1', '@' + _TurboSearch);
+                    Member.SetFilter("Last Name", '%1', '@' + _TurboSearch);
+                    Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(_TurboSearch, '@', '?')));
+                    Member.SetFilter("Phone No.", '%1', _TurboSearch);
+                    Member.FilterGroup := 0;
+
+                    Member.SetLoadFields("Entry No.");
+                    if (Member.FindSet()) then
+                        repeat
+                            Member.Mark(true);
+                        until (Member.Next() = 0);
+
+                    Rec.Copy(Member);
+                    Rec.SetLoadFields();
+                    Rec.MarkedOnly(true);
+                    CurrPage.Update(false);
+                end;
+            }
             repeater(Group)
             {
+                Editable = false;
                 field("External Member No."; Rec."External Member No.")
                 {
                     ToolTip = 'Specifies the value of the External Member No. field';
@@ -42,6 +82,41 @@ page 6060126 "NPR MM Members"
                 {
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRRetail;
+                }
+                field(Address; Rec.Address)
+                {
+                    ToolTip = 'Specifies the value of the Address field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Post Code Code"; Rec."Post Code Code")
+                {
+                    ToolTip = 'Specifies the value of the ZIP Code field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(City; Rec.City)
+                {
+                    ToolTip = 'Specifies the value of the City field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Country Code"; Rec."Country Code")
+                {
+                    ToolTip = 'Specifies the value of the Country Code field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Country; Rec.Country)
+                {
+                    ToolTip = 'Specifies the value of the Country field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Store Code"; Rec."Store Code")
+                {
+                    ToolTip = 'Specifies the value of the Store Code field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Blocked; Rec.Blocked)
+                {
+                    ToolTip = 'Specifies the value of the Blocked field';
+                    ApplicationArea = All;
                 }
             }
         }
@@ -106,6 +181,7 @@ page 6060126 "NPR MM Members"
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Register Arrival action';
                 ApplicationArea = NPRRetail;
+                Scope = Repeater;
 
                 trigger OnAction()
                 var
@@ -126,6 +202,7 @@ page 6060126 "NPR MM Members"
                 Image = CreateInteraction;
                 ToolTip = 'Executes the Synchronize Contact action';
                 ApplicationArea = NPRRetail;
+                Scope = Repeater;
 
                 trigger OnAction()
                 begin
@@ -170,6 +247,7 @@ page 6060126 "NPR MM Members"
                 RunPageLink = "Member Entry No." = FIELD("Entry No.");
                 ToolTip = 'Executes the Preferred Com. Methods action';
                 ApplicationArea = NPRRetail;
+                Scope = Repeater;
             }
             action("Arrival Log")
             {
@@ -184,6 +262,7 @@ page 6060126 "NPR MM Members"
                 RunPageLink = "External Member No." = FIELD("External Member No.");
                 ToolTip = 'Executes the Arrival Log action';
                 ApplicationArea = NPRRetail;
+                Scope = Repeater;
             }
             group("Raptor Integration")
             {
@@ -258,6 +337,7 @@ page 6060126 "NPR MM Members"
         RaptorEnabled: Boolean;
         ConfirmContactSynchQst: Label 'Do you want to sync the contacts for %1 members?', Comment = '%1=Member.Count()';
         EntriesNotFoundForMemberErr: Label 'No entries found for member %1.', Comment = '%1=Rec."External Member No."';
+        _TurboSearch: Text[100];
 
     local procedure SyncContact()
     var
