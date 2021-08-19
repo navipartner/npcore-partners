@@ -364,7 +364,26 @@ table 6151420 "NPR Magento Store Item"
 
         FieldRef := RecRef.Field(FieldNo("Special Price To"));
         UpdateWebsiteField(FieldRef);
+
+        FieldRef := RecRef.Field(FieldNo("Unit Price Enabled"));
+        UpdateWebsiteField(FieldRef);
+
+        FieldRef := RecRef.Field(FieldNo("Product New From Enabled"));
+        UpdateWebsiteField(FieldRef);
+
+        FieldRef := RecRef.Field(FieldNo("Product New To Enabled"));
+        UpdateWebsiteField(FieldRef);
+
+        FieldRef := RecRef.Field(FieldNo("Special Price Enabled"));
+        UpdateWebsiteField(FieldRef);
+
+        FieldRef := RecRef.Field(FieldNo("Special Price From Enabled"));
+        UpdateWebsiteField(FieldRef);
+
+        FieldRef := RecRef.Field(FieldNo("Special Price To Enabled"));
+        UpdateWebsiteField(FieldRef);
     end;
+
 
     local procedure UpdateWebsiteLink(DeleteTrigger: Boolean)
     var
