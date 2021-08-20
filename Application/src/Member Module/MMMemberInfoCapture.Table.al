@@ -77,16 +77,17 @@ table 6060134 "NPR MM Member Info Capture"
             TableRelation = IF ("Country Code" = CONST('')) "Post Code"
             ELSE
             IF ("Country Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
             var
                 County: Text[50];
                 PostCode: Record "Post Code";
+                CountryRegion: Record "Country/Region";
             begin
                 PostCode.ValidatePostCode(City, "Post Code Code", County, "Country Code", (CurrFieldNo <> 0) and GuiAllowed);
+                if (CountryRegion.Get(Rec."Country Code")) then
+                    Rec.Country := CountryRegion.Name;
             end;
         }
         field(27; City; Text[50])
@@ -99,6 +100,14 @@ table 6060134 "NPR MM Member Info Capture"
             Caption = 'Country Code';
             DataClassification = CustomerContent;
             TableRelation = "Country/Region";
+            ValidateTableRelation = false;
+            trigger OnValidate()
+            var
+                CountryRegion: Record "Country/Region";
+            begin
+                if (CountryRegion.Get("Country Code")) then
+                    Country := CountryRegion.Name;
+            end;
         }
         field(29; Country; Text[50])
         {
