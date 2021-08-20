@@ -7,6 +7,8 @@ report 6014617 "NPR Purchase Order"
     Caption = 'NP Purchase Order';
     DefaultLayout = Word;
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Purchase Header"; "Purchase Header")

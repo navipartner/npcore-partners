@@ -6,6 +6,8 @@ report 6150614 "NPR Posting Overview POS"
     ApplicationArea = NPRRetail;
     Caption = 'Posting Overview POS';
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(POS_Entry; "NPR POS Entry")

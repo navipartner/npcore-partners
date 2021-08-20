@@ -6,6 +6,7 @@ report 6060127 "NPR MM Member Card Print QR"
     Caption = 'Member Card Print';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {
@@ -52,7 +53,7 @@ report 6060127 "NPR MM Member Card Print QR"
 
             trigger OnAfterGetRecord()
             var
-            
+
                 BarcodeLib: Codeunit "NPR Barcode Image Library";
                 MMMembershipRole: Record "NPR MM Membership Role";
             begin

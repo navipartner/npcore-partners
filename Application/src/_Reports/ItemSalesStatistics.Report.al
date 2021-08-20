@@ -6,6 +6,8 @@ report 6014414 "NPR Item Sales Statistics"
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(RunOnce; "Integer")

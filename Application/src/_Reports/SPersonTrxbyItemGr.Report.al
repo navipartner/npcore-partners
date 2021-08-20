@@ -5,6 +5,8 @@ report 6014431 "NPR S.Person Trx by Item Gr."
     Caption = 'Sales Person Trn. By Item Gr.';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Item Category"; "Item Category")

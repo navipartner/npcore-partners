@@ -5,6 +5,7 @@ report 6014460 "NPR Balancing Report A4"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Balancing Report -A4 - POS';
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

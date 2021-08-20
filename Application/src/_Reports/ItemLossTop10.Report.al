@@ -4,6 +4,8 @@ report 6014543 "NPR Item - Loss - Top 10"
     Caption = 'Item Shrinkage - Top 10';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

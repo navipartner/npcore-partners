@@ -7,6 +7,8 @@ report 6151016 "NPR NpRv Voucher 4"
     ApplicationArea = NPRRetail;
     Caption = 'NpRv Voucher';
     DefaultLayout = Word;
+    DataAccessIntent = ReadOnly;
+    
     dataset
     {
         dataitem("NpRv Voucher"; "NPR NpRv Voucher")

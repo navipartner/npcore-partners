@@ -5,6 +5,8 @@ report 6014412 "NPR Sold Items by Sales Person"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Sold Items By Sales Person';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

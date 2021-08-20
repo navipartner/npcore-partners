@@ -5,6 +5,7 @@ report 6060134 "NPR MM Member Info"
     Caption = 'Member Info';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

@@ -5,6 +5,7 @@ report 6014401 "NPR Voucher List"
     RDLCLayout = './src/_Reports/layouts/Voucher List.rdlc';
     ApplicationArea = NPRRetail;
     UsageCategory = ReportsAndAnalysis;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

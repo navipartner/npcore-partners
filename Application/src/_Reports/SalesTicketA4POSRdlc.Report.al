@@ -6,6 +6,8 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
     ApplicationArea = NPRRetail;
     DefaultLayout = RDLC;
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(POS_Entry; "NPR POS Entry")

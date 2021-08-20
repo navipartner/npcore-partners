@@ -6,6 +6,8 @@ report 6060129 "NPR MM Membersh. Points Summ."
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")

@@ -6,6 +6,8 @@ report 6014439 "NPR Item Sales Postings"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(AuxItemLedgerEntry; "NPR Aux. Item Ledger Entry")

@@ -6,6 +6,7 @@ report 6060135 "NPR MM Member Card Owner"
     ShowPrintStatus = false;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

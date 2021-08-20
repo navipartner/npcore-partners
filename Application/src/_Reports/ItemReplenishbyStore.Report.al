@@ -6,6 +6,7 @@ report 6014475 "NPR Item Replenish. by Store"
     PreviewMode = PrintLayout;
     UsageCategory = Tasks;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

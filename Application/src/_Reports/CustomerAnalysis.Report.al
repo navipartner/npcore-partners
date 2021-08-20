@@ -6,6 +6,7 @@ report 6014432 "NPR Customer Analysis"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

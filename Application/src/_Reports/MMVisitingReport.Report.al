@@ -5,6 +5,8 @@ report 6060133 "NPR MM Visiting Report"
     Caption = 'MM Visiting Report';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")

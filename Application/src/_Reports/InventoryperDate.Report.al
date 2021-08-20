@@ -5,6 +5,7 @@ report 6014417 "NPR Inventory per Date"
     Caption = 'Inventory per Date';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

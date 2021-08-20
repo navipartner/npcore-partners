@@ -5,6 +5,8 @@ report 6014542 "NPR Item - Loss"
     Caption = 'Item - Loss';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

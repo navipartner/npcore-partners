@@ -5,6 +5,7 @@ report 6014474 "NPR Item/Sales Person Top"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Item/Sales Person Top';
+    DataAccessIntent = ReadOnly;
 
     dataset
     {
