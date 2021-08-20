@@ -106,8 +106,6 @@ table 6060126 "NPR MM Member"
             Caption = 'ZIP Code';
             DataClassification = CustomerContent;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -130,6 +128,15 @@ table 6060126 "NPR MM Member"
         {
             Caption = 'Country Code';
             DataClassification = CustomerContent;
+            TableRelation = "Country/Region";
+            ValidateTableRelation = false;
+            trigger OnValidate()
+            var
+                CountryRegion: Record "Country/Region";
+            begin
+                if (CountryRegion.Get("Country Code")) then
+                    Country := CountryRegion.Name;
+            end;
         }
         field(29; Country; Text[50])
         {

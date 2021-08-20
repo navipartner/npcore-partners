@@ -332,7 +332,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         MembershipSalesSetup."Valid From Base" := MembershipSalesSetup."Valid From Base"::SALESDATE;
         MemberInfoCapture."Document Date" := Today();
         MemberInfoCapture."Valid Until" := Today();
-        MembershipSalesSetup."Valid Until Calculation" := MembershipSalesSetup."Valid Until Calculation"::DATEFORMULA;
+        MembershipSalesSetup."Valid Until Calculation" := MembershipSalesSetup."Valid Until Calculation"::DateFormula;
         Evaluate(MembershipSalesSetup."Duration Formula", '<+0D>');
 
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::FOREIGN;
@@ -644,6 +644,9 @@ codeunit 6060147 "NPR MM NPR Membership"
         ElementPath: Text;
         XmlMessage: Text;
         XmlDomMgt: Codeunit "XML DOM Management";
+        TextCountry: Text;
+        TextCountryCode: Text;
+        CountryRegion: Record "Country/Region";
     begin
         // <GetMembershipMembers_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/member_services">
         //    <member>
@@ -693,7 +696,16 @@ codeunit 6060147 "NPR MM NPR Membership"
         MemberInfoCapture.Address := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'address', MaxStrLen(MemberInfoCapture.Address), false);
         MemberInfoCapture."Post Code Code" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'postcode', MaxStrLen(MemberInfoCapture."Post Code Code"), false);
         MemberInfoCapture.City := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'city', MaxStrLen(MemberInfoCapture.City), false);
-        MemberInfoCapture."Country Code" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'country', MaxStrLen(MemberInfoCapture."Country Code"), false);
+
+        TextCountry := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'country', MaxStrLen(MemberInfoCapture.Country), false);
+        TextCountryCode := NpXmlDomMgt.GetAttributeCode(Element, ElementPath + 'country', 'code', MaxStrLen(MemberInfoCapture."Country Code"), false);
+        if (TextCountryCode <> '') and (CountryRegion.Get(TextCountryCode)) then begin
+            MemberInfoCapture."Country Code" := TextCountryCode;
+            MemberInfoCapture.Country := CountryRegion.Name;
+        end else begin
+            MemberInfoCapture."Country Code" := '';
+            MemberInfoCapture.Country := TextCountry;
+        end;
 
         if (Evaluate(MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText(Element, ElementPath + 'birthday', 10, false))) then;
         if (Evaluate(MemberInfoCapture.Gender, NpXmlDomMgt.GetXmlText(Element, ElementPath + 'gender', 1, false))) then;
