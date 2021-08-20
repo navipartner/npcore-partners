@@ -1,9 +1,5 @@
 ﻿codeunit 6059900 "NPR Task Jnl. Management"
 {
-    // TQ1.19/JDH/20141203 CASE 199066 Multicompany handling extended
-    // TQ1.27/JDH/20150701 CASE 217903 Deleted unused Variables and fields
-    // TQ1.28/MHA/20151216  CASE 229609 Task Queue
-
     Permissions = TableData "Job Journal Template" = imd,
                   TableData "Job Journal Batch" = imd;
 
@@ -126,19 +122,18 @@
         TaskQueue: Record "NPR Task Queue";
         TaskQueue2: Record "NPR Task Queue";
         TaskLog2: Record "NPR Task Log (Task)";
+        TaskLog3: Record "NPR Task Log (Task)";
         TaskOutputLog2: Record "NPR Task Output Log";
         TaskLineParm2: Record "NPR Task Line Parameters";
         TaskLineParm: Record "NPR Task Line Parameters";
         Dia: Dialog;
     begin
-        //TQ1.06-
         TaskBatch.Get(TaskLine."Journal Template Name", TaskLine."Journal Batch Name");
         if not TaskBatch."Common Companies" then
             exit;
 
         TaskBatch.TestField("Master Company", CompanyName);
 
-        //-TQ1.19
         if GuiAllowed then begin
             SyncNextExecuteTime := Confirm(Text006, false, TaskQueue.FieldCaption("Next Run time"));
             if SyncNextExecuteTime then begin
@@ -148,15 +143,12 @@
             SyncParms := Confirm(Text006, false, TaskLineParm.TableCaption);
             Dia.Open(Text008);
         end;
-        //+TQ1.19
 
         Comp.SetFilter(Name, '<>%1', CompanyName);
         if Comp.FindSet() then
             repeat
-                //-TQ1.19
                 if GuiAllowed then
                     Dia.Update(1, Comp.Name);
-                //+TQ1.19
                 TaskBatch2.ChangeCompany(Comp.Name);
                 if TaskBatch2.Get(TaskBatch."Journal Template Name", TaskBatch.Name) then begin
                     case ChangeType of
@@ -170,10 +162,6 @@
                         ChangeType::Modify:
                             begin
                                 TaskLine2.ChangeCompany(Comp.Name);
-                                //-TQ1.19
-                                //TaskLine2 := TaskLine;
-                                //IF NOT TaskLine2.MODIFY(FALSE) THEN
-                                //  TaskLine2.INSERT(FALSE);
                                 if TaskLine2.Get(TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.") then begin
                                     TaskLine2.TransferFields(TaskLine, false);
                                     TaskLine2.Modify();
@@ -213,8 +201,6 @@
                                         until TaskLineParm.Next() = 0;
 
                                 end;
-
-                                //+TQ1.19
                             end;
                         ChangeType::Delete:
                             begin
@@ -222,7 +208,6 @@
                                 TaskLine2.TestField(Enabled, false);
                                 if TaskLine2.Get(TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.") then
                                     TaskLine2.Delete(false);
-                                //-TQ1.19
                                 TaskQueue2.LockTable();
                                 TaskQueue2.SetRange(Company, CompanyName);
                                 TaskQueue2.SetRange("Task Template", TaskLine."Journal Template Name");
@@ -234,15 +219,17 @@
                                 end;
 
                                 TaskLog2.ChangeCompany(Comp.Name);
+                                TaskLog2.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Line No.");
                                 TaskLog2.SetRange("Journal Template Name", TaskLine."Journal Template Name");
                                 TaskLog2.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
                                 TaskLog2.SetRange("Line No.", TaskLine."Line No.");
                                 if TaskLog2.FindSet(true, true) then
                                     repeat
-                                        TaskLog2."Journal Template Name" := '';
-                                        TaskLog2."Journal Batch Name" := '';
-                                        TaskLog2."Line No." := 0;
-                                        TaskLog2.Modify();
+                                        TaskLog3 := TaskLog2;
+                                        TaskLog3."Journal Template Name" := '';
+                                        TaskLog3."Journal Batch Name" := '';
+                                        TaskLog3."Line No." := 0;
+                                        TaskLog3.Modify();
                                     until TaskLog2.Next() = 0;
 
                                 TaskOutputLog2.ChangeCompany(Comp.Name);
@@ -262,7 +249,6 @@
                                 TaskLineParm2.SetRange("Journal Batch Name", TaskLine."Journal Batch Name");
                                 TaskLineParm2.SetRange("Journal Line No.", TaskLine."Line No.");
                                 TaskLineParm2.DeleteAll();
-                                //+TQ1.19
                             end;
                         ChangeType::Rename:
                             begin
@@ -271,11 +257,8 @@
                     end;
                 end;
             until Comp.Next() = 0;
-        //TQ1.06+
-        //-TQ1.19
         if GuiAllowed then
             Dia.Close();
-        //+TQ1.19
     end;
 
     procedure SetupCommonBatch(TaskBatch: Record "NPR Task Batch")
@@ -366,4 +349,3 @@
             until TempConfigSel.Next() = 0;
     end;
 }
-

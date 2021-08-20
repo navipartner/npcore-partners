@@ -496,6 +496,7 @@ table 6059902 "NPR Task Line"
     var
         TaskQueue: Record "NPR Task Queue";
         TaskLog: Record "NPR Task Log (Task)";
+        TaskLog2: Record "NPR Task Log (Task)";
         TaskOutputLog: Record "NPR Task Output Log";
         TaskLineParm: Record "NPR Task Line Parameters";
     begin
@@ -509,15 +510,17 @@ table 6059902 "NPR Task Line"
             TaskQueue.Delete(true);
         end;
 
+        TaskLog.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Line No.");
         TaskLog.SetRange("Journal Template Name", "Journal Template Name");
         TaskLog.SetRange("Journal Batch Name", "Journal Batch Name");
         TaskLog.SetRange("Line No.", "Line No.");
         if TaskLog.FindSet(true, true) then
             repeat
-                TaskLog."Journal Template Name" := '';
-                TaskLog."Journal Batch Name" := '';
-                TaskLog."Line No." := 0;
-                TaskLog.Modify();
+                TaskLog2 := TaskLog;
+                TaskLog2."Journal Template Name" := '';
+                TaskLog2."Journal Batch Name" := '';
+                TaskLog2."Line No." := 0;
+                TaskLog2.Modify();
             until TaskLog.Next() = 0;
 
         TaskOutputLog.SetRange("Journal Template Name", "Journal Template Name");
