@@ -6,6 +6,8 @@ report 6014402 "NPR Discount Statistics"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

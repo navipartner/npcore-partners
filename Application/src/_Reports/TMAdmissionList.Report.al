@@ -5,6 +5,8 @@ report 6060126 "NPR TM Admission List"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'TM Admission List';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("TM Admission"; "NPR TM Admission")

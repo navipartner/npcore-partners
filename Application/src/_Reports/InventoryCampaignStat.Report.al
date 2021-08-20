@@ -5,6 +5,7 @@ report 6014499 "NPR Inventory Campaign Stat."
     Caption = 'Inventory Campaign Stat.';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

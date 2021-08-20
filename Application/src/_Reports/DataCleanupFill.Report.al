@@ -5,6 +5,8 @@ report 6060100 "NPR Data Cleanup Fill"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Data Cleanup Customer';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Integer"; "Integer")

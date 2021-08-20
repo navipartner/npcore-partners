@@ -5,6 +5,8 @@ report 6060150 "NPR Event Customer Template"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Event Customer Template';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Job; Job)

@@ -5,6 +5,8 @@ report 6060136 "NPR MM Membership Not Renewed"
     Caption = 'Membership Not Renewed';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("MM Membership Setup"; "NPR MM Membership Setup")

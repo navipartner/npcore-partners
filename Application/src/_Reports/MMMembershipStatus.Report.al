@@ -5,6 +5,8 @@ report 6060132 "NPR MM Membership Status"
     Caption = 'Membership Status';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("MM Membership Setup"; "NPR MM Membership Setup")

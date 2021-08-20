@@ -5,6 +5,8 @@ report 6014450 "NPR Items Received&Not Invoic."
     Caption = 'Items Received & Not Invoiced';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Purchase Header"; "Purchase Header")

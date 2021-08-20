@@ -6,6 +6,7 @@ report 6014490 "NPR Advanced Sales Stat."
     ApplicationArea = NPRRetail;
     Caption = 'Advanced Sales Statistics';
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

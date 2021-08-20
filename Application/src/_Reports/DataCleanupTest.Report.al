@@ -5,6 +5,8 @@ report 6060101 "NPR Data Cleanup Test"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Data Cleanup Test';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Data Cleanup GCVI"; "NPR Data Cleanup GCVI")

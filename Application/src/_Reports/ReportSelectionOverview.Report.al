@@ -5,5 +5,6 @@ report 6014613 "NPR Report Selection Overview"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Report Selection Overview';
+    DataAccessIntent = ReadOnly;
 }
 

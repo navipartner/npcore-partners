@@ -7,6 +7,8 @@ report 6014456 "NPR Sales per week year/Last"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Integer"; "Integer")

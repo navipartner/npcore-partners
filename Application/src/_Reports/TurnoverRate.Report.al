@@ -5,6 +5,8 @@ report 6014427 "NPR Turnover Rate"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Turnover Rate';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

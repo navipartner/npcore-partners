@@ -5,6 +5,8 @@ report 6014597 "NPR Sales Per Contact"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Sales Per. Contact';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Contact; Contact)

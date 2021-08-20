@@ -5,6 +5,7 @@ report 6014540 "NPR Items With Low Sales"
     Caption = 'Items With Low Sales';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

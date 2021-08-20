@@ -5,6 +5,7 @@ report 6014555 "NPR Attribute Filter"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'NPR Attribute Filter';
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

@@ -6,6 +6,7 @@ report 6014497 "NPR Campaign Vendor List"
     ApplicationArea = NPRRetail;
     Caption = 'Inventory Campaign Stat.';
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

@@ -6,6 +6,8 @@ report 6014514 "NPR Retail Journal List"
     ApplicationArea = NPRRetail;
     Caption = 'Retail Journal List';
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Retail Journal Line"; "NPR Retail Journal Line")

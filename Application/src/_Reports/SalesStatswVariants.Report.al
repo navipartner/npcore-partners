@@ -6,6 +6,8 @@ report 6014611 "NPR Sales Stats w/ Variants"
     ApplicationArea = NPRRetail;
     Caption = 'Item - Sales Statistics';
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

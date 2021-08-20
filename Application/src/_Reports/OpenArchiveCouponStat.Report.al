@@ -5,6 +5,8 @@ report 6151598 "NPR Open/Archive Coupon Stat."
     Caption = 'Open/Archived Coupon Statistics';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("NpDc Coupon Type"; "NPR NpDc Coupon Type")

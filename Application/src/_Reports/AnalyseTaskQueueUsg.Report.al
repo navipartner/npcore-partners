@@ -5,6 +5,8 @@ report 6059900 "NPR Analyse Task Queue Usg."
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Analyse Task Queue Usage';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Task Log (Task)"; "NPR Task Log (Task)")

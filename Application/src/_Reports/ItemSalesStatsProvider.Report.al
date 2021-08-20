@@ -5,6 +5,8 @@ report 6014430 "NPR Item Sales Stats/Provider"
     Caption = 'Item Sales Statistics/Provider';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Integer"; "Integer")

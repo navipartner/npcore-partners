@@ -5,6 +5,8 @@ report 6014529 "NPR Vendor/Salesperson"
     Caption = 'Vendor/Salesperson';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Vendor; Vendor)

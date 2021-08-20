@@ -7,6 +7,8 @@ report 6014612 "NPR Inventory per Variant/date"
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(ReportHdr; "Integer")

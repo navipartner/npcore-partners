@@ -6,6 +6,8 @@ report 6060125 "NPR TM Visiting Report"
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("TM Admission Schedule Entry"; "NPR TM Admis. Schedule Entry")

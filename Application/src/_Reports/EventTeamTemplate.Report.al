@@ -5,6 +5,8 @@ report 6060151 "NPR Event Team Template"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Event Team Template';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Job; Job)

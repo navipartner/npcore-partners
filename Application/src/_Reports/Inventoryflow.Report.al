@@ -7,6 +7,8 @@ report 6014533 "NPR Inventory - flow"
     Caption = 'Inventory Flow';
     UseRequestPage = true;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Vendor; Vendor)

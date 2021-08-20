@@ -5,6 +5,7 @@ report 6014400 "NPR Inventory by age"
     Caption = 'Inventory By Age';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

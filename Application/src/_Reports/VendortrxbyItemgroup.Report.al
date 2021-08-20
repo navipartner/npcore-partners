@@ -6,6 +6,8 @@ report 6014449 "NPR Vendor trx by Item group"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(ItemCategory; "Item Category")

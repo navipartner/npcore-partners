@@ -5,6 +5,7 @@ report 6014448 "NPR Item Group Inv. Value"
     Caption = 'Item Group Inventory Value';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

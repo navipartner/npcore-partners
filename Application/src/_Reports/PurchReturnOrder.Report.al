@@ -6,6 +6,8 @@ report 6014510 "NPR Purch Return Order"
     ApplicationArea = NPRRetail;
     Caption = 'Return Order';
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Purchase Header"; "Purchase Header")
