@@ -90,6 +90,12 @@ page 6060136 "NPR MM Member Card"
                     ToolTip = 'Specifies the value of the City field';
                     ApplicationArea = NPRRetail;
                 }
+                field(CountryCode; Rec."Country Code")
+                {
+                    ToolTip = 'Specifies the value of the Country Code field';
+                    ApplicationArea = NPRRetail;
+                }
+
                 field(Country; Rec.Country)
                 {
 

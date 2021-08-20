@@ -84,6 +84,10 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         }
                         fieldelement(country; tmpMemberInfoResponse.Country)
                         {
+                            fieldattribute(countrycode; tmpMemberInfoResponse."Country Code")
+                            {
+                                XmlName = 'code';
+                            }
                         }
                         fieldelement(birthday; tmpMemberInfoResponse.Birthday)
                         {
