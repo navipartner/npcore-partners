@@ -5,6 +5,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Acc. Statement w FIK-Card';
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

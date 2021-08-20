@@ -5,6 +5,7 @@ report 6060111 "NPR Check Duplicate Cust."
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Check Duplicate Customers';
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

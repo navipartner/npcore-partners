@@ -5,6 +5,8 @@ report 6014616 "NPR Retail Campaign Items"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Retail Campaign Items';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Retail Campaign Header"; "NPR Retail Campaign Header")

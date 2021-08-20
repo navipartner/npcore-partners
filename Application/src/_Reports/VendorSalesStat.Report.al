@@ -6,6 +6,8 @@ report 6014419 "NPR Vendor Sales Stat"
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Vendor; Vendor)

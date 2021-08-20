@@ -5,6 +5,8 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
     Caption = 'Restaurant Daily Turnover';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("POS Entry"; "NPR POS Entry")

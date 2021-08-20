@@ -6,6 +6,8 @@ report 6014457 "NPR Sales Stat/Analysis"
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(ItemCategoryHeader; "Item Category")

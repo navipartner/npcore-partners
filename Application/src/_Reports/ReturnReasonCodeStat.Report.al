@@ -6,6 +6,8 @@ report 6014404 "NPR Return Reason Code Stat."
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Return Reason"; "Return Reason")

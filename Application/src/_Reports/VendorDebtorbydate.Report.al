@@ -5,6 +5,8 @@ report 6014434 "NPR Vendor/Debtor by date"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Vendor/Customer by date';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Integer"; "Integer")

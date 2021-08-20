@@ -5,6 +5,8 @@ report 6014615 "NPR Sales Stats Per Variety"
     Caption = 'Sales Statistics Variant';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

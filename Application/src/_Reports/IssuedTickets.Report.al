@@ -5,6 +5,7 @@ report 6014413 "NPR Issued Tickets"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Issued Tickets';
+    DataAccessIntent = ReadOnly;
     dataset
     {
         dataitem("TM Ticket"; "NPR TM Ticket")

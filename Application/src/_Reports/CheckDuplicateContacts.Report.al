@@ -5,6 +5,8 @@ report 6060112 "NPR Check Duplicate Contacts"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Check Duplicate Contacts';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(IntegerComp; "Integer")

@@ -5,6 +5,8 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Inventory - Sales Statistics';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Item; Item)

@@ -6,6 +6,8 @@ report 6014443 "NPR Period Discount Stat."
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem("Period Discount"; "NPR Period Discount")

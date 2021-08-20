@@ -5,6 +5,7 @@ report 6014403 "NPR Archived Voucher List"
     RDLCLayout = './src/_Reports/layouts/Archived Voucher List.rdlc';
     ApplicationArea = NPRRetail;
     UsageCategory = ReportsAndAnalysis;
+    DataAccessIntent = ReadOnly;
 
     dataset
     {

@@ -6,6 +6,7 @@ report 6151013 "NPR NpRv Voucher"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'NpRv Voucher';
+    DataAccessIntent = ReadOnly;
     DefaultLayout = Word;
     dataset
     {

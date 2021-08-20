@@ -5,6 +5,8 @@ report 6014425 "NPR Event Overview"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Event Overview';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(Date; Date)

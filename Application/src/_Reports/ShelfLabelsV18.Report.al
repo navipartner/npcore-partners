@@ -8,6 +8,8 @@ report 6014428 "NPR Shelf Labels"
     Caption = 'Shelf Labels';
     PreviewMode = PrintLayout;
     UseSystemPrinter = true;
+    DataAccessIntent = ReadOnly;
+    
     dataset
     {
         dataitem(Retail_Journal_Line; "NPR Retail Journal Line")

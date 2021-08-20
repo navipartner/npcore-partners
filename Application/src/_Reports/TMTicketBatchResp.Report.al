@@ -5,6 +5,8 @@ report 6060124 "NPR TM Ticket Batch Resp."
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Ticket Batch Response';
+    DataAccessIntent = ReadOnly;
+
     dataset
     {
         dataitem(ReservationRequest; "NPR TM Ticket Reservation Req.")
