@@ -5,6 +5,7 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
         SendClientDiagnostics();
     end;
 
+    [TryFunction]
     local procedure SendClientDiagnostics()
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -182,7 +183,7 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
             exit;
         end;
 
-        if Run() then;
+        SendClientDiagnostics();
         LogMessageStopwatch.LogFinish();
     end;
 }
