@@ -86,7 +86,7 @@ tableextension 6014437 "NPR Contact" extends Contact
 
     keys
     {
-#if BC18
+#if not BC17
         key("NPR Key1"; "E-Mail")
         {
             
