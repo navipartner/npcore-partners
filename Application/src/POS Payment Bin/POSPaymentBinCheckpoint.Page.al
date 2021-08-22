@@ -405,10 +405,10 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
 
     local procedure GetPosUnitNo(): Code[10]
     var
+        POSUnit: Record "NPR POS Unit";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
-        POSUnit: Record "NPR POS Unit";
     begin
         if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
             POSFrontEndManagement.GetSession(POSSession);
@@ -422,10 +422,10 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
 
     local procedure GetStoreCode(): Code[10]
     var
+        POSStore: Record "NPR POS Store";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
-        POSStore: Record "NPR POS Store";
     begin
         if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
             POSFrontEndManagement.GetSession(POSSession);

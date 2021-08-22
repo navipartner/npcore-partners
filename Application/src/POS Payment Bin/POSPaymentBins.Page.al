@@ -149,14 +149,14 @@ page 6150620 "NPR POS Payment Bins"
 
     local procedure TransferContentsToBin()
     var
-        CheckpointEntryNo: Integer;
+        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        SalePOS: Record "NPR POS Sale";
         PaymentBinCheckpoint: Codeunit "NPR POS Payment Bin Checkpoint";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
-        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        CheckpointEntryNo: Integer;
         PageAction: Action;
-        SalePOS: Record "NPR POS Sale";
     begin
 
         //-NPR5.40 [307267]
@@ -183,7 +183,7 @@ page 6150620 "NPR POS Payment Bins"
                 SalePOS."Register No." := 'TMP';
                 SalePOS."POS Store Code" := 'TMP';
                 SalePOS.Date := Today();
-                SalePOS."Sales Ticket No." := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890'));
+                SalePOS."Sales Ticket No." := CopyStr(DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890')), 1, 20);
 
                 POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, true, CheckpointEntryNo);
             end;
@@ -193,13 +193,13 @@ page 6150620 "NPR POS Payment Bins"
 
     local procedure InsertInitialFloat()
     var
-        POSPayBinSetFloat: Page "NPR POS Paym.Bin Set Float";
-        POSUnit: Record "NPR POS Unit";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        POSUnit: Record "NPR POS Unit";
         TempPOSPaymentMethod: Record "NPR POS Payment Method" temporary;
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         BinEntry: Record "NPR POS Bin Entry";
+        POSPayBinSetFloat: Page "NPR POS Paym.Bin Set Float";
     begin
         //-NPR5.51 [353761]
         POSUnit.Get(Rec."Attached to POS Unit No.");

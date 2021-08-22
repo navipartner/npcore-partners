@@ -101,10 +101,10 @@ page 6150623 "NPR POS Paym.Bin Set Float"
     end;
 
     var
-        Amount: Decimal;
-        TempPOSPaymentMethod: Record "NPR POS Payment Method" temporary;
-        NegAmountErr: Label 'Amount can''t be set as negative.';
         POSPaymentBin: Record "NPR POS Payment Bin";
+        TempPOSPaymentMethod: Record "NPR POS Payment Method" temporary;
+        Amount: Decimal;
+        NegAmountErr: Label 'Amount can''t be set as negative.';
         FloatAlreadySetErr: Label 'Float is already set for %1 %2, %3 %4.';
 
     procedure SetPaymentBin(POSPaymentBinHere: Record "NPR POS Payment Bin")
