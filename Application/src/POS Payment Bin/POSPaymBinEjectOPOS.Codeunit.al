@@ -48,8 +48,8 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
     local procedure OnLookupBinInvokeMethods(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;
-        tmpRetailList.Choice := InvokeMethodCode();
-        tmpRetailList.Value := InvokeMethodCode();
+        tmpRetailList.Choice := CopyStr(InvokeMethodCode(), 1, 246);
+        tmpRetailList.Value := CopyStr(InvokeMethodCode(), 1, 250);
         tmpRetailList.Insert();
     end;
 
@@ -101,9 +101,9 @@ codeunit 6150642 "NPR POS Paym.Bin Eject: OPOS"
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
     local procedure OnOPOSEjectResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        OPOSEjectDrawerResponse: DotNet NPRNetEjectDrawerResponse;
-        ErrorMessage: Text;
         Stargate: Codeunit "NPR POS Stargate Management";
+        ErrorMessage: Text;
+        OPOSEjectDrawerResponse: DotNet NPRNetEjectDrawerResponse;
     begin
         if ActionName <> InvokeMethodCode() then
             exit;

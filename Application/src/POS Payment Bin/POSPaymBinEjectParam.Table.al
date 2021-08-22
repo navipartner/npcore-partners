@@ -63,9 +63,9 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
         if not Get(BinNoIn, NameIn) then begin
             Init();
             "Bin No." := BinNoIn;
-            Name := NameIn;
+            Name := CopyStr(NameIn, 1, 30);
             "Data Type" := DataType;
-            OptionString := OptionStringIn;
+            OptionString := CopyStr(OptionStringIn, 1, 250);
             Validate(Value, DefaultValue);
             Insert();
             Commit();
@@ -92,7 +92,7 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
 
         foreach Part in Parts do begin
             TempRetailList.Number += 1;
-            TempRetailList.Choice := Part;
+            TempRetailList.Choice := CopyStr(Part, 1, 246);
             TempRetailList.Insert();
         end;
 
@@ -160,7 +160,7 @@ table 6150633 "NPR POS Paym. Bin Eject Param."
                     OnGetParameterOptionStringCaption(Rec, OptionsCaption);
                     if OptionsCaption <> '' then
                         if TrySelectStr(GetOptionInt(Value, OptionsCaption), OptionString, OptionOut) then
-                            Value := OptionOut;
+                            Value := CopyStr(OptionOut, 1, 250);
                     case true of
                         Value = '':
                             Value := '0';

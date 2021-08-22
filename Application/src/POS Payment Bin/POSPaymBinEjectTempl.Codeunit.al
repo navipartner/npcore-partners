@@ -20,14 +20,14 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
     local procedure OnEjectPaymentBin(POSPaymentBin: Record "NPR POS Payment Bin"; var Ejected: Boolean)
     var
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
-        Template: Text;
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+        Template: Text[20];
         RecordVariant: Variant;
     begin
         if POSPaymentBin."Eject Method" <> InvokeMethodCode() then
             exit;
 
-        Template := POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'print_template', '');
+        Template := CopyStr(POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'print_template', ''), 1, 20);
 
         POSPaymentBin.SetRecFilter();
         RecordVariant := POSPaymentBin;
@@ -40,8 +40,8 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
     local procedure OnLookupBinInvokeMethods(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;
-        tmpRetailList.Choice := InvokeMethodCode();
-        tmpRetailList.Value := InvokeMethodCode();
+        tmpRetailList.Choice := CopyStr(InvokeMethodCode(), 1, 246);
+        tmpRetailList.Value := CopyStr(InvokeMethodCode(), 1, 250);
         tmpRetailList.Insert();
     end;
 
