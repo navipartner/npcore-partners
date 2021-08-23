@@ -463,8 +463,8 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
     local procedure SerialNoOnAfterValidate()
     var
-        ExpDate: Date;
         ItemTrackingMgt: Codeunit "Item Tracking Management";
+        ExpDate: Date;
         EntriesExist: Boolean;
     begin
         if Rec."Serial No." <> '' then
@@ -477,8 +477,8 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
     local procedure LotNoOnAfterValidate()
     var
-        ExpDate: Date;
         ItemTrackingMgt: Codeunit "Item Tracking Management";
+        ExpDate: Date;
         EntriesExist: Boolean;
     begin
         if Rec."Lot No." <> '' then
