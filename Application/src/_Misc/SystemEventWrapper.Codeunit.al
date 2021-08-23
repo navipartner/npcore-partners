@@ -87,7 +87,7 @@ codeunit 6014427 "NPR System Event Wrapper"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Caption Class", 'OnAfterCaptionClassResolve', '', true, true)]
     local procedure CaptionClassOnAfterCaptionClassTranslate(Language: Integer; CaptionExpression: Text; var Caption: Text[1024])
     begin
-        OnAfterCaptionClassTranslate(Language, CaptionExpression, Caption);
+        OnAfterCaptionClassTranslate(Language, CopyStr(CaptionExpression, 1, 1024), Caption);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::ReportManagement, 'OnAfterGetPrinterName', '', true, true)]

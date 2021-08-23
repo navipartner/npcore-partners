@@ -15,7 +15,7 @@ codeunit 6059823 "NPR TransferOrder-Post + Print"
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
         POSFlagG: Boolean;
         ShipReceiveLbl: Label '&Ship,&Receive';
-        TemplateName: Text;
+        TemplateName: Text[20];
 
     local procedure "Code"()
     var
@@ -92,7 +92,7 @@ codeunit 6059823 "NPR TransferOrder-Post + Print"
         end;
     end;
 
-    procedure SetParameter(Template: Text; Rec: Record "Transfer Header")
+    procedure SetParameter(Template: Text[20]; Rec: Record "Transfer Header")
     begin
         TemplateName := Template;
     end;

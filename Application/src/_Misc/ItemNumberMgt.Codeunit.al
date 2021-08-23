@@ -214,7 +214,7 @@
         ItemVendor.SetRange("Vendor No.", VendorNo);
         if ItemVendor.FindFirst() then
             if ItemVendor."Vendor Item No." <> '' then
-                exit(ItemVendor."Vendor Item No.");
+                exit(CopyStr(ItemVendor."Vendor Item No.", 1, 30));
 
         SKU.Reset();
         SKU.SetRange("Item No.", ItemNo);
@@ -222,9 +222,9 @@
         SKU.SetFilter("Vendor No.", '%1|%2', VendorNo, '');
         SKU.SetFilter("Vendor Item No.", '<>%1', '');
         if SKU.FindFirst() then
-            exit(SKU."Vendor Item No.");
+            exit(CopyStr(SKU."Vendor Item No.", 1, 30));
 
-        exit(Item."Vendor Item No.");
+        exit(CopyStr(Item."Vendor Item No.", 1, 30));
     end;
 
     procedure UpdateBarcode(ItemNo: Code[20]; VariantCode: Code[20]; BarCode: Code[50]; BarCodeType: Option AltNo,CrossReference)

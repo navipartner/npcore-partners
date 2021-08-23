@@ -51,7 +51,7 @@ table 6060101 "NPR Data Cleanup GCVI"
 
             trigger OnValidate()
             begin
-                "User Approve Del" := UserId;
+                "User Approve Del" := CopyStr(UserId, 1, 50);
                 IsApproved := "Approve Delete";
             end;
         }
@@ -152,7 +152,7 @@ table 6060101 "NPR Data Cleanup GCVI"
 
             trigger OnValidate()
             begin
-                "User Approve Ren" := UserId;
+                "User Approve Ren" := CopyStr(UserId, 1, 50);
                 IsApproved := "Approve Rename";
             end;
         }
@@ -181,7 +181,7 @@ table 6060101 "NPR Data Cleanup GCVI"
     begin
         "Date Created" := Today();
         "Time Created" := Time;
-        "User Created" := UserId;
+        "User Created" := CopyStr(UserId, 1, 50);
 
         UpdateDescription();
     end;
@@ -190,7 +190,7 @@ table 6060101 "NPR Data Cleanup GCVI"
     begin
         "Date Modified" := Today();
         "Time Modified" := Time;
-        "User Modified" := UserId;
+        "User Modified" := CopyStr(UserId, 1, 50);
 
         UpdateDescription();
     end;

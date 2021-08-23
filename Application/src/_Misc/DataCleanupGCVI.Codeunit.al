@@ -18,7 +18,7 @@ codeunit 6060101 "NPR Data Cleanup GCVI"
             repeat
                 DataCleanupCVI2.Get(DataCleanupCVI."Cleanup Action", DataCleanupCVI.Type, DataCleanupCVI."No.");
                 if not CODEUNIT.Run(CODEUNIT::"NPR Data Cleanup GCVI Line", DataCleanupCVI2) then begin
-                    DataCleanupCVI2.Status := GetLastErrorText;
+                    DataCleanupCVI2.Status := CopyStr(GetLastErrorText(), 1, 250);
                     DataCleanupCVI2.IsError := true;
                 end else begin
                     DataCleanupCVI2.Status := SuccessLbl;
@@ -42,7 +42,7 @@ codeunit 6060101 "NPR Data Cleanup GCVI"
                 DataCleanupCVI2.Get(DataCleanupCVI."Cleanup Action", DataCleanupCVI.Type, DataCleanupCVI."No.");
 
                 if not CODEUNIT.Run(CODEUNIT::"NPR Data Cleanup GCVI Line", DataCleanupCVI2) then begin
-                    DataCleanupCVI2.Status := GetLastErrorText;
+                    DataCleanupCVI2.Status := CopyStr(GetLastErrorText(), 1, 250);
                     DataCleanupCVI2.IsError := true;
                 end else begin
                     DataCleanupCVI2.Status := SuccessLbl;
