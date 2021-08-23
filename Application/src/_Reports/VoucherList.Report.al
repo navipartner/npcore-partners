@@ -17,47 +17,42 @@ report 6014401 "NPR Voucher List"
             column(No; "No.")
             {
                 IncludeCaption = true;
-
             }
             column(VoucherType; "Voucher Type")
             {
                 IncludeCaption = true;
-
             }
             column(Description; Description)
             {
                 IncludeCaption = true;
-
             }
             column(IssueDate; "Issue Date")
             {
                 IncludeCaption = true;
-
             }
             column(Open; Open)
             {
                 IncludeCaption = true;
-
+            }
+            column(Initial_Amount; "Initial Amount")
+            {
+                IncludeCaption = true;
             }
             column(Amount; Amount)
             {
                 IncludeCaption = true;
-
             }
+
             column(StartingDate; "Starting Date")
             {
                 IncludeCaption = true;
-
             }
             column(EndingDate; "Ending Date")
             {
-                IncludeCaption = true;
-
             }
             column(ReferenceNo; "Reference No.")
             {
                 IncludeCaption = true;
-
             }
             column(Name; Name)
             {
@@ -127,6 +122,15 @@ report 6014401 "NPR Voucher List"
                 }
             }
         }
+        trigger OnOpenPage()
+        begin
+
+            NPRNpRvVoucher.Setrange(Open, true);
+        end;
+    }
+    labels
+    {
+        ExpireDate_cap = 'Expiry Date';
     }
 
     trigger OnInitReport()
@@ -141,5 +145,4 @@ report 6014401 "NPR Voucher List"
         ArchivedLbl: Label 'Archived';
 
         TitleLbl: Label 'VOUCHER LIST';
-
 }
