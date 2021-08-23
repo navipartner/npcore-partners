@@ -103,12 +103,12 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
     }
 
     var
-        TemplateN: Text;
-        PostingVisibility: Boolean;
-        PostingVisibilityPOS: Boolean;
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         Codeunit6059823: Codeunit "NPR TransferOrder-Post + Print";
+        PostingVisibility: Boolean;
+        PostingVisibilityPOS: Boolean;
         Visiblitycheck: Boolean;
+        TemplateN: Text[20];
 
     trigger OnOpenPage()
     begin

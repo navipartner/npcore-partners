@@ -34,12 +34,12 @@ codeunit 6014404 "NPR Event Subscriber"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
     local procedure SalesPostOnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
+        ConsignorEntry: Record "NPR Consignor Entry";
         SalesShptHeader: Record "Sales Shipment Header";
         SalesSetup: Record "Sales & Receivables Setup";
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-        RecRefShipment: RecordRef;
         PacsoftSetup: Record "NPR Pacsoft Setup";
-        ConsignorEntry: Record "NPR Consignor Entry";
+        RecRefShipment: RecordRef;
     begin
         SalesSetup.Get();
         if SalesHeader.Ship then
