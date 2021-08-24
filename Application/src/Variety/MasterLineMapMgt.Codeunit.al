@@ -33,12 +33,15 @@ codeunit 6014472 "NPR Master Line Map Mgt."
         MasterLineMap: Record "NPR Master Line Map";
     begin
         MasterLineMap.Init();
-        MasterLineMap."Table Id" := TableId;
-        MasterLineMap."Table Record Id" := TableRecordId;
+        if not MasterLineMap.Get(TableId, TableRecordId) then begin
+            MasterLineMap."Table Id" := TableId;
+            MasterLineMap."Table Record Id" := TableRecordId;
+            MasterLineMap.Insert();
+        end;
         MasterLineMap."Master Id" := MasterId;
         MasterLineMap."Is Master" := (TableRecordId = MasterId);
         MasterLineMap.Ordinal := NextOrdinal(TableId, MasterId);
-        MasterLineMap.Insert();
+        MasterLineMap.Modify();
     end;
 
     procedure IsMaster(TableId: Integer; TableRecordId: Guid): Boolean
