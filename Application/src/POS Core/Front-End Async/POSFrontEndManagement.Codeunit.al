@@ -836,6 +836,15 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    procedure SetLoggingLevel(Level: Integer)
+    var
+        Request: Codeunit "NPR Front-End: SetLoggingLevel";
+    begin
+        MakeSureFrameworkIsAvailable(true);
+        Request.SetLoggingLevel(Level);
+        InvokeFrontEndAsync(Request);
+    end;
+
     #region Model UI - TODO: refactor into Dragonglass!
 
     [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
