@@ -180,8 +180,8 @@ table 6150902 "NPR HC Register"
     end;
 
     var
-        Text1060003: Label 'Register %1 cannot be renamed!';
         DimMgt: Codeunit DimensionManagement;
+        Text1060003: Label 'Register %1 cannot be renamed!';
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin

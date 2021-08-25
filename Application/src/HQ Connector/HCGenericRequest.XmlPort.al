@@ -121,7 +121,7 @@ xmlport 6150905 "NPR HC Generic Request"
     procedure SetResponse(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)
     begin
         TmpResponse.TransferFields(TmpHCGenericWebRequest, true);
-        TmpResponse."Response User ID" := UserId;
+        TmpResponse."Response User ID" := CopyStr(UserId, 1, 50);
         TmpResponse."Response Date" := CurrentDateTime;
         TmpResponse.Insert();
 
