@@ -22,10 +22,10 @@ codeunit 6150912 "NPR HC Handle Inv. Message"
 
     local procedure ProcessRequest(Parameter: array[6] of Text; var Response: array[4] of Text; var ErrorDescription: Text): Boolean
     var
-        Inventory: Decimal;
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         Location: Record Location;
+        Inventory: Decimal;
     begin
         if Parameter[1] = '' then begin
             ErrorDescription := StrSubstNo(NotSpecified, Item.TableCaption);

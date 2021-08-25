@@ -203,7 +203,7 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
         Evaluate(TempHCAuditRoll."Item Entry Posted", NpXmlDomMgt.GetXmlText(Element, 'itementryposted', 0, false), 9);
         Evaluate(TempHCAuditRoll.Send, NpXmlDomMgt.GetXmlText(Element, 'send', 0, false), 9);
         Evaluate(TempHCAuditRoll."Offline receipt no.", NpXmlDomMgt.GetXmlText(Element, 'offlinereceiptno', 0, false), 9);
-        TempHCAuditRoll.Reference := NpXmlDomMgt.GetXmlText(Element, 'reference', MaxStrLen(TempHCAuditRoll.Reference), false);
+        TempHCAuditRoll.Reference := CopyStr(NpXmlDomMgt.GetXmlText(Element, 'reference', MaxStrLen(TempHCAuditRoll.Reference), false), 1, 50);
         PreprocessAuditRollLine(TempHCAuditRoll);
 
         //Record insert

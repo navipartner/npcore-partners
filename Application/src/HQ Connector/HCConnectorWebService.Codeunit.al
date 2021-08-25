@@ -79,10 +79,10 @@
     procedure GetCustomerPrice(var customerPriceRequest: XMLport "NPR HC Customer Price Request")
     var
         NaviConnectImportEntry: Record "NPR Nc Import Entry";
-        OutStr: OutStream;
-        CustomerPriceManagement: Codeunit "NPR HC Customer Price Mgt.";
         TempSalesHeader: Record "Sales Header" temporary;
         TempSalesLine: Record "Sales Line" temporary;
+        CustomerPriceManagement: Codeunit "NPR HC Customer Price Mgt.";
+        OutStr: OutStream;
         CustomerPriceRequestSetErrorResponseLbl: Label '<h3>HQ Connect Server:</h3><br>%1', Locked = true;
     begin
         SelectLatestVersion();
@@ -120,10 +120,10 @@
     procedure GenericWebRequest(var genericrequest: XMLport "NPR HC Generic Request")
     var
         NaviConnectImportEntry: Record "NPR Nc Import Entry";
-        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        OutStr: OutStream;
-        HCGenericWebReqManagement: Codeunit "NPR HC Generic Web Req. Mgt.";
         TempHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        HCGenericWebReqManagement: Codeunit "NPR HC Generic Web Req. Mgt.";
+        OutStr: OutStream;
         GenericRequestSetErrorResponseLbl: Label '<h3>HQ Connect Server:</h3><br>%1', Locked = true;
     begin
         SelectLatestVersion();
@@ -160,7 +160,7 @@
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
     end;
 
-    local procedure InsertImportEntry(WebserviceFunction: Text; CodeunitID: Integer; var ImportEntry: Record "NPR Nc Import Entry")
+    local procedure InsertImportEntry(WebserviceFunction: Text[80]; CodeunitID: Integer; var ImportEntry: Record "NPR Nc Import Entry")
     var
         NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
@@ -178,7 +178,7 @@
         ImportEntry.Insert(true);
     end;
 
-    local procedure InsertImportType(CodeunitNo: Integer; Webservicefunction: Text)
+    local procedure InsertImportType(CodeunitNo: Integer; Webservicefunction: Text[80])
     var
         NcImportType: Record "NPR Nc Import Type";
     begin
