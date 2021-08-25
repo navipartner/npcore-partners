@@ -107,13 +107,13 @@
         NonstockItem."Entry No." := '';
         NonstockItem.Validate("Vendor No.", VendorNo);
 
-        ItemCategory.Code := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 38);
+        ItemCategory.Code := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 38), 1, MaxStrLen(ItemCategory.Code));
         if not ItemCategory.Find() then begin
             ItemCategory.Init();
             ItemCategory.Insert();
         end;
 
-        ConfigTemplateHeader.Code := ItemCategory.Code;
+        ConfigTemplateHeader.Code := CopyStr(ItemCategory.Code, 1, MaxStrLen(ConfigTemplateHeader.Code));
         if not ConfigTemplateHeader.Find() then begin
             ConfigTemplateHeader.Init();
             ConfigTemplateHeader.Description := 'Created from Nordic Item Database';
@@ -130,7 +130,7 @@
         if not ConfigTemplateLine.FindFirst() then begin
             ConfigTemplateLine.Init();
             ConfigTemplateLine.Validate("Data Template Code", ItemCategory.Code);
-            ConfigTemplateLine."Line No." := GetNextConfigTemplateLineNo(ItemCategory.Code);
+            ConfigTemplateLine."Line No." := GetNextConfigTemplateLineNo(CopyStr(ItemCategory.Code, 1, 10));
             ConfigTemplateLine.Validate("Table ID", 27);
             ConfigTemplateLine.Validate("Field ID", 5702);
             ConfigTemplateLine.Mandatory := true;
@@ -143,7 +143,7 @@
 #else
         NonstockItem.Validate("Item Templ. Code", ItemCategory.Code);
 #endif
-        Manufacturer.Code := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 3);
+        Manufacturer.Code := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 3), 1, MaxStrLen(Manufacturer.Code));
         if not Manufacturer.Find() then begin
             Manufacturer.Init();
             Manufacturer.Insert();
@@ -152,7 +152,7 @@
         NonstockItem.Validate("Manufacturer Code", Manufacturer.Code);
         NonstockItem.Description := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 10), 1, MaxStrLen(NonstockItem.Description));
 
-        UnitofMeasure.Code := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 11);
+        UnitofMeasure.Code := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 11), 1, MaxStrLen(UnitofMeasure.Code));
         if not UnitofMeasure.Find() then begin
             UnitofMeasure.Init();
             UnitofMeasure.Validate(Code);
@@ -179,8 +179,8 @@
                 CatalogNonstockManagement.UpdateItemAttribute(1, NonstockItem."Entry No.", NPRAttribute.Code, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", NPRAttribute."Import File Column No."));
             until NPRAttribute.Next() = 0;
         NonstockItemMaterial."Nonstock Item Entry No." := NonstockItem."Entry No.";
-        NonstockItemMaterial."Item Material" := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 44);
-        NonstockItemMaterial."Item Material Density" := TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 45);
+        NonstockItemMaterial."Item Material" := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 44), 1, MaxStrLen(NonstockItemMaterial."Item Material"));
+        NonstockItemMaterial."Item Material Density" := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 45), 1, MaxStrLen(NonstockItemMaterial."Item Material Density"));
         NonstockItemMaterial.Insert();
     end;
 
