@@ -62,7 +62,7 @@ page 6151041 "NPR Notification List"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCompletedFlag(UserId, gPOSNo, Format(Rec.Id));
+                    AFAPIWebService.SetNotificationCompletedFlag(CopyStr(UserId, 1, 50), gPOSNo, Format(Rec.Id));
                     CurrPage.Update();
                 end;
             }
@@ -80,7 +80,7 @@ page 6151041 "NPR Notification List"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCancelledFlag(UserId, gPOSNo, Format(Rec.Id));
+                    AFAPIWebService.SetNotificationCancelledFlag(CopyStr(UserId, 1, 50), gPOSNo, Format(Rec.Id));
                     CurrPage.Update();
                 end;
             }
