@@ -223,7 +223,7 @@ table 6151574 "NPR AF Notification Hub"
     begin
         "Notification Delivered to Hub" := false;
         Created := CurrentDateTime;
-        "Created By" := UserId;
+        "Created By" := CopyStr(UserId, 1, MaxStrLen("Created By"));
         Handled := 0DT;
         "Handled By" := '';
     end;

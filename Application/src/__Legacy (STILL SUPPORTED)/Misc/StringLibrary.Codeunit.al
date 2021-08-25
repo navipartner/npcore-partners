@@ -93,7 +93,7 @@ codeunit 6014465 "NPR String Library"
             Index := StrPos(String, Sequence);
             if Index > 0 then begin
                 Occurences += 1;
-                String := CopyStr(String, Index + StrLen(Sequence));
+                String := CopyStr(String, Index + StrLen(Sequence), MaxStrLen(String));
             end;
         end;
     end;
@@ -101,14 +101,14 @@ codeunit 6014465 "NPR String Library"
     procedure DeletePrefix(Text: Text[30])
     begin
         if StartsWith(Text) then begin
-            _String := CopyStr(_String, StrLen(Text) + 1);
+            _String := CopyStr(_String, StrLen(Text) + 1, MaxStrLen(_String));
         end;
     end;
 
     procedure DeleteSuffix(Text: Text[30])
     begin
         if EndsWith(Text) then begin
-            _String := CopyStr(_String, 1, StrLen(_String) - StrLen(Text));
+            _String := CopyStr(CopyStr(_String, 1, StrLen(_String) - StrLen(Text)), 1, MaxStrLen(_String));
         end;
     end;
 
@@ -123,9 +123,9 @@ codeunit 6014465 "NPR String Library"
         exit(CopyStr(_String, TextLen - SuffixLen + 1) = Text);
     end;
 
-    procedure GetPrefixBySeq(Sequence: Text[10]; n: Integer) Prefix: Text[512]
+    procedure GetPrefixBySeq(Sequence: Text[10]; n: Integer) Prefix: Text[1024]
     var
-        Suffix: Text[512];
+        Suffix: Text[1024];
         Index: Integer;
     begin
         if (CountOccurences(Sequence) < n) then
@@ -137,10 +137,10 @@ codeunit 6014465 "NPR String Library"
             if Index > 0 then begin
                 n -= 1;
                 Prefix += CopyStr(Suffix, 1, Index);
-                Suffix := CopyStr(Suffix, Index + 1);
+                Suffix := CopyStr(Suffix, Index + 1, MaxStrLen(Suffix));
             end;
         end;
-        Prefix := CopyStr(Prefix, 1, StrLen(Prefix) - 1)
+        Prefix := CopyStr(CopyStr(Prefix, 1, StrLen(Prefix) - 1), 1, MaxStrLen(Prefix));
     end;
 
     procedure GetSentence("Sentence Length": Integer): Text[1024]
@@ -150,12 +150,12 @@ codeunit 6014465 "NPR String Library"
     begin
         for Index := 1 to "Sentence Length" do
             if _String[Index] = ' ' then LastSpace := Index;
-        exit(CopyStr(_String, 1, LastSpace));
+        exit(CopyStr(CopyStr(_String, 1, LastSpace), 1, 1024));
     end;
 
-    procedure GetSuffixBySeq(Sequence: Text[10]; n: Integer) Suffix: Text[512]
+    procedure GetSuffixBySeq(Sequence: Text[10]; n: Integer) Suffix: Text[1024]
     var
-        Prefix: Text[512];
+        Prefix: Text[1024];
         Index: Integer;
     begin
         if (CountOccurences(Sequence) < n) then
@@ -167,7 +167,7 @@ codeunit 6014465 "NPR String Library"
             if Index > 0 then begin
                 n -= 1;
                 Prefix += CopyStr(Suffix, 1, Index);
-                Suffix := CopyStr(Suffix, Index + 1);
+                Suffix := CopyStr(Suffix, Index + 1, MaxStrLen(Suffix));
             end;
         end;
     end;
@@ -187,7 +187,7 @@ codeunit 6014465 "NPR String Library"
                 Index := -1;
             if Index > 0 then begin
                 _String := DelStr(_String, Index, StrLen(_What));
-                _String := InsStr(_String, _With, Index);
+                _String := CopyStr(InsStr(_String, _With, Index), 1, MaxStrLen(_String));
                 Index += StrLen(_With);
             end;
         end;
@@ -213,36 +213,36 @@ codeunit 6014465 "NPR String Library"
                 CopyStr(_String, Index, 1) in ['æ', 'å']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'a', Index);
+                        _String := CopyStr(InsStr(_String, 'a', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['Æ', 'Å']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'A', Index);
+                        _String := CopyStr(InsStr(_String, 'A', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['ø', 'ö']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'o', Index);
+                        _String := CopyStr(InsStr(_String, 'o', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['Ø', 'Ö']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'O', Index);
+                        _String := CopyStr(InsStr(_String, 'O', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['É', 'È', 'Ë', 'Ê']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'E', Index);
+                        _String := CopyStr(InsStr(_String, 'E', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['è', 'é', 'ë', 'ê']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'e', Index);
+                        _String := CopyStr(InsStr(_String, 'e', Index), 1, MaxStrLen(_String));
                     end;
                 else begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, '-', Index);
+                        _String := CopyStr(InsStr(_String, '-', Index), 1, MaxStrLen(_String));
                     end;
             end;
             Index += 1;
@@ -268,36 +268,36 @@ codeunit 6014465 "NPR String Library"
                 CopyStr(_String, Index, 1) in ['æ', 'å']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'a', Index);
+                        _String := CopyStr(InsStr(_String, 'a', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['Æ', 'Å']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'A', Index);
+                        _String := CopyStr(InsStr(_String, 'A', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['ø', 'ö']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'o', Index);
+                        _String := CopyStr(InsStr(_String, 'o', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['Ø', 'Ö']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'O', Index);
+                        _String := CopyStr(InsStr(_String, 'O', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['É', 'È', 'Ë', 'Ê']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'E', Index);
+                        _String := CopyStr(InsStr(_String, 'E', Index), 1, MaxStrLen(_String));
                     end;
                 CopyStr(_String, Index, 1) in ['è', 'é', 'ë', 'ê']:
                     begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, 'e', Index);
+                        _String := CopyStr(InsStr(_String, 'e', Index), 1, MaxStrLen(_String));
                     end;
                 else begin
                         _String := DelStr(_String, Index, 1);
-                        _String := InsStr(_String, '-', Index);
+                        _String := CopyStr(InsStr(_String, '-', Index), 1, MaxStrLen(_String));
                     end;
             end;
             Index += 1;
@@ -316,14 +316,14 @@ codeunit 6014465 "NPR String Library"
         Int1 := 1;
         while Itt < Index do begin
             Int1 := StrPos(String, Sep) + StrLen(Sep);
-            String := CopyStr(String, Int1);
+            String := CopyStr(String, Int1, MaxStrLen(String));
             Itt += 1;
         end;
         Int2 := StrPos(String, Sep);
         if Int2 > 0 then
-            exit(CopyStr(String, 1, Int2 - 1))
+            exit(CopyStr(CopyStr(String, 1, Int2 - 1), 1, 250))
         else
-            exit(String);
+            exit(CopyStr(String, 1, 250));
     end;
 
     procedure SelectString(Index: Integer): Text[250]
@@ -347,13 +347,13 @@ codeunit 6014465 "NPR String Library"
     procedure TrimStart(Sequence: Text[10])
     begin
         while CopyStr(_String, 1, StrLen(Sequence)) = Sequence do
-            _String := CopyStr(_String, 1 + StrLen(Sequence));
+            _String := CopyStr(_String, 1 + StrLen(Sequence), MaxStrLen(_String));
     end;
 
     procedure TrimEnd(Sequence: Text[10])
     begin
         while CopyStr(_String, StrLen(_String) - StrLen(Sequence) + 1) = Sequence do
-            _String := CopyStr(_String, 1, StrLen(_String) - StrLen(Sequence));
+            _String := CopyStr(CopyStr(_String, 1, StrLen(_String) - StrLen(Sequence)), 1, MaxStrLen(_String));
     end;
 
     procedure TrimWhiteSpace(StringToTrim: Text[1024]): Text[1024]
@@ -375,15 +375,15 @@ codeunit 6014465 "NPR String Library"
         OutStr := '';
         for i := 1 to TotalStrLen - StrLen(String) do begin
             if PadChar <> '' then
-                OutStr := OutStr + PadChar
+                OutStr := CopyStr(OutStr + PadChar, 1, MaxStrLen(OutStr))
             else
-                OutStr := OutStr + ' ';
+                OutStr := CopyStr(OutStr + ' ', 1, MaxStrLen(OutStr));
         end;
 
         if After then
-            OutStr := String + OutStr
+            OutStr := CopyStr(String + OutStr, 1, MaxStrLen(OutStr))
         else
-            OutStr := OutStr + String
+            OutStr := CopyStr(OutStr + String, 1, MaxStrLen(OutStr));
     end;
 }
 

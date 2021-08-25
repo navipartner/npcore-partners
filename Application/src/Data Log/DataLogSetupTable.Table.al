@@ -80,13 +80,13 @@ table 6059897 "NPR Data Log Setup (Table)"
 
     trigger OnInsert()
     begin
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Last Date Modified" := CurrentDateTime;
     end;
 
     trigger OnModify()
     begin
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Last Date Modified" := CurrentDateTime;
     end;
 
