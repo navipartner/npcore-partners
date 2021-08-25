@@ -361,7 +361,7 @@
         DataLogRecord."Table ID" := RecRef.Number;
         DataLogRecord."Log Date" := LastModified;
         DataLogRecord."Type of Change" := TypeOfChange;
-        DataLogRecord."User ID" := UserId;
+        DataLogRecord."User ID" := CopyStr(UserId, 1, MaxStrLen(DataLogRecord."User ID"));
         DataLogRecord.Insert();
 
         exit(DataLogRecord."Entry No.");
@@ -378,7 +378,7 @@
         DataLogRecord."Table ID" := RecRef.Number;
         DataLogRecord."Log Date" := LastModified;
         DataLogRecord."Type of Change" := TypeOfChange;
-        DataLogRecord."User ID" := UserId;
+        DataLogRecord."User ID" := CopyStr(UserId, 1, MaxStrLen(DataLogRecord."User ID"));
         DataLogRecord.Insert();
 
         exit(DataLogRecord."Entry No.");
