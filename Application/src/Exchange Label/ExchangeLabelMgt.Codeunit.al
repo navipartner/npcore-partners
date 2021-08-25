@@ -18,12 +18,12 @@
             if POSUnit.Get(UserSetup."NPR POS Unit No.") then;
 
         if StrLen(POSUnit."POS Store Code") <> 3 then
-            POSUnit."POS Store Code" := String.PadStrLeft(POSUnit."POS Store Code", 3, ' ', false);
+            POSUnit."POS Store Code" := CopyStr(String.PadStrLeft(POSUnit."POS Store Code", 3, ' ', false), 1, MaxStrLen(POSUnit."POS Store Code"));
 
-        ExchangeLabel."Store ID" := POSUnit."POS Store Code";
+        ExchangeLabel."Store ID" := CopyStr(POSUnit."POS Store Code", 1, MaxStrLen(ExchangeLabel."Store ID"));
         ExchangeLabel."Register No." := POSUnit."No.";
 
-        ExchangeLabel."Company Name" := CompanyName;
+        ExchangeLabel."Company Name" := CopyStr(CompanyName, 1, MaxStrLen(ExchangeLabel."Company Name"));
         ExchangeLabel."Table No." := RecRef.Number;
         ExchangeLabel."Valid From" := ValidFromDate;
         ExchangeLabel."Unit Price" := GetUnitPriceInclVat(RecRef);
@@ -71,8 +71,8 @@
     begin
         ExchangeLabelSetup.Get();
 
-        LabelCode := String.PadStrLeft(ExchangeLabel."No.", 7, '0', false);
-        exit(CreateEAN(StoreCode + LabelCode, ExchangeLabelSetup."EAN Prefix Exhange Label"));
+        LabelCode := CopyStr(String.PadStrLeft(ExchangeLabel."No.", 7, '0', false), 1, MaxStrLen(LabelCode));
+        exit(CopyStr(CreateEAN(StoreCode + LabelCode, ExchangeLabelSetup."EAN Prefix Exhange Label"), 1, 13));
     end;
 
     local procedure GetLabelFromLabelNo(LabelNo: Code[7]; var ExchangeLabel: Record "NPR Exchange Label")
@@ -158,7 +158,7 @@
         if not IsItemLine(RecRef) then exit;
 
         LabelNo := CreateExchLabelLineFromRecRef(RecRef, ValidFromDate, LabelBatchNumber, false);
-        GetLabelFromLabelNo(LabelNo, ExchangeLabel);
+        GetLabelFromLabelNo(CopyStr(LabelNo, 1, 7), ExchangeLabel);
         Commit();
         PrintLabel(ExchangeLabel);
     end;

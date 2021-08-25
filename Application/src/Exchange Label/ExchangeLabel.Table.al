@@ -157,9 +157,12 @@ table 6014498 "NPR Exchange Label"
     trigger OnInsert()
     var
         ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
+        NewNo: Code[20];
     begin
-        if "No." = '' then
-            NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", 0D, "No.", "No. Series");
+        if "No." = '' then begin
+            NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", 0D, NewNo, "No. Series");
+            "No." := CopyStr(NewNo, 1, MaxStrLen("No."));
+        end;
 
         TestField("Store ID");
 
