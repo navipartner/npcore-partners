@@ -53,7 +53,7 @@
             NPRAttributeValueSet.Insert();
         end;
 
-        NPRAttributeValueSet."Text Value" := AttributeValue;
+        NPRAttributeValueSet."Text Value" := CopyStr(AttributeValue, 1, MaxStrLen(NPRAttributeValueSet."Text Value"));
         NPRAttributeValueSet.Modify(true);
     end;
 
