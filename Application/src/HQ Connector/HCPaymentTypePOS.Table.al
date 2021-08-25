@@ -173,8 +173,8 @@ table 6150905 "NPR HC Payment Type POS"
             trigger OnValidate()
             var
                 Cust: Record Customer;
-                ErrCustomer: Label 'A deptor must be chosen for this accounttype';
                 CustomerList: Page "Customer List";
+                ErrCustomer: Label 'A deptor must be chosen for this accounttype';
             begin
                 RetailSetup.Get();
                 if "Account Type" = "Account Type"::Customer then begin

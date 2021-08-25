@@ -10,9 +10,9 @@
     var
         TempRevisionsrulle: Record "NPR HC Audit Roll Posting" temporary;
         HCRetailSetup: Record "NPR HC Retail Setup";
+        pRevisionsrulle: Record "NPR HC Audit Roll Posting";
         HCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
         ProgressVis: Boolean;
-        pRevisionsrulle: Record "NPR HC Audit Roll Posting";
         SkipPostGL: Boolean;
         SkipPostItem: Boolean;
 
@@ -199,15 +199,15 @@
         HCAuditRollToSalesDocument: Record "NPR HC Audit Roll";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        LocalHCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
-        LineNo: Integer;
-        SuccessPosting: Boolean;
         HCAuditRollPosting: Record "NPR HC Audit Roll Posting";
+        PaymentMethod: Record "Payment Method";
+        LocalHCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
+        HCPostSalesHeader: Codeunit "NPR HC Post S.Header";
+        LineNo: Integer;
         AccountType: Integer;
         AccountNo: Code[20];
+        SuccessPosting: Boolean;
         PostPayment: Boolean;
-        PaymentMethod: Record "Payment Method";
-        HCPostSalesHeader: Codeunit "NPR HC Post S.Header";
     begin
         HCAuditRoll.TestField("Customer No.");
         SalesHeader.Init();

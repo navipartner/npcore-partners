@@ -117,7 +117,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         NodeList: XmlNodeList;
         Node: XmlNode;
         TextOk: Text;
-        ElementPath: Text;
+        ElementPath: Text[250];
     begin
 
         if Element.IsEmpty then begin
@@ -154,7 +154,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
     var
         XMLDomManagement: Codeunit "XML DOM Management";
         Base64Convert: codeunit "Base64 Convert";
-        B64Credential: Text[200];
+        B64Credential: Text;
         XmlDocOut: XmlDocument;
         Client: HttpClient;
         RequestContent: HttpContent;
@@ -218,7 +218,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         exit(false);
     end;
 
-    local procedure EvaluateToDecimal(NumberText: Text[30]): Decimal
+    local procedure EvaluateToDecimal(NumberText: Text): Decimal
     var
         DecimalValueOut: Decimal;
     begin
@@ -229,7 +229,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         exit(DecimalValueOut);
     end;
 
-    local procedure EvaluateToInteger(NumberText: Text[30]): Integer
+    local procedure EvaluateToInteger(NumberText: Text): Integer
     var
         IntegerValueOut: Integer;
     begin

@@ -668,8 +668,8 @@ page 6150900 "NPR HC Audit Roll"
     procedure PostReceipt()
     var
         HCAuditRoll4: Record "NPR HC Audit Roll";
-        HCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
         HCAuditRollPosting: Record "NPR HC Audit Roll Posting";
+        HCPostTempAuditRoll: Codeunit "NPR HC Post Temp Audit Roll";
         TX001: Label 'Posted ?';
         PostDocNo: Code[20];
     begin

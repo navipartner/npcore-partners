@@ -6,11 +6,11 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
     procedure CallGenericWebRequest(EndpointCode: Code[10]; RequestCode: Code[20]; Parameters: array[6] of Text; var ResponseArray: array[4] of Text)
     var
         HCEndpointSetup: Record "NPR POS HC Endpoint Setup";
+        TempHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
+        ResponseXmlElement: XmlElement;
         SoapAction: Text;
         RequestXmlDocText: Text;
-        ResponseXmlElement: XmlElement;
         ResponseText: Text;
-        TempHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
         ResponseXmlText: Text;
     begin
 
@@ -32,7 +32,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
     begin
         TmpHCGenericWebRequest."Entry No." := 0;
         TmpHCGenericWebRequest."Request Date" := CurrentDateTime;
-        TmpHCGenericWebRequest."Request User ID" := UserId;
+        TmpHCGenericWebRequest."Request User ID" := CopyStr(UserId, 1, 50);
         TmpHCGenericWebRequest."Request Code" := RequestCode;
         TmpHCGenericWebRequest."Parameter 1" := Parameters[1];
         TmpHCGenericWebRequest."Parameter 2" := Parameters[2];
@@ -102,14 +102,14 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
         end;
 
         ElementPath := 'GenericWebRequest_Result/genericrequest/requestresponse/responeseline';
-        if (not NpXmlDomMgt.FindNodes(Element.AsXmlNode(), ElementPath, NodeList)) then
+        if (not NpXmlDomMgt.FindNodes(Element.AsXmlNode(), CopyStr(ElementPath, 1, 250), NodeList)) then
             Error('Find node [%1] failed in document \\%2', ElementPath, Element.InnerXml);
 
         foreach Node in NodeList do begin
-            TmpHCGenericWebRequest."Response 1" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response1', MaxStrLen(TmpHCGenericWebRequest."Response 1"), false);
-            TmpHCGenericWebRequest."Response 2" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response2', MaxStrLen(TmpHCGenericWebRequest."Response 2"), false);
-            TmpHCGenericWebRequest."Response 3" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response3', MaxStrLen(TmpHCGenericWebRequest."Response 3"), false);
-            TmpHCGenericWebRequest."Response 4" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response4', MaxStrLen(TmpHCGenericWebRequest."Response 4"), false);
+            TmpHCGenericWebRequest."Response 1" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response1', MaxStrLen(TmpHCGenericWebRequest."Response 1"), false), 1, 250);
+            TmpHCGenericWebRequest."Response 2" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response2', MaxStrLen(TmpHCGenericWebRequest."Response 2"), false), 1, 250);
+            TmpHCGenericWebRequest."Response 3" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response3', MaxStrLen(TmpHCGenericWebRequest."Response 3"), false), 1, 250);
+            TmpHCGenericWebRequest."Response 4" := CopyStr(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'response4', MaxStrLen(TmpHCGenericWebRequest."Response 4"), false), 1, 250);
             exit(true);
         end;
     end;
@@ -118,7 +118,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
     var
         XMLDomManagement: Codeunit "XML DOM Management";
         Base64Convert: codeunit "Base64 Convert";
-        B64Credential: Text[200];
+        B64Credential: Text;
         XmlDocOut: XmlDocument;
         Client: HttpClient;
         RequestContent: HttpContent;
