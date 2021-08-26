@@ -3,12 +3,12 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
     var
         Text000: Label 'Process Collect in Store Orders';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
         exit('PROCESS_COLLECT_ORD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

@@ -14,12 +14,12 @@
         OpenDocumentLbl: Label 'Open Document';
         OpenDocumentDescriptionLbl: Label 'Open the selected order before document is delivered';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
         exit('DELIVER_COLLECT_ORD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;

@@ -54,8 +54,8 @@
                 if Company.Get(NpCsStore."Company Name") then begin
                     PrevRec := Format(NpCsStore);
 
-                    NpCsStore."Store Stock Item Url" := GetStoreStockItemUrl(Company.Name);
-                    NpCsStore."Store Stock Status Url" := GetStoreStockStatusUrl(Company.Name);
+                    NpCsStore."Store Stock Item Url" := CopyStr(GetStoreStockItemUrl(Company.Name), 1, MaxStrLen(NpCsStore."Store Stock Item Url"));
+                    NpCsStore."Store Stock Status Url" := CopyStr(GetStoreStockStatusUrl(Company.Name), 1, MaxStrLen(NpCsStore."Store Stock Status Url"));
 
                     if PrevRec <> Format(NpCsStore) then
                         NpCsStore.Modify(true);

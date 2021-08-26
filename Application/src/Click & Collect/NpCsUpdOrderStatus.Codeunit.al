@@ -96,14 +96,14 @@
         if NpCsDocument."Processing Status" <> Status then begin
             NpCsDocument."Processing Status" := Status;
             NpCsDocument."Processing updated at" := NpXmlDomMgt.GetElementDT(Node.AsXmlElement(), 'processing_updated_at', true);
-            NpCsDocument."Processing updated by" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'processing_updated_by', MaxStrLen(NpCsDocument."Processing updated by"), true);
+            NpCsDocument."Processing updated by" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'processing_updated_by', MaxStrLen(NpCsDocument."Processing updated by"), true), 1, MaxStrLen(NpCsDocument."Processing updated by"));
         end;
 
         Status := NpXmlDomMgt.GetElementInt(Node.AsXmlElement(), 'delivery_status', true);
         if NpCsDocument."Delivery Status" <> Status then begin
             NpCsDocument."Delivery Status" := Status;
             NpCsDocument."Delivery updated at" := NpXmlDomMgt.GetElementDT(Node.AsXmlElement(), 'delivery_updated_at', true);
-            NpCsDocument."Delivery updated by" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'delivery_updated_by', MaxStrLen(NpCsDocument."Delivery updated by"), true);
+            NpCsDocument."Delivery updated by" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'delivery_updated_by', MaxStrLen(NpCsDocument."Delivery updated by"), true), 1, MaxStrLen(NpCsDocument."Delivery updated by"));
         end;
 
         if OrderProcessingComplete(NpCsDocument) then
@@ -141,12 +141,12 @@
         NpCsDocumentLogEntry."Store Code" := NpCsStore.Code;
         NpCsDocumentLogEntry."Log Date" := NpXmlDomMgt.GetElementDT(Element, 'log_date', true);
         NpCsDocumentLogEntry."Workflow Type" := NpXmlDomMgt.GetElementInt(Element, 'workflow_type', true);
-        NpCsDocumentLogEntry."Workflow Module" := NpXmlDomMgt.GetElementCode(Element, 'workflow_module', MaxStrLen(NpCsDocumentLogEntry."Workflow Module"), true);
-        NpCsDocumentLogEntry."Log Message" := NpXmlDomMgt.GetElementText(Element, 'log_message', MaxStrLen(NpCsDocumentLogEntry."Log Message"), true);
+        NpCsDocumentLogEntry."Workflow Module" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'workflow_module', MaxStrLen(NpCsDocumentLogEntry."Workflow Module"), true), 1, MaxStrLen(NpCsDocumentLogEntry."Workflow Module"));
+        NpCsDocumentLogEntry."Log Message" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'log_message', MaxStrLen(NpCsDocumentLogEntry."Log Message"), true), 1, MaxStrLen(NpCsDocumentLogEntry."Log Message"));
         NpCsDocumentLogEntry."Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
         OutStr.WriteText(NpXmlDomMgt.GetElementText(Element, 'error_message', 0, true));
         NpCsDocumentLogEntry."Error Entry" := NpXmlDomMgt.GetElementBoolean(Element, 'error_entry', true);
-        NpCsDocumentLogEntry."User ID" := NpXmlDomMgt.GetElementCode(Element, 'user_id', MaxStrLen(NpCsDocumentLogEntry."User ID"), true);
+        NpCsDocumentLogEntry."User ID" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'user_id', MaxStrLen(NpCsDocumentLogEntry."User ID"), true), 1, MaxStrLen(NpCsDocumentLogEntry."User ID"));
         NpCsDocumentLogEntry.Insert(true);
     end;
 
