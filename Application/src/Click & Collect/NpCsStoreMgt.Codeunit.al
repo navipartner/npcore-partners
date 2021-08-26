@@ -3,11 +3,11 @@
     procedure InitLocalStore(var NpCsStore: Record "NPR NpCs Store")
     begin
         if NpCsStore."Company Name" = '' then
-            NpCsStore."Company Name" := CompanyName;
+            NpCsStore."Company Name" := CopyStr(CompanyName, 1, MaxStrLen(NpCsStore."Company Name"));
 
         if NpCsStore."Service Url" = '' then begin
             InitCollectService();
-            NpCsStore."Service Url" := GetCollectWSUrl(CompanyName);
+            NpCsStore."Service Url" := CopyStr(GetCollectWSUrl(CompanyName), 1, MaxStrLen(NpCsStore."Service Url"));
         end;
     end;
 
@@ -96,15 +96,15 @@
 
         PrevRec := Format(NpCsStore);
 
-        NpCsStore."Contact Name" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_name', MaxStrLen(NpCsStore."Contact Name"), false);
-        NpCsStore."Contact Name 2" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_name_2', MaxStrLen(NpCsStore."Contact Name 2"), false);
-        NpCsStore."Contact Address" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_address', MaxStrLen(NpCsStore."Contact Address"), false);
-        NpCsStore."Contact Address 2" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_address_2', MaxStrLen(NpCsStore."Contact Address 2"), false);
-        NpCsStore."Contact Post Code" := NpXmlDomMgt.GetElementCode(Node.AsXmlElement(), 'contact_post_code', MaxStrLen(NpCsStore."Contact Post Code"), false);
-        NpCsStore."Contact Country/Region Code" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_country_code', MaxStrLen(NpCsStore."Contact Country/Region Code"), false);
-        NpCsStore."Contact County" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_county', MaxStrLen(NpCsStore."Contact County"), false);
-        NpCsStore."Contact Phone No." := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_phone_no', MaxStrLen(NpCsStore."Contact Phone No."), false);
-        NpCsStore."Contact E-mail" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_email', MaxStrLen(NpCsStore."Contact E-mail"), false);
+        NpCsStore."Contact Name" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_name', MaxStrLen(NpCsStore."Contact Name"), false), 1, MaxStrLen(NpCsStore."Contact Name"));
+        NpCsStore."Contact Name 2" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_name_2', MaxStrLen(NpCsStore."Contact Name 2"), false), 1, MaxStrLen(NpCsStore."Contact Name 2"));
+        NpCsStore."Contact Address" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_address', MaxStrLen(NpCsStore."Contact Address"), false), 1, MaxStrLen(NpCsStore."Contact Address"));
+        NpCsStore."Contact Address 2" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_address_2', MaxStrLen(NpCsStore."Contact Address 2"), false), 1, MaxStrLen(NpCsStore."Contact Address 2"));
+        NpCsStore."Contact Post Code" := CopyStr(NpXmlDomMgt.GetElementCode(Node.AsXmlElement(), 'contact_post_code', MaxStrLen(NpCsStore."Contact Post Code"), false), 1, MaxStrLen(NpCsStore."Contact Post Code"));
+        NpCsStore."Contact Country/Region Code" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_country_code', MaxStrLen(NpCsStore."Contact Country/Region Code"), false), 1, MaxStrLen(NpCsStore."Contact Country/Region Code"));
+        NpCsStore."Contact County" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_county', MaxStrLen(NpCsStore."Contact County"), false), 1, MaxStrLen(NpCsStore."Contact County"));
+        NpCsStore."Contact Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_phone_no', MaxStrLen(NpCsStore."Contact Phone No."), false), 1, MaxStrLen(NpCsStore."Contact Phone No."));
+        NpCsStore."Contact E-mail" := CopyStr(NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_email', MaxStrLen(NpCsStore."Contact E-mail"), false), 1, MaxStrLen(NpCsStore."Contact E-mail"));
 
         if PrevRec <> Format(NpCsStore) then
             NpCsStore.Modify(true);

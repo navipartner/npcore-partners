@@ -54,7 +54,7 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
 
         Element.SelectNodes('sales_lines/sales_line [type=2 and cross_reference_no!=""]', NodeList);
         foreach Node in NodeList do begin
-            FromNo := NpXmlDomMgt.GetXmlText(Element2, 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+            FromNo := CopyStr(NpXmlDomMgt.GetXmlText(Element2, 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true), 1, MaxStrLen(NpCsDocumentMapping."From No."));
             MarkOrderMapping(NpCsDocumentMapping.Type::"Item Cross Reference No.", FromStore, FromNo, NpCsDocumentMapping);
         end;
     end;
@@ -95,7 +95,7 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
 
     local procedure GetFromStoreCode(Element: XmlElement) StoreCode: Code[20]
     begin
-        StoreCode := UpperCase(NpXmlDomMgt.GetAttributeText(Element, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true));
+        StoreCode := CopyStr(UpperCase(NpXmlDomMgt.GetAttributeText(Element, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true)), 1, MaxStrLen(StoreCode));
         exit(StoreCode);
     end;
 }

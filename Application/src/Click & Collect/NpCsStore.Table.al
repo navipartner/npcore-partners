@@ -33,8 +33,8 @@ table 6151195 "NPR NpCs Store"
                     exit;
 
                 "Local Store" := CompanyName = "Company Name";
-                "Store Stock Item Url" := NpCsStoreStockDataMgt.GetStoreStockItemUrl(Company.Name);
-                "Store Stock Status Url" := NpCsStoreStockDataMgt.GetStoreStockStatusUrl(Company.Name);
+                "Store Stock Item Url" := CopyStr(NpCsStoreStockDataMgt.GetStoreStockItemUrl(Company.Name), 1, MaxStrLen("Store Stock Item Url"));
+                "Store Stock Status Url" := CopyStr(NpCsStoreStockDataMgt.GetStoreStockStatusUrl(Company.Name), 1, MaxStrLen(("Store Stock Status Url")));
                 Url := GetUrl(CLIENTTYPE::SOAP, Company.Name, OBJECTTYPE::Codeunit, CODEUNIT::"NPR NpCs Collect WS");
                 "Service Url" := CopyStr(Url, 1, MaxStrLen("Service Url"));
             end;
