@@ -8,12 +8,12 @@
         PrepaymentPercantageLbl: Label 'Enter Prepayment Percentage';
         OptionsFromStoreCodeLbl: Label 'POS Relation,Store Code Parameter,Location Filter Parameter';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Text[20]
     begin
         exit('CREATE_COLLECT_ORD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -319,10 +319,10 @@
         NpCsStoreMgt: Codeunit "NPR NpCs Store Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         NpCsStoresbyDistance: Page "NPR NpCs Stores by Distance";
-        FromStoreCode: Text;
+        FromStoreCode: Code[20];
         PrevRec: Text;
     begin
-        FromStoreCode := UpperCase(Context.GetString('fromStoreCode'));
+        FromStoreCode := CopyStr(UpperCase(Context.GetString('fromStoreCode')), 1, MaxStrLen(FromStoreCode));
         FromNpCsStore.Get(FromStoreCode);
 
         POSSession.GetSale(POSSale);
@@ -380,7 +380,7 @@
         Clear(TempNpCsStoreInventoryBuffer);
         NpCsStoresbyDistance.SetSourceTables(TempNpCsStore, TempNpCsStoreInventoryBuffer);
         NpCsStoresbyDistance.SetShowInventory(true);
-        NpCsStoresbyDistance.SetFromStoreCode(FromStoreCode);
+        NpCsStoresbyDistance.SetFromStoreCode(FromNpCsStore.Code);
         NpCsStoresbyDistance.LookupMode(true);
         if NpCsStoresbyDistance.RunModal() <> ACTION::LookupOK then
             exit;
@@ -397,7 +397,7 @@
     local procedure FindItemPosLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        Sku: Text;
+        Sku: Text[50];
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");

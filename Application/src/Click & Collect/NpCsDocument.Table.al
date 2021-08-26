@@ -186,7 +186,7 @@ table 6151198 "NPR NpCs Document"
             trigger OnValidate()
             begin
                 "Processing updated at" := CurrentDateTime;
-                "Processing updated by" := UserId;
+                "Processing updated by" := CopyStr(UserId, 1, MaxStrLen("Processing updated by"));
             end;
         }
         field(105; "Processing updated at"; DateTime)
@@ -300,7 +300,7 @@ table 6151198 "NPR NpCs Document"
             trigger OnValidate()
             begin
                 "Delivery updated at" := CurrentDateTime;
-                "Delivery updated by" := UserId;
+                "Delivery updated by" := CopyStr(UserId, 1, MaxStrLen("Delivery updated by"));
             end;
         }
         field(205; "Delivery updated at"; DateTime)

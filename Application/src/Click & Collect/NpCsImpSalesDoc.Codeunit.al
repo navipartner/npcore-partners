@@ -103,12 +103,12 @@
         PrevRec := Format(NpCsStore);
 
         NpCsStore.Validate("Company Name", NpXmlDomMgt.GetElementText(Element, 'from_store/company_name', MaxStrLen(NpCsStore."Company Name"), true));
-        NpCsStore.Name := NpXmlDomMgt.GetElementText(Element, 'from_store/name', MaxStrLen(NpCsStore.Name), true);
-        NpCsStore."Service Url" := NpXmlDomMgt.GetElementText(Element, 'from_store/service_url', MaxStrLen(NpCsStore."Service Url"), true);
-        NpCsStore."Service Username" := NpXmlDomMgt.GetElementText(Element, 'from_store/service_username', MaxStrLen(NpCsStore."Service Username"), true);
-        NpCsStore."Service Password" := NpXmlDomMgt.GetElementText(Element, 'from_store/service_password', MaxStrLen(NpCsStore."Service Password"), true);
-        NpCsStore."E-mail" := NpXmlDomMgt.GetElementText(Element, 'from_store/email', MaxStrLen(NpCsStore."E-mail"), true);
-        NpCsStore."Mobile Phone No." := NpXmlDomMgt.GetElementText(Element, 'from_store/mobile_phone_no', MaxStrLen(NpCsStore."Mobile Phone No."), true);
+        NpCsStore.Name := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/name', MaxStrLen(NpCsStore.Name), true), 1, MaxStrLen(NpCsStore.Name));
+        NpCsStore."Service Url" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_url', MaxStrLen(NpCsStore."Service Url"), true), 1, MaxStrLen(NpCsStore."Service Url"));
+        NpCsStore."Service Username" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_username', MaxStrLen(NpCsStore."Service Username"), true), 1, MaxStrLen(NpCsStore."Service Username"));
+        NpCsStore."Service Password" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/service_password', MaxStrLen(NpCsStore."Service Password"), true), 1, MaxStrLen(NpCsStore."Service Password"));
+        NpCsStore."E-mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/email', MaxStrLen(NpCsStore."E-mail"), true), 1, MaxStrLen(NpCsStore."E-mail"));
+        NpCsStore."Mobile Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'from_store/mobile_phone_no', MaxStrLen(NpCsStore."Mobile Phone No."), true), 1, MaxStrLen(NpCsStore."Mobile Phone No."));
 
         if PrevRec <> Format(NpCsStore) then
             NpCsStore.Modify(true);
@@ -147,7 +147,7 @@
     begin
         FromStore := GetFromStoreCode(Element);
 
-        FromNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+        FromNo := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true), 1, MaxStrLen(NpCsDocumentMapping."From No."));
         Description := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name', 0, true);
         Description2 := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', 0, false);
         InsertDocumentMapping(NpCsDocumentMapping.Type::"Customer No.", FromStore, FromNo, Description, Description2);
@@ -159,7 +159,7 @@
 
         Element.SelectNodes('//sales_lines/sales_line[type=2 and cross_reference_no!=""]', NodeList);
         foreach Node in NodeList do begin
-            FromNo := NpXmlDomMgt.GetElementCode(Node.AsXmlElement(), 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+            FromNo := CopyStr(NpXmlDomMgt.GetElementCode(Node.AsXmlElement(), 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true), 1, MaxStrLen(NpCsDocumentMapping."From No."));
             Description := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'description', 0, true);
             Description2 := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'description_2', 0, false);
             InsertDocumentMapping(NpCsDocumentMapping.Type::"Item Cross Reference No.", FromStore, FromNo, Description, Description2);
@@ -213,7 +213,7 @@
         end;
 
         StoreCode := GetFromStoreCode(Element);
-        CustNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+        CustNo := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true), 1, MaxStrLen(NpCsDocumentMapping."From No."));
         NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Customer No.", StoreCode, CustNo);
         if NpCsDocumentMapping."To No." <> Customer."No." then begin
             NpCsDocumentMapping.Validate("To No.", Customer."No.");
@@ -222,7 +222,7 @@
 
         PrevRec := Format(Customer);
 
-        ConfigTemplateCode := NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false);
+        ConfigTemplateCode := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false), 1, MaxStrLen(ConfigTemplateHeader.Code));
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
             RecRef.GetTable(Customer);
             ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
@@ -230,15 +230,15 @@
         end;
 
         Customer.Validate(Name, NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name', MaxStrLen(Customer.Name), true));
-        Customer."Name 2" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', MaxStrLen(Customer."Name 2"), true);
-        Customer.Address := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address', MaxStrLen(Customer.Address), true);
-        Customer."Address 2" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address_2', MaxStrLen(Customer."Address 2"), true);
-        Customer."Post Code" := NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/post_code', MaxStrLen(Customer."Post Code"), true);
-        Customer.City := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/city', MaxStrLen(Customer.City), true);
+        Customer."Name 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', MaxStrLen(Customer."Name 2"), true), 1, MaxStrLen(Customer."Name 2"));
+        Customer.Address := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address', MaxStrLen(Customer.Address), true), 1, MaxStrLen(Customer.Address));
+        Customer."Address 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address_2', MaxStrLen(Customer."Address 2"), true), 1, MaxStrLen(Customer."Address 2"));
+        Customer."Post Code" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/post_code', MaxStrLen(Customer."Post Code"), true), 1, MaxStrLen(Customer."Post Code"));
+        Customer.City := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/city', MaxStrLen(Customer.City), true), 1, MaxStrLen(Customer.City));
         Customer.Validate("Country/Region Code", NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/country_code', MaxStrLen(Customer."Country/Region Code"), true));
-        Customer.Contact := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/contact', MaxStrLen(Customer.Contact), true);
-        Customer."Phone No." := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true);
-        Customer."E-Mail" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true);
+        Customer.Contact := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/contact', MaxStrLen(Customer.Contact), true), 1, MaxStrLen(Customer.Contact));
+        Customer."Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true), 1, MaxStrLen(Customer."Phone No."));
+        Customer."E-Mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true), 1, MaxStrLen(Customer."E-Mail"));
 
         if PrevRec <> Format(Customer) then
             Customer.Modify(true);
@@ -303,14 +303,14 @@
         SalesHeader.Validate("Posting Date", NpXmlDomMgt.GetElementDate(Element, 'posting_date', true));
         SalesHeader.Validate("Order Date", NpXmlDomMgt.GetElementDate(Element, 'posting_date', true));
         SalesHeader.Validate("Due Date", NpXmlDomMgt.GetElementDate(Element, 'due_date', true));
-        BillToCustNo := NpXmlDomMgt.GetElementCode(Element, 'bill_to_customer_no', MaxStrLen(SalesHeader."Bill-to Customer No."), false);
+        BillToCustNo := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'bill_to_customer_no', MaxStrLen(SalesHeader."Bill-to Customer No."), false), 1, MaxStrLen(SalesHeader."Bill-to Customer No."));
         if BillToCustNo <> '' then
             SalesHeader.Validate("Bill-to Customer No.", BillToCustNo);
         SalesHeader.Validate("Location Code", NpXmlDomMgt.GetElementCode(Element, 'location_code', MaxStrLen(SalesHeader."Location Code"), true));
         SalesHeader.Validate("Salesperson Code", NpXmlDomMgt.GetElementCode(Element, 'salesperson_code', MaxStrLen(SalesHeader."Salesperson Code"), true));
         SalesHeader.Validate("Payment Method Code", NpXmlDomMgt.GetElementCode(Element, 'payment_method_code', MaxStrLen(SalesHeader."Payment Method Code"), true));
         SalesHeader.Validate("Shipment Method Code", NpXmlDomMgt.GetElementCode(Element, 'shipment_method_code', MaxStrLen(SalesHeader."Shipment Method Code"), true));
-        SalesHeader."Ship-to Contact" := NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(SalesHeader."Ship-to Contact"), false);
+        SalesHeader."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(SalesHeader."Ship-to Contact"), false), 1, MaxStrLen(SalesHeader."Ship-to Contact"));
         SalesHeader.Modify(true);
     end;
 
@@ -335,7 +335,7 @@
         NpCsDocument."Document Type" := SalesHeader."Document Type";
         NpCsDocument."Document No." := SalesHeader."No.";
         NpCsDocument.Validate("Document No.");
-        NpCsDocument."Reference No." := NpXmlDomMgt.GetElementCode(Element, 'reference_no', MaxStrLen(NpCsDocument."Reference No."), true);
+        NpCsDocument."Reference No." := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'reference_no', MaxStrLen(NpCsDocument."Reference No."), true), 1, MaxStrLen(NpCsDocument."Reference No."));
         NpCsDocument."From Document Type" := DocType;
         NpCsDocument."From Document No." := CopyStr(DocNo, 1, MaxStrLen(NpCsDocument."From Document No."));
         NpCsDocument."From Store Code" := StoreCode;
@@ -347,34 +347,34 @@
                 NpCsDocument."Processing Status" := ProcessingStatus;
         end;
         NpCsDocument."Processing updated at" := CurrentDateTime;
-        NpCsDocument."Customer No." := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocument."Customer No."), false);
-        NpCsDocument."Customer E-mail" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(NpCsDocument."Customer E-mail"), false);
-        NpCsDocument."Customer Phone No." := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(NpCsDocument."Customer Phone No."), false);
-        NpCsDocument."Ship-to Contact" := NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(NpCsDocument."Ship-to Contact"), false);
+        NpCsDocument."Customer No." := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocument."Customer No."), false), 1, MaxStrLen(NpCsDocument."Customer No."));
+        NpCsDocument."Customer E-mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(NpCsDocument."Customer E-mail"), false), 1, MaxStrLen(NpCsDocument."Customer E-mail"));
+        NpCsDocument."Customer Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(NpCsDocument."Customer Phone No."), false), 1, MaxStrLen(NpCsDocument."Customer Phone No."));
+        NpCsDocument."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(NpCsDocument."Ship-to Contact"), false), 1, MaxStrLen(NpCsDocument."Ship-to Contact"));
         NpCsDocument."Send Notification from Store" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/send_notification_from_store', false);
         NpCsDocument."Notify Customer via E-mail" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/notify_customer_via_email', false);
-        NpCsDocument."E-mail Template (Pending)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_pending', MaxStrLen(NpCsDocument."E-mail Template (Pending)"), false);
-        NpCsDocument."E-mail Template (Confirmed)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_confirmed', MaxStrLen(NpCsDocument."E-mail Template (Confirmed)"), false);
-        NpCsDocument."E-mail Template (Rejected)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_rejected', MaxStrLen(NpCsDocument."E-mail Template (Rejected)"), false);
-        NpCsDocument."E-mail Template (Expired)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_expired', MaxStrLen(NpCsDocument."E-mail Template (Expired)"), false);
+        NpCsDocument."E-mail Template (Pending)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_pending', MaxStrLen(NpCsDocument."E-mail Template (Pending)"), false), 1, MaxStrLen(NpCsDocument."E-mail Template (Pending)"));
+        NpCsDocument."E-mail Template (Confirmed)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_confirmed', MaxStrLen(NpCsDocument."E-mail Template (Confirmed)"), false), 1, MaxStrLen(NpCsDocument."E-mail Template (Confirmed)"));
+        NpCsDocument."E-mail Template (Rejected)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_rejected', MaxStrLen(NpCsDocument."E-mail Template (Rejected)"), false), 1, MaxStrLen(NpCsDocument."E-mail Template (Rejected)"));
+        NpCsDocument."E-mail Template (Expired)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_expired', MaxStrLen(NpCsDocument."E-mail Template (Expired)"), false), 1, MaxStrLen(NpCsDocument."E-mail Template (Expired)"));
         NpCsDocument."Notify Customer via Sms" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/notify_customer_via_sms', false);
-        NpCsDocument."Sms Template (Pending)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_pending', MaxStrLen(NpCsDocument."Sms Template (Pending)"), false);
-        NpCsDocument."Sms Template (Confirmed)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_confirmed', MaxStrLen(NpCsDocument."Sms Template (Confirmed)"), false);
-        NpCsDocument."Sms Template (Rejected)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_rejected', MaxStrLen(NpCsDocument."Sms Template (Rejected)"), false);
-        NpCsDocument."Sms Template (Expired)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_expired', MaxStrLen(NpCsDocument."Sms Template (Expired)"), false);
-        NpCsDocument."Opening Hour Set" := NpXmlDomMgt.GetElementCode(Element, 'notification/opening_hour_set', MaxStrLen(NpCsDocument."Opening Hour Set"), false);
+        NpCsDocument."Sms Template (Pending)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_pending', MaxStrLen(NpCsDocument."Sms Template (Pending)"), false), 1, MaxStrLen(NpCsDocument."Sms Template (Pending)"));
+        NpCsDocument."Sms Template (Confirmed)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_confirmed', MaxStrLen(NpCsDocument."Sms Template (Confirmed)"), false), 1, MaxStrLen(NpCsDocument."Sms Template (Confirmed)"));
+        NpCsDocument."Sms Template (Rejected)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_rejected', MaxStrLen(NpCsDocument."Sms Template (Rejected)"), false), 1, MaxStrLen(NpCsDocument."Sms Template (Rejected)"));
+        NpCsDocument."Sms Template (Expired)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_expired', MaxStrLen(NpCsDocument."Sms Template (Expired)"), false), 1, MaxStrLen(NpCsDocument."Sms Template (Expired)"));
+        NpCsDocument."Opening Hour Set" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'notification/opening_hour_set', MaxStrLen(NpCsDocument."Opening Hour Set"), false), 1, MaxStrLen(NpCsDocument."Opening Hour Set"));
         NpCsDocument."Processing Expiry Duration" := NpXmlDomMgt.GetElementDuration(Element, 'notification/processing_expiry_duration', false);
         NpCsDocument."Delivery Expiry Days (Qty.)" := NpXmlDomMgt.GetElementInt(Element, 'notification/delivery_expiry_days_qty', false);
         NpCsDocument."Archive on Delivery" := NpXmlDomMgt.GetElementBoolean(Element, 'archive_on_delivery', false);
         NpCsDocument."Store Stock" := NpXmlDomMgt.GetElementBoolean(Element, 'store_stock', false);
         NpCsDocument."Post on" := NpXmlDomMgt.GetElementInt(Element, 'post_on', false);
         NpCsDocument."Bill via" := NpXmlDomMgt.GetElementInt(Element, 'bill_via', false);
-        NpCsDocument."Processing Print Template" := NpXmlDomMgt.GetElementCode(Element, 'processing_print_template', MaxStrLen(NpCsDocument."Processing Print Template"), false);
-        NpCsDocument."Delivery Print Template (POS)" := NpXmlDomMgt.GetElementCode(Element, 'delivery_print_template_pos', MaxStrLen(NpCsDocument."Delivery Print Template (POS)"), false);
-        NpCsDocument."Delivery Print Template (S.)" := NpXmlDomMgt.GetElementCode(Element, 'delivery_print_template_sales_doc', MaxStrLen(NpCsDocument."Delivery Print Template (S.)"), false);
-        NpCsDocument."Salesperson Code" := NpXmlDomMgt.GetElementCode(Element, 'salesperson_code', MaxStrLen(NpCsDocument."Salesperson Code"), false);
+        NpCsDocument."Processing Print Template" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'processing_print_template', MaxStrLen(NpCsDocument."Processing Print Template"), false), 1, MaxStrLen(NpCsDocument."Processing Print Template"));
+        NpCsDocument."Delivery Print Template (POS)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'delivery_print_template_pos', MaxStrLen(NpCsDocument."Delivery Print Template (POS)"), false), 1, MaxStrLen(NpCsDocument."Delivery Print Template (POS)"));
+        NpCsDocument."Delivery Print Template (S.)" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'delivery_print_template_sales_doc', MaxStrLen(NpCsDocument."Delivery Print Template (S.)"), false), 1, MaxStrLen(NpCsDocument."Delivery Print Template (S.)"));
+        NpCsDocument."Salesperson Code" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'salesperson_code', MaxStrLen(NpCsDocument."Salesperson Code"), false), 1, MaxStrLen(NpCsDocument."Salesperson Code"));
         NpCsDocument."Prepaid Amount" := NpXmlDomMgt.GetElementDec(Element, 'prepaid_amount', false);
-        NpCsDocument."Prepayment Account No." := NpXmlDomMgt.GetElementCode(Element, 'prepayment_account_no', MaxStrLen(NpCsDocument."Prepayment Account No."), NpCsDocument."Prepaid Amount" <> 0);
+        NpCsDocument."Prepayment Account No." := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'prepayment_account_no', MaxStrLen(NpCsDocument."Prepayment Account No."), NpCsDocument."Prepaid Amount" <> 0), 1, MaxStrLen(NpCsDocument."Prepayment Account No."));
         if Callback <> '' then begin
             NpCsDocument."Callback Data".CreateOutStream(OutStr, TEXTENCODING::UTF8);
             OutStr.WriteText(Callback);
@@ -408,8 +408,8 @@
                     if ItemVariant.Code <> '' then
                         SalesLine.Validate("Variant Code", ItemVariant.Code);
                     SalesLine.Validate("Unit of Measure Code", NpXmlDomMgt.GetElementCode(Element, 'unit_of_measure_code', MaxStrLen(SalesLine."Unit of Measure Code"), true));
-                    SalesLine.Description := NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true);
-                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
+                    SalesLine.Description := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
+                    SalesLine."Description 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false), 1, MaxStrLen(SalesLine."Description 2"));
                     SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(Element, 'quantity', true));
                     SalesLine.Validate("Unit Price", NpXmlDomMgt.GetElementDec(Element, 'unit_price', true));
                     SalesLine.Validate("VAT %", NpXmlDomMgt.GetElementDec(Element, 'vat_pct', true));
@@ -420,8 +420,8 @@
                 begin
                     SalesLine.Validate("No.", NpXmlDomMgt.GetElementCode(Element, 'no', MaxStrLen(SalesLine."No."), true));
                     SalesLine.Validate("Unit of Measure Code", NpXmlDomMgt.GetElementCode(Element, 'unit_of_measure_code', MaxStrLen(SalesLine."Unit of Measure Code"), true));
-                    SalesLine.Description := NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true);
-                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
+                    SalesLine.Description := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
+                    SalesLine."Description 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false), 1, MaxStrLen(SalesLine."Description 2"));
                     SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(Element, 'quantity', true));
                     SalesLine.Validate("Unit Price", NpXmlDomMgt.GetElementDec(Element, 'unit_price', true));
                     SalesLine.Validate("VAT %", NpXmlDomMgt.GetElementDec(Element, 'vat_pct', true));
@@ -430,8 +430,8 @@
                 end;
             SalesLine.Type::" ":
                 begin
-                    SalesLine.Description := NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true);
-                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
+                    SalesLine.Description := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
+                    SalesLine."Description 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false), 1, MaxStrLen(SalesLine."Description 2"));
                     SalesLine.Modify(true);
                 end;
         end;
@@ -468,7 +468,7 @@
         if StoreCode = '' then
             exit(false);
 
-        CustNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+        CustNo := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true), 1, MaxStrLen(NpCsDocumentMapping."From No."));
         if CustNo = '' then
             exit(false);
 
@@ -520,7 +520,7 @@
                 end;
             NpCsWorkflow."Customer Mapping"::"Fixed Customer No.", NpCsWorkflow."Customer Mapping"::"Customer No. from Source":
                 begin
-                    CustNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(Customer."No."), true);
+                    CustNo := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(Customer."No."), true), 1, MaxStrLen(Customer."No."));
                     Customer.Get(CustNo);
                     exit(true);
                 end;
@@ -580,7 +580,7 @@
         Clear(ItemVariant);
 
         StoreCode := GetFromStoreCode(Element);
-        FromItemRefNo := NpXmlDomMgt.GetElementCode(Element, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false);
+        FromItemRefNo := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false), 1, MaxStrLen(ItemVariant."Item No."));
         if NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Item Cross Reference No.", StoreCode, FromItemRefNo) and (NpCsDocumentMapping."To No." <> '') then begin
             ItemRef.SetRange("Reference No.", NpCsDocumentMapping."To No.");
 
@@ -591,11 +591,11 @@
             end;
         end;
 
-        FromItemNo := NpXmlDomMgt.GetElementCode(Element, 'no', MaxStrLen(ItemVariant."Item No."), true);
+        FromItemNo := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'no', MaxStrLen(ItemVariant."Item No."), true), 1, MaxStrLen(ItemVariant."Item No."));
         if FromItemNo = '' then
             Error(Text002, '<no>', Element.Name);
 
-        FromVariantCode := NpXmlDomMgt.GetElementCode(Element, 'variant_code', MaxStrLen(ItemVariant.Code), false);
+        FromVariantCode := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'variant_code', MaxStrLen(ItemVariant.Code), false), 1, MaxStrLen(ItemVariant.Code));
         if (FromVariantCode <> '') and ItemVariant.Get(FromItemNo, FromVariantCode) then begin
             if NpCsDocumentMapping."From No." <> '' then begin
                 NpCsDocumentMapping.Validate("To No.", GetItemRefNo(ItemVariant));
@@ -659,7 +659,7 @@
         if Element.IsEmpty() then
             exit('');
 
-        StoreCode := NpXmlDomMgt.GetAttributeCode(Element, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true);
+        StoreCode := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true), 1, MaxStrLen(StoreCode));
         exit(StoreCode);
     end;
 
@@ -670,7 +670,7 @@
         if Element.IsEmpty() then
             exit('');
 
-        StoreCode := NpXmlDomMgt.GetAttributeCode(Element, '/*/sales_document/to_store', 'store_code', MaxStrLen(StoreCode), false);
+        StoreCode := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, '/*/sales_document/to_store', 'store_code', MaxStrLen(StoreCode), false), 1, MaxStrLen(StoreCode));
         exit(StoreCode);
     end;
 

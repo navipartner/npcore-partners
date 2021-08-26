@@ -87,7 +87,7 @@ table 6151199 "NPR NpCs Document Log Entry"
         if "Log Date" = 0DT then
             "Log Date" := CurrentDateTime;
         if "User ID" = '' then
-            "User ID" := UserId;
+            "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
     end;
 
     procedure GetErrorMessage() FullLogMessage: Text
