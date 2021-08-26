@@ -168,8 +168,8 @@
         POSSale: Record "NPR POS Sale";
         POSSaleLine: Record "NPR POS Sale Line";
     begin
-        Setup.InitSetup(POSSale.TableName());
-        Setup.InitSetup(POSSaleLine.TableName());
+        Setup.InitSetup(CopyStr(POSSale.TableName(), 1, 250));
+        Setup.InitSetup(CopyStr(POSSaleLine.TableName(), 1, 250));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Cross Ref. Setup", 'OnAfterValidateEvent', 'Table Name', true, true)]
@@ -208,7 +208,7 @@
         if Rec.IsTemporary() then
             exit;
 
-        POSCrossRefMgt.UpdateReference(Rec.SystemId, Rec.TableName(), Rec."Document No.");
+        POSCrossRefMgt.UpdateReference(Rec.SystemId, CopyStr(Rec.TableName(), 1, 250), Rec."Document No.");
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry Sales Line", 'OnAfterInsertEvent', '', true, true)]
@@ -219,7 +219,7 @@
         if Rec.IsTemporary() then
             exit;
 
-        POSCrossRefMgt.UpdateReference(Rec.SystemId, Rec.TableName(), Rec."Document No." + '_' + Format(Rec."Line No."));
+        POSCrossRefMgt.UpdateReference(Rec.SystemId, CopyStr(Rec.TableName(), 1, 250), Rec."Document No." + '_' + Format(Rec."Line No."));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, true)]
@@ -230,7 +230,7 @@
         if Rec.IsTemporary() then
             exit;
 
-        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, CopyStr(Rec.TableName(), 1, 250));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
@@ -241,7 +241,7 @@
         if Rec.IsTemporary() then
             exit;
 
-        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, CopyStr(Rec.TableName(), 1, 250));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry", 'OnAfterDeleteEvent', '', true, true)]
@@ -252,7 +252,7 @@
         if Rec.IsTemporary() then
             exit;
 
-        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, CopyStr(Rec.TableName(), 1, 250));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry Sales Line", 'OnAfterDeleteEvent', '', true, true)]
@@ -263,7 +263,7 @@
         if Rec.IsTemporary() then
             exit;
 
-        POSCrossRefMgt.RemoveReference(Rec.SystemId, Rec.TableName());
+        POSCrossRefMgt.RemoveReference(Rec.SystemId, CopyStr(Rec.TableName(), 1, 250));
     end;
 
     procedure InitReferenceNoSaleLinePOS(SaleLinePOS: Record "NPR POS Sale Line") ReferenceNo: Text
@@ -280,7 +280,7 @@
 
         ReferenceNo := GenerateLineReferenceNo(SaleLinePOS);
         POSCrossRefMgt.InitReference(
-          SaleLinePOS.SystemId, ReferenceNo, POSSaleLine.TableName(), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
+          SaleLinePOS.SystemId, ReferenceNo, CopyStr(POSSaleLine.TableName(), 1, 250), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
 
         exit(ReferenceNo);
     end;
@@ -314,7 +314,7 @@
             ReferenceNo := NpRegEx.RegExReplaceNL(ReferenceNo, Format(NaturalLineNo));
             ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(POSCrossReference."Reference No.")));
 
-            if IsNullGuid(POSCrossRefMgt.GetSysID(POSSaleLine.TableName(), ReferenceNo)) then
+            if IsNullGuid(POSCrossRefMgt.GetSysID(CopyStr(POSSaleLine.TableName(), 1, 250), ReferenceNo)) then
                 exit(ReferenceNo);
 
             if ReferenceNo = POSCrossRefSetup."Reference No. Pattern" then

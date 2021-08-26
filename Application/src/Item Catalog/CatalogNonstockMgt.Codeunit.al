@@ -17,7 +17,7 @@
             until NPRAttributeKey.Next() = 0;
     end;
 
-    procedure UpdateItemAttribute(Type: Option Item,Nonstocktem; ItemNo: Code[20]; AttributeCode: Code[20]; AttributeValue: Text)
+    procedure UpdateItemAttribute(Type: Option Item,Nonstocktem; ItemNo: Code[20]; AttributeCode: Code[20]; AttributeValue: Text[250])
     var
         NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";

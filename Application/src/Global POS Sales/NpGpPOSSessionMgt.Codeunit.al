@@ -81,13 +81,13 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         NcTask."Entry No." := 0;
         NcTask.Type := NcTask.Type::Insert;
         NcTask."Table No." := RecRef.Number;
-        NcTask."Record Position" := RecRef.GetPosition(false);
+        NcTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NcTask."Record Position"));
         NcTask."Log Date" := CurrentDateTime;
         NcTask."Company Name" := '';
         NcTask.Processed := false;
         NcTask."Process Error" := false;
         NcTask."Record Value" := DocNo;
-        NcTask."Task Processor Code" := UpperCase(CopyStr(TaskProcessorCode, 1, MaxStrLen(NcTask."Task Processor Code")));
+        NcTask."Task Processor Code" := CopyStr(TaskProcessorCode, 1, MaxStrLen(NcTask."Task Processor Code"));
         exit(NcTask.Insert(true));
     end;
 
