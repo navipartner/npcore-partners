@@ -2,6 +2,7 @@ controladdin "NPR Dragonglass"
 {
     Scripts =
         'src/_ControlAddins/Dragonglass/Scripts/GetImageResource.js',
+        'src/_ControlAddins/Dragonglass/Scripts/appInsights.min.js',
         'src/_ControlAddins/Dragonglass/Scripts/jquery-2.1.1.min.js',
         'src/_ControlAddins/Dragonglass/Scripts/jquery-ui.min.js',
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.js',
