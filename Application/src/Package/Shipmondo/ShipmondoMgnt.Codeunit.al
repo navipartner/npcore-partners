@@ -1,14 +1,13 @@
 codeunit 6014578 "NPR Shipmondo Mgnt."
 {
     var
+        PackageProviderSetup: Record "NPR Pacsoft Setup";
         ApiUser: Text;
         ApiKey: Text;
         RequestString: Text;
         RequestURL: Text;
         Text0001: Label 'Login Details Missing';
         Err0001: Label 'Pakkelabels Return the following  error: %1';
-
-        PackageProviderSetup: Record "NPR Pacsoft Setup";
         ErrorTextFound: Text;
 
     local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") services: Text;
@@ -32,7 +31,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     local procedure CreateShipment(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document"; Silent: Boolean);
     var
         ShipmentID: Code[20];
-        ShipmentNumber: Code[80];
+        ShipmentNumber: Code[50];
         Response: JsonToken;
     begin
         RequestURL := 'https://app.pakkelabels.dk/api/public/v3/shipments/';
@@ -41,8 +40,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             Exit;
 
 
-        ShipmentID := GetJsonText(Response, 'id', 0);
-        ShipmentNumber := GetJsonText(Response, 'pkg_no', 0);
+        ShipmentID := CopyStr(GetJsonText(Response, 'id', 0), 1, 20);
+        ShipmentNumber := CopyStr(GetJsonText(Response, 'pkg_no', 0), 1, 50);
 
         if ShipmentID <> '' then
             PakkelabelsShipment."Response Shipment ID" := ShipmentID;
@@ -86,12 +85,12 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
                 PakkelabelsPrinter.SETRANGE(Name, PrinterName);
                 if not PakkelabelsPrinter.FINDFIRST() then begin
                     PakkelabelsPrinter.INIT();
-                    PakkelabelsPrinter.Name := PrinterName;
+                    PakkelabelsPrinter.Name := CopyStr(PrinterName, 1, 50);
                     PakkelabelsPrinter.INSERT(true);
                 end;
-                PakkelabelsPrinter."Host Name" := GetJsonText(JToken, 'hostname', 0);
-                PakkelabelsPrinter.Printer := GetJsonText(JToken, 'printer', 0);
-                PakkelabelsPrinter."Label Format" := GetJsonText(JToken, 'label_format', 0);
+                PakkelabelsPrinter."Host Name" := CopyStr(GetJsonText(JToken, 'hostname', 0), 1, 50);
+                PakkelabelsPrinter.Printer := CopyStr(GetJsonText(JToken, 'printer', 0), 1, 50);
+                PakkelabelsPrinter."Label Format" := CopyStr(GetJsonText(JToken, 'label_format', 0), 1, 30);
                 PakkelabelsPrinter.MODIFY();
             end;
         end;
@@ -99,8 +98,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
 
     local procedure BuildShipmentRequest(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") Output: Text;
     var
-        own_agreement: Text;
         ShippingAgent: Record "NPR Package Shipping Agent";
+        own_agreement: Text;
         test_mode: Text[10];
         QueryParamsLbl: Label '"test_mode": %1,', Locked = true;
         QueryParams2Lbl: Label '"own_agreement": %1,', Locked = true;
@@ -753,9 +752,9 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'NPR PrintShipmentDocument', true, true)]
     local procedure P130OnAfterActionEventCreatePackage(var Rec: Record "Sales Shipment Header");
     var
-        RecRef: RecordRef;
         SalesShptHeader: Record "Sales Shipment Header";
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+        RecRef: RecordRef;
         RecRefShipment: RecordRef;
         text000: Label 'Do you Want to create a Package entry ?';
         Text001: Label 'Do you want to print the Document?';
