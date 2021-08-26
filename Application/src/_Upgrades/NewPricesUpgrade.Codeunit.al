@@ -24,7 +24,7 @@ codeunit 6014595 "NPR New Prices Upgrade"
 
         UpdateMagentoSetup();
         FillPriceListNos();
-        EnableFeature('SalesPrices');
+        EnableFeature();
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR New Prices Upgrade"));
         LogMessageStopwatch.LogFinish();
@@ -65,20 +65,22 @@ codeunit 6014595 "NPR New Prices Upgrade"
         POSSalesDiscCalcMgt.InitDiscountPriority(DiscountPriority);
     end;
 
-    local procedure EnableFeature(FeatureName: Text)
+    procedure EnableFeature()
     var
         FeatureKey: Record "Feature Key";
         FeatureDataUpdateStatus: Record "Feature Data Update Status";
+        PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
     begin
-        FeatureKey.SetRange(ID, FeatureName);
-        FeatureKey.SetRange(Enabled, FeatureKey.Enabled::None);
-        if FeatureKey.FindFirst() then begin
-            FeatureKey.Validate(Enabled, FeatureKey.Enabled::"All Users");
-            FeatureKey.Modify(true);
+        if not FeatureKey.Get(PriceCalculationMgt.GetFeatureKey()) then
+            exit;
 
-            if FeatureDataUpdateStatus.Get(FeatureKey.ID, CompanyName()) then
-                Codeunit.Run(Codeunit::"Update Feature Data", FeatureDataUpdateStatus);
+        if FeatureKey.Enabled = FeatureKey.Enabled::None then begin
+            FeatureKey.Validate(Enabled, FeatureKey.Enabled::"All Users");
+            FeatureKey.Modify();
         end;
+
+        if FeatureDataUpdateStatus.Get(FeatureKey.ID, CompanyName()) then
+            Codeunit.Run(Codeunit::"Update Feature Data", FeatureDataUpdateStatus);
     end;
 
     local procedure FillPriceListNos()
