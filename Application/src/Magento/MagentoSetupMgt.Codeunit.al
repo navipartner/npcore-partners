@@ -283,7 +283,6 @@
         XNode: XmlNode;
         XNodeList: XmlNodeList;
         XAttribute: XmlAttribute;
-        i: Integer;
     begin
         MagentoSetup.Get();
         if not MagentoSetup."Magento Enabled" then
@@ -305,12 +304,10 @@
                 MagentoWebsite.Modify(true);
             end;
 
-            if XNode.SelectNodes('store_groups/store_group', XNodeList) then begin
-                foreach XNode in XNodeList do begin
-                    XNodeList.Get(i, XNode);
+            if XNode.SelectNodes('store_groups/store_group', XNodeList) then
+                foreach XNode in XNodeList do
                     CreateStores(XNode.AsXmlElement(), MagentoWebsite);
-                end;
-            end;
+
             SetDefaultItemGroupRoots();
         end;
     end;
