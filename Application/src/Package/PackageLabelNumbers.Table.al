@@ -27,12 +27,12 @@ table 6014551 "NPR Package Label Numbers"
                     Type::Order:
                         begin
                             "Sales Header".Get("Sales Header"."Document Type"::Order, "No.");
-                            "Sell-To Name" := "Sales Header"."Sell-to Customer Name";
+                            "Sell-To Name" := CopyStr("Sales Header"."Sell-to Customer Name", 1, 30);
                         end;
                     Type::Shipment:
                         begin
                             "Sales Shipment Header".Get("No.");
-                            "Sell-To Name" := "Sales Shipment Header"."Sell-to Customer Name";
+                            "Sell-To Name" := CopyStr("Sales Shipment Header"."Sell-to Customer Name", 1, 30);
                         end;
                 end;
             end;
@@ -52,14 +52,14 @@ table 6014551 "NPR Package Label Numbers"
                     Type::Order:
                         begin
                             "Sales Header".Get("Sales Header"."Document Type"::Order, "No.");
-                            "Sell-To Name" := "Sales Header"."Sell-to Customer Name";
+                            "Sell-To Name" := CopyStr("Sales Header"."Sell-to Customer Name",1,30);
                             "Shipping Agent".Get("Sales Header"."Shipping Agent Code");
                             "Track And Trace Link" := StrSubstNo("Shipping Agent"."Internet Address", "Package Tracking Num");
                         end;
                     Type::Shipment:
                         begin
                             "Sales Shipment Header".Get("No.");
-                            "Sell-To Name" := "Sales Shipment Header"."Sell-to Customer Name";
+                            "Sell-To Name" := CopyStr("Sales Shipment Header"."Sell-to Customer Name",1,30);
                             "Shipping Agent".Get("Sales Shipment Header"."Shipping Agent Code");
                             "Track And Trace Link" := StrSubstNo("Shipping Agent"."Internet Address", "Package Tracking Num");
                         end;
