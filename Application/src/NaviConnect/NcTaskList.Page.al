@@ -341,7 +341,7 @@ page 6151502 "NPR Nc Task List"
         Rec.SetFilter("Task Processor Code", TaskProcessorFilter);
 
         if ShowProcessed then
-            Rec.SetRange(Processed)
+            Rec.SetRange(Processed, true)
         else
             Rec.SetRange(Processed, false);
 
