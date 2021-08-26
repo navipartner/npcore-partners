@@ -101,9 +101,8 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
 
     trigger OnAfterGetRecord()
     begin
-        if not IsNullGuid(Rec."Service Password") then begin
-            IsolatedStorage.Get(Rec."Service Password", DataScope::Company, Password);
-        end;
+        if not IsNullGuid(Rec."Service Password") then
+            Password := '*';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean

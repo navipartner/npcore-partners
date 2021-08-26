@@ -39,8 +39,8 @@ page 6014615 "NPR RapidStart Base Data Imp."
                         + '&sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageList);
                     foreach package in packageList do begin
                         TempRetailList.Number += 1;
-                        TempRetailList.Value := package;
-                        TempRetailList.Choice := package;
+                        TempRetailList.Value := CopyStr(package, 1, MaxStrLen(TempRetailList.Value));
+                        TempRetailList.Choice := CopyStr(package, 1, MaxStrLen(TempRetailList.Choice));
                         TempRetailList.Insert();
                     end;
 

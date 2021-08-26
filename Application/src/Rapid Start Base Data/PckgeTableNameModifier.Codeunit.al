@@ -522,7 +522,7 @@ codeunit 6014596 "NPR Pckge Table Name Modifier"
 
             //General conversion rule
             else
-                exit(CopyStr(NewName, 5));
+                exit(CopyStr(NewName, 5, 250));
         end;
     end;
 }

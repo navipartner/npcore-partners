@@ -122,15 +122,15 @@
             ConfigTemplateHeader.Insert();
         end;
 
-        ConfigTemplateLine.SetRange("Data Template Code", ItemCategory.Code);
+        ConfigTemplateLine.SetRange("Data Template Code", ConfigTemplateHeader.Code);
         ConfigTemplateLine.SetRange(Type, ConfigTemplateLine.Type::Field);
         ConfigTemplateLine.SetRange("Field ID", 5702);
         ConfigTemplateLine.SetRange("Table ID", 27);
         ConfigTemplateLine.SetRange("Default Value", ItemCategory.Code);
         if not ConfigTemplateLine.FindFirst() then begin
             ConfigTemplateLine.Init();
-            ConfigTemplateLine.Validate("Data Template Code", ItemCategory.Code);
-            ConfigTemplateLine."Line No." := GetNextConfigTemplateLineNo(CopyStr(ItemCategory.Code, 1, 10));
+            ConfigTemplateLine.Validate("Data Template Code", ConfigTemplateHeader.Code);
+            ConfigTemplateLine."Line No." := GetNextConfigTemplateLineNo(ConfigTemplateHeader.Code);
             ConfigTemplateLine.Validate("Table ID", 27);
             ConfigTemplateLine.Validate("Field ID", 5702);
             ConfigTemplateLine.Mandatory := true;
@@ -139,9 +139,9 @@
             ConfigTemplateLine.Insert();
         end;
 #if BC17
-        NonstockItem.Validate("Item Template Code", ItemCategory.Code);
+        NonstockItem.Validate("Item Template Code", ConfigTemplateHeader.Code);
 #else
-        NonstockItem.Validate("Item Templ. Code", ItemCategory.Code);
+        NonstockItem.Validate("Item Templ. Code", ConfigTemplateHeader.Code);
 #endif
         Manufacturer.Code := CopyStr(TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", 3), 1, MaxStrLen(Manufacturer.Code));
         if not Manufacturer.Find() then begin
