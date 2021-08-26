@@ -18,7 +18,7 @@ codeunit 6014599 "NPR New Prices Install"
 
         InitDiscountPriority();
 
-        EnableFeature('SalesPrices');
+        EnableFeature();
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR New Prices Install"));
 
@@ -35,20 +35,11 @@ codeunit 6014599 "NPR New Prices Install"
         POSSalesDiscCalcMgt.InitDiscountPriority(DiscountPriority);
     end;
 
-    local procedure EnableFeature(FeatureName: Text)
+    local procedure EnableFeature()
     var
-        FeatureKey: Record "Feature Key";
-        FeatureDataUpdateStatus: Record "Feature Data Update Status";
+        NewPriceUpgrade: Codeunit "NPR New Prices Upgrade";
     begin
-        FeatureKey.SetRange(ID, FeatureName);
-        FeatureKey.SetRange(Enabled, FeatureKey.Enabled::None);
-        if FeatureKey.FindFirst() then begin
-            FeatureKey.Validate(Enabled, FeatureKey.Enabled::"All Users");
-            FeatureKey.Modify(true);
-
-            if FeatureDataUpdateStatus.Get(FeatureKey.ID, CompanyName()) then
-                Codeunit.Run(Codeunit::"Update Feature Data", FeatureDataUpdateStatus);
-        end;
+        NewPriceUpgrade.EnableFeature();
     end;
 }
 
