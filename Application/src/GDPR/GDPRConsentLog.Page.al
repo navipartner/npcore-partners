@@ -90,10 +90,10 @@ page 6151124 "NPR GDPR Consent Log"
                 begin
                     Rec.FilterGroup(2);
                     if (Rec."Agreement No." = '') then
-                        Rec."Agreement No." := Rec.GetFilter("Agreement No.");
+                        Rec."Agreement No." := CopyStr(Rec.GetFilter("Agreement No."), 1, MaxStrLen(Rec."Agreement No."));
 
                     if (Rec."Data Subject Id" = '') then
-                        Rec."Data Subject Id" := Rec.GetFilter("Data Subject Id");
+                        Rec."Data Subject Id" := CopyStr(Rec.GetFilter("Data Subject Id"), 1, MaxStrLen(Rec."Data Subject Id"));
                     Rec.FilterGroup(0);
 
                     GDPRManagement.CreateAgreementAcceptEntry(Rec."Agreement No.", 0, Rec."Data Subject Id");
@@ -113,13 +113,12 @@ page 6151124 "NPR GDPR Consent Log"
 
                 trigger OnAction()
                 begin
-
                     Rec.FilterGroup(2);
                     if (Rec."Agreement No." = '') then
-                        Rec."Agreement No." := Rec.GetFilter("Agreement No.");
+                        Rec."Agreement No." := CopyStr(Rec.GetFilter("Agreement No."), 1, MaxStrLen(Rec."Agreement No."));
 
                     if (Rec."Data Subject Id" = '') then
-                        Rec."Data Subject Id" := Rec.GetFilter("Data Subject Id");
+                        Rec."Data Subject Id" := CopyStr(Rec.GetFilter("Data Subject Id"), 1, MaxStrLen(Rec."Data Subject Id"));
                     Rec.FilterGroup(0);
 
                     GDPRManagement.CreateAgreementRejectEntry(Rec."Agreement No.", 0, Rec."Data Subject Id");
@@ -139,13 +138,12 @@ page 6151124 "NPR GDPR Consent Log"
 
                 trigger OnAction()
                 begin
-
                     Rec.FilterGroup(2);
                     if (Rec."Agreement No." = '') then
-                        Rec."Agreement No." := Rec.GetFilter("Agreement No.");
+                        Rec."Agreement No." := CopyStr(Rec.GetFilter("Agreement No."), 1, MaxStrLen(Rec."Agreement No."));
 
                     if (Rec."Data Subject Id" = '') then
-                        Rec."Data Subject Id" := Rec.GetFilter("Data Subject Id");
+                        Rec."Data Subject Id" := CopyStr(Rec.GetFilter("Data Subject Id"), 1, MaxStrLen(Rec."Data Subject Id"));
                     Rec.FilterGroup(0);
 
                     GDPRManagement.CreateAgreementPendingEntry(Rec."Agreement No.", 0, Rec."Data Subject Id");

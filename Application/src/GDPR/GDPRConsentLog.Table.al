@@ -78,14 +78,14 @@ table 6151123 "NPR GDPR Consent Log"
     trigger OnInsert()
     begin
 
-        "Last Changed By" := UserId;
+        "Last Changed By" := CopyStr(UserId, 1, MaxStrLen("Last Changed By"));
         "Last Changed At" := CurrentDateTime();
     end;
 
     trigger OnModify()
     begin
 
-        "Last Changed By" := UserId;
+        "Last Changed By" := CopyStr(UserId, 1, MaxStrLen("Last Changed By"));
         "Last Changed At" := CurrentDateTime();
     end;
 

@@ -429,7 +429,7 @@
         GDPRLogEntry."Customer is a Member" := Member;
         GDPRLogEntry."Open Journal Entries/Statement" := Journals;
         GDPRLogEntry."Log Entry Date Time" := CurrentDateTime;
-        GDPRLogEntry."Anonymized By" := UserId;
+        GDPRLogEntry."Anonymized By" := CopyStr(UserId, 1, MaxStrLen(GDPRLogEntry."Anonymized By"));
         GDPRLogEntry.Insert();
     end;
 

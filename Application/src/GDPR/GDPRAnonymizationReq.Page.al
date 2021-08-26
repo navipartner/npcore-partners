@@ -260,7 +260,7 @@ page 6151153 "NPR GDPR Anonymization Req."
         GDPRLogEntry."Customer No" := CustNo;
         GDPRLogEntry.Status := GDPRLogEntry.Status::Anonymised;
         GDPRLogEntry."Log Entry Date Time" := CURRENTDATETIME;
-        GDPRLogEntry."Anonymized By" := USERID;
+        GDPRLogEntry."Anonymized By" := CopyStr(USERID, 1, MaxStrLen(GDPRLogEntry."Anonymized By"));
         GDPRLogEntry.Insert();
 
     end;
