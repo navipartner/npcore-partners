@@ -6,6 +6,7 @@ page 6060127 "NPR MM Memberships"
     DataCaptionExpression = Rec."External Membership No.";
     InsertAllowed = false;
     ModifyAllowed = false;
+    Editable = true;
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Membership";
@@ -17,8 +18,36 @@ page 6060127 "NPR MM Memberships"
     {
         area(content)
         {
+            field(Search; _SearchTerm)
+            {
+                Editable = true;
+                Caption = 'Smart Search';
+                ApplicationArea = NPRRetail;
+                ToolTip = 'This search is optimized to search relevant columns only.';
+                trigger OnValidate()
+                var
+                    Membership: Record "NPR MM Membership";
+                    SmartSearch: Codeunit "NPR MM Smart Search";
+                begin
+                    Rec.Reset();
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
+                    if (_SearchTerm = '') then begin
+                        CurrPage.Update(false);
+                        exit;
+                    end;
+
+                    SmartSearch.SearchMembership(_SearchTerm, Membership);
+
+                    Rec.Copy(Membership);
+                    Rec.SetLoadFields();
+                    Rec.MarkedOnly(true);
+                    CurrPage.Update(false);
+                end;
+            }
             repeater(Group)
             {
+                Editable = false;
                 field("External Membership No."; Rec."External Membership No.")
                 {
 
@@ -252,6 +281,15 @@ page 6060127 "NPR MM Memberships"
 
                     end;
                 }
+            }
+        }
+        area(factboxes)
+        {
+            part(MembershipFactBox; "NPR MM Membership FactBox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Membership Details';
+                SubPageLink = "Entry No." = FIELD("Entry No.");
             }
         }
     }
@@ -488,6 +526,7 @@ page 6060127 "NPR MM Memberships"
 
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        _SearchTerm: Text[100];
         CONFIRM_SYNC: Label 'Do you want to sync the customers and contacts for %1 memberships?';
         DisplayName: Text[200];
         NPRAttrTextArray: array[40] of Text[250];
