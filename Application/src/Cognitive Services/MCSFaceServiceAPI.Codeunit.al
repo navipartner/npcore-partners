@@ -43,9 +43,9 @@
             JsonObj.Get('personGroupId', JsonTokValue);
             PersonGroups.Init();
             PersonGroups.Id := Counter;
-            PersonGroups.PersonGroupId := JsonTokValue.AsValue().AsText();
+            PersonGroups.PersonGroupId := CopyStr(JsonTokValue.AsValue().AsText(), 1, MaxStrLen(PersonGroups.PersonGroupId));
             JsonObj.Get('name', JsonTokValue);
-            PersonGroups.Name := JsonTokValue.AsValue().AsText();
+            PersonGroups.Name := CopyStr(JsonTokValue.AsValue().AsText(), 1, MaxStrLen(PersonGroups.Name));
             PersonGroups.Insert();
             Counter += 10000;
         end;
@@ -96,8 +96,8 @@
 
         if Rec.IsTemporary then
             exit;
-        Rec.PersonGroupId := LowerCase(CreateGuid());
-        Rec.PersonGroupId := CopyStr(Rec.PersonGroupId, 2, StrLen(Rec.PersonGroupId) - 2);
+        Rec.PersonGroupId := CopyStr(LowerCase(CreateGuid()), 1, MaxStrLen(Rec.PersonGroupId));
+        Rec.PersonGroupId := CopyStr(CopyStr(Rec.PersonGroupId, 2, StrLen(Rec.PersonGroupId) - 2), 1, MaxStrLen(Rec.PersonGroupId));
         Rec.Modify(true);
 
         JsonObj.Add('name', Rec.Name);
@@ -274,8 +274,8 @@
                 MCSPerson.Init();
                 MCSPerson.PersonId := MCSFaces.PersonId;
                 MCSPerson.PersonGroupId := PersonGroups.PersonGroupId;
-                MCSPerson.Name := PersonName;
-                MCSPerson.UserData := UserData;
+                MCSPerson.Name := CopyStr(PersonName, 1, MaxStrLen(MCSPerson.Name));
+                MCSPerson.UserData := CopyStr(UserData, 1, MaxStrLen(MCSPerson.UserData));
                 if MCSPerson.Insert(true) then begin
                     MCSPersonBusinessEntities.Init();
                     MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
@@ -301,8 +301,8 @@
         JsonTokValue: JsonToken;
     begin
         MCSFaces.Init();
-        MCSFaces.FaceId := FaceID;
-        MCSFaces.PersonId := PersonId;
+        MCSFaces.FaceId := CopyStr(FaceID, 1, MaxStrLen(MCSFaces.FaceId));
+        MCSFaces.PersonId := CopyStr(PersonId, 1, MaxStrLen(MCSFaces.PersonId));
 
         MCSFaces.Identified := FaceIdentified;
 
@@ -333,7 +333,7 @@
         MCSFaces.Age := JsonTokValue.AsValue().AsDecimal();
 
         FaceAttrJsonObj.Get('gender', JsonTokValue);
-        MCSFaces.Gender := JsonTokValue.AsValue().AsText();
+        MCSFaces.Gender := CopyStr(JsonTokValue.AsValue().AsText(), 1, MaxStrLen(MCSFaces.Gender));
 
         FaceAttrJsonObj.Get('smile', JsonTokValue);
         MCSFaces.IsSmiling := JsonTokValue.AsValue().AsDecimal() > 0.5;
@@ -351,7 +351,7 @@
         MCSFaces.Sideburns := JsonTokValue.AsValue().AsDecimal();
 
         FaceAttrJsonObj.Get('glasses', JsonTokValue);
-        MCSFaces.Glasses := JsonTokValue.AsValue().AsText();
+        MCSFaces.Glasses := CopyStr(JsonTokValue.AsValue().AsText(), 1, MaxStrLen(MCSFaces.Glasses));
     end;
 
     local procedure IsPersonIdentified(FaceID: Text; IdentifyJsonArray: JsonArray) PersonId: Text
@@ -718,7 +718,7 @@
             JsonObj := JsonTok.AsObject();
             JsonObj.Get('faceId', JsonTokValue);
             FaceId := JsonTokValue.AsValue().AsText();
-            PersonId := IsPersonIdentified(FaceId, JsonIdArr);
+            PersonId := CopyStr(IsPersonIdentified(FaceId, JsonIdArr), 1, MaxStrLen(PersonId));
         end;
     end;
 }
