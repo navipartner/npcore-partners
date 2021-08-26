@@ -6,6 +6,7 @@ page 6060130 "NPR MM Member Card List"
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
+    Editable = true;
     PageType = List;
     SourceTable = "NPR MM Member Card";
     UsageCategory = Lists;
@@ -15,6 +16,33 @@ page 6060130 "NPR MM Member Card List"
     {
         area(content)
         {
+            field(Search; _SearchTerm)
+            {
+                Editable = true;
+                Caption = 'Smart Search';
+                ApplicationArea = NPRRetail;
+                ToolTip = 'This search is optimized to search relevant columns only.';
+                trigger OnValidate()
+                var
+                    MemberCard: Record "NPR MM Member Card";
+                    SmartSearch: Codeunit "NPR MM Smart Search";
+                begin
+                    Rec.Reset();
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
+                    if (_SearchTerm = '') then begin
+                        CurrPage.Update(false);
+                        exit;
+                    end;
+
+                    SmartSearch.SearchMemberCard(_SearchTerm, MemberCard);
+
+                    Rec.Copy(MemberCard);
+                    Rec.SetLoadFields();
+                    Rec.MarkedOnly(true);
+                    CurrPage.Update(false);
+                end;
+            }
             repeater(Group)
             {
                 Editable = false;
@@ -26,6 +54,25 @@ page 6060130 "NPR MM Member Card List"
                 field("Valid Until"; Rec."Valid Until")
                 {
                     ToolTip = 'Specifies the value of the Valid Until field';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field("External Membership No."; Rec."External Membership No.")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the External Membership No.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("External Member No."; Rec."External Member No.")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the External Member No.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Display Name"; Rec."Display Name")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Display Name.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -116,5 +163,7 @@ page 6060130 "NPR MM Member Card List"
             }
         }
     }
+    var
+        _SearchTerm: Text[100];
 }
 

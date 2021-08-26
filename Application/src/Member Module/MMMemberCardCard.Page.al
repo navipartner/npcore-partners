@@ -14,7 +14,6 @@ page 6060133 "NPR MM Member Card Card"
             {
                 field("External Card No."; Rec."External Card No.")
                 {
-
                     NotBlank = true;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the External Card No. field';
@@ -39,65 +38,76 @@ page 6060133 "NPR MM Member Card Card"
 
                     end;
                 }
+                field("Display Name"; Rec."Display Name")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Display Name.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Valid Until"; Rec."Valid Until")
+                {
+                    ToolTip = 'Specifies the value of the Valid Until field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("External Membership No."; Rec."External Membership No.")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the External Membership No.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("External Member No."; Rec."External Member No.")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the External Member No.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+            group(Card)
+            {
                 field("External Card No. Last 4"; Rec."External Card No. Last 4")
                 {
-
                     ToolTip = 'Specifies the value of the External Card No. Last 4 field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pin Code"; Rec."Pin Code")
                 {
-
                     ToolTip = 'Specifies the value of the Pin Code field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Valid Until"; Rec."Valid Until")
-                {
-
-                    ToolTip = 'Specifies the value of the Valid Until field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Card Is Temporary"; Rec."Card Is Temporary")
                 {
-
                     ToolTip = 'Specifies the value of the Card Is Temporary field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-
                     ToolTip = 'Specifies the value of the Blocked field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-
                     ToolTip = 'Specifies the value of the Blocked At field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Block Reason"; Rec."Block Reason")
                 {
-
                     ToolTip = 'Specifies the value of the Block Reason field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Membership Entry No."; Rec."Membership Entry No.")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Membership Entry No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Member Entry No."; Rec."Member Entry No.")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Member Entry No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document ID"; Rec."Document ID")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document ID field';
                     ApplicationArea = NPRRetail;
