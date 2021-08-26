@@ -17,37 +17,26 @@ page 6060126 "NPR MM Members"
     {
         area(content)
         {
-            field(Search; _TurboSearch)
+            field(Search; _SearchTerm)
             {
                 Editable = true;
-                Caption = 'Fast Search';
+                Caption = 'Smart Search';
                 ApplicationArea = NPRRetail;
                 ToolTip = 'This search is optimized to search relevant columns only.';
                 trigger OnValidate()
                 var
                     Member: Record "NPR MM Member";
+                    SmartSearch: Codeunit "NPR MM Smart Search";
                 begin
                     Rec.Reset();
                     Rec.ClearMarks();
                     Rec.MarkedOnly(false);
-                    if (_TurboSearch = '') then begin
+                    if (_SearchTerm = '') then begin
                         CurrPage.Update(false);
                         exit;
                     end;
 
-                    Member.FilterGroup := -1;
-                    Member.SetFilter("External Member No.", '%1', UpperCase(_TurboSearch));
-                    Member.SetFilter("First Name", '%1', '@' + _TurboSearch);
-                    Member.SetFilter("Last Name", '%1', '@' + _TurboSearch);
-                    Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(_TurboSearch, '@', '?')));
-                    Member.SetFilter("Phone No.", '%1', _TurboSearch);
-                    Member.FilterGroup := 0;
-
-                    Member.SetLoadFields("Entry No.");
-                    if (Member.FindSet()) then
-                        repeat
-                            Member.Mark(true);
-                        until (Member.Next() = 0);
+                    SmartSearch.SearchMember(_SearchTerm, Member);
 
                     Rec.Copy(Member);
                     Rec.SetLoadFields();
@@ -337,7 +326,7 @@ page 6060126 "NPR MM Members"
         RaptorEnabled: Boolean;
         ConfirmContactSynchQst: Label 'Do you want to sync the contacts for %1 members?', Comment = '%1=Member.Count()';
         EntriesNotFoundForMemberErr: Label 'No entries found for member %1.', Comment = '%1=Rec."External Member No."';
-        _TurboSearch: Text[100];
+        _SearchTerm: Text[100];
 
     local procedure SyncContact()
     var
