@@ -28,6 +28,7 @@ codeunit 6014682 "NPR MM Smart Search"
         Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
         Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
         Member.SetFilter("Phone No.", '%1', SearchTerm);
+        Member.SetFilter("Display Name", '%1', SearchTerm);
         Member.FilterGroup := 0;
 
         Member.SetLoadFields("Entry No.");
@@ -114,6 +115,7 @@ codeunit 6014682 "NPR MM Smart Search"
             Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
             Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
             Member.SetFilter("Phone No.", '%1', SearchTerm);
+            Member.SetFilter("Display Name", '%1', SearchTerm);
             Member.FilterGroup := 0;
 
             Member.SetLoadFields("Entry No.");
@@ -188,6 +190,7 @@ codeunit 6014682 "NPR MM Smart Search"
             Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
             Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
             Member.SetFilter("Phone No.", '%1', SearchTerm);
+            Member.SetFilter("Display Name", '%1', SearchTerm);
             Member.FilterGroup := 0;
 
             Member.SetLoadFields("Entry No.");
