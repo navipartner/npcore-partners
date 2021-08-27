@@ -39,6 +39,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG App. Area User Exp."));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -128,6 +129,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                     'AdjustDeletePOSLinePOSActionParameters':
                         exit('NPRDeletePOSLineActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
                 end;
+            Codeunit::"NPR UPG App. Area User Exp.":
+                exit('NPR-482497-AppAreaForUserExperience-20210825');
         end;
     end;
 }
