@@ -263,7 +263,7 @@
     local procedure TaskError(var NaviConnectTask: Record "NPR Nc Task")
     var
         OutStream: OutStream;
-        ErrorText: Text[1024];
+        ErrorText: Text;
     begin
         NaviConnectTask.LockTable();
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
