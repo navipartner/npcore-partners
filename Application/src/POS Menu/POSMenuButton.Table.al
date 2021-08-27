@@ -175,6 +175,8 @@ table 6150701 "NPR POS Menu Button"
         {
             Caption = 'Blocking UI';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Does not really make sense as it should not be persistent data stored on a per button level. It should be hardcoded by the developer that created the action, whether the action should block the UI';
         }
         field(31; "Background Image Url"; Text[250])
         {
@@ -338,7 +340,6 @@ table 6150701 "NPR POS Menu Button"
                 if POSAction."Bound to DataSource" then
                     Enabled := Enabled::Auto;
                 "Data Source Name" := POSAction."Data Source Name";
-                "Blocking UI" := POSAction."Blocking UI";
                 if (POSAction.Tooltip <> '') and (Tooltip = '') then
                     Tooltip := POSAction.Tooltip;
                 if (POSAction."Secure Method Code" <> '') and ("Secure Method Code" = '') then
@@ -356,7 +357,6 @@ table 6150701 "NPR POS Menu Button"
         Clear("Action Code");
         Clear("Data Source Name");
         Clear(Enabled);
-        Clear("Blocking UI");
         Clear(Tooltip);
         ClearParameters();
     end;
@@ -556,12 +556,11 @@ table 6150701 "NPR POS Menu Button"
     var
         POSAction: Record "NPR POS Action";
     begin
-        if "Blocking UI" then
-            ActionIn.Content().Add('Blocking', true);
-
         if (not POSSession.RetrieveSessionAction("Action Code", POSAction)) then
             exit;
 
+        if POSAction."Blocking UI" then
+            ActionIn.Content().Add('Blocking', true);
         ActionIn.Content().Add('requirePosUnitType', Format(POSAction."Requires POS Type", 0, 9));
     end;
 

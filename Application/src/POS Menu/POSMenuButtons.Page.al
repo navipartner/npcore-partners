@@ -133,13 +133,6 @@ page 6150702 "NPR POS Menu Buttons"
                     ToolTip = 'Specifies the value of the Enabled field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Blocking UI"; Rec."Blocking UI")
-                {
-
-                    Editable = IsBlockingUIEnabled;
-                    ToolTip = 'Specifies the value of the Blocking UI field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Secure Method Code"; Rec."Secure Method Code")
                 {
 
@@ -391,7 +384,6 @@ page 6150702 "NPR POS Menu Buttons"
         HasSubMenus: Boolean;
         IsParametersEnabled: Boolean;
         IsPopupEnabled: Boolean;
-        IsBlockingUIEnabled: Boolean;
         RowStyle: Text;
         NeedParameterRefresh: Boolean;
 
@@ -481,7 +473,6 @@ page 6150702 "NPR POS Menu Buttons"
     begin
         IsParametersEnabled := Rec."Action Type" in [Rec."Action Type"::Action, Rec."Action Type"::Item, Rec."Action Type"::PopupMenu, Rec."Action Type"::PaymentType];
         IsPopupEnabled := Rec."Action Type" = Rec."Action Type"::PopupMenu;
-        IsBlockingUIEnabled := Rec."Action Type" <> Rec."Action Type"::Action;
     end;
 
     local procedure DoRefreshActionCode()
@@ -496,4 +487,3 @@ page 6150702 "NPR POS Menu Buttons"
         end;
     end;
 }
-
