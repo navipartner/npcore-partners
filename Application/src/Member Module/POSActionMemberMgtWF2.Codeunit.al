@@ -386,14 +386,20 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         ExternalMemberCardNo: Text;
         FrontEndInputMethod: Option;
-        MEMBERSHIP_NOT_SELECTED: Label 'No membership was selected.';
     begin
         ExternalMemberCardNo := Context.GetString('memberCardInput');
         FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         if ((FrontEndInputMethod = MemberSelectionMethod::NO_PROMPT) and (ExternalMemberCardNo = '')) then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
-                Error(MEMBERSHIP_NOT_SELECTED);
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+                Error('');
+
+        if ((FrontEndInputMethod = MemberSelectionMethod::CARD_SCAN)) then begin
+            if (ExternalMemberCardNo = '') then
+                if (not ChooseMemberCard(ExternalMemberCardNo)) then
+                    Error('');
+            FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT;
+        end;
 
         MemberRetailIntegration.POS_ShowMemberCard(FrontEndInputMethod, ExternalMemberCardNo);
 
@@ -463,7 +469,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
         if ((ExternalMemberCardNo = '') and (InputMethod in [MemberSelectionMethod::NO_PROMPT, MemberSelectionMethod::CARD_SCAN])) then begin
             InputMethod := MemberSelectionMethod::NO_PROMPT;
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 Error(MEMBERSHIP_NOT_SELECTED);
         end;
 
@@ -664,59 +670,65 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         exit(FieldMetaData);
     end;
 
-
-    procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
+    procedure ChooseMemberCard(var ExtMemberCardNo: Text[100]): Boolean
     begin
-        exit(SelectMemberCardViaMemberUI(ExtMemberCardNo));
+        exit(ChooseMemberCardViaMemberSearchUI(ExtMemberCardNo));
     end;
 
-    local procedure SelectMemberCardViaMemberUI(var ExtMemberCardNo: Text[100]): Boolean
+    local procedure ChooseMemberCardViaMemberSearchUI(var ExtMemberCardNo: Text[100]): Boolean
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
         MemberCardList: Page "NPR MM Member Card List";
-        ExtMemberNo: Code[20];
+        MemberCardCount: Integer;
     begin
 
-        if (not SelectMemberUI(ExtMemberNo)) then
-            exit(false);
-
-        Member.SetFilter("External Member No.", '=%1', ExtMemberNo);
         Member.SetFilter(Blocked, '=%1', false);
-        if (not Member.FindFirst()) then
-            exit(false);
-
+        if (not ChooseMemberWithSearchUI(Member)) then
+            exit;
 
         MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
         MemberCard.SetFilter(Blocked, '=%1', false);
-        MemberCard.SetFilter("Valid Until", '=%1|>=%2', 0D, Today);
-        if (MemberCard.Count() > 1) then begin
-            MemberCardList.SetTableView(MemberCard);
-            MemberCardList.Editable(false);
-            MemberCardList.LookupMode(true);
-            if (ACTION::LookupOK <> MemberCardList.RunModal()) then
-                exit(false);
+        MemberCard.SetFilter("Valid Until", '=%1|>=%2', 0D, Today());
+        MemberCardCount := MemberCard.Count();
 
-            MemberCardList.GetRecord(MemberCard);
-
-        end else begin
-            if (not MemberCard.FindFirst()) then begin
-                MemberCard.Reset();
-                MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
-                MemberCard.SetFilter(Blocked, '=%1', false);
-                if (MemberCard.Count() > 1) then begin
+        case true of
+            MemberCardCount > 1:
+                begin
                     MemberCardList.SetTableView(MemberCard);
                     MemberCardList.Editable(false);
                     MemberCardList.LookupMode(true);
-                    if (ACTION::LookupOK <> MemberCardList.RunModal()) then
+                    if (Action::LookupOK <> MemberCardList.RunModal()) then
                         exit(false);
+
                     MemberCardList.GetRecord(MemberCard);
-                end else begin
-                    if (not MemberCard.FindFirst()) then
-                        exit(false);
                 end;
-            end;
+            MemberCardCount = 1:
+                begin
+                    MemberCard.FindFirst();
+                end;
+            else begin
+                    MemberCard.Reset();
+                    MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
+                    MemberCard.SetFilter(Blocked, '=%1', false);
+                    MemberCardCount := MemberCard.Count();
+                    case true of
+                        MemberCardCount > 1:
+                            begin
+                                MemberCardList.SetTableView(MemberCard);
+                                MemberCardList.Editable(false);
+                                MemberCardList.LookupMode(true);
+                                if (Action::LookupOK <> MemberCardList.RunModal()) then
+                                    exit;
+                                MemberCardList.GetRecord(MemberCard);
+                            end;
+                        else begin
+                                if (not MemberCard.FindFirst()) then
+                                    exit;
+                            end;
+                    end;
+                end;
         end;
 
         ExtMemberCardNo := MemberCard."External Card No.";
@@ -724,17 +736,33 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     end;
 
-    local procedure SelectMemberUI(var ExtMemberNo: Code[20]): Boolean
+    local procedure ChooseMemberWithSearchUI(var Member: Record "NPR MM Member"): Boolean
     var
-        Member: Record "NPR MM Member";
+        MemberSearch: Page "NPR MM Member Search Fields";
+        MemberList: Page "NPR MM Members";
+        PageAction: Action;
+        FullTextSearch: Label 'Are you not finding what you are looking for? Do you want to do a full text member search?';
     begin
 
-        if (ACTION::LookupOK <> PAGE.RunModal(0, Member)) then
-            exit(false);
+        MemberSearch.LookupMode(true);
+        PageAction := MemberSearch.RunModal();
 
-        ExtMemberNo := Member."External Member No.";
-        exit(ExtMemberNo <> '');
+        if (PageAction = Action::LookupOK) then begin
+            Member.SetFilter("External Member No.", '=%1', MemberSearch.GetSelectedMemberNumber());
+            if (Member.FindFirst()) then
+                ;
+        end else begin
+            if (not Confirm(FullTextSearch, false)) then
+                exit(false);
 
+            MemberList.LookupMode(true);
+            MemberList.SetTableView(Member);
+            PageAction := MemberList.RunModal();
+            if (PageAction = Action::LookupOK) then
+                MemberList.GetRecord(Member);
+        end;
+
+        exit(Member."External Member No." <> '');
     end;
 
     local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[50]; Description: Text[100]; Description2: Text[80]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR POS Sale Line")

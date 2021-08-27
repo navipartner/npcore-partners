@@ -246,7 +246,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (InputMethod = DialogMethod::NO_PROMPT) and (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 Error(MEMBER_REQUIRED);
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
@@ -303,7 +303,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         POSSale.Refresh(SalePOS);
 
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
@@ -331,7 +331,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -358,7 +358,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -394,7 +394,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -421,7 +421,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -473,7 +473,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(false, false, InputMethod, false, ExternalMemberCardNo);
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit;
 
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ReasonNotFound);
@@ -503,7 +503,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit(false);
 
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ReasonNotFound);
@@ -525,7 +525,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (ExternalMemberNo = '') then
-            if (not SelectMemberUI(ExternalMemberNo)) then
+            if (not ChooseMember(ExternalMemberNo)) then
                 exit(false);
 
         MemberEntryNo := MembershipManagement.GetMemberFromExtMemberNo(ExternalMemberNo);
@@ -665,7 +665,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ShowMemberCard(InputMethod, ExternalMemberCardNo);
@@ -817,24 +817,24 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         exit(ItemNo);
     end;
 
-    local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
+    local procedure ChooseMemberCard(var ExtMemberCardNo: Text[100]): Boolean
     begin
-        exit(SelectMemberCardViaMemberUI(ExtMemberCardNo));
+        exit(ChooseMemberCardViaMemberSearchUI(ExtMemberCardNo));
     end;
 
-    local procedure SelectMemberUI(var ExtMemberNo: Code[20]): Boolean
+    local procedure ChooseMember(var ExtMemberNo: Code[20]): Boolean
     var
         Member: Record "NPR MM Member";
     begin
         ExtMemberNo := '';
 
-        if (SelectMemberUI(Member)) then
+        if (ChooseMemberWithSearchUI(Member)) then
             ExtMemberNo := Member."External Member No.";
 
         exit(ExtMemberNo <> '');
     end;
 
-    local procedure SelectMemberUI(var Member: Record "NPR MM Member"): Boolean
+    local procedure ChooseMemberWithSearchUI(var Member: Record "NPR MM Member"): Boolean
     var
         MemberSearch: Page "NPR MM Member Search Fields";
         MemberList: Page "NPR MM Members";
@@ -863,17 +863,16 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         exit(Member."External Member No." <> '');
     end;
 
-    local procedure SelectMemberCardViaMemberUI(var ExtMemberCardNo: Text[100]): Boolean
+    local procedure ChooseMemberCardViaMemberSearchUI(var ExtMemberCardNo: Text[100]): Boolean
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
         MemberCardList: Page "NPR MM Member Card List";
         MemberCardCount: Integer;
     begin
-        Member.SetRange(Blocked, false);
-        if (not SelectMemberUI(Member)) then
+        Member.SetFilter(Blocked, '=%1', false);
+        if (not ChooseMemberWithSearchUI(Member)) then
             exit;
-
 
         MemberCard.SetCurrentKey("Member Entry No.");
         MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -1009,7 +1008,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             MembershipSelected := false;
 
             if (ExternalMemberNo = '') then
-                SelectMemberUI(ExternalMemberNo);
+                ChooseMember(ExternalMemberNo);
 
             if (Member.Get(MembershipManagement.GetMemberFromExtMemberNo(ExternalMemberNo))) then begin
 
