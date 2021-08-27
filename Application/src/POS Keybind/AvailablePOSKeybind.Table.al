@@ -2,6 +2,8 @@ table 6150723 "NPR Available POS Keybind"
 {
     Caption = 'Available POS Keybind';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Almost zero usage since the module was introduced, but caused significant performance issues';
 
     fields
     {
