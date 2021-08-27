@@ -5550,6 +5550,8 @@ body {
         color: var(--color-danger-100); }
       .transcendence .grid__table table tbody tr.tr-highlight {
         background-color: var(--color-primary-300); }
+      .transcendence .grid__table table tbody tr.negative {
+        color: firebrick; }
     .transcendence .grid__table table tbody td {
       border-right: none;
       padding: 0.5% 1%;
@@ -9126,9 +9128,6 @@ body {
 .statusbar__section--group {
   padding: 0 12px;
   line-height: 1.8em; }
-  .statusbar__section--group.right {
-    float: right;
-    line-height: 0; }
 
 .statusbar__notifications {
   border-left: 1px solid rgba(255, 255, 255, 0.15);
@@ -9136,7 +9135,8 @@ body {
   padding-right: 10px;
   display: table-cell;
   width: 70px;
-  vertical-align: middle; }
+  vertical-align: middle;
+  float: right; }
   .statusbar__notifications div {
     padding-left: 5px;
     padding-right: 5px;

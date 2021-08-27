@@ -138,6 +138,8 @@ codeunit 6150710 "NPR POS Data Management"
             end;
         end;
 
+        OnAfterReadDataSourceRow(POSSession, RecRef, DataSource.Id(), DataRow);
+
         if HasVariables then begin
             OnReadDataSourceVariables(POSSession, RecRef, DataSource.Id(), DataRow, Handled);
             if not Handled then
@@ -250,6 +252,15 @@ codeunit 6150710 "NPR POS Data Management"
 
     [IntegrationEvent(false, false)]
     procedure OnAfterRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management")
+    begin
+    end;
+
+    /// <summary>
+    /// Event called after a a data source row has been read and converted to DataRow instance. It allows individual
+    /// data source to modify the content of the DataRow (for example, setting negative property, etc.)
+    /// </summary>
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterReadDataSourceRow(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row")
     begin
     end;
 
