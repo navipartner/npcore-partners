@@ -52,6 +52,19 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
         Handled := true;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnAfterReadDataSourceRow', '', false, false)]
+    local procedure OnAfterReadDataSourceRow(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row")
+    var
+        SaleLine: Record "NPR POS Sale Line";
+    begin
+        if DataSource <> GetSourceNameText() then
+            exit;
+
+        RecRef.SetTable(SaleLine);
+        if SaleLine.Quantity < 0 then
+            DataRow.SetNegative(true);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnSetPosition', '', false, false)]
     local procedure SetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
     var

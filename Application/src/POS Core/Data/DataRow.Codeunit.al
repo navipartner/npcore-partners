@@ -49,7 +49,8 @@ codeunit 6150895 "NPR Data Row" implements "NPR IJsonSerializable"
     procedure SetNegative(NewNegative: Boolean);
     begin
         MakeSureIsConstructed();
-        _negative.AsValue().SetValue(NewNegative);
+        _json.Replace(LabelNegative, NewNegative);
+        _json.Get(LabelNegative, _negative);
     end;
 
     procedure Class(): Text;
@@ -61,7 +62,8 @@ codeunit 6150895 "NPR Data Row" implements "NPR IJsonSerializable"
     procedure SetClass(NewClass: Text);
     begin
         MakeSureIsConstructed();
-        _class.AsValue().SetValue(NewClass);
+        _json.Replace(LabelClass, NewClass);
+        _json.Get(LabelClass, _class);
     end;
 
     procedure Style(): Text;
@@ -73,7 +75,8 @@ codeunit 6150895 "NPR Data Row" implements "NPR IJsonSerializable"
     procedure SetStyle(NewStyle: Text);
     begin
         MakeSureIsConstructed();
-        _style.AsValue().SetValue(NewStyle);
+        _json.Replace(LabelStyle, NewStyle);
+        _json.Get(LabelStyle, _style);
     end;
 
     procedure Deleted(): Boolean;
