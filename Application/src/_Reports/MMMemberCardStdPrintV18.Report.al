@@ -88,7 +88,7 @@ report 6060123 "NPR MM Member Card Std Print"
                 BarcodeSimbiology := BarcodeSimbiology::Code128;
 
                 BarCodeText := "MM Member Card"."External Card No.";
-                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false));
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(CopyStr(BarCodeText, 1, 250), BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false));
 
                 Clear(MemberDate);
                 Clear(MemberItem);

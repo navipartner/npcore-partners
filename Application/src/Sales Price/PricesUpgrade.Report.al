@@ -50,7 +50,7 @@ report 6014409 "NPR Prices Upgrade"
                 if Confirm(ConfirmUpgradeLbl) then begin
                     PriceCalculationMgt.TestIsEnabled();
                     FeatureDataUpdateStatus."Feature Key" := 'SalesPrice';
-                    FeatureDataUpdateStatus."Company Name" := CompanyName();
+                    FeatureDataUpdateStatus."Company Name" := CopyStr(CompanyName(), 1, 30);
                     FeaturePriceCalculation.UpdateData(FeatureDataUpdateStatus);
                 end;
             end else
