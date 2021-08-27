@@ -118,6 +118,8 @@ table 6150650 "NPR POS Audit Profile"
         {
             Caption = 'Do Not Print Receipt on Sale';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(110; "Sales Ticket No. Series"; Code[20])
         {

@@ -75,12 +75,6 @@ page 6150632 "NPR POS Audit Profiles"
                     ToolTip = 'Specifies the value of the Print Receipt On Sale Cancel field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
-                {
-
-                    ToolTip = 'Specifies the value of the Do Not Print Receipt on Sale field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {
 
