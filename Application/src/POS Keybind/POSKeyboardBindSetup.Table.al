@@ -2,6 +2,8 @@ table 6150719 "NPR POS Keyboard Bind. Setup"
 {
     Caption = 'POS Keyboard Binding Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Almost zero usage since the module was introduced, but caused significant performance issues';
 
     fields
     {
@@ -20,21 +22,6 @@ table 6150719 "NPR POS Keyboard Bind. Setup"
             Caption = 'Key Bind';
             DataClassification = CustomerContent;
 
-            trigger OnLookup()
-            var
-                AvailablePOSKeybinds: Page "NPR Available POS Keybinds";
-                AvailablePOSKeybind: Record "NPR Available POS Keybind";
-            begin
-                AvailablePOSKeybinds.LookupMode := true;
-                AvailablePOSKeybinds.Editable := false;
-                AvailablePOSKeybind.SetRange(Supported, true);
-                AvailablePOSKeybinds.SetTableView(AvailablePOSKeybind);
-                if AvailablePOSKeybinds.RunModal() = ACTION::LookupOK then begin
-                    AvailablePOSKeybinds.GetRecord(AvailablePOSKeybind);
-                    Validate("Key Bind", AvailablePOSKeybind."Key Name");
-                end;
-            end;
-
             trigger OnValidate()
             begin
                 if "Key Bind" <> xRec."Key Bind" then
@@ -45,11 +32,6 @@ table 6150719 "NPR POS Keyboard Bind. Setup"
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                POSKeyboardBindingMgt.CheckKeyBind(Rec, false);
-            end;
         }
         field(30; "Default Key Bind"; Text[30])
         {
@@ -64,7 +46,4 @@ table 6150719 "NPR POS Keyboard Bind. Setup"
         {
         }
     }
-
-    var
-        POSKeyboardBindingMgt: Codeunit "NPR POS Keyboard Binding Mgt.";
 }

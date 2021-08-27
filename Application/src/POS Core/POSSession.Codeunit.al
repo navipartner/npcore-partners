@@ -124,7 +124,6 @@ codeunit 6150700 "NPR POS Session"
         UI.ConfigureReusableWorkflows(This, Setup);
         DebugWithTimestamp('AdvertiseStargatePackages');
         FrontEnd.AdvertiseStargatePackages();
-        InitializeKeyboardBindings();
         DebugWithTimestamp('InitializeSecureMethods');
         FrontEnd.ConfigureSecureMethods();
         DebugWithTimestamp('ConfigureActionSequences');
@@ -174,15 +173,6 @@ codeunit 6150700 "NPR POS Session"
             RequestRefreshData();
             JS.RefreshData(This, FrontEnd);
         end;
-    end;
-
-    local procedure InitializeKeyboardBindings()
-    var
-        POSKeyboardBindingMgt: Codeunit "NPR POS Keyboard Binding Mgt.";
-    begin
-        POSKeyboardBindingMgt.DiscoverKeyboardBindings(KeyboardBindings);
-        if KeyboardBindings.Count() > 0 then
-            FrontEnd.ConfigureKeyboardBindings(KeyboardBindings);
     end;
 
     procedure StartPOSSession()
