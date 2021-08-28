@@ -10,7 +10,7 @@ pageextension 6014493 "NPR Customer Lookup" extends "Customer Lookup"
             {
                 Editable = true;
                 Caption = 'Fast Search';
-                ApplicationArea = NPRetail;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'This search is optimized to search relevant columns only.';
                 trigger OnValidate()
                 var
