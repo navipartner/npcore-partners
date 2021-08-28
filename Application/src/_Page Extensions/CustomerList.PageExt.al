@@ -10,7 +10,7 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
             {
                 Editable = true;
                 Caption = 'Fast Search';
-                ApplicationArea = NPRetail;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'This search is optimized to search relevant columns only.';
                 trigger OnValidate()
                 var
