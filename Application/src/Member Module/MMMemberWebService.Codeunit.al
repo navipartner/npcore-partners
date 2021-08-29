@@ -156,6 +156,9 @@ codeunit 6060128 "NPR MM Member WebService"
                 Membership.AddResponse(MemberInfoCapture."Membership Entry No.");
             until (MemberInfoCapture.Next() = 0);
 
+            if (MemberInfoCapture."External Membership No." <> '') then
+                ImportEntry."Document Name" := StrSubstNo(FileNameLbl, MemberInfoCapture."External Membership No.");
+
             MemberInfoCapture.DeleteAll();
         end else begin
             Membership.AddErrorResponse(ImportEntry."Error Message");
@@ -197,9 +200,9 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportEntry."Document Source".CreateOutStream(OutStr);
         membership.SetDestination(OutStr);
         membership.Export();
+        ImportEntry.Modify(true);
         Commit();
 
-        ImportEntry.Modify(true);
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
             membership.ClearResponse();
@@ -210,12 +213,19 @@ codeunit 6060128 "NPR MM Member WebService"
                 membership.AddResponse(MemberInfoCapture."Membership Entry No.");
             until (MemberInfoCapture.Next() = 0);
 
+            if (MemberInfoCapture."External Membership No." <> '') then
+                ImportEntry."Document Name" := StrSubstNo(FileNameLbl, MemberInfoCapture."External Membership No.");
+
             MemberInfoCapture.DeleteAll();
 
         end else begin
             membership.AddErrorResponse(ImportEntry."Error Message");
         end;
 
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        membership.SetDestination(OutStr);
+        membership.Export();
+        ImportEntry.Modify(true);
         Commit();
     end;
 
@@ -237,9 +247,9 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportEntry."Document Source".CreateOutStream(OutStr);
         member.SetDestination(OutStr);
         member.Export();
+        ImportEntry.Modify(true);
         Commit();
 
-        ImportEntry.Modify(true);
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
             member.ClearResponse();
@@ -250,11 +260,18 @@ codeunit 6060128 "NPR MM Member WebService"
                 member.AddResponse(MemberInfoCapture."Member Entry No");
             until (MemberInfoCapture.Next() = 0);
 
+            if (MemberInfoCapture."External Membership No." <> '') then
+                ImportEntry."Document Name" := StrSubstNo(FileNameLbl, MemberInfoCapture."External Membership No.");
+
             MemberInfoCapture.DeleteAll();
         end else begin
             member.AddErrorResponse(ImportEntry."Error Message");
         end;
 
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        member.SetDestination(OutStr);
+        member.Export();
+        ImportEntry.Modify(true);
         Commit();
     end;
 
@@ -276,9 +293,9 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportEntry."Document Source".CreateOutStream(OutStr);
         AnonymousMember.SetDestination(OutStr);
         AnonymousMember.Export();
+        ImportEntry.Modify(true);
         Commit();
 
-        ImportEntry.Modify(true);
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
             AnonymousMember.ClearResponse();
@@ -366,6 +383,9 @@ codeunit 6060128 "NPR MM Member WebService"
                 membership.AddResponse(MemberInfoCapture."Membership Entry No.");
             until (MemberInfoCapture.Next() = 0);
 
+            if (MemberInfoCapture."External Membership No." <> '') then
+                ImportEntry."Document Name" := StrSubstNo(FileNameLbl, MemberInfoCapture."External Membership No.");
+
             MemberInfoCapture.DeleteAll();
         end else begin
             membership.AddErrorResponse(ImportEntry."Error Message");
@@ -410,6 +430,9 @@ codeunit 6060128 "NPR MM Member WebService"
 
             member.AddResponse(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Member No", MemberInfoCapture."External Card No.");
 
+            if (MemberInfoCapture."External Membership No." <> '') then
+                ImportEntry."Document Name" := StrSubstNo(FileNameLbl, MemberInfoCapture."External Membership No.");
+
             MemberInfoCapture.DeleteAll();
         end else begin
             member.AddErrorResponse(ImportEntry."Error Message");
@@ -453,6 +476,9 @@ codeunit 6060128 "NPR MM Member WebService"
             repeat
                 member.AddResponse(MemberInfoCapture."Member Entry No");
             until (MemberInfoCapture.Next() = 0);
+
+            if (MemberInfoCapture."External Membership No." <> '') then
+                ImportEntry."Document Name" := StrSubstNo(FileNameLbl, MemberInfoCapture."External Membership No.");
 
             MemberInfoCapture.DeleteAll();
         end else begin
@@ -516,6 +542,9 @@ codeunit 6060128 "NPR MM Member WebService"
             MemberInfoCapture.FindFirst();
 
             member.AddResponse(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Member No", MemberInfoCapture."External Card No.");
+
+            if (MemberInfoCapture."External Membership No." <> '') then
+                ImportEntry."Document Name" := StrSubstNo(FileNameLbl, MemberInfoCapture."External Membership No.");
 
             MemberInfoCapture.DeleteAll();
         end else begin
