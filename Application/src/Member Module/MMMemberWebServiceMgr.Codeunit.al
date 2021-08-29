@@ -150,13 +150,14 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         end;
 
         MemberInfoCapture."Membership Entry No." := MembershipManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, true);
-        MemberInfoCapture.Modify();
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
         Membership."Document ID" := DocumentID;
         Membership.Modify();
 
-        Membership.Get(MemberInfoCapture."Membership Entry No.");
+        MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+        MemberInfoCapture.Modify();
+
         MembershipSetup.Get(Membership."Membership Code");
         case MembershipSetup."Web Service Print Action" of
             MembershipSetup."Web Service Print Action"::DIRECT:
