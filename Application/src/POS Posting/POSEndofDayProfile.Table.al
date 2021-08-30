@@ -111,6 +111,11 @@ table 6150652 "NPR POS End of Day Profile"
             OptionMembers = NEVER,DAILY;
             InitValue = DAILY;
         }
+        field(80; "Hide Turnover Section"; Boolean)
+        {
+            Caption = 'Hide Turnover Section';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -118,10 +123,6 @@ table 6150652 "NPR POS End of Day Profile"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     var
