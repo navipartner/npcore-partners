@@ -1,13 +1,9 @@
 page 6014602 "NPR Item Variants"
 {
-    // NPR5.40/TSA /20180329 CASE 308522 Added Inventory and NetChange
-    // NPR5.55/ANPA/20200505  CASE 401161 Changed visibility setting of "description 2" to true
-
     Caption = 'NPR Item Variants';
     DataCaptionFields = "Item No.";
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "Item Variant";
     ApplicationArea = NPRRetail;
 
@@ -44,26 +40,21 @@ page 6014602 "NPR Item Variants"
                     ToolTip = 'Specifies the value of the Description 2 field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Inventory; Inventory)
-                {
 
-                    Caption = 'Inventory';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Inventory field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(NetChange; NetChange)
-                {
-
-                    Caption = 'Net Change';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Net Change field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
-        area(factboxes)
+
+        area(FactBoxes)
         {
+            part(ItemVariantsFactBox; "NPR Item Variants FactBox")
+            {
+
+                Caption = 'Availability FactBox';
+                SubPageLink = "No." = FIELD("Item No.");
+                ApplicationArea = all;
+                Visible = true;
+
+            }
             systempart(Control1900383207; Links)
             {
                 Visible = false;
@@ -76,6 +67,7 @@ page 6014602 "NPR Item Variants"
                 ApplicationArea = NPRRetail;
 
             }
+
         }
     }
 
@@ -114,13 +106,9 @@ page 6014602 "NPR Item Variants"
         if (LocationCodeFilter <> '') then
             Item.SetFilter("Location Filter", '=%1', LocationCodeFilter);
         Item.CalcFields(Inventory, "Net Change");
-        Inventory := Item.Inventory;
-        NetChange := Item."Net Change";
     end;
 
     var
-        Inventory: Decimal;
-        NetChange: Decimal;
         LocationCodeFilter: Code[10];
 
     procedure SetLocationCodeFilter(LocationCodeFilterIn: Code[10])
