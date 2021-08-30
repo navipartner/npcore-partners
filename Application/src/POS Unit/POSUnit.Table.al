@@ -347,10 +347,18 @@ table 6150615 "NPR POS Unit"
 
     procedure GetProfile(var POSAuditProfile: Record "NPR POS Audit Profile"): Boolean
     begin
-        Clear("POS Audit Profile");
+        Clear(POSAuditProfile);
         if "POS Audit Profile" = '' then
             exit;
         exit(POSAuditProfile.Get("POS Audit Profile"));
+    end;
+
+    procedure GetProfile(var POSEoDProfile: Record "NPR POS End of Day Profile"): Boolean
+    begin
+        Clear(POSEoDProfile);
+        if "POS End of Day Profile" = '' then
+            exit;
+        exit(POSEoDProfile.Get("POS End of Day Profile"));
     end;
 
     procedure GetCurrentPOSUnit(): Code[10]

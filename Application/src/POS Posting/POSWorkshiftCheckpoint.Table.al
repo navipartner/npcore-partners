@@ -114,7 +114,7 @@ table 6150627 "NPR POS Workshift Checkpoint"
         }
         field(70; "EFT (LCY)"; Decimal)
         {
-            Caption = 'EFT (LCY)';
+            Caption = 'Card Payment/EFT (LCY)';
             DataClassification = CustomerContent;
         }
         field(80; "Manual Card (LCY)"; Decimal)
