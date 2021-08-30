@@ -46,7 +46,7 @@ table 6059971 "NPR Variety"
         }
         field(22; "Use Description field"; Boolean)
         {
-            Caption = 'Use Description field';
+            Caption = 'Use Description Field';
             DataClassification = CustomerContent;
         }
 
