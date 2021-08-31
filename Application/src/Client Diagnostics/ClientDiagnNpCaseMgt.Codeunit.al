@@ -183,7 +183,9 @@ codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
             exit;
         end;
 
-        SendClientDiagnostics();
+        if not SendClientDiagnostics() then
+            LogMessageStopwatch.SetError(GetLastErrorText());
+
         LogMessageStopwatch.LogFinish();
     end;
 }

@@ -8,11 +8,14 @@
         _FinishDT: DateTime;
         _Started: Boolean;
 
+        _ErrorTxt: Text;
+
     procedure LogStart(Company: Text; ObjectName: Text; ProcedureName: Text)
     var
         StartEventIdTok: Label 'NPR000_START', Locked = true;
         MsgTok: Label 'Object: %1, Procedure: %2 in Company:%3, Tenant: %4, ServiceName: %5, Server: %6';
     begin
+        _ErrorTxt := '';
         _StartDT := CurrentDateTime();
 
         // this will not be found if eg. Install of app was triggered via web client and session was closed
@@ -42,16 +45,26 @@
         FinishWithoutStartErr: Label 'LogFinish() called without LogStart().';
     begin
         if not _Started then begin
+            _ErrorTxt := '';
             Clear(_LogDict);
             _Msg := FinishWithoutStartErr;
         end else begin
             _FinishDT := CurrentDateTime();
             _LogDict.Add('NPR_Finish', Format(_FinishDT, 0, 9));
             _LogDict.Add('NPR_Duration', Format(_FinishDT - _StartDT, 0, 9));
+
+            if _ErrorTxt <> '' then
+                _LogDict.Add('NPR_Error', _ErrorTxt);
         end;
 
         Session.LogMessage(FinishEventIdTok, 'Stop: ' + _Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, _LogDict);
 
         _Started := false;
     end;
+
+    procedure SetError(ErrorTxt: Text)
+    begin
+        _ErrorTxt := ErrorTxt;
+    end;
+
 }
