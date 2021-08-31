@@ -3721,7 +3721,7 @@ body {
   position: fixed;
   right: 24px;
   top: 24px;
-  transition: background-color 0.3s ease-out, width 0.6s, height 0.6s, border-radius 0.6s;
+  transition: background-color 0.3s ease-out, width 0.6s, height 0.6s, border-radius 0.6s;
   width: 100px;
   z-index: 100; }
 
@@ -4097,74 +4097,121 @@ body {
     .transcendence .dialog__container.dialog__container--configuration-table .column-caption span.fa-mobile:before {
       font-size: 40px; }
 
-.transcendence .dialog-host .dialog__container.dialog__container--lookup {
+.transcendence .dialog-host .dialog__container--lookup {
   height: 75%;
   width: 65%; }
-  .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body {
+  .transcendence .dialog-host .dialog__container--lookup .dialog__body {
     flex: auto;
-    display: flex; }
-    .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-content-outer {
-      flex: auto; }
-      .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding-bottom: 0;
+    margin-bottom: 2em; }
+    .transcendence .dialog-host .dialog__container--lookup .dialog__body .buttongrid {
+      margin-bottom: 0.5em; }
+    .transcendence .dialog-host .dialog__container--lookup .dialog__body .input {
+      display: flex;
+      flex: 1; }
+    .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer {
+      height: 100%; }
+      .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content {
         height: 100%;
         overflow-y: auto; }
-    .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body span {
-      display: block;
-      color: var(--color-text-100); }
-    .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-loading {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-header {
+          display: flex;
+          background: var(--color-primary-100);
+          color: var(--color-text-200);
+          padding: 0.75em 0;
+          border-radius: 3px; }
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-header-cell {
+          display: flex;
+          flex: 1;
+          padding: 0 1em; }
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-row {
+          display: flex;
+          border-bottom: 1px solid var(--color-secondary-100);
+          padding: 0.75em 0;
+          transition: background-color 300ms ease-out; }
+          .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-row:hover {
+            background-color: var(--color-primary-300);
+            cursor: pointer; }
+          .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-row--selected {
+            background-color: var(--color-primary-300); }
+            .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-row--selected:hover {
+              background-color: var(--color-primary-200);
+              color: var(--color-text-200); }
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-cell {
+          display: flex;
+          flex: 1;
+          padding: 0 1em; }
+    .transcendence .dialog-host .dialog__container--lookup .dialog__body span {
+      display: block; }
+    .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-loading {
       display: flex;
       flex: 1 1 auto;
       height: 3em;
       justify-content: center;
       align-items: center;
       flex-direction: column; }
-      .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-loading span {
+      .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-loading span {
         color: #898989;
         display: inline; }
-      .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-loading .lookup-loading__icon {
+      .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-loading__icon {
         padding: 0.25em;
         color: #898989;
         animation: spin 4s linear infinite; }
-    .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry {
+    .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry {
       margin: 0.5em;
       padding: 0.5em;
       transition: background-color 300ms ease-out; }
-      .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry.lookup-entry--selected {
+      .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry:hover {
         background-color: var(--color-primary-300); }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry.lookup-entry--selected:hover {
+      .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry--selected {
+        background-color: var(--color-primary-300); }
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry--selected:hover {
           background-color: var(--color-primary-200); }
-      .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry:hover {
-        background-color: var(--color-primary-300); }
-      .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line {
+          .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry--selected:hover .lookup-entry-line-cell__value {
+            color: var(--color-text-200); }
+      .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line {
         padding: 0.25em;
         display: flex;
         flex-flow: row;
         justify-content: space-between; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line.lookup-entry-line--main span {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line--main span {
           color: var(--color-text-100); }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-left {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-left {
           text-align: left; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-center {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-center {
           text-align: center; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-right {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--align-right {
           text-align: right; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-x-small {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-x-small {
           font-size: 0.75em; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-small {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-small {
           font-size: 0.85em; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-normal {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-normal {
           font-size: 1em; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-medium {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-medium {
           font-size: 1.15em; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-large {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-large {
           font-size: 1.25em; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-x-large {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell--font-size-x-large {
           font-size: 1.33em; }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell__caption {
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line .lookup-entry-line-cell__caption {
           font-size: 0.67em;
-          color: var(--color-text-300); }
-        .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line span {
+          color: var(--color-text-400); }
+        .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line span {
           color: var(--color-text-100); }
+  .transcendence .dialog-host .dialog__container--lookup .dialog__titlebar {
+    display: flex;
+    justify-content: space-between; }
+  .transcendence .dialog-host .dialog__container--lookup .dialog__headerIcons {
+    display: flex; }
+  .transcendence .dialog-host .dialog__container--lookup .dialog__headerIcon {
+    margin-right: 0.5em; }
+    .transcendence .dialog-host .dialog__container--lookup .dialog__headerIcon:hover {
+      cursor: pointer; }
 
 .transcendence .dialog-host .dialog__container.dialog__container--menu {
   width: 75%;
@@ -5004,7 +5051,7 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
     transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
     z-index: 100; }
   .transcendence .datepicker.-from-top- {
     -webkit-transform: translateY(-8px);
@@ -5024,7 +5071,7 @@ body {
     transform: translate(0);
     transition: opacity 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease;
     transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease; }
+    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease; }
   .transcendence .datepicker-inline .datepicker {
     border-color: var(--color-primary-300);
     box-shadow: var(--box-shadow);
@@ -7294,7 +7341,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-family: var(--font-mobile); }
+  font-family: var(--font-mobile) !important; }
   .mobile-view .body {
     display: flex;
     justify-content: center;
@@ -7329,17 +7376,20 @@ body {
       .mobile-view .body .subpage--hidden {
         left: 0; }
     .mobile-view .body .layout {
-      height: 100%;
       width: 100vw;
       display: flex;
-      flex-direction: column;
-      flex: 1 1 auto; }
+      flex-direction: column; }
+      .mobile-view .body .layout--fullHeight {
+        height: 100%; }
   .mobile-view .mobile {
     width: 100%;
     flex-grow: 1; }
 
 .mobile-view .login {
-  margin: auto 0; }
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); }
   .mobile-view .login .password-input {
     font-size: 1.7em;
     text-align: center;
@@ -7421,7 +7471,7 @@ body {
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
-  height: 100%; }
+  height: calc(100vh - 8em); }
   .data-grid__item {
     width: 100%;
     height: fit-content;
@@ -7520,13 +7570,20 @@ body {
 .expanded-item {
   height: 100%;
   width: 100vw;
-  position: absolute;
+  position: fixed;
   top: 0;
+  left: 0;
   z-index: 25;
   background: var(--color-secondary-100);
   box-shadow: var(--box-shadow);
   padding: 1em;
-  overflow: hidden; }
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-family: var(--font-mobile) !important;
+  text-align: left; }
   .expanded-item__total {
     text-align: center;
     margin-bottom: 1em;
@@ -7558,8 +7615,8 @@ body {
       max-width: 10rem;
       max-height: 10rem; }
   .expanded-item__description {
-    height: 100%;
-    overflow-y: auto; }
+    overflow-y: auto;
+    font-weight: 500; }
   .expanded-item__back-menu {
     background: var(--color-primary-mobile-100);
     position: fixed;
@@ -7569,7 +7626,8 @@ body {
     font-size: 2rem;
     color: var(--color-text-200);
     padding: 1rem 1.5rem;
-    z-index: 100; }
+    z-index: 100;
+    display: flex; }
   .expanded-item .item-counter {
     display: flex;
     margin: 1.5em auto;
@@ -7730,7 +7788,7 @@ body {
   flex-wrap: nowrap;
   justify-content: space-evenly;
   box-shadow: var(--box-shadow-top);
-  z-index: 20; }
+  z-index: 30; }
   .mobile-view .nav__button {
     background-color: transparent;
     border: none;
@@ -8347,6 +8405,34 @@ body {
       margin: 0 auto; }
       .search-results__not-found .search-again__icon {
         margin-right: 0.25em; }
+
+.payment-prompt {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  color: var(--color-text-100);
+  font-size: 1.3em;
+  padding: 0 2em; }
+  .payment-prompt__image {
+    position: relative; }
+  .payment-prompt__caption {
+    opacity: 0.7;
+    position: relative;
+    margin-bottom: 2em; }
+  .payment-prompt__call-to-action {
+    background: var(--color-accent-100);
+    position: relative;
+    overflow: hidden;
+    color: var(--color-text-200);
+    width: fit-content;
+    padding: 0.75em 1.25em;
+    border-radius: 3px;
+    box-shadow: var(--box-shadow);
+    margin: 0 auto; }
+  .payment-prompt__icon {
+    margin-right: 0.25em; }
 
 .statistics {
   height: 100%;
