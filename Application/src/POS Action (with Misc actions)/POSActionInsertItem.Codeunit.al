@@ -662,7 +662,7 @@
 
         ItemReference.SetRange("Reference No.", UpperCase(EanBoxValue));
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-        if ItemReference.FindFirst() then
+        if not ItemReference.IsEmpty() then
             InScope := true;
     end;
 
@@ -675,7 +675,7 @@
             exit;
 
         SetItemSearchFilter(EanBoxValue, Item);
-        if Item.FindFirst() then
+        if not Item.IsEmpty() then
             InScope := true;
     end;
 

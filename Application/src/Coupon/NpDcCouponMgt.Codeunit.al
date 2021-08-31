@@ -920,7 +920,7 @@
             exit;
 
         NpDcCoupon.SetRange("Reference No.", EanBoxValue);
-        if NpDcCoupon.FindFirst() then
+        if not NpDcCoupon.IsEmpty() then
             InScope := true;
     end;
 

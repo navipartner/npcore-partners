@@ -1413,7 +1413,7 @@
             exit;
 
         TMTicket.SetRange("External Ticket No.", EanBoxValue);
-        if (TMTicket.FindFirst()) then
+        if not TMTicket.IsEmpty() then
             InScope := true;
     end;
 

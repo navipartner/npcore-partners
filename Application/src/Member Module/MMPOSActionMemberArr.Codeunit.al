@@ -242,7 +242,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
             exit;
 
         MMMemberCard.SetRange("External Card No.", UpperCase(EanBoxValue));
-        if (MMMemberCard.FindFirst()) then
+        if not MMMemberCard.IsEmpty() then
             InScope := true;
 
     end;
