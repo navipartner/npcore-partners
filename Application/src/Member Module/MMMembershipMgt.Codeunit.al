@@ -5140,19 +5140,20 @@ codeunit 6060127 "NPR MM Membership Mgt."
             MCSFaceServiceAPI.IdentifyFace(PersonGroups.PersonGroupId, JsonFacesArr, JsonIdArr);
             if JsonIdArr.Count() = 0 then
                 Error(FaceNotIdentifiedErr);
-            PersonId := MCSFaceServiceAPI.FindMember(PersonGroups, JsonFacesArr, JsonIdArr, PictureStream);
+            PersonId := MCSFaceServiceAPI.FindMember(PersonGroups, JsonFacesArr, JsonIdArr);
         end;
     end;
 
     internal procedure TakeMemberInfoPicture(MMMemberInfoCapture: Record "NPR MM Member Info Capture")
     var
-        Camera: Codeunit Camera;
+        Camera: Page Camera;
         PictureStream: InStream;
         OStream: OutStream;
-        PictureName: Text;
     begin
-        if Camera.GetPicture(PictureStream, PictureName) then begin
-            // MMMemberInfoCapture.Image.ImportStream(PictureStream, PictureName);
+        Clear(Camera);
+        Camera.SetQuality(50);
+        Camera.RunModal();
+        if Camera.HasPicture() then begin
             MMMemberInfoCapture.Picture.CreateOutStream(OStream);
             CopyStream(OStream, PictureStream);
             MMMemberInfoCapture.Modify();
@@ -5161,15 +5162,17 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     internal procedure TakeMemberPicture(MMMember: Record "NPR MM Member")
     var
-        Camera: Codeunit Camera;
+        Camera: Page Camera;
         PictureStream: InStream;
         OStream: OutStream;
-        PictureName: Text;
     begin
-        if Camera.GetPicture(PictureStream, PictureName) then begin
+        Clear(Camera);
+        Camera.SetQuality(50);
+        Camera.RunModal();
+        if Camera.HasPicture() then begin
+            Camera.GetPicture(PictureStream);
             MMMember.Picture.CreateOutStream(OStream);
             CopyStream(OStream, PictureStream);
-            // MMMember.Image.ImportStream(PictureStream, PictureName);
             MMMember.Modify();
             Commit();
             TrainFacialRecognitionService(MMMember, PictureStream);
