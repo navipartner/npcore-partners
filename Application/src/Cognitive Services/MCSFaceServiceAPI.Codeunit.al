@@ -707,7 +707,7 @@
         Error(JsonTok.AsValue().AsText());
     end;
 
-    procedure FindMember(PersonGroups: Record "NPR MCS Person Groups"; JsonFacesArr: JsonArray; JsonIdArr: JsonArray; PictureStream: InStream) PersonId: Text[50]
+    procedure FindMember(PersonGroups: Record "NPR MCS Person Groups"; JsonFacesArr: JsonArray; JsonIdArr: JsonArray) PersonId: Text[50]
     var
         JsonTok: JsonToken;
         JsonObj: JsonObject;
