@@ -27,6 +27,23 @@ codeunit 6014574 "NPR Lookup: BankDepositBinCode" implements "NPR IPOSLookupType
         Row.Add('description', Rec.Description);
     end;
 
+    procedure IsMatchForSearch(RecRef: RecordRef; SearchFilter: Text): Boolean;
+    var
+        Rec: Record "NPR POS Payment Bin";
+        No: Text;
+    begin
+        RecRef.SetTable(Rec);
+
+        if (Rec.Description.ToLower().Contains(SearchFilter)) then
+            exit(true);
+
+        No := Rec."No.";
+        if (No.ToLower().Contains(SearchFilter)) then
+            exit(true);
+
+        exit(false);
+    end;
+
     #endregion
 
     #region Event subscribers

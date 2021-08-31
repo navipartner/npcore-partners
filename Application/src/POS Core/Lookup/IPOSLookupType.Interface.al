@@ -16,4 +16,6 @@ interface "NPR IPOSLookupType"
     /// <param name="RecRef">RecordRef containing the current row of data to convert to JsonObject</param>
     /// <returns></returns>
     procedure GetLookupEntry(RecRef: RecordRef): JsonObject;
+
+    procedure IsMatchForSearch(RecRef: RecordRef; SearchFilter: Text): Boolean;
 }

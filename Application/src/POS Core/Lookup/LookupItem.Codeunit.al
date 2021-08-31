@@ -26,6 +26,25 @@ codeunit 6014665 "NPR Lookup: Item" implements "NPR IPOSLookupType"
         Row.Add('description2', Rec."Description 2");
     end;
 
+    procedure IsMatchForSearch(RecRef: RecordRef; SearchFilter: Text): Boolean;
+    var
+        Rec: Record Item;
+        No: Text;
+    begin
+        RecRef.SetTable(Rec);
+
+        if (Rec.Description.ToLower().Contains(SearchFilter)) then
+            exit(true);
+        if (Rec."Description 2".ToLower().Contains(SearchFilter)) then
+            exit(true);
+
+        No := Rec."No.";
+        if (No.ToLower().Contains(SearchFilter)) then
+            exit(true);
+
+        exit(false);
+    end;
+
     #endregion
 
     #region Generation monitoring event subscribers
