@@ -465,7 +465,7 @@
             exit;
 
         MMMemberCard.SetRange("External Card No.", UpperCase(EanBoxValue));
-        if (MMMemberCard.FindFirst()) then
+        if not MMMemberCard.IsEmpty() then
             InScope := true;
 
     end;
