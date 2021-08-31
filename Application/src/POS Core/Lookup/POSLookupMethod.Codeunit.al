@@ -17,6 +17,7 @@ codeunit 6014570 "NPR POS Lookup Method"
         BatchSize: Integer;
         FetchType: Integer;
         LoadAll: Boolean;
+        SearchFilter: Text;
         RetrievingLookupTypeLbl: Label 'Retrieving lookup type during LookupFromPOS';
     begin
         if Method <> 'LookupFromPOS' then
@@ -28,6 +29,7 @@ codeunit 6014570 "NPR POS Lookup Method"
 
         Generation := Json.GetInteger('generation');
         LookupTypeText := Json.GetStringOrFail('type', RetrievingLookupTypeLbl);
+        SearchFilter := Json.GetString('filter').ToLower().Trim();
         LookupTypeEnum := LookupTypeFromTextToEnum(LookupTypeText, FrontEnd);
         Skip := Json.GetInteger('skip');
         BatchSize := Json.GetInteger('batchSize');
@@ -37,7 +39,7 @@ codeunit 6014570 "NPR POS Lookup Method"
             BatchSize := 120;
 
         Data.SetLookupType(LookupTypeText);
-        ProcessLookup(Generation, Skip, BatchSize, LoadAll, FetchType, LookupTypeEnum, Data);
+        ProcessLookup(Generation, Skip, BatchSize, LoadAll, SearchFilter, FetchType, LookupTypeEnum, Data);
 
         FrontEnd.RespondToFrontEndMethod(Context, Data.GetJson(), FrontEnd);
     end;
@@ -52,10 +54,11 @@ codeunit 6014570 "NPR POS Lookup Method"
     /// <param name="Skip">Number of records to skip (this is the count of records already retrieved by the front end)</param>
     /// <param name="BatchSize">Size of batch. The result data set won't contain more than this many records.</param>
     /// <param name="LoadAll">Indicates whether all records must be loaded regardless of the batch size.</param>
+    /// <param name="SearchFilter">Specifies the text to search for in the data set.</param>
     /// <param name="FetchType">Specifies how data is to be fetched. Different fetch types are invoked from different places in the front-end (check Dragonglass project documentation, constant FETCH_TYPE for more details.</param>
     /// <param name="LookupTypeEnum">Lookup type to use for processing</param>
     /// <param name="Data">Resulting data set instance to populate data into</param>
-    local procedure ProcessLookup(FrontEndGeneration: Integer; Skip: Integer; BatchSize: Integer; LoadAll: Boolean; FetchType: Option FetchFirstBatch,UpdateIfNeeded,FetchNextBatch; LookupTypeEnum: Enum "NPR POS Lookup Type"; Data: Codeunit "NPR POS Lookup Data Set")
+    local procedure ProcessLookup(FrontEndGeneration: Integer; Skip: Integer; BatchSize: Integer; LoadAll: Boolean; SearchFilter: Text; FetchType: Option FetchFirstBatch,UpdateIfNeeded,FetchNextBatch; LookupTypeEnum: Enum "NPR POS Lookup Type"; Data: Codeunit "NPR POS Lookup Data Set")
     var
         LookupTypeGeneration: Record "NPR POS Lookup Type Generation";
         RecRef: RecordRef;
@@ -64,6 +67,7 @@ codeunit 6014570 "NPR POS Lookup Method"
         ReadCount: Integer;
         BackEndGeneration: Integer;
         HasMore: Boolean;
+        IncludeRow: Boolean;
     begin
         LookupType := LookupTypeEnum;
 
@@ -95,8 +99,14 @@ codeunit 6014570 "NPR POS Lookup Method"
 
         while true do begin
             Row := LookupType.GetLookupEntry(RecRef);
-            Data.AddRow(Row);
-            ReadCount += 1;
+            IncludeRow := true;
+            if (StrLen(SearchFilter) > 0) then begin
+                IncludeRow := LookupType.IsMatchForSearch(RecRef, SearchFilter);
+            end;
+            if IncludeRow then begin
+                Data.AddRow(Row);
+                ReadCount += 1;
+            end;
             HasMore := RecRef.Next() <> 0;
             if ((ReadCount = BatchSize) and (not LoadAll)) or (not HasMore) then
                 break;
