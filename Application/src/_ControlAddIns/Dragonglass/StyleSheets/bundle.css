@@ -3721,7 +3721,7 @@ body {
   position: fixed;
   right: 24px;
   top: 24px;
-  transition: background-color 0.3s ease-out, width 0.6s, height 0.6s, border-radius 0.6s;
+  transition: background-color 0.3s ease-out, width 0.6s, height 0.6s, border-radius 0.6s;
   width: 100px;
   z-index: 100; }
 
@@ -4139,8 +4139,7 @@ body {
           .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-row--selected {
             background-color: var(--color-primary-300); }
             .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-row--selected:hover {
-              background-color: var(--color-primary-200);
-              color: var(--color-text-200); }
+              background-color: var(--color-primary-400); }
         .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-content-outer .lookup-content__grid-body-cell {
           display: flex;
           flex: 1;
@@ -4166,13 +4165,12 @@ body {
       padding: 0.5em;
       transition: background-color 300ms ease-out; }
       .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry:hover {
-        background-color: var(--color-primary-300); }
+        background-color: var(--color-primary-300);
+        cursor: pointer; }
       .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry--selected {
         background-color: var(--color-primary-300); }
         .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry--selected:hover {
-          background-color: var(--color-primary-200); }
-          .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry--selected:hover .lookup-entry-line-cell__value {
-            color: var(--color-text-200); }
+          background-color: var(--color-primary-400); }
       .transcendence .dialog-host .dialog__container--lookup .dialog__body .lookup-entry .lookup-entry-line {
         padding: 0.25em;
         display: flex;
@@ -5051,7 +5049,7 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
     transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0.3s, -webkit-transform 0.3s ease;
     z-index: 100; }
   .transcendence .datepicker.-from-top- {
     -webkit-transform: translateY(-8px);
@@ -5071,7 +5069,7 @@ body {
     transform: translate(0);
     transition: opacity 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease;
     transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s;
-    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease; }
+    transition: opacity 0.3s ease, transform 0.3s ease, left 0s 0s, -webkit-transform 0.3s ease; }
   .transcendence .datepicker-inline .datepicker {
     border-color: var(--color-primary-300);
     box-shadow: var(--box-shadow);
