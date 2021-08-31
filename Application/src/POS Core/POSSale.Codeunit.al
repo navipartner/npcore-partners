@@ -19,7 +19,7 @@
         EndedPaidAmount: Decimal;
         EndedChangeAmount: Decimal;
         EndedRoundingAmount: Decimal;
-        Text000: Label 'During End Sale, after Audit Roll Insert, before Audit Roll Posting';
+        Text000: Label 'During End Sale';
         ERROR_AFTER_END_SALE: Label 'An error occurred after the sale ended: %1';
 
     procedure InitializeAtLogin(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup")
