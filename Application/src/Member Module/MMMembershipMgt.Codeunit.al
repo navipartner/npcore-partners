@@ -5154,6 +5154,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Camera.SetQuality(50);
         Camera.RunModal();
         if Camera.HasPicture() then begin
+            Camera.GetPicture(PictureStream);
             MMMemberInfoCapture.Picture.CreateOutStream(OStream);
             CopyStream(OStream, PictureStream);
             MMMemberInfoCapture.Modify();
