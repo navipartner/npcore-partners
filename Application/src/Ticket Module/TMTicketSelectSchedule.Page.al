@@ -109,7 +109,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
 
         LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today()), Format(Time()));
 
-        TicketManagement.ValidateAdmSchEntryForSales(Rec, gTicketItemNo, gTicketItemNo, Today, Time, Remaining);
+        TicketManagement.ValidateAdmSchEntryForSales(Rec, gTicketItemNo, gTicketVariantCode, Today, Time, Remaining);
 
         RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
