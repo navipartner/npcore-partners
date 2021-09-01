@@ -71,18 +71,21 @@ page 6151591 "NPR NpDc Coupon Types"
 
                     ToolTip = 'Specifies the value of the Application Sequence No. field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("Coupon Qty. (Open)"; Rec."Coupon Qty. (Open)")
                 {
 
                     ToolTip = 'Specifies the value of the Coupon Qty. (Open) field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("Arch. Coupon Qty."; Rec."Arch. Coupon Qty.")
                 {
 
                     ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
             }
         }
