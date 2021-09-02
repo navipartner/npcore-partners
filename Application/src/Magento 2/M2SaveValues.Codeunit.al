@@ -37,4 +37,42 @@ codeunit 6059834 "NPR M2 Save Values"
 
         Page.Run(Page::"NPR M2 Contact List", TempMagentoContactBuffer);
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"CustCont-Update", 'OnBeforeOnDelete', '', true, true)]
+    local procedure OnBeforeOnDelete(Customer: Record Customer)
+    begin
+        if Customer.IsTemporary() then
+            exit;
+
+        ClearMagentoContact(Customer);
+    end;
+
+    local procedure ClearMagentoContact(Customer: Record Customer)
+    var
+        ContBusRel: Record "Contact Business Relation";
+        Contact: Record Contact;
+        POSEntry: Record "NPR POS Entry";
+    begin
+        ContBusRel.SetCurrentKey("Link to Table", "No.");
+        ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
+        ContBusRel.SetRange("No.", Customer."No.");
+        if ContBusRel.IsEmpty() then
+            exit;
+        ContBusRel.FindSet();
+        repeat
+            Contact.Reset();
+            Contact.SetRange("No.", ContBusRel."Contact No.");
+            Contact.SetRange("NPR Magento Contact", true);
+            if not Contact.IsEmpty() then begin
+                POSEntry.Reset();
+                POSEntry.SetRange("Contact No.", ContBusRel."No.");
+                POSEntry.SetFilter("Customer No.", '%1', '');
+                if POSEntry.IsEmpty() then begin
+                    Contact.ModifyAll("E-Mail", '');
+                    Contact.ModifyAll("E-Mail 2", '');
+                end;
+                Contact.ModifyAll("NPR Magento Contact", false);
+            end;
+        until ContBusRel.Next() = 0;
+    end;
 }
