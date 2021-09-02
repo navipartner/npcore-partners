@@ -48,6 +48,16 @@ pageextension 6014493 "NPR Customer Lookup" extends "Customer Lookup"
                 end;
             }
         }
+
+        addlast(Group)
+        {
+            field("NPR E-Mail"; Rec."E-Mail")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Specifies Email.';
+            }
+        }
+
         modify(Group)
         {
             Editable = false;
