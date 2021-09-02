@@ -48,6 +48,16 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
                 end;
             }
         }
+
+        addlast(Control1)
+        {
+            field("NPR E-Mail"; Rec."E-Mail")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Specifies Email.';
+            }
+        }
+
         modify(Control1)
         {
             Editable = false;
