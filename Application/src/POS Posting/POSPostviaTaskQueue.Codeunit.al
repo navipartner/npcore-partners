@@ -158,10 +158,8 @@ codeunit 6150631 "NPR POS Post via Task Queue"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        NotBeforeDateTime: DateTime;
         JobQueueDescrLbl: Label 'POS Entry Item posting', MaxLength = 250;
     begin
-        NotBeforeDateTime := JobQueueMgt.NowWithDelayInSeconds(360);
         AddJobQueueCategory();
 
         // POS Item posting, every minute, every day, compressed and no stopping on error.
@@ -174,25 +172,21 @@ codeunit 6150631 "NPR POS Post via Task Queue"
             Codeunit::"NPR POS Post via Task Queue",
             JQParamStrMgt.GetParamListAsCSString(),
             JobQueueDescrLbl,
-            NotBeforeDateTime,
+            JobQueueMgt.NowWithDelayInSeconds(600),
             1,
             JQCategoryCode(),
             JobQueueEntry)
         then
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
     procedure AddPosPostingJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        NotBeforeDateTime: DateTime;
         NextRunDateFormula: DateFormula;
         JobQueueDescrLbl: Label 'POS Entry posting', MaxLength = 250;
     begin
-        NotBeforeDateTime := CreateDateTime(Today, 230000T);
-        if NotBeforeDateTime < JobQueueMgt.NowWithDelayInSeconds(360) then
-            NotBeforeDateTime := CreateDateTime(Today + 1, 230000T);
         Evaluate(NextRunDateFormula, '<1D>');
         AddJobQueueCategory();
 
@@ -206,17 +200,17 @@ codeunit 6150631 "NPR POS Post via Task Queue"
             Codeunit::"NPR POS Post via Task Queue",
             JQParamStrMgt.GetParamListAsCSString(),
             JobQueueDescrLbl,
-            NotBeforeDateTime,
-            DT2Time(NotBeforeDateTime),
+            JobQueueMgt.NowWithDelayInSeconds(600),
+            230000T,
             0T,
             NextRunDateFormula,
             JQCategoryCode(),
             JobQueueEntry)
         then
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
-    local procedure AddJobQueueCategory()
+    procedure AddJobQueueCategory()
     var
         JobQueueCategory: Record "Job Queue Category";
         JobCategoryDescrLbl: Label 'Posting related tasks', MaxLength = 30;
@@ -224,7 +218,7 @@ codeunit 6150631 "NPR POS Post via Task Queue"
         JobQueueCategory.InsertRec(JQCategoryCode(), JobCategoryDescrLbl);
     end;
 
-    local procedure JQCategoryCode(): Code[10]
+    procedure JQCategoryCode(): Code[10]
     begin
         exit('NPR-POST');
     end;
