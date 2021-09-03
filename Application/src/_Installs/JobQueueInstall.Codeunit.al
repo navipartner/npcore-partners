@@ -32,6 +32,7 @@ codeunit 6014438 "NPR Job Queue Install"
         AddJQLogEntryCleanupJobQueue();
         AddPosItemPostingJobQueue();
         AddPosPostingJobQueue();
+        AddInventoryAdjmtJobQueues();
         AddSMSJobQueue();
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install"));
@@ -74,6 +75,19 @@ codeunit 6014438 "NPR Job Queue Install"
         POSPostViaJobQueue: Codeunit "NPR POS Post via Task Queue";
     begin
         POSPostViaJobQueue.AddPosPostingJobQueue();
+    end;
+
+    local procedure AddInventoryAdjmtJobQueues()
+    var
+        SalesSetup: Record "Sales & Receivables Setup";
+        POSPostViaJobQueue: Codeunit "NPR POS Post via Task Queue";
+    begin
+        if SalesSetup.Get() then begin
+            POSPostViaJobQueue.AddJobQueueCategory();
+            SalesSetup."Job Queue Category Code" := POSPostViaJobQueue.JQCategoryCode();
+            SalesSetup.Modify();
+        end;
+        Codeunit.Run(Codeunit::"NPR Schedule Invt. Cost Adj.");
     end;
 
     local procedure AddSMSJobQueue()
