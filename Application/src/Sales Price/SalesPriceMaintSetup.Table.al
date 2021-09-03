@@ -1,9 +1,5 @@
 table 6059781 "NPR Sales Price Maint. Setup"
 {
-    // NPR5.25/CLVA/20160628 CASE 244461 : Sales Price Maintenance
-    // NPR5.29/TS  /20170116 CASE 257404 : Change DrillDown Page
-    // NPR5.33/CLVA/20170607 CASE 272906 : Added fields "Exclude Item Groups" and "Exclude All Item Groups"
-
     Caption = 'Sales Price Maintenance Setup';
     DrillDownPageID = "NPR Sales Price Maint. Setup";
     LookupPageID = "NPR Sales Price Maint. Setup";
@@ -104,6 +100,12 @@ table 6059781 "NPR Sales Price Maint. Setup"
             Caption = 'Exclude All Item Groups';
             DataClassification = CustomerContent;
         }
+        field(30; "Price List Code"; Code[20])
+        {
+            Caption = 'Price List Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Price List Header";
+        }
     }
 
     keys
@@ -135,4 +137,3 @@ table 6059781 "NPR Sales Price Maint. Setup"
         Txt002: Label '"Sales Type" must be set to "All Customers" when using "VAT Bus. Posting Gr. (Price)"';
         Txt003: Label '"Sales Type" Campaign is not in use';
 }
-

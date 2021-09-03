@@ -73,11 +73,8 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup";
         PriceListLine: Record "Price List Line";
         PriceListHeader: Record "Price List Header";
-        Customer: Record Customer;
         VATPostingSetup: Record "VAT Posting Setup";
-        CustomerPriceGroup: Record "Customer Price Group";
         VATPct: Decimal;
-        VATBusPostingGrp: Code[20];
         Currency: Record Currency;
         GeneralLedgerSetup: Record "General Ledger Setup";
         CurrencyFactor: Decimal;
@@ -123,73 +120,20 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
 
                 if not BreakLoop then begin
                     VATPct := 0;
-                    VATBusPostingGrp := '';
                     PricesInCurrency := false;
 
-                    Clear(PriceListLine);
-                    PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
-                    PriceListLine.SetRange("Asset No.", Item."No.");
-                    PriceListLine.SetRange("Source Type", GetSourceType(SalesPriceMaintenanceSetup."Sales Type"));
-                    PriceListLine.SetRange("Source No.", SalesPriceMaintenanceSetup."Sales Code");
-                    PriceListLine.SetRange("Currency Code", SalesPriceMaintenanceSetup."Currency Code");
-                    PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
+                    GetPriceListHeader(SalesPriceMaintenanceSetup, PriceListHeader);
 
-                    if not PriceListLine.FindFirst() then begin
-                        Clear(PriceListLine);
-                        if not PriceListHeader.Get(SalesPriceMaintenanceSetup."Sales Code") then
-                            CreatePriceListHeader(SalesPriceMaintenanceSetup."Sales Code");
-                        PriceListLine.Init();
-                        PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
-                        PriceListLine.Validate("Asset No.", Item."No.");
-                        PriceListLine.Validate("Source Type", GetSourceType(SalesPriceMaintenanceSetup."Sales Type"));
-                        PriceListLine.Validate("Source No.", SalesPriceMaintenanceSetup."Sales Code");
-                        PriceListLine.Validate("Currency Code", SalesPriceMaintenanceSetup."Currency Code");
-                        PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
-                        PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
-                        PriceListLine.Validate(Status, PriceListLine.Status::Active);
-                        PriceListLine.Insert(true);
-                    end;
-
-                    case SalesPriceMaintenanceSetup."Sales Type" of
-                        SalesPriceMaintenanceSetup."Sales Type"::"All Customers":
-                            begin
-                                if VATPostingSetup.Get(SalesPriceMaintenanceSetup."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
-                                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
-                                    VATPct := VATPostingSetup."VAT %";
-                                    VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
-                                end;
-                            end;
-                        SalesPriceMaintenanceSetup."Sales Type"::Campaign:
-                            begin
-                                //Do we need this??
-                            end;
-                        SalesPriceMaintenanceSetup."Sales Type"::Customer:
-                            begin
-                                Customer.Get(SalesPriceMaintenanceSetup."Sales Code");
-                                if Customer."VAT Bus. Posting Group" <> '' then
-                                    if VATPostingSetup.Get(Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group") then begin
-                                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
-                                        VATPct := VATPostingSetup."VAT %";
-                                        VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
-                                    end;
-                            end;
-                        SalesPriceMaintenanceSetup."Sales Type"::"Customer Price Group":
-                            begin
-                                CustomerPriceGroup.Get(SalesPriceMaintenanceSetup."Sales Code");
-                                if CustomerPriceGroup."Price Includes VAT" and (CustomerPriceGroup."VAT Bus. Posting Gr. (Price)" <> '') then
-                                    if VATPostingSetup.Get(CustomerPriceGroup."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
-                                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
-                                        VATPct := VATPostingSetup."VAT %";
-                                        VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
-                                    end;
-                            end;
+                    if VATPostingSetup.Get(PriceListHeader."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
+                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                        VATPct := VATPostingSetup."VAT %";
                     end;
 
                     if SalesPriceMaintenanceSetup.Factor = 0 then
                         SalesPriceMaintenanceSetup.Factor := 1;
 
-                    if (SalesPriceMaintenanceSetup."Currency Code" <> '') and (SalesPriceMaintenanceSetup."Currency Code" <> GeneralLedgerSetup."LCY Code") then begin
-                        if Currency.Get(SalesPriceMaintenanceSetup."Currency Code") then begin
+                    if (PriceListHeader."Currency Code" <> '') and (PriceListHeader."Currency Code" <> GeneralLedgerSetup."LCY Code") then begin
+                        if Currency.Get(PriceListHeader."Currency Code") then begin
                             Currency.SetRecFilter();
                             CurrencyFactor := CurrencyExchangeRate.ExchangeRate(ExchRateDate, Currency.Code);
                             PricesInCurrency := true;
@@ -203,42 +147,58 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
                     case SalesPriceMaintenanceSetup."Internal Unit Price" of
                         SalesPriceMaintenanceSetup."Internal Unit Price"::"Unit Cost":
                             begin
-                                if not SalesPriceMaintenanceSetup."Prices Including VAT" then
+                                if not PriceListHeader."Price Includes VAT" then
                                     UnitPrice := Item."Unit Cost" * SalesPriceMaintenanceSetup.Factor
                                 else
                                     UnitPrice := (Item."Unit Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
                             end;
                         SalesPriceMaintenanceSetup."Internal Unit Price"::"Last Direct Cost":
                             begin
-                                if not SalesPriceMaintenanceSetup."Prices Including VAT" then
+                                if not PriceListHeader."Price Includes VAT" then
                                     UnitPrice := Item."Last Direct Cost" * SalesPriceMaintenanceSetup.Factor
                                 else
                                     UnitPrice := (Item."Last Direct Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
                             end;
                         SalesPriceMaintenanceSetup."Internal Unit Price"::"Standard Cost":
                             begin
-                                if not SalesPriceMaintenanceSetup."Prices Including VAT" then
+                                if not PriceListHeader."Price Includes VAT" then
                                     UnitPrice := Item."Standard Cost" * SalesPriceMaintenanceSetup.Factor
                                 else
                                     UnitPrice := (Item."Standard Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
                             end;
                         SalesPriceMaintenanceSetup."Internal Unit Price"::"Unit Price":
                             begin
-                                if not SalesPriceMaintenanceSetup."Prices Including VAT" then
+                                if not PriceListHeader."Price Includes VAT" then
                                     UnitPrice := Item."Unit Price" * SalesPriceMaintenanceSetup.Factor
                                 else
                                     UnitPrice := (Item."Unit Price" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
                             end;
                     end;
 
+                    Clear(PriceListLine);
+                    PriceListLine.SetRange("Price List Code", PriceListHeader."Code");
+                    PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
+                    PriceListLine.SetRange("Asset No.", Item."No.");
+                    PriceListLine.SetRange("Source Type", PriceListHeader."Source Type");
+                    PriceListLine.SetRange("Source No.", PriceListHeader."Source No.");
+                    PriceListLine.SetRange("Currency Code", PriceListHeader."Currency Code");
+                    PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
+                    PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
+
+                    if not PriceListLine.FindFirst() then begin
+                        Clear(PriceListLine);
+                        PriceListLine.Init();
+                        PriceListLine.CopyFrom(PriceListHeader);
+                        PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
+                        PriceListLine.Validate("Asset No.", Item."No.");
+                        PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
+                        PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
+                        PriceListLine.Insert(true);
+                    end;
+
                     ConvertPriceLCYToFCY(PricesInCurrency, ExchRateDate, Currency, UnitPrice, CurrencyFactor);
                     PriceListLine.Status := PriceListLine.Status::Draft;
                     PriceListLine.Validate("Unit Price", UnitPrice);
-
-                    PriceListLine.Validate("Price Includes VAT", SalesPriceMaintenanceSetup."Prices Including VAT");
-                    PriceListLine.Validate("Allow Invoice Disc.", SalesPriceMaintenanceSetup."Allow Invoice Disc.");
-                    PriceListLine.Validate("Allow Line Disc.", SalesPriceMaintenanceSetup."Allow Line Disc.");
-                    PriceListLine.Validate("VAT Bus. Posting Gr. (Price)", VATBusPostingGrp);
                     PriceListLine.Status := PriceListLine.Status::Active;
                     PriceListLine.Modify(true)
                 end;
@@ -277,16 +237,72 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         end;
     end;
 
-    local procedure CreatePriceListHeader(WorksheetTemplateName: Code[10])
+    local procedure GetPriceListHeader(var SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup"; var PriceListHeader: Record "Price List Header")
     var
-        PriceListHeader: Record "Price List Header";
+        CouldNotCreatePriceListHdrErr: Label 'System could not create a %1 for %2 = %3. Please manually create a %1 and assign it to the %2', Comment = '%1 = Price List Header tablecaption, %2 = Sales Price Maintenance Setup table caption, %3 = Sales Price Maintenance Setup Id';
     begin
+        if SalesPriceMaintenanceSetup."Price List Code" <> '' then
+            if PriceListHeader.get(SalesPriceMaintenanceSetup."Price List Code") then
+                exit;
+
+        if SalesPriceMaintenanceSetup."Price List Code" = '' then begin
+            if SalesPriceMaintenanceSetup."Sales Code" <> '' then begin
+                if not PriceListHeader.Get(SalesPriceMaintenanceSetup."Sales Code") then
+                    SalesPriceMaintenanceSetup."Price List Code" := SalesPriceMaintenanceSetup."Sales Code";
+            end;
+            if SalesPriceMaintenanceSetup."Price List Code" = '' then begin
+                if SalesPriceMaintenanceSetup.Id <= 0 then
+                    SalesPriceMaintenanceSetup."Price List Code" := '001'
+                else
+                    SalesPriceMaintenanceSetup."Price List Code" := CopyStr(Format(SalesPriceMaintenanceSetup.Id), 1, MaxStrLen(SalesPriceMaintenanceSetup."Price List Code"));
+                while PriceListHeader.Get(SalesPriceMaintenanceSetup."Price List Code") do begin
+                    if StrLen(IncStr(SalesPriceMaintenanceSetup."Price List Code")) > MaxStrLen(SalesPriceMaintenanceSetup."Price List Code") then
+                        Error(CouldNotCreatePriceListHdrErr, PriceListHeader.TableCaption, SalesPriceMaintenanceSetup.TableCaption, SalesPriceMaintenanceSetup.Id);
+#pragma warning disable AA0139
+                    SalesPriceMaintenanceSetup."Price List Code" := IncStr(SalesPriceMaintenanceSetup."Price List Code");
+#pragma warning restore
+                end;
+            end;
+        end;
+        SalesPriceMaintenanceSetup.Modify();
+
         PriceListHeader.Init();
-        PriceListHeader.Code := WorksheetTemplateName;
+        PriceListHeader.Code := SalesPriceMaintenanceSetup."Price List Code";
         PriceListHeader.Insert(true);
-        PriceListHeader.Validate("Source Group", PriceListHeader."Source Group"::All);
-        PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
+        PriceListHeader."Source Group" := PriceListHeader."Source Group"::All;
+        PriceListHeader.Validate("Source Type", GetSourceType(SalesPriceMaintenanceSetup."Sales Type"));
+        PriceListHeader.Validate("Source No.", SalesPriceMaintenanceSetup."Sales Code");
+        PriceListHeader."Currency Code" := SalesPriceMaintenanceSetup."Currency Code";
+        PriceListHeader."Price Includes VAT" := SalesPriceMaintenanceSetup."Prices Including VAT";
+        PriceListHeader."VAT Bus. Posting Gr. (Price)" := GetVatBusinessPostingGroupForPrices(SalesPriceMaintenanceSetup);
+        PriceListHeader."Allow Invoice Disc." := SalesPriceMaintenanceSetup."Allow Invoice Disc.";
+        PriceListHeader."Allow Line Disc." := SalesPriceMaintenanceSetup."Allow Line Disc.";
+        PriceListHeader.Status := PriceListHeader.Status::Active;
         PriceListHeader.Modify(true);
     end;
-}
 
+    local procedure GetVatBusinessPostingGroupForPrices(SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup"): Code[20]
+    var
+        Customer: Record Customer;
+        CustomerPriceGroup: Record "Customer Price Group";
+    begin
+        case SalesPriceMaintenanceSetup."Sales Type" of
+            SalesPriceMaintenanceSetup."Sales Type"::"All Customers":
+                begin
+                    exit(SalesPriceMaintenanceSetup."VAT Bus. Posting Gr. (Price)");
+                end;
+            SalesPriceMaintenanceSetup."Sales Type"::Customer:
+                begin
+                    SalesPriceMaintenanceSetup.TestField("Sales Code");
+                    Customer.Get(SalesPriceMaintenanceSetup."Sales Code");
+                    exit(Customer."VAT Bus. Posting Group");
+                end;
+            SalesPriceMaintenanceSetup."Sales Type"::"Customer Price Group":
+                begin
+                    SalesPriceMaintenanceSetup.TestField("Sales Code");
+                    CustomerPriceGroup.Get(SalesPriceMaintenanceSetup."Sales Code");
+                    exit(CustomerPriceGroup."VAT Bus. Posting Gr. (Price)");
+                end;
+        end;
+    end;
+}
