@@ -36,18 +36,18 @@ jobs:
       - runtime: '"6.0"'
 
     - name: BC18
-      containerImageName: npretail.azurecr.io/np/dynamicsnav:18.2.26217.26490-w1
+      containerImageName: npretail.azurecr.io/np/dynamicsnav:18.4.28601.29139-w1
       artifactUrl: ''
       endpointName: npretail_ACR
       serverInstanceName: BC
       licenseSecureFileName: 'DEV_BC OP 18.flf'
 
-      majorVersion: 1802
+      majorVersion: 1804
       appJsonValues:
       -  platform: '18.0.0.0'
       -  application: '18.0.0.0'
-      -  preprocessorSymbols: [BC18.2]
-      -  runtime: '"7.1"'   
+      -  preprocessorSymbols: [BC18.4]
+      -  runtime: '"7.2"'   
 
 
     scriptsRepo: scriptsRepo
@@ -113,6 +113,9 @@ jobs:
           - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
           - path: 'C:\Applications\TestFramework\TestLibraries\Variable Storage\Microsoft_Library Variable Storage.app'
           - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Permissions Mock\Microsoft_Permissions Mock.app'
+            versionFilter:
+              min: 1804       
           - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
 
     - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
