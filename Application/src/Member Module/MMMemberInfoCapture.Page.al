@@ -1006,9 +1006,9 @@ page 6060134 "NPR MM Member Info Capture"
         MissingInformation := false;
         MissingFields := '';
 
-        if (Rec."Item No." <> '') then begin
+        if (MemberInfoCapture."Item No." <> '') then begin
             MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
-            MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
+            MembershipSalesSetup.SetFilter("No.", '=%1', MemberInfoCapture."Item No.");
             if (MembershipSalesSetup.FindFirst()) then begin
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
@@ -1018,18 +1018,18 @@ page 6060134 "NPR MM Member Info Capture"
                         MemberCommunity."Member Unique Identity"::NONE:
                             MissingInformation := false;
                         MemberCommunity."Member Unique Identity"::EMAIL:
-                            SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
+                            SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
                         MemberCommunity."Member Unique Identity"::PHONENO:
-                            SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Phone No."), (MemberInfoCapture."Phone No." = ''));
+                            SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Phone No."), (MemberInfoCapture."Phone No." = ''));
                         MemberCommunity."Member Unique Identity"::SSN:
-                            SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Social Security No."), (MemberInfoCapture."Social Security No." = ''));
+                            SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Social Security No."), (MemberInfoCapture."Social Security No." = ''));
                     end;
 
                     if (ActivationDateEditable) and (MemberInfoCapture."Document Date" = 0D) then
-                        SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Document Date"), (Rec."Document Date" = 0D));
+                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Document Date"), (MemberInfoCapture."Document Date" = 0D));
 
                     if (BirthDateMandatory) then begin
-                        SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption(Birthday), (MemberInfoCapture.Birthday = 0D));
+                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption(Birthday), (MemberInfoCapture.Birthday = 0D));
                         if (MemberInfoCapture.Birthday <> 0D) then
                             if (not MembershipManagement.CheckAgeConstraint(
                                 MembershipManagement.GetMembershipAgeConstraintDate(MembershipSalesSetup, MemberInfoCapture),
@@ -1037,7 +1037,7 @@ page 6060134 "NPR MM Member Info Capture"
                                 MembershipSetup."Validate Age Against",
                                 MembershipSalesSetup."Age Constraint Type",
                                 MembershipSalesSetup."Age Constraint (Years)")) then begin
-                                SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption(Birthday), true);
+                                SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption(Birthday), true);
                                 Message(AGE_VERIFICATION, MemberInfoCapture."First Name", MembershipSalesSetup."Age Constraint (Years)");
                             end;
                     end;
@@ -1046,30 +1046,30 @@ page 6060134 "NPR MM Member Info Capture"
 
                 if (ShowNewCardSection) then begin
                     if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL) then begin
-                        SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("External Card No."), (MemberInfoCapture."External Card No." = ''));
+                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("External Card No."), (MemberInfoCapture."External Card No." = ''));
 
                         if (MembershipSetup."Card Expire Date Calculation" <> MembershipSetup."Card Expire Date Calculation"::NA) then
-                            SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Valid Until"), (MemberInfoCapture."Valid Until" = 0D));
+                            SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Valid Until"), (MemberInfoCapture."Valid Until" = 0D));
 
                     end;
                 end;
 
                 if (ShowAddToMembershipSection) or (ShowAddMemberCardSection) or (ShowReplaceCardSection) then begin
-                    SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("External Membership No."), (MemberInfoCapture."External Membership No." = ''));
+                    SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("External Membership No."), (MemberInfoCapture."External Membership No." = ''));
                 end;
 
                 if (ShowAddMemberCardSection) or (ShowReplaceCardSection) then begin
-                    SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("External Member No"), (MemberInfoCapture."External Member No" = ''));
+                    SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("External Member No"), (MemberInfoCapture."External Member No" = ''));
                 end;
 
-                if (Rec."Enable Auto-Renew") then
-                    SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Auto-Renew Payment Method Code"), (Rec."Auto-Renew Payment Method Code" = ''));
+                if (MemberInfoCapture."Enable Auto-Renew") then
+                    SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Auto-Renew Payment Method Code"), (MemberInfoCapture."Auto-Renew Payment Method Code" = ''));
 
                 case MembershipSetup."GDPR Mode" of
                     MembershipSetup."GDPR Mode"::REQUIRED:
-                        SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("GDPR Approval"), (Rec."GDPR Approval" <> Rec."GDPR Approval"::ACCEPTED));
+                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("GDPR Approval"), (MemberInfoCapture."GDPR Approval" <> MemberInfoCapture."GDPR Approval"::ACCEPTED));
                     MembershipSetup."GDPR Mode"::CONSENT:
-                        SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("GDPR Approval"), (Rec."GDPR Approval" = Rec."GDPR Approval"::NA));
+                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("GDPR Approval"), (MemberInfoCapture."GDPR Approval" = MemberInfoCapture."GDPR Approval"::NA));
                 end;
 
                 if (MemberCommunity."Membership to Cust. Rel.") then begin
@@ -1092,11 +1092,11 @@ page 6060134 "NPR MM Member Info Capture"
 
             end;
         end else begin
-            SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
+            SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
 
             if (SetAddGuardianMode) then begin
                 MissingInformation := false;
-                SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("Guardian External Member No."), (MemberInfoCapture."Guardian External Member No." = ''));
+                SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Guardian External Member No."), (MemberInfoCapture."Guardian External Member No." = ''));
             end;
 
         end;

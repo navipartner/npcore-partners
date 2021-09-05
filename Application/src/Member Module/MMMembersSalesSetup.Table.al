@@ -105,13 +105,20 @@ table 6060125 "NPR MM Members. Sales Setup"
         }
         field(50; "Suggested Membercount In Sales"; Integer)
         {
-            Caption = 'Suggested Membercount In Sales';
+            Caption = 'Suggested Member Count In Sales';
             DataClassification = CustomerContent;
         }
         field(60; "Assign Loyalty Points On Sale"; Boolean)
         {
             Caption = 'Assign Loyalty Points On Sale';
             DataClassification = CustomerContent;
+        }
+        field(65; "Mixed Sale Policy"; Option)
+        {
+            Caption = 'Mixed Sale Policy';
+            DataClassification = CustomerContent;
+            OptionMembers = ALLOW,MEMBERSHIP_ITEM,SAME_ITEM,DISALLOW;
+            OptionCaption = 'Allow Any Item,Membership Items,Same Item,Disallowed';
         }
         field(70; "Auto-Renew To"; Code[20])
         {
