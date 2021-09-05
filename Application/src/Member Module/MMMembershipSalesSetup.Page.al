@@ -16,127 +16,111 @@ page 6060125 "NPR MM Membership Sales Setup"
             {
                 field(Type; Rec.Type)
                 {
-
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-
                     ToolTip = 'Specifies the value of the No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Business Flow Type"; Rec."Business Flow Type")
                 {
-
                     ToolTip = 'Specifies the value of the Business Flow Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-
                     ToolTip = 'Specifies the value of the Membership Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-
                     ToolTip = 'Specifies the value of the Blocked field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-
                     ToolTip = 'Specifies the value of the Blocked At field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Valid From Base"; Rec."Valid From Base")
                 {
-
                     ToolTip = 'Specifies the value of the Valid From Base field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Cut-Off Date Calculation"; Rec."Sales Cut-Off Date Calculation")
                 {
-
                     ToolTip = 'Specifies the value of the Sales Cut-Off Date Calculation field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Valid From Date Calculation"; Rec."Valid From Date Calculation")
                 {
-
                     ToolTip = 'Specifies the value of the Valid From Date Calculation field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Valid Until Calculation"; Rec."Valid Until Calculation")
                 {
-
                     ToolTip = 'Specifies the value of the Valid Until Calculation field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Duration Formula"; Rec."Duration Formula")
                 {
-
                     ToolTip = 'Specifies the value of the Duration Formula field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Suggested Membercount In Sales"; Rec."Suggested Membercount In Sales")
                 {
-
                     ToolTip = 'Specifies the value of the Suggested Membercount In Sales field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Assign Loyalty Points On Sale"; Rec."Assign Loyalty Points On Sale")
                 {
-
                     ToolTip = 'Specifies the value of the Assign Loyalty Points On Sale field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Mixed Sale Policy"; Rec."Mixed Sale Policy")
+                {
+                    ToolTip = 'Specifies the value of the Mixed Sale Policy field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Auto-Renew To"; Rec."Auto-Renew To")
                 {
-
                     ToolTip = 'Specifies the value of the Auto-Renew To field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Auto-Admit Member On Sale"; Rec."Auto-Admit Member On Sale")
                 {
-
                     ToolTip = 'Specifies the value of the Auto-Admit Member On Sale field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Member Card Type Selection"; Rec."Member Card Type Selection")
                 {
-
                     ToolTip = 'Specifies the value of the Member Card Type Selection field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Member Card Type"; Rec."Member Card Type")
                 {
-
                     ToolTip = 'Specifies the value of the Member Card Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Magento M2 Membership Sign-up"; Rec."Magento M2 Membership Sign-up")
                 {
-
                     ToolTip = 'Specifies the value of the Magento M2 Membership Sign-up field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Age Constraint Type"; Rec."Age Constraint Type")
                 {
-
                     ToolTip = 'Specifies the value of the Age Constraint Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Age Constraint (Years)"; Rec."Age Constraint (Years)")
                 {
-
                     ToolTip = 'Specifies the value of the Age Constraint (Years) field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Requires Guardian"; Rec."Requires Guardian")
                 {
-
                     ToolTip = 'Specifies the value of the Requires Guardian field';
                     ApplicationArea = NPRRetail;
                 }
