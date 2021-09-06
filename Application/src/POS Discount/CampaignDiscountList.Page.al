@@ -74,13 +74,6 @@ page 6014455 "NPR Campaign Discount List"
                     ToolTip = 'Specifies the value of the Period Description field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Comment; Rec.Comment)
-                {
-
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Comment field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Created Date"; Rec."Created Date")
                 {
 

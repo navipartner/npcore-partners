@@ -95,14 +95,6 @@ table 6014413 "NPR Period Discount"
             Editable = false;
             DataClassification = CustomerContent;
         }
-        field(20; Comment; Boolean)
-        {
-            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014413),
-                                                        "No." = FIELD(Code)));
-            Caption = 'Comment';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(21; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
