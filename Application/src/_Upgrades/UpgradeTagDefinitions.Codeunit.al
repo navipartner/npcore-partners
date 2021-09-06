@@ -41,6 +41,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG App. Area User Exp."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Sales Pr. Maint. Setup"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Customer Templates"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -134,6 +135,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPR-482497-AppAreaForUserExperience-20210825');
             Codeunit::"NPR UPG Sales Pr. Maint. Setup":
                 exit('NPRSalesPriceMaintSetupUpgrade-20210901');
+            Codeunit::"NPR UPG Customer Templates":
+                exit('NPRCustomerTemplates-20210906');
         end;
     end;
 }
