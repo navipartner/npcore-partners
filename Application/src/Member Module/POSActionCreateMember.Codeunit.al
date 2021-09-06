@@ -57,7 +57,7 @@ codeunit 6014660 "NPR POS Action Create Member"
         POSSession.GetSale(PosSaleMgr);
         PosSaleMgr.GetCurrentSale(POSSale);
         ;
-        if (CreateMembershipAndAssignToSales(POSSale, Context.GetStringParameter('MembershipSalesSetupItemNumber'))) then begin
+        if (CreateMembershipAndAssignToSales(POSSale, CopyStr(Context.GetStringParameter('MembershipSalesSetupItemNumber'), 1, 20))) then begin
             PosSaleMgr.Refresh(POSSale);
             PosSaleMgr.Modify(false, false);
             POSSession.RequestRefreshData();

@@ -39,11 +39,11 @@ table 6060127 "NPR MM Membership"
                 MembershipRole: Record "NPR MM Membership Role";
                 Contact: Record Contact;
             begin
-                "Blocked At" := CreateDateTime(0D, 0T);
-                "Blocked By" := '';
-                if (Blocked) then begin
-                    "Blocked At" := CurrentDateTime();
-                    "Blocked By" := UserId;
+                Rec."Blocked At" := CreateDateTime(0D, 0T);
+                Rec."Blocked By" := '';
+                if (Rec.Blocked) then begin
+                    Rec."Blocked At" := CurrentDateTime();
+                    Rec."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(Rec."Blocked By"));
                 end;
 
                 MembershipRole.SetFilter("Membership Entry No.", '=%1', "Entry No.");

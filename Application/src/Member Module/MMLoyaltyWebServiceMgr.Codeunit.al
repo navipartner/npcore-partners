@@ -10,7 +10,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
     begin
 
         if (Rec.LoadXmlDoc(XmlDoc)) then begin
-            FunctionName := GetWebserviceFunction(Rec."Import Type");
+            FunctionName := GetWebServiceFunction(Rec."Import Type");
             case FunctionName of
                 'GetLoyaltyPoints':
                     GetLoyaltyPoints(XmlDoc, Rec."Document ID");
@@ -89,11 +89,11 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(Request, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."External Member No" := GetXmlText20(Request, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Membership No." := GetXmlText20(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
 
-        CustomerNo := NpXmlDomMgt.GetXmlText(Request, 'customernumber', 20, false);
+        CustomerNo := GetXmlText20(Request, 'customernumber', MaxStrLen(CustomerNo), false);
         if (CustomerNo <> '') then begin
             Membership.SetFilter("Customer No.", '=%1', CustomerNo);
             Membership.SetFilter(Blocked, '=%1', false);
@@ -109,7 +109,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         MemberInfoCapture.Insert()
     end;
 
-    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text[100]
+    local procedure GetWebServiceFunction(ImportTypeCode: Code[20]): Text[100]
     var
         ImportType: Record "NPR Nc Import Type";
     begin
@@ -120,4 +120,16 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
 
         exit(ImportType."Webservice Function");
     end;
+
+#pragma warning disable AA0139
+    local procedure GetXmlText20(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[20]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText100(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[100]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+#pragma warning restore
 }

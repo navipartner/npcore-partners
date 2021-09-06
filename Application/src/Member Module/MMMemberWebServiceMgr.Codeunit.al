@@ -202,14 +202,14 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        TargetDocumentId := NpXmlDomMgt.GetXmlText(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
+        TargetDocumentId := GetXmlText100(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.FindFirst();
 
-        MemberInfoCapture."Document No." := NpXmlDomMgt.GetXmlText(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false);
-        Evaluate(MemberInfoCapture.Amount, NpXmlDomMgt.GetXmlText(Request, 'amount', 10, false));
-        Evaluate(MemberInfoCapture."Amount Incl VAT", NpXmlDomMgt.GetXmlText(Request, 'amountinclvat', 10, false));
+        MemberInfoCapture."Document No." := GetXmlText20(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false);
+        Evaluate(MemberInfoCapture.Amount, GetXmlText20(Request, 'amount', 20, false));
+        Evaluate(MemberInfoCapture."Amount Incl VAT", GetXmlText20(Request, 'amountinclvat', 20, false));
 
         MemberInfoCapture."Membership Entry No." := MembershipEntry."Membership Entry No.";
         MemberInfoCapture.Modify();
@@ -819,7 +819,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        TargetDocumentId := NpXmlDomMgt.GetXmlText(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
+        TargetDocumentId := GetXmlText100(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.FindFirst();
@@ -973,14 +973,14 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."Item No." := NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'membershipsalesitem', MaxStrLen(MemberInfoCapture."Item No."), true);
+        MemberInfoCapture."Item No." := GetXmlText20(CreateMembershipRequest, 'membershipsalesitem', MaxStrLen(MemberInfoCapture."Item No."), true);
 
-        Evaluate(MemberInfoCapture."Document Date", NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'activationdate', 0, false), 9);
+        Evaluate(MemberInfoCapture."Document Date", GetXmlText20(CreateMembershipRequest, 'activationdate', 20, false), 9);
         MemberInfoCapture.Insert();
 
-        MemberInfoCapture."Company Name" := NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'companyname', MaxStrLen(MemberInfoCapture."Company Name"), false);
+        MemberInfoCapture."Company Name" := GetXmlText50(CreateMembershipRequest, 'companyname', MaxStrLen(MemberInfoCapture."Company Name"), false);
 
-        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
+        MemberInfoCapture."Customer No." := GetXmlText20(CreateMembershipRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
 
     end;
 
@@ -989,32 +989,32 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         GenderText: Text[30];
         CrmText: Text[30];
         GdprText: Text[30];
-        BooleanTextField: Text;
-        DateTextField: Text;
+        BooleanTextField: Text[20];
+        DateTextField: Text[20];
         isPermanent: Boolean;
         NotificationMethodText: Text[30];
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(MemberRequest, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Membership No." := GetXmlText20(MemberRequest, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."External Member No" := GetXmlText20(MemberRequest, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
 
-        MemberInfoCapture."First Name" := NpXmlDomMgt.GetXmlText(MemberRequest, 'firstname', MaxStrLen(MemberInfoCapture."First Name"), true);
-        MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(MemberRequest, 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
+        MemberInfoCapture."First Name" := GetXmlText50(MemberRequest, 'firstname', MaxStrLen(MemberInfoCapture."First Name"), true);
+        MemberInfoCapture."E-Mail Address" := LowerCase(GetXmlText80(MemberRequest, 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
 
-        MemberInfoCapture."Guardian External Member No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'guardian/membernumber', MaxStrLen(MemberInfoCapture."Guardian External Member No."), false);
+        MemberInfoCapture."Guardian External Member No." := GetXmlText20(MemberRequest, 'guardian/membernumber', MaxStrLen(MemberInfoCapture."Guardian External Member No."), false);
         if (MemberInfoCapture."Guardian External Member No." <> '') then
             if (MemberInfoCapture."E-Mail Address" = '') then
-                MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(MemberRequest, 'guardian/email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
+                MemberInfoCapture."E-Mail Address" := LowerCase(GetXmlText80(MemberRequest, 'guardian/email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
 
-        MemberInfoCapture."Middle Name" := NpXmlDomMgt.GetXmlText(MemberRequest, 'middlename', MaxStrLen(MemberInfoCapture."Middle Name"), false);
-        MemberInfoCapture."Last Name" := NpXmlDomMgt.GetXmlText(MemberRequest, 'lastname', MaxStrLen(MemberInfoCapture."Last Name"), true);
-        MemberInfoCapture.Address := NpXmlDomMgt.GetXmlText(MemberRequest, 'address', MaxStrLen(MemberInfoCapture.Address), false);
+        MemberInfoCapture."Middle Name" := GetXmlText50(MemberRequest, 'middlename', MaxStrLen(MemberInfoCapture."Middle Name"), false);
+        MemberInfoCapture."Last Name" := GetXmlText50(MemberRequest, 'lastname', MaxStrLen(MemberInfoCapture."Last Name"), true);
+        MemberInfoCapture.Address := GetXmlText100(MemberRequest, 'address', MaxStrLen(MemberInfoCapture.Address), false);
 
-        MemberInfoCapture."Post Code Code" := NpXmlDomMgt.GetXmlText(MemberRequest, 'postcode', MaxStrLen(MemberInfoCapture."Post Code Code"), false);
-        MemberInfoCapture.City := NpXmlDomMgt.GetXmlText(MemberRequest, 'city', MaxStrLen(MemberInfoCapture.City), false);
-        MemberInfoCapture.Country := NpXmlDomMgt.GetXmlText(MemberRequest, 'country', MaxStrLen(MemberInfoCapture.Country), false);
-        MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
+        MemberInfoCapture."Post Code Code" := GetXmlText20(MemberRequest, 'postcode', MaxStrLen(MemberInfoCapture."Post Code Code"), false);
+        MemberInfoCapture.City := GetXmlText50(MemberRequest, 'city', MaxStrLen(MemberInfoCapture.City), false);
+        MemberInfoCapture.Country := GetXmlText50(MemberRequest, 'country', MaxStrLen(MemberInfoCapture.Country), false);
+        MemberInfoCapture."Phone No." := GetXmlText30(MemberRequest, 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
 
         if (MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
@@ -1025,7 +1025,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
 
-        NotificationMethodText := NpXmlDomMgt.GetXmlText(MemberRequest, 'notificationmethod', MaxStrLen(NotificationMethodText), false);
+        NotificationMethodText := GetXmlText30(MemberRequest, 'notificationmethod', MaxStrLen(NotificationMethodText), false);
         case UpperCase(NotificationMethodText) of
             'NO_THANKYOU', '0':
                 MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::NO_THANKYOU;
@@ -1039,9 +1039,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 ; // Do nothing
         end;
 
-        Evaluate(MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText(MemberRequest, 'birthday', 0, false), 9);
+        Evaluate(MemberInfoCapture.Birthday, GetXmlText20(MemberRequest, 'birthday', 20, false), 9);
 
-        GenderText := NpXmlDomMgt.GetXmlText(MemberRequest, 'gender', MaxStrLen(GenderText), false);
+        GenderText := GetXmlText30(MemberRequest, 'gender', MaxStrLen(GenderText), false);
         case UpperCase(GenderText) of
             'MALE', '1', Format(MemberInfoCapture.Gender::MALE, 0, 9):
                 MemberInfoCapture.Gender := MemberInfoCapture.Gender::MALE;
@@ -1053,7 +1053,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 MemberInfoCapture.Gender := MemberInfoCapture.Gender::NOT_SPECIFIED;
         end;
 
-        CrmText := NpXmlDomMgt.GetXmlText(MemberRequest, 'newsletter', MaxStrLen(CrmText), false);
+        CrmText := GetXmlText30(MemberRequest, 'newsletter', MaxStrLen(CrmText), false);
         case UpperCase(CrmText) of
             'YES', '1', Format(MemberInfoCapture."News Letter"::YES, 0, 9):
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::YES;
@@ -1063,10 +1063,10 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::NOT_SPECIFIED;
         end;
 
-        MemberInfoCapture."User Logon ID" := UpperCase(NpXmlDomMgt.GetXmlText(MemberRequest, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
-        MemberInfoCapture."Password SHA1" := NpXmlDomMgt.GetXmlText(MemberRequest, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
+        MemberInfoCapture."User Logon ID" := UpperCase(GetXmlText80(MemberRequest, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
+        MemberInfoCapture."Password SHA1" := GetXmlText50(MemberRequest, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
 
-        GdprText := NpXmlDomMgt.GetXmlText(MemberRequest, 'gdpr_approval', MaxStrLen(GdprText), false);
+        GdprText := GetXmlText30(MemberRequest, 'gdpr_approval', MaxStrLen(GdprText), false);
         case UpperCase(GdprText) of
             'PENDING', '1', UpperCase(Format(MemberInfoCapture."GDPR Approval"::PENDING, 0, 9)):
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::PENDING;
@@ -1078,20 +1078,22 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::NA;
         end;
 
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'membercard/cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(MemberRequest, 'membercard/cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
         if (MemberInfoCapture."External Card No." <> '') then begin
 
             if (StrLen(MemberInfoCapture."External Card No.") >= 4) then
+#pragma warning disable AA0139,
                 MemberInfoCapture."External Card No. Last 4" := CopyStr(MemberInfoCapture."External Card No.", StrLen(MemberInfoCapture."External Card No.") - 3);
+#pragma warning restore
 
-            BooleanTextField := NpXmlDomMgt.GetXmlText(MemberRequest, 'membercard/is_permanent', MaxStrLen(BooleanTextField), true);
+            BooleanTextField := GetXmlText20(MemberRequest, 'membercard/is_permanent', MaxStrLen(BooleanTextField), true);
             if (BooleanTextField = '') then
                 BooleanTextField := Format(false, 0, 9);
 
             Evaluate(isPermanent, BooleanTextField, 9);
             MemberInfoCapture."Temporary Member Card" := not isPermanent;
 
-            DateTextField := NpXmlDomMgt.GetXmlText(MemberRequest, 'membercard/valid_until', MaxStrLen(DateTextField), true);
+            DateTextField := GetXmlText20(MemberRequest, 'membercard/valid_until', MaxStrLen(DateTextField), true);
             if (DateTextField = '') then
                 DateTextField := Format(CalcDate('<+10D>', Today), 0, 9); // Default valid for 10 days
             Evaluate(MemberInfoCapture."Valid Until", DateTextField, 9);
@@ -1100,9 +1102,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         MemberInfoCapture."Member Card Type" := MemberInfoCapture."Member Card Type"::NONE;
 
-        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
-        MemberInfoCapture."Contact No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'preassigned_contact_number', MaxStrLen(MemberInfoCapture."Contact No."), false);
-        MemberInfoCapture."Store Code" := NpXmlDomMgt.GetXmlText(MemberRequest, 'store_code', MaxStrLen(MemberInfoCapture."Store Code"), false);
+        MemberInfoCapture."Customer No." := GetXmlText20(MemberRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
+        MemberInfoCapture."Contact No." := GetXmlText20(MemberRequest, 'preassigned_contact_number', MaxStrLen(MemberInfoCapture."Contact No."), false);
+        MemberInfoCapture."Store Code" := GetXmlText20(MemberRequest, 'store_code', MaxStrLen(MemberInfoCapture."Store Code"), false);
 
         MemberInfoCapture.Insert();
     end;
@@ -1114,13 +1116,13 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(Request, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        MemberInfoCapture."User Logon ID" := UpperCase(NpXmlDomMgt.GetXmlText(Request, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
-        MemberInfoCapture."Password SHA1" := NpXmlDomMgt.GetXmlText(Request, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
+        MemberInfoCapture."External Member No" := GetXmlText20(Request, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Membership No." := GetXmlText20(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."User Logon ID" := UpperCase(GetXmlText80(Request, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
+        MemberInfoCapture."Password SHA1" := GetXmlText50(Request, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
 
-        CustomerNo := NpXmlDomMgt.GetXmlText(Request, 'customernumber', 20, false);
+        CustomerNo := GetXmlText20(Request, 'customernumber', MaxStrLen(CustomerNo), false);
         if (CustomerNo <> '') then begin
             Membership.SetFilter("Customer No.", '=%1', CustomerNo);
             Membership.SetFilter(Blocked, '=%1', false);
@@ -1133,7 +1135,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         end;
 
-        MemberInfoCapture."Document No." := UpperCase(NpXmlDomMgt.GetXmlText(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false));
+        MemberInfoCapture."Document No." := UpperCase(GetXmlText20(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false));
 
         MemberInfoCapture.Insert();
     end;
@@ -1142,7 +1144,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
         MemberInfoCapture.Insert();
 
     end;
@@ -1152,9 +1154,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         ChangeType: Text[100];
     begin
 
-        MemberInfoCapture."Item No." := NpXmlDomMgt.GetXmlText(Request, 'membershipchangeitem', MaxStrLen(MemberInfoCapture."Item No."), true);
+        MemberInfoCapture."Item No." := GetXmlText20(Request, 'membershipchangeitem', MaxStrLen(MemberInfoCapture."Item No."), true);
 
-        ChangeType := NpXmlDomMgt.GetXmlText(Request, 'changetype', MaxStrLen(ChangeType), true);
+        ChangeType := GetXmlText100(Request, 'changetype', MaxStrLen(ChangeType), true);
         case UpperCase(ChangeType) of
             'CANCEL', '1', Format(MemberInfoCapture."Information Context"::REGRET, 0, 9):
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::REGRET;
@@ -1187,8 +1189,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        Evaluate(MemberInfoCapture.Quantity, NpXmlDomMgt.GetXmlText(Request, 'addmembercount', 0, false), 9);
+        MemberInfoCapture."External Membership No." := GetXmlText20(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        Evaluate(MemberInfoCapture.Quantity, GetXmlText20(Request, 'addmembercount', 20, false), 9);
 
         MemberInfoCapture.Insert();
 
@@ -1196,14 +1198,14 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     local procedure GetGdprArgs(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var DataSubjectId: Text[40])
     var
-        GdprText: Text;
+        GdprText: Text[20];
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        DataSubjectId := NpXmlDomMgt.GetXmlText(Request, 'datasubjectid', MaxStrLen(DataSubjectId), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        DataSubjectId := GetXmlText40(Request, 'datasubjectid', MaxStrLen(DataSubjectId), false);
 
-        GdprText := NpXmlDomMgt.GetXmlText(Request, 'gdpr_approval', MaxStrLen(GdprText), false);
+        GdprText := GetXmlText20(Request, 'gdpr_approval', MaxStrLen(GdprText), false);
         case UpperCase(GdprText) of
             'PENDING', '1', UpperCase(Format(MemberInfoCapture."GDPR Approval"::PENDING, 0, 9)):
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::PENDING;
@@ -1240,7 +1242,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     end;
 
-    local procedure ApplyAttributesToMemberInfoCapture(MemberInfoCaptureEntryNo: Integer; AttributeCode: Code[20]; AttributeValue: Text)
+    local procedure ApplyAttributesToMemberInfoCapture(MemberInfoCaptureEntryNo: Integer; AttributeCode: Code[20]; AttributeValue: Text[250])
     var
         NPRAttribute: Record "NPR Attribute";
         NPRAttributeID: Record "NPR Attribute ID";
@@ -1263,5 +1265,36 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         NPRAttributeManagement.SetEntryAttributeValue(TableId, NPRAttributeID."Shortcut Attribute ID", MemberInfoCaptureEntryNo, AttributeValue);
 
     end;
+#pragma warning disable AA0139
+    local procedure GetXmlText20(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[20]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText30(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[30]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText40(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[40]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText50(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[50]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText80(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[80]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText100(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[100]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+#pragma warning restore
 }
 

@@ -266,7 +266,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
     var
         AlterationOption: Option " ",REGRET,RENEW,UPGRADE,EXTEND,CANCEL;
         CONFIRM_EXECUTE: Label '%1 lines are selected. Are you sure you want to make the selected changes? ';
-        GDateMask: Text;
+        GDateMask: Code[20];
         IMPORT_MESSAGE_DIALOG: Label 'Importing :\#1#######################################################';
         GLineCount: Integer;
         FldAlterationType: Text;
@@ -552,7 +552,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         validateTextField(FldExternalNumber, MaxStrLen(Rec."External Membership No."), REQUIRED, Rec.FieldCaption("External Membership No."));
         validateTextField(FldAlterationItemNo, MaxStrLen(Rec."Item No."), OPTIONAL, Rec.FieldCaption("Item No."));
         validateDateField(FldAlterationDate, GDateMask, OPTIONAL, Rec.FieldCaption("Document Date"));
-
     end;
 
     local procedure InsertLine()
@@ -580,14 +579,14 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         end;
         SetInformationContext(AlterationOption, MemberInfoCapture);
 
-        if (not SelectMembershipUsingMemberCard(FldExternalNumber, MemberInfoCapture)) then
-            SetExternalMembershipNo(FldExternalNumber, MemberInfoCapture);
+        if (not SelectMembershipUsingMemberCard(CopyStr(FldExternalNumber, 1, 100), MemberInfoCapture)) then
+            SetExternalMembershipNo(CopyStr(FldExternalNumber, 1, 20), MemberInfoCapture);
 
         if (MemberInfoCapture."Item No." = '') then
             validateTextField(FldAlterationItemNo, MaxStrLen(Rec."Item No."), REQUIRED, Rec.FieldCaption("Item No."));
 
         if (FldAlterationItemNo <> '') then
-            SetItemNo(FldAlterationItemNo, MemberInfoCapture);
+            SetItemNo(CopyStr(FldAlterationItemNo, 1, 20), MemberInfoCapture);
 
         MemberInfoCapture."Document Date" := Today();
         if (FldAlterationDate <> '') then
@@ -645,17 +644,17 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
     end;
 
-    local procedure nextField(var VarLineOfText: Text[1024]): Text[1024]
+    local procedure nextField(var VarLineOfText: Text): Text
     begin
 
         exit(forwardTokenizer(VarLineOfText, ';', '"'));
 
     end;
 
-    local procedure forwardTokenizer(var VarText: Text[1024]; PSeparator: Char; PQuote: Char) RField: Text[1024]
+    local procedure forwardTokenizer(var VarText: Text; PSeparator: Char; PQuote: Char) RField: Text
     var
         IsQuoted: Boolean;
-        InputText: Text[1024];
+        InputText: Text;
         NextFieldPos: Integer;
         IsNextField: Boolean;
         NextByte: Text[1];

@@ -4,7 +4,7 @@ codeunit 6060132 "NPR MM Import Members"
     trigger OnRun()
     var
         FileManagement: Codeunit "File Management";
-        FileName: Text[1024];
+        FileName: Text;
     begin
 
         if GuiAllowed then begin
@@ -175,7 +175,7 @@ codeunit 6060132 "NPR MM Import Members"
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
     begin
-
+#pragma warning disable AA0139
         Clear(GMemberInfo);
 
         GMemberInfo."External Member No" := validateTextField(FldMemberNo, MaxStrLen(GMemberInfo."External Member No"), REQUIRED, GMemberInfo.FieldCaption("External Member No"));
@@ -307,6 +307,7 @@ codeunit 6060132 "NPR MM Import Members"
             exit(false);
 
         exit(true);
+#pragma warning restore
     end;
 
     procedure insertMember(EntryNo: Integer)
@@ -409,16 +410,16 @@ codeunit 6060132 "NPR MM Import Members"
         exit(rInteger);
     end;
 
-    local procedure nextField(var VarLineOfText: Text[1024]): Text[1024]
+    local procedure nextField(var VarLineOfText: Text): Text
     begin
 
         exit(forwardTokenizer(VarLineOfText, ';', '"'));
     end;
 
-    local procedure forwardTokenizer(var VarText: Text[1024]; PSeparator: Char; PQuote: Char) RField: Text[1024]
+    local procedure forwardTokenizer(var VarText: Text; PSeparator: Char; PQuote: Char) RField: Text
     var
         IsQuoted: Boolean;
-        InputText: Text[1024];
+        InputText: Text;
         NextFieldPos: Integer;
         IsNextField: Boolean;
         NextByte: Text[1];

@@ -40,7 +40,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
     var
         Member: Record "NPR MM Member";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        Token: Text;
+        Token: Text[100];
     begin
 
         Token := TicketRequestManager.GetNewToken();
@@ -58,7 +58,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         exit(true);
     end;
 
-    local procedure CreateTicketRequest(Token: Text; MembershipRole: Record "NPR MM Membership Role"; SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup")
+    local procedure CreateTicketRequest(Token: Text[100]; MembershipRole: Record "NPR MM Membership Role"; SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup")
     var
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
@@ -280,7 +280,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         end;
 
         SponsorshipTicketEntry."Notification Sent At" := CurrentDateTime();
-        SponsorshipTicketEntry."Notification Sent By User" := UserId;
+        SponsorshipTicketEntry."Notification Sent By User" := CopyStr(UserId(), 1, MaxStrLen(SponsorshipTicketEntry."Notification Sent By User"));
         SponsorshipTicketEntry."Notification Send Status" := SendStatus;
 
         SponsorshipTicketEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(SponsorshipTicketEntry."Failed With Message"));

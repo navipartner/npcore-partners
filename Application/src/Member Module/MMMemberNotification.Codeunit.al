@@ -295,9 +295,9 @@ codeunit 6060136 "NPR MM Member Notification"
                     MemberNotificationEntry."Magento Get Password URL" := NotificationSetup."Fallback Magento PW URL";
                     if (Member."E-Mail Address" <> '') then
                         MemberNotificationEntry."Magento Get Password URL" := StrSubstNo(EMailLbl, NotificationSetup."Fallback Magento PW URL", Member."E-Mail Address");
-                    if (NotificationSetup."Generate Magento PW URL") then begin
+
+                    if (NotificationSetup."Generate Magento PW URL") then
                         RequestMagentoPasswordUrl(Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
-                    end;
 
                     if (MemberNotificationEntry.Insert()) then;
                 end;
@@ -640,8 +640,9 @@ codeunit 6060136 "NPR MM Member Notification"
     begin
 
         Randomize();
+#pragma warning disable AA0139
         Token := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
-
+#pragma warning restore
         for n := StrLen(Token) to MaxStrLen(Token) do begin
             case Random(3) of
                 1:
@@ -745,7 +746,9 @@ codeunit 6060136 "NPR MM Member Notification"
         MembershipRole.Get(MemberNotificationEntry."Membership Entry No.", MemberNotificationEntry."Member Entry No.");
 
         if (MembershipRole."Wallet Pass Id" = '') then begin
+#pragma warning disable AA0139
             MembershipRole."Wallet Pass Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+#pragma warning restore
             MembershipRole.Modify();
         end;
 
@@ -772,9 +775,9 @@ codeunit 6060136 "NPR MM Member Notification"
             exit(false);
 
         JObject.ReadFrom(JSONResult);
-        MemberNotificationEntry."Wallet Pass Default URL" := GetStringValue(JObject, 'public_url.default');
-        MemberNotificationEntry."Wallet Pass Andriod URL" := GetStringValue(JObject, 'public_url.android');
-        MemberNotificationEntry."Wallet Pass Landing URL" := GetStringValue(JObject, 'public_url.landing');
+        MemberNotificationEntry."Wallet Pass Default URL" := CopyStr(GetStringValue(JObject, 'public_url.default'), 1, MaxStrLen(MemberNotificationEntry."Wallet Pass Default URL"));
+        MemberNotificationEntry."Wallet Pass Andriod URL" := CopyStr(GetStringValue(JObject, 'public_url.android'), 1, MaxStrLen(MemberNotificationEntry."Wallet Pass Andriod URL"));
+        MemberNotificationEntry."Wallet Pass Landing URL" := CopyStr(GetStringValue(JObject, 'public_url.landing'), 1, MaxStrLen(MemberNotificationEntry."Wallet Pass Landing URL"));
 
         exit(true);
     end;
@@ -894,7 +897,7 @@ codeunit 6060136 "NPR MM Member Notification"
         exit(template);
     end;
 
-    local procedure RequestMagentoPasswordUrl(CustomerNo: Code[20]; ContactNo: Code[20]; EmailAddress: Text[200]; var ResponseUrl: Text[200]; var ReasonText: Text): Boolean
+    local procedure RequestMagentoPasswordUrl(CustomerNo: Code[20]; ContactNo: Code[20]; EmailAddress: Text[200]; var ResponseUrl: Text[200]; var ReasonText: Text[250]): Boolean
     var
         Customer: Record Customer;
         Contact: Record Contact;
@@ -928,10 +931,8 @@ codeunit 6060136 "NPR MM Member Notification"
             exit;
         end;
 
-        ResponseUrl := ResponseText;
-
+        ResponseUrl := CopyStr(ResponseText, 1, MaxStrLen(ResponseUrl));
         exit(true);
-
     end;
 
     [TryFunction]

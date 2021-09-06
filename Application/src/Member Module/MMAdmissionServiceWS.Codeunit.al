@@ -41,7 +41,7 @@
         AdmissionIsValid: Boolean;
         MMAdmissionServiceLog: Record "NPR MM Admis. Service Log";
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
-        MessageText: Text[250];
+        MessageText: Text;
         TMTicket: Record "NPR TM Ticket";
         MMMembership: Record "NPR MM Membership";
         Item: Record Item;
@@ -129,8 +129,9 @@
 
                 //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
                 if TMTicketWebService.ValidateTicketArrival(AdmissionCode, Barcode, ScannerStationId, MessageText) then begin
-
+#pragma warning disable AA0139
                     MMAdmissionServiceLog."Response No" := Barcode;
+#pragma warning restore
                     MMAdmissionServiceLog."Response Token" := CreateToken();
                     No := MMAdmissionServiceLog."Response No";
                     Token := MMAdmissionServiceLog."Response Token";
@@ -142,7 +143,7 @@
                     MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
                     MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
                     MMAdmissionServiceEntry."Display Name" := TicketDisplayName;
-                    MMAdmissionServiceEntry.Message := MessageText;
+                    MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                     MMAdmissionServiceEntry."Ticket Entry No." := TMTicket."No.";
                     MMAdmissionServiceEntry."External Ticket No." := TMTicket."External Ticket No.";
                     MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
@@ -179,12 +180,13 @@
                     end;
                     AdmissionIsValid := true;
                 end else begin
+#pragma warning disable AA0139
                     MMAdmissionServiceLog."Response No" := Barcode;
-
+#pragma warning restore
                     MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
                     MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
                     MMAdmissionServiceEntry."Display Name" := TicketDisplayName;
-                    MMAdmissionServiceEntry.Message := MessageText;
+                    MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                 end;
             end;
             if not AdmissionIsValid then begin
@@ -206,7 +208,7 @@
         MMAdmissionServiceEntry.Modify(true);
 
         MMAdmissionServiceLog."Error Number" := ErrorNumber;
-        MMAdmissionServiceLog."Error Description" := ErrorDescription;
+        MMAdmissionServiceLog."Error Description" := CopyStr(ErrorDescription, 1, MaxStrLen(MMAdmissionServiceLog."Error Description"));
         MMAdmissionServiceLog."Return Value" := (DataError <> true);
         MMAdmissionServiceLog."Entry No." := MMAdmissionServiceEntry."Entry No.";
         MMAdmissionServiceLog.Key := No;
@@ -217,14 +219,14 @@
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
-    procedure GuestArrival(No: Text; Token: Text; ScannerStationId: Code[10]; var Name: Text; var PictureBase64: Text; var Transaktion: Code[10]; var ErrorNumber: Code[10]; var ErrorDescription: Text): Boolean
+    procedure GuestArrival(No: Text[20]; Token: Text[50]; ScannerStationId: Code[10]; var Name: Text; var PictureBase64: Text; var Transaktion: Code[10]; var ErrorNumber: Code[10]; var ErrorDescription: Text): Boolean
     var
         MMAdmissionServiceLog: Record "NPR MM Admis. Service Log";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
         DataError: Boolean;
         MMMemberWebService: Codeunit "NPR MM Member WebService";
-        MessageText: Text[250];
+        MessageText: Text;
     begin
         SelectLatestVersion();
 
@@ -292,7 +294,7 @@
                             MMMemberWebService.GetMemberImage(MMAdmissionServiceEntry.Key, PictureBase64, ScannerStationId);
                             if PictureBase64 = '' then
                                 GetAvatarImage(MMAdmissionServiceSetup, PictureBase64);
-                            MMAdmissionServiceEntry.Message := MessageText;
+                            MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                             MMAdmissionServiceEntry.Arrived := true;
                             MMAdmissionServiceEntry."Modify Date" := CurrentDateTime;
                             MMAdmissionServiceEntry.Modify(true);
@@ -322,7 +324,7 @@
         end;
 
         MMAdmissionServiceLog."Error Number" := ErrorNumber;
-        MMAdmissionServiceLog."Error Description" := ErrorDescription;
+        MMAdmissionServiceLog."Error Description" := CopyStr(ErrorDescription, 1, MaxStrLen(MMAdmissionServiceLog."Error Description"));
         MMAdmissionServiceLog."Return Value" := (DataError <> true);
         MMAdmissionServiceLog."Response PictureBase64" := (PictureBase64 <> '');
         MMAdmissionServiceLog.Modify(true);
@@ -331,14 +333,14 @@
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
-    procedure GuestArrivalV2(No: Text; Token: Text; ScannerStationId: Code[10]; var Name: Text; var PictureBase64: Text; var Transaktion: Code[10]; var ErrorNumber: Code[10]; var ErrorDescription: Text): Boolean
+    procedure GuestArrivalV2(No: Text[20]; Token: Text[50]; ScannerStationId: Code[10]; var Name: Text; var PictureBase64: Text; var Transaktion: Code[10]; var ErrorNumber: Code[10]; var ErrorDescription: Text): Boolean
     var
         MMAdmissionServiceLog: Record "NPR MM Admis. Service Log";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
         DataError: Boolean;
         MMMemberWebService: Codeunit "NPR MM Member WebService";
-        MessageText: Text[250];
+        MessageText: Text;
     begin
         SelectLatestVersion();
 
@@ -417,13 +419,13 @@
                             MMMemberWebService.GetMemberImage(MMAdmissionServiceEntry.Key, PictureBase64, ScannerStationId);
                             if PictureBase64 = '' then
                                 GetAvatarImageV2(MMAdmissionServiceSetup, PictureBase64, MMAdmissionServiceEntry."Scanner Station Id");
-                            MMAdmissionServiceEntry.Message := MessageText;
+                            MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                             MMAdmissionServiceEntry.Arrived := true;
                             MMAdmissionServiceEntry."Modify Date" := CurrentDateTime;
                             MMAdmissionServiceEntry.Modify(true);
                         end else begin
                             ErrorNumber := '7';
-                            ErrorDescription := MessageText;
+                            ErrorDescription := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                             DataError := true;
                         end;
                     end;
@@ -447,7 +449,7 @@
         end;
 
         MMAdmissionServiceLog."Error Number" := ErrorNumber;
-        MMAdmissionServiceLog."Error Description" := ErrorDescription;
+        MMAdmissionServiceLog."Error Description" := CopyStr(ErrorDescription, 1, MaxStrLen(MMAdmissionServiceLog."Error Description"));
         MMAdmissionServiceLog."Return Value" := (DataError <> true);
         MMAdmissionServiceLog."Response PictureBase64" := (PictureBase64 <> '');
         MMAdmissionServiceLog.Modify(true);
@@ -516,11 +518,11 @@
 
     local procedure CreateToken(): Code[50]
     var
-        Token: Text;
+        Token: Text[50];
         NewGuid: Guid;
     begin
         NewGuid := CreateGuid();
-        Token := DelChr(CopyStr(Format(NewGuid), 2, StrLen(Format(NewGuid)) - 2), '=', '-');
+        Token := CopyStr(DelChr(CopyStr(Format(NewGuid), 2, StrLen(Format(NewGuid)) - 2), '=', '-'), 1, MaxStrLen(Token));
         exit(Token);
     end;
 
@@ -568,7 +570,7 @@
         end;
     end;
 
-    local procedure GetImageContentAndExtension(InS: InStream; MimeType: Text[100]; var Base64: Text; var Extension: Text[10])
+    local procedure GetImageContentAndExtension(InS: InStream; MimeType: Text[100]; var Base64: Text; var Extension: Text)
     var
         Base64Convert: Codeunit "Base64 Convert";
     begin
@@ -590,7 +592,7 @@
         AdmissionIsValid: Boolean;
         MMAdmissionServiceLog: Record "NPR MM Admis. Service Log";
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
-        MessageText: Text[250];
+        MessageText: Text;
         TMTicket: Record "NPR TM Ticket";
         MMMembership: Record "NPR MM Membership";
         Item: Record Item;
@@ -682,8 +684,9 @@
 
                 //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
                 if TMTicketWebService.ValidateTicketArrival(AdmissionCode, Barcode, ScannerStationId, MessageText) then begin
-
+#pragma warning disable AA0139
                     MMAdmissionServiceLog."Response No" := Barcode;
+#pragma warning restore
                     MMAdmissionServiceLog."Response Token" := CreateToken();
                     No := MMAdmissionServiceLog."Response No";
                     Token := MMAdmissionServiceLog."Response Token";
@@ -695,7 +698,7 @@
                     MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
                     MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
                     MMAdmissionServiceEntry."Display Name" := TicketDisplayName;
-                    MMAdmissionServiceEntry.Message := MessageText;
+                    MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                     MMAdmissionServiceEntry."Ticket Entry No." := TMTicket."No.";
                     MMAdmissionServiceEntry."External Ticket No." := TMTicket."External Ticket No.";
                     MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
@@ -733,12 +736,14 @@
                     AdmissionIsValid := true;
                     LightColor := '2';
                 end else begin
+#pragma warning disable AA0139
                     MMAdmissionServiceLog."Response No" := Barcode;
+#pragma warning restore
 
                     MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
                     MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
                     MMAdmissionServiceEntry."Display Name" := TicketDisplayName;
-                    MMAdmissionServiceEntry.Message := MessageText;
+                    MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                 end;
             end;
             if not AdmissionIsValid then begin
@@ -760,7 +765,7 @@
         MMAdmissionServiceEntry.Modify(true);
 
         MMAdmissionServiceLog."Error Number" := ErrorNumber;
-        MMAdmissionServiceLog."Error Description" := ErrorDescription;
+        MMAdmissionServiceLog."Error Description" := CopyStr(ErrorDescription, 1, MaxStrLen(MMAdmissionServiceLog."Error Description"));
         MMAdmissionServiceLog."Return Value" := (DataError <> true);
         MMAdmissionServiceLog."Entry No." := MMAdmissionServiceEntry."Entry No.";
         MMAdmissionServiceLog.Key := No;

@@ -150,7 +150,7 @@
     end;
 
 
-    procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Option);
+    procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Option);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -203,7 +203,7 @@
         CreateAttributeTableLink(CreateAttribute('MM', 10, 'Membership Only'), DATABASE::"NPR MM Membership", 10);
     end;
 
-    procedure CreateExtendSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateExtendSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -282,7 +282,7 @@
         MembershipSalesSetup.Modify();
     end;
 
-    procedure CreateRenewSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateRenewSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -309,7 +309,7 @@
         AlterationSetup.Modify(true);
     end;
 
-    procedure CreateUpgradeSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateUpgradeSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -338,78 +338,78 @@
         AlterationSetup.Modify(true);
     end;
 
-    procedure SetupCancel_NoGrace(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NEwDescription: Text);
+    procedure SetupCancel_NoGrace(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDescription: Text[100]);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
         CreateCancelSetup(CurrentMembershipCode, SalesItemNo,
-  NEwDescription,
-  AlterationSetup."Alteration Activate From"::ASAP,
-  '',          // AlterationSetup."Alteration Date Formula"
-  false,       // AlterationSetup."Activate Grace Period"
-  AlterationSetup."Grace Period Relates To"::START_DATE,
-  '',          // AlterationSetup."Grace Period Before",
-  '',          // AlterationSetup."Grace Period After",
-  AlterationSetup."Price Calculation"::UNIT_PRICE);
+            NewDescription,
+            AlterationSetup."Alteration Activate From"::ASAP,
+            '',          // AlterationSetup."Alteration Date Formula"
+            false,       // AlterationSetup."Activate Grace Period"
+            AlterationSetup."Grace Period Relates To"::START_DATE,
+            '',          // AlterationSetup."Grace Period Before",
+            '',          // AlterationSetup."Grace Period After",
+            AlterationSetup."Price Calculation"::UNIT_PRICE);
     end;
 
-    procedure SetupExtend(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text);
+    procedure SetupExtend(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text[100]);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
         CreateExtendSetup(CurrentMembershipCode, SalesItemNo,
-  NewDescription,
-  NewMembershipCode,
-  AlterationSetup."Alteration Activate From"::ASAP,
-  '',          // AlterationSetup."Alteration Date Formula"
-  false,       // AlterationSetup."Activate Grace Period"
-  AlterationSetup."Grace Period Relates To"::START_DATE,
-  '',          // AlterationSetup."Grace Period Before",
-  '',          // AlterationSetup."Grace Period After",
-  NewDuration, // AlterationSetup."Membership Duration"
-  AlterationSetup."Price Calculation"::UNIT_PRICE,
-  false);      // AlterationSetup."Stacking Allowed"
+            NewDescription,
+            NewMembershipCode,
+            AlterationSetup."Alteration Activate From"::ASAP,
+            '',          // AlterationSetup."Alteration Date Formula"
+            false,       // AlterationSetup."Activate Grace Period"
+            AlterationSetup."Grace Period Relates To"::START_DATE,
+            '',          // AlterationSetup."Grace Period Before",
+            '',          // AlterationSetup."Grace Period After",
+            NewDuration, // AlterationSetup."Membership Duration"
+            AlterationSetup."Price Calculation"::UNIT_PRICE,
+            false);      // AlterationSetup."Stacking Allowed"
     end;
 
-    procedure SetupMembership_Demo(CommunityCode: Code[20]; MembershipCode: Code[20]; LoyaltyCode: Code[20]; NewDescription: Text): Code[20];
+    procedure SetupMembership_Demo(CommunityCode: Code[20]; MembershipCode: Code[20]; LoyaltyCode: Code[20]; NewDescription: Text[50]): Code[20];
     var
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
 
         exit(CreateLoyaltyMembershipSetup(MembershipCode,
-  NewDescription,
-  CommunityCode,
-  MembershipSetup."Membership Type"::GROUP,
-  LoyaltyCode,
-  MembershipSetup."Loyalty Card"::YES,
-  MembershipSetup."Member Information"::NAMED,
-  false, // Perpetual
-  MembershipSetup."Member Role Assignment"::FIRST_IS_ADMIN,
-  2,
-  true,
-  true,
-  'MC-DEMO01'));
+            NewDescription,
+            CommunityCode,
+            MembershipSetup."Membership Type"::GROUP,
+            LoyaltyCode,
+            MembershipSetup."Loyalty Card"::YES,
+            MembershipSetup."Member Information"::NAMED,
+            false, // Perpetual
+            MembershipSetup."Member Role Assignment"::FIRST_IS_ADMIN,
+            2,
+            true,
+            true,
+            'MC-DEMO01'));
     end;
 
-    procedure SetupRenew_NoGraceNotStackable(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDescription: Text);
+    procedure SetupRenew_NoGraceNotStackable(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDescription: Text[100]);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
         CreateRenewSetup(CurrentMembershipCode, SalesItemNo,
-  NewDescription,
-  NewMembershipCode,
-  AlterationSetup."Alteration Activate From"::ASAP,
-  '',          // AlterationSetup."Alteration Date Formula"
-  false,       // AlterationSetup."Activate Grace Period"
-  AlterationSetup."Grace Period Relates To"::START_DATE,
-  '',          // AlterationSetup."Grace Period Before",
-  '',          // AlterationSetup."Grace Period After",
-  '<+1Y-1D>',  // AlterationSetup."Membership Duration"
-  AlterationSetup."Price Calculation"::UNIT_PRICE,
-  false);      // AlterationSetup."Stacking Allowed"
+            NewDescription,
+            NewMembershipCode,
+            AlterationSetup."Alteration Activate From"::ASAP,
+            '',          // AlterationSetup."Alteration Date Formula"
+            false,       // AlterationSetup."Activate Grace Period"
+            AlterationSetup."Grace Period Relates To"::START_DATE,
+            '',          // AlterationSetup."Grace Period Before",
+            '',          // AlterationSetup."Grace Period After",
+            '<+1Y-1D>',  // AlterationSetup."Membership Duration"
+            AlterationSetup."Price Calculation"::UNIT_PRICE,
+            false);      // AlterationSetup."Stacking Allowed"
     end;
 
     procedure SetupSimpleMembershipSalesItem(ItemNo: Code[20]; MembershipCode: Code[20]);
@@ -426,23 +426,23 @@
           '<+1Y-1D>');
     end;
 
-    procedure SetupUpgrade(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text);
+    procedure SetupUpgrade(CurrentMembershipCode: Code[20]; SalesItemNo: Code[20]; NewMembershipCode: Code[20]; NewDuration: Text[30]; NewDescription: Text[100]);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 
         CreateUpgradeSetup(CurrentMembershipCode, SalesItemNo,
-  NewDescription,
-  NewMembershipCode,
-  AlterationSetup."Alteration Activate From"::ASAP,
-  '',          // AlterationSetup."Alteration Date Formula"
-  false,       // AlterationSetup."Activate Grace Period"
-  AlterationSetup."Grace Period Relates To"::START_DATE,
-  '',          // AlterationSetup."Grace Period Before",
-  '',          // AlterationSetup."Grace Period After",
-  NewDuration, // AlterationSetup."Membership Duration"
-  AlterationSetup."Price Calculation"::UNIT_PRICE,
-  false);      // AlterationSetup."Stacking Allowed"
+            NewDescription,
+            NewMembershipCode,
+            AlterationSetup."Alteration Activate From"::ASAP,
+            '',          // AlterationSetup."Alteration Date Formula"
+            false,       // AlterationSetup."Activate Grace Period"
+            AlterationSetup."Grace Period Relates To"::START_DATE,
+            '',          // AlterationSetup."Grace Period Before",
+            '',          // AlterationSetup."Grace Period After",
+            NewDuration, // AlterationSetup."Membership Duration"
+            AlterationSetup."Price Calculation"::UNIT_PRICE,
+            false);      // AlterationSetup."Stacking Allowed"
     end;
 
     procedure SetupWalletNotification(NotificationCode: Code[10]; CommunityCode: Code[20]; MembershipCode: Code[20]; TriggerType: option CREATE,UPDATE);
@@ -472,10 +472,10 @@
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := AzureKeyVaultMgt.GetSecret('PassesServerBaseUrl');
+        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(AzureKeyVaultMgt.GetSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
-        MemberNotificationSetup."Pass Token" := AzureKeyVaultMgt.GetSecret('PassesToken');
+        MemberNotificationSetup."Pass Token" := CopyStr(AzureKeyVaultMgt.GetSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
         MemberNotificationSetup."Pass Type Code" := 'npmembership';
         MemberNotificationSetup."Include NP Pass" := true;
 
@@ -507,10 +507,10 @@
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := AzureKeyVaultMgt.GetSecret('PassesServerBaseUrl');
+        MemberNotificationSetup."NP Pass Server Base URL" := CopyStr(AzureKeyVaultMgt.GetSecret('PassesServerBaseUrl'), 1, MaxStrLen(MemberNotificationSetup."NP Pass Server Base URL"));
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
-        MemberNotificationSetup."Pass Token" := AzureKeyVaultMgt.GetSecret('PassesToken');
+        MemberNotificationSetup."Pass Token" := CopyStr(AzureKeyVaultMgt.GetSecret('PassesToken'), 1, MaxStrLen(MemberNotificationSetup."Pass Token"));
         MemberNotificationSetup."Pass Type Code" := 'npmembership';
         MemberNotificationSetup."Include NP Pass" := true;
 
@@ -604,7 +604,7 @@
     end;
 
 
-    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Option; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text; MembershipNoSeries: Code[20]; MemberNoSeries: Code[20]): Code[20];
+    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Option; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text[50]; MembershipNoSeries: Code[20]; MemberNoSeries: Code[20]): Code[20];
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
@@ -706,7 +706,7 @@
         exit(No);
     end;
 
-    local procedure CreateLoyaltyMembershipSetup(Code: Code[20]; Description: Text; CommunityCode: Code[20]; MembershipType: Option; LoyaltyCode: Code[20]; LoyaltyCard: Option; MemberInfo: Option; Perpetual: Boolean; RoleAssignment: Option; MemberCardinality: Integer; WelcomeNotification: Boolean; RenewNotification: Boolean; MemberCardNoSeries: Code[20]): Code[20];
+    local procedure CreateLoyaltyMembershipSetup(Code: Code[20]; Description: Text[50]; CommunityCode: Code[20]; MembershipType: Option; LoyaltyCode: Code[20]; LoyaltyCard: Option; MemberInfo: Option; Perpetual: Boolean; RoleAssignment: Option; MemberCardinality: Integer; WelcomeNotification: Boolean; RenewNotification: Boolean; MemberCardNoSeries: Code[20]): Code[20];
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
@@ -886,21 +886,21 @@
     begin
     end;
 
-    local procedure SetupCommunity_Demo(CommunityCode: Code[20]; NewDescription: Text): Code[20]
+    local procedure SetupCommunity_Demo(CommunityCode: Code[20]; NewDescription: Text[50]): Code[20]
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
 
         exit(CreateCommunitySetup(CommunityCode,
-  MemberCommunity."External No. Search Order"::CARDNO,
-  MemberCommunity."Member Unique Identity"::EMAIL,
-  MemberCommunity."Create Member UI Violation"::ERROR,
-  MemberCommunity."Member Logon Credentials"::MEMBER_UNIQUE_ID,
-  false,
-  true,
-  NewDescription,
-  'MS-DEMO01',
-  'MM-DEMO01'));
+                MemberCommunity."External No. Search Order"::CARDNO,
+                MemberCommunity."Member Unique Identity"::EMAIL,
+                MemberCommunity."Create Member UI Violation"::ERROR,
+                MemberCommunity."Member Logon Credentials"::MEMBER_UNIQUE_ID,
+                false,
+                true,
+                NewDescription,
+                'MS-DEMO01',
+                'MM-DEMO01'));
     end;
 
 
