@@ -81,11 +81,14 @@ table 6060134 "NPR MM Member Info Capture"
 
             trigger OnValidate()
             var
-                County: Text[50];
+                CountyTxt: Text[30];
+                CityTxt: Text[30];
                 PostCode: Record "Post Code";
                 CountryRegion: Record "Country/Region";
             begin
-                PostCode.ValidatePostCode(City, "Post Code Code", County, "Country Code", (CurrFieldNo <> 0) and GuiAllowed);
+                CityTxt := CopyStr(Rec.City, 1, MaxStrLen(CityTxt));
+                PostCode.ValidatePostCode(CityTxt, Rec."Post Code Code", CountyTxt, Rec."Country Code", (CurrFieldNo <> 0) and GuiAllowed);
+                Rec.City := CityTxt;
                 if (CountryRegion.Get(Rec."Country Code")) then
                     Rec.Country := CountryRegion.Name;
             end;
@@ -229,7 +232,7 @@ table 6060134 "NPR MM Member Info Capture"
             Caption = 'Contact No.';
             DataClassification = CustomerContent;
         }
-        field(200; "User Logon ID"; Code[50])
+        field(200; "User Logon ID"; Code[80])
         {
             Caption = 'User Logon ID';
             DataClassification = CustomerContent;

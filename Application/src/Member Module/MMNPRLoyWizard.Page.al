@@ -87,7 +87,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
 
                     end;
                 }
-                field(TenentName; TenentName)
+                field(TenentName; TenantName)
                 {
 
                     Caption = 'Tenant';
@@ -169,34 +169,25 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         CommunityCode: Code[20];
         FS_Prefix: Code[10];
         ServiceBaseURL: Text;
-        TenentName: Text;
-        ServiceUser: Text;
-        ServicePassword: Text;
+        TenantName: Text;
+        ServiceUser: Text[50];
+        ServicePassword: Text[30];
         GLAccount: Code[20];
         Description: Text;
-        LoyaltyAuth: Text;
-        LoyaltyCmpName: Text;
+        LoyaltyAuth: Text[40];
+        LoyaltyCmpName: Text[80];
         IsEditable: Boolean;
         MembershipCode: Code[10];
         EarnRatio: Decimal;
         BurnRation: Decimal;
 
     local procedure InitializeDefaults()
-    var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         PaymentMethodCode := 'MM-LOYALTY';
         CommunityCode := 'NPR-CC';
         FS_Prefix := 'NPR';
         GLAccount := '2345';
         Description := 'Membership Loyalty Program';
-
-        if (UserId = 'TSA') then begin
-            ServiceBaseURL := AzureKeyVaultMgt.GetSecret('MMLoyaltyServiceBaseUrl');
-            ServiceUser := AzureKeyVaultMgt.GetSecret('MMLoyaltyServiceUsername');
-            ServicePassword := AzureKeyVaultMgt.GetSecret('MMLoyaltyServicePassword');
-        end;
-
         BurnRation := 0.015;
         EarnRatio := 1;
     end;
@@ -209,7 +200,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         IsEditable := false;
     end;
 
-    procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vUsername: Text; var vPassword: Text; var vDescription: Text; var vAuthCode: Text; var vLoyaltyServerCompanyName: Text; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
+    procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vUsername: Text[50]; var vPassword: Text[30]; var vDescription: Text; var vAuthCode: Text[40]; var vLoyaltyServerCompanyName: Text[80]; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
     begin
 
         vCommunityCode := CommunityCode;
@@ -219,7 +210,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         vPaymentGLAccount := GLAccount;
 
         vBaseUrl := ServiceBaseURL;
-        vTenant := TenentName;
+        vTenant := TenantName;
         vUsername := ServiceUser;
         vPassword := ServicePassword;
 

@@ -8,12 +8,12 @@
         NO_MEMBER: Label 'No member/customer specified.';
         MULTIPLE_MEMBERSHIPS: Label 'Customer number %1 resolves to more than one membership. Before redeeming points for this customer, this issue needs to be corrected. One possible solution is to block the incorrect memberships for this customer.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('MM_MEMBER_LOYALTY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;
@@ -98,7 +98,7 @@
         if (FunctionId < 0) then
             FunctionId := 0;
 
-        MemberCardNumber := JSON.GetStringParameter('DefaultInputValue');
+        MemberCardNumber := CopyStr(JSON.GetStringParameter('DefaultInputValue'), 1, MaxStrLen(MemberCardNumber));
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -116,7 +116,7 @@
                         MemberCardNumber := CopyStr(GetInput(JSON, 'membercard_number'), 1, MaxStrLen(MemberCardNumber));
 
                     if (MemberCardNumber = '') then
-                        MemberCardNumber := POSSalesInfo."Scanned Card Data";
+                        MemberCardNumber := CopyStr(POSSalesInfo."Scanned Card Data", 1, MaxStrLen(MemberCardNumber));
 
                     case FunctionId of
                         0:

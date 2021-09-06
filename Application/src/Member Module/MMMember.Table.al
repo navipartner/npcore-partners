@@ -43,23 +43,23 @@ table 6060126 "NPR MM Member"
                 MembershipRole: Record "NPR MM Membership Role";
                 Contact: Record Contact;
             begin
-                "Blocked At" := CreateDateTime(0D, 0T);
-                "Blocked By" := '';
-                if (Blocked) then begin
-                    "Blocked At" := CurrentDateTime();
-                    "Blocked By" := UserId();
+                Rec."Blocked At" := CreateDateTime(0D, 0T);
+                Rec."Blocked By" := '';
+                if (Rec.Blocked) then begin
+                    Rec."Blocked At" := CurrentDateTime();
+                    Rec."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(Rec."Blocked By"));
                 end;
 
-                MembershipRole.SetFilter("Member Entry No.", '=%1', "Entry No.");
+                MembershipRole.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
                 MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
                 if (MembershipRole.FindSet()) then begin
                     repeat
                         // -MM1.41 [369123]
-                        MembershipRole.Validate(Blocked, Blocked);
+                        MembershipRole.Validate(Blocked, Rec.Blocked);
                         MembershipRole.Modify();
 
                         if (Contact.Get(MembershipRole."Contact No.")) then begin
-                            Contact.Validate("NPR Magento Contact", not Blocked);
+                            Contact.Validate("NPR Magento Contact", not Rec.Blocked);
                             Contact.Modify();
                         end;
                     until (MembershipRole.Next() = 0);
@@ -110,13 +110,16 @@ table 6060126 "NPR MM Member"
 
             trigger OnValidate()
             var
-                County: Text;
+                CountyTxt: Text[30];
+                CityTxt: Text[30];
                 PostCode: Record "Post Code";
                 CountryRegion: Record "Country/Region";
             begin
-                PostCode.ValidatePostCode(City, "Post Code Code", County, "Country Code", (CurrFieldNo <> 0) and GuiAllowed());
+                CityTxt := CopyStr(Rec.City, 1, MaxStrLen(CityTxt));
+                PostCode.ValidatePostCode(CityTxt, Rec."Post Code Code", CountyTxt, Rec."Country Code", (CurrFieldNo <> 0) and GuiAllowed());
+                Rec.City := CityTxt;
                 if (CountryRegion.Get("Country Code")) then
-                    Country := CountryRegion.Name;
+                    Rec.Country := CountryRegion.Name;
             end;
         }
         field(27; City; Text[50])
@@ -134,8 +137,8 @@ table 6060126 "NPR MM Member"
             var
                 CountryRegion: Record "Country/Region";
             begin
-                if (CountryRegion.Get("Country Code")) then
-                    Country := CountryRegion.Name;
+                if (CountryRegion.Get(Rec."Country Code")) then
+                    Rec.Country := CountryRegion.Name;
             end;
         }
         field(29; Country; Text[50])

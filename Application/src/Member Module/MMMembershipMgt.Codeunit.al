@@ -1742,7 +1742,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 if (EndDateCurrent <= MembershipEntry."Valid From Date") then begin
                     MembershipEntry.Blocked := true;
                     MembershipEntry."Blocked At" := CurrentDateTime();
-                    MembershipEntry."Blocked By" := UserId();
+                    MembershipEntry."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(MembershipEntry."Blocked By"));
                 end else begin
                     MembershipEntry."Valid Until Date" := EndDateCurrent;
                 end;
@@ -2727,7 +2727,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure GetCommunicationMethod_Welcome(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[200]; var Engine: Option): Boolean
+    procedure GetCommunicationMethod_Welcome(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2736,7 +2736,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure GetCommunicationMethod_Renew(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[200]; var Engine: Option): Boolean
+    procedure GetCommunicationMethod_Renew(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2745,7 +2745,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure GetCommunicationMethod_MemberCard(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[200]; var Engine: Option): Boolean
+    procedure GetCommunicationMethod_MemberCard(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2754,7 +2754,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure GetCommunicationMethod_Ticket(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[200]; var Engine: Option): Boolean
+    procedure GetCommunicationMethod_Ticket(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
@@ -2763,7 +2763,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure GetCommunicationMethodWorker(MemberEntryNo: Integer; MembershipEntryNo: Integer; MessageType: Option; var Method: Code[10]; var Address: Text[200]; var Engine: Option): Boolean
+    local procedure GetCommunicationMethodWorker(MemberEntryNo: Integer; MembershipEntryNo: Integer; MessageType: Option; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
         Member: Record "NPR MM Member";
@@ -3913,12 +3913,12 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
 
         CurrentMember.Copy(Member);
-
+#pragma warning disable AA0139
         Member."First Name" := DeleteCtrlChars(MemberInfoCapture."First Name");
         Member."Middle Name" := DeleteCtrlChars(MemberInfoCapture."Middle Name");
         Member."Last Name" := DeleteCtrlChars(MemberInfoCapture."Last Name");
         Member.Address := DeleteCtrlChars(MemberInfoCapture.Address);
-
+#pragma warning restore
         Member."Post Code Code" := MemberInfoCapture."Post Code Code";
         Member.City := MemberInfoCapture.City;
         Member."Country Code" := MemberInfoCapture."Country Code";
@@ -3949,8 +3949,9 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
 
         Member."E-Mail Address" := LowerCase(MemberInfoCapture."E-Mail Address");
+#pragma warning disable AA0139
         Member."E-Mail Address" := DeleteCtrlChars(Member."E-Mail Address");
-
+#pragma warning restore
         Member."Phone No." := MemberInfoCapture."Phone No.";
         Member."Social Security No." := MemberInfoCapture."Social Security No.";
         Member.Gender := MemberInfoCapture.Gender;
@@ -4086,7 +4087,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             Error(LOGIN_ID_EXIST, MembershipRole."User Logon ID", Member."External Member No.");
 
         MembershipRole."GDPR Agreement No." := MembershipSetup."GDPR Agreement No.";
-        MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        MembershipRole."GDPR Data Subject Id" := CreateDataSubjectId();
 
         if (MemberInfoCapture."Contact No." <> '') then begin
             if (not ValidateUseContactNo(Membership."Customer No.", MemberInfoCapture."Contact No.")) then begin
@@ -4154,7 +4155,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
                         if ((MembershipRole."GDPR Agreement No." <> MembershipSetup."GDPR Agreement No.") or (MembershipRole."GDPR Data Subject Id" = '')) then begin
                             MembershipRole."GDPR Agreement No." := MembershipSetup."GDPR Agreement No.";
                             if (MembershipRole."GDPR Data Subject Id" = '') then
-                                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+                                MembershipRole."GDPR Data Subject Id" := CreateDataSubjectId();
                             MembershipRole.Modify();
                         end;
 
@@ -4184,7 +4185,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
             if (MembershipSetup."GDPR Agreement No." <> '') then begin
                 MembershipRole."GDPR Agreement No." := MembershipSetup."GDPR Agreement No.";
-                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+                MembershipRole."GDPR Data Subject Id" := CreateDataSubjectId();
             end;
 
             MembershipRole."Created At" := CurrentDateTime;
@@ -4294,10 +4295,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure EncodeSHA1(Plain: Text): Text
+    local procedure EncodeSHA1(Plain: Text): Text[80]
     begin
-
-        exit(Plain);
+        // Should be obsoleted
+        exit(CopyStr(Plain, 1, 80));
     end;
 
     local procedure AssignExternalMembershipNo(CommunityCode: Code[20]) ExternalNo: Code[20]
@@ -4370,7 +4371,9 @@ codeunit 6060127 "NPR MM Membership Mgt."
             Error(PAN_TO_LONG, MaxStrLen(MemberInfoCapture."External Card No."), MembershipSetup."Card Number Pattern");
 
         MemberInfoCapture."External Card No." := PAN;
+#pragma warning disable AA0139
         MemberInfoCapture."External Card No. Last 4" := CopyStr(PAN, StrLen(PAN) - 4 + 1);
+#pragma warning restore
         MemberInfoCapture."Pin Code" := '1234';
 
         if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::DateFormula) then
@@ -4387,6 +4390,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
+#pragma warning disable AA0139
     procedure GenerateExtCardNo(GeneratePattern: Text[30]; ExternalMemberNo: Code[20]; ExternalMembershipNo: Code[20]; NumberSeries: Code[20]) ExtCardNo: Code[50]
     var
         PosStartClause: Integer;
@@ -4405,7 +4409,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         // Pattern example TEXT-[MA][N*5]-[N]
         // MA MemberAccount (external)
         // MS MemberShip (external)
-        // S Numberseries
+        // S Number Series
         // N random number (repeats * time)
         // A random char (repeats * time)
         // X random alpha numeric (repeats * time)
@@ -4468,29 +4472,30 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         end;
     end;
+#pragma warning restore
 
     local procedure GenerateRandom(Pattern: Code[2]) Random: Code[1]
     var
         Number: Integer;
-        Char: Char;
+        RandomCharacter: Code[1];
     begin
         Number := GetRandom(2);
         case Pattern of
             'N':
                 Random := Format(Number mod 10);
             'A':
-                Char := (Number mod 25) + 65;
+                RandomCharacter[1] := (Number mod 25) + 65;
             'X':
                 begin
                     if (GetRandom(2) mod 35) < 10 then
                         Random := Format(Number mod 10)
                     else
-                        Char := (Number mod 25) + 65;
+                        RandomCharacter[1] := (Number mod 25) + 65;
                 end;
         end;
 
         if (Random = '') then
-            exit(UpperCase(Format(Char)));
+            exit(RandomCharacter);
     end;
 
     local procedure GetRandom(Bytes: Integer) RandomInt: Integer
@@ -4498,7 +4503,9 @@ codeunit 6060127 "NPR MM Membership Mgt."
         i: Integer;
         RandomHexString: Code[50];
     begin
+#pragma warning disable AA0139
         RandomHexString := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+#pragma warning restore
         Bytes := Bytes mod StrLen(RandomHexString);
 
         RandomInt := 0;
@@ -4676,7 +4683,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         end;
     end;
 
-    procedure GetMembershipFromUserPassword(UserLogonId: Code[50]; Password: Text[50]) MembershipEntryNo: Integer
+    procedure GetMembershipFromUserPassword(UserLogonId: Code[80]; Password: Text[80]) MembershipEntryNo: Integer
     var
         MembershipRole: Record "NPR MM Membership Role";
         Membership: Record "NPR MM Membership";
@@ -4886,7 +4893,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure GetMemberFromExtMemberNo(ExternalMemberNo: Code[50]) MemberEntryNo: Integer
+    procedure GetMemberFromExtMemberNo(ExternalMemberNo: Code[20]) MemberEntryNo: Integer
     var
         Member: Record "NPR MM Member";
     begin
@@ -5080,7 +5087,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text[1024]; DocNoOfRecords: Integer): Integer
+    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin
 
         if (DocNoOfRecords = 0) then
@@ -5195,5 +5202,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MCSFaceServiceAPI.DetectIdentifyPicture(RecRef, MemberName, PictureStream);
     end;
 
-
+    local procedure CreateDataSubjectId(): Text[35]
+    begin
+#pragma warning disable AA0139
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+#pragma warning restore
+    end;
 }

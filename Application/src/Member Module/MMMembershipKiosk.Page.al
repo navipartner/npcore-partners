@@ -1,5 +1,8 @@
+#pragma warning disable AA0139
 page 6060078 "NPR MM Membership Kiosk"
 {
+
+    // This file should probably be deleted. /Tim
 
     // 
     // https://dev90.dynamics-retail.com/NPRetail90_W1_DEV_Latest/WebClient/?page=6060078&company=RetailDemo2016
@@ -319,3 +322,4 @@ page 6060078 "NPR MM Membership Kiosk"
     end;
 }
 
+#pragma warning restore

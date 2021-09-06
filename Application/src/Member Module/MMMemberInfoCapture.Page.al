@@ -930,7 +930,7 @@ page 6060134 "NPR MM Member Info Capture"
         GDPRMandatory: Boolean;
         GDPRSelected: Boolean;
         NAMEFIELD_TO_LONG: Label 'The maximum length for "%1", "%2" and "%3" when combined is %4. Current total length is %5.';
-        NPRAttrTextArray: array[40] of Text[250];
+        NPRAttrTextArray: array[40] of Text;
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;
