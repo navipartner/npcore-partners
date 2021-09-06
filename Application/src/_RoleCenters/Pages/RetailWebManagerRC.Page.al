@@ -46,7 +46,7 @@ page 6151244 "NPR Retail Web Manager RC"
             group("Magento Integration")
             {
                 Caption = 'Magento Integration';
-                action("MagentoSetup")
+                action(MagentoSetup)
                 {
                     Caption = 'Magento Setup';
                     Image = List;
@@ -242,7 +242,7 @@ page 6151244 "NPR Retail Web Manager RC"
             group("Magento Customers")
             {
                 Caption = 'Magento Customers';
-                action("Customer")
+                action(Customer)
                 {
                     Caption = 'Customers';
                     Image = List;
@@ -250,7 +250,7 @@ page 6151244 "NPR Retail Web Manager RC"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Customers action';
                 }
-                action("Contact")
+                action(Contact)
                 {
                     Caption = 'Contacts';
                     Image = List;
@@ -258,7 +258,7 @@ page 6151244 "NPR Retail Web Manager RC"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Contacts action';
                 }
-                action("CustomerMapping")
+                action(CustomerMapping)
                 {
                     Caption = 'Customer Mapping';
                     Image = List;
@@ -295,7 +295,7 @@ page 6151244 "NPR Retail Web Manager RC"
             group("Retail Vouchers")
             {
                 Caption = 'Retail Vouchers';
-                action("Vouchers")
+                action(Vouchers)
                 {
                     Caption = 'Vouchers';
                     Image = List;
@@ -336,7 +336,7 @@ page 6151244 "NPR Retail Web Manager RC"
                     ToolTip = 'Executes the Retail Voucher Partners action';
                 }
             }
-            group("NaviConnect")
+            group(NaviConnect)
             {
                 Caption = 'NaviConnect';
                 action("NaviConnect Setup")
@@ -403,7 +403,7 @@ page 6151244 "NPR Retail Web Manager RC"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Data Log Setup action';
                 }
-                action("TaskList")
+                action(TaskList)
                 {
                     Caption = 'Task List';
                     Image = List;
@@ -496,159 +496,11 @@ page 6151244 "NPR Retail Web Manager RC"
                     ToolTip = 'Executes the Collect Document Mapping action';
                 }
             }
-            group("Tickets")
-            {
-                Caption = 'Tickets';
 
-                action("Issued Tickets")
-                {
-                    Caption = 'Issued Tickets';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket List";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Issued Tickets action';
-                }
-                action("Ticket Requests")
-                {
-                    Caption = 'Ticket Requests';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Request";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Requests action';
-                }
-                action("Offline Ticket Validation")
-                {
-                    Caption = 'Offline Ticket Validation';
-                    Image = List;
-                    RunObject = page "NPR TM Offline Ticket Valid.";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Offline Ticket Validation action';
-                }
-                action("ImportLists")
-                {
-                    Caption = 'Import List';
-                    Image = List;
-                    RunObject = page "NPR Nc Import List";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Import List action';
-                }
-                action("Ticket Access Statistics Matrix")
-                {
-                    Caption = 'Ticket Access Statistics Matrix';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Acc. Stat. Mtrx";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Access Statistics Matrix action';
-                }
-                action("Sales Ticket Statistics")
-                {
-                    Caption = 'Sales Ticket Statistics';
-                    Image = List;
-                    RunObject = page "NPR Sales Ticket Statistics";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Sales Ticket Statistics action';
-                }
-                action("Issued/Admitted Ticket Statistics")
-                {
-                    Caption = 'Issued/Admitted Ticket Statistics';
-                    Image = List;
-                    RunObject = report "NPR Issued/Admit. Ticket Stats";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Issued/Admitted Ticket Statistics action';
-                }
-                action("Ticket Access Entry List")
-                {
-                    Caption = 'Ticket Access Entry List';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket AccessEntry List";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Access Entry List action';
-                }
-                action("Ticket Access Facts")
-                {
-                    Caption = 'Ticket Access Facts';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Access Facts";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Access Facts action';
-                }
-                action("Ticket Access Statistics")
-                {
-                    Caption = 'Ticket Access Statistics';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Access Stats";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Access Statistics action';
-                }
-                action("Visiting Report")
-                {
-                    Caption = 'Visiting Report';
-                    Image = List;
-                    RunObject = report "NPR TM Visiting Report";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Visiting Report action';
-                }
-                action("Admission Forecast Matrix")
-                {
-                    Caption = 'Admission Forecast Matrix';
-                    Image = List;
-                    RunObject = page "NPR TM Admis. Forecast Matrix";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Admission Forecast Matrix action';
-                }
-                action("Ticket Setup Wizard")
-                {
-                    Caption = 'Ticket Setup Wizard';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Wizard";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Setup Wizard action';
-                }
-                action("Ticket Type")
-                {
-                    Caption = 'Ticket Type';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Type";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Type action';
-                }
-                action("Ticket Admission BOM")
-                {
-                    Caption = 'Ticket Admission BOM';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket BOM";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Admission BOM action';
-                }
-                action("Ticket Schedules")
-                {
-                    Caption = 'Ticket Schedules';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Schedules";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Schedules action';
-                }
-                action("Ticket Admissions")
-                {
-                    Caption = 'Ticket Admissions';
-                    Image = List;
-                    RunObject = page "NPR TM Ticket Admissions";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Admissions action';
-                }
-                action("Ticket Admission Object Schedules")
-                {
-                    Caption = 'Ticket Admission Object Schedules';
-                    Image = List;
-                    RunObject = page "NPR TM Admis. Schedule Lines";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Executes the Ticket Admission Object Schedules action';
-                }
-            }
-            group("Membership")
+            group(Membership)
             {
                 Caption = 'Membership';
-                action("Members")
+                action(Members)
                 {
                     Caption = 'Members';
                     Image = List;
@@ -656,7 +508,7 @@ page 6151244 "NPR Retail Web Manager RC"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Executes the Members action';
                 }
-                action("Memberships")
+                action(Memberships)
                 {
                     Caption = 'Memberships';
                     Image = List;
@@ -796,7 +648,7 @@ page 6151244 "NPR Retail Web Manager RC"
             group("Discount Coupons")
             {
                 Caption = 'Discount Coupons';
-                action("Coupons")
+                action(Coupons)
                 {
                     Caption = 'Coupons';
                     Image = List;
