@@ -12,7 +12,7 @@ codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
     procedure OnPageOpen(var vMembershipBurndownSetup: Record "NPR RC Members. Burndown Setup")
     begin
         if not vMembershipBurndownSetup.Get(UserId) then begin
-            vMembershipBurndownSetup."User ID" := UserId;
+            vMembershipBurndownSetup."User ID" := CopyStr(UserId(), 1, MaxStrLen(vMembershipBurndownSetup."User ID"));
             vMembershipBurndownSetup."Use Work Date as Base" := true;
             vMembershipBurndownSetup."Period Length" := vMembershipBurndownSetup."Period Length"::Month;
             vMembershipBurndownSetup."Value to Calculate" := vMembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_COUNT;

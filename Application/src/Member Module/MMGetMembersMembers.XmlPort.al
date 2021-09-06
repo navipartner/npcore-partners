@@ -189,7 +189,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
         tmpMemberInfoResponse.DeleteAll();
     end;
 
-    procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[50])
+    procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[100])
     var
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";

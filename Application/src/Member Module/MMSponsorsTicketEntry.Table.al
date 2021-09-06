@@ -36,7 +36,7 @@ table 6151186 "NPR MM Sponsors. Ticket Entry"
             Caption = 'Ticket Token';
             DataClassification = CustomerContent;
         }
-        field(11; "Ticket No."; Code[20])
+        field(11; "Ticket No."; Code[30])
         {
             Caption = 'Ticket No.';
             DataClassification = CustomerContent;

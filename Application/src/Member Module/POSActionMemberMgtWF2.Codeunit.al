@@ -3,12 +3,12 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     var
         MemberSelectionMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('MM_MEMBERMGMT_WF2');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -168,13 +168,13 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         LogEntryNo: Integer;
         ResponseCode: Integer;
         FrontEndInputMethod: Option;
-        ExternalMemberCardNo: Text;
+        ExternalMemberCardNo: Text[100];
         ItemDescription: Text;
         ResponseMessage: Text;
         PlaceHolderLbl: Label '%1/%2', Locked = true;
     begin
 
-        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
         FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
@@ -223,9 +223,9 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         FrontEndInputMethod: Option;
-        ExternalMemberCardNo: Text;
+        ExternalMemberCardNo: Text[100];
     begin
-        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
         FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
@@ -251,13 +251,13 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         FrontEndInputMethod: Option;
-        ExternalMemberCardNo: Text;
+        ExternalMemberCardNo: Text[100];
         LookupProperties: JsonObject;
         MembershipEntries: JsonArray;
         MEMBERSHIP_ENTRIES: Label 'Membership Entries.';
         MembershipEntriesJsonText: Text;
     begin
-        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
         FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, false);
@@ -292,12 +292,12 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
-        ExternalMemberCardNo: Text;
+        ExternalMemberCardNo: Text[100];
         ExecutingMembershipAlterationErr: Label 'executing membership alteration';
     begin
-        ItemNo := Context.GetStringOrFail('itemNumber', ExecutingMembershipAlterationErr);
+        ItemNo := CopyStr(Context.GetStringOrFail('itemNumber', ExecutingMembershipAlterationErr), 1, MaxStrLen(ItemNo));
 
-        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
         GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         case AlterationType of
@@ -324,7 +324,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
         MemberInfoCapture.Modify();
 
-        AddItemToPOS(POSSession, MemberInfoEntryNo, ItemNo, MembershipAlterationSetup.Description, ExternalMemberCardNo, 1, MemberInfoCapture."Unit Price", SaleLinePOS);
+        AddItemToPOS(POSSession, MemberInfoEntryNo, ItemNo, MembershipAlterationSetup.Description, CopyStr(ExternalMemberCardNo, 1, 80), 1, MemberInfoCapture."Unit Price", SaleLinePOS);
 
     end;
 
@@ -384,10 +384,10 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     procedure ShowMember(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        ExternalMemberCardNo: Text;
+        ExternalMemberCardNo: Text[100];
         FrontEndInputMethod: Option;
     begin
-        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
         FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         if ((FrontEndInputMethod = MemberSelectionMethod::NO_PROMPT) and (ExternalMemberCardNo = '')) then
@@ -418,13 +418,11 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         RENEW_NOT_VALID: Label 'There are no valid renewal products for this membership at this time.';
         UPGRADE_NOT_VALID: Label 'There are no valid upgrade products for this membership at this time.';
         UPGRADE_OPTION: Label 'Upgrade options...';
-
-        ExternalMemberCardNo: Text;
-
+        ExternalMemberCardNo: Text[100];
     begin
         FunctionId := Context.GetIntegerParameter('Function');
 
-        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
         GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         MembershipAlterationSetup.setfilter("From Membership Code", '=%1', Membership."Membership Code");
@@ -457,7 +455,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     end;
 
-    local procedure GetMembershipFromCardNumberWithUI(InputMethod: option; var ExternalMemberCardNo: Text; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean)
+    local procedure GetMembershipFromCardNumberWithUI(InputMethod: option; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean)
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -486,7 +484,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
             Error(MEMBERSHIP_BLOCKED_NOT_FOUND, ExternalMemberCardNo);
     end;
 
-    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
+    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[100]): Boolean
     var
         Membership: Record "NPR MM Membership";
         POSSalesInfo: Record "NPR MM POS Sales Info";

@@ -59,7 +59,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyStoreLedger.TransferFields(TmpAuthorizationIn, false);
         LoyaltyStoreLedger."Entry No." := 0;
         LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RECEIPT;
-        LoyaltyStoreLedger."Authorization Code" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        LoyaltyStoreLedger."Authorization Code" := CreateAuthorizationCode();
 
         // Store the details in the points entry ledgers
         TmpSaleLinesIn.Reset();
@@ -121,7 +121,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyStoreLedger.TransferFields(TmpAuthorizationIn, false);
         LoyaltyStoreLedger."Entry No." := 0;
         LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RESERVE;
-        LoyaltyStoreLedger."Authorization Code" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        LoyaltyStoreLedger."Authorization Code" := CreateAuthorizationCode();
 
         // Store the details in the points entry ledger
         TmpReserveLinesIn.Reset();
@@ -894,5 +894,11 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyLedgerEntry."Burned Points" := BurnPoints * -1;
         LoyaltyLedgerEntry.Insert();
     end;
+#pragma warning disable AA0139
+    local procedure CreateAuthorizationCode(): Text[40]
+    begin
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+    end;
+#pragma warning restore
 }
 

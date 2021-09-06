@@ -932,7 +932,7 @@ page 6060136 "NPR MM Member Card"
         CONFIRM_PRINT: Label 'Do you want to print a member account card for %1?';
         CONFIRM_PRINT_FMT: Label '[%1] - %2';
         ACTIVATE_MEMBERSHIP: Label 'The membership has not been activated yet. Do you want to activate it now?';
-        NPRAttrTextArray: array[40] of Text[250];
+        NPRAttrTextArray: array[40] of Text;
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;

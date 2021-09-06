@@ -59,7 +59,7 @@ codeunit 6060128 "NPR MM Member WebService"
         exit(Success = 0);
     end;
 
-    procedure MemberCardRegisterArrival(ExternalMemberCardNo: Code[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var MessageText: Text) IsRegistered: Boolean
+    procedure MemberCardRegisterArrival(ExternalMemberCardNo: Code[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var MessageText: Text) IsRegistered: Boolean
     var
         Member: Record "NPR MM Member";
         MembershipMgr: Codeunit "NPR MM Membership Mgt.";
@@ -92,7 +92,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetMembershipTicketList', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Membership.SetDestination(OutStr);
@@ -139,7 +139,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetMembershipChangeItemsList', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Membership.SetDestination(OutStr);
@@ -195,7 +195,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('CreateMembership', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         membership.SetDestination(OutStr);
@@ -242,7 +242,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('AddMembershipMember', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         member.SetDestination(OutStr);
@@ -288,7 +288,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('AddAnonymousMember', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         AnonymousMember.SetDestination(OutStr);
@@ -326,7 +326,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('ChangeMembership', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         membership.SetDestination(OutStr);
@@ -366,7 +366,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetMembership', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         membership.SetDestination(OutStr);
@@ -412,7 +412,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetMembershipMembers', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         member.SetDestination(OutStr);
@@ -459,7 +459,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('UpdateMember', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         member.SetDestination(OutStr);
@@ -525,7 +525,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('BlockMembership', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         member.SetDestination(OutStr);
@@ -572,7 +572,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('BlockMember', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         member.SetDestination(OutStr);
@@ -617,7 +617,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetMembershipRoles', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         roles.SetDestination(OutStr);
@@ -658,7 +658,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('SetGDPRApproval', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         gdpr.SetDestination(OutStr);
@@ -698,7 +698,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('ConfirmMembershipPayment', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         ConfirmMembershipPayment.SetDestination(OutStr);
@@ -743,7 +743,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('RegretMembership', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Membership.SetDestination(OutStr);
@@ -820,7 +820,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('CreateWalletMemberPass', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         CreateMemberPass.SetDestination(OutStr);
@@ -932,7 +932,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetSetMemberComOption', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetSetMemberComOptions.SetDestination(OutStr);
@@ -1008,7 +1008,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetMembershipAutoRenewProduct', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Membership.SetDestination(OutStr);
@@ -1051,7 +1051,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('ConfirmAutoRenewPayment', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Membership.SetDestination(OutStr);
@@ -1093,7 +1093,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         InsertImportEntry('GetSetAutoRenewOption', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetSetAutoRenew.SetDestination(OutStr);
@@ -1291,6 +1291,11 @@ codeunit 6060128 "NPR MM Member WebService"
 
         exit('');
     end;
-
+#pragma warning disable AA0139
+    local procedure CreateDocumentId(): Text[50]
+    begin
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+    end;
+#pragma warning restore
 }
 

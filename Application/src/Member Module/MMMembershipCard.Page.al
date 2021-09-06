@@ -816,7 +816,7 @@ page 6060137 "NPR MM Membership Card"
         NeedsActivation: Boolean;
         NOT_ACTIVATED: Label 'Not activated';
         ADD_MEMBER_SETUP: Label 'Could not find %1 with %2 set to option %3 for %4 %5. Additional members can''t be added until setup is completed.';
-        NPRAttrTextArray: array[40] of Text[250];
+        NPRAttrTextArray: array[40] of Text;
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;

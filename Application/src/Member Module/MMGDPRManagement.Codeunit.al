@@ -237,7 +237,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
 #pragma warning disable AA0240
-        DummyEMailAddressLbl: Label 'anonymous%1@nowhere.com', Locked = true;
+        DummyEMailAddressLbl: Label 'anonymous%1@unknown-domain.com', Locked = true;
 #pragma warning restore
     begin
 
@@ -264,7 +264,7 @@ codeunit 6151121 "NPR MM GDPR Management"
 
         Member.Blocked := true;
         Member."Blocked At" := CurrentDateTime();
-        Member."Blocked By" := UserId;
+        Member."Blocked By" := GetUserId();
         Member."Block Reason" := Member."Block Reason"::ANONYMIZED;
 
         Member.Modify(true);
@@ -275,7 +275,7 @@ codeunit 6151121 "NPR MM GDPR Management"
             repeat
                 MemberCard.Blocked := true;
                 MemberCard."Blocked At" := CurrentDateTime();
-                MemberCard."Blocked By" := UserId;
+                MemberCard."Blocked By" := GetUserId();
                 MemberCard."Block Reason" := MemberCard."Block Reason"::ANONYMIZED;
                 MemberCard.Modify();
             until (MemberCard.Next() = 0);
@@ -289,7 +289,7 @@ codeunit 6151121 "NPR MM GDPR Management"
 
         MembershipRole.Blocked := true;
         MembershipRole."Blocked At" := CurrentDateTime();
-        MembershipRole."Blocked By" := UserId;
+        MembershipRole."Blocked By" := GetUserId();
         MembershipRole."Block Reason" := MembershipRole."Block Reason"::ANONYMIZED;
 
         MembershipRole."User Logon ID" := '--------';
@@ -323,7 +323,7 @@ codeunit 6151121 "NPR MM GDPR Management"
 
         Membership.Blocked := true;
         Membership."Blocked At" := CurrentDateTime();
-        Membership."Blocked By" := UserId;
+        Membership."Blocked By" := GetUserId();
         Membership."Block Reason" := Membership."Block Reason"::ANONYMIZED;
 
         Membership.Modify(true); // This will cause a customer sync.
@@ -450,7 +450,7 @@ codeunit 6151121 "NPR MM GDPR Management"
 
             MembershipRole."GDPR Agreement No." := GDPRAgreementNo;
             if (MembershipRole."GDPR Data Subject Id" = '') then
-                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+                MembershipRole."GDPR Data Subject Id" := CreateSubjectId();
             MembershipRole.Modify();
         end;
 
@@ -488,7 +488,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         if ((MembershipRole."GDPR Agreement No." <> MembershipSetup."GDPR Agreement No.") or (MembershipRole."GDPR Data Subject Id" = '')) then begin
             MembershipRole."GDPR Agreement No." := GDPRAgreementNo;
             if (MembershipRole."GDPR Data Subject Id" = '') then
-                MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+                MembershipRole."GDPR Data Subject Id" := CreateSubjectId();
             MembershipRole.Modify();
         end;
 
@@ -502,5 +502,18 @@ codeunit 6151121 "NPR MM GDPR Management"
 
         end;
     end;
+
+    local procedure CreateSubjectId(): Code[35]
+    begin
+#pragma warning disable AA0139
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+#pragma warning restore
+    end;
+
+    local procedure GetUserId(): Code[30]
+    begin
+        exit(CopyStr(UserId, 1, 30));
+    end;
+
 }
 

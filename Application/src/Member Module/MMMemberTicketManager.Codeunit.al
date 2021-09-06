@@ -154,7 +154,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Token: Code[100];
         MembershipEntryNo: Integer;
         MemberEntryNo: Integer;
-        ReusedToken: Text;
+        ReusedToken: Text[100];
         PlaceHolderLbl: Label '%1 [%2;%3]', Locked = true;
     begin
 

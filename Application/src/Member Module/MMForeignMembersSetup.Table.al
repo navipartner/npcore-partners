@@ -76,7 +76,7 @@ table 6060143 "NPR MM Foreign Members. Setup"
         if ("Community Code" <> '') then begin
             ForeignMembershipSetup.Get('', "Manager Code");
             Description := ForeignMembershipSetup.Description;
-            "Append Local Prefix" := "Community Code" + '-';
+            "Append Local Prefix" := CopyStr("Community Code", 1, MaxStrLen("Append Local Prefix") - 1) + '-';
         end;
     end;
 

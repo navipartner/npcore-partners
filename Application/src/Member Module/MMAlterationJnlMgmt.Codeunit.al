@@ -15,6 +15,8 @@ codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
         NOT_FOUND: Label '%1 %2 was not found.';
 
     procedure AlterMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        ReasonText: Text;
     begin
 
         if (MemberInfoCapture."Source Type" <> MemberInfoCapture."Source Type"::ALTERATION_JNL) then
@@ -26,17 +28,19 @@ codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
             MemberInfoCapture."Response Status"::REGISTERED:
                 begin
                     MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::FAILED;
-                    if (CheckAlteration(MemberInfoCapture."Entry No.", RequestUserConfirmation, MemberInfoCapture."Response Message")) then
+
+                    if (CheckAlteration(MemberInfoCapture."Entry No.", RequestUserConfirmation, ReasonText)) then
                         MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::READY;
                 end;
 
             MemberInfoCapture."Response Status"::READY:
                 begin
                     MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::FAILED;
-                    if (ExecuteAlteration(MemberInfoCapture."Entry No.", RequestUserConfirmation, MemberInfoCapture."Response Message")) then
+                    if (ExecuteAlteration(MemberInfoCapture."Entry No.", RequestUserConfirmation, ReasonText)) then
                         MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::COMPLETED;
                 end;
         end;
+        MemberInfoCapture."Response Message" := CopyStr(ReasonText, 1, MaxStrLen(MemberInfoCapture."Response Message"));
     end;
 
     local procedure ExecuteAlteration(MemberInfoCaptureEntryNo: Integer; WithConfirm: Boolean; var ReasonMessage: Text): Boolean

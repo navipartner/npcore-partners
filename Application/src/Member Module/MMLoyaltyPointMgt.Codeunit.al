@@ -34,7 +34,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         end;
 
-        CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY, ItemJournalLine."NPR Register Number");
+        CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY, CopyStr(ItemJournalLine."NPR Register Number", 1, 10));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterInsertMembershipEntry', '', true, true)]

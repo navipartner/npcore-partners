@@ -46,7 +46,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             exit;
 
         MemberArrivalLogEntry."Response Code" := MessageCode;
-        MemberArrivalLogEntry."Response Message" := MessageText;
+        MemberArrivalLogEntry."Response Message" := CopyStr(MessageText, 1, MaxStrLen(MemberArrivalLogEntry."Response Message"));
         if (MessageCode = 0) then
             MemberArrivalLogEntry."Response Type" := MemberArrivalLogEntry."Response Type"::SUCCESS else
             MemberArrivalLogEntry."Response Type" := MemberArrivalLogEntry."Response Type"::ACCESS_DENIED;

@@ -191,7 +191,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         TmpTransactionAuthorization."Foreign Transaction Id" := EFTTransactionRequest.Token;
         TmpTransactionAuthorization."Transaction Date" := EFTTransactionRequest."Transaction Date";
         TmpTransactionAuthorization."Transaction Time" := EFTTransactionRequest."Transaction Time";
-        TmpTransactionAuthorization."Company Name" := DATABASE.CompanyName;
+        TmpTransactionAuthorization."Company Name" := CopyStr(DATABASE.CompanyName, 1, MaxStrLen(TmpTransactionAuthorization."Company Name"));
         TmpTransactionAuthorization.Insert();
     end;
 
@@ -256,7 +256,10 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
                         TempRegisterPaymentLines.Type := TempRegisterPaymentLines.Type::REFUND;
                 end;
                 TempRegisterPaymentLines.Description := EFTTransactionRequest2."POS Description";
+#pragma warning disable AA0139
+                // This should blow up if the Authorization number does not fit.
                 TempRegisterPaymentLines."Authorization Code" := EFTTransactionRequest2."Authorisation Number";
+#pragma warning restore
                 TempRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
                 TempRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
                 TempRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
@@ -308,7 +311,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         PointsNode: XmlNode;
         ResponseMessageNode: XmlNode;
         OStream: OutStream;
-        ResponseCode: Code[20];
+        ResponseCode: Text;
         ResponseMessage: Text;
         MessageCode: Text;
         AuthorizationCode: Text;
@@ -342,7 +345,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'AuthorizationNumber', false);
         NewBalance := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'NewPointBalance', false);
 
-        EFTTransactionRequest.Successful := (ResponseCode = 'OK');
+        EFTTransactionRequest.Successful := (UpperCase(ResponseCode) = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
         EFTTransactionRequest.Modify();
         Commit();
@@ -368,7 +371,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         Element: XmlElement;
         PointsNode: XmlNode;
         ResponseMessageNode: XmlNode;
-        ResponseCode: Code[20];
+        ResponseCode: Text;
         ResponseMessage: Text;
         MessageCode: Text;
         AuthorizationCode: Text;
@@ -402,7 +405,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'ReferenceNumber', false);
         AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'AuthorizationNumber', false);
 
-        EFTTransactionRequest.Successful := (ResponseCode = 'OK');
+        EFTTransactionRequest.Successful := (UpperCase(ResponseCode) = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
         EFTTransactionRequest.Modify();
         Commit();
@@ -456,8 +459,11 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
             EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Input" * POSPaymentMethod."Fixed Rate" / 100;
             EFTTransactionRequest."Amount Output" := EFTTransactionRequest."Amount Input";
+#pragma warning disable AA0139
+            // This should blow up if there is spill overflow
             EFTTransactionRequest."Authorisation Number" := AuthorizationCode;
             EFTTransactionRequest."Reference Number Output" := ReferenceNumber;
+#pragma warning restore
         end;
 
         EFTTransactionRequest.Finished := CurrentDateTime();
@@ -761,7 +767,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
         CardInfo := POSSalesInfo.FindFirst();
         if (CardInfo) then begin
-            EFTTransactionRequest."Card Number" := POSSalesInfo."Scanned Card Data";
+            EFTTransactionRequest."Card Number" := CopyStr(POSSalesInfo."Scanned Card Data", 1, MaxStrLen(EFTTransactionRequest."Card Number"));
             EFTTransactionRequest."Track Presence Input" := EFTTransactionRequest."Track Presence Input"::"Manually Entered";
 
             if (not Membership.Get(POSSalesInfo."Membership Entry No.")) then
@@ -838,7 +844,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest."Entry No." := 0;
 
         EFTTransactionRequest.Token := CreateGuid();
-        EFTTransactionRequest."User ID" := UserId();
+        EFTTransactionRequest."User ID" := CopyStr(UserId(), 1, MaxStrLen(EFTTransactionRequest."User ID"));
         EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
         EFTTransactionRequest."Auxiliary Operation ID" := 1;
         EFTTransactionRequest."Auxiliary Operation Desc." := 'Register Receipt';

@@ -56,7 +56,7 @@
             if (MembershipAutoRenew."Started At" = CreateDateTime(0D, 0T)) then
                 MembershipAutoRenew."Started At" := CurrentDateTime();
 
-            MembershipAutoRenew."Started By" := UserId();
+            MembershipAutoRenew."Started By" := CopyStr(UserId(), 1, MaxStrLen(MembershipAutoRenew."Started By"));
             MembershipAutoRenew.Modify();
             Commit();
 

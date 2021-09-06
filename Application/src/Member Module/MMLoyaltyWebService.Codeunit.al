@@ -20,7 +20,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyPoints', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyPoints.SetDestination(OutStr);
@@ -61,7 +61,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyPointEntries', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyStatement.SetDestination(OutStr);
@@ -103,7 +103,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyReceiptList', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyReceiptList.SetDestination(OutStr);
@@ -196,7 +196,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('RegisterSale', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
         ImportEntry.Modify(true);
         Commit();
 
@@ -248,7 +248,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('ReservePoints', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
         ImportEntry.Modify(true);
         Commit();
 
@@ -299,7 +299,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyConfiguration', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
         ImportEntry.Modify(true);
         Commit();
 
@@ -352,8 +352,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('LoyaltyCouponEligibility', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
-        ImportEntry.Imported := false;
+        ImportEntry."Document ID" := CreateDocumentId();
         ImportEntry."Runtime Error" := true;
         ImportEntry.Modify(true);
         Commit();
@@ -414,7 +413,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('LoyaltyCreateCoupon', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         ImportEntry."Import Started at" := CurrentDateTime;
@@ -493,7 +492,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('LoyaltyListCoupon', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         ImportEntry."Import Started at" := CurrentDateTime();
@@ -574,7 +573,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('LoyaltyDeleteCoupon', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry."Document ID" := CreateDocumentId();
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         ImportEntry."Import Started at" := CurrentDateTime();
@@ -720,5 +719,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         exit('');
     end;
+
+#pragma warning disable AA0139
+    local procedure CreateDocumentId(): Text[50]
+    begin
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+    end;
+#pragma warning restore
 }
 

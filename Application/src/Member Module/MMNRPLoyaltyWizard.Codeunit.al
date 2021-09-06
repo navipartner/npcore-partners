@@ -19,14 +19,14 @@
         MembershipCode: Code[20];
         BaseUrl: Text;
         TenantName: Text;
-        UserName: Text;
-        Password: Text;
+        UserName: Text[50];
+        Password: Text[30];
         Prefix: Code[10];
         PaymentTypeCode: Code[10];
         GL_Account: Code[20];
         Description: Text;
-        AuthCode: Text;
-        LoyaltyCompanyName: Text;
+        AuthCode: Text[40];
+        LoyaltyCompanyName: Text[80];
         LoyaltyCode: Code[20];
         BurnFactor: Decimal;
         EarnFactor: Decimal;
@@ -179,7 +179,7 @@
         exit(PaymentTypeCode);
     end;
 
-    local procedure CreateEndpoints(CommunityCode: Code[20]; EndpointCode: Code[10]; BaseUrl: Text; ServiceType: Integer; Username: Text[50]; Password: Text[50]; TenantName: Text)
+    local procedure CreateEndpoints(CommunityCode: Code[20]; EndpointCode: Code[10]; BaseUrl: Text; ServiceType: Integer; Username: Text[50]; Password: Text[30]; TenantName: Text)
     var
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
         CreateEndpointsLbl: Label 'NPR %1', Locked = true;
@@ -232,15 +232,15 @@
         EFTSetup.Insert();
     end;
 
-    local procedure CreateStoreSetup(CommunityCode: Code[20]; AuthorizationCode: Text; CompanyName: Text; LoyaltyCode: Code[20]; PaymentTypeCode: Code[10])
+    local procedure CreateStoreSetup(CommunityCode: Code[20]; AuthorizationCode: Text[40]; CompanyName: Text[80]; LoyaltyCode: Code[20]; PaymentTypeCode: Code[10])
     var
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         POSStore: Record "NPR POS Store";
-        FromCompany: Text;
+        FromCompany: Text[80];
         CreateStoreSetupLbl: Label '%1-L', Locked = true;
     begin
 
-        FromCompany := DATABASE.CompanyName;
+        FromCompany := CopyStr(DATABASE.CompanyName, 1, MaxStrLen(FromCompany));
 
         if (POSStore.FindSet()) then begin
             repeat
@@ -271,7 +271,7 @@
                         LoyaltyStoreSetup.Insert();
                     end;
 
-                    LoyaltyStoreSetup.Description := POSStore.Name;
+                    LoyaltyStoreSetup.Description := CopyStr(POSStore.Name, 1, MaxStrLen(LoyaltyStoreSetup.Description));
                     LoyaltyStoreSetup."Authorization Code" := AuthorizationCode;
                     LoyaltyStoreSetup.Modify();
                 end;

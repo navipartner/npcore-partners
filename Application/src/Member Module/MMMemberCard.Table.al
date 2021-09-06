@@ -51,11 +51,11 @@ table 6060131 "NPR MM Member Card"
 
             trigger OnValidate()
             begin
-                "Blocked At" := CreateDateTime(0D, 0T);
-                "Blocked By" := '';
-                if (Blocked) then begin
-                    "Blocked At" := CurrentDateTime();
-                    "Blocked By" := UserId;
+                Rec."Blocked At" := CreateDateTime(0D, 0T);
+                Rec."Blocked By" := '';
+                if (Rec.Blocked) then begin
+                    Rec."Blocked At" := CurrentDateTime();
+                    Rec."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(Rec."Blocked By"));
                 end;
             end;
         }

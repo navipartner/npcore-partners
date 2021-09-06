@@ -10,12 +10,12 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('MM_MEMBER_ARRIVAL');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;
@@ -103,13 +103,13 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        AdmissionCode := JSON.GetStringParameter('AdmissionCode');
+        AdmissionCode := CopyStr(JSON.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.GetBooleanParameterOrFail('ConfirmMember', ActionCode());
 
         if (DefaultInputValue <> '') then
-            MemberCardNumber := DefaultInputValue;
+            MemberCardNumber := CopyStr(DefaultInputValue, 1, MaxStrLen(MemberCardNumber));
 
         if (WorkflowStep = '9') then
             MemberArrival(POSSession, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode);

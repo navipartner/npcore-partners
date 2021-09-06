@@ -22,12 +22,12 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         MembershipEvents: Codeunit "NPR MM Membership Events";
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('MM_MEMBERMGT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.5');
     end;
@@ -577,7 +577,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberCard: Record "NPR MM Member Card";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberEntryNo: Integer;
-        ExternalMemberCardNo: Text;
+        ExternalMemberCardNo: Text[100];
     begin
 
         if (ExternalMemberNo = '') then
@@ -594,12 +594,12 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     end;
 
-    procedure AssignMembershipToPOSSale(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
+    procedure AssignMembershipToPOSSale(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[100]): Boolean
     begin
         exit(AssignMembershipToPOSWorker(SalePOS, MembershipEntryNo, ExternalMemberCardNo));
     end;
 
-    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[200]): Boolean
+    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[100]): Boolean
     var
         Membership: Record "NPR MM Membership";
         POSSalesInfo: Record "NPR MM POS Sales Info";

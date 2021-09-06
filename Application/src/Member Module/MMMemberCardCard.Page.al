@@ -34,7 +34,9 @@ page 6060133 "NPR MM Member Card Card"
 
                         Rec."External Card No. Last 4" := '';
                         if (StrLen(Rec."External Card No.") >= 4) then
+#pragma warning disable AA0139
                             Rec."External Card No. Last 4" := CopyStr(Rec."External Card No.", StrLen(Rec."External Card No.") - 3);
+#pragma warning restore
 
                     end;
                 }

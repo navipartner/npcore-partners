@@ -36,15 +36,15 @@ table 6060128 "NPR MM Membership Role"
                 MembershipRole: Record "NPR MM Membership Role";
                 MembershipManagement: Codeunit "NPR MM Membership Mgt.";
             begin
-                "Blocked At" := CreateDateTime(0D, 0T);
-                "Blocked By" := '';
-                if (Blocked) then begin
-                    "Blocked At" := CurrentDateTime();
-                    "Blocked By" := UserId;
+                Rec."Blocked At" := CreateDateTime(0D, 0T);
+                Rec."Blocked By" := '';
+                if (Rec.Blocked) then begin
+                    Rec."Blocked At" := CurrentDateTime();
+                    Rec."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(Rec."Blocked By"));
                 end;
 
                 if (Contact.Get(MembershipRole."Contact No.")) then begin
-                    Contact.Validate("NPR Magento Contact", not Blocked);
+                    Contact.Validate("NPR Magento Contact", not Rec.Blocked);
                     Contact.Modify();
                 end;
 

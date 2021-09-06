@@ -9,13 +9,13 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
     var
         ActionDescription: Label 'This action provides access to backend manangement function for the member module.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
 
         exit('MM_MEMBER_BACKEND');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.2');
@@ -58,7 +58,7 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ItemNumber := JSON.GetStringParameterOrFail('MembershipSalesSetupItemNumber', ActionCode());
+        ItemNumber := CopyStr(JSON.GetStringParameterOrFail('MembershipSalesSetupItemNumber', ActionCode()), 1, MaxStrLen(ItemNumber));
         CreateMembership(ItemNumber);
     end;
 
