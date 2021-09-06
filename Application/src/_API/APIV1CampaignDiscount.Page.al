@@ -32,10 +32,6 @@ page 6014470 "NPR APIV1 - Campaign Discount"
                 {
                     Caption = 'blockCustomDisc', Locked = true;
                 }
-                field(comment; Rec.Comment)
-                {
-                    Caption = 'comment', Locked = true;
-                }
                 field(createdDate; Rec."Created Date")
                 {
                     Caption = 'createdDate', Locked = true;
