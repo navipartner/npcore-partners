@@ -509,6 +509,19 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             NextLinkURI := SelectJsonToken(JTokenMainObject.AsObject(), '$.[''@odata.nextLink'']', true); // get NextLink if there is a next page                                                                                                
     end;
 
+    procedure GetImageHash(var TempBlob: Codeunit "Temp Blob"): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        Crypto: Codeunit "Cryptography Management";
+        IStr: InStream;
+    begin
+        IF NOT TempBlob.HasValue() then
+            exit('');
+
+        TempBlob.CreateInStream(IStr);
+        Exit(Crypto.GenerateHash(Base64Convert.ToBase64(IStr), 2));
+    end;
+
     procedure CheckFieldValue(RecRef: RecordRef; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean) ValueChanged: Boolean
     var
         FRef: FieldRef;
@@ -524,6 +537,8 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         GenericDT2: DateTime;
         GenericTime: Time;
         GenericTime2: Time;
+        GenericDateFormula: DateFormula;
+        GenericDateFormula2: DateFormula;
     begin
         FRef := RecRef.Field(FieldNo);
 
@@ -568,6 +583,15 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
                     IF evaluate(GenericTime2, SourceTxt, 9) then
                         If GenericTime <> GenericTime2 then begin
                             FRef.Value(GenericTime2);
+                            ValueChanged := true;
+                        end;
+                end;
+            'dateformula':
+                begin
+                    GenericDateFormula := FRef.Value;
+                    IF evaluate(GenericDateFormula2, SourceTxt, 9) then
+                        If GenericDateFormula <> GenericDateFormula2 then begin
+                            FRef.Value(GenericDateFormula2);
                             ValueChanged := true;
                         end;
                 end;

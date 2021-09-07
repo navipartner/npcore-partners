@@ -4,7 +4,7 @@ page 6014544 "NPR API V1 - Price Lists"
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    Caption = 'apiV1PriceLists';
+    Caption = 'Price Lists';
     DelayedInsert = true;
     EntityName = 'priceList';
     EntitySetName = 'priceLists';

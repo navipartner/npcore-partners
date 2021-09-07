@@ -92,6 +92,22 @@ codeunit 6150700 "NPR POS Session"
         Initialized := true;
     end;
 
+    procedure Constructor(SetupIn: Codeunit "NPR POS Setup"; SessionIn: Codeunit "NPR POS Session")
+    begin
+        // for POS Sales created via API we do not use FrontEnd part, but need to create and use a POS Session for reusing existing code
+        if not Initialized then begin
+            Setup := SetupIn;
+            This := SessionIn;
+
+            Setup.Initialize();
+
+        end else begin
+            Message(Text001);
+        end;
+
+        Initialized := true;
+    end;
+
     procedure InitializeUI()
     var
         Salesperson: Record "Salesperson/Purchaser";
@@ -184,6 +200,13 @@ codeunit 6150700 "NPR POS Session"
         SessionStarted := true;
     end;
 
+    procedure StartPOSSessionWS()
+    begin
+        // for POS Sales created via Web Service API we do not use FrontEnd part, but need to create and use POS Session for reusing existing code
+        InitializePOSSession();
+        SessionStarted := true;
+    end;
+
     local procedure InitializePOSSession()
     begin
         Clear(Sale);
@@ -271,10 +294,24 @@ codeunit 6150700 "NPR POS Session"
         Sale.InitializeNewSale(POSUnit, FrontEnd, Setup, Sale);
     end;
 
+    procedure StartTransactionWS()
+    begin
+        // for POS Sales created via Web Service API we do not use FrontEnd part, but need to create and use POS Session for reusing existing code
+        Clear(Sale);
+        Sale.InitializeNewWSSale(POSUnit, Setup, Sale);
+    end;
+
     procedure ResumeTransaction(SalePOS: Record "NPR POS Sale")
     begin
         Clear(Sale);
         Sale.ResumeExistingSale(SalePOS, POSUnit, FrontEnd, Setup, Sale);
+    end;
+
+    procedure ResumeTransactionWS(SalePOS: Record "NPR POS Sale")
+    begin
+        // for POS Sales created via Web Service API we do not use FrontEnd part, but need to create and use POS Session for reusing existing code
+        Clear(Sale);
+        Sale.ResumeExistingWSSale(SalePOS, POSUnit, Setup, Sale);
     end;
 
     procedure BeginAction("Action": Text): Guid

@@ -15,6 +15,8 @@ codeunit 6150707 "NPR POS Payment Line"
         MinAmountLimit: Label 'Minimum payment amount for %1 is %2.';
         InvalidAmount: Label 'Amount %1 is not valid for payment type %2';
 
+        UsePresetLineNo: Boolean;
+
     procedure Init(RegisterNoIn: Code[20]; SalesTicketNoIn: Code[20]; SaleIn: Codeunit "NPR POS Sale"; SetupIn: Codeunit "NPR POS Setup"; FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
         Clear(Rec);
@@ -129,7 +131,9 @@ codeunit 6150707 "NPR POS Payment Line"
         Rec.Init();
         Rec."Register No." := Sale."Register No.";
         Rec."Sales Ticket No." := Sale."Sales Ticket No.";
-        Rec."Line No." := GetNextLineNo();
+
+        if not (UsePresetLineNo and (Rec."Line No." <> 0)) then
+            Rec."Line No." := GetNextLineNo();
     end;
 
     procedure GetNextLineNo() NextLineNo: Integer
@@ -163,6 +167,9 @@ codeunit 6150707 "NPR POS Payment Line"
     begin
 
         ValidatePaymentLine(Line);
+
+        if UsePresetLineNo then
+            Rec."Line No." := Line."Line No.";
 
         InitLine();
         Rec.TransferFields(Line, false);
@@ -366,6 +373,11 @@ codeunit 6150707 "NPR POS Payment Line"
             POSPaymentMethod.TestField("Allow Refund");
 
         POSPaymentMethod.TestField("Block POS Payment", false);
+    end;
+
+    procedure SetUsePresetLineNo(Set: Boolean)
+    begin
+        UsePresetLineNo := Set;
     end;
 
     [IntegrationEvent(false, false)]
