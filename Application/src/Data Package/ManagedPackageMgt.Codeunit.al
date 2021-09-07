@@ -49,26 +49,22 @@ codeunit 6014628 "NPR Managed Package Mgt."
 
     procedure ImportFromFile()
     var
-        FileMgt: Codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
         JObject: JsonObject;
         JToken: JsonToken;
         InStr: InStream;
-        JSON: Text;
+        FileName: Text;
         Handled: Boolean;
         PrimaryPackageTable: Integer;
+        JsonFileTypeDesciptionLbl: Label 'Json File %1', Comment = '%1 - json file mask';
+        JsonFileTypeMaskLbl: Label '(*.json)|*.json', Locked = true;
     begin
-        if FileMgt.BLOBImportWithFilter(TempBlob, Caption_SelectPackage, '', 'JSON File (*.json)|*.json', 'json') = '' then
+        if not UploadIntoStream(Caption_SelectPackage, '', StrSubstNo(JsonFileTypeDesciptionLbl, JsonFileTypeMaskLbl), FileName, InStr) then
             exit;
 
-        TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
-
-        InStr.Read(JSON);
-        JObject.ReadFrom(JSON);
+        JObject.ReadFrom(InStr);
         JObject.Get('Primary Package Table', JToken);
         PrimaryPackageTable := JToken.AsValue().AsInteger();
         JObject.Get('Data', JToken);
-
 
         OnLoadPackage(Handled, PrimaryPackageTable, JToken, 0);
         if Handled then
