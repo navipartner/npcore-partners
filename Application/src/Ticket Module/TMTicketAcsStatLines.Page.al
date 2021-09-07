@@ -216,16 +216,16 @@
         MatrixRecords: array[12] of Record "Dimension Code Buffer";
         MATRIX_ColumnTempRec: Record "Dimension Code Buffer";
         MATRIX_MaxNoOfMatrixColumn: Integer;
-        MATRIX_CellData: array[12] of Text[80];
+        MATRIX_CellData: array[12] of Text;
         MATRIX_CaptionSet: array[32] of Text[80];
-        LINE_Total: Text[80];
+        LINE_Total: Text;
         TicketAdmissionStatisticsMgr: Codeunit "NPR TM Ticket Access Stats";
         TicketStatisticsFilter: Record "NPR TM Ticket Access Stats";
-        TicketDrilldownFilter: Record "NPR TM Ticket Access Stats";
+        TicketDrillDownFilter: Record "NPR TM Ticket Access Stats";
         TicketFactLineFilter: Record "NPR TM Ticket Access Fact";
         LineFactOption: Option ITEM,TICKET_TYPE,ADMISSION_DATE,ADMISSION_HOUR,PERIOD,ADMISSION_CODE,VARIANT_CODE;
         ColumnFactOption: Option ITEM,TICKET_TYPE,ADMISSION_DATE,ADMISSION_HOUR,PERIOD,ADMISSION_CODE,VARIANT_CODE;
-        PeriodFilter: Text[1024];
+        PeriodFilter: Text;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
         PeriodInitialized: Boolean;
         InternalDateFilter: Text[30];
@@ -242,22 +242,22 @@
 
     local procedure MATRIX_OnDrillDown(MATRIX_ColumnOrdinal: Integer)
     var
-        MatrixPeriod: Text[30];
+        MatrixPeriod: Text;
     begin
         MATRIX_ColumnTempRec := MatrixRecords[MATRIX_ColumnOrdinal];
 
         if (ColumnFactOption = ColumnFactOption::PERIOD) then begin
-            MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
+            MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatrixPeriod('', Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
 
         end else
             if (LineFactOption = LineFactOption::PERIOD) then begin
-                MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(Rec."Period Start"), PeriodType, 0);
+                MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatrixPeriod('', Format(Rec."Period Start"), PeriodType, 0);
 
             end;
 
-        TicketAdmissionStatisticsMgr.StatisticsDrilldown(LineFactOption, Rec.Code,
+        TicketAdmissionStatisticsMgr.StatisticsDrillDown(LineFactOption, Rec.Code,
                 ColumnFactOption, MATRIX_ColumnTempRec.Code, true,
-                TicketDrilldownFilter, MatrixPeriod);
+                TicketDrillDownFilter, MatrixPeriod);
     end;
 
     local procedure MATRIX_OnAfterGetRecord(MATRIX_NumberOfColumns: Integer)
@@ -329,13 +329,13 @@
         TicketStatisticsFilter.SetFilter("Admission Code Filter", AdmissionCodeFactFilter);
         TicketStatisticsFilter.SetFilter("Variant Code Filter", VariantCodeFactFilter);
 
-        TicketDrilldownFilter.Reset();
-        TicketDrilldownFilter.SetFilter("Item No.", ItemFactFilter);
-        TicketDrilldownFilter.SetFilter("Ticket Type", TicketTypeFactFilter);
-        TicketDrilldownFilter.SetFilter("Admission Date", DateFactFilter);
-        TicketDrilldownFilter.SetFilter("Admission Hour", HourFactFilter);
-        TicketDrilldownFilter.SetFilter("Admission Code", AdmissionCodeFactFilter);
-        TicketDrilldownFilter.SetFilter("Variant Code", VariantCodeFactFilter);
+        TicketDrillDownFilter.Reset();
+        TicketDrillDownFilter.SetFilter("Item No.", ItemFactFilter);
+        TicketDrillDownFilter.SetFilter("Ticket Type", TicketTypeFactFilter);
+        TicketDrillDownFilter.SetFilter("Admission Date", DateFactFilter);
+        TicketDrillDownFilter.SetFilter("Admission Hour", HourFactFilter);
+        TicketDrillDownFilter.SetFilter("Admission Code", AdmissionCodeFactFilter);
+        TicketDrillDownFilter.SetFilter("Variant Code", VariantCodeFactFilter);
 
         HideLinesWithZeroAdmitted := pHideLinesWithZeroAdmitted;
     end;
@@ -354,9 +354,9 @@
         exit(newFilter);
     end;
 
-    procedure DisplayCellValue(FormatOption: Option A,B,C,D; ColumnOrdinal: Integer; IncludeColumns: Boolean) CellValue: Text[30]
+    procedure DisplayCellValue(FormatOption: Option A,B,C,D; ColumnOrdinal: Integer; IncludeColumns: Boolean) CellValue: Text
     var
-        MatrixPeriod: Text[30];
+        MatrixPeriod: Text;
     begin
         MATRIX_ColumnTempRec.Init();
         if (IncludeColumns) then
@@ -365,13 +365,13 @@
         MatrixPeriod := DateFactFilter;
 
         if (ColumnFactOption = ColumnFactOption::PERIOD) then begin
-            MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
+            MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatrixPeriod('', Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
             if (not IncludeColumns) then
                 MatrixPeriod := DateFactFilter;
 
         end else
             if (LineFactOption = LineFactOption::PERIOD) then begin
-                MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(Rec."Period Start"), PeriodType, 0);
+                MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatrixPeriod('', Format(Rec."Period Start"), PeriodType, 0);
 
             end;
 

@@ -555,7 +555,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
 
     local procedure GetNextSplitFraction(var CsvString: Text; MaxNodeCount: Integer) Fraction: Decimal
     var
-        NewSplitText: Code[10];
+        NewSplitText: Text;
         NewSplitNumber: Decimal;
     begin
 
@@ -649,7 +649,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
         exit(GetInheritedUnitPice(SeatingTemplate."Parent Entry No."));
     end;
 
-    local procedure NextField(var VarLineOfText: Text[1024]): Text[1024]
+    local procedure NextField(var VarLineOfText: Text): Text
     begin
 
         exit(ForwardTokenizer(VarLineOfText, ';', '"'));
@@ -658,7 +658,7 @@ codeunit 6151130 "NPR TM Seating Mgt."
     local procedure ForwardTokenizer(var vText: Text; pSeparator: Char; pQuote: Char) rField: Text
     var
         IsQuoted: Boolean;
-        InputText: Text[1024];
+        InputText: Text;
         NextFieldPos: Integer;
         IsNextField: Boolean;
         NextByte: Text[1];

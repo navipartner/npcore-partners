@@ -46,6 +46,7 @@ page 6060063 "NPR MM Membership Rapid Pckg."
                         TempRetailList.Insert();
                     end;
 
+                    Commit();
                     RetailListPage.LookupMode(true);
                     RetailListPage.SetRec(TempRetailList);
                     if RetailListPage.RunModal() <> Action::LookupOK then

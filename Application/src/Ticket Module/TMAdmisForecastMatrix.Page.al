@@ -166,8 +166,8 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
         PagePeriodOption: Option ACTUAL,DAY,WEEK,MONTH,QUARTER,YEAR;
         MATRIX_MatrixRecords: array[32] of Record "NPR TM Admis. Schedule Entry";
         MATRIX_CaptionSet: array[32] of Text[80];
-        MATRIX_CaptionRange: Text[250];
-        MATRIX_PrimKeyFirstCaptionInCu: Text[80];
+        MATRIX_CaptionRange: Text;
+        MATRIX_PrimKeyFirstCaptionInCu: Text;
         MATRIX_CurrentNoOfColumns: Integer;
         MATRIX_Step: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn;
         AdmSchEntry: Record "NPR TM Admis. Schedule Entry";

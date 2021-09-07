@@ -1,11 +1,5 @@
 codeunit 6060109 "NPR TM Offline Ticket Valid."
 {
-    // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
-    // TM1.24/TSA /20170807 CASE 286185 Added handling default handling for emptpy fields
-    // TM1.40/TSA /20190318 CASE 348952 Fixed an issue when selecting an incorrect time
-    // TM1.40/TSA /20190318 CASE 348952 Fixed an issue when ticket has more than one admission object
-    // TM90.1.46/TSA /20200127 CASE 376136 Close a possible reservation when registering offline admission
-
 
     trigger OnRun()
     begin
@@ -80,7 +74,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
             exit(true);
         end;
 
-        //-TM1.24 [286185]
         if (OfflineTicketValidation."Admission Code" = '') then begin
             TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
             TicketAdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
@@ -123,8 +116,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
             exit(true);
         end;
 
-
-        //-TM90.1.46 [376136] - Get Reservation Time / restructured
         repeat
 
             if (GetInitialEntry(Ticket."No.", AccessEntry."Admission Code", ExternalEntryNo)) then
@@ -142,7 +133,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
                 OfflineTicketValidation."Event Time" := Time;
                 OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
             end;
-            //+TM90.1.46 [376136]
 
             ScheduleEntryNo := GetInternalScheduleEntryNo(AccessEntry."Admission Code", OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
 
@@ -179,12 +169,10 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         TicketReservationRequest.SetFilter("Entry No.", '=%1', TicketReservationRequest2."Entry No.");
         TicketReservationRequest.FindFirst();
 
-
         TicketOfflineValidation.SetCurrentKey("Import Reference No.");
         if (TicketOfflineValidation.FindLast()) then;
         ImportBatchNo := TicketOfflineValidation."Import Reference No." + 1;
 
-        //-TM1.40 [348952]
         TicketReservationRequest2.FindSet();
         repeat
             // All tickets in the ticket request must relate to same schedules entry time request.
@@ -200,7 +188,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
                     EventStartTime := AdmissionScheduleEntry."Admission Start Time";
                 end;
             end;
-            //+TM1.40 [348952]
 
             // The link to ticket is only on the first request
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
@@ -215,20 +202,15 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
                     // TicketOfflineValidation."Member Reference Type" :=
                     // TicketOfflineValidation."Member Reference No."
 
-                    //-TM1.40 [348952]
                     //TicketOfflineValidation."Admission Code" := '';
                     TicketOfflineValidation."Admission Code" := TicketReservationRequest2."Admission Code";
-                    //+TM1.40 [348952]
-
 
                     TicketOfflineValidation."Event Type" := TicketOfflineValidation."Event Type"::ADMIT;
 
-                    //-TM1.40 [348952]
                     // TicketOfflineValidation."Event Date" := Today();
                     // TicketOfflineValidation."Event Time" := TIME;
                     TicketOfflineValidation."Event Date" := EventStartDate;
                     TicketOfflineValidation."Event Time" := EventStartTime;
-                    //+TM1.40 [348952]
 
                     TicketOfflineValidation."Imported At" := CurrentDateTime;
                     TicketOfflineValidation."Import Reference Name" := TicketReservationRequest."Session Token ID";
@@ -238,9 +220,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
                 until (Ticket.Next() = 0);
             end;
 
-        //-TM1.40 [348952]
         until (TicketReservationRequest2.Next() = 0);
-        //+TM1.40 [348952]
 
         exit(ImportBatchNo);
     end;
@@ -271,13 +251,12 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         AdmittedTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         AdmittedTicketAccessEntry.Open := true;
         AdmittedTicketAccessEntry."Created Datetime" := CreateDateTime(pDate, pTime);
-        AdmittedTicketAccessEntry."User ID" := UserId;
-        AdmittedTicketAccessEntry."Scanner Station ID" := StrSubstNo(StationIdLbl, CurrentDateTime);
+        AdmittedTicketAccessEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(AdmittedTicketAccessEntry."User ID"));
+        AdmittedTicketAccessEntry."Scanner Station ID" := StrSubstNo(StationIdLbl, CurrentDateTime());
         AdmittedTicketAccessEntry.Insert();
 
-        //-TM90.1.46 [376136]
         CloseReservationEntry(AdmittedTicketAccessEntry);
-        //+TM90.1.46 [376136]
+
     end;
 
     local procedure CloseReservationEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean
@@ -285,9 +264,8 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
-        //-TM90.1.46 [376136]
         exit(CloseTicketAccessEntry(ClosedByAccessEntry, DetailedTicketAccessEntry.Type::RESERVATION));
-        //+TM90.1.46 [376136]
+
     end;
 
     local procedure CloseTicketAccessEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; ClosingEntryType: Option) Closed: Boolean
@@ -295,7 +273,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
-        //-TM90.1.46 [376136]
         DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
         DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', ClosedByAccessEntry."Ticket Access Entry No.");
         DetailedTicketAccessEntry.SetFilter(Type, '=%1', ClosingEntryType);
@@ -314,7 +291,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
             ClosedByAccessEntry."External Adm. Sch. Entry No." := DetailedTicketAccessEntry."External Adm. Sch. Entry No.";
 
         exit(Closed);
-        //+TM90.1.46 [376136]
+
     end;
 
     procedure GetInternalScheduleEntryNo(AdmissionCode: Code[20]; ArrivalDate: Date; ArrivalTime: Time): Integer
@@ -339,7 +316,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
-        //-TM90.1.46 [376136]
         if (AdmissionCode = '') then
             exit(false);
 
@@ -358,7 +334,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
 
         ExternalReservationEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
         exit(true);
-        //+TM90.1.46 [376136]
+
     end;
 
     local procedure SetReservationTime(ExternalAdmSchEntryNo: Integer; ForceUpdate: Boolean; var OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.")
@@ -367,7 +343,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         RespLbl: Label '%1 %2', Locked = true;
     begin
 
-        //-TM90.1.46 [376136]
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalAdmSchEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not AdmissionScheduleEntry.FindLast()) then
@@ -383,7 +358,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
             OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", RESERVATION_TIME);
         end;
 
-        //+TM90.1.46 [376136]
     end;
 
     local procedure GetInitialEntry(TicketNo: Code[20]; AdmissionCode: Code[20]; var ExternalAdmissionEntryNo: Integer): Boolean
@@ -392,7 +366,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
-        //-TM90.1.46 [376136]
         if (AdmissionCode = '') then
             exit(false);
 
@@ -411,7 +384,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
 
         ExternalAdmissionEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
         exit(true);
-        //+TM90.1.46 [376136]
+
     end;
 
     local procedure SetInitialTime(ExternalAdmSchEntryNo: Integer; ForceUpdate: Boolean; var OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.")
@@ -420,7 +393,6 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         RespLbl: Label '%1 %2', Locked = true;
     begin
 
-        //-TM90.1.46 [376136]
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalAdmSchEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not AdmissionScheduleEntry.FindLast()) then
@@ -436,7 +408,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
             OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
         end;
 
-        //+TM90.1.46 [376136]
     end;
 }
+
 

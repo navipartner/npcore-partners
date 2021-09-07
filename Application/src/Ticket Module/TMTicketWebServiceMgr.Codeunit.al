@@ -148,7 +148,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             ReservationNodeList.Get(NReservation, Node);
             Reservation := Node.AsXmlElement();
 
-            Token := NpXmlDomMgt.GetXmlText(Reservation, 'ticket_token', MaxStrLen(Token), true);
+            Token := GetXmlText100(Reservation, 'ticket_token', MaxStrLen(Token), true);
             PreConfirmReservationRequest(Token);
         end;
     end;
@@ -223,10 +223,10 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             ReservationNodeList.Get(NReservation, Node);
             Reservation := Node.AsXmlElement();
 
-            Token := NpXmlDomMgt.GetXmlText(Reservation, 'ticket_token', MaxStrLen(Token), true);
+            Token := GetXmlText100(Reservation, 'ticket_token', MaxStrLen(Token), true);
             TicketRequestManager.SetReservationRequestExtraInfo(Token,
-              NpXmlDomMgt.GetXmlText(Reservation, 'send_notification_to', 80, false),
-              NpXmlDomMgt.GetXmlText(Reservation, 'external_order_no', 80, false));
+              GetXmlText80(Reservation, 'send_notification_to', 80, false),
+              GetXmlText20(Reservation, 'external_order_no', 20, false));
 
             // Response is updated with a soft fail message if confirm fails.
             TicketRequestManager.ConfirmReservationRequest(Token, ResponseMessage);
@@ -254,7 +254,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             ReservationNodeList.Get(NReservation, Node);
             Reservation := Node.AsXmlElement();
 
-            Token := NpXmlDomMgt.GetXmlText(Reservation, 'ticket_token', MaxStrLen(Token), true);
+            Token := GetXmlText100(Reservation, 'ticket_token', MaxStrLen(Token), true);
             TicketRequestManager.DeleteReservationTokenRequest(Token);
         end;
 
@@ -426,8 +426,8 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         if (not NpXmlDomMgt.FindNode(Element.AsXmlNode(), 'ChangeReservation', Node)) then
             exit;
 
-        TicketNumber := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'Request/TicketNumber', MaxStrLen(TicketNumber), true);
-        PinCode := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'Request/PinCode', MaxStrLen(PinCode), true);
+        TicketNumber := GetXmlText30(Node.AsXmlElement(), 'Request/TicketNumber', MaxStrLen(TicketNumber), true);
+        PinCode := GetXmlText10(Node.AsXmlElement(), 'Request/PinCode', MaxStrLen(PinCode), true);
 
         if (not TicketRequestManager.CreateChangeRequest(TicketNumber, PinCode, DocumentID, ResponseMessage)) then
             Error(ResponseMessage);
@@ -472,7 +472,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         if (not NpXmlDomMgt.FindNode(Element.AsXmlNode(), 'ConfirmChangeReservation', Node)) then
             exit;
 
-        ChangeRequestToken := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'Request/ChangeRequestToken', MaxStrLen(ChangeRequestToken), true);
+        ChangeRequestToken := GetXmlText100(Node.AsXmlElement(), 'Request/ChangeRequestToken', MaxStrLen(ChangeRequestToken), true);
         if (not TicketRequestManager.TokenRequestExists(ChangeRequestToken)) then
             exit;
 
@@ -659,7 +659,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ExternalItemType: Integer;
-        WaitingListOptInAddress: Text[200];
+        WaitingListOptInAddress: Text[100];
     begin
 
         Initialize();
@@ -719,7 +719,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
     end;
 
-    local procedure ApplyAttributes(Token: Text[50]; AdmissionCode: Code[20]; AttributeCode: Code[20]; AttributeValue: Text)
+    local procedure ApplyAttributes(Token: Text[50]; AdmissionCode: Code[20]; AttributeCode: Code[20]; AttributeValue: Text[250])
     var
         NPRAttribute: Record "NPR Attribute";
         NPRAttributeID: Record "NPR Attribute ID";
@@ -779,5 +779,33 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         exit(ImportType."Webservice Function");
     end;
+
+#pragma warning disable AA0139
+    local procedure GetXmlText10(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[10]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText20(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[20]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText30(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[30]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText80(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[80]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+
+    local procedure GetXmlText100(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[100]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+    end;
+#pragma warning restore
+
 }
 

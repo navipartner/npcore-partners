@@ -2,7 +2,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 {
     var
         Text6059776: Label 'This value must be an integer between 1 and 4.';
-        RandomHexString: Text[100];
+
         UNSUPPORTED_VALIDATION_METHOD: Label 'Unsupported Ticket Entry Validation Method.';
         INVALID_REFERENCE: Label 'Invalid %1 %2';
         REFERENCE: Label 'reference';
@@ -1016,7 +1016,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         DetTicketAccessEntry.Open := false;
         DetTicketAccessEntry."Sales Channel No." := ItemNo;
         DetTicketAccessEntry."Created Datetime" := CurrentDateTime;
-        DetTicketAccessEntry."User ID" := UserId();
+        DetTicketAccessEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(DetTicketAccessEntry."User ID"));
         DetTicketAccessEntry.Insert();
 
         exit(true);
@@ -1386,6 +1386,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         Itt: Integer;
         PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
+#pragma warning disable AA0139
         if (GeneratePattern = '') then
             exit('');
 
@@ -1442,37 +1443,38 @@ codeunit 6059784 "NPR TM Ticket Management"
                 GeneratePattern := '';
 
         end;
-
+#pragma warning restore
     end;
 
     local procedure GenerateRandom(Pattern: Code[2]) Random: Code[1]
     var
         Number: Integer;
-        Char: Char;
+        RandomCharacter: Code[1];
     begin
         Number := GetRandom(2);
         case Pattern of
             'N':
                 Random := Format(Number mod 10);
             'A':
-                Char := (Number mod 25) + 65;
-            'X', 'AN':
+                RandomCharacter[1] := (Number mod 25) + 65;
+            'X':
                 begin
                     if (GetRandom(2) mod 35) < 10 then
                         Random := Format(Number mod 10)
                     else
-                        Char := (Number mod 25) + 65;
+                        RandomCharacter[1] := (Number mod 25) + 65;
                 end;
         end;
 
         if (Random = '') then
-            exit(UpperCase(Format(Char)));
+            exit(RandomCharacter);
     end;
 
     local procedure GetRandom(Bytes: Integer) RandomInt: Integer
     var
         RandomHexStringLen: Integer;
         i: Integer;
+        RandomHexString: Text[100];
     begin
         if (not (Bytes in [1 .. 4])) then
             Error(Text6059776);
@@ -1519,7 +1521,9 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (RandomHexStringLen = Bytes) then
             RandomHexString := ''
         else
+#pragma warning disable AA0139
             RandomHexString := CopyStr(RandomHexString, Bytes + 1);
+#pragma warning restore
     end;
 
     local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer)
@@ -1869,7 +1873,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(0);
     end;
 
-    local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[20]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean): Boolean
+    local procedure GetAdmScheduleEntry(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; AdmissionDate: Date; AdmissionTime: Time; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry"; WithCreate: Boolean): Boolean
     var
         Admission: Record "NPR TM Admission";
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
@@ -2538,7 +2542,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                 TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
                 TempCustomizedCalendarChange."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
                 TempCustomizedCalendarChange."Date" := AdmissionDate;
-                TempCustomizedCalendarChange.Description := CalendarDesc;
+                TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
                 TempCustomizedCalendarChange."Source Code" := AdmissionCode;
                 TempCustomizedCalendarChange.Insert();
 
@@ -2552,7 +2556,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                     TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
                     TempCustomizedCalendarChange."Base Calendar Code" := TicketBOM."Ticket Base Calendar Code";
                     TempCustomizedCalendarChange."Date" := AdmissionDate;
-                    TempCustomizedCalendarChange.Description := CalendarDesc;
+                    TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
                     TempCustomizedCalendarChange."Source Code" := AdmissionCode;
                     TempCustomizedCalendarChange."Additional Source Code" := ItemNo;
                     TempCustomizedCalendarChange.Insert();
@@ -2571,7 +2575,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                     TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
                     TempCustomizedCalendarChange."Base Calendar Code" := Admission."Ticket Base Calendar Code";
                     TempCustomizedCalendarChange."Date" := AdmissionDate;
-                    TempCustomizedCalendarChange.Description := CalendarDesc;
+                    TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
                     TempCustomizedCalendarChange."Source Code" := AdmissionCode;
                     TempCustomizedCalendarChange.Insert();
 
@@ -2922,11 +2926,11 @@ codeunit 6059784 "NPR TM Ticket Management"
             if (SalesInvHeader.FindFirst()) then begin
                 if (SalesInvHeader."External Document No." <> '') then begin
                     TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."External Document No.");
-                    RowsFound := InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, SalesInvHeader."External Document No.", TicketReservationReq.TableCaption(), TicketReservationReq.Count());
                 end;
                 if ((RowsFound = 0) and (SalesInvHeader."NPR External Order No." <> '')) then begin
                     TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."NPR External Order No.");
                     RowsFound := InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, SalesInvHeader."NPR External Order No.", TicketReservationReq.TableCaption(), TicketReservationReq.Count());
+                    RowsFound := InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, CopyStr(SalesInvHeader."External Document No.", 1, 20), TicketReservationReq.TableCaption(), TicketReservationReq.Count());
                 end;
             end;
         end;
@@ -2958,7 +2962,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         end
     end;
 
-    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text[1024]; DocNoOfRecords: Integer): Integer
+    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);

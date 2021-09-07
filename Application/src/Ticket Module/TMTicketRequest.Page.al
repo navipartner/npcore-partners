@@ -384,7 +384,7 @@ page 6060103 "NPR TM Ticket Request"
                 repeat
                     AmountToReverse := 0;
                     QtyToRevoke := 0;
-                    TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", UserId, 0, AmountToReverse, QtyToRevoke);
+                    TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", CopyStr(UserId(), 1, 20), 0, AmountToReverse, QtyToRevoke);
                 until (Ticket.Next() = 0);
                 TicketRequestManager.RevokeReservationTokenRequest(Token, false);
             end;

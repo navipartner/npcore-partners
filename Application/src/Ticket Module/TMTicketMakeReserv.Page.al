@@ -378,7 +378,7 @@
         gBatchTicketCreateMode: Boolean;
         gTicketItemNo: Code[20];
         gTicketVariantCode: Code[10];
-        gDeliverTicketTo: Text;
+        gDeliverTicketTo: Text[100];
         gShowDeliverTo: Boolean;
         WAITING_LIST: Label 'Waiting List';
         NO_NOTIFICATION_ADDR: Label 'When you have selected a ticket schedule with waiting list, you need to provide e-mail or sms in the deliver-to field.';

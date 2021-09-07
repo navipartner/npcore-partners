@@ -195,14 +195,14 @@ xmlport 6060124 "NPR TM Send eTicket"
         exit(tmpTicketReservationResponse.Confirmed);
     end;
 
-    local procedure CreateErrorResponse(ResponseText: Text[250])
+    local procedure CreateErrorResponse(ResponseText: Text)
     begin
 
         if (TmpTicketNotificationResponse.IsTemporary()) then
             TmpTicketNotificationResponse.DeleteAll();
 
         tmpTicketReservationResponse.Confirmed := false;
-        tmpTicketReservationResponse."Response Message" := ResponseText;
+        tmpTicketReservationResponse."Response Message" := CopyStr(ResponseText, 1, MaxStrLen(tmpTicketReservationResponse."Response Message"));
         tmpTicketReservationResponse.Insert();
     end;
 }

@@ -749,10 +749,10 @@ codeunit 6151131 "NPR TM Seating UI"
         exit(ForwardTokenizer(VarLineOfText, ',', '"'));
     end;
 
-    local procedure ForwardTokenizer(var VarText: Text; PSeparator: Char; PQuote: Char) RField: Text[1024]
+    local procedure ForwardTokenizer(var VarText: Text; PSeparator: Char; PQuote: Char) RField: Text
     var
         IsQuoted: Boolean;
-        InputText: Text[1024];
+        InputText: Text;
         NextFieldPos: Integer;
         IsNextField: Boolean;
         NextByte: Text[1];

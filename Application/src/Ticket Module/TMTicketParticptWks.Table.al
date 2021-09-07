@@ -53,11 +53,11 @@ table 6060113 "NPR TM Ticket Particpt. Wks."
 
             trigger OnValidate()
             begin
-                "Blocked At" := CreateDateTime(0D, 0T);
-                "Blocked By User" := '';
-                if (Blocked) then begin
-                    "Blocked At" := CurrentDateTime();
-                    "Blocked By User" := UserId;
+                Rec."Blocked At" := CreateDateTime(0D, 0T);
+                Rec."Blocked By User" := '';
+                if (Rec.Blocked) then begin
+                    Rec."Blocked At" := CurrentDateTime();
+                    Rec."Blocked By User" := CopyStr(UserId(), 1, MaxStrLen(Rec."Blocked By User"));
                 end;
             end;
         }

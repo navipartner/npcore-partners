@@ -1,7 +1,5 @@
 table 6060109 "NPR TM Offline Ticket Valid."
 {
-    // TM1.22/NPKNAV/20170612  CASE 274464 Transport T0007 - 12 June 2017
-
     Caption = 'Offline Ticket Validation';
     DataClassification = CustomerContent;
 
@@ -20,7 +18,7 @@ table 6060109 "NPR TM Offline Ticket Valid."
             OptionCaption = 'Ticket No.';
             OptionMembers = EXTERNALTICKETNO;
         }
-        field(15; "Ticket Reference No."; Code[20])
+        field(15; "Ticket Reference No."; Code[30])
         {
             Caption = 'Ticket Reference No.';
             DataClassification = CustomerContent;

@@ -205,7 +205,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
     end;
 
 
-    procedure SetupMembershipGuestTicket(AdmissionCode: Code[20]; AdmissionDescription: text[50]; ItemCode: Code[20]; ItemDescription: text[50]): code[20]
+    procedure SetupMembershipGuestTicket(AdmissionCode: Code[20]; AdmissionDescription: text[50]; ItemCode: Code[20]; ItemDescription: text[100]): code[20]
     var
         TicketType: Record "NPR TM Ticket Type";
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -314,7 +314,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
             AdmissionGroupConcurrency.INSERT();
         end;
 
-        AdmissionGroupConcurrency.Description := Description;
+        AdmissionGroupConcurrency.Description := CopyStr(Description, 1, MaxStrLen(AdmissionGroupConcurrency.Description));
         AdmissionGroupConcurrency."Total Capacity" := Limit;
         AdmissionGroupConcurrency."Capacity Control" := CapacityOption;
         AdmissionGroupConcurrency."Concurrency Type" := ConcurrencyOption;
@@ -323,7 +323,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         exit(AdmissionGroupConcurrency.Code);
     end;
 
-    procedure CreateItem(No: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; Description: Text[30]; UnitPrice: Decimal): Code[20]
+    procedure CreateItem(No: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; Description: Text[100]; UnitPrice: Decimal): Code[20]
     var
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
@@ -532,7 +532,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         TicketBom.MODIFY();
     end;
 
-    procedure CreateTicketType(TicketTypeCode: Code[10]; Description: text[50]; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Option; EntryValidation: Option; ConfigurationSource: Option): Code[10]
+    procedure CreateTicketType(TicketTypeCode: Code[10]; Description: text; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Option; EntryValidation: Option; ConfigurationSource: Option): Code[10]
     var
         TicketType: Record "NPR TM Ticket Type";
     begin
@@ -542,7 +542,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
             TicketType.INSERT();
         end;
 
-        TicketType.Description := Description;
+        TicketType.Description := CopyStr(Description, 1, MaxStrLen(TicketType.Description));
         TicketType."Print Ticket" := FALSE;
         TicketType.VALIDATE("No. Series", 'NPR-TICKET');
         TicketType."External Ticket Pattern" := 'ATF-[S][A*1]-[N]';
