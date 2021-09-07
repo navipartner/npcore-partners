@@ -1,16 +1,16 @@
-page 6014641 "NPR APIV1 Cust. Price Groups"
+page 6014662 "NPR APIV1 - Payment Methods"
 {
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    Caption = 'apiv1CustPriceGroups';
+    Caption = 'Payment Methods';
     DelayedInsert = true;
-    EntityName = 'custPriceGroup';
-    EntitySetName = 'custPriceGroups';
+    EntityName = 'paymentMethod';
+    EntitySetName = 'paymentMethods';
     ODataKeyFields = SystemId;
     PageType = API;
-    SourceTable = "Customer Price Group";
+    SourceTable = "Payment Method";
 
     layout
     {
@@ -30,31 +30,31 @@ page 6014641 "NPR APIV1 Cust. Price Groups"
                 {
                     Caption = 'Description';
                 }
-                field(allowInvoiceDisc; Rec."Allow Invoice Disc.")
+                field(balAccountNo; Rec."Bal. Account No.")
                 {
-                    Caption = 'Allow Invoice Disc.';
+                    Caption = 'Bal. Account No.';
                 }
-                field(allowLineDisc; Rec."Allow Line Disc.")
+                field(balAccountType; Rec."Bal. Account Type")
                 {
-                    Caption = 'Allow Line Disc.';
+                    Caption = 'Bal. Account Type';
                 }
-                field(priceCalculationMethod; Rec."Price Calculation Method")
+                field(directDebit; Rec."Direct Debit")
                 {
-                    Caption = 'Price Calculation Method';
+                    Caption = 'Direct Debit';
                 }
-                field(priceIncludesVAT; Rec."Price Includes VAT")
+                field(directDebitPmtTermsCode; Rec."Direct Debit Pmt. Terms Code")
                 {
-                    Caption = 'Price Includes VAT';
+                    Caption = 'Direct Debit Pmt. Terms Code';
                 }
-                field(vatBusPostingGrPrice; Rec."VAT Bus. Posting Gr. (Price)")
+                field(pmtExportLineDefinition; Rec."Pmt. Export Line Definition")
                 {
-                    Caption = 'VAT Bus. Posting Gr. (Price)';
+                    Caption = 'Pmt. Export Line Definition';
                 }
+
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
                 }
-
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;

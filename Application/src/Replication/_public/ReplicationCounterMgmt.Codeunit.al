@@ -1562,6 +1562,288 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Customer Posting Group", 'OnAfterInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterInsertCustPostingGroup(var Rec: Record "Customer Posting Group"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Customer Posting Group", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyCustPostGroup(var Rec: Record "Customer Posting Group"; var xRec: Record "Customer Posting Group"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Customer Posting Group", 'OnAfterRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterRenameCustPostGroup(var Rec: Record "Customer Posting Group"; var xRec: Record "Customer Posting Group"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Location, 'OnAfterInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterInsertLocation(var Rec: Record Location; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Location, 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyLocation(var Rec: Record Location; var xRec: Record Location; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Location, 'OnAfterRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterRenameLocation(var Rec: Record Location; var xRec: Record Location; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Shipment Method", 'OnAfterInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterInsertShipMethod(var Rec: Record "Shipment Method"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Shipment Method", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyShipMethod(var Rec: Record "Shipment Method"; var xRec: Record "Shipment Method"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Shipment Method", 'OnAfterRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterRenameShipMethod(var Rec: Record "Shipment Method"; var xRec: Record "Shipment Method"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Payment Terms", 'OnAfterInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterInsertPaymentTerms(var Rec: Record "Payment Terms"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Payment Terms", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyPaymentTerms(var Rec: Record "Payment Terms"; var xRec: Record "Payment Terms"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Payment Terms", 'OnAfterRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterRenamePaymentTerms(var Rec: Record "Payment Terms"; var xRec: Record "Payment Terms"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterInsertPayMethod(var Rec: Record "Payment Method"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyPayMethod(var Rec: Record "Payment Method"; var xRec: Record "Payment Method"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterRenamePayMethod(var Rec: Record "Payment Method"; var xRec: Record "Payment Method"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Currency, 'OnAfterInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterInsertCurrency(var Rec: Record Currency; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Currency, 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyCurrency(var Rec: Record Currency; var xRec: Record Currency; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::Currency, 'OnAfterRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnAfterRenameCurrency(var Rec: Record Currency; var xRec: Record Currency; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        IF Rec.IsTemporary() then
+            exit;
+
+        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+            Rec.Modify(false);
+        end;
+    end;
+
     #endregion
 
 }

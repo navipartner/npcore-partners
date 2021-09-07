@@ -4,6 +4,7 @@ codeunit 6014623 "NPR Rep. Get Item" implements "NPR Replication IEndpoint Meth"
 
     var
         DefaultFileNameLbl: Label 'GetItems_%1', Comment = '%1=Current Date and Time';
+        ImageCouldNotBeReadErr: Label 'Image for Item %1 could not be read. Please check Replication Error Log Entry No. %2 for more details';
 
     procedure SendRequest(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; var URI: Text; var NextLinkURI: Text)
     var
@@ -69,13 +70,14 @@ codeunit 6014623 "NPR Rep. Get Item" implements "NPR Replication IEndpoint Meth"
             IF NOT Item.Get(ItemNo) then
                 InsertNewRec(Item, ItemNo, ItemId);
 
-        IF CheckFieldsChanged(Item, JToken) then
+        IF CheckFieldsChanged(Item, JToken, ReplicationEndPoint) then
             Item.Modify(true);
     end;
 
-    local procedure CheckFieldsChanged(var Item: Record Item; JToken: JsonToken) FieldsChanged: Boolean
+    local procedure CheckFieldsChanged(var Item: Record Item; JToken: JsonToken; ReplicationEndPoint: Record "NPR Replication Endpoint") FieldsChanged: Boolean
     var
         ReplicationAPI: Codeunit "NPR Replication API";
+        PictureJToken: JsonToken;
     begin
         IF CheckFieldValue(Item, Item.FieldNo(Description), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.displayName'), true) then
             FieldsChanged := true;
@@ -274,6 +276,103 @@ codeunit 6014623 "NPR Rep. Get Item" implements "NPR Replication IEndpoint Meth"
 
         IF CheckFieldValue(Item, Item.FieldNo("NPR Variety 4 Table"), ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.nprVariety4Table'), false) then
             FieldsChanged := true;
+
+        IF STRPOS(ReplicationEndPoint.Path, 'picture') > 0 then
+            IF JToken.SelectToken('$.picture', PictureJToken) then
+                If CheckImage(PictureJToken, Item, ReplicationEndPoint) then
+                    FieldsChanged := true;
+    end;
+
+    local procedure CheckImage(PictureJToken: JsonToken; var Item: Record Item; ReplicationEndPoint: Record "NPR Replication Endpoint"): Boolean
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        ErrLog: Record "NPR Replication Error Log";
+        ReplicationAPI: Codeunit "NPR Replication API";
+        Response: Codeunit "Temp Blob";
+        Client: HttpClient;
+        StatusCode: Integer;
+        NewImageIStr: InStream;
+        TempBlobNewImage: Codeunit "Temp Blob";
+        TempBlobExistingImage: Codeunit "Temp Blob";
+        NewImageURL: Text;
+        MimeType: Text;
+        ImageWidth: Integer;
+        ImageHeight: Integer;
+    begin
+        NewImageURL := ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.[''pictureContent@odata.mediaReadLink'']');
+        IF NewImageURL = '' then
+            Exit(false);
+
+        IF EValuate(ImageWidth, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.width')) then;
+        IF Evaluate(ImageHeight, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.height')) then;
+        MimeType := ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.contentType');
+
+        IF (ImageWidth > 0) AND (ImageHeight > 0) and (MimeType <> '') then begin
+            ServiceSetup.Get(ReplicationEndPoint."Service Code");
+            ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, NewImageURL);
+
+            IF ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then begin
+                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', NewImageURL, Response);
+                Commit();
+                Error(ImageCouldNotBeReadErr, Item."No.", ErrLog."Entry No.");
+            end;
+
+            ReadNewImage(Response, TempBlobNewImage, MimeType); // if use directly the InStream data(without read from temptable) sometimes the hash of 2 same png images is different.
+            ReadExistingImage(Item, TempBlobExistingImage);
+
+            If ReplicationAPI.GetImageHash(TempBlobNewImage) <> ReplicationAPI.GetImageHash(TempBlobExistingImage) then begin
+                Response.CreateInStream(NewImageIStr);
+                UpdateImage(Item, NewImageIStr, MimeType);
+                Exit(true);
+            end;
+        end else begin // no image
+            if Item.Picture.Count > 0 THEN begin
+                Clear(Item.Picture); // remove existing image
+                Exit(true);
+            end;
+        end;
+
+        exit(false);
+
+    end;
+
+    local procedure ReadExistingImage(var Item: Record Item; var TempBlob: Codeunit "Temp Blob")
+    var
+        Media: Record "Tenant Media";
+        OStr: OutStream;
+        IStr: InStream;
+        MediaId: Guid;
+    begin
+        IF Item.Picture.Count > 0 then begin
+            MediaId := Item.Picture.Item(1);
+            Media.Get(MediaId);
+            if (Media.Content.HasValue()) then begin
+                Media.CalcFields(Content);
+                Media.Content.CreateInStream(IStr);
+                TempBlob.CreateOutStream(OStr);
+                CopyStream(OStr, IStr);
+            end;
+        end;
+    end;
+
+    local procedure ReadNewImage(var ResponseTempBlob: Codeunit "Temp Blob"; var TempBlob: Codeunit "Temp Blob"; MimeType: Text)
+    var
+        IStr: InStream;
+        OStr: OutStream;
+        TempMediaRepository: Record "Media Repository" temporary;
+    begin
+        ResponseTempBlob.CreateInStream(IStr);
+        TempMediaRepository.Image.ImportStream(IStr, '', MimeType);
+        IF TempMediaRepository.Image.HasValue then begin
+            TempBlob.CreateOutStream(OStr);
+            TempMediaRepository.Image.ExportStream(OStr);
+        end;
+    end;
+
+    local procedure UpdateImage(var Item: Record Item; IStr: InStream; MimeType: Text)
+    begin
+        Clear(Item.Picture);
+        Item.Picture.ImportStream(IStr, Item.Description, MimeType);
     end;
 
     local procedure CheckFieldValue(var Item: Record Item; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean): Boolean

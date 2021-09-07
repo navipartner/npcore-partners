@@ -4,7 +4,7 @@ page 6014649 "NPR APIV1 - Cust Disc. Group"
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    Caption = 'apiv1CustomerDiscGroup';
+    Caption = 'Customer Discount Group';
     DelayedInsert = true;
     EntityName = 'custDiscountGroup';
     EntitySetName = 'custDiscountGroups';
@@ -41,5 +41,10 @@ page 6014649 "NPR APIV1 - Cust Disc. Group"
             }
         }
     }
+
+    trigger OnInit()
+    begin
+        CurrentTransactionType := TransactionType::Update;
+    end;
 
 }

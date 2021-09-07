@@ -1,16 +1,16 @@
-page 6014641 "NPR APIV1 Cust. Price Groups"
+page 6014661 "NPR APIV1 - Payment Terms"
 {
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    Caption = 'apiv1CustPriceGroups';
+    Caption = 'Payment Terms';
     DelayedInsert = true;
-    EntityName = 'custPriceGroup';
-    EntitySetName = 'custPriceGroups';
+    EntityName = 'paymentTerm';
+    EntitySetName = 'paymentTerms';
     ODataKeyFields = SystemId;
     PageType = API;
-    SourceTable = "Customer Price Group";
+    SourceTable = "Payment Terms";
 
     layout
     {
@@ -30,31 +30,26 @@ page 6014641 "NPR APIV1 Cust. Price Groups"
                 {
                     Caption = 'Description';
                 }
-                field(allowInvoiceDisc; Rec."Allow Invoice Disc.")
+                field(discount; Rec."Discount %")
                 {
-                    Caption = 'Allow Invoice Disc.';
+                    Caption = 'Discount %';
                 }
-                field(allowLineDisc; Rec."Allow Line Disc.")
+                field(calcPmtDiscOnCrMemos; Rec."Calc. Pmt. Disc. on Cr. Memos")
                 {
-                    Caption = 'Allow Line Disc.';
+                    Caption = 'Calc. Pmt. Disc. on Cr. Memos';
                 }
-                field(priceCalculationMethod; Rec."Price Calculation Method")
+                field(discountDateCalculation; Rec."Discount Date Calculation")
                 {
-                    Caption = 'Price Calculation Method';
+                    Caption = 'Discount Date Calculation';
                 }
-                field(priceIncludesVAT; Rec."Price Includes VAT")
+                field(dueDateCalculation; Rec."Due Date Calculation")
                 {
-                    Caption = 'Price Includes VAT';
-                }
-                field(vatBusPostingGrPrice; Rec."VAT Bus. Posting Gr. (Price)")
-                {
-                    Caption = 'VAT Bus. Posting Gr. (Price)';
+                    Caption = 'Due Date Calculation';
                 }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
                 }
-
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;

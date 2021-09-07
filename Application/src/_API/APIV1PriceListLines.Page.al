@@ -4,7 +4,7 @@ page 6014545 "NPR API V1 - Price List Lines"
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    Caption = 'apiV1PriceListLines';
+    Caption = 'Price List Lines';
     DelayedInsert = true;
     EntityName = 'priceListLine';
     EntitySetName = 'priceListLines';
