@@ -795,6 +795,7 @@
     var
         jsonobj: JsonObject;
     begin
+        Clear(MediaDictionary);
         jsonobj.Add('ScreenNo', DisplaySetup."Screen No.");
         jsonobj.Add('ReceiptWidthPct', DisplaySetup."Receipt Width Pct.");
         jsonobj.Add('ReceiptPlacement', DisplaySetup."Receipt Placement");
@@ -807,7 +808,6 @@
         jsonobj.Add('Base64Dictionary', Base64Dictionary);
         jsonobj.Add('DisplayContentUrl', '');
         SecondaryMonitorRequest := jsonobj;
-
     end;
 
     local procedure SetContentHtml(): Text
