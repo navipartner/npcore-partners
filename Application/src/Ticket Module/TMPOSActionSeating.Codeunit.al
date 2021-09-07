@@ -11,12 +11,12 @@ codeunit 6151132 "NPR TM POS Action - Seating"
     var
         ActionDescription: Label 'This is a built-in action for running the ticket seating functionality';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('TM_SEATING');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

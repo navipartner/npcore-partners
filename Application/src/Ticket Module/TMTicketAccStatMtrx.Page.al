@@ -497,8 +497,8 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
     var
         MATRIX_MatrixRecords: array[32] of Record "Dimension Code Buffer";
         MATRIX_CaptionSet: array[32] of Text[80];
-        MATRIX_CaptionRange: Text[250];
-        MATRIX_PrimKeyFirstCaptionInCu: Text[80];
+        MATRIX_CaptionRange: Text;
+        MATRIX_PrimKeyFirstCaptionInCu: Text;
         MATRIX_CurrentNoOfColumns: Integer;
         MATRIX_Step: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn;
         TicketAccessStatisticsMgr: Codeunit "NPR TM Ticket Access Stats";
@@ -506,19 +506,19 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         ColumnFactOption: Option ITEM,TICKET_TYPE,ADMISSION_DATE,ADMISSION_HOUR,PERIOD,ADMISSION_CODE,VARIANT_CODE;
         FactNameAsColumnHeading: Boolean;
         HideLinesWithZeroAdmissionCount: Boolean;
-        ItemFactFilter: Text[1024];
-        TicketTypeFactFilter: Text[1024];
-        DateFactFilter: Text[1024];
-        HourFactFilter: Text[1024];
-        AdmissionCodeFilter: Text[1024];
-        VariantCodeFilter: Text[1024];
+        ItemFactFilter: Text;
+        TicketTypeFactFilter: Text;
+        DateFactFilter: Text;
+        HourFactFilter: Text;
+        AdmissionCodeFilter: Text;
+        VariantCodeFilter: Text;
         DisplayOption: Option "COUNT",COUNT_TREND,TREND;
         TrendPeriodType: Option PERIOD,YEAR;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
         TicketStatisticsFilter: Record "NPR TM Ticket Access Stats";
-        InternalDateFilter: Text[30];
-        VerticalTotalText: Text[30];
-        INVALID_FACTOPTION: Label 'Invalid FactOption';
+        InternalDateFilter: Text;
+        VerticalTotalText: Text;
+        INVALID_FACT_OPTION: Label 'Invalid FactOption';
         BlockedItemFactFilter: Text;
         BlockedAdmissionFactFilter: Text;
         BlockedTicketTypeFactFilter: Text;
@@ -633,7 +633,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         end;
     end;
 
-    local procedure FindPeriod(SearchText: Code[10])
+    local procedure FindPeriod(SearchText: Text[3])
     var
         Calendar: Record Date;
         PeriodFormMgt: Codeunit PeriodFormManagement;
@@ -698,7 +698,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         CurrPage.Update(false);
     end;
 
-    procedure FactLookup(FactOption: Option; var FactFilter: Text[1024]): Boolean
+    procedure FactLookup(FactOption: Option; var FactFilter: Text): Boolean
     var
         FactList: Page "NPR TM Ticket Access Facts";
         TicketFact: Record "NPR TM Ticket Access Fact";
@@ -721,7 +721,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
             //+TM1.36 [323024]
 
             else
-                Error(INVALID_FACTOPTION);
+                Error(INVALID_FACT_OPTION);
         end;
         TicketFact.FilterGroup(0);
 
@@ -738,7 +738,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 
     local procedure CalcVerticalTotal()
     var
-        MatrixPeriod: Text[100];
+        MatrixPeriod: Text;
     begin
 
         MatrixPeriod := DateFactFilter;

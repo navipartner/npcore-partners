@@ -338,7 +338,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
             exit(false);
         end;
 
-        ErrorCode := NpXmlDomMgt.GetXmlText(XmlRoot, CodePath, 10, false);
+        ErrorCode := CopyStr(NpXmlDomMgt.GetXmlText(XmlRoot, CodePath, 10, false), 1, MaxStrLen(ErrorCode));
         if (ErrorCode = '') then
             ErrorCode := '999';
 

@@ -146,7 +146,7 @@ page 6151131 "NPR TM Seating Template"
                 begin
 
                     if (Rec.GetFilter("Admission Code") <> '') then
-                        SeatingManagement.AddRoot(Rec.GetFilter("Admission Code"), '');
+                        SeatingManagement.AddRoot(CopyStr(Rec.GetFilter("Admission Code"), 1, 20), '');
                 end;
             }
             action("Add Parent")

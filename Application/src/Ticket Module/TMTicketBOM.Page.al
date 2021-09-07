@@ -328,7 +328,7 @@ page 6060121 "NPR TM Ticket BOM"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         OfflineTicketValidationMgr: Codeunit "NPR TM Offline Ticket Valid.";
         DIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
-        Token: Text;
+        Token: Text[100];
         ResponseMessage: Text;
         ImportReferenceNo: Integer;
     begin
@@ -388,7 +388,7 @@ page 6060121 "NPR TM Ticket BOM"
         end;
     end;
 
-    local procedure CreateTicketRequest(PaymentType: Option; Token: Text; ItemNo: Code[20]; VariantCode: Code[10]): Text
+    local procedure CreateTicketRequest(PaymentType: Option; Token: Text[100]; ItemNo: Code[20]; VariantCode: Code[10]): Text[100]
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
@@ -422,7 +422,7 @@ page 6060121 "NPR TM Ticket BOM"
         exit(Token);
     end;
 
-    local procedure FinalizeReservation(Token: Text; ItemNo: Code[20]; VariantCode: Code[10]): Boolean
+    local procedure FinalizeReservation(Token: Text[100]; ItemNo: Code[20]; VariantCode: Code[10]): Boolean
     var
         DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         ResponseMessage: Text;

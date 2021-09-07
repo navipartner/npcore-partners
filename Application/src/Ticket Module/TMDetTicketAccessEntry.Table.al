@@ -1,18 +1,9 @@
 table 6060123 "NPR TM Det. Ticket AccessEntry"
 {
-    // NPR4.16/TSA/20150803 CASE219658 Ticket Initial Version
-    // TM1.00/TSA/20151217  CASE 224225 NaviPartner Ticket Management
-    // TM1.04/TSA20160115  CASE 231834 Changed quantity field to decimal to make flowfield sum work
-    // TM1.07/TSA/20160125  CASE 232495 Added key Type,Created Datetime, for statistics
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
-    // TM1.22/TSA/20170526  CASE 278142 Added options PREPAID,POSTPAID to option Type, extended Sales Channel to code 20 and renamed to Sales Channel No. Added Scanner Station ID
-    // TM1.33/TSA/20180527 CASE 319454 Added Quantity on as sumindex field to enhance the schedule entry page flowfields
-
     Caption = 'Det. Ticket Access Entry';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR TM Det. Ticket AccessEntry";
-    LookupPageID = "NPR TM Det. Ticket AccessEntry";
+    DrillDownPageId = "NPR TM Det. Ticket AccessEntry";
+    LookupPageId = "NPR TM Det. Ticket AccessEntry";
 
     fields
     {
@@ -120,14 +111,14 @@ table 6060123 "NPR TM Det. Ticket AccessEntry"
 
     trigger OnInsert()
     begin
-        "Created Datetime" := CurrentDateTime();
-        "User ID" := UserId;
+        Rec."Created Datetime" := CurrentDateTime();
+        Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
     end;
 
     trigger OnModify()
     begin
-        "Created Datetime" := CurrentDateTime();
-        "User ID" := UserId;
+        Rec."Created Datetime" := CurrentDateTime();
+        Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
     end;
 
     trigger OnRename()

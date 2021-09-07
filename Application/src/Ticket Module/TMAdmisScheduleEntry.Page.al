@@ -257,7 +257,7 @@ page 6060122 "NPR TM Admis. Schedule Entry"
     end;
 
     var
-        ConcurrentCapacityText: Text[20];
+        ConcurrentCapacityText: Text[30];
 
     local procedure NotifyTicketHolders()
     var

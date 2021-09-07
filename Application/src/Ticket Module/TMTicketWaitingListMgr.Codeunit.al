@@ -58,7 +58,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         exit(true);
     end;
 
-    procedure CreateWaitingListEntry(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; NotificationAddress: Text[200])
+    procedure CreateWaitingListEntry(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; NotificationAddress: Text[100])
     var
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
         Admission: Record "NPR TM Admission";

@@ -247,7 +247,7 @@ codeunit 6060110 "NPR TM Statistics WebService"
                 TmpTicketAccessFact."Fact Name" := TmpTicketAccessFact."Fact Name"::ADMISSION_CODE;
                 TmpTicketAccessFact."Fact Code" := TmpTicketAccessStatistics."Admission Code";
                 if (Admission.Get(TmpTicketAccessFact."Fact Code")) then
-                    TmpTicketAccessFact.Description := Admission.Description;
+                    TmpTicketAccessFact.Description := CopyStr(Admission.Description, 1, MaxStrLen(TmpTicketAccessFact.Description));
                 TmpTicketAccessFact.Insert();
             end;
 
