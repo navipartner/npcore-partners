@@ -137,13 +137,15 @@
         if Client.Get(NpCsStore."Service Url", Response) then
             exit;
 
-        ErrorMessage := Response.ReasonPhrase;
-        ErrorMessage := XmlDomManagement.RemoveNamespaces(ErrorMessage);
-        if XmlDocument.ReadFrom(ErrorMessage, Document) then
-            if Document.SelectSingleNode('//faultstring', Node) then
-                Error(Node.AsXmlElement().InnerText());
+        if not Response.IsSuccessStatusCode then begin
+            ErrorMessage := Response.ReasonPhrase;
+            ErrorMessage := XmlDomManagement.RemoveNamespaces(ErrorMessage);
+            if XmlDocument.ReadFrom(ErrorMessage, Document) then
+                if Document.SelectSingleNode('//faultstring', Node) then
+                    Error(Node.AsXmlElement().InnerText());
 
-        Error(ErrorMessage);
+            Error(ErrorMessage);
+        end;
     end;
 
     procedure InitStoresWithDistance(FromNpCsStore: Record "NPR NpCs Store"; var TempNpCsStore: Record "NPR NpCs Store" temporary)
