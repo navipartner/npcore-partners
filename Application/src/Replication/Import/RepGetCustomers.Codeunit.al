@@ -314,7 +314,7 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
             ReadImage(TempCust, TempBlobNewImage); // if use directly the InStream data(without read from temptable) sometimes the hash of 2 same png images is different.
             ReadImage(Customer, TempBlobExistingImage);
 
-            If GetImageHash(TempBlobNewImage) <> GetImageHash(TempBlobExistingImage) then begin
+            If ReplicationAPI.GetImageHash(TempBlobNewImage) <> ReplicationAPI.GetImageHash(TempBlobExistingImage) then begin
                 UpdateImage(Customer, NewImageIStr, MimeType);
                 Exit(true);
             end;
@@ -343,19 +343,6 @@ codeunit 6014658 "NPR Rep. Get Customers" implements "NPR Replication IEndpoint 
     begin
         Clear(Customer.Image);
         Customer.Image.ImportStream(IStr, Customer.Name, MimeType);
-    end;
-
-    local procedure GetImageHash(var TempBlob: Codeunit "Temp Blob"): Text
-    var
-        Base64Convert: Codeunit "Base64 Convert";
-        Crypto: Codeunit "Cryptography Management";
-        IStr: InStream;
-    begin
-        IF NOT TempBlob.HasValue() then
-            exit('');
-
-        TempBlob.CreateInStream(IStr);
-        Exit(Crypto.GenerateHash(Base64Convert.ToBase64(IStr), 2));
     end;
 
     local procedure InsertNewRec(var Customer: Record Customer; CustNo: Text[20]; CustId: text)

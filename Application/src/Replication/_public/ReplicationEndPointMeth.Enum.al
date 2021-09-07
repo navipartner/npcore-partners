@@ -79,6 +79,12 @@ enum 6014474 "NPR Replication EndPoint Meth" implements "NPR Replication IEndpoi
         Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Cust Disc. Groups";
     }
 
+    value(37; "Get Customer Posting Groups")
+    {
+        Caption = 'Get Customer Posting Groups';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Cust Post. Groups";
+    }
+
     value(40; "Get Price List Headers")
     {
         Caption = 'Get Price List Headers';
@@ -126,6 +132,36 @@ enum 6014474 "NPR Replication EndPoint Meth" implements "NPR Replication IEndpoi
     {
         Caption = 'Get Default Dimensions';
         Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Def. Dimensions";
+    }
+
+    value(80; "Get Locations")
+    {
+        Caption = 'Get Locations';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Locations";
+    }
+
+    value(90; "Get Shipment Methods")
+    {
+        Caption = 'Get Shipment Methods';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Ship. Methods";
+    }
+
+    value(100; "Get Payment Terms")
+    {
+        Caption = 'Get Payment Terms';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Payment Terms";
+    }
+
+    value(110; "Get Payment Methods")
+    {
+        Caption = 'Get Payment Methods';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Payment Methods";
+    }
+
+    value(120; "Get Currencies")
+    {
+        Caption = 'Get Currencies';
+        Implementation = "NPR Replication IEndpoint Meth" = "NPR Rep. Get Currencies";
     }
 
 }

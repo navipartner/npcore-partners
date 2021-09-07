@@ -3,16 +3,16 @@ codeunit 6014608 "NPR Replication Register"
     Access = Internal;
 
     var
-        ServiceURLLbl: Label 'https://np461611.dynamics-retail.net:443/bc/api', Locked = true;
         ItemsServiceCodeLbl: Label 'Item_NPAPI V1', Locked = true;
         ItemsServiceNameLbl: Label 'Item - NP Replication API V1.0';
-
         CustServiceCodeLbl: Label 'Cust_NPAPI V1', Locked = true;
         CustServiceNameLbl: Label 'Customer - NP Replication API V1.0';
         NPRetailServiceCodeLbl: Label 'Retail_NPAPI V1', Locked = true;
         NPRetailServiceNameLbl: Label 'Retail - NP Replication API V1.0';
         DimensionsServiceCodeLbl: Label 'Dimension_NPAPI V1', Locked = true;
         DimensionsServiceNameLbl: Label 'Dimension - NP Replication API V1.0';
+        MiscServiceCodeLbl: Label 'Misc_NPAPI V1', Locked = true;
+        MiscServiceNameLbl: Label 'Miscellaneous - NP Replication API V1.0';
 
         #region Item related endpoints data
         ItemsEndPointIDLbl: Label 'GetItems', Locked = true;
@@ -108,6 +108,12 @@ codeunit 6014608 "NPR Replication Register"
         CustDiscGroupsEndPointDescriptionLbl: Label 'Gets Customer Discount Groups from related company.', Locked = true;
 
         CustDiscGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/custDiscountGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        CustPostingGroupsEndPointIDLbl: Label 'GetCustPostingGroups', Locked = true;
+
+        CustPostingGroupsEndPointDescriptionLbl: Label 'Gets Customer Posting Groups from related company.', Locked = true;
+
+        CustPostingGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/custPostingGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
         #endregion
 
         #region NP RETAIL endpoints data
@@ -144,6 +150,46 @@ codeunit 6014608 "NPR Replication Register"
 
         DefaultDimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/defaultDimensions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
+        #endregion
+
+        #region MISC endpoints data
+        LocationsEndPointIDLbl: Label 'GetLocations', Locked = true;
+
+        LocationsEndPointDescriptionLbl: Label 'Gets Locations from related company.', Locked = true;
+
+        LocationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/locations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        ShipmentMethodsEndPointIDLbl: Label 'GetShipmentMethods', Locked = true;
+
+
+        ShipmentMethodsEndPointDescriptionLbl: Label 'Gets Shipment Methods from related company.', Locked = true;
+
+
+        ShipmentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/shipmentMethods/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        PaymentTermsEndPointIDLbl: Label 'GetPaymentTerms', Locked = true;
+
+
+        PaymentTermsEndPointDescriptionLbl: Label 'Gets Payment Terms from related company.', Locked = true;
+
+
+        PaymentTermsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentTerms/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        PaymentMethodsEndPointIDLbl: Label 'GetPaymentMethods', Locked = true;
+
+
+        PaymentMethodsEndPointDescriptionLbl: Label 'Gets Payment Methods from related company.', Locked = true;
+
+
+        PaymentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentMethods/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        CurrenciesEndPointIDLbl: Label 'GetCurrencies', Locked = true;
+
+
+        CurrenciesEndPointDescriptionLbl: Label 'Gets Currencies from related company.', Locked = true;
+
+
+        CurrenciesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/currencies/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
     #endregion
 
     #region Register Service with EndPoints
@@ -159,7 +205,7 @@ codeunit 6014608 "NPR Replication Register"
     begin
         // ITEM
         sender.RegisterService(ItemsServiceCodeLbl,
-            ServiceURLLbl, ItemsServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), ItemsServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
         RegisterItemServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -168,7 +214,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // CUSTOMER
         sender.RegisterService(CustServiceCodeLbl,
-            ServiceURLLbl, CustServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), CustServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
         RegisterCustServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -177,7 +223,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // NP RETAIL
         sender.RegisterService(NPRetailServiceCodeLbl,
-            ServiceURLLbl, NPRetailServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), NPRetailServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
         RegisterNPRetailServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -186,8 +232,17 @@ codeunit 6014608 "NPR Replication Register"
 
         // DIMENSIONS
         sender.RegisterService(DimensionsServiceCodeLbl,
-            ServiceURLLbl, DimensionsServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), DimensionsServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
         RegisterDimensionsServiceEndPoints();
+        IF sender.Enabled then begin
+            ReplicationAPI.RegisterNcImportType(sender."API Version");
+            ReplicationAPI.ScheduleJobQueueEntry(sender);
+        end;
+
+        // MISC
+        sender.RegisterService(MiscServiceCodeLbl,
+            GetAPIServiceURL(), MiscServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+        RegisterMiscellaneousServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
             ReplicationAPI.ScheduleJobQueueEntry(sender);
@@ -266,6 +321,9 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, CustDiscGroupsEndPointIDLbl, CustDiscGroupsPathLbl,
                             CustDiscGroupsEndPointDescriptionLbl, true, 410, "NPR Replication EndPoint Meth"::"Get Customer Discount Groups", 0, 1000);
 
+        ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, CustPostingGroupsEndPointIDLbl, CustPostingGroupsPathLbl,
+                           CustPostingGroupsEndPointDescriptionLbl, true, 420, "NPR Replication EndPoint Meth"::"Get Customer Posting Groups", 0, 1000);
+
         ServiceEndPoint.RegisterServiceEndPoint(CustServiceCodeLbl, CustomersEndPointIDLbl, CustomersPathLbl,
                             CustomersEndPointDescriptionLbl, true, 500, "NPR Replication EndPoint Meth"::"Get Customers", 0, 1000);
 
@@ -318,5 +376,37 @@ codeunit 6014608 "NPR Replication Register"
                            DefaultDimensionsEndPointDescriptionLbl, true, 200, "NPR Replication EndPoint Meth"::"Get Default Dimensions", 0, 1000);
 
     end;
+
+    local procedure RegisterMiscellaneousServiceEndPoints()
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        ServiceEndPoint: Record "NPR Replication Endpoint";
+    begin
+        ServiceSetup.SetRange("API Version", DimensionsServiceCodeLbl);
+        if ServiceSetup.IsEmpty() then
+            exit;
+
+        ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, LocationsEndPointIDLbl, LocationsPathLbl,
+                          LocationsEndPointDescriptionLbl, true, 100, "NPR Replication EndPoint Meth"::"Get Locations", 0, 1000);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, ShipmentMethodsEndPointIDLbl, ShipmentMethodsPathLbl,
+                          ShipmentMethodsEndPointDescriptionLbl, true, 200, "NPR Replication EndPoint Meth"::"Get Shipment Methods", 0, 1000);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, PaymentTermsEndPointIDLbl, PaymentTermsPathLbl,
+                          PaymentTermsEndPointDescriptionLbl, true, 300, "NPR Replication EndPoint Meth"::"Get Payment Terms", 0, 1000);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, PaymentMethodsEndPointIDLbl, PaymentMethodsPathLbl,
+                          PaymentMethodsEndPointDescriptionLbl, true, 400, "NPR Replication EndPoint Meth"::"Get Payment Methods", 0, 1000);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MiscServiceCodeLbl, CurrenciesEndPointIDLbl, CurrenciesPathLbl,
+                          CurrenciesEndPointDescriptionLbl, true, 600, "NPR Replication EndPoint Meth"::"Get Currencies", 0, 1000);
+
+    end;
     #endregion
+
+    local procedure GetAPIServiceURL(): Text
+    begin
+        Exit(GetUrl(ClientType::Api).TrimEnd('/'));
+    end;
 }
+

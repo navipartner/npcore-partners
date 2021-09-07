@@ -156,6 +156,7 @@
         Rec.Type := Line.Type;
         Rec."Sale Type" := Line."Sale Type";
 
+        Rec.SetSkipCalcDiscount(Line.GetSkipCalcDiscount());
         Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
         if ((Line.Type = Line.Type::Item) and (Line."Variant Code" = '') and (ItemVariantIsRequired(Line."No."))) then begin

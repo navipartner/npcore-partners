@@ -1,16 +1,16 @@
-page 6014641 "NPR APIV1 Cust. Price Groups"
+page 6014667 "NPR APIV1 - Ship. Methods"
 {
 
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    Caption = 'apiv1CustPriceGroups';
+    Caption = 'Shipment Methods';
     DelayedInsert = true;
-    EntityName = 'custPriceGroup';
-    EntitySetName = 'custPriceGroups';
+    EntityName = 'shipmentMethod';
+    EntitySetName = 'shipmentMethods';
     ODataKeyFields = SystemId;
     PageType = API;
-    SourceTable = "Customer Price Group";
+    SourceTable = "Shipment Method";
 
     layout
     {
@@ -30,31 +30,10 @@ page 6014641 "NPR APIV1 Cust. Price Groups"
                 {
                     Caption = 'Description';
                 }
-                field(allowInvoiceDisc; Rec."Allow Invoice Disc.")
-                {
-                    Caption = 'Allow Invoice Disc.';
-                }
-                field(allowLineDisc; Rec."Allow Line Disc.")
-                {
-                    Caption = 'Allow Line Disc.';
-                }
-                field(priceCalculationMethod; Rec."Price Calculation Method")
-                {
-                    Caption = 'Price Calculation Method';
-                }
-                field(priceIncludesVAT; Rec."Price Includes VAT")
-                {
-                    Caption = 'Price Includes VAT';
-                }
-                field(vatBusPostingGrPrice; Rec."VAT Bus. Posting Gr. (Price)")
-                {
-                    Caption = 'VAT Bus. Posting Gr. (Price)';
-                }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
                 }
-
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;
