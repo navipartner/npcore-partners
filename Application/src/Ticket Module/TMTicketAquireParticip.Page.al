@@ -1,10 +1,5 @@
 page 6060110 "NPR TM Ticket Aquire Particip."
 {
-    // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
-    // TM1.17/TSA/20160913  CASE 251883 Added SMS as Notification Method
-    // TM1.23/TSA /20170724 CASE 284752 Added NPR Attribute Support
-    // TM1.38/TSA /20181017 CASE 332109 Changed the suggested defaults based on the notification method
-
     Caption = 'Aquire Participant';
     DataCaptionExpression = Rec."Admission Description";
     DataCaptionFields = "Admission Description";
@@ -254,7 +249,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
         RequireNotificationAddress: Boolean;
         SuggestNotificationMethod: Option NA,EMAIL,SMS;
         SuggestNotificationAddress: Text[100];
-        NPRAttrTextArray: array[40] of Text[100];
+        NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;

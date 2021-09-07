@@ -19,7 +19,7 @@
         REVOKE_IN_PROGRESS: Label 'Ticket %1 is being processed for revoke and can''t be added at this time.';
         TICKETMGMTLbl: Label 'TM_TICKETMGMT_%1', Locked = true;
 
-    local procedure ActionCode(VersionCode: Code[10]): Text
+    local procedure ActionCode(VersionCode: Code[10]): Code[20]
     begin
         if (VersionCode <> '') then
             exit(StrSubstNo(TICKETMGMTLbl, VersionCode));
@@ -27,7 +27,7 @@
         exit('TM_TICKETMGMT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1.1');
     end;
@@ -203,7 +203,7 @@
         if (FunctionId < 0) then
             FunctionId := 0;
 
-        AdmissionCode := JSON.GetStringParameter('Admission Code');
+        AdmissionCode := CopyStr(JSON.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
         POSSession.GetSetup(PosSetup);
         PosUnitNo := PosSetup.GetPOSUnitNo();
 
@@ -343,7 +343,7 @@
 
     end;
 
-    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text; PosUnitNo: Code[10]; WithTicketPrint: Boolean)
+    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text[30]; PosUnitNo: Code[10]; WithTicketPrint: Boolean)
     begin
 
         case FunctionId of
@@ -379,11 +379,11 @@
     var
         FunctionId: Integer;
         AdmissionCode: Code[20];
-        ExternalTicketNumber: Code[50];
+        ExternalTicketNumber: Code[30];
         TicketMaxQty: Integer;
         ShowQtyDialog: Boolean;
         DefaultTicketNumber: Text;
-        TicketReference: Code[20];
+        TicketReference: Code[30];
         PosUnitNo: Code[10];
         WithTicketPrint: Boolean;
         PosSetup: Codeunit "NPR POS Setup";
@@ -393,7 +393,7 @@
         if (FunctionId < 0) then
             FunctionId := 1;
 
-        AdmissionCode := Context.GetStringParameter('Admission Code');
+        AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
         DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber');
         WithTicketPrint := Context.GetBooleanParameter('PrintTicketOnArrival');
         POSSession.GetSetup(PosSetup);
@@ -401,7 +401,7 @@
 
         Context.SetScopeRoot();
         Context.SetScope('TicketReference');
-        TicketReference := Context.GetString('value');
+        TicketReference := CopyStr(Context.GetString('value'), 1, MaxStrLen(TicketReference));
 
         Context.SetScopeRoot();
         Context.SetScope('ticketnumber');
@@ -803,7 +803,7 @@
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketAccessEntryNo: Integer;
-        Token: Text;
+        Token: Text[100];
         UnitPrice: Decimal;
         RevokeQuantity: Integer;
         PosEntry: Record "NPR POS Entry";
@@ -1220,7 +1220,7 @@
         exit(LookupOK);
     end;
 
-    local procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[50]; ForceDialog: Boolean): Boolean
+    local procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]; ForceDialog: Boolean): Boolean
     var
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         MemberManagement: Codeunit "NPR MM Membership Mgt.";

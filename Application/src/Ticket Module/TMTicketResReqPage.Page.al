@@ -363,7 +363,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
     end;
 
     var
-        NPRAttrTextArray: array[40] of Text[100];
+        NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;

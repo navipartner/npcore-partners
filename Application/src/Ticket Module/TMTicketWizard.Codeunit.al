@@ -26,14 +26,14 @@
         TicketWizardPage: Page "NPR TM Ticket Wizard";
         PageAction: Action;
         ItemNo: Code[20];
-        ItemDescription: Text[50];
+        ItemDescription: Text[30];
         ItemCategory: Code[20];
         UnitPrice: Decimal;
         TypeCode: Code[10];
         TypeDescription: Text[30];
         TypeTemplate: Code[10];
         AdmissionCode: Code[20];
-        AdmissionDescription: Text[30];
+        AdmissionDescription: Text[50];
         AdmissionTemplate: Code[10];
         ScheduleStartDate: Date;
         ScheduleUntilDate: Date;
@@ -159,7 +159,7 @@
         TicketType.Modify(true);
     end;
 
-    local procedure CreateAdmission(var AdmissionCode: Code[20]; Description: Text[30]; AdmissionTemplateCode: Code[10])
+    local procedure CreateAdmission(var AdmissionCode: Code[20]; Description: Text[50]; AdmissionTemplateCode: Code[10])
     var
         Admission: Record "NPR TM Admission";
         TicketSetup: Record "NPR TM Ticket Setup";

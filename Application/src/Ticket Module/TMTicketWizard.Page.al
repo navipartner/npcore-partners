@@ -232,7 +232,7 @@ page 6151133 "NPR TM Ticket Wizard"
         TmpTicketTypeDescription: Text[30];
         TmpTicketTypeTemplate: Code[10];
         TmpAdmissionCode: Code[20];
-        TmpAdmissionDescription: Text[30];
+        TmpAdmissionDescription: Text[50];
         TmpAdmissionTemplate: Code[10];
         TmpTicketBomTemplate: Code[10];
         TicketTypeCodeValid: Boolean;
@@ -297,7 +297,7 @@ page 6151133 "NPR TM Ticket Wizard"
 
         ItemNumberValid := Item.Get(TmpItemNo);
         if (ItemNumberValid) then begin
-            TmpDescription := Item.Description;
+            TmpDescription := CopyStr(Item.Description, 1, MaxStrLen(TmpDescription));
             TmpItemCategory := Item."Item Category Code";
             TmpUnitPrice := Item."Unit Price";
 
@@ -324,7 +324,7 @@ page 6151133 "NPR TM Ticket Wizard"
         CurrPage.Schedules.PAGE.GetSchedules(AdmissionScheduleOut);
     end;
 
-    procedure GetAdmissionInformation(var AdmissionCodeOut: Code[20]; var DescriptionOut: Text[30]; var AdmissionTemplateCodeOut: Code[10])
+    procedure GetAdmissionInformation(var AdmissionCodeOut: Code[20]; var DescriptionOut: Text[50]; var AdmissionTemplateCodeOut: Code[10])
     begin
 
         AdmissionCodeOut := TmpAdmissionCode;

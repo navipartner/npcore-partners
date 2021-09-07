@@ -347,7 +347,7 @@
             TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
             TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
             TempCustomizedCalendarChange."Date" := StartFromDate;
-            TempCustomizedCalendarChange.Description := CalendarDesc;
+            TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
             TempCustomizedCalendarChange."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
             TempCustomizedCalendarChange.Insert();
 
@@ -362,7 +362,7 @@
             TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
             TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
             TempCustomizedCalendarChange."Date" := StartFromDate;
-            TempCustomizedCalendarChange.Description := CalendarDesc;
+            TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
             TempCustomizedCalendarChange."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
             TempCustomizedCalendarChange.Insert();
 
@@ -377,7 +377,7 @@
             TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
             TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
             TempCustomizedCalendarChange."Date" := StartFromDate;
-            TempCustomizedCalendarChange.Description := CalendarDesc;
+            TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
             TempCustomizedCalendarChange."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
             TempCustomizedCalendarChange."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
             TempCustomizedCalendarChange.Insert();

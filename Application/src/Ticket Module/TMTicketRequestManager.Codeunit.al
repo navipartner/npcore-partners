@@ -45,7 +45,9 @@
 
     procedure GetNewToken() Token: Code[40]
     begin
+#pragma warning disable AA0139
         exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+#pragma warning restore
     end;
 
     procedure TokenRequestExists(Token: Text[100]): Boolean
@@ -280,7 +282,7 @@
         if (TicketSetup."Authorization Code Scheme" = '') then
             TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
 
-        ReservationRequest."Authorization Code" := TicketManagement.GenerateCertificateNumber(TicketSetup."Authorization Code Scheme", '-');
+        ReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateCertificateNumber(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(ReservationRequest."Authorization Code"));
         ReservationRequest.Modify();
 
         for i := 1 to Abs(NumberOfTickets) do begin
@@ -1848,11 +1850,11 @@
                         SeatingTemplate.SetFilter("Admission Code", '=%1', TicketNotificationEntry."Admission Code");
                         SeatingTemplate.SetFilter(ElementId, '=%1', SeatingReservationEntry.ElementId);
                         if (SeatingTemplate.FindFirst()) then begin
-                            TicketNotificationEntry.Seat := SeatingTemplate.Description;
+                            TicketNotificationEntry.Seat := CopyStr(SeatingTemplate.Description, 1, MaxStrLen(TicketNotificationEntry.Seat));
                             if (SeatingTemplate.Get(SeatingTemplate."Parent Entry No.")) then begin
-                                TicketNotificationEntry.Row := SeatingTemplate.Description;
+                                TicketNotificationEntry.Row := CopyStr(SeatingTemplate.Description, 1, MaxStrLen(TicketNotificationEntry.Row));
                                 if (SeatingTemplate.Get(SeatingTemplate."Parent Entry No.")) then begin
-                                    TicketNotificationEntry.Section := SeatingTemplate.Description;
+                                    TicketNotificationEntry.Section := CopyStr(SeatingTemplate.Description, 1, MaxStrLen(TicketNotificationEntry.Section));
                                 end;
                             end;
                         end;
@@ -1956,7 +1958,7 @@
 
         TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::SENT;
         TicketNotificationEntry."Notification Sent At" := CurrentDateTime();
-        TicketNotificationEntry."Notification Sent By User" := UserId();
+        TicketNotificationEntry."Notification Sent By User" := CopyStr(UserId(), 1, MaxStrLen(TicketNotificationEntry."Notification Sent By User"));
         TicketNotificationEntry.Modify();
         ResponseMessage := '';
         Commit(); // External System State can not roll back
@@ -2041,9 +2043,9 @@
 
         JObject.ReadFrom(JSONResult);
 
-        TicketNotificationEntry."eTicket Pass Default URL" := GetStringValue(JObject, 'public_url.default');
-        TicketNotificationEntry."eTicket Pass Andriod URL" := GetStringValue(JObject, 'public_url.android');
-        TicketNotificationEntry."eTicket Pass Landing URL" := GetStringValue(JObject, 'public_url.landing');
+        TicketNotificationEntry."eTicket Pass Default URL" := CopyStr(GetStringValue(JObject, 'public_url.default'), 1, MaxStrLen(TicketNotificationEntry."eTicket Pass Default URL"));
+        TicketNotificationEntry."eTicket Pass Andriod URL" := CopyStr(GetStringValue(JObject, 'public_url.android'), 1, MaxStrLen(TicketNotificationEntry."eTicket Pass Andriod URL"));
+        TicketNotificationEntry."eTicket Pass Landing URL" := CopyStr(GetStringValue(JObject, 'public_url.landing'), 1, MaxStrLen(TicketNotificationEntry."eTicket Pass Landing URL"));
 
         exit(true);
     end;

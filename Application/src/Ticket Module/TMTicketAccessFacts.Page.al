@@ -42,12 +42,12 @@ page 6060114 "NPR TM Ticket Access Facts"
     {
     }
 
-    procedure GetSelectionFilter(): Code[250]
+    procedure GetSelectionFilter(): Text
     var
         Fact: Record "NPR TM Ticket Access Fact";
         FirstFact: Code[30];
         LastFact: Code[30];
-        SelectionFilter: Code[250];
+        SelectionFilter: Text;
         FactCount: Integer;
         More: Boolean;
     begin
