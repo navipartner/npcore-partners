@@ -66,9 +66,9 @@ codeunit 6014629 "NPR Managed Package Builder"
         TempBlob: Codeunit "Temp Blob";
         PackageFileNameLbl: Label '%1 Package.json', Locked = true;
     begin
-        TempBlob.CreateOutStream(OutStm);
+        TempBlob.CreateOutStream(OutStm, TextEncoding::UTF8);
         OutStm.WriteText(CreateManifest(Name, Version, Description, PrimaryPackageTable));
-        TempBlob.CreateInStream(InStm);
+        TempBlob.CreateInStream(InStm, TextEncoding::UTF8);
 
         CopyStream(OutStm, InStm);
         FileName := StrSubstNo(PackageFileNameLbl, Name);
