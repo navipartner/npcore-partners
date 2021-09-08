@@ -54,11 +54,11 @@ codeunit 6059901 "NPR Task Queue Manager"
 
             TaskWorker.Init();
             TaskWorker."Server Instance ID" := ActiveSession."Server Instance ID";
-            TaskWorker."User ID" := ActiveSession."User ID";
+            TaskWorker."User ID" := CopyStr(ActiveSession."User ID", 1, MaxStrLen(TaskWorker."User ID"));
             TaskWorker."Session ID" := ActiveSession."Session ID";
             TaskWorker."Login Time" := ActiveSession."Login Datetime";
-            TaskWorker."Current Company" := CompanyName;
-            TaskWorker."Host Name" := ActiveSession."Client Computer Name";
+            TaskWorker."Current Company" := CopyStr(CompanyName, 1, MaxStrLen(TaskWorker."Current Company"));
+            TaskWorker."Host Name" := CopyStr(ActiveSession."Client Computer Name", 1, MaxStrLen(TaskWorker."Host Name"));
             TaskWorker."Task Worker Group" := TaskWorkerGroupCode;
             TaskWorker."Current Check Interval" := TaskWorkerGroup."Min Interval Between Check";
             TaskWorker."Current Language ID" := GlobalLanguage;

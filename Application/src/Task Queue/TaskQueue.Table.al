@@ -126,14 +126,14 @@ table 6059903 "NPR Task Queue"
                         end;
                     Status::Assigned:
                         begin
-                            "Assigned To User" := UserId;
+                            "Assigned To User" := CopyStr(UserId, 1, MaxStrLen("Assigned To User"));
                             "Assigned Time" := CurrentDateTime;
                             "Assigned to Service Inst.ID" := ServiceInstanceId();
                             "Assigned to Session ID" := SessionId();
                         end;
                     Status::Started:
                         begin
-                            "Assigned To User" := UserId;
+                            "Assigned To User" := CopyStr(UserId, 1, MaxStrLen("Assigned To User"));
                             "Assigned Time" := CurrentDateTime;
                             "Assigned to Service Inst.ID" := ServiceInstanceId();
                             "Assigned to Session ID" := SessionId();
@@ -266,7 +266,7 @@ table 6059903 "NPR Task Queue"
         TaskTemplate: Record "NPR Task Template";
     begin
         TaskTemplate.Get(TaskLine."Journal Template Name");
-        Company := CompanyName;
+        Company := CopyStr(CompanyName, 1, MaxStrLen(Company));
         "Task Template" := TaskLine."Journal Template Name";
         "Task Batch" := TaskLine."Journal Batch Name";
         "Task Line No." := TaskLine."Line No.";

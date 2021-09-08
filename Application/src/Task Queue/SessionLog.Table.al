@@ -110,7 +110,7 @@ table 6059908 "NPR Session Log"
         // "User ID" := USERID;
         // "Server Instance ID" := SERVICEINSTANCEID;
         // "Session ID" := SESSIONID;
-        "User ID" := TaskWorker."User ID";
+        "User ID" := CopyStr(TaskWorker."User ID", 1, MaxStrLen("User ID"));
         "Server Instance ID" := TaskWorker."Server Instance ID";
         //+TQ1.29
     end;
