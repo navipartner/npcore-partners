@@ -10,6 +10,7 @@ codeunit 6014688 "NPR APIV1 - POS Sale Mgmt."
         PaymentTypeNotFound: Label '%1 %2 for POS unit %3 was not found.';
 
         TransactionNotBalancedErr: Label 'Transaction is not balanced. Difference: %1.';
+        NoLinesToExportErr: Label 'There are no sale lines to export';
 
     procedure UpdatePOSSale(var TempPOSSaleBuff: Record "NPR POS Sales API Buffer"; POSSale: Codeunit "NPR POS Sale")
     var
@@ -267,6 +268,134 @@ codeunit 6014688 "NPR APIV1 - POS Sale Mgmt."
         POSEntry.SetRange("Entry Date", POSSaleRec.Date);
         exit(POSEntry.FindLast());
     end;
+
+    #region ExportToDocument 
+    procedure SetDocExportReference(JObject: JsonObject; var SalePOS: Record "NPR POS Sale")
+    var
+        ExtDocNo: Text;
+        Attention: Text;
+        YourRef: Text;
+        ModifyRec: Boolean;
+    begin
+        ExtDocNo := SelectJsonToken(JObject, 'extdocno');
+        if (ExtDocNo <> '') then begin
+            SalePOS.Validate("External Document No.", CopyStr(ExtDocNo, 1, MaxStrLen(SalePOS."External Document No.")));
+            ModifyRec := true;
+        end;
+
+        Attention := SelectJsonToken(JObject, 'attention');
+        if (Attention <> '') then begin
+            SalePOS.Validate("Contact No.", CopyStr(Attention, 1, MaxStrLen(SalePOS."Contact No.")));
+            ModifyRec := true;
+        end;
+
+        YourRef := SelectJsonToken(JObject, 'yourref');
+        if (YourRef <> '') then begin
+            SalePOS.Validate(Reference, CopyStr(YourRef, 1, MaxStrLen(SalePOS.Reference)));
+            ModifyRec := true;
+        end;
+
+        if ModifyRec then
+            SalePOS.Modify(true);
+    end;
+
+    procedure SetDocExportParameters(JObject: JsonObject; var POSSaleLine: Codeunit "NPR POS Sale Line"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
+    var
+        DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict;
+        DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
+        AmountExclVAT: Decimal;
+        VATAmount: Decimal;
+        AmountInclVAT: Decimal;
+        LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
+        SpecificLocationCode: Code[10];
+        PaymentMethodCode: Code[10];
+        DocExportAction: Codeunit "NPR POS Action: Doc. Export";
+    begin
+        RetailSalesDocMgt.SetAsk(false);
+        RetailSalesDocMgt.SetPrint(false);
+        RetailSalesDocMgt.SetInvoice(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetInvoice')));
+        RetailSalesDocMgt.SetReceive(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetReceive')));
+        RetailSalesDocMgt.SetShip(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetShip')));
+        RetailSalesDocMgt.SetSendPostedPdf2Nav(false);
+        RetailSalesDocMgt.SetRetailPrint(false);
+        RetailSalesDocMgt.SetAutoReserveSalesLine(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetAutoReserveSalesLine')));
+        RetailSalesDocMgt.SetTransferSalesPerson(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetTransferSalesperson')));
+        RetailSalesDocMgt.SetTransferPostingsetup(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetTransferPostingSetup')));
+        RetailSalesDocMgt.SetTransferDimensions(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetTransferDimensions')));
+        RetailSalesDocMgt.SetTransferTaxSetup(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetTransferTaxSetup')));
+        RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
+        RetailSalesDocMgt.SetSendDocument(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SetSend')));
+        RetailSalesDocMgt.SetSendICOrderConf(ConvertJsonTextToBool(SelectJsonToken(JObject, 'SendICOrderConfirmation')));
+        RetailSalesDocMgt.SetCustomerCreditCheck(ConvertJsonTextToBool(SelectJsonToken(JObject, 'CheckCustomerCredit')));
+
+        POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
+
+        DocumentTypePozitive := ConvertJsonTextToInteger(SelectJsonToken(JObject, 'SetDocumentType'));
+        DocumentTypeNegative := ConvertJsonTextToInteger(SelectJsonToken(JObject, 'SetNegBalDocumentType'));
+        DocExportAction.SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive, DocumentTypeNegative);
+
+        LocationSource := ConvertJsonTextToInteger(SelectJsonToken(JObject, 'UseLocationFrom'));
+        SpecificLocationCode := SelectJsonToken(JObject, 'UseSpecLocationCode');
+        DocExportAction.SetLocationSource(RetailSalesDocMgt, LocationSource, SpecificLocationCode);
+
+        PaymentMethodCode := SelectJsonToken(JObject, 'PaymentMethodCode');
+        RetailSalesDocMgt.SetPaymentMethod(PaymentMethodCode);
+    end;
+
+    procedure SetCustomer(JObject: JsonObject; var POSSale: Record "NPR POS Sale"): Boolean
+    var
+        Customer: Record Customer;
+    begin
+        if POSSale."Customer No." <> '' then begin
+            POSSale.TestField("Customer Type", POSSale."Customer Type"::Ord);
+            exit(true);
+        end;
+
+        IF SelectJsonToken(JObject, 'custNo') = '' then
+            exit(false);
+
+        IF Customer.Get(SelectJsonToken(JObject, 'custNo')) then begin
+            POSSale."Customer Type" := POSSale."Customer Type"::Ord;
+            POSSale.Validate("Customer No.", Customer."No.");
+            POSSale.Modify(true);
+            Exit(true);
+        end;
+    end;
+
+    procedure SetPricesInclVAT(JObject: JsonObject; var SalePOS: Record "NPR POS Sale")
+    begin
+        IF ConvertJsonTextToBool(SelectJsonToken(JObject, 'ForcePricesInclVAT')) and (not SalePOS."Prices Including VAT") then begin
+            SalePOS.Validate("Prices Including VAT", true);
+            SalePOS.Modify(true);
+        end;
+    end;
+
+    procedure ValidateSale(var SalePOS: Record "NPR POS Sale"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
+    begin
+        if not SalePOS.SalesLinesExist() then
+            Error(NoLinesToExportErr);
+
+        RetailSalesDocMgt.TestSalePOS(SalePOS);
+    end;
+
+    local procedure SelectJsonToken(JObject: JsonObject; Path: Text): Text
+    var
+        RepApi: Codeunit "NPR Replication API";
+    begin
+        Exit(RepApi.SelectJsonToken(JObject, Path, true))
+    end;
+
+    local procedure ConvertJsonTextToBool(Txt: text) ReturnBool: Boolean
+    begin
+        IF Evaluate(ReturnBool, Txt) then;
+    end;
+
+    local procedure ConvertJsonTextToInteger(Txt: text) ReturnInt: Integer
+    begin
+        IF Evaluate(ReturnInt, Txt) then;
+    end;
+
+    #endregion
 
     /* procedure PropagateModifyPOSSaleLine(var POSSaleLineBuff: Record "NPR POS Sales Line API Buffer"; var TempFieldBuffer: Record "Field Buffer")
     var
