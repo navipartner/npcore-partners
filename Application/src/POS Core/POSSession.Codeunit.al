@@ -209,7 +209,7 @@ codeunit 6150700 "NPR POS Session"
 
     local procedure InitializePOSSession()
     begin
-        Clear(Sale);
+        ClearSale();
         Setup.Initialize();
         Setup.GetPOSUnit(POSUnit);
         Sale.InitializeAtLogin(POSUnit, Setup);
@@ -290,7 +290,7 @@ codeunit 6150700 "NPR POS Session"
 
     procedure StartTransaction()
     begin
-        Clear(Sale);
+        ClearSale();
         Sale.InitializeNewSale(POSUnit, FrontEnd, Setup, Sale);
     end;
 
@@ -303,7 +303,7 @@ codeunit 6150700 "NPR POS Session"
 
     procedure ResumeTransaction(SalePOS: Record "NPR POS Sale")
     begin
-        Clear(Sale);
+        ClearSale();
         Sale.ResumeExistingSale(SalePOS, POSUnit, FrontEnd, Setup, Sale);
     end;
 
@@ -389,6 +389,15 @@ codeunit 6150700 "NPR POS Session"
             ActionState.Remove(Key);
 
         ActionState.Add(Key, Object);
+    end;
+
+    local procedure ClearSale()
+    var
+        LastSalePOSEntry: Record "NPR POS Entry";
+    begin
+        Sale.GetLastSalePOSEntry(LastSalePOSEntry);
+        Clear(Sale);
+        Sale.SetLastSalePOSEntry(LastSalePOSEntry);
     end;
 
     //#endregion

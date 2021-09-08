@@ -12,6 +12,7 @@
         POSAuditLog: Record "NPR POS Audit Log";
         SaleCancelled: Boolean;
     begin
+        Clear(GlobalPOSEntry);
         ValidateSaleHeader(Rec);
 
         OnBeforeCreatePOSEntry(Rec);
@@ -41,9 +42,11 @@
         end;
 
         OnAfterInsertPOSEntry(Rec, POSEntry);
+        GlobalPOSEntry := POSEntry;
     end;
 
     var
+        GlobalPOSEntry: Record "NPR POS Entry";
         ERR_NO_OPEN_UNIT: Label 'No open %1 could be found for %2 %3.';
         ERR_DOCUMENT_NO_CLASH: Label '%1 %2 has already been used by another %3';
         TXT_SALES_TICKET: Label 'Sales Ticket %1';
@@ -101,6 +104,7 @@
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         SalesHeaderLbl: Label '%1 %2', Locked = true;
     begin
+        Clear(GlobalPOSEntry);
         OnBeforeCreatePOSEntry(SalePOS);
 
         if not GetPOSPeriodRegister(SalePOS, POSPeriodRegister, true) then
@@ -126,6 +130,7 @@
         POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CREDIT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CREDIT_SALE_END, '');
 
         OnAfterInsertPOSEntry(SalePOS, POSEntry);
+        GlobalPOSEntry := POSEntry;
     end;
 
     local procedure InsertPOSEntry(var POSPeriodRegister: Record "NPR POS Period Register"; var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry"; EntryType: Option)
@@ -778,7 +783,7 @@
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
     begin
-
+        Clear(GlobalPOSEntry);
         if (not GetPOSPeriodRegisterForPOSUnit(POSUnitNo, POSPeriodRegister, false)) then
             Error(ERR_NO_OPEN_UNIT, POSPeriodRegister.TableCaption, POSPeriodRegister.FieldCaption("POS Unit No."), POSUnitNo);
 
@@ -801,6 +806,8 @@
         POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted";
 
         POSEntry.Insert();
+
+        GlobalPOSEntry := POSEntry;
 
         exit(POSEntry."Entry No.");
     end;
@@ -1359,5 +1366,9 @@
     begin
         POSEntryTaxCalc.PostPOSTaxAmountCalculation(POSEntry."Entry No.", SystemId);
     end;
-}
 
+    procedure GetCreatedPOSEntry(var POSEntryOut: Record "NPR POS Entry")
+    begin
+        POSEntryOut := GlobalPOSEntry;
+    end;
+}
