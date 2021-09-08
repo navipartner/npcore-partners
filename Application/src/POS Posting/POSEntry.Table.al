@@ -444,8 +444,9 @@ table 6150621 "NPR POS Entry"
         }
         key(Key7; "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
         {
-            SumIndexFields = "Amount Excl. Tax", "Amount Incl. Tax";
             MaintainSqlIndex = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'sift performance not worth the locking';
         }
         key(Key8; "Fiscal No.")
         { }
