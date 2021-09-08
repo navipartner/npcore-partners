@@ -199,7 +199,7 @@
         end;
     end;
 
-    procedure GetItemItemVendorNo(ItemNo: Code[20]; VariantCode: Code[20]; VendorNo: Code[20]) VendorItemNo: Text[30]
+    procedure GetItemItemVendorNo(ItemNo: Code[20]; VariantCode: Code[20]; VendorNo: Code[20]) VendorItemNo: Text[50]
     var
         Item: Record Item;
         SKU: Record "Stockkeeping Unit";

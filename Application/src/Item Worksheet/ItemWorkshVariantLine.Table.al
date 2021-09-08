@@ -711,7 +711,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
                             StatusCommentText := StatusCommentText + AddCommentText;
                         end else begin
                             if ItemWorksheetLine."Status Comment" <> '' then
-                                ItemWorksheetLine."Status Comment" := ItemWorksheetLine."Status Comment" + ' - ';
+                                ItemWorksheetLine."Status Comment" := CopyStr(ItemWorksheetLine."Status Comment" + ' - ', 1, MaxStrLen(ItemWorksheetLine."Status Comment"));
                             ItemWorksheetLine."Status Comment" := CopyStr(ItemWorksheetLine."Status Comment" + AddCommentText, 1, MaxStrLen(ItemWorksheetLine."Status Comment"));
                             ItemWorksheetLine.Modify(true);
                         end;

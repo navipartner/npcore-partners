@@ -41,7 +41,7 @@ table 6150730 "NPR POS Sales Workflow Step"
                     exit;
 
                 "Subscriber Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Subscriber Function" := EventSubscription."Subscriber Function";
+                "Subscriber Function" := CopyStr(EventSubscription."Subscriber Function", 1, MaxStrLen("Subscriber Function"));
             end;
 
             trigger OnValidate()
@@ -87,7 +87,7 @@ table 6150730 "NPR POS Sales Workflow Step"
                     exit;
 
                 "Subscriber Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Subscriber Function" := EventSubscription."Subscriber Function";
+                "Subscriber Function" := CopyStr(EventSubscription."Subscriber Function", 1, MaxStrLen("Subscriber Function"));
             end;
 
             trigger OnValidate()

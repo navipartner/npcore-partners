@@ -111,7 +111,7 @@ page 6150729 "NPR POS Scenarios"
     end;
 
     var
-        Text000: Label '%1 Workflow Steps initiated';
         POSSalesWorkflow: Record "NPR POS Sales Workflow";
+        Text000: Label '%1 Workflow Steps initiated';
 }
 

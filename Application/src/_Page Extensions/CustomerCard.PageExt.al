@@ -175,11 +175,11 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
     }
 
     var
+        UserSetup: Record "User Setup";
         MagentoVersion: Decimal;
         ReasonText: Text;
         Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
         ToAnonymizeEditable: Boolean;
-        UserSetup: Record "User Setup";
 
     trigger OnAfterGetRecord()
     begin

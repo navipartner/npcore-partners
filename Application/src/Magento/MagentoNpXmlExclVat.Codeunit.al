@@ -35,10 +35,10 @@ codeunit 6151454 "NPR Magento NpXml ExclVat"
         GeneralLedgerSetup: Record "General Ledger Setup";
         PriceListLine: Record "Price List Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        FieldRef: FieldRef;
-        DecimalValue: Decimal;
         MagentoItemCustomOption: Record "NPR Magento Item Custom Option";
         MagentoItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
+        FieldRef: FieldRef;
+        DecimalValue: Decimal;
         NotSupportedErr: Label 'Unsupported table: %1 %2 - codeunit 6151454 "NPR Magento NpXml ExclVat" ';
     begin
         FieldRef := RecRef.Field(FieldNo);

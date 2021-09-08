@@ -80,6 +80,7 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR MCS Person Groups", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertPersonGroup(var Rec: Record "NPR MCS Person Groups"; RunTrigger: Boolean)
     var
+        TempBlob: Codeunit "Temp Blob";
         JsonObj: JsonObject;
         HttpCont: HttpContent;
         ReqMsgInStr: InStream;
@@ -89,7 +90,6 @@
         Uri: Text;
         BaseUrl: Text;
         HttpRespMessage: HttpResponseMessage;
-        TempBlob: Codeunit "Temp Blob";
     begin
         if not RunTrigger then
             exit;
@@ -155,8 +155,8 @@
     procedure CreatePersonBusinessEntity(Origin: RecordID; NewRecordID: RecordID)
     var
         NewMCSPersonBusinessEntities: Record "NPR MCS Person Bus. Entit.";
-        RecRef: RecordRef;
         MCSPersonBusinessEntities: Record "NPR MCS Person Bus. Entit.";
+        RecRef: RecordRef;
     begin
         MCSPersonBusinessEntities.Reset();
         MCSPersonBusinessEntities.SetCurrentKey(Key);
@@ -184,10 +184,10 @@
 
     procedure ImportMemberPicture(var MMMember: Record "NPR MM Member")
     var
+        TempBlob: Codeunit "Temp Blob";
         RecRef: RecordRef;
         MemberName: Text;
         ImageInStream: InStream;
-        TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
     begin
         RecRef.Get(MMMember.RecordId);
@@ -220,7 +220,7 @@
         MCSPerson: Record "NPR MCS Person";
         MCSFaces: Record "NPR MCS Faces";
         UserData: Text;
-        PersonId: Text;
+        PersonId: Text[50];
         PersonIdentified: Boolean;
         BaseUrl: Text;
         JsonFacesArr: JsonArray;
@@ -228,7 +228,7 @@
         JsonTok: JsonToken;
         JsonTokValue: JsonToken;
         JsonObj: JsonObject;
-        FaceId: Text;
+        FaceId: Text[50];
         SkipIdentify: Boolean;
     begin
         if ImageInStream.EOS then
@@ -254,8 +254,8 @@
         foreach JsonTok in JsonFacesArr do begin
             JsonObj := JsonTok.AsObject();
             JsonObj.Get('faceId', JsonTokValue);
-            FaceId := JsonTokValue.AsValue().AsText();
-            PersonId := IsPersonIdentified(FaceId, JsonIdArr);
+            FaceId := CopyStr(JsonTokValue.AsValue().AsText(), 1, MaxStrLen(FaceId));
+            PersonId := CopyStr(IsPersonIdentified(FaceId, JsonIdArr), 1, MaxStrLen(PersonId));
             PersonIdentified := PersonId <> '';
 
             if PersonId = '' then
@@ -296,7 +296,7 @@
         TrainGroup(PersonGroups.PersonGroupId);
     end;
 
-    local procedure InitFace(var MCSFaces: Record "NPR MCS Faces"; PersonId: Text; FaceID: Text; FaceIdentified: Boolean; FaceRectJsonObj: JsonObject)
+    local procedure InitFace(var MCSFaces: Record "NPR MCS Faces"; PersonId: Text[50]; FaceID: Text[50]; FaceIdentified: Boolean; FaceRectJsonObj: JsonObject)
     var
         JsonTokValue: JsonToken;
     begin

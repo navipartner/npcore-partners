@@ -274,8 +274,8 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
                     trigger OnAction()
                     var
-                        MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                         MagentoDisplayConfig: Record "NPR Magento Display Config";
+                        MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                     begin
                         MagentoDisplayConfig.SetRange(MagentoDisplayConfig."No.", Rec."No.");
                         MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Item);
@@ -307,8 +307,8 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     trigger OnAction()
                     var
                         Item: Record Item;
-                        LabelLibrary: Codeunit "NPR Label Library";
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
+                        LabelLibrary: Codeunit "NPR Label Library";
                     begin
                         Item := Rec;
                         Item.SetRecFilter();
@@ -330,8 +330,8 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     trigger OnAction()
                     var
                         Item: Record Item;
-                        LabelLibrary: Codeunit "NPR Label Library";
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
+                        LabelLibrary: Codeunit "NPR Label Library";
                     begin
                         Item := Rec;
                         Item.SetRecFilter();
@@ -387,9 +387,9 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
                 trigger OnAction()
                 var
+                    BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
                     InputDialog: Page "NPR Input Dialog";
                     Validering: Text[50];
-                    BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
                     ItemNo: Code[20];
                     VariantCode: Code[10];
                     ResolvingTable: Integer;
@@ -420,9 +420,9 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
                 trigger OnAction()
                 var
+                    NPRAttItemSearch: Codeunit "NPR Att. Item Search";
                     InputDialog: Page "NPR Input Dialog";
                     Validering: Text;
-                    NPRAttItemSearch: Codeunit "NPR Att. Item Search";
                 begin
                     Clear(InputDialog);
                     InputDialog.SetInput(1, Validering, Text001);

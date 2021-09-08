@@ -148,8 +148,8 @@ page 6151482 "NPR Magento Sales Chart"
     }
 
     var
-        ChartIsReady: Boolean;
         BusChartBuf: Record "Business Chart Buffer";
+        ChartIsReady: Boolean;
         ChartMgt: Codeunit "NPR Magento Chart Mgt.";
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;

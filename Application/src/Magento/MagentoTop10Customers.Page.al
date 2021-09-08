@@ -143,8 +143,8 @@ page 6151483 "NPR Magento Top 10 Customers"
     end;
 
     var
-        Query1: Query "NPR Top 10 Cust. Sales";
         Cust: Record Customer;
+        Query1: Query "NPR Top 10 Cust. Sales";
         StartDate: Date;
         Enddate: Date;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;

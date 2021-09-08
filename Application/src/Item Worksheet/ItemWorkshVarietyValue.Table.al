@@ -50,7 +50,7 @@ table 6060044 "NPR Item Worksh. Variety Value"
             begin
                 if Description = '' then begin
                     if StrLen(Value) = 1 then
-                        Description := Value
+                        Description := CopyStr(Value, 1, MaxStrLen(Description))
                     else
                         Description := CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2));
                 end;
@@ -100,7 +100,7 @@ table 6060044 "NPR Item Worksh. Variety Value"
     procedure AssignSortOrder()
     var
         VRTValue: Record "NPR Item Worksh. Variety Value";
-        Value2: Code[20];
+        Value2: Code[50];
         Dec: Decimal;
         NewSortOrder: Integer;
         DecSep: Text[1];

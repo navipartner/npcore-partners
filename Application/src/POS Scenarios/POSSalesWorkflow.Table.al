@@ -118,7 +118,7 @@ table 6150729 "NPR POS Sales Workflow"
                 //+NPR5.45 [321266]
                 POSSalesWorkflowStep."Workflow Code" := Code;
                 POSSalesWorkflowStep."Subscriber Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                POSSalesWorkflowStep."Subscriber Function" := EventSubscription."Subscriber Function";
+                POSSalesWorkflowStep."Subscriber Function" := CopyStr(EventSubscription."Subscriber Function", 1, MaxStrLen(POSSalesWorkflowStep."Subscriber Function"));
                 POSSalesWorkflowStep.Enabled := true;
                 POSSalesWorkflowStep.Insert(true);
             end;
