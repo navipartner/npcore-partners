@@ -429,6 +429,10 @@
         key(Key1; "Waiter Pad No.", "Line No.")
         {
         }
+        key(LinkToPOSSale; "Sale Retail ID")
+        { }
+        key(LinkToPOSSaleLine; "Sale Line Retail ID")
+        { }
     }
 
     trigger OnDelete()

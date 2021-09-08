@@ -51,6 +51,7 @@ codeunit 6150687 "NPR NPRE RVA: Select Table"
                     SeatingCode := CopyStr(Context.GetStringParameterOrFail('SeatingCode', ActionCode()), 1, MaxStrLen(SeatingCode));
                     Seating.Get(SeatingCode);
 
+                    SeatingWaiterPadLink.SetCurrentKey(Closed);
                     SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
                     SeatingWaiterPadLink.SetRange(Closed, false);
                     if SeatingWaiterPadLink.IsEmpty then begin

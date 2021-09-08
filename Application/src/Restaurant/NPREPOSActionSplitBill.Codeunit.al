@@ -214,6 +214,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
             if SeatingCode = '' then
                 IncludeAllWPads := IncludeAllWPads::No
             else begin
+                SeatingWPadLink.SetCurrentKey(Closed);
                 SeatingWPadLink.SetRange("Seating Code", SeatingCode);
                 SeatingWPadLink.SetFilter("Waiter Pad No.", '<>%1', WaiterPadCode);
                 SeatingWPadLink.SetRange(Closed, false);

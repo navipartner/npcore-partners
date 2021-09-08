@@ -340,8 +340,10 @@
 
         SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
-        if OpenOnly then
+        if OpenOnly then begin
+            SeatingWaiterPadLink.SetCurrentKey(Closed);
             SeatingWaiterPadLink.SetRange(Closed, false);
+        end;
         if ExcludeWaiterPadNo <> '' then
             SeatingWaiterPadLink.SetFilter("Waiter Pad No.", '<>%1', ExcludeWaiterPadNo);
 
@@ -357,8 +359,10 @@
 
         SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
-        if OpenOnly then
+        if OpenOnly then begin
+            SeatingWaiterPadLink.SetCurrentKey(Closed);
             SeatingWaiterPadLink.SetRange(Closed, false);
+        end;
         if ExcludeWaiterPadNo <> '' then
             SeatingWaiterPadLink.SetFilter("Waiter Pad No.", '<>%1', ExcludeWaiterPadNo);
 
@@ -572,6 +576,7 @@
         NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         TempNPREWaiterPad: Record "NPR NPRE Waiter Pad" temporary;
     begin
+        NPRESeatingWaiterPadLink.SetCurrentKey(Closed);
         NPRESeatingWaiterPadLink.SetRange("Seating Code", NPRESeating.Code);
         NPRESeatingWaiterPadLink.SetRange(Closed, false);
         if NPRESeatingWaiterPadLink.IsEmpty then
@@ -606,6 +611,7 @@
         POSInfoWaiterPadLink: Record "NPR POS Info NPRE Waiter Pad";
         POSInfoTransaction: Record "NPR POS Info Transaction";
     begin
+        POSInfoTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
         POSInfoTransaction.SetRange("Register No.", SaleLinePOS."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
@@ -623,7 +629,8 @@
                 until POSInfoTransaction.Next() = 0;
 
         end else begin
-            POSInfoTransaction.DeleteAll();
+            if not POSInfoTransaction.IsEmpty then
+                POSInfoTransaction.DeleteAll();
 
             POSInfoWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
             POSInfoWaiterPadLink.SetRange("Waiter Pad Line No.", WaiterPadLineNo);
@@ -701,8 +708,10 @@
     begin
         if IsNullGuid(SalePOS.SystemId) then
             exit;
+        WaiterPadLine.SetCurrentKey("Sale Retail ID");
         WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
-        WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
+        if not WaiterPadLine.IsEmpty() then
+            WaiterPadLine.ModifyAll("Sale Retail ID", GetNullGuid());
     end;
 
     local procedure ClearWPLineSaleLineLinks(SaleLinePOS: Record "NPR POS Sale Line")
@@ -711,8 +720,10 @@
     begin
         if IsNullGuid(SaleLinePOS.SystemId) then
             exit;
+        WaiterPadLine.SetCurrentKey("Sale Line Retail ID");
         WaiterPadLine.SetRange("Sale Line Retail ID", SaleLinePOS.SystemId);
-        WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
+        if not WaiterPadLine.IsEmpty() then
+            WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, false)]
@@ -748,6 +759,7 @@
     begin
         if IsNullGuid(POSSalesLine.SystemId) then
             exit;
+        WaiterPadLine.SetCurrentKey("Sale Line Retail ID");
         WaiterPadLine.SetRange("Sale Line Retail ID", POSSalesLine.SystemId);
         if WaiterPadLine.FindFirst() then begin
             if POSSalesLine."Quantity (Base)" <> 0 then begin
