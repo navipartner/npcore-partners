@@ -68,9 +68,24 @@ page 6014665 "NPR APIV1 - POS Sale"
                 {
                     Caption = 'Customer No.';
                 }
+
+                field(contactNo; Rec."Contact No.")
+                {
+                    Caption = 'Contact No.';
+                }
                 field(reference; Rec.Reference)
                 {
                     Caption = 'Reference';
+                }
+
+                field(pricesIncludingVAT; Rec."Prices Including VAT")
+                {
+                    Caption = 'Prices Including VAT';
+                }
+
+                field(externalDocumentNo; Rec."External Document No.")
+                {
+                    Caption = 'External Document No.';
                 }
                 //add Sales Line subform
                 part(posSaleLines; "NPR APIV1 - POS Sale Line")
@@ -127,17 +142,11 @@ page 6014665 "NPR APIV1 - POS Sale"
         ModifyNotAllowedErr: Label 'It is not allowed to modify an existing POS Sale. Please Delete existing record and Recreate it if a correction is needed.';
 
     local procedure InitializePOSSale()
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         POSSession.Constructor(Setup, POSSession);
         Setup.GetPOSUnit(POSUnit);
-    end;
-
-    local procedure InsertNewPOSSale()
-    var
-        APIPOSSaleMgmt: Codeunit "NPR APIV1 - POS Sale Mgmt.";
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-    begin
-        InitializePOSSale();
 
         IF Rec."Salesperson Code" <> '' then begin
             SalespersonPurchaser.Get(Rec."Salesperson Code");
@@ -149,6 +158,13 @@ page 6014665 "NPR APIV1 - POS Sale"
             else
                 Error('Illegal password.');
         end;
+    end;
+
+    local procedure InsertNewPOSSale()
+    var
+        APIPOSSaleMgmt: Codeunit "NPR APIV1 - POS Sale Mgmt.";
+    begin
+        InitializePOSSale();
 
         POSSession.StartPOSSessionWS();
         POSSession.StartTransactionWS();
@@ -192,6 +208,45 @@ page 6014665 "NPR APIV1 - POS Sale"
         POSSaleRec.GetBySystemId(Rec."POS Sale System Id");
         APIPOSSaleMgmt.CalculateBalance(POSSaleRec, SaleAmount, PaidAmount, ReturnAmount, Subtotal);
         Exit(ReturnAmount);
+    end;
+
+    [ServiceEnabled]
+    procedure ExportToDocument(inputJsonTxt: Text) InfoText: Text
+    var
+        POSSaleRec: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        APIPOSSaleMgmt: Codeunit "NPR APIV1 - POS Sale Mgmt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        JsonObj: JsonObject;
+        InfoTxtJson: JsonObject;
+        SalesHeaderCreatedTxt: Label 'Sales Header created.';
+    begin
+        POSSaleRec.GetBySystemId(Rec."POS Sale System Id");
+        InitializePOSSale();
+        POSSession.ResumeTransactionWS(POSSaleRec);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(POSSaleRec);
+        POSSession.GetSaleLine(POSSaleLine);
+
+        JsonObj.ReadFrom(inputJsonTxt);
+
+        IF NOT APIPOSSaleMgmt.SetCustomer(JsonObj, POSSaleRec) then
+            POSSaleRec.TestField("Customer No.");
+
+        APIPOSSaleMgmt.SetDocExportReference(JsonObj, POSSaleRec);
+        APIPOSSaleMgmt.SetPricesInclVAT(JsonObj, POSSaleRec);
+        APIPOSSaleMgmt.SetDocExportParameters(JsonObj, POSSaleLine, RetailSalesDocMgt);
+        APIPOSSaleMgmt.ValidateSale(POSSaleRec, RetailSalesDocMgt);
+
+        RetailSalesDocMgt.ProcessPOSSale(POSSaleRec);
+
+        RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
+        InfoTxtJson.Add('Action', SalesHeaderCreatedTxt);
+        InfoTxtJson.Add('Document Type', Format(SalesHeader."Document Type"));
+        InfoTxtJson.Add('Document No.', SalesHeader."No.");
+        InfoTxtJson.WriteTo(InfoText);
     end;
 
 }

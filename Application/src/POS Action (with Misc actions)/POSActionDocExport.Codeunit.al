@@ -450,7 +450,18 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
         DocumentTypePozitive := JSON.GetIntegerParameterOrFail('SetDocumentType', ActionCode());
         DocumentTypeNegative := JSON.GetIntegerParameterOrFail('SetNegBalDocumentType', ActionCode());
+        SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive, DocumentTypeNegative);
 
+        LocationSource := JSON.GetIntegerParameterOrFail('UseLocationFrom', ActionCode());
+        SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode');
+        SetLocationSource(RetailSalesDocMgt, LocationSource, SpecificLocationCode);
+
+        PaymentMethodCode := JSON.GetStringParameter('PaymentMethodCode');
+        RetailSalesDocMgt.SetPaymentMethod(PaymentMethodCode);
+    end;
+
+    procedure SetDocumentType(AmountInclVAT: Decimal; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict; DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict)
+    begin
         if AmountInclVAT >= 0 then
             case DocumentTypePozitive of
                 DocumentTypePozitive::Order:
@@ -471,16 +482,17 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 DocumentTypeNegative::Restrict:
                     Error(WrongNegativeSignErr, SelectStr(DocumentTypePozitive + 1, OptionDocTypePozitive));
             end;
+    end;
 
-        LocationSource := JSON.GetIntegerParameterOrFail('UseLocationFrom', ActionCode());
+    procedure SetLocationSource(var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation; SpecificLocationCode: Code[10])
+    begin
         if LocationSource = LocationSource::Undefined then
             Error(LocationSourceMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom));
-        SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode');
+
         if (LocationSource = LocationSource::SpecificLocation) and (SpecificLocationCode = '') then
             Error(SpecLocationCodeMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom), CaptionUseSpecLocationCode);
+
         RetailSalesDocMgt.SetLocationSource(LocationSource, SpecificLocationCode);
-        PaymentMethodCode := JSON.GetStringParameter('PaymentMethodCode');
-        RetailSalesDocMgt.SetPaymentMethod(PaymentMethodCode);
     end;
 
     local procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal

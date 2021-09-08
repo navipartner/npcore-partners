@@ -51,6 +51,11 @@ table 6014596 "NPR POS Sales API Buffer"
             ValidateTableRelation = false;
         }
 
+        field(15; "Contact No."; Text[30])
+        {
+            Caption = 'Contact';
+            DataClassification = CustomerContent;
+        }
         field(16; Reference; Text[35])
         {
             Caption = 'Reference';
@@ -71,6 +76,18 @@ table 6014596 "NPR POS Sales API Buffer"
             DataClassification = CustomerContent;
             OptionCaption = 'Sale,Annullment';
             OptionMembers = Sale,Annullment;
+        }
+
+        field(120; "Prices Including VAT"; Boolean)
+        {
+            Caption = 'Prices Including VAT';
+            DataClassification = CustomerContent;
+        }
+
+        field(128; "External Document No."; Code[35])
+        {
+            Caption = 'External Document No.';
+            DataClassification = CustomerContent;
         }
 
         field(1550; Password; Code[20])
