@@ -545,14 +545,14 @@ table 6059902 "NPR Task Line"
     trigger OnInsert()
     begin
         "Last Modified Date" := CurrentDateTime;
-        "Last Modified By User" := UserId;
+        "Last Modified By User" := CopyStr(UserId, 1, MaxStrLen("Last Modified By User"));
         TaskJnlMgt.SyncroniseCompanies(Rec, 0);
     end;
 
     trigger OnModify()
     begin
         "Last Modified Date" := CurrentDateTime;
-        "Last Modified By User" := UserId;
+        "Last Modified By User" := CopyStr(UserId, 1, MaxStrLen("Last Modified By User"));
         TaskJnlMgt.SyncroniseCompanies(Rec, 1);
     end;
 
@@ -690,7 +690,7 @@ table 6059902 "NPR Task Line"
     begin
         TestField("File Path");
         TestField("File Name");
-        exit(TaskQueueExecute.GetFilePath(Rec) + TaskQueueExecute.GetFileName(Rec));
+        exit(CopyStr(TaskQueueExecute.GetFilePath(Rec) + TaskQueueExecute.GetFileName(Rec), 1, 1024));
     end;
 
     procedure IncreaseIndentation()
@@ -714,7 +714,7 @@ table 6059902 "NPR Task Line"
         TestField(Recurrence, Recurrence::None);
     end;
 
-    procedure GetParameterText(ParameterName: Text[30]): Text[250]
+    procedure GetParameterText(ParameterName: Text[20]): Text[250]
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -728,7 +728,7 @@ table 6059902 "NPR Task Line"
         InsertParameter(ParameterName, 0);
     end;
 
-    procedure GetParameterInt(ParameterName: Text[30]): Integer
+    procedure GetParameterInt(ParameterName: Text[20]): Integer
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -742,7 +742,7 @@ table 6059902 "NPR Task Line"
         InsertParameter(ParameterName, 4);
     end;
 
-    procedure GetParameterBool(ParameterName: Text[30]): Boolean
+    procedure GetParameterBool(ParameterName: Text[20]): Boolean
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -756,7 +756,7 @@ table 6059902 "NPR Task Line"
         InsertParameter(ParameterName, 6);
     end;
 
-    procedure GetParameterDate(ParameterName: Text[30]): Date
+    procedure GetParameterDate(ParameterName: Text[20]): Date
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -769,7 +769,7 @@ table 6059902 "NPR Task Line"
         InsertParameter(ParameterName, 1);
     end;
 
-    procedure GetParameterTime(ParameterName: Text[30]): Time
+    procedure GetParameterTime(ParameterName: Text[20]): Time
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -782,7 +782,7 @@ table 6059902 "NPR Task Line"
         InsertParameter(ParameterName, 2);
     end;
 
-    procedure GetParameterDateFormula(ParameterName: Text[30]): Text[100]
+    procedure GetParameterDateFormula(ParameterName: Text[20]): Text[100]
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -795,7 +795,7 @@ table 6059902 "NPR Task Line"
         InsertParameter(ParameterName, 7);
     end;
 
-    procedure GetParameterCalcDate(ParameterName: Text[30]): Date
+    procedure GetParameterCalcDate(ParameterName: Text[20]): Date
     var
         DateFormula: DateFormula;
     begin
@@ -806,7 +806,7 @@ table 6059902 "NPR Task Line"
         exit(CalcDate(DateFormula, Today));
     end;
 
-    procedure SetParameterText(ParameterName: Text[30]; Value: Text[1024])
+    procedure SetParameterText(ParameterName: Text[20]; Value: Text[1024])
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -817,11 +817,11 @@ table 6059902 "NPR Task Line"
         if not TaskLineParam.FindFirst() then
             exit;
 
-        TaskLineParam.Value := Value;
+        TaskLineParam.Value := CopyStr(Value, 1, MaxStrLen(TaskLineParam.Value));
         TaskLineParam.Modify();
     end;
 
-    procedure SetParameterInt(ParameterName: Text[30]; Value: Integer)
+    procedure SetParameterInt(ParameterName: Text[20]; Value: Integer)
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -836,7 +836,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.Modify();
     end;
 
-    procedure SetParameterBool(ParameterName: Text[30]; Value: Boolean)
+    procedure SetParameterBool(ParameterName: Text[20]; Value: Boolean)
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -851,7 +851,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.Modify();
     end;
 
-    procedure SetParameterDate(ParameterName: Text[30]; Value: Date)
+    procedure SetParameterDate(ParameterName: Text[20]; Value: Date)
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -866,7 +866,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.Modify();
     end;
 
-    procedure SetParameterTime(ParameterName: Text[30]; Value: Time)
+    procedure SetParameterTime(ParameterName: Text[20]; Value: Time)
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -881,7 +881,7 @@ table 6059902 "NPR Task Line"
         TaskLineParam.Modify();
     end;
 
-    procedure SetParameterDateFormula(ParameterName: Text[30]; Value: DateFormula)
+    procedure SetParameterDateFormula(ParameterName: Text[20]; Value: DateFormula)
     var
         TaskLineParam: Record "NPR Task Line Parameters";
     begin
@@ -945,11 +945,11 @@ table 6059902 "NPR Task Line"
         if TableKey = '' then begin
             Pos := StrPos(CurrTableView, 'WHERE(');
             if Pos > 0 then
-                TableView := CopyStr(CurrTableView, 1, Pos - 1)
+                TableView := CopyStr(CopyStr(CurrTableView, 1, Pos - 1), 1, MaxStrLen(TableView))
             else
-                TableView := CurrTableView + ' ';
+                TableView := CopyStr(CurrTableView + ' ', 1, MaxStrLen(TableView));
         end else
-            TableView := 'SORTING(' + TableKey + ') ';
+            TableView := CopyStr('SORTING(' + TableKey + ') ', 1, MaxStrLen(TableView));
 
         Pos := StrPos(TableFilter, ': ');
         if Pos = 0 then
@@ -960,29 +960,29 @@ table 6059902 "NPR Task Line"
         if CopyStr(TableFilter, 1, Pos - 1) <> AllObj."Object Name" then
             exit(TableView);
 
-        TableFilter := CopyStr(TableFilter, Pos + 2);
+        TableFilter := CopyStr(CopyStr(TableFilter, Pos + 2), 1, MaxStrLen(TableFilter));
 
         Pos := StrPos(TableFilter, '=');
         if Pos = 0 then
             exit(TableView);
 
-        TableView := TableView + 'WHERE(';
+        TableView := CopyStr(TableView + 'WHERE(', 1, MaxStrLen(TableView));
 
         while Pos > 0 do begin
             TableView := TableView + CopyStr(TableFilter, 1, Pos) + 'FILTER(';
-            TableFilter := CopyStr(TableFilter, Pos + 1);
+            TableFilter := CopyStr(CopyStr(TableFilter, Pos + 1), 1, MaxStrLen(TableFilter));
 
             if TableFilter[1] = '"' then begin
-                TableFilter := CopyStr(TableFilter, 2);
+                TableFilter := CopyStr(CopyStr(TableFilter, 2), 1, MaxStrLen(TableFilter));
                 Pos := StrPos(TableFilter, '"');
                 while Pos > 0 do begin
                     TableView := TableView + CopyStr(TableFilter, 1, Pos - 1);
                     if CopyStr(TableFilter, Pos, 2) = '""' then begin
-                        TableView := TableView + '"';
-                        TableFilter := CopyStr(TableFilter, Pos + 2);
+                        TableView := CopyStr(TableView + '"', 1, MaxStrLen(TableView));
+                        TableFilter := CopyStr(CopyStr(TableFilter, Pos + 2), 1, MaxStrLen(TableFilter));
                         Pos := StrPos(TableFilter, '"');
                     end else begin
-                        TableFilter := CopyStr(TableFilter, Pos + 1);
+                        TableFilter := CopyStr(CopyStr(TableFilter, Pos + 1), 1, MaxStrLen(TableFilter));
                         Pos := 0;
                     end;
                 end;
@@ -993,11 +993,11 @@ table 6059902 "NPR Task Line"
                 Pos := StrLen(TableFilter) + 1;
 
             TableView := TableView + CopyStr(TableFilter, 1, Pos - 1) + ')' + CopyStr(TableFilter, Pos, 1);
-            TableFilter := CopyStr(TableFilter, Pos + 1);
+            TableFilter := CopyStr(CopyStr(TableFilter, Pos + 1), 1, MaxStrLen(TableFilter));
             Pos := StrPos(TableFilter, '=');
         end;
 
-        TableView := TableView + ')';
+        TableView := CopyStr(TableView + ')', 1, MaxStrLen(TableView));
 
         exit(TableView);
     end;

@@ -153,17 +153,17 @@ codeunit 6059903 "NPR Task Queue Execute"
             if (StartPos = 0) or (EndPos = 0) then
                 exit(NewFilePath);
 
-            FieldValue := CopyStr(NewFilePath, StartPos + 1, EndPos - StartPos - 1);
+            FieldValue := CopyStr(CopyStr(NewFilePath, StartPos + 1, EndPos - StartPos - 1), 1, MaxStrLen(FieldValue));
             CommaPos := StrPos(FieldValue, ',');
             if CommaPos <> 0 then begin
-                FormatLenghtTxt := CopyStr(FieldValue, CommaPos + 1);
-                FieldValue := CopyStr(FieldValue, 1, CommaPos - 1);
+                FormatLenghtTxt := CopyStr(CopyStr(FieldValue, CommaPos + 1), 1, MaxStrLen(FormatLenghtTxt));
+                FieldValue := CopyStr(CopyStr(FieldValue, 1, CommaPos - 1), 1, MaxStrLen(FieldValue));
             end;
 
             CommaPos := StrPos(FormatLenghtTxt, ',');
             if CommaPos <> 0 then begin
-                FormatStr := CopyStr(FormatLenghtTxt, CommaPos + 1);
-                FormatLenghtTxt := CopyStr(FormatLenghtTxt, 1, CommaPos - 1);
+                FormatStr := CopyStr(CopyStr(FormatLenghtTxt, CommaPos + 1), 1, MaxStrLen(FormatStr));
+                FormatLenghtTxt := CopyStr(CopyStr(FormatLenghtTxt, 1, CommaPos - 1), 1, MaxStrLen(FormatLenghtTxt));
             end;
 
             if FormatLenghtTxt <> '' then
