@@ -1,6 +1,6 @@
-page 6151247 "NPR Setup Act - Scenarios"
+page 6151247 "NPR Retail - Setups"
 {
-    Caption = 'NP Retail - POS Scenarios Setups';
+    Caption = 'NP Retail - Setups';
     PageType = CardPart;
     RefreshOnActivate = true;
     SourceTable = "NPR NP Retail Admin Cue";
@@ -10,18 +10,7 @@ page 6151247 "NPR Setup Act - Scenarios"
     {
         area(content)
         {
-            cuegroup("POS Scenarios")
-            {
-                Caption = 'Pos Scenarios';
-                field("NPR POS Scenarios"; Rec."NPR POS Sales Workflow")
-                {
 
-                    Caption = 'POS Scenarios';
-                    ShowCaption = true;
-                    ToolTip = 'Specifies the value of the POS Sales Scenarios field';
-                    ApplicationArea = NPRRetail;
-                }
-            }
             cuegroup("Product Videos")
             {
                 Caption = 'Product Videos';

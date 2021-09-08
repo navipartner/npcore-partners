@@ -20,7 +20,7 @@ codeunit 6014441 "NPR Get Started Notification"
         PAGE.RunModal(PAGE::"NPR Getting Started");
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"NPR Setup Act - Scenarios", 'OnOpenPageEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Retail - Setups", 'OnOpenPageEvent', '', false, false)]
     local procedure SendNotificationOnEvent()
     begin
         SendOrRecallGetStartedNotification();
