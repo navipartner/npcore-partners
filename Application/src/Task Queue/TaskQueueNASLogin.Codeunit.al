@@ -289,13 +289,13 @@
 
             TaskWorker.Init();
             TaskWorker."Server Instance ID" := ActiveSession."Server Instance ID";
-            TaskWorker."User ID" := ActiveSession."User ID";
+            TaskWorker."User ID" := CopyStr(ActiveSession."User ID", 1, MaxStrLen(TaskWorker."User ID"));
             TaskWorker."Session ID" := ActiveSession."Session ID";
             TaskWorker."Login Time" := ActiveSession."Login Datetime";
-            TaskWorker."Current Company" := CompanyName;
-            TaskWorker."Application Name" := ActiveSession."Server Computer Name";
-            TaskWorker."DB Name" := ActiveSession."Database Name";
-            TaskWorker."Host Name" := ActiveSession."Client Computer Name";
+            TaskWorker."Current Company" := CopyStr(CompanyName, 1, MaxStrLen(TaskWorker."Current Company"));
+            TaskWorker."Application Name" := CopyStr(ActiveSession."Server Computer Name", 1, MaxStrLen(TaskWorker."Application Name"));
+            TaskWorker."DB Name" := CopyStr(ActiveSession."Database Name", 1, MaxStrLen(TaskWorker."DB Name"));
+            TaskWorker."Host Name" := CopyStr(ActiveSession."Client Computer Name", 1, MaxStrLen(TaskWorker."Host Name"));
             TaskWorker."Task Worker Group" := 'MASTER';
             TaskWorker."Current Check Interval" := MilisecondsBetweenPolls;
             TaskWorker."Current Language ID" := GlobalLanguage;

@@ -79,7 +79,7 @@ table 6059904 "NPR Task Log (Task)"
 
             trigger OnLookup()
             var
-                Text: Text[1024];
+                Text: Text;
                 InStream: InStream;
             begin
                 CalcFields("Last Error Message BLOB");
@@ -181,7 +181,7 @@ table 6059904 "NPR Task Log (Task)"
         "Entry Type" := "Entry Type"::Task;
         "Starting Time" := CurrentDateTime;
         Status := Status::Started;
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Task Worker Group" := TaskQueue."Task Worker Group";
         "Object Type" := TaskLine."Object Type";
         "Object No." := TaskLine."Object No.";
@@ -214,10 +214,10 @@ table 6059904 "NPR Task Log (Task)"
             Status := Status::Succes
         else
             Status := Status::Error;
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Task Worker Group" := TaskQueue."Task Worker Group";
         if Status = Status::Error then begin
-            TMPText := GetLastErrorText;
+            TMPText := CopyStr(GetLastErrorText,1,MaxStrLen(TMPText));
             TMPText := ConvertCarrigeReturn(TMPText);
             "Last Error Message BLOB".CreateOutStream(OutStream);
             OutStream.WriteText(TMPText);
@@ -248,13 +248,13 @@ table 6059904 "NPR Task Log (Task)"
         "Entry Type" := "Entry Type"::Task;
         "Starting Time" := CurrentDateTime;
         Status := Status::Error;
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Task Worker Group" := TaskQueue."Task Worker Group";
         "Object Type" := TaskLine."Object Type";
         "Object No." := TaskLine."Object No.";
         //-TQ1.17
         //"Last Error Message" := COPYSTR(GETLASTERRORTEXT,1,MAXSTRLEN("Last Error Message"));
-        TMPText := GetLastErrorText;
+        TMPText := CopyStr(GetLastErrorText, 1, MaxStrLen(TMPText));
         TMPText := ConvertCarrigeReturn(TMPText);
         "Last Error Message BLOB".CreateOutStream(OutStream);
         OutStream.WriteText(TMPText);
@@ -287,7 +287,7 @@ table 6059904 "NPR Task Log (Task)"
         "Entry Type" := "Entry Type"::Task;
         "Starting Time" := CurrentDateTime;
         Status := Status::Error;
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Task Worker Group" := TaskQueue."Task Worker Group";
         "Object Type" := TaskLine."Object Type";
         "Object No." := TaskLine."Object No.";
@@ -320,7 +320,7 @@ table 6059904 "NPR Task Log (Task)"
         "Entry Type" := "Entry Type"::Task;
         "Starting Time" := CurrentDateTime;
         Status := Status::Message;
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Task Worker Group" := TaskLine."Task Worker Group";
         "Object Type" := TaskLine."Object Type";
         "Object No." := TaskLine."Object No.";

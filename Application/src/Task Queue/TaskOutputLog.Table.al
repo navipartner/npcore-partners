@@ -59,7 +59,7 @@ table 6059905 "NPR Task Output Log"
             trigger OnLookup()
             var
                 InStream: InStream;
-                Text: Text[1024];
+                Text: Text;
             begin
                 CalcFields(File);
                 if File.HasValue() then begin

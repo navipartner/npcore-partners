@@ -25,7 +25,7 @@ codeunit 6014679 "NPR Setup Endpoint Req Tasks"
 
 
         TaskLineNo := 50000;
-        SetupTaskLineMinute(TaskCode, TaskCode, TaskLineNo, TaskDescription + ' Endpoint Send Req. Batch', TaskCode);
+        SetupTaskLineMinute(TaskCode, TaskCode, TaskLineNo, CopyStr(TaskDescription + ' Endpoint Send Req. Batch', 1, MaxStrLen(TaskDescription)), TaskCode);
         SetTaskLineEnabled(TaskCode, TaskCode, TaskLineNo, NaviConnectSetup."Task Queue Enabled");
     end;
 
