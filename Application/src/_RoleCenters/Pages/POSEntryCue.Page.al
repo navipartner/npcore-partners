@@ -99,7 +99,7 @@ page 6151260 "NPR POS Entry Cue"
             Rec.Init();
             Rec.Insert();
         end;
-        Rec.SetRange("EFT Errors Date Filter", CalcDate('<-30D>'), Today());
+        Rec.SetRange("EFT Errors Date Filter", CalcDate('<-30D>', Today()), Today());
     end;
 
     trigger OnAfterGetRecord()
