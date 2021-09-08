@@ -19,7 +19,7 @@ page 6151245 "NPR Retail Setup RC"
 
             }
 
-            part(Control14; "NPR Setup Act - Scenarios")
+            part(Control14; "NPR Retail - Setups")
             {
                 ApplicationArea = NPRRetail;
 
@@ -108,6 +108,7 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Executes the POS Default View action';
                     ApplicationArea = NPRRetail;
                 }
+
                 action("POS Scenarios")
                 {
                     Caption = 'POS Scenarios';
