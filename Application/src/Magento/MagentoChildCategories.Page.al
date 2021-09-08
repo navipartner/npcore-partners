@@ -64,8 +64,8 @@ page 6151417 "NPR Magento Child Categories"
     end;
 
     var
-        MagentoCategoryMgt: Codeunit "NPR Magento Category Mgt.";
         ParentMagentoCategory: Record "NPR Magento Category";
+        MagentoCategoryMgt: Codeunit "NPR Magento Category Mgt.";
 
     procedure SetParentItemGroup(NewParentMagentoCategory: Record "NPR Magento Category")
     begin

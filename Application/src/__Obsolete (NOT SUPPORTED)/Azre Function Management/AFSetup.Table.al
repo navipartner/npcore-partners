@@ -233,13 +233,13 @@ table 6151570 "NPR AF Setup"
 
     trigger OnInsert()
     begin
-        "Customer Tag" := ConvertStr(Format(CreateGuid()), '{}-', '000');
+        "Customer Tag" := CopyStr(ConvertStr(Format(CreateGuid()), '{}-', '000'), 1, MaxStrLen("Customer Tag"));
     end;
 
     trigger OnModify()
     begin
         if "Customer Tag" = '' then
-            "Customer Tag" := ConvertStr(Format(CreateGuid()), '{}-', '000');
+            "Customer Tag" := CopyStr(ConvertStr(Format(CreateGuid()), '{}-', '000'), 1, MaxStrLen("Customer Tag"));
 
         if "Msg Service - Site Created" then
             if (xRec."Msg Service - Name" <> "Msg Service - Name") then

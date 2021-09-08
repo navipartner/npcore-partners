@@ -115,19 +115,19 @@
 
         if not UserSetup.Get(UserId) then begin
             UserSetup.Init();
-            UserSetup."User ID" := UserId;
+            UserSetup."User ID" := CopyStr(UserId, 1, MaxStrLen(UserSetup."User ID"));
             UserSetup.Insert();
         end;
         UserSetup."NPR POS Unit No." := POSUnit."No.";
         UserSetup.Modify();
 
-        SalesTicketNo := DelChr(Format(CurrentDateTime, 0, 9), '=', ' -:.ZT');
+        SalesTicketNo := CopyStr(DelChr(Format(CurrentDateTime, 0, 9), '=', ' -:.ZT'), 1, MaxStrLen(SalesTicketNo));
         while SalePOS.Get(POSUnit."No.", '-' + SalesTicketNo) do
             SalesTicketNo := IncStr(SalesTicketNo);
 
         SalePOS.Init();
         SalePOS."Register No." := POSUnit."No.";
-        SalePOS."Sales Ticket No." := '-' + SalesTicketNo;
+        SalePOS."Sales Ticket No." := CopyStr('-' + SalesTicketNo, 1, MaxStrLen(SalePOS."Sales Ticket No."));
         SalePOS.Date := Today();
         SalePOS.Insert();
     end;

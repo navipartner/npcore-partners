@@ -312,7 +312,7 @@
             CouponEntry."Register No." := '';
             CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
             CouponEntry."Document No." := '';
-            CouponEntry."User ID" := UserId;
+            CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
             CouponEntry."Closed by Entry No." := 0;
             CouponEntry.Insert();
 
@@ -349,7 +349,7 @@
         CouponEntry."Register No." := '';
         CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
         CouponEntry."Document No." := '';
-        CouponEntry."User ID" := UserId;
+        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
         CouponEntry."Closed by Entry No." := 0;
         CouponEntry.Insert();
     end;
@@ -376,7 +376,7 @@
         CouponEntry."Register No." := '';
         CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
         CouponEntry."Document No." := '';
-        CouponEntry."User ID" := UserId;
+        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
         CouponEntry."Closed by Entry No." := 0;
         CouponEntry.Insert();
     end;
@@ -405,7 +405,7 @@
         CouponEntry."Register No." := SaleLinePOSCoupon."Register No.";
         CouponEntry."Document Type" := CouponEntry."Document Type"::"POS Entry";
         CouponEntry."Document No." := SaleLinePOSCoupon."Sales Ticket No.";
-        CouponEntry."User ID" := UserId;
+        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
         CouponEntry."Closed by Entry No." := 0;
         CouponEntry.Insert();
 
@@ -492,7 +492,7 @@
                 end;
         end;
         CouponEntry."Document No." := SalesHeader."No.";
-        CouponEntry."User ID" := UserId;
+        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
         CouponEntry."Closed by Entry No." := 0;
         CouponEntry.Insert();
 

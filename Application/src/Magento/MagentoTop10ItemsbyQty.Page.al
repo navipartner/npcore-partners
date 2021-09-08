@@ -136,8 +136,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
     end;
 
     var
-        Query1: Query "NPR Top 10 Items by Quantity";
         Item: Record Item;
+        Query1: Query "NPR Top 10 Items by Quantity";
         StartDate: Date;
         Enddate: Date;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;

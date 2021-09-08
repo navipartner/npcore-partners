@@ -119,11 +119,11 @@ page 6151257 "NPR Retail Headline EFT RC"
         DefaultFieldsVisible: Boolean;
         DocumentationTxt: Label 'Want to learn more about %1?', Comment = '%1 is the NAV short product name.';
         DocumentationUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=867580', Locked = true;
-        GreetingText: Text[250];
-        DocumentationText: Text[250];
+        GreetingText: Text;
+        DocumentationText: Text;
         UserGreetingVisible: Boolean;
-        MyPickText: Text[250];
-        AwayPickText: Text[250];
+        MyPickText: Text;
+        AwayPickText: Text;
 
     local procedure ComputeDefaultFieldsVisibility()
     var

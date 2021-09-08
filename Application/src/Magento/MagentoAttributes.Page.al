@@ -129,8 +129,8 @@ page 6151431 "NPR Magento Attributes"
     end;
 
     var
-        Text001: Label 'The Type is: %1\\Type can not be changed after Creation\\Create Attribute?';
         MagentoSetup: Record "NPR Magento Setup";
+        Text001: Label 'The Type is: %1\\Type can not be changed after Creation\\Create Attribute?';
         TypeEditable: Boolean;
 
     procedure UsedByAttributeSetDrillDown()

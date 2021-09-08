@@ -802,16 +802,17 @@ report 6014459 "NPR Balancing Report A4 POS"
     end;
 
     var
+        CompanyInfo: Record "Company Information";
+        POSEntry: Record "NPR POS Entry";
+        Salesperson: Record "Salesperson/Purchaser";
         VarTax: Integer;
         VarMain: Integer;
         VarBin: Integer;
-        POSEntry: Record "NPR POS Entry";
         RegisterNoLbl: Label 'Register No.';
         SalesTicketNoLbl: Label 'Sales Ticket No';
         OpeningHrsLbl: Label 'Opening Hours';
         ClosingDatelbl: Label 'Closing Date';
         BalancedByLbl: Label 'Register Balanced By';
-        Salesperson: Record "Salesperson/Purchaser";
         VarBalancedBy: Text;
         WithLbl: Label 'With';
         VarReportTitle: Text;
@@ -847,5 +848,4 @@ report 6014459 "NPR Balancing Report A4 POS"
         AttachedPaymentBinslbl: Label 'Attached Payment Bins';
         CustomerPaymentLbl: Label 'Payment';
         Workshiftlbl: Label 'Workshift';
-        CompanyInfo: Record "Company Information";
 }

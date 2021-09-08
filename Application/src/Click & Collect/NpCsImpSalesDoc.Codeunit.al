@@ -199,8 +199,8 @@
         ConfigTemplateHeader: Record "Config. Template Header";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
-        RecRef: RecordRef;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        RecRef: RecordRef;
         StoreCode: Code[20];
         CustNo: Code[20];
         ConfigTemplateCode: Code[10];

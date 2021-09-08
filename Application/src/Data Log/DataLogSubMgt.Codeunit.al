@@ -17,13 +17,13 @@
 
     local procedure AssignValue(var FieldRef: FieldRef; Value: Text[250])
     var
+        DateFormulaValue: DateFormula;
         TextValue: Text[250];
         DecimalValue: Decimal;
         IntegerValue: Integer;
         BooleanValue: Boolean;
         DateValue: Date;
         TimeValue: Time;
-        DateFormulaValue: DateFormula;
         BigIntegerValue: BigInteger;
         DateTimeValue: DateTime;
     begin

@@ -54,8 +54,8 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
     end;
 
     var
-        SessionName: Text[40];
         SalesHeader: Record "Sales Header";
+        SessionName: Text[40];
 
     procedure SelectTable(Sheader: Record "Sales Header")
     begin
@@ -65,9 +65,9 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
     local procedure ImportSalesLine(SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
+        Item: Record Item;
         NextLineNo: Integer;
         Qty: Decimal;
-        Item: Record Item;
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");

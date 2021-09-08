@@ -31,8 +31,8 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
     end;
 
     var
-        Text000: Label 'Invalid Xml data';
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        Text000: Label 'Invalid Xml data';
 
     local procedure MarkOrderMappings(Element: XmlElement; var NpCsDocumentMapping: Record "NPR NpCs Document Mapping")
     var

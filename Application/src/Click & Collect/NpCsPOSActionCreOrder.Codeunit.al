@@ -414,7 +414,7 @@
             if not TempSaleLinePOS.FindFirst() then begin
                 TempSaleLinePOS.Init();
                 TempSaleLinePOS := SaleLinePOS;
-                TempSaleLinePOS.Reference := Sku;
+                TempSaleLinePOS.Reference := CopyStr(Sku, 1, MaxStrLen(TempSaleLinePOS.Reference));
                 TempSaleLinePOS.Insert();
             end else begin
                 TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;

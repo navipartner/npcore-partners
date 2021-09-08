@@ -186,11 +186,11 @@ table 6060051 "NPR Item Worksh. Excel Column"
                 end;
 
                 if "Process as" = "Process as"::Other then begin
-                    "Map to Field Name" := TempFieldName("Map to Field Number");
-                    "Map to Caption" := TempFieldName("Map to Field Number");
+                    "Map to Field Name" := CopyStr(TempFieldName("Map to Field Number"), 1, MaxStrLen("Map to Field Name"));
+                    "Map to Caption" := CopyStr(TempFieldName("Map to Field Number"), 1, MaxStrLen("Map to Caption"));
                 end;
                 if "Excel Header Text" = '' then
-                    "Excel Header Text" := "Map to Caption";
+                    "Excel Header Text" := CopyStr("Map to Caption", 1, MaxStrLen("Excel Header Text"));
             end;
         }
         field(80; "Map to Field Name"; Text[30])

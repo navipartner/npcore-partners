@@ -156,8 +156,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
-                        MixedDiscountLines: Page "NPR Mixed Discount Lines";
                         MixedDiscountLine: Record "NPR Mixed Discount Line";
+                        MixedDiscountLines: Page "NPR Mixed Discount Lines";
                     begin
                         MixedDiscountLines.Editable(false);
                         MixedDiscountLine.Reset();
@@ -192,8 +192,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
-                        CampaignDiscountLines: Page "NPR Campaign Discount Lines";
                         PeriodDiscountLine: Record "NPR Period Discount Line";
+                        CampaignDiscountLines: Page "NPR Campaign Discount Lines";
                     begin
                         CampaignDiscountLines.Editable(false);
                         PeriodDiscountLine.Reset();
@@ -907,8 +907,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        PrintLabelAndDisplay: Codeunit 6014413;
                         ReportSelectionRetail: Record 6014404;
+                        PrintLabelAndDisplay: Codeunit 6014413;
                     begin
                         PrintLabelAndDisplay.ResolveVariantAndPrintItem(Rec, ReportSelectionRetail."Report Type"::"Price Label");
                     end;
@@ -1065,8 +1065,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        CampaignDiscountLines: Page 6014454;
                         PeriodDiscountLine: Record 6014414;
+                        CampaignDiscountLines: Page 6014454;
                     begin
                         CLEAR(CampaignDiscountLines);
                         CampaignDiscountLines.EDITABLE(FALSE);
@@ -1090,8 +1090,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        MixedDiscountLines: Page 6014451;
                         MixedDiscountLine: Record 6014412;
+                        MixedDiscountLines: Page 6014451;
 
                     begin
                         CLEAR(MixedDiscountLines);
@@ -1234,9 +1234,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         AccessorySparePart: Record "NPR Accessory/Spare Part";
         ItemCostMgt: Codeunit ItemCostManagement;
         AverageCostACY: Decimal;
-
-
-
         Text6151400: Label 'Update Seo Link?';
 
 

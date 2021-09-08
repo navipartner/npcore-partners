@@ -54,8 +54,8 @@ xmlport 6014414 "NPR Import from ScannerFilePO"
     end;
 
     var
-        SessionName: Text[40];
         PurchaseHeader: Record "Purchase Header";
+        SessionName: Text[40];
 
     procedure SelectTable(Pheader: Record "Purchase Header")
     begin

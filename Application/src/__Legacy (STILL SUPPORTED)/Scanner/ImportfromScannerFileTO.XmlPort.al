@@ -59,8 +59,8 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
     local procedure ImportTransferLine(TransferHeader: Record "Transfer Header")
     var
         TransferLine: Record "Transfer Line";
-        LineNo: Integer;
         Item: Record Item;
+        LineNo: Integer;
     begin
         TransferLine.SetRange("Document No.", TransferHeader."No.");
         if TransferLine.FindLast() then

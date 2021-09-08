@@ -93,8 +93,8 @@ page 6151420 "NPR Magento Brands"
 
                 trigger OnAction()
                 var
-                    MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                     MagentoDisplayConfig: Record "NPR Magento Display Config";
+                    MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                 begin
                     MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Brand);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);

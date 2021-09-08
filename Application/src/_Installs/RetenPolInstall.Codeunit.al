@@ -90,8 +90,8 @@ codeunit 6014496 "NPR Reten. Pol. Install"
 
     local procedure AddAllowedTable(TableId: Integer; RtnPeriodEnum: Enum "Retention Period Enum")
     var
-        RecRef: RecordRef;
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RecRef: RecordRef;
     begin
         RecRef.Open(TableId);
 

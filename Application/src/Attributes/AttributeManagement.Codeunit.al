@@ -195,21 +195,21 @@
             exit(false);
 
         vAttributeValue.Init();
-        vAttributeValue."Text Value" := TextValue;
+        vAttributeValue."Text Value" := CopyStr(TextValue, 1, MaxStrLen(vAttributeValue."Text Value"));
 
         case Attribute."Value Datatype" of
             Attribute."Value Datatype"::DT_TEXT:
                 begin
                     if GuiAllowed then
                         MakeText(TextValue);
-                    vAttributeValue."Text Value" := CopyStr(TextValue, 1, MaxStrLen(TextValue));
+                    vAttributeValue."Text Value" := CopyStr(TextValue, 1, MaxStrLen(vAttributeValue."Text Value"));
                 end;
             Attribute."Value Datatype"::DT_CODE:
                 begin
                     if (Attribute."On Validate" = Attribute."On Validate"::VALUE_LOOKUP) then
                         if (DoAttributeValueCodeLookup(Attribute.Code, TextValue) = false) then
                             Error(Text002, Attribute.Code, TextValue);
-                    vAttributeValue."Text Value" := CopyStr(UpperCase(TextValue), 1, 20);
+                    vAttributeValue."Text Value" := CopyStr(UpperCase(TextValue), 1, MaxStrLen(vAttributeValue."Text Value"));
                 end;
             Attribute."Value Datatype"::DT_DATE:
                 begin
@@ -401,10 +401,10 @@
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCaptionClassTranslate', '', false, false)]
     local procedure C1_OnAfterCaptionClassTranslate(Language: Integer; CaptionExpression: Text[1024]; var Caption: Text[1024])
     var
+        AttributeManagement: Codeunit "NPR Attribute Management";
         CaptionArea: Text[80];
         CaptionRef: Text[1024];
         CommaPosition: Integer;
-        AttributeManagement: Codeunit "NPR Attribute Management";
     begin
         CommaPosition := StrPos(CaptionExpression, ',');
         if (CommaPosition > 0) and (CommaPosition < 80) then begin
@@ -420,8 +420,8 @@
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseDelete', '', true, true)]
     local procedure C1_OnAfterOnDatabaseDelete(RecRef: RecordRef)
     var
-        KeyLayout: Option;
         AttributeID: Record "NPR Attribute ID";
+        KeyLayout: Option;
         CodePrimaryKey: Code[20];
         OptionPrimaryKey: Option;
         LinePrimaryKey: Integer;
@@ -462,8 +462,8 @@
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseRename', '', true, true)]
     local procedure C1_OnAfterOnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
     var
-        KeyLayout: Option;
         AttributeID: Record "NPR Attribute ID";
+        KeyLayout: Option;
         DoRename: Boolean;
         CodePrimaryKey: Code[20];
         OptionPrimaryKey: Option;
@@ -1441,8 +1441,8 @@
 
     PROCEDURE GetSeparateDateTime(DateTimeText: Text; VAR Date: Date; VAR Time: Time): Boolean;
     VAR
-        DateText: Text[250];
-        TimeText: Text[250];
+        DateText: Text;
+        TimeText: Text;
         Position: Integer;
         Length: Integer;
     BEGIN

@@ -278,9 +278,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
 
                 trigger OnAction()
                 var
+                    SalesHeader: Record "Sales Header";
                     LabelLibrary: Codeunit "NPR Label Library";
                     RecRef: RecordRef;
-                    SalesHeader: Record "Sales Header";
                 begin
                     SalesHeader := Rec;
                     SalesHeader.SetRecFilter();

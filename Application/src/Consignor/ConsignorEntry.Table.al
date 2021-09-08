@@ -92,7 +92,7 @@ table 6184601 "NPR Consignor Entry"
     trigger OnInsert()
     begin
         "Created Date Time" := CurrentDateTime;
-        "Created By" := UserId;
+        "Created By" := CopyStr(UserId, 1, MaxStrLen("Created By"));
     end;
 
     var

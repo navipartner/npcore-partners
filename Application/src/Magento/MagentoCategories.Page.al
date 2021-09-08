@@ -95,8 +95,8 @@ page 6151416 "NPR Magento Categories"
 
                 trigger OnAction()
                 var
-                    MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                     MagentoDisplayConfig: Record "NPR Magento Display Config";
+                    MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                 begin
                     MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::"Item Group");
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
