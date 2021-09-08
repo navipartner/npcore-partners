@@ -75,6 +75,8 @@ codeunit 6150724 "NPR POS Action - Change View"
                             Error(RemainingLines)
                     end;
 
+                    Commit();
+
                     POSSession.StartPOSSession();
                 end;
             ViewType::Sale:

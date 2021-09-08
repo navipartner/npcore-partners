@@ -508,9 +508,13 @@ table 6150621 "NPR POS Entry"
         end;
     end;
 
+    procedure IsSaleTransaction(): Boolean
+    begin
+        exit("Entry Type" in ["Entry Type"::"Direct Sale", "Entry Type"::"Credit Sale"]);
+    end;
+
     [IntegrationEvent(TRUE, false)]
     local procedure OnAfterRecalculate(var Modified: Boolean)
     begin
     end;
 }
-
