@@ -1,6 +1,7 @@
 ﻿codeunit 6150705 "NPR POS Sale"
 {
     var
+        LastSalePOSEntry: Record "NPR POS Entry";
         Rec: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
         This: Codeunit "NPR POS Sale";
@@ -147,45 +148,70 @@
         SalePOS.Copy(Rec);
     end;
 
+    procedure SetLastSalePOSEntry(POSEntryIn: Record "NPR POS Entry")
+    begin
+        LastSalePOSEntry := POSEntryIn;
+    end;
+
+    procedure GetLastSalePOSEntry(var POSEntryOut: Record "NPR POS Entry")
+    begin
+        POSEntryOut := LastSalePOSEntry;
+    end;
+
     procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
     var
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
-        NoMoreEntries: Boolean;
         LastSaleDateLbl: Label '%1 | %2', Locked = true;
     begin
         if not LastSaleRetrieved then begin
-            POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
-            POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
-            POSEntry.SetRange("POS Unit No.", Rec."Register No.");
-            if not POSEntry.Find('+') then
-                exit;
-            repeat
-                LastSaleRetrieved := POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale"];
-                if not LastSaleRetrieved then
-                    NoMoreEntries := POSEntry.Next(-1) = 0;
-            until NoMoreEntries or LastSaleRetrieved;
-            if not LastSaleRetrieved then
-                exit;
+            POSEntry := LastSalePOSEntry;
+            LastSaleRetrieved :=
+                (POSEntry."Entry No." <> 0) and POSEntry.IsSaleTransaction() and
+                ((Rec."Register No." = POSEntry."POS Unit No.") or ((Rec."Register No." = '') and (POSUnit."No." = POSEntry."POS Unit No.")));
+            if not LastSaleRetrieved and ((Rec."Register No." <> '') or (POSUnit."No." <> '')) then begin
+                POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+                if Rec."Register No." <> '' then begin
+                    POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
+                    POSEntry.SetRange("POS Unit No.", Rec."Register No.");
+                end else begin
+                    POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
+                    POSEntry.SetRange("POS Unit No.", POSUnit."No.");
+                end;
+                POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
+                LastSaleRetrieved := POSEntry.FindLast();
+                if LastSaleRetrieved then
+                    SetLastSalePOSEntry(POSEntry);
+            end;
 
-            LastReceiptNoOut := POSEntry."Fiscal No.";
-            LastSaleDateTextOut := StrSubstNo(LastSaleDateLbl, POSEntry."Entry Date", POSEntry."Ending Time");
-
-            POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-            POSSalesLine.CalcSums("Amount Incl. VAT (LCY)");
-            LastSaleTotalOut := POSSalesLine."Amount Incl. VAT (LCY)";
-
+            LastSaleTotalOut := 0;
             LastSalePaymentOut := 0;
             LastSaleReturnAmountOut := 0;
-            POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-            if POSPaymentLine.FindSet() then
-                repeat
-                    if POSPaymentLine."Amount (LCY)" > 0 then
-                        LastSalePaymentOut += POSPaymentLine."Amount (LCY)"
-                    else
-                        LastSaleReturnAmountOut += POSPaymentLine."Amount (LCY)";
-                until POSPaymentLine.Next() = 0;
+            if LastSaleRetrieved then begin
+                LastReceiptNoOut := POSEntry."Fiscal No.";
+                LastSaleDateTextOut := StrSubstNo(LastSaleDateLbl, POSEntry."Entry Date", POSEntry."Ending Time");
+
+                POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSSalesLine.SetLoadFields("Amount Incl. VAT (LCY)");
+                if POSSalesLine.FindSet() then
+                    repeat
+                        LastSaleTotalOut += POSSalesLine."Amount Incl. VAT (LCY)";
+                    until POSSalesLine.Next() = 0;
+
+                POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSPaymentLine.SetLoadFields("Amount (LCY)");
+                if POSPaymentLine.FindSet() then
+                    repeat
+                        if POSPaymentLine."Amount (LCY)" > 0 then
+                            LastSalePaymentOut += POSPaymentLine."Amount (LCY)"
+                        else
+                            LastSaleReturnAmountOut += POSPaymentLine."Amount (LCY)";
+                    until POSPaymentLine.Next() = 0;
+            end else begin
+                LastReceiptNoOut := '';
+                LastSaleDateTextOut := '';
+            end;
         end;
     end;
 
@@ -402,9 +428,12 @@
     local procedure EndSaleTransaction(SalePOS: Record "NPR POS Sale")
     var
         POSCreateEntry: Codeunit "NPR POS Create Entry";
+        POSEntry: Record "NPR POS Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSCreateEntry.Run(Rec);
+        POSCreateEntry.GetCreatedPOSEntry(POSEntry);
+        SetLastSalePOSEntry(POSEntry);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
