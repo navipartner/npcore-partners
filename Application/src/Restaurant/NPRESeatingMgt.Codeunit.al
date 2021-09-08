@@ -59,6 +59,7 @@
         if ServiceFlowProfile."Seating Status after Clearing" = '' then
             exit;
 
+        SeatingWaiterPadLink.SetCurrentKey(Closed);
         SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
         SeatingWaiterPadLink.SetRange(Closed, false);
         if not SeatingWaiterPadLink.IsEmpty then

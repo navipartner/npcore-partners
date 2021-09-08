@@ -178,6 +178,7 @@ table 6150665 "NPR NPRE Seating"
             HasBeenAssigned := true;
         end;
 
+        SeatingWaiterPadLink.SetCurrentKey(Closed);
         SeatingWaiterPadLink.SetRange("Seating Code", Code);
         SeatingWaiterPadLink.SetRange(Closed, false);
         if SeatingWaiterPadLink.FindSet() then
