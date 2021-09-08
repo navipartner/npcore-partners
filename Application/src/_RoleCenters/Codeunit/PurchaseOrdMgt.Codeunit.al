@@ -8,7 +8,7 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
     begin
         if not TrailingPurchOrdersSetup.Get(UserId) then begin
             TrailingPurchOrdersSetup.LockTable();
-            TrailingPurchOrdersSetup."User ID" := UserId;
+            TrailingPurchOrdersSetup."User ID" := CopyStr(UserId,1,MaxStrLen(TrailingPurchOrdersSetup."User ID"));
             TrailingPurchOrdersSetup."Use Work Date as Base" := true;
             TrailingPurchOrdersSetup."Period Length" := TrailingPurchOrdersSetup."Period Length"::Month;
             TrailingPurchOrdersSetup."Value to Calculate" := TrailingPurchOrdersSetup."Value to Calculate"::"No. of Orders";

@@ -497,7 +497,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             if CalcType = CalcType::GenJnlLine then
                                 Rec.SetRange("Applies-to ID", GenJnlLine."Applies-to ID")
                             else begin
-                                CustEntryApplID := UserId;
+                                CustEntryApplID := CopyStr(UserId, 1, MaxStrLen(CustEntryApplID));
                                 if CustEntryApplID = '' then
                                     CustEntryApplID := '***';
                                 Rec.SetRange("Applies-to ID", CustEntryApplID);
@@ -613,6 +613,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         TotalSalesLineLCY: Record "Sales Line";
         TotalServLine: Record "Service Line";
         TotalServLineLCY: Record "Service Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
         CustEntrySetApplID: Codeunit "Cust. Entry-SetAppl.ID";
         GenJnlApply: Codeunit "Gen. Jnl.-Apply";
         SalesPost: Codeunit "Sales-Post";
@@ -643,7 +644,6 @@ page 6014493 "NPR POS Apply Cust. Entries"
         PostingDone: Boolean;
         [InDataSet]
         "Applies-to IDVisible": Boolean;
-        SaleLinePOS: Record "NPR POS Sale Line";
 
     procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
     begin
@@ -1067,7 +1067,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
     local procedure FindApplyingEntry()
     begin
         if CalcType = CalcType::Direct then begin
-            CustEntryApplID := UserId;
+            CustEntryApplID := CopyStr(UserId, 1, MaxStrLen(CustEntryApplID));
             if CustEntryApplID = '' then
                 CustEntryApplID := '***';
 

@@ -17,6 +17,8 @@
     var
         MagentoSetup: Record "NPR Magento Setup";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
+        CurrImportEntry: Record "NPR Nc Import Entry";
+        CurrImportType: Record "NPR Nc Import Type";
         MagentoMgt: Codeunit "NPR Magento Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         SalesPost: Codeunit "Sales-Post";
@@ -29,8 +31,6 @@
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
-        CurrImportEntry: Record "NPR Nc Import Entry";
-        CurrImportType: Record "NPR Nc Import Type";
         Text003: Label 'Voucher Payment Amount %1 exceeds Voucher Amount %2';
 
     local procedure ImportSalesOrders(XmlDoc: XmlDocument)
@@ -369,8 +369,8 @@
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvGlobalVoucherWebservice: Codeunit "NPR NpRv Global Voucher WS";
         PaymentLine: Record "NPR Magento Payment Line";
+        NpRvGlobalVoucherWebservice: Codeunit "NPR NpRv Global Voucher WS";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         ExternalReferenceNo: Text;
         Amount: Decimal;
@@ -464,10 +464,10 @@
         PaymentMapping: Record "NPR Magento Payment Mapping";
         NPRMagentoMgt: Codeunit "NPR Magento Mgt.";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        RecRef: RecordRef;
         XmlElement2: XmlElement;
         XNode: XmlNode;
         XNodeList: XmlNodeList;
-        RecRef: RecordRef;
         OrderNo: Code[20];
         CurrencyFactor: Decimal;
     begin

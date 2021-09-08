@@ -84,7 +84,7 @@
             exit(StrSubstNo(QualifierLbl, QualifierText));
     end;
 
-    procedure GetUserGreetingText(var GreetingText: Text[250])
+    procedure GetUserGreetingText(var GreetingText: Text)
     var
         User: Record User;
     begin
@@ -92,7 +92,7 @@
         GetUserGreetingTextInternal(User."Full Name", GetTimeOfDay(), GreetingText);
     end;
 
-    procedure GetUserGreetingTextInternal(UserName: Text[80]; CurrentTimeOfDay: Option; var GreetingText: Text[250])
+    procedure GetUserGreetingTextInternal(UserName: Text[80]; CurrentTimeOfDay: Option; var GreetingText: Text)
     var
         UserNameFound: Boolean;
         CleanUserName: Text;
@@ -219,7 +219,7 @@
     begin
     end;
 
-    procedure GetTopSalesToday(var HigestTodaySales: Text[250])
+    procedure GetTopSalesToday(var HigestTodaySales: Text)
     var
         POSEntry: Record "NPR POS Entry";
         SalesAmt: Decimal;
@@ -266,7 +266,7 @@
         MyPickText := Format(WarehouseActivityHdr.Count());
     end;
 
-    procedure GetMyPutAwayToday(var AwayPickText: Text[50])
+    procedure GetMyPutAwayToday(var AwayPickText: Text)
     var
         WarehouseActivityHdr: Record "Warehouse Activity Header";
     begin

@@ -58,8 +58,8 @@
             i += 1;
 
             M2ValueBuffer.Init();
-            M2ValueBuffer.Value := UpperCase(GetJsonText(DisplayGroup, 'value', MaxStrLen(M2ValueBuffer.Value)));
-            M2ValueBuffer.Label := GetJsonText(DisplayGroup, 'label', MaxStrLen(M2ValueBuffer.Label));
+            M2ValueBuffer.Value := CopyStr(UpperCase(GetJsonText(DisplayGroup, 'value')), 1, MaxStrLen(M2ValueBuffer.Value));
+            M2ValueBuffer.Label := CopyStr(GetJsonText(DisplayGroup, 'label'), 1, MaxStrLen(M2ValueBuffer.Label));
             M2ValueBuffer.Position := i;
             M2ValueBuffer.Insert();
         end;
@@ -139,7 +139,7 @@
             i += 1;
 
             M2ValueBuffer.Init();
-            M2ValueBuffer.Value := GetJsonText(ShippingGroup, '', MaxStrLen(M2ValueBuffer.Value));
+            M2ValueBuffer.Value := CopyStr(GetJsonText(ShippingGroup, ''), 1, MaxStrLen(M2ValueBuffer.Value));
             M2ValueBuffer.Position := i;
             M2ValueBuffer.Insert();
         end;
@@ -210,7 +210,7 @@
             i += 1;
 
             M2ValueBuffer.Init();
-            M2ValueBuffer.Value := GetJsonText(PaymentGroup, '', MaxStrLen(M2ValueBuffer.Value));
+            M2ValueBuffer.Value := CopyStr(GetJsonText(PaymentGroup, ''), 1, MaxStrLen(M2ValueBuffer.Value));
             M2ValueBuffer.Position := i;
             M2ValueBuffer.Insert();
         end;
@@ -293,8 +293,8 @@
             i += 1;
 
             M2ValueBuffer.Init();
-            M2ValueBuffer.Value := UpperCase(GetJsonText(CustomerGroup, 'customer_group_code', MaxStrLen(M2ValueBuffer.Value)));
-            M2ValueBuffer.Label := GetJsonText(CustomerGroup, 'tax_class_code', MaxStrLen(M2ValueBuffer.Label));
+            M2ValueBuffer.Value := CopyStr(UpperCase(GetJsonText(CustomerGroup, 'customer_group_code')), 1, MaxStrLen(M2ValueBuffer.Value));
+            M2ValueBuffer.Label := CopyStr(GetJsonText(CustomerGroup, 'tax_class_code'), 1, MaxStrLen(M2ValueBuffer.Label));
             M2ValueBuffer.Position := i;
             M2ValueBuffer.Insert();
         end;
@@ -399,8 +399,8 @@
                     i += 1;
 
                     M2ValueBuffer.Init();
-                    M2ValueBuffer.Value := GetJsonText(MagentoStore, '_attribute.code', MaxStrLen(M2ValueBuffer.Value));
-                    M2ValueBuffer.Label := GetJsonText(MagentoStore, '_value', MaxStrLen(M2ValueBuffer.Label));
+                    M2ValueBuffer.Value := CopyStr(GetJsonText(MagentoStore, '_attribute.code'), 1, MaxStrLen(M2ValueBuffer.Value));
+                    M2ValueBuffer.Label := CopyStr(GetJsonText(MagentoStore, '_value'), 1, MaxStrLen(M2ValueBuffer.Label));
                     M2ValueBuffer.Position := i;
                     M2ValueBuffer.Insert();
                 end;
@@ -473,7 +473,7 @@
         Result.ReadFrom(Response);
     end;
 
-    local procedure GetJsonText(JToken: JsonToken; JPath: Text; MaxLen: Integer) Value: Text
+    local procedure GetJsonText(JToken: JsonToken; JPath: Text) Value: Text
     var
         JToken2: JsonToken;
     begin
@@ -481,8 +481,6 @@
             exit('');
 
         Value := JToken2.AsValue().AsText();
-        if MaxLen > 0 then
-            Value := CopyStr(Value, 1, MaxLen);
         exit(Value);
     end;
 }

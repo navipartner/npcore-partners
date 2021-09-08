@@ -293,9 +293,9 @@ page 6151439 "NPR Magento Store Item List"
 
                                             trigger OnAssistEdit()
                                             var
+                                                MagentoFunctions: Codeunit "NPR Magento Functions";
                                                 RecRef: RecordRef;
                                                 FieldRef: FieldRef;
-                                                MagentoFunctions: Codeunit "NPR Magento Functions";
                                             begin
                                                 RecRef.GetTable(Rec);
                                                 FieldRef := RecRef.Field(Rec.FieldNo("Webshop Description"));
@@ -333,9 +333,9 @@ page 6151439 "NPR Magento Store Item List"
 
                                             trigger OnAssistEdit()
                                             var
+                                                MagentoFunctions: Codeunit "NPR Magento Functions";
                                                 RecRef: RecordRef;
                                                 FieldRef: FieldRef;
-                                                MagentoFunctions: Codeunit "NPR Magento Functions";
                                             begin
                                                 RecRef.GetTable(Rec);
                                                 FieldRef := RecRef.Field(Rec.FieldNo("Webshop Short Desc."));

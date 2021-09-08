@@ -244,7 +244,7 @@ codeunit 6014569 "NPR RegEx"
         while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i;
-            TempVariable."Variable Name" := Match.Value();
+            TempVariable."Variable Name" := CopyStr(Match.Value(), 1, MaxStrLen(TempVariable."Variable Name"));
             TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
             TempVariable."Variable Type" := TempVariable."Variable Type"::Mailchimp;
             TempVariable.Insert();
@@ -259,7 +259,7 @@ codeunit 6014569 "NPR RegEx"
         while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i + OffSet;
-            TempVariable."Variable Name" := Match.Value();
+            TempVariable."Variable Name" := CopyStr(Match.Value(), 1, MaxStrLen(TempVariable."Variable Name"));
             TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
             TempVariable."Variable Type" := TempVariable."Variable Type"::Handlebars;
             TempVariable.Insert();
@@ -359,11 +359,11 @@ codeunit 6014569 "NPR RegEx"
 
     local procedure ConvertToValue(FieldNoText: Text; RecRef: RecordRef): Text
     var
+        AutoFormat: Codeunit "Auto Format";
         FldRef: FieldRef;
         FieldNumber: Integer;
         OptionString: Text;
         OptionNo: Integer;
-        AutoFormat: Codeunit "Auto Format";
     begin
         if not Evaluate(FieldNumber, DelChr(FieldNoText, '<>', '{}')) then
             exit(FieldNoText);
@@ -410,9 +410,9 @@ codeunit 6014569 "NPR RegEx"
             Groups.Item(2, Group2);
             TempMagentoPicture.Init();
             TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
-            TempMagentoPicture.Name := PictureName;
+            TempMagentoPicture.Name := CopyStr(PictureName, 1, MaxStrLen(TempMagentoPicture.Name));
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
-            TempMagentoPicture."Mime Type" := Group1.Value();
+            TempMagentoPicture."Mime Type" := CopyStr(Group1.Value(), 1, MaxStrLen(TempMagentoPicture."Mime Type"));
             TempBlob.CreateOutStream(OutStr);
             Convert.FromBase64(Group2.Value(), OutStr);
             TempBlob.CreateInStream(InStr);
@@ -435,7 +435,7 @@ codeunit 6014569 "NPR RegEx"
                     TempGroup2 := TempGroups;
                     TempMagentoPicture.Init();
                     TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
-                    TempMagentoPicture.Name := PictureName;
+                    TempMagentoPicture.Name := CopyStr(PictureName,1,MaxStrLen(TempMagentoPicture.Name));
                     TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
                     TempMagentoPicture."Mime Type" := TempGroup1.ReadValue();
                     TempBlob.CreateOutStream(OutStr);

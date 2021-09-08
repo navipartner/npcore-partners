@@ -28,7 +28,7 @@ codeunit 6150708 "NPR POS Setup"
 
         if not UserSetup.Get(UserId) then begin
             UserSetup.Init();
-            UserSetup."User ID" := UserId;
+            UserSetup."User ID" := CopyStr(UserId, 1, MaxStrLen(UserSetup."User ID"));
             UserSetup.Insert();
         end;
 

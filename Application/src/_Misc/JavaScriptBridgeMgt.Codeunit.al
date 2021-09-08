@@ -89,12 +89,12 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
         FrontEnd: Codeunit "NPR POS Front End Management";
         JSON: Codeunit "NPR POS JSON Management";
         RegisterModuleRequest: JsonObject;
-        Module: Text;
+        Module: Text[10];
         Script: Text;
         RequestModuleErr: Label 'reading from RequestModule context';
     begin
         JSON.InitializeJObjectParser(EventContent, FrontEnd);
-        Module := JSON.GetStringOrFail('module', RequestModuleErr);
+        Module := CopyStr(JSON.GetStringOrFail('module', RequestModuleErr), 1, MaxStrLen(Module));
 
         Script := Web.GetJavaScript(Module);
         if Script = '' then

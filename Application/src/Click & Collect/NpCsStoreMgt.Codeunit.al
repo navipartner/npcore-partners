@@ -166,12 +166,12 @@
 
     procedure CalcDistance(FromNpCsStore: Record "NPR NpCs Store"; ToNpCsStore: Record "NPR NpCs Store") Distance: Decimal
     var
+        Math: Codeunit Math;
         PI: Decimal;
         Lat1: Decimal;
         Lat2: Decimal;
         Lon1: Decimal;
         Lon2: Decimal;
-        Math: Codeunit Math;
     begin
         //DotNet from this function can be easy removed after upgrade to BC 17.2 because Microsoft added theese functions to Codeunit Math (currently it has procedure "Abs" only.)
         //https://github.com/microsoft/ALAppExtensions/tree/master/Modules/System/Math

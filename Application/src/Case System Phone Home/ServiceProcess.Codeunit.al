@@ -10,10 +10,10 @@ codeunit 6014483 "NPR Service Process"
         if StrLen(Rec.Value) > 0 then begin
             if Evaluate(AmountUsed, Rec.Value) then;
             AmountUsed := AmountUsed / 100;
-            if not ProcessServiceAmount(Rec.Choice, AmountUsed) then
+            if not ProcessServiceAmount(CopyStr(Rec.Choice,1,20), AmountUsed) then
                 Rec.Chosen := false;
         end else
-            if not ProcessService(Rec.Choice) then
+            if not ProcessService(CopyStr(Rec.Choice,1,20)) then
                 Rec.Chosen := false;
     end;
 

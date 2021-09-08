@@ -478,8 +478,8 @@ xmlport 6151401 "NPR Magento Sales Order Import"
     }
 
     var
-        LineNo: Integer;
         TempSalesLine9: Record "Sales Line" temporary;
+        LineNo: Integer;
 
     procedure GetOrderNo(): Text
     begin
