@@ -174,6 +174,7 @@
         POSEntry."Tax Area Code" := SalePOS."Tax Area Code";
         POSEntry."Prices Including VAT" := SalePOS."Prices Including VAT";
         POSEntry."NPRE Number of Guests" := SalePOS."NPRE Number of Guests";
+        POSEntry."External Document No." := SalePOS."External Document No.";
 
         OnBeforeInsertPOSEntry(SalePOS, POSEntry);
 

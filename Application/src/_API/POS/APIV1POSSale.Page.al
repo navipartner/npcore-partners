@@ -196,18 +196,23 @@ page 6014665 "NPR APIV1 - POS Sale"
     end;
 
     [ServiceEnabled]
-    procedure GetSaleBalance(): Decimal
+    procedure GetSaleBalance() InfoText: Text
     var
         POSSaleRec: Record "NPR POS Sale";
+        GLSetup: Record "General Ledger Setup";
         SaleAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         Subtotal: Decimal;
         APIPOSSaleMgmt: Codeunit "NPR APIV1 - POS Sale Mgmt.";
+        InfoTxtJson: JsonObject;
     begin
         POSSaleRec.GetBySystemId(Rec."POS Sale System Id");
+        GLSetup.Get();
         APIPOSSaleMgmt.CalculateBalance(POSSaleRec, SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-        Exit(ReturnAmount);
+        InfoTxtJson.Add('Amount', ReturnAmount);
+        InfoTxtJson.Add('CurrencyCode', GLSetup."LCY Code");
+        InfoTxtJson.WriteTo(InfoText);
     end;
 
     [ServiceEnabled]

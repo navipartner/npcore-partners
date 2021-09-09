@@ -453,10 +453,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive, DocumentTypeNegative);
 
         LocationSource := JSON.GetIntegerParameterOrFail('UseLocationFrom', ActionCode());
-        SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode');
+        SpecificLocationCode := COPYSTR(JSON.GetStringParameter('UseSpecLocationCode'), 1, MaxStrLen(SpecificLocationCode));
         SetLocationSource(RetailSalesDocMgt, LocationSource, SpecificLocationCode);
 
-        PaymentMethodCode := JSON.GetStringParameter('PaymentMethodCode');
+        PaymentMethodCode := COPYSTR(JSON.GetStringParameter('PaymentMethodCode'), 1, MaxStrLen(PaymentMethodCode));
         RetailSalesDocMgt.SetPaymentMethod(PaymentMethodCode);
     end;
 

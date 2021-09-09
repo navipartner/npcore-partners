@@ -211,6 +211,11 @@ table 6150621 "NPR POS Entry"
             DataClassification = CustomerContent;
             TableRelation = "Tax Area";
         }
+        field(128; "External Document No."; Code[35])
+        {
+            Caption = 'External Document No.';
+            DataClassification = CustomerContent;
+        }
         field(160; "POS Sale ID"; Integer)
         {
             Caption = 'POS Sale ID';
