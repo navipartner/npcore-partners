@@ -15,17 +15,17 @@ page 6014555 "NPR TM Notif. Profile Card"
                 field("Profile Code"; Rec."Profile Code")
                 {
                     ToolTip = 'Specifies the value of the Profile Code field';
-                    ApplicationArea = NRTTicketAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NRTTicketAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NRTTicketAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
             }
             part(Lines; "NPR TM Notif. Profile Line")
@@ -33,7 +33,7 @@ page 6014555 "NPR TM Notif. Profile Card"
                 Caption = 'Notification Lines';
                 SubPageLink = "Profile Code" = FIELD("Profile Code");
                 SubPageView = sorting("Profile Code", "Line No.");
-                ApplicationArea = NRTTicketAdvanced;
+                ApplicationArea = NPRTicketAdvanced;
             }
         }
     }

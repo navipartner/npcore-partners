@@ -169,6 +169,25 @@ table 6060122 "NPR TM Admis. Schedule Entry"
                                                                             Open = CONST(false),
                                                                             "Sales Channel No." = FIELD("Sales Channel Filter")));
             Caption = 'Initial Entry';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(104; "Initial Entry (All)"; Decimal)
+        {
+            CalcFormula = Sum("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
+                                                                            Type = CONST(INITIAL_ENTRY),
+                                                                            "Sales Channel No." = FIELD("Sales Channel Filter")));
+            Caption = 'Initial Entry (All)';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(105; "Open Reservations (All)"; Decimal)
+        {
+            CalcFormula = Sum("NPR TM Det. Ticket AccessEntry".Quantity WHERE("External Adm. Sch. Entry No." = FIELD("External Schedule Entry No."),
+                                                                            Type = CONST(RESERVATION),
+                                                                            "Sales Channel No." = FIELD("Sales Channel Filter")));
+            Caption = 'Open Reservations (All)';
+            Editable = false;
             FieldClass = FlowField;
         }
         field(109; "Sales Channel Filter"; Code[10])

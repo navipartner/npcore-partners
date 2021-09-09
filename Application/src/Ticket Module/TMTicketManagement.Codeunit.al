@@ -389,7 +389,9 @@ codeunit 6059784 "NPR TM Ticket Management"
         LowDate := DMY2Date(31, 12, 9999);
         HighDate := 0D;
 
+        // Each admission must only contribute with only one of its INITIAL_ENTRY or RESERVATION entries
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.SetLoadFields("Admission Code");
         if (TicketAccessEntry.FindSet()) then begin
             repeat
                 if (TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then begin
@@ -405,7 +407,8 @@ codeunit 6059784 "NPR TM Ticket Management"
                         LowDate := AdmissionScheduleEntry."Admission Start Date";
 
                     if (Format(TicketBom."Duration Formula") <> '') then
-                        AdmissionScheduleEntry."Admission End Date" := CalcDate(TicketBom."Duration Formula", AdmissionScheduleEntry."Admission End Date");
+                        if (CalcDate(TicketBom."Duration Formula", AdmissionScheduleEntry."Admission Start Date") > HighDate) then
+                            HighDate := CalcDate(TicketBom."Duration Formula", AdmissionScheduleEntry."Admission Start Date");
 
                     if (AdmissionScheduleEntry."Admission End Date" > HighDate) then
                         HighDate := AdmissionScheduleEntry."Admission End Date";
@@ -413,6 +416,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                 end;
             until (TicketAccessEntry.Next() = 0);
         end;
+
     end;
 
     procedure CreateAdmissionAccessEntry(Ticket: Record "NPR TM Ticket"; TicketQty: Integer; AdmissionCode: Code[20]; AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
@@ -2215,7 +2219,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure CalculateCurrentCapacity(CapacityControl: Option; AdmissionScheduleEntryNo: Integer) AdmittedCount: Integer
     var
         Admission: Record "NPR TM Admission";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
     begin
@@ -2227,14 +2230,10 @@ codeunit 6059784 "NPR TM Ticket Management"
 
             Admission."Capacity Control"::SALES:
                 begin
-                    DetailedTicketAccessEntry.SetCurrentKey("External Adm. Sch. Entry No.", Type, Open);
-                    DetailedTicketAccessEntry.SetFilter("External Adm. Sch. Entry No.", '=%1', AdmissionScheduleEntry."External Schedule Entry No.");
-                    DetailedTicketAccessEntry.SetFilter(Type, '=%1', DetailedTicketAccessEntry.Type::INITIAL_ENTRY);
-                    if (DetailedTicketAccessEntry.FindSet()) then begin
-                        repeat
-                            AdmittedCount += DetailedTicketAccessEntry.Quantity;
-                        until (DetailedTicketAccessEntry.Next() = 0);
-                    end;
+                    // Performance / Deadlock. SUM (x) flowfield issues SQL with statement for repeatable read "with(UPDLOCK)"
+                    // TODO
+                    AdmissionScheduleEntry.CalcFields("Initial Entry (All)");
+                    AdmittedCount := AdmissionScheduleEntry."Initial Entry (All)";
                 end;
 
             Admission."Capacity Control"::ADMITTED:
@@ -2441,7 +2440,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     var
         Admission: Record "NPR TM Admission";
         AdmissionText: Record "NPR TM Admission";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         Schedule: Record "NPR TM Admis. Schedule";
         AdmissionSchedule: Record "NPR TM Admis. Schedule Lines";
         AdmittedCount: Integer;
@@ -2468,15 +2466,10 @@ codeunit 6059784 "NPR TM Ticket Management"
 
             Admission."Capacity Control"::SALES:
                 begin
-                    DetailedTicketAccessEntry.SetCurrentKey("External Adm. Sch. Entry No.", Type, Open);
-                    DetailedTicketAccessEntry.SetFilter("External Adm. Sch. Entry No.", '=%1', AdmissionScheduleEntry."External Schedule Entry No.");
-                    DetailedTicketAccessEntry.SetFilter(Type, '=%1', DetailedTicketAccessEntry.Type::RESERVATION);
-
-                    if (DetailedTicketAccessEntry.FindSet()) then begin
-                        repeat
-                            AdmittedCount += DetailedTicketAccessEntry.Quantity;
-                        until (DetailedTicketAccessEntry.Next() = 0);
-                    end;
+                    // Performance / Deadlock. SUM (x) flowfield issues SQL with statement for repeatable read "with(UPDLOCK)"
+                    // TODO
+                    AdmissionScheduleEntry.CalcFields("Open Reservations (All)");
+                    AdmittedCount := AdmissionScheduleEntry."Open Reservations (All)";
                 end;
 
             Admission."Capacity Control"::ADMITTED, // Admitted and Full mode are the same when it comes to reservations

@@ -41,11 +41,11 @@ table 6014591 "NPR TM Notification Profile"
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         ProfileLine: Record "NPR TM Notif. Profile Line";
     begin
-        TicketBOM.SetFilter("Admission Dependency Code", '=%1', "Profile Code");
+        TicketBOM.SetFilter("Notification Profile Code", '=%1', Rec."Profile Code");
         if (not TicketBOM.IsEmpty()) then
-            Error(IN_USE, FieldCaption("Profile Code"), "Profile Code", TicketBOM.TableCaption());
+            Error(IN_USE, FieldCaption(Rec."Profile Code"), "Profile Code", TicketBOM.TableCaption());
 
-        ProfileLine.SetFilter("Profile Code", '=%1', "Profile Code");
+        ProfileLine.SetFilter("Profile Code", '=%1', Rec."Profile Code");
         ProfileLine.DeleteAll();
     end;
 }
