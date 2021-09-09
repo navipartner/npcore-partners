@@ -229,7 +229,7 @@ table 6060121 "NPR TM Ticket Admission BOM"
         }
         field(120; "Notification Profile Code"; Code[10])
         {
-            Caption = 'Profile Code';
+            Caption = 'Notification Profile Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Notification Profile";
         }

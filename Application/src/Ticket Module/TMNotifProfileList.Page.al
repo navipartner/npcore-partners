@@ -1,11 +1,12 @@
 page 6014564 "NPR TM Notif. Profile List"
 {
     PageType = List;
-    ApplicationArea = NRTTicketAdvanced;
+    ApplicationArea = NPRTicketAdvanced;
     UsageCategory = Administration;
     SourceTable = "NPR TM Notification Profile";
     Caption = 'Ticket Notification Profile List';
     CardPageId = "NPR TM Notif. Profile Card";
+    Editable = false;
 
     layout
     {
@@ -16,17 +17,17 @@ page 6014564 "NPR TM Notif. Profile List"
                 field("Profile Code"; Rec."Profile Code")
                 {
                     ToolTip = 'Specifies the value of the Profile Code field';
-                    ApplicationArea = NRTTicketAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
                     ToolTip = 'Specifies the value of the Blocked field';
-                    ApplicationArea = NRTTicketAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NRTTicketAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
             }
         }

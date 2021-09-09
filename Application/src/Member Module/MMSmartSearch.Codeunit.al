@@ -20,6 +20,7 @@ codeunit 6014682 "NPR MM Smart Search"
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         MembershipRole: Record "NPR MM Membership Role";
+        MembershipEntry: Record "NPR MM Membership Entry";
         MemberFound: Boolean;
     begin
         Member.FilterGroup := -1;
@@ -70,6 +71,25 @@ codeunit 6014682 "NPR MM Smart Search"
                 until (MemberCard.Next() = 0);
             end;
         end;
+
+        if (not MemberFound) then begin
+            MembershipEntry.SetLoadFields("Membership Entry No.");
+            MembershipEntry.SetFilter("Receipt No.", '=%1', UpperCase(SearchTerm));
+            if (MembershipEntry.FindSet()) then begin
+                repeat
+                    MembershipRole.SetLoadFields("Membership Entry No.", "Member Entry No.");
+                    MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntry."Membership Entry No.");
+                    if (MembershipRole.FindSet()) then begin
+                        repeat
+                            if (Member.Get(MembershipRole."Member Entry No.")) then begin
+                                MemberFound := true;
+                                Member.Mark(true);
+                            end;
+                        until (MembershipRole.Next() = 0);
+                    end;
+                until (MembershipEntry.Next() = 0);
+            end;
+        end;
     end;
 
     local procedure MembershipSearchWorker(SearchTerm: Text[100]; var Membership: Record "NPR MM Membership")
@@ -77,6 +97,7 @@ codeunit 6014682 "NPR MM Smart Search"
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
         MembershipRole: Record "NPR MM Membership Role";
+        MembershipEntry: Record "NPR MM Membership Entry";
         MembershipFound: Boolean;
     begin
         if (not MembershipFound) then begin
@@ -135,6 +156,20 @@ codeunit 6014682 "NPR MM Smart Search"
                 until (Member.Next() = 0);
             end;
         end;
+
+        if (not MembershipFound) then begin
+            MembershipEntry.SetLoadFields("Membership Entry No.");
+            MembershipEntry.SetFilter("Receipt No.", '=%1', UpperCase(SearchTerm));
+            if (MembershipEntry.FindSet()) then begin
+                repeat
+                    if (Membership.Get(MembershipEntry."Membership Entry No.")) then begin
+                        MembershipFound := true;
+                        Membership.Mark(true);
+                    end;
+                until (MembershipEntry.Next() = 0);
+            end;
+        end;
+
     end;
 
     local procedure MemberCardSearchWorker(SearchTerm: Text[100]; var MemberCard: Record "NPR MM Member Card")
