@@ -89,7 +89,7 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
         EmailMgt: Codeunit "NPR E-mail Management";
         EmailDocumentManagement: Codeunit "NPR E-mail Doc. Mgt.";
         ReportID: Integer;
-        EmailAddr: Text;
+        EmailAddr: Text[250];
     begin
         RecRef.GetTable(PosEntry);
         if not Silent then

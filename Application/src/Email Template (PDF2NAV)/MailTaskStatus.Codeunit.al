@@ -344,7 +344,7 @@ codeunit 6059905 "NPR Mail Task Status"
             until TaskLineParm.Next() = 0;
     end;
 
-    procedure AddRecipient(NewRecipient: Text[80])
+    procedure AddRecipient(NewRecipient: Text)
     var
         Recipients: List of [Text];
         Separators: List of [Text];
@@ -354,7 +354,7 @@ codeunit 6059905 "NPR Mail Task Status"
         EmailSenderHandler.AddRecipients(TempEmailItem, Recipients);
     end;
 
-    procedure AddRecipientCC(NewRecipientCC: Text[80])
+    procedure AddRecipientCC(NewRecipientCC: Text)
     var
         CCRecipients: List of [Text];
         Separators: List of [Text];
@@ -364,7 +364,7 @@ codeunit 6059905 "NPR Mail Task Status"
         EmailSenderHandler.AddRecipientCC(TempEmailItem, CCRecipients);
     end;
 
-    procedure AddRecipientBCC(NewRecipientBCC: Text[80])
+    procedure AddRecipientBCC(NewRecipientBCC: Text)
     var
         BCCRecipients: List of [Text];
         Separators: List of [Text];
