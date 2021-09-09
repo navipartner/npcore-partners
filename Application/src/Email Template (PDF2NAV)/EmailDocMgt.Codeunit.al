@@ -444,7 +444,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         case TemplateType of
             "TemplateType.SalesQuote"():
                 begin
-                    NewTemplateCode := UpperCase(SalesQuoteLbl);
+                    NewTemplateCode := CopyStr(UpperCase(SalesQuoteLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := SalesQuoteLbl;
@@ -454,7 +454,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.SalesOrder"():
                 begin
-                    NewTemplateCode := UpperCase(SalesOrderLbl);
+                    NewTemplateCode := CopyStr(UpperCase(SalesOrderLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := SalesOrderLbl;
@@ -464,7 +464,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.SalesShpt"():
                 begin
-                    NewTemplateCode := UpperCase(SalesShipmentLbl);
+                    NewTemplateCode := CopyStr(UpperCase(SalesShipmentLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := SalesShipmentLbl;
@@ -474,7 +474,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.SalesInv"():
                 begin
-                    NewTemplateCode := UpperCase(SalesInvoiceLbl);
+                    NewTemplateCode := CopyStr(UpperCase(SalesInvoiceLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := SalesInvoiceLbl;
@@ -484,7 +484,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.SalesCrMemo"():
                 begin
-                    NewTemplateCode := UpperCase(SalesCrMemoLbl);
+                    NewTemplateCode := CopyStr(UpperCase(SalesCrMemoLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := SalesCrMemoLbl;
@@ -494,7 +494,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.PurchQuote"():
                 begin
-                    NewTemplateCode := UpperCase(PurchaseQuoteLbl);
+                    NewTemplateCode := CopyStr(UpperCase(PurchaseQuoteLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := PurchaseQuoteLbl;
@@ -504,7 +504,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.PurchOrder"():
                 begin
-                    NewTemplateCode := UpperCase(PurchaseOrderLbl);
+                    NewTemplateCode := CopyStr(UpperCase(PurchaseOrderLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := PurchaseOrderLbl;
@@ -514,7 +514,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.PurchRcpt"():
                 begin
-                    NewTemplateCode := UpperCase(PurchaseReceiptLbl);
+                    NewTemplateCode := CopyStr(UpperCase(PurchaseReceiptLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := PurchaseReceiptLbl;
@@ -524,7 +524,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.PurchInv"():
                 begin
-                    NewTemplateCode := UpperCase(PurchaseInvoiceLbl);
+                    NewTemplateCode := CopyStr(UpperCase(PurchaseInvoiceLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := PurchaseInvoiceLbl;
@@ -534,7 +534,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.PurchCrMemo"():
                 begin
-                    NewTemplateCode := UpperCase(PurchaseCrMemoLbl);
+                    NewTemplateCode := CopyStr(UpperCase(PurchaseCrMemoLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := PurchaseCrMemoLbl;
@@ -544,7 +544,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.Reminder"():
                 begin
-                    NewTemplateCode := UpperCase(ReminderLbl);
+                    NewTemplateCode := CopyStr(UpperCase(ReminderLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := ReminderLbl;
@@ -554,7 +554,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.ChargeMemo"():
                 begin
-                    NewTemplateCode := UpperCase(ChargeMemolbl);
+                    NewTemplateCode := CopyStr(UpperCase(ChargeMemolbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := ChargeMemolbl;
@@ -564,7 +564,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.Statement"():
                 begin
-                    NewTemplateCode := UpperCase(StatementLbl);
+                    NewTemplateCode := CopyStr(UpperCase(StatementLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := StatementLbl;
@@ -574,7 +574,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.ServQuote"():
                 begin
-                    NewTemplateCode := UpperCase(ServiceQuoteLbl);
+                    NewTemplateCode := CopyStr(UpperCase(ServiceQuoteLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := ServiceQuoteLbl;
@@ -584,7 +584,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.ServOrder"():
                 begin
-                    NewTemplateCode := UpperCase(ServiceOrderLbl);
+                    NewTemplateCode := CopyStr(UpperCase(ServiceOrderLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := ServiceOrderLbl;
@@ -594,7 +594,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.ServShpt"():
                 begin
-                    NewTemplateCode := UpperCase(ServiceShipmentLbl);
+                    NewTemplateCode := CopyStr(UpperCase(ServiceShipmentLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := ServiceShipmentLbl;
@@ -604,7 +604,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.ServInv"():
                 begin
-                    NewTemplateCode := UpperCase(ServiceInvoiceLbl);
+                    NewTemplateCode := CopyStr(UpperCase(ServiceInvoiceLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := ServiceInvoiceLbl;
@@ -614,7 +614,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                 end;
             "TemplateType.POSEntry"():
                 begin
-                    NewTemplateCode := UpperCase(POSEntryLbl);
+                    NewTemplateCode := CopyStr(UpperCase(POSEntryLbl), 1, MaxStrLen(NewTemplateCode));
                     NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
                     EmailTemplate.Code := NewTemplateCode;
                     EmailTemplate.Description := POSEntryLbl;
@@ -805,7 +805,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         if not EmailTemplate.Get(NewTemplateCode) then
             exit(NewTemplateCode);
 
-        NewTemplateCode := NewTemplateCode + '-2';
+        NewTemplateCode := CopyStr(NewTemplateCode + '-2', 1, MaxStrLen(NewTemplateCode));
 
         while EmailTemplate.Get(NewTemplateCode) do
             NewTemplateCode := IncStr(NewTemplateCode);
@@ -813,14 +813,14 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         exit(NewTemplateCode);
     end;
 
-    procedure GetMailReceipients(RecRef: RecordRef; ReportID: Integer): Text
+    procedure GetMailReceipients(RecRef: RecordRef; ReportID: Integer): Text[250]
     var
-        MailReceipients: Text;
+        MailReceipients: Text[250];
     begin
-        MailReceipients := EmailMgt.GetCustomReportEmailAddress();
+        MailReceipients := CopyStr(EmailMgt.GetCustomReportEmailAddress(), 1, MaxStrLen(MailReceipients));
 
         if MailReceipients = '' then
-            MailReceipients := EmailMgt.GetEmailAddressFromRecRef(RecRef);
+            MailReceipients := CopyStr(EmailMgt.GetEmailAddressFromRecRef(RecRef), 1, MaxStrLen(MailReceipients));
         exit(MailReceipients);
     end;
 

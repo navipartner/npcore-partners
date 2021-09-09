@@ -37,7 +37,7 @@ table 6014458 "NPR E-mail Attachment"
                     if not Confirm(Text001, false) then
                         exit;
 
-                FileName := FileMgt.BLOBImport(TempBlob, '*.*');
+                FileName := CopyStr(FileMgt.BLOBImport(TempBlob, '*.*'), 1, MaxStrLen(FileName));
                 if FileName = '' then
                     exit;
                 RecRef.GetTable(Rec);
@@ -45,8 +45,8 @@ table 6014458 "NPR E-mail Attachment"
                 RecRef.SetTable(Rec);
 
                 while StrPos(FileName, '\') <> 0 do
-                    FileName := CopyStr(FileName, StrPos(FileName, '\') + 1, StrLen(FileName) - StrPos(FileName, '\'));
-                Description := FileName;
+                    FileName := CopyStr(CopyStr(FileName, StrPos(FileName, '\') + 1, StrLen(FileName) - StrPos(FileName, '\')), 1, MaxStrLen(FileName));
+                Description := CopyStr(FileName, 1, MaxStrLen(Description));
             end;
         }
         field(40; Description; Text[250])

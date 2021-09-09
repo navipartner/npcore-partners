@@ -112,7 +112,7 @@
         EmailTemplateHeader.Modify(true);
     end;
 
-    procedure ExportHtmlTemplate(var EmailTemplateHeader: Record "NPR E-mail Template Header"; UseDialog: Boolean) Path: Text[1024]
+    procedure ExportHtmlTemplate(var EmailTemplateHeader: Record "NPR E-mail Template Header"; UseDialog: Boolean) Path: Text
     var
         FileManagement: Codeunit "File Management";
         InStr: InStream;
@@ -132,7 +132,7 @@
         Error(Text000);
     end;
 
-    procedure ImportHtmlTemplate(Path: Text[1024]; UseDialog: Boolean; var EmailTemplateHeader: Record "NPR E-mail Template Header")
+    procedure ImportHtmlTemplate(Path: Text; UseDialog: Boolean; var EmailTemplateHeader: Record "NPR E-mail Template Header")
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";

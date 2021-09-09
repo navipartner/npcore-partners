@@ -61,38 +61,38 @@ codeunit 6014553 "NPR Email Sending Handler"
         case true of
             EmailItem."Attachment File Path" = '':
                 begin
-                    EmailItem."Attachment File Path" := FileName;
-                    EmailItem."Attachment Name" := FileName;
+                    EmailItem."Attachment File Path" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment File Path"));
+                    EmailItem."Attachment Name" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment Name"));
                 end;
             EmailItem."Attachment File Path 2" = '':
                 begin
-                    EmailItem."Attachment File Path 2" := FileName;
-                    EmailItem."Attachment Name 2" := FileName;
+                    EmailItem."Attachment File Path 2" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment File Path 2"));
+                    EmailItem."Attachment Name 2" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment Name 2"));
                 end;
             EmailItem."Attachment File Path 3" = '':
                 begin
-                    EmailItem."Attachment File Path 3" := FileName;
-                    EmailItem."Attachment Name 3" := FileName;
+                    EmailItem."Attachment File Path 3" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment File Path 3"));
+                    EmailItem."Attachment Name 3" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment Name 3"));
                 end;
             EmailItem."Attachment File Path 4" = '':
                 begin
-                    EmailItem."Attachment File Path 4" := FileName;
-                    EmailItem."Attachment Name 4" := FileName;
+                    EmailItem."Attachment File Path 4" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment File Path 4"));
+                    EmailItem."Attachment Name 4" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment Name 4"));
                 end;
             EmailItem."Attachment File Path 5" = '':
                 begin
-                    EmailItem."Attachment File Path 5" := FileName;
-                    EmailItem."Attachment Name 5" := FileName;
+                    EmailItem."Attachment File Path 5" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment File Path 5"));
+                    EmailItem."Attachment Name 5" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment Name 5"));
                 end;
             EmailItem."Attachment File Path 6" = '':
                 begin
-                    EmailItem."Attachment File Path 6" := FileName;
-                    EmailItem."Attachment Name 6" := FileName;
+                    EmailItem."Attachment File Path 6" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment File Path 6"));
+                    EmailItem."Attachment Name 6" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment Name 6"));
                 end;
             EmailItem."Attachment File Path 7" = '':
                 begin
-                    EmailItem."Attachment File Path 7" := FileName;
-                    EmailItem."Attachment Name 7" := FileName;
+                    EmailItem."Attachment File Path 7" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment File Path 7"));
+                    EmailItem."Attachment Name 7" := CopyStr(FileName, 1, MaxStrLen(EmailItem."Attachment Name 7"));
                 end;
         end;
         EmailItem.Modify();
