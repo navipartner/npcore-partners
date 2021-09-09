@@ -104,17 +104,21 @@ table 6060044 "NPR Item Worksh. Variety Value"
         Dec: Decimal;
         NewSortOrder: Integer;
         DecSep: Text[1];
+        IsNumber: Boolean;
     begin
-        if Evaluate(Dec, Value) then begin
-            //its a number. take the sort order from here (if possible)
+        IsNumber := Evaluate(Dec, Value);
+        if not IsNumber then begin
             //convert '.' with ',' so we can use the number correct
             DecSep := GetDecimalSeperator();
+            Value2 := DelChr(Value, '=', DecSep);
             if DecSep = '.' then
-                Value2 := ConvertStr(Value, ',', DecSep)
+                Value2 := ConvertStr(Value2, ',', DecSep)
             else
-                Value2 := ConvertStr(Value, '.', DecSep);
-            Evaluate(Dec, Value2);
-
+                Value2 := ConvertStr(Value2, '.', DecSep);
+            IsNumber := Evaluate(Dec, Value2);
+        end;
+        if IsNumber then begin
+            //its a number. take the sort order from here (if possible)
             //number 10 will be 100. Number 10,5 will be 105
             NewSortOrder := Round(Dec, 0.1) * 10;
             VRTValue.SetCurrentKey("Worksheet Template Name", "Worksheet Name", "Sort Order");
