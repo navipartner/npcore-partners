@@ -30,7 +30,7 @@
         exit(SendEmailTemplate(RecRef, EmailTemplateHeader, RecipientEmail, Silent));
     end;
 
-    procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text; Silent: Boolean) ErrorMessage: Text
+    procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
     begin
         ErrorMessage := SetupEmailTemplate(RecRef, RecipientEmail, Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
@@ -104,10 +104,10 @@
         EmailTemplateReport.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
         if EmailTemplateReport.FindSet() then
             repeat
-                Filename := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateReport.Filename, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
+                Filename := CopyStr(EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateReport.Filename, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag"), 1, MaxStrLen(Filename));
                 if StrPos(Filename, '.pdf') = 0 then
                     Filename += '.pdf';
-                Filename := ReplaceSpecialChar(Filename);
+                Filename := CopyStr(ReplaceSpecialChar(Filename), 1, MaxStrLen(Filename));
 
                 if not PrintPDF(EmailTemplateReport."Report ID", RecRef, Filename) then
                     ErrorMessage := StrSubstNo(Text006, EmailTemplateReport."Report ID", GetLastErrorText);
@@ -155,10 +155,10 @@
         CopyStream(OutStream, InStream);
         Pos := StrPos(Filename, '\');
         while Pos > 0 do begin
-            Filename := CopyStr(Filename, Pos + 1);
+            Filename := CopyStr(CopyStr(Filename, Pos + 1), 1, MaxStrLen(Filename));
             Pos := StrPos(Filename, '\');
         end;
-        TempEmailAttachment.Description := ReplaceSpecialChar(Filename);
+        TempEmailAttachment.Description := CopyStr(ReplaceSpecialChar(Filename), 1, MaxStrLen(TempEmailAttachment.Description));
         TempEmailAttachment.Insert();
         AddAttachmentToBuffer(TempEmailAttachment);
         exit(true);
@@ -297,7 +297,7 @@
             TempEmailItem.Body.CreateInStream(InStr);
             TempEmailItem.Modify();
             InStr.Read(BodyText);
-            ErrorMessage := TransactionalEmailMgt.SendClassicMail(TransactionalEmailRecipient, TempEmailItem."Send CC", TempEmailItem."Send BCC", TempEmailItem.Subject, BodyText, '', FromAddress, FromName, '', true, true, '', '', TempAttachmentBuffer, Silent);
+            ErrorMessage := CopyStr(TransactionalEmailMgt.SendClassicMail(TransactionalEmailRecipient, TempEmailItem."Send CC", TempEmailItem."Send BCC", TempEmailItem.Subject, BodyText, '', FromAddress, FromName, '', true, true, '', '', TempAttachmentBuffer, Silent), 1, MaxStrLen(ErrorMessage));
             HandledByTransactional := true;
         end;
 
@@ -359,8 +359,8 @@
             if Silent then
                 EmailTemplateHeader."Verify Recipient" := false;
             EmailTemplateHeader."Default Recipient Address" := GetEmailRecepientAddress(EmailTemplateHeader, RecipientEmail);
-            EmailTemplateHeader."From E-mail Address" := GetEmailFromAddress(EmailTemplateHeader);
-            EmailTemplateHeader."From E-mail Name" := GetEmailFromName(EmailTemplateHeader);
+            EmailTemplateHeader."From E-mail Address" := CopyStr(GetEmailFromAddress(EmailTemplateHeader), 1, MaxStrLen(EmailTemplateHeader."From E-mail Address"));
+            EmailTemplateHeader."From E-mail Name" := CopyStr(GetEmailFromName(EmailTemplateHeader), 1, MaxStrLen(EmailTemplateHeader."From E-mail Name"));
             OnAfterSetFromEmail(EmailTemplateHeader.Code, RecRef, RecipientEmail, Silent, EmailTemplateHeader."From E-mail Address", EmailTemplateHeader."From E-mail Name");
         end else
             ErrorMessage := Text011;
@@ -386,7 +386,7 @@
         Parameters: Text;
     begin
         SetGlobalCustomReport();
-        TempEmailAttachment.Description := Filename;
+        TempEmailAttachment.Description := CopyStr(Filename, 1, MaxStrLen(TempEmailAttachment.Description));
         TempEmailAttachment."Attached File".CreateOutStream(OStream);
         Parameters := GetReqParametersFromStore(ReportID);
         Result := REPORT.SaveAs(ReportID, Parameters, REPORTFORMAT::Pdf, OStream, RecVariant);
@@ -434,7 +434,7 @@
             NewEmailRecipientAddress := EmailTemplateHeader."Default Recipient Address";
 
         if EmailTemplateHeader."Verify Recipient" or (NewEmailRecipientAddress = '') then
-            NewEmailRecipientAddress := VerifyEmailAddress(NewEmailRecipientAddress);
+            NewEmailRecipientAddress := CopyStr(VerifyEmailAddress(NewEmailRecipientAddress), 1, MaxStrLen(NewEmailRecipientAddress));
 
         exit(NewEmailRecipientAddress);
     end;
@@ -679,10 +679,10 @@
         Chr[2] := 10;
         EmailLog.Init();
         EmailLog."Table No." := RecRef.Number;
-        EmailLog."Primary Key" := RecRef.GetPosition(false);
+        EmailLog."Primary Key" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(EmailLog."Primary Key"));
         EmailLog."Sent Time" := Time;
         EmailLog."Sent Date" := Today();
-        EmailLog."Sent Username" := UserId;
+        EmailLog."Sent Username" := CopyStr(UserId, 1, MaxStrLen(EmailLog."Sent Username"));
         EmailLog."Recipient E-mail" := CopyStr(TempEmailItem."Send to", 1, MaxStrLen(EmailLog."Recipient E-mail"));
         EmailLog."From E-mail" := CopyStr(TempEmailItem."From Address", 1, MaxStrLen(EmailLog."From E-mail"));
         EmailLog."E-mail subject" := CopyStr(TempEmailItem.Subject, 1, MaxStrLen(EmailLog."E-mail subject"));
