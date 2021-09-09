@@ -19,7 +19,10 @@ codeunit 6014688 "NPR APIV1 - POS Sale Mgmt."
         POSSale.GetCurrentSale(POSSaleRec);
 
         POSSaleRec.Validate(Reference, TempPOSSaleBuff.Reference);
+        POSSaleRec.Validate("External Document No.", TempPOSSaleBuff."External Document No.");
+        POSSaleRec.Validate("Prices Including VAT", TempPOSSaleBuff."Prices Including VAT");
 
+        POSSaleRec.Validate("Contact No.", TempPOSSaleBuff."Contact No.");
         IF TempPOSSaleBuff."Customer No." <> '' then begin
             POSSaleRec."Customer Type" := TempPOSSaleBuff."Customer Type";
             POSSaleRec.Validate("Customer No.", TempPOSSaleBuff."Customer No.");
@@ -335,10 +338,10 @@ codeunit 6014688 "NPR APIV1 - POS Sale Mgmt."
         DocExportAction.SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive, DocumentTypeNegative);
 
         LocationSource := ConvertJsonTextToInteger(SelectJsonToken(JObject, 'UseLocationFrom'));
-        SpecificLocationCode := SelectJsonToken(JObject, 'UseSpecLocationCode');
+        SpecificLocationCode := COPYSTR(SelectJsonToken(JObject, 'UseSpecLocationCode'), 1, MaxStrLen(SpecificLocationCode));
         DocExportAction.SetLocationSource(RetailSalesDocMgt, LocationSource, SpecificLocationCode);
 
-        PaymentMethodCode := SelectJsonToken(JObject, 'PaymentMethodCode');
+        PaymentMethodCode := COPYSTR(SelectJsonToken(JObject, 'PaymentMethodCode'), 1, MaxStrLen(PaymentMethodCode));
         RetailSalesDocMgt.SetPaymentMethod(PaymentMethodCode);
     end;
 
