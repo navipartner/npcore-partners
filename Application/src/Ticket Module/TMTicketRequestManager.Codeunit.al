@@ -306,7 +306,6 @@
     local procedure _IssueOneTicket(ItemNo: Code[20]; VariantCode: Code[10]; QuantityPerTicket: Integer; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal)
     var
         Ticket: Record "NPR TM Ticket";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         LowDate: Date;
         HighDate: Date;
@@ -338,16 +337,12 @@
 
         // Update ticket valid from / to dates based on contents
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
-            TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-            if (TicketAccessEntry.FindSet()) then begin
-                repeat
-                    TicketManagement.GetTicketAccessEntryValidDateBoundary(Ticket, LowDate, HighDate);
-                    Ticket."Valid From Date" := LowDate;
-                    Ticket."Valid To Date" := HighDate;
-                    Ticket.Modify();
-                until (TicketAccessEntry.Next() = 0);
-            end;
+            TicketManagement.GetTicketAccessEntryValidDateBoundary(Ticket, LowDate, HighDate);
+            Ticket."Valid From Date" := LowDate;
+            Ticket."Valid To Date" := HighDate;
+            Ticket.Modify();
         end;
+
     end;
 
     local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "NPR TM Ticket"; QuantityPerTicket: Integer; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal)

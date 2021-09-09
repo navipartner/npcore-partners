@@ -1,10 +1,9 @@
-xmlport 6014400 "NPR TM Get Admission Schedules"
+xmlport 6060106 "NPR TM Get Admission Schedules"
 {
     Caption = 'Admission Schedules';
     Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
     schema
     {
         textelement(admission_schedule)
@@ -35,7 +34,7 @@ xmlport 6014400 "NPR TM Get Admission Schedules"
                     end;
                 }
             }
-            textelement(reponse)
+            textelement(response)
             {
                 MaxOccurs = Once;
                 MinOccurs = Zero;
