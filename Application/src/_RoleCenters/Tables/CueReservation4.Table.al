@@ -2,6 +2,8 @@ table 6059988 "NPR Cue Reservation 4"
 {
     Caption = 'Cue Reservation 4';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {

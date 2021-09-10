@@ -2,6 +2,8 @@ table 6059932 "NPR Doc. Exch. Cue"
 {
     Caption = 'Doc. Exch. Cue';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used';
 
     fields
     {
