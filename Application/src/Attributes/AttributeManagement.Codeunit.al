@@ -172,7 +172,7 @@
         end;
     end;
 
-    procedure SetAttributeValue(SetID: Integer; AttributeCode: Code[20]; var TextValue: Text[1024]; var vAttributeValue: Record "NPR Attribute Value Set"): Boolean
+    procedure SetAttributeValue(SetID: Integer; AttributeCode: Code[20]; var TextValue: Text[250]; var vAttributeValue: Record "NPR Attribute Value Set"): Boolean
     var
         Attribute: Record "NPR Attribute";
         myDate: Date;
@@ -408,8 +408,8 @@
     begin
         CommaPosition := StrPos(CaptionExpression, ',');
         if (CommaPosition > 0) and (CommaPosition < 80) then begin
-            CaptionArea := CopyStr(CaptionExpression, 1, CommaPosition - 1);
-            CaptionRef := CopyStr(CaptionExpression, CommaPosition + 1);
+            CaptionArea := CopyStr(CopyStr(CaptionExpression, 1, CommaPosition - 1), 1, MaxStrLen(CaptionArea));
+            CaptionRef := CopyStr(CopyStr(CaptionExpression, CommaPosition + 1), 1, MaxStrLen(CaptionRef));
             case CaptionArea of
                 '6014555':
                     Caption := AttributeManagement.GetAttributeCaption(Language, CopyStr(CaptionRef, 1, 80));
@@ -1061,12 +1061,12 @@
             end;
         end;
 
-        PartOfText := DelChr(Text, '<>', ' ');
+        PartOfText := CopyStr(DelChr(Text, '<>', ' '), 1, MaxStrLen(PartOfText));
         Length := StrLen(Text);
         if (Length = 0) then exit(true);
 
         if ('?' = CopyStr(PartOfText, 1, 1)) then
-            PartOfText := CopyStr(PartOfText, 2);
+            PartOfText := CopyStr(CopyStr(PartOfText, 2), 1, MaxStrLen(PartOfText));
 
         AttrLookupValue.SetFilter("Attribute Code", '=%1', AttributeCode);
         if (PartOfText = '') then begin
@@ -1240,7 +1240,7 @@
         exit(AttributeTextValue);
     end;
 
-    procedure IGSetAttributeValue("Record": Variant; AttributeCode: Code[20]; AttributeValue: Text)
+    procedure IGSetAttributeValue("Record": Variant; AttributeCode: Code[20]; AttributeValue: Text[250])
     var
         RecRef: RecordRef;
         NPRAttribute: Record "NPR Attribute";
@@ -1292,7 +1292,7 @@
         SetAttributeValue(NPRAttributeKey."Attribute Set ID", NPRAttribute.Code, AttributeValue, NPRAttributeValueSet);
     end;
 
-    procedure OnPageLookUp(TableID: Integer; AttributeReference: Integer; PKCode: Code[20]; var Value: Text)
+    procedure OnPageLookUp(TableID: Integer; AttributeReference: Integer; PKCode: Code[20]; var Value: Text[250])
     var
         Attribute: Record "NPR Attribute";
         AttributeID: Record "NPR Attribute ID";
@@ -1341,7 +1341,7 @@
         end;
     end;
 
-    procedure MakeText(VAR Text: Text): Integer;
+    procedure MakeText(VAR Text: Text[250]): Integer;
     VAR
         StandardText: Record "Standard Text";
         PartOfText: Text[132];
@@ -1353,7 +1353,7 @@
         ReadCharacter(' ', Text, Position, Length);
         if not ReadSymbol('?', Text, Position, Length) then
             exit(0);
-        PartOfText := COPYSTR(Text, Position);
+        PartOfText := CopyStr(COPYSTR(Text, Position), 1, MaxStrLen(PartOfText));
         if PartOfText = '' then begin
             if PAGE.RUNMODAL(0, StandardText) = ACTION::LookupOK then
                 Text := StandardText.Description;
@@ -1383,7 +1383,7 @@
         exit(true);
     end;
 
-    procedure MakeDateText(VAR DateText: Text): Integer;
+    procedure MakeDateText(VAR DateText: Text[250]): Integer;
     VAR
         Date: Date;
         PartOfText: Text;
@@ -1424,7 +1424,7 @@
         exit(true);
     END;
 
-    PROCEDURE MakeDateTimeText(VAR DateTimeText: Text): Integer;
+    PROCEDURE MakeDateTimeText(VAR DateTimeText: Text[250]): Integer;
     VAR
         Date: Date;
         Time: Time;
@@ -1441,7 +1441,7 @@
 
     PROCEDURE GetSeparateDateTime(DateTimeText: Text; VAR Date: Date; VAR Time: Time): Boolean;
     VAR
-        DateText: Text;
+        DateText: Text[250];
         TimeText: Text;
         Position: Integer;
         Length: Integer;
@@ -1454,7 +1454,7 @@
         Length := STRLEN(DateTimeText);
         ReadCharacter(' ', DateTimeText, Position, Length);
         ReadUntilCharacter(' ', DateTimeText, Position, Length);
-        DateText := DELCHR(COPYSTR(DateTimeText, 1, Position - 1), '<>');
+        DateText := CopyStr(DELCHR(COPYSTR(DateTimeText, 1, Position - 1), '<>'), 1, MaxStrLen(DateText));
         TimeText := DELCHR(COPYSTR(DateTimeText, Position), '<>');
         if DateText = '' then
             exit(true);
@@ -1479,7 +1479,7 @@
 
     PROCEDURE MakeTimeText(VAR TimeText: Text): Integer;
     VAR
-        PartOfText: Text[132];
+        PartOfText: Text;
         Position: Integer;
         Length: Integer;
     BEGIN
