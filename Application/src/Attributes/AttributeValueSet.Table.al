@@ -134,6 +134,6 @@ table 6014555 "NPR Attribute Value Set"
 
     var
         AttributeManager: Codeunit "NPR Attribute Management";
-        tmpTextValue: Text[100];
+        tmpTextValue: Text[250];
 }
 
