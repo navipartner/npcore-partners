@@ -3,6 +3,8 @@ page 6059804 "NPR E-mail Txt Editor Dlg"
     Caption = 'NaviConnect Text Editor Dialog';
     PageType = StandardDialog;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used and not working';
 
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
