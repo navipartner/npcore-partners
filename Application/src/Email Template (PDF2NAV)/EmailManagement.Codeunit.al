@@ -22,6 +22,7 @@
         TransactionalEmailRecipient: Text;
         AttachmentNoData: Label 'No data in %1';
         NoOutputFromReport: Label 'No output from report.';
+        EmailTemplateErr: Label 'Email template doesn''t support email adresses longer than 250 characters';
 
     procedure SendEmail(var RecRef: RecordRef; RecipientEmail: Text; Silent: Boolean) ErrorMessage: Text
     var
@@ -32,7 +33,10 @@
 
     procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
     begin
-        ErrorMessage := SetupEmailTemplate(RecRef, RecipientEmail, Silent, EmailTemplateHeader);
+        if (StrLen(RecipientEmail) > 250) then
+            Error(EmailTemplateErr);
+
+        ErrorMessage := SetupEmailTemplate(RecRef, CopyStr(RecipientEmail, 1, 250), Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
             exit;
         if ErrorMessage = '' then
@@ -98,7 +102,7 @@
     var
         EmailTemplateReport: Record "NPR E-mail Templ. Report";
         EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
-        Filename: Text[250];
+        Filename: Text;
     begin
         EmailTemplateReport.Reset();
         EmailTemplateReport.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
@@ -133,7 +137,7 @@
             until EmailAttachment.Next() = 0;
     end;
 
-    procedure AddFileToSmtpMessage(Filename: Text[250]) FileAttached: Boolean
+    procedure AddFileToSmtpMessage(Filename: Text) FileAttached: Boolean
     var
         TempEmailAttachment: Record "NPR E-mail Attachment" temporary;
         InStream: InStream;
@@ -236,7 +240,7 @@
 
         if TransactionalType <> TransactionalType::Smart then begin
             HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, EmailTemplateHeader.Subject, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
-            EmailSendingHandler.AddSubject(TempEmailItem, HtmlLine);
+            EmailSendingHandler.AddSubject(TempEmailItem, CopyStr(HtmlLine, 1, 250));
             if not EmailTemplateHeader."Use HTML Template" then begin
                 EmailTemplateLine.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
                 if EmailTemplateLine.FindSet() then

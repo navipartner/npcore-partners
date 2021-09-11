@@ -41,7 +41,7 @@ codeunit 6014553 "NPR Email Sending Handler"
 
     procedure AddSubject(var EmailItem: Record "Email Item"; Subject: Text[250])
     begin
-        EmailItem.Validate(Subject, Subject);
+        EmailItem.Validate(Subject, CopyStr(Subject, 1, MaxStrLen(EmailItem.Subject)));
         EmailItem.Modify();
     end;
 
@@ -202,7 +202,7 @@ codeunit 6014553 "NPR Email Sending Handler"
         end;
     end;
 
-    procedure GetLastError(var ErrorMessage: Text)
+    procedure GetLastError(var ErrorMessage: Text[250])
     var
         ErrorMessageManagement: Codeunit "Error Message Management";
     begin
