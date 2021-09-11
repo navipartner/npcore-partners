@@ -29,7 +29,7 @@ table 6014458 "NPR E-mail Attachment"
             trigger OnLookup()
             var
                 TempBlob: Codeunit "Temp Blob";
-                FileName: Text[1024];
+                FileName: Text;
                 RecRef: RecordRef;
             begin
                 CalcFields("Attached File");
