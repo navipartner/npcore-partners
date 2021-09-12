@@ -57,7 +57,7 @@
                             ReplenishmentDemandLine."Units per Parcel" := Item."Units per Parcel";
                             ReplenishmentDemandLine."Due Date" := DistributionSetup."Required Delivery Date";
                             ReplenishmentDemandLine."Location Code" := DistributionGroupMembers.Location;
-                            ReplenishmentDemandLine."Vendor Item No." := Item."Vendor Item No.";
+                            ReplenishmentDemandLine."Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen(ReplenishmentDemandLine."Vendor Item No."));
                             ReplenishmentDemandLine."Item Hierachy" := ItemHierachyID;
                             ReplenishmentDemandLine."Distribution Group" := DistributionGroup;
 
