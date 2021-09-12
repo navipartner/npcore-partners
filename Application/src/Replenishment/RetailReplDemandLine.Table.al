@@ -60,10 +60,10 @@ table 6151061 "NPR Retail Repl. Demand Line"
 
                 Item.Get("Item No.");
                 if ItemVend.Get("Vendor No.", "Item No.", "Variant Code") then begin
-                    "Vendor Item No." := ItemVend."Vendor Item No.";
+                    "Vendor Item No." := CopyStr(ItemVend."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
                 end else begin
                     if "Vendor No." = Item."Vendor No." then
-                        "Vendor Item No." := Item."Vendor Item No."
+                        "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."))
                     else
                         "Vendor Item No." := '';
                 end;
