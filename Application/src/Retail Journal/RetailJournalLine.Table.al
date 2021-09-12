@@ -31,7 +31,7 @@
                     Validate("Vendor No.", Item."Vendor No.");
                     Description := Item.Description;
                     "Description 2" := Item."Description 2";
-                    "Vendor Item No." := Item."Vendor Item No.";
+                    "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
                     "Last Direct Cost" := Item."Last Direct Cost";
                     "Unit Price" := Item."Unit Price";
                     "Item group" := Item."Item Category Code";
@@ -74,8 +74,8 @@
                 if not Vendor.Get("Vendor No.") then
                     Vendor.Init();
 
-                "Vendor Name" := Vendor.Name;
-                "Vendor Search Description" := Vendor."Search Name";
+                "Vendor Name" := CopyStr(Vendor.Name, 1, MaxStrLen("Vendor Name"));
+                "Vendor Search Description" := CopyStr(Vendor."Search Name", 1, MaxStrLen("Vendor Search Description"));
             end;
         }
         field(6; "Vendor Item No."; Code[20])
@@ -775,7 +775,7 @@
     local procedure UpdateBarcode()
     var
         BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
-        BarcodeValue: Text;
+        BarcodeValue: Text[50];
         ResolvingTable: Integer;
         TmpItemNo: Code[20];
         TmpVarCode: Code[10];
