@@ -59,8 +59,8 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
                 RetailInventoryBuffer.Init();
                 RetailInventoryBuffer."Set Code" := RetailInventorySetEntry."Set Code";
                 RetailInventoryBuffer."Line No." := RetailInventorySetEntry."Line No.";
-                RetailInventoryBuffer."Item Filter" := ItemFilter;
-                RetailInventoryBuffer."Variant Filter" := VariantFilter;
+                RetailInventoryBuffer."Item Filter" := CopyStr(ItemFilter, 1, MaxStrLen(RetailInventoryBuffer."Item Filter"));
+                RetailInventoryBuffer."Variant Filter" := CopyStr(VariantFilter, 1, MaxStrLen(RetailInventoryBuffer."Variant Filter"));
                 RetailInventoryBuffer."Location Filter" := RetailInventorySetEntry."Location Filter";
                 RetailInventoryBuffer."Company Name" := RetailInventorySetEntry."Company Name";
                 RetailInventoryBuffer.Inventory := 0;
