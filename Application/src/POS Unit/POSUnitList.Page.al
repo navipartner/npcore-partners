@@ -52,12 +52,7 @@ page 6150616 "NPR POS Unit List"
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
-                field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
-                {
 
-                    ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
 
