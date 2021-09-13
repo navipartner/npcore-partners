@@ -43,7 +43,7 @@
         EndpointRequest."Type of Change" := DataLogRecord."Type of Change";
         //"Record ID" := DataLogRecord."Record ID";
         RecRef.Get(DataLogRecord."Record ID");
-        EndpointRequest."Record Position" := RecRef.GetPosition(false);
+        EndpointRequest."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(EndpointRequest."Record Position"));
         EndpointRequest."Table No." := DataLogRecord."Table ID";
         EndpointRequest."Data log Record No." := DataLogRecord."Entry No.";
         EndpointManagement.PopulatePKFields(EndpointRequest, RecRef);

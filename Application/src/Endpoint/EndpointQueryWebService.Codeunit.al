@@ -24,7 +24,7 @@ codeunit 6014680 "NPR Endpoint Query WebService"
         InsertImportEntry('Createendpointquery', ImportEntry);
         ImportEntry."Document ID" := EndpointQueryWebImport.GetMessageID();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+            ImportEntry."Document ID" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(ImportEntry."Document ID"));
 
         ImportEntry."Document Name" := StrSubstNo(FileLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");

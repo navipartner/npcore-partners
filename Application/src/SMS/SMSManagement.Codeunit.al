@@ -302,8 +302,8 @@
         MessageLog: Record "NPR SMS Log";
     begin
         MessageLog.Init();
-        MessageLog."Sender No." := SenderNo;
-        MessageLog."Reciepient No." := PhoneNo;
+        MessageLog."Sender No." := CopyStr(SenderNo, 1, MaxStrLen(MessageLog."Sender No."));
+        MessageLog."Reciepient No." := CopyStr(PhoneNo, 1, MaxStrLen(MessageLog."Reciepient No."));
         MessageLog.SetMessage(Message);
         if SendDT <> 0DT then
             MessageLog."Send on Date Time" := SendDT

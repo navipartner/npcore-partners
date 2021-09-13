@@ -188,7 +188,7 @@ page 6059944 "NPR SMS Send Message"
         RecTypeVisible := false;
     end;
 
-    procedure SetData(RecRecipientType: Enum "NPR SMS Recipient Type"; ReceiverGroupNo: Text; ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text; RecTypeVis: Boolean)
+    procedure SetData(RecRecipientType: Enum "NPR SMS Recipient Type"; ReceiverGroupNo: Text[10]; ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text; RecTypeVis: Boolean)
     begin
         PhoneNo := ReceiverPhoneNo;
         GroupCode := ReceiverGroupNo;

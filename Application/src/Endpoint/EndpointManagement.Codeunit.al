@@ -137,7 +137,7 @@
         EndpointRequest."Request Batch No." := GetEndpointRequestBatchNo(EndPointCode);
         EndpointRequest."Type of Change" := EndpointRequest."Type of Change"::Modify;
         //"Record ID" := DataLogRecord."Record ID";
-        EndpointRequest."Record Position" := RecRef.GetPosition(false);
+        EndpointRequest."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(EndpointRequest."Record Position"));
         EndpointRequest."Table No." := RecRef.Number;
         EndpointRequest."Data log Record No." := 0;
         PopulatePKFields(EndpointRequest, RecRef);

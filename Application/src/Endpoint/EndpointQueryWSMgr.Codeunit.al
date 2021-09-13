@@ -100,7 +100,7 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
             Evaluate(EndpointQuery."External No.", CopyStr(Node.AsXmlElement().InnerText(), 1, Maxstrlen(format(EndpointQuery."External No."))), 9);
 
         if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'name'), Node) then
-            EndpointQuery.Name := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery.Name));
+            EndpointQuery.Name := CopyStr(CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery.Name)), 1, MaxStrLen(EndpointQuery.Name));
 
         if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'tableno'), Node) then begin
             TableNoAsString := Node.AsXmlElement().InnerText();
@@ -109,13 +109,13 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
         end;
 
         if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'senderdatabasename'), Node) then
-            EndpointQuery."Database Name" := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."Database Name"));
+            EndpointQuery."Database Name" := CopyStr(CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."Database Name")), 1, MaxStrLen(EndpointQuery."Database Name"));
 
         if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'sendercompany'), Node) then
-            EndpointQuery."Company Name" := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."Company Name"));
+            EndpointQuery."Company Name" := CopyStr(CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."Company Name")), 1, MaxStrLen(EndpointQuery."Company Name"));
 
         if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'senderuserid'), Node) then
-            EndpointQuery."User ID" := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."User Id"));
+            EndpointQuery."User ID" := CopyStr(CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."User Id")), 1, MaxStrLen(EndpointQuery."User ID"));
 
         if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'OnlyNewandmodified'), Node) then begin
             NewAndModifiedRecs := Node.AsXmlElement().InnerText();
@@ -139,11 +139,11 @@ codeunit 6014673 "NPR Endpoint Query WS Mgr"
 
         EndpointQueryFilter.Init();
         if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'filtertext'), Node) then
-            EndpointQueryFilter."Filter Text" := Node.AsXmlElement().InnerText();
+            EndpointQueryFilter."Filter Text" := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(EndpointQueryFilter."Filter Text"));
         EndpointQueryFilter.Insert(true);
     end;
 
-    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text
+    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text[80]
     var
         ImportType: Record "NPR Nc Import Type";
     begin

@@ -10,10 +10,10 @@ codeunit 6014483 "NPR Service Process"
         if StrLen(Rec.Value) > 0 then begin
             if Evaluate(AmountUsed, Rec.Value) then;
             AmountUsed := AmountUsed / 100;
-            if not ProcessServiceAmount(CopyStr(Rec.Choice,1,20), AmountUsed) then
+            if not ProcessServiceAmount(CopyStr(Rec.Choice, 1, 20), AmountUsed) then
                 Rec.Chosen := false;
         end else
-            if not ProcessService(CopyStr(Rec.Choice,1,20)) then
+            if not ProcessService(CopyStr(Rec.Choice, 1, 20)) then
                 Rec.Chosen := false;
     end;
 
@@ -93,7 +93,7 @@ codeunit 6014483 "NPR Service Process"
                 CustomerSubscribed := IsCustomerSubscribed(CustomerNo, serviceid);
                 if CustomerSubscribed then begin
                     CreateUserAccount(SubscriptionUserId, CustomerNo, serviceid);
-                    CreateTransactionLogEntry(UserId, CustomerNo, serviceid);
+                    CreateTransactionLogEntry(CopyStr(UserId, 1, 50), CustomerNo, serviceid);
                     ServiceUsed := true;
                 end;
 
