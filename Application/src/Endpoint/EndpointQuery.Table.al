@@ -256,7 +256,7 @@ table 6014678 "NPR Endpoint Query"
                 end;
             until EndpointQueryFilter.Next() = 0;
         if StrLen(RecRef.GetView()) <= MaxStrLen("Table View") then begin
-            "Table View" := RecRef.GetView()
+            "Table View" := CopyStr(RecRef.GetView(), 1, MaxStrLen("Table View"))
         end else begin
             "Table No." := 0;
             "Table View" := '';
@@ -363,7 +363,7 @@ table 6014678 "NPR Endpoint Query"
                 EndpointRequest."Endpoint Code" := Endpoint.Code;
                 EndpointRequest."Request Batch No." := EndpointManagement.GetEndpointRequestBatchNo(Endpoint.Code);
                 EndpointRequest."Type of Change" := EndpointRequest."Type of Change"::Modify;
-                EndpointRequest."Record Position" := RecRef.GetPosition(false);
+                EndpointRequest."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(EndpointRequest."Record Position"));
                 EndpointRequest."Table No." := RecRef.Number;
                 EndpointRequest."Data log Record No." := 0;
                 EndpointRequest."Query No." := "No.";

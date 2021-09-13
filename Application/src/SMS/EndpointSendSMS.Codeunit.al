@@ -30,9 +30,8 @@ codeunit 6014420 "NPR Endpoint Send SMS" implements "NPR Send SMS"
         TempNcTaskOutput.Data.CreateOutStream(OStream, TEXTENCODING::Windows);
         OStream.WriteText(FileContent);
         TempNcTaskOutput.Insert(false);
-        TempNcTaskOutput.Name := FileName;
+        TempNcTaskOutput.Name := CopyStr(FileName, 1, MaxStrLen(TempNcTaskOutput.Name));
         if not NcEndpointMgt.RunEndpoint(TempNcTaskOutput, NcEndpoint, Response) then
             Error(SendFailedErr, NcEndpoint.Code);
     end;
-
 }
