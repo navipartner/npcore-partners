@@ -42,7 +42,7 @@ report 6014428 "NPR Shelf Labels"
             column(Description2_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Description 2")
             {
             }
-            column(VendorItemNo_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Vendor Item No.")
+            column(VendorItemNo_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Vend Item No.")
             {
             }
             column(CurrentUnitPrice_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1."Discount Unit Price")

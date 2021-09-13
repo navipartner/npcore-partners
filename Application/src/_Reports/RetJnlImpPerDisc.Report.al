@@ -34,7 +34,7 @@ report 6014481 "NPR Ret. Jnl. Imp. Per. Disc."
                         RetailJournalLine.Validate("Quantity to Print", 1);
                         RetailJournalLine.Validate(Description, Item.Description);
                         RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
-                        RetailJournalLine.Validate("Vendor Item No.", Item."Vendor Item No.");
+                        RetailJournalLine.Validate("Vend Item No.", Item."Vendor Item No.");
                         RetailJournalLine.Validate("Discount Price Incl. Vat", PeriodDiscountLine."Campaign Unit Price");
                         RetailJournalLine.Validate("Last Direct Cost", PeriodDiscountLine."Campaign Unit Cost");
                         RetailJournalLine.Validate("Period Discount", PeriodDiscount.Code);

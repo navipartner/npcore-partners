@@ -31,7 +31,7 @@
                     Validate("Vendor No.", Item."Vendor No.");
                     Description := Item.Description;
                     "Description 2" := Item."Description 2";
-                    "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
+                    "Vend Item No." := Item."Vendor Item No.";
                     "Last Direct Cost" := Item."Last Direct Cost";
                     "Unit Price" := Item."Unit Price";
                     "Item group" := Item."Item Category Code";
@@ -74,14 +74,16 @@
                 if not Vendor.Get("Vendor No.") then
                     Vendor.Init();
 
-                "Vendor Name" := CopyStr(Vendor.Name, 1, MaxStrLen("Vendor Name"));
-                "Vendor Search Description" := CopyStr(Vendor."Search Name", 1, MaxStrLen("Vendor Search Description"));
+                "Vend Name" := Vendor.Name;
+                "Vend Search Description" := Vendor."Search Name";
             end;
         }
         field(6; "Vendor Item No."; Code[20])
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. filed';
         }
         field(7; "Discount Price Incl. Vat"; Decimal)
         {
@@ -147,6 +149,11 @@
         field(14; "Period Discount"; Code[20])
         {
             Caption = 'Campaign/period discount';
+            DataClassification = CustomerContent;
+        }
+        field(15; "Vend Item No."; Code[50])
+        {
+            Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
         }
         field(17; "Variant Code"; Code[10])
@@ -304,8 +311,22 @@
         {
             Caption = 'Vendor Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Name filed';
         }
         field(42; "Vendor Search Description"; Code[50])
+        {
+            Caption = 'Vendor Search Description';
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Search Description filed';
+        }
+        field(43; "Vend Name"; Text[100])
+        {
+            Caption = 'Vendor Name';
+            DataClassification = CustomerContent;
+        }
+        field(44; "Vend Search Description"; Code[100])
         {
             Caption = 'Vendor Search Description';
             DataClassification = CustomerContent;
