@@ -109,12 +109,16 @@ codeunit 6014590 "NPR Service Tier User Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
     local procedure OnBeforeLogInStart()
+    var
+        EnvironmentHandler: Codeunit "NPR Environment Handler";
     begin
         if NavApp.IsInstalling() then
             exit;
 
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
             exit;
+
+        EnvironmentHandler.EnableAllowHttpInSandbox();
 
         TestUserExpired();
         TestUserLocked();

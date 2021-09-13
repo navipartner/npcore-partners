@@ -24,12 +24,15 @@ codeunit 6014602 "NPR Import Base NPR Data"
         BaseUri: Text;
         packageName: Text;
         Secret: Text;
+        EnvironmentHandler: Codeunit "NPR Environment Handler";
     begin
         packageName := package.Replace('.rapidstart', '');
 
         //Can be invoked in crane environment to auto import test data. Prevent multiple invocations on container re-creation.        
         if autoRapidstartImportLog.Get(packageName) then
             exit;
+
+        EnvironmentHandler.EnableAllowHttpInSandbox();
 
         BaseUri := 'https://npretailbasedata.blob.core.windows.net';
         Secret := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataSecret');
