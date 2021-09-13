@@ -33,11 +33,11 @@ report 6014514 "NPR Retail Journal List"
             {
                 IncludeCaption = true;
             }
-            column(VendorItemNo_RetailJournalLine; "Retail Journal Line"."Vendor Item No.")
+            column(VendorItemNo_RetailJournalLine; "Retail Journal Line"."Vend Item No.")
             {
                 IncludeCaption = true;
             }
-            column(VendorName_RetailJournalLine; "Retail Journal Line"."Vendor Name")
+            column(VendorName_RetailJournalLine; "Retail Journal Line"."Vend Name")
             {
                 IncludeCaption = true;
             }

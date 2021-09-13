@@ -33,7 +33,7 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                     RetailJournalLine.Validate("Quantity to Print", 1);
                     RetailJournalLine.Validate(Description, Item.Description);
                     RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
-                    RetailJournalLine.Validate("Vendor Item No.", Item."Vendor Item No.");
+                    RetailJournalLine.Validate("Vend Item No.", Item."Vendor Item No.");
                     RetailJournalLine.Validate("Discount Price Incl. Vat", Item."Unit Price");
 
                     case ImportUnitCost of
@@ -61,7 +61,7 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                             RetailJournalLine.Validate("Quantity to Print", 1);
                             RetailJournalLine.Validate(Description, Item.Description);
                             RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
-                            RetailJournalLine.Validate("Vendor Item No.", Item."Vendor Item No.");
+                            RetailJournalLine.Validate("Vend Item No.", Item."Vendor Item No.");
                             RetailJournalLine.Validate("Unit Price", Item."Unit Price");
                             RetailJournalLine.Validate(RetailJournalLine.Inventory, Item.Inventory);
 

@@ -37,7 +37,7 @@ report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
                         RetailJournalLine.Validate("Quantity to Print", 1);
                         RetailJournalLine.Validate(Description, Item.Description);
                         RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
-                        RetailJournalLine.Validate("Vendor Item No.", Item."Vendor Item No.");
+                        RetailJournalLine.Validate("Vend Item No.", Item."Vendor Item No.");
                         RetailJournalLine.Validate("Discount Price Incl. Vat", MixedDiscountLine."Unit price");
                         RetailJournalLine.Validate("Last Direct Cost", MixedDiscountLine."Unit cost");
                         RetailJournalLine.Validate("Mixed Discount", MixedDiscount.Code);

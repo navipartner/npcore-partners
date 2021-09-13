@@ -22,7 +22,7 @@ xmlport 6014420 "NPR Retail Journal Imp/Exp"
                 fieldelement(VendorNo; "Retail Journal Line"."Vendor No.")
                 {
                 }
-                fieldelement(VendorItemNo; "Retail Journal Line"."Vendor Item No.")
+                fieldelement(VendorItemNo; "Retail Journal Line"."Vend Item No.")
                 {
                 }
                 fieldelement(UnitPrice; "Retail Journal Line"."Discount Price Incl. Vat")
