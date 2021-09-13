@@ -6,7 +6,7 @@ codeunit 6014621 "NPR NpRvCheckVoucher"
         exit('CHECK_VOUCHER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[3]
     begin
         exit('1.0');
     end;
@@ -57,7 +57,7 @@ codeunit 6014621 "NPR NpRvCheckVoucher"
         if StrLen(VoucherType) > MaxStrLen(VoucherTypeCode) then
             Error(TooLongErr, 'VoucherTypeCode', 20)
         else
-            VoucherTypeCode := VoucherType;
+            VoucherTypeCode := CopyStr(VoucherType, 1, MaxStrLen(VoucherTypeCode));
 
         if not NpRvVoucherMgt.FindVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
             Error(NotFoundErr, ReferenceNo, VoucherTypeCode);
@@ -92,6 +92,7 @@ codeunit 6014621 "NPR NpRvCheckVoucher"
     var
         NpRvVoucherTypeLbl: Label '@%1*', Locked = true;
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        ErrorMsg: Label 'POS Parameter value can''t be longer then voucher type code';
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -102,7 +103,10 @@ codeunit 6014621 "NPR NpRvCheckVoucher"
                     if POSParameterValue.Value = '' then
                         exit;
 
-                    NpRvVoucherType.Code := POSParameterValue.Value;
+                    if StrLen(POSParameterValue.Value) > MaxStrLen(NpRvVoucherType.Code) then
+                        Error(ErrorMsg);
+
+                    NpRvVoucherType.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(NpRvVoucherType.Code));
                     if not NpRvVoucherType.Find() then begin
                         NpRvVoucherType.SetFilter(Code, CopyStr(StrSubstNo(NpRvVoucherTypeLbl, POSParameterValue.Value), 1, MaxStrLen(NpRvVoucherType.Code)));
                         NpRvVoucherType.FindFirst();
