@@ -104,7 +104,7 @@ codeunit 6014438 "NPR Job Queue Install"
         SMSSetup.Modify();
     end;
 
-    local procedure InsertSMSSetup(var SMSSetup: Record "NPR SMS Setup")
+    procedure InsertSMSSetup(var SMSSetup: Record "NPR SMS Setup")
     begin
         SMSSetup.Init();
         SMSSetup."Discard Msg. Older Than [Hrs]" := 24;

@@ -718,9 +718,12 @@
     var
         SMSSetup: Record "NPR SMS Setup";
         JobQueueCategory: Record "Job Queue Category";
+        JobQueueInstall: Codeunit "NPR Job Queue Install";
         DefMessJobCatLbl: Label 'NPR-SendMessage';
     begin
-        SMSSetup.Get();
+        if not SMSSetup.Get() then
+            JobQueueInstall.InsertSMSSetup(SMSSetup);
+
         if SMSSetup."Job Queue Category Code" <> '' then
             exit(SMSSetup."Job Queue Category Code");
 
