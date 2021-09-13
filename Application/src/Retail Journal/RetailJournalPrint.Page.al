@@ -82,7 +82,7 @@ page 6014473 "NPR Retail Journal Print"
                     ToolTip = 'Specifies the value of the Vendor No. field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Vendor Item No."; Rec."Vendor Item No.")
+                field("Vendor Item No."; Rec."Vend Item No.")
                 {
 
                     Visible = false;
