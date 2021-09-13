@@ -43,12 +43,14 @@ page 6150616 "NPR POS Unit List"
 
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
 
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {

@@ -45,12 +45,14 @@ page 6150614 "NPR POS Store List"
 
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
 
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
