@@ -1,6 +1,6 @@
 page 6151247 "NPR Retail - Setups"
 {
-    Caption = 'NP Retail - Setups';
+    Caption = 'Videos';
     PageType = CardPart;
     RefreshOnActivate = true;
     SourceTable = "NPR NP Retail Admin Cue";
