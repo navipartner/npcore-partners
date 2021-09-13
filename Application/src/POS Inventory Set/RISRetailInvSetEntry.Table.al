@@ -179,6 +179,6 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
     procedure SetApiUrl()
     begin
         if "Api Url" = '' then
-            "Api Url" := GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"NPR Magento Webservice");
+            "Api Url" := CopyStr(GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"NPR Magento Webservice"),1,MaxStrLen("Api Url"));
     end;
 }
