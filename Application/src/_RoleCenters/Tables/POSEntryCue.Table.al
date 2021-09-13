@@ -64,7 +64,7 @@ table 6151247 "NPR POS Entry Cue."
         }
         field(12; "Unfinished EFT Requests"; Integer)
         {
-            CalcFormula = Count("NPR EFT Transaction Request" where(Finished = Filter(0DT),
+            CalcFormula = Count("NPR EFT Transaction Request" where(Finished = Filter(''),
                                                                     "Transaction Date" = Field("EFT Errors Date Filter"),
                                                                     "Amount Input" = Filter(<> 0)));
             FieldClass = FlowField;
