@@ -4,13 +4,17 @@ codeunit 6014693 "NPR Environment Handler"
         IssueDetectedNotificationTxt: Label 'Something went wrong and Allow HTTP for extension ''%1'' won''t be enabled.';
         AllowHttpEnabledTxt: Label 'Allow HTTP has been successfully enabled for extension ''%1''';
 
+    trigger OnRun()
+    begin
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, true)]
     local procedure OnBeforeLoginStart()
     begin
-        EnableAllowHttp();
+        EnableAllowHttpInSandbox();
     end;
 
-    local procedure EnableAllowHttp()
+    internal procedure EnableAllowHttpInSandbox()
     var
         NAVAppSetting: Record "NAV App Setting";
         EnvironmentInfo: Codeunit "Environment Information";
