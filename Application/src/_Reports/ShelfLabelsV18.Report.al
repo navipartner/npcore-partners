@@ -9,7 +9,7 @@ report 6014428 "NPR Shelf Labels"
     PreviewMode = PrintLayout;
     UseSystemPrinter = true;
     DataAccessIntent = ReadOnly;
-    
+
     dataset
     {
         dataitem(Retail_Journal_Line; "NPR Retail Journal Line")
@@ -60,6 +60,12 @@ report 6014428 "NPR Shelf Labels"
             column(BarCodeTempBlobCol1; BarCodeEncodedText)
             {
             }
+            column(BarcodeFontFamily; BarcodeFontFamily)
+            {
+            }
+            column(BarcodeFontSize; BarcodeFontSize)
+            {
+            }
             column(Assortment_TMPRetailJournalLineCol1; TMPRetail_Journal_Line_Col1.Assortment)
             {
             }
@@ -97,8 +103,7 @@ report 6014428 "NPR Shelf Labels"
             trigger OnAfterGetRecord()
             begin
 
-                BarCodeText := Barcode;
-                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false));
+                CalculateBarcodeAndFonts(Barcode);
 
                 Clear(ItemVariant);
                 if Item.Get("Item No.") then begin
@@ -181,8 +186,9 @@ report 6014428 "NPR Shelf Labels"
         ItemCategory: Record "Item Category";
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
         BarcodeSimbiology: Enum "Barcode Symbology";
-        BarCodeText: code[250];
         BarCodeEncodedText: Text;
+        BarcodeFontFamily: Text;
+        BarcodeFontSize: Text;
         CurrencyChar: Char;
         TMPBeforeUnitPrice: Decimal;
         TMPRetailLineDiscount: Decimal;
@@ -261,6 +267,45 @@ report 6014428 "NPR Shelf Labels"
 
         TMPUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
         exit;
+    end;
+
+    local procedure CalculateBarcodeAndFonts(Barcode: Text[50])
+    var
+        BarcodeLength: Integer;
+        ArialFontLbl: Label 'Arial', locked = true;
+        AutomationC128XLFontLbl: Label 'IDAutomationC128XXL', Locked = true;
+    begin
+        BarcodeLength := StrLen(Barcode);
+        BarcodeFontSize := CalculateFontSize(BarcodeLength);
+
+        if (BarcodeLength = 0) or (BarcodeLength > 20) then begin
+            BarCodeEncodedText := '***';
+            BarcodeFontFamily := ArialFontLbl;
+        end
+        else begin
+            BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(Barcode, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false));
+            BarcodeFontFamily := AutomationC128XLFontLbl;
+        end;
+    end;
+
+    local procedure CalculateFontSize(Length: Integer): Text
+    begin
+        case Length of
+            17 .. 20:
+                exit('4pt');
+            14 .. 16:
+                exit('5pt');
+            11 .. 13:
+                exit('6pt');
+            9, 10:
+                exit('7pt');
+            8:
+                exit('8pt');
+            7:
+                exit('9pt');
+            else
+                exit('10pt');
+        end;
     end;
 }
 #endif
