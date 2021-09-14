@@ -139,7 +139,7 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
         Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');
     end;
 
-    local procedure GetSourceNameText(): Text
+    local procedure GetSourceNameText(): Text[50]
     begin
         exit('BUILTIN_REGISTER_BALANCING');
     end;

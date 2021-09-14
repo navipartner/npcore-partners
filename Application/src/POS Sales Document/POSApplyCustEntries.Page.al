@@ -870,7 +870,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
             CalcType::Direct:
                 begin
                     FindAmountRounding();
-                    CustEntryApplID := UserId;
+                    CustEntryApplID := CopyStr(UserId, 1, MaxStrLen(CustEntryApplID));
                     if CustEntryApplID = '' then
                         CustEntryApplID := '***';
 

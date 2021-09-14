@@ -314,7 +314,7 @@ page 6014401 "NPR Debit sale info"
         Rec."Your Reference" := Text;
     end;
 
-    procedure GetCustomer(var Text: Text[30])
+    procedure GetCustomer(var Text: Text[35])
     begin
         Text := Rec."Your Reference";
     end;

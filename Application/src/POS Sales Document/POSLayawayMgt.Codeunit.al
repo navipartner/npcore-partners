@@ -27,7 +27,7 @@
         Instalments: Integer;
         DownpaymentPct: Decimal;
         CreditMemoNo: Text;
-        DownpaymentInvoiceNo: Text;
+        DownpaymentInvoiceNo: Text[20];
         PrepaymentPaymentTerms: Text;
         ServiceInvoiceNo: Text;
 
@@ -56,7 +56,7 @@
     begin
         FunctionToRun := FunctionToRun::HandleDownpayment;
         POSSession := POSSessionIn;
-        DownpaymentInvoiceNo := DownpaymentInvoiceNoIn;
+        DownpaymentInvoiceNo := CopyStr(DownpaymentInvoiceNoIn, 1, MaxStrLen(DownpaymentInvoiceNo));
     end;
 
     local procedure ApplyPrepmtCreditMemoAndRefund(var SalesHeader: Record "Sales Header")
@@ -226,7 +226,7 @@
         CODEUNIT.Run(CODEUNIT::"CustEntry-Apply Posted Entries", ApplyingCustLedgerEntry);
     end;
 
-    local procedure CreateAndPostDownpaymentInvoice(var SalesHeader: Record "Sales Header"; DownpaymentPct: Decimal; PrepaymentPaymentTerms: Text): Text
+    local procedure CreateAndPostDownpaymentInvoice(var SalesHeader: Record "Sales Header"; DownpaymentPct: Decimal; PrepaymentPaymentTerms: Text): Text[20]
     var
         SalesLine: Record "Sales Line";
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";

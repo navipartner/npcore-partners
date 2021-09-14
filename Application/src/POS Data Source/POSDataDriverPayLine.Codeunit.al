@@ -82,7 +82,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
         //+NPR5.36 [287688]
     end;
 
-    local procedure GetSourceNameText(): Text
+    local procedure GetSourceNameText(): Text[50]
     begin
         exit('BUILTIN_PAYMENTLINE');
     end;
