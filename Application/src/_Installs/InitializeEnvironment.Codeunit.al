@@ -2,7 +2,7 @@ codeunit 6014694 "NPR Initialize Environment"
 {
     Subtype = Install;
 
-    trigger OnInstallAppPerCompany()
+    trigger OnInstallAppPerDatabase()
     begin
         AllowHttpRequestForSandboxEnvironment();
     end;
