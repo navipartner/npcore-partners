@@ -40,8 +40,8 @@ codeunit 6014620 "NPR POS Cross Reference Mgt."
         Rec.Init();
         Rec.SystemId := SysID;
         Rec."Table Name" := TableName;
-        Rec."Record Value" := RecordValue;
-        Rec."Reference No." := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Rec."Reference No.")));
+        Rec."Record Value" := CopyStr(RecordValue, 1, MaxStrLen(Rec."Record Value"));
+        Rec."Reference No." := CopyStr(UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Rec."Reference No."))), 1, MaxStrLen(Rec."Reference No."));
         Rec.Insert(true, true);
     end;
 
