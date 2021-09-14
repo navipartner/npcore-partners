@@ -31,6 +31,7 @@
         CaptionPaymentsDetails: Label 'Payment Details:';
         CaptionRemaningAmt: Label 'Remaining Amount';
 
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitializeAtLogin', '', true, true)]
     local procedure CU6150705OnAfterInitializeAtLogin(POSUnit: Record "NPR POS Unit")
     var
@@ -905,7 +906,7 @@
         ContentHtml: Text;
         DisplayContentLines: Record "NPR Display Content Lines";
         VideoCounter: Integer;
-        ContentIfStmtLbl: Label '      if (video_count == %1) video_count = 1;', Locked = true;
+
     begin
         DisplayContentLines.SetRange("Content Code", ContentCode);
         if DisplayContentLines.FindSet() then begin
@@ -933,8 +934,7 @@
             ContentHtml += '    var videoPlayer = document.getElementById("fullscreenVideo");';
             ContentHtml += '    function run() {';
             ContentHtml += '      video_count++;';
-            ContentHtml += StrSubstNo(
-                           ContentIfStmtLbl, VideoCounter);
+            ContentHtml += StrSubstNo('if (video_count == %1) video_count = 1;', VideoCounter);
             ContentHtml += '      var nextVideo = "video" + video_count + ".mp4";';
             ContentHtml += '      videoPlayer.src = nextVideo;';
             ContentHtml += '      videoPlayer.play();';
@@ -946,81 +946,26 @@
         exit(ContentHtml);
     end;
 
-    // local procedure GetImageContentAndExtension(DisplayContentLines: Record "NPR Display Content Lines"; var Base64: Text; var Extension: Text[10])
-    // var
-    //     InS: InStream;
-    //     OutS: OutStream;
-    //     base64Convert: Codeunit "Base64 Convert";
-    //     blobber: Codeunit "Temp Blob";
-    //     filenameindex: Integer;
-    //     med: Record "Tenant Media";
-
-    // begin
-    //     if DisplayContentLines.Picture.HasValue() then begin
-    //         blobber.CreateOutStream(OutS);
-    //         DisplayContentLines.Picture.ExportStream(OutS);
-    //         blobber.CreateInStream(InS);
-    //         Base64 := base64Convert.ToBase64(InS);
-    //         if (med.Get(DisplayContentLines.Picture.MediaId())) then begin
-    //             filenameindex := med.Description.LastIndexOf('.') + 1;
-    //             Extension := med.Description.Substring(filenameindex);
-    //         end;
-
-    //     end;
-    // end;
-
     local procedure GetImageContentAndExtension(DisplayContentLines: Record "NPR Display Content Lines"; var Base64: Text; var Extension: Text[10])
     var
-        Base64Convert: Codeunit "Base64 Convert";
-        Bytes: DotNet NPRNetArray;
         InS: InStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
-        Converter: DotNet NPRNetImageConverter;
+        OutS: OutStream;
+        base64Convert: Codeunit "Base64 Convert";
+        blobber: Codeunit "Temp Blob";
+        filenameindex: Integer;
+        med: Record "Tenant Media";
+
     begin
-        DisplayContentLines.CalcFields(Image);
-        if DisplayContentLines.Image.HasValue() then begin
-            DisplayContentLines.Image.CreateInStream(InS);
+        if DisplayContentLines.Picture.HasValue() then begin
+            blobber.CreateOutStream(OutS);
+            DisplayContentLines.Picture.ExportStream(OutS);
+            blobber.CreateInStream(InS);
+            Base64 := base64Convert.ToBase64(InS);
+            if (med.Get(DisplayContentLines.Picture.MediaId())) then begin
+                filenameindex := med.Description.LastIndexOf('.') + 1;
+                Extension := med.Description.Substring(filenameindex);
+            end;
 
-            MemoryStream := MemoryStream.MemoryStream();
-            CopyStream(MemoryStream, InS);
-
-            Bytes := MemoryStream.ToArray();
-
-            Converter := Converter.ImageConverter();
-            Image := Converter.ConvertFrom(Bytes);
-
-            //Image.FromStream(MemoryStream);
-
-            if (ImageFormat.Jpeg.Equals(Image.RawFormat)) then
-                Extension := 'jpeg'
-            else
-                if (ImageFormat.Png.Equals(Image.RawFormat)) then
-                    Extension := 'png'
-                else
-                    if (ImageFormat.Gif.Equals(Image.RawFormat)) then
-                        Extension := 'gif'
-                    else
-                        if (ImageFormat.Bmp.Equals(Image.RawFormat)) then
-                            Extension := 'bmp'
-                        else
-                            if (ImageFormat.Tiff.Equals(Image.RawFormat)) then
-                                Extension := 'tiff'
-                            else
-                                if (ImageFormat.Emf.Equals(Image.RawFormat)) then
-                                    Extension := 'emf'
-                                else
-                                    if (ImageFormat.Icon.Equals(Image.RawFormat)) then
-                                        Extension := 'icon'
-                                    else
-                                        if (ImageFormat.Exif.Equals(Image.RawFormat)) then
-                                            Extension := 'exif'
-                                        else
-                                            if (ImageFormat.Wmf.Equals(Image.RawFormat)) then
-                                                Extension := 'wmf';
-
-            Base64 := Base64Convert.ToBase64(InS);
         end;
     end;
 
