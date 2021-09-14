@@ -172,7 +172,8 @@
                                               <TextRun>
                                                 <Value>=Fields!BarCodeTempBlobCol1.Value</Value>
                                                 <Style>
-                                                  <FontFamily>IDAutomationC128M</FontFamily>
+                                                  <FontFamily>=Fields!BarcodeFontFamily.Value</FontFamily>
+                                                  <FontSize>=Fields!BarcodeFontSize.Value</FontSize>
                                                 </Style>
                                               </TextRun>
                                             </TextRuns>
@@ -278,8 +279,7 @@
                                                 <Value>=Fields!ItemNo_TMPRetailJournalLineCol1.Value</Value>
                                                 <Style>
                                                   <FontFamily>Courier New</FontFamily>
-                                                  <FontSize>7pt</FontSize>
-                                                  <FontWeight>Bold</FontWeight>
+                                                  <FontSize>5pt</FontSize>
                                                 </Style>
                                               </TextRun>
                                             </TextRuns>
@@ -498,6 +498,12 @@ End Function
         </Field>
         <Field Name="BarCodeTempBlobCol1">
           <DataField>BarCodeTempBlobCol1</DataField>
+        </Field>
+        <Field Name="BarcodeFontFamily">
+          <DataField>BarcodeFontFamily</DataField>
+        </Field>
+        <Field Name="BarcodeFontSize">
+          <DataField>BarcodeFontSize</DataField>
         </Field>
         <Field Name="Assortment_TMPRetailJournalLineCol1">
           <DataField>Assortment_TMPRetailJournalLineCol1</DataField>
