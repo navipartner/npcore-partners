@@ -407,7 +407,7 @@
                     ReservationEntry."Entry No." += 1;
                     ReservationEntry.Positive := false;
                     ReservationEntry."Creation Date" := Today();
-                    ReservationEntry."Created By" := UserId;
+                    ReservationEntry."Created By" := CopyStr(UserId, 1, MaxStrLen(ReservationEntry."Created By"));
                     ReservationEntry."Item No." := SaleLinePOS."No.";
                     ReservationEntry."Location Code" := SaleLinePOS."Location Code";
                     ReservationEntry."Quantity (Base)" := -SalesLine."Quantity (Base)";

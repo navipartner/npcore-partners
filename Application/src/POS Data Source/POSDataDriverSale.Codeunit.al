@@ -145,7 +145,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');
     end;
 
-    local procedure GetSourceNameText(): Text
+    local procedure GetSourceNameText(): Text[50]
     begin
         exit('BUILTIN_SALE');
     end;

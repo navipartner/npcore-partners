@@ -215,7 +215,7 @@
         SaleLinePOS.Validate("No.", CustLedgerEntry."Customer No.");
         SaleLinePOS."Buffer Document Type" := CustLedgerEntry."Document Type";
         SaleLinePOS."Buffer Document No." := CustLedgerEntry."Document No.";
-        SaleLinePOS."Buffer ID" := SaleLinePOS."Register No." + '-' + SaleLinePOS."Sales Ticket No.";
+        SaleLinePOS."Buffer ID" := CopyStr(SaleLinePOS."Register No." + '-' + SaleLinePOS."Sales Ticket No.", 1, MaxStrLen(SaleLinePOS."Buffer ID"));
 
         case CustLedgerEntry."Document Type" of
             CustLedgerEntry."Document Type"::Invoice:
