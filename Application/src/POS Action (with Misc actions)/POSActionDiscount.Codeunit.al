@@ -36,12 +36,12 @@ codeunit 6150792 "NPR POS Action - Discount"
         DiscountReasonCode: Code[10];
         ReadingErr: Label 'reading in %1 of %2';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('DISCOUNT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.7');
     end;
@@ -350,7 +350,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         ReasonCode: Code[10];
     begin
         JSON.SetScopeParameters(ActionCode());
-        ReasonCode := JSON.GetStringOrFail('FixedReasonCode', StrSubstNo(ReadingErr, 'OnActionFixedReasonCode', ActionCode()));
+        ReasonCode := CopyStr(JSON.GetStringOrFail('FixedReasonCode', StrSubstNo(ReadingErr, 'OnActionFixedReasonCode', ActionCode())), 1, MaxStrLen(ReasonCode));
         if ReasonCode = '' then
             exit;
 
@@ -893,10 +893,10 @@ codeunit 6150792 "NPR POS Action - Discount"
     local procedure GetAdditionalParams(JSON: Codeunit "NPR POS JSON Management")
     begin
         JSON.SetScopeRoot();
-        ApprovedBySalespersonCode := JSON.GetString('approvedBySalesperson');
-        DiscountReasonCode := JSON.GetString('discountReasonCode');
-        AddDimensionCode := JSON.GetString('addDimensionCode');
-        AddDimensionValueCode := JSON.GetString('addDimensionValueCode');
+        ApprovedBySalespersonCode := CopyStr(JSON.GetString('approvedBySalesperson'), 1, MaxStrLen(ApprovedBySalespersonCode));
+        DiscountReasonCode := CopyStr(JSON.GetString('discountReasonCode'), 1, MaxStrLen(DiscountReasonCode));
+        AddDimensionCode := CopyStr(JSON.GetString('addDimensionCode'), 1, MaxStrLen(AddDimensionCode));
+        AddDimensionValueCode := CopyStr(JSON.GetString('addDimensionValueCode'), 1, MaxStrLen(AddDimensionValueCode));
     end;
 
     local procedure ApplyAdditionalParams(var SaleLinePOS: Record "NPR POS Sale Line")

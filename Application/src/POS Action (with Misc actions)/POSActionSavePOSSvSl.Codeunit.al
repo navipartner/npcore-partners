@@ -5,12 +5,12 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         Text001: Label 'POS Quote';
         Text002: Label 'Save current Sale as POS Quote?';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SAVE_AS_POS_QUOTE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -98,7 +98,7 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl"
         if not PrintAfterSave then
             exit;
 
-        PrintTemplateCode := JSON.GetStringParameter('PrintTemplate');
+        PrintTemplateCode := CopyStr(JSON.GetStringParameter('PrintTemplate'), 1, MaxStrLen(PrintTemplateCode));
         if not RPTemplateHeader.Get(PrintTemplateCode) then
             exit;
         RPTemplateHeader.CalcFields("Table ID");

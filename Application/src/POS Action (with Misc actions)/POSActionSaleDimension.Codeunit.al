@@ -8,12 +8,12 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
         TITLE: Label 'Dimension and Statistics';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SALE_DIMENSION');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.4');
     end;

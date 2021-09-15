@@ -3,12 +3,12 @@ codeunit 6150914 "NPR POS Action: HC Inv.Message"
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('HC_INVMESSAGE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

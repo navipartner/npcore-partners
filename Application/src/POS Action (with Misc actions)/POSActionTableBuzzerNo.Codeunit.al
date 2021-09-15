@@ -62,12 +62,12 @@ codeunit 6150780 "NPR POS Action: TableBuzzerNo"
         POSSession.RequestRefreshData();
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('INSERT_TABLE_BUZZER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

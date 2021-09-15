@@ -5,12 +5,12 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         Text001: Label 'Item not found';
         Text002: Label 'Invalid Quantity';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('ITEM_QTY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -163,9 +163,9 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         if not EanBoxEvent.Get(EventCodeItemQty()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemQty();
-            EanBoxEvent."Module Name" := Item.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(Text000, 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);

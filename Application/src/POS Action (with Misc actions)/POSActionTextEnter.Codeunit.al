@@ -5,12 +5,12 @@ codeunit 6150722 "NPR POS Action: Text Enter"
         Text001: Label 'Control %1 has just sent an %2 event, but it appears that events for this control are not handled.';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('TEXT_ENTER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

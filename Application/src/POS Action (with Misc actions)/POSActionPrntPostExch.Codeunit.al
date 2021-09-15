@@ -6,12 +6,12 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
         ChooseDetailsCaption: Label 'Please choose sale details';
         NoSaleLinesErr: Label 'The sale selected has no lines';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PRINT_TMPL_POSTED');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -72,7 +72,7 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
             Error(NoSaleLinesErr);
 
         RecordVar := POSSalesLine;
-        TemplateMgt.PrintTemplate(JSON.GetStringParameterOrFail('Template', ActionCode()), RecordVar, 0);
+        TemplateMgt.PrintTemplate(CopyStr(JSON.GetStringParameterOrFail('Template', ActionCode()), 1, 20), RecordVar, 0);
 
         Handled := true;
     end;

@@ -47,7 +47,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm."
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         Line.Type := Line.Type::Comment;
-        Line.Description := JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode()));
+        Line.Description := CopyStr(JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(Line.Description));
 
         POSSession.GetSaleLine(SaleLine);
         SaleLine.InsertLine(Line);
@@ -55,12 +55,12 @@ codeunit 6150795 "NPR POS Action - Insert Comm."
         POSSession.RequestRefreshData();
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('INSERT_COMMENT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

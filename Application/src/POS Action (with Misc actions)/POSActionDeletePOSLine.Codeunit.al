@@ -1,11 +1,11 @@
 codeunit 6150796 "NPR POSAction: Delete POS Line"
 {
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('DELETE_POS_LINE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -15,7 +15,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
     var
         ActionDescriptionLbl: Label 'This built in function deletes sales or payment line from the POS';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
             Sender.RegisterWorkflow20(
                 'let saleLines = runtime.getData("BUILTIN_SALELINE");' +
                 'if ((!saleLines.length) || (saleLines._invalid)) {' +

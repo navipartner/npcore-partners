@@ -4,12 +4,12 @@ codeunit 6150833 "NPR POS Action: Notif. List"
         ActionDescription: Label 'This built in function opens the notification list page';
         Title: Label 'Notification List';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('NOTIFICATIONLIST');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

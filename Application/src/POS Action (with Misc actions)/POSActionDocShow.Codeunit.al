@@ -10,12 +10,12 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
         DescSalesView: Label 'Pre-filtered list of sales documents';
         OptionSelectType: Label 'List,Selected Line';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SALES_DOC_SHOW');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -178,7 +178,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
                         FilterPageBuilder.SetView(SalesHeader.TableCaption, SalesHeader.GetView(false));
                     end;
                     if FilterPageBuilder.RunModal() then
-                        POSParameterValue.Value := FilterPageBuilder.GetView(SalesHeader.TableCaption, false);
+                        POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(SalesHeader.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
                 end;
         end;
     end;

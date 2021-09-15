@@ -3,12 +3,12 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
     var
         ActionDescriptionLbl: Label 'This action transfer funds from one bin to a different bin using the thPOS';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('BIN_TRANSFER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -75,7 +75,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
     begin
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        FromBinNo := JSON.GetStringOrFail('FROM_BIN', ReadingErr);
+        FromBinNo := CopyStr(JSON.GetStringOrFail('FROM_BIN', ReadingErr), 1, MaxStrLen(FromBinNo));
 
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(FromBinNo);
 
@@ -181,7 +181,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
     begin
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        exit(JSON.GetStringParameterOrFail('SourceBin', ActionCode()));
+        exit(CopyStr(JSON.GetStringParameterOrFail('SourceBin', ActionCode()), 1, 10));
     end;
 
     local procedure GetDefaultUnitBin(POSSession: Codeunit "NPR POS Session"): Code[10]

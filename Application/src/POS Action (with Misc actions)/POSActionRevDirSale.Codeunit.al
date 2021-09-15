@@ -18,12 +18,12 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('REVERSE_DIRECT_SALE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;
@@ -123,7 +123,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 
         JSON.SetScopeRoot();
         JSON.SetScope('$receipt', StrSubstNo(SettingScopeErr, ActionCode()));
-        SalesTicketNo := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
+        SalesTicketNo := CopyStr(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(SalesTicketNo));
         if (SalesTicketNo = '') then
             Error('That receipt is not valid for sales reversal.');
 
@@ -153,7 +153,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 
         JSON.SetScopeRoot();
         JSON.SetScope('$receipt', StrSubstNo(SettingScopeErr, ActionCode()));
-        SalesTicketNo := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
+        SalesTicketNo := CopyStr(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(SalesTicketNo));
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -165,7 +165,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 
         JSON.SetScopeRoot();
 
-        ReturnReasonCode := JSON.GetString('ReturnReasonCode');
+        ReturnReasonCode := CopyStr(JSON.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
         ReverseSalesTicket(SalePOS, SalesTicketNo, ReturnReasonCode);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -242,7 +242,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         SaleLinePOS."Amount Including VAT" := -POSSalesLine."Amount Incl. VAT";
         SaleLinePOS."Serial No." := POSSalesLine."Serial No.";
         SaleLinePOS."Discount Type" := POSSalesLine."Discount Type";
-        SaleLinePOS."Discount Code" := POSSalesLine."Discount Code";
+        SaleLinePOS."Discount Code" := CopyStr(POSSalesLine."Discount Code", 1, MaxStrLen(SaleLinePOS."Discount Code"));
         SaleLinePOS."Gen. Bus. Posting Group" := POSSalesLine."Gen. Bus. Posting Group";
         SaleLinePOS."Gen. Prod. Posting Group" := POSSalesLine."Gen. Prod. Posting Group";
         SaleLinePOS."VAT Bus. Posting Group" := POSSalesLine."VAT Bus. Posting Group";

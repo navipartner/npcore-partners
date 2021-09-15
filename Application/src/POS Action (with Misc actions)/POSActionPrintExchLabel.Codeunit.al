@@ -3,12 +3,12 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
     var
         ReadingErr: Label 'reading in %1 of %2';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PRINT_EXCH_LABEL');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -18,7 +18,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
     var
         ActionDescriptionLbl: Label 'This is a built-in action for printing exchange labels';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
             Sender.RegisterWorkflow20(
                 'await workflow.respond("AddPresetValuesToContext");' +
                 'if (($parameters.Setting == $parameters.Setting["Package"]) || ($parameters.Setting == $parameters.Setting["Selection"])) {' +

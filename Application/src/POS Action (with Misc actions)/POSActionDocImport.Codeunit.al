@@ -15,12 +15,12 @@
         OptionDocType: Label 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
         OptionLocationFrom: Label 'POS Store,Location Filter Parameter';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SALES_DOC_IMP');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;
@@ -240,7 +240,7 @@
                         FilterPageBuilder.SetView(SalesHeader.TableCaption, SalesHeader.GetView(false));
                     end;
                     if FilterPageBuilder.RunModal() then
-                        POSParameterValue.Value := FilterPageBuilder.GetView(SalesHeader.TableCaption, false);
+                        POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(SalesHeader.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
                 end;
 
             'LocationFilter':
@@ -250,7 +250,7 @@
                     LocationList.SetTableView(Location);
                     LocationList.LookupMode(true);
                     if LocationList.RunModal() = ACTION::LookupOK then
-                        POSParameterValue.Value := LocationList.GetSelectionFilter();
+                        POSParameterValue.Value := CopyStr(LocationList.GetSelectionFilter(), 1, MaxStrLen(POSParameterValue.Value));
                 end;
         end;
     end;
@@ -270,7 +270,7 @@
         end;
     end;
 
-    local procedure ThisDataSource(): Text
+    local procedure ThisDataSource(): Code[50]
     begin
         exit('BUILTIN_SALE');
     end;

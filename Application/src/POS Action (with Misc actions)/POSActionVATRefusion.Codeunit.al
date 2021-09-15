@@ -10,12 +10,12 @@
         TEXTRefussionNotPos_lead: Label 'VAT Amount can not be zero for VAT Refussion';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('VATREFUSION');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -113,7 +113,7 @@
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScopeParameters(ActionCode());
         POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.GetPOSPaymentMethod(POSPaymentMethod, JSON.GetStringOrFail('PaymentTypePOSCode', StrSubstNo(ReadingErr, ActionCode())));
+        POSPaymentLine.GetPOSPaymentMethod(POSPaymentMethod, CopyStr(JSON.GetStringOrFail('PaymentTypePOSCode', StrSubstNo(ReadingErr, ActionCode())), 1, 10));
         POSPaymentMethod.Get(POSPaymentMethod.Code);
 
         //Get amount and add to payment line

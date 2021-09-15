@@ -5,12 +5,12 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         LookupType: Option Item,Customer,SKU;
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('LOOKUP');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.4');
     end;
@@ -144,7 +144,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         ItemNo: Code[20];
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ItemNo := JSON.GetStringOrFail('selected_itemno', StrSubstNo(ReadingErr, ActionCode()));
+        ItemNo := CopyStr(JSON.GetStringOrFail('selected_itemno', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(ItemNo));
         if ItemNo = '' then begin
             exit;
         end else begin

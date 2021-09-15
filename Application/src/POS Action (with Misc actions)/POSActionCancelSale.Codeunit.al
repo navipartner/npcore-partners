@@ -56,14 +56,14 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         Handled := true;
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     var
         CancelPosSalesLbl: Label 'CANCEL_POS_SALE', Locked = true;
     begin
         exit(CancelPosSalesLbl);
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

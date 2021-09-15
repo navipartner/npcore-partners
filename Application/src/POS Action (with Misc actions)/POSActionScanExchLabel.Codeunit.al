@@ -70,12 +70,12 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
         Captions.AddActionCaption(ActionCode(), 'InpInstr', '');
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('EXCHANGELABEL');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -113,7 +113,7 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
             EanBoxEvent.Code := EventCodeExchLabel();
             EanBoxEvent."Module Name" := InpTitle;
             EanBoxEvent.Description := CopyStr(ExchangeLabel.FieldCaption(Barcode), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);

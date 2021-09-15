@@ -48,12 +48,12 @@ codeunit 6150803 "NPR POSAction: Zoom"
         end;
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('ZOOM');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

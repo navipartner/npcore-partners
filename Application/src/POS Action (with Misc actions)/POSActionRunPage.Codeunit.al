@@ -4,12 +4,12 @@ codeunit 6150802 "NPR POS Action: Run Page"
         ActionDescription: Label 'This is a built-in action for running a page';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('RUNPAGE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -86,7 +86,7 @@ codeunit 6150802 "NPR POS Action: Run Page"
         if POSParameterTableIDValue.FindFirst() then
             if Evaluate(TableID, POSParameterTableIDValue.Value) then
                 if TableID <> 0 then begin
-                    POSParameterValue.Value := POSParameterValue.GetTableViewString(TableID, POSParameterValue.Value);
+                    POSParameterValue.Value := CopyStr(POSParameterValue.GetTableViewString(TableID, POSParameterValue.Value), 1, MaxStrLen(POSParameterValue.Value));
                     Handled := true;
                 end;
     end;
@@ -111,7 +111,7 @@ codeunit 6150802 "NPR POS Action: Run Page"
                     if TableID <> 0 then begin
                         RecRef.Open(TableID);
                         RecRef.SetView(POSParameterValue.Value);
-                        POSParameterValue.Value := RecRef.GetView(false);
+                        POSParameterValue.Value := CopyStr(RecRef.GetView(false), 1, MaxStrLen(POSParameterValue.Value));
                     end;
         end;
     end;

@@ -29,12 +29,12 @@ codeunit 6060160 "NPR POS Action: Get Event"
         Captions.AddActionCaption(ActionCode(), 'prompt', EnterEventTxt);
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('GET_EVENT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

@@ -13,12 +13,12 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         CaptionPdf2NavDoc: Label 'Pdf2Nav Send Document';
         DescPdf2NavDoc: Label 'Use Pdf2Nav to send the posted document';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SALES_DOC_PAY_POST');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

@@ -66,7 +66,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
                     Description := GetInput(JSON, 'description');
                     Amount := GetDecimal(JSON, 'amount');
                     JSON.SetScopeRoot();
-                    AccountNo := JSON.GetStringOrFail('accountno', StrSubstNo(ReadingErr, ActionCode()));
+                    AccountNo := CopyStr(JSON.GetStringOrFail('accountno', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(AccountNo));
 
                     case PayOption of
                         0:
@@ -94,7 +94,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
     begin
         JSON.SetScopeRoot();
         JSON.SetScopeParameters(ActionCode());
-        ReasonCode := JSON.GetStringOrFail('FixedReasonCode', StrSubstNo(ReadingErr, ActionCode()));
+        ReasonCode := CopyStr(JSON.GetStringOrFail('FixedReasonCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(ReasonCode));
         if ReasonCode = '' then
             exit;
 
@@ -111,12 +111,12 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         ApplyReasonCode(ReasonCode.Code, POSSession);
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PAYIN_PAYOUT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -153,7 +153,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         Line.Type := Line.Type::"G/L Entry";
         Line."Sale Type" := Line."Sale Type"::"Out payment";
         Line."No." := AccountNo;
-        Line.Description := Description;
+        Line.Description := CopyStr(Description, 1, MaxStrLen(Line.Description));
         Line."Custom Descr" := (Description <> '');
         Line.Quantity := 1;
         Line."Amount Including VAT" := Amount;
@@ -163,7 +163,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         POSSaleLine.InsertLine(Line);
 
         POSSaleLine.GetCurrentSaleLine(Line);
-        Line.Description := Description;
+        Line.Description := CopyStr(Description, 1, MaxStrLen(Line.Description));
 
         Line.UpdateAmounts(Line);
 

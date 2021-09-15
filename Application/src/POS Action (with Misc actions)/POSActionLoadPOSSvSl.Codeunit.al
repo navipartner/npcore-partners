@@ -5,12 +5,12 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
         CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('LOAD_FROM_POS_QUOTE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.4');
     end;
@@ -92,7 +92,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
         Filter := JSON.GetIntegerParameterOrFail('Filter', ActionCode());
         POSQuoteMgt.SetSalePOSFilter(SalePOS, POSQuoteEntry, Filter);
 
-        SalesTicketNo := JSON.GetString('SalesTicketNo');
+        SalesTicketNo := CopyStr(JSON.GetString('SalesTicketNo'), 1, MaxStrLen(SalesTicketNo));
         if SalesTicketNo = '' then begin
             if PAGE.RunModal(0, POSQuoteEntry) <> ACTION::LookupOK then
                 exit;

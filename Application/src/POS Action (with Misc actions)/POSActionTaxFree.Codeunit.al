@@ -10,12 +10,12 @@ codeunit 6150794 "NPR POS Action: Tax Free"
         Error_CancelReverse: Label 'An active tax free voucher is linked to sales ticket %1. It must be voided if you are reversing the sales ticket!';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('TAX_FREE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

@@ -16,12 +16,12 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         DescSelectionMethod: Label 'Select next prepayment invoice to pay based on due date or manually select from list';
         OptionSelectionMethod: Label 'Next Due,List';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('LAYAWAY_PAY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -241,7 +241,7 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
-        SaleLinePOS.Description := Description;
+        SaleLinePOS.Description := CopyStr(Description, 1, MaxStrLen(SaleLinePOS.Description));
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 

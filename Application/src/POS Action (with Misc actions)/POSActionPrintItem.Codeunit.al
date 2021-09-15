@@ -6,12 +6,12 @@ codeunit 6150789 "NPR POS Action: Print Item"
         PrintQuantity: Label 'Quantity To Print';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PRINT_ITEM');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

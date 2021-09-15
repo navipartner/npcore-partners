@@ -10,12 +10,12 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         COMMENT_VATADDED: Label 'VAT added to sale';
         COMMENT_VATREMOVED: Label 'VAT removed from sale';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SET_SALE_VAT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

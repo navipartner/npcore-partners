@@ -5,12 +5,12 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         Setup: Codeunit "NPR POS Setup";
         CashkeeperNotFound: Label 'CashKeeper Setup for POS unit %3 was not found.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CK_MANAGEMENT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -136,7 +136,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
                 CashKeeperOverview."Value In Cents" := OverviewAmout;
                 if CashKeeperOverview."Value In Cents" > 0 then
                     CashKeeperOverview."Total Amount" := CashKeeperOverview."Value In Cents" / 100;
-                CashKeeperOverview."User Id" := UserId;
+                CashKeeperOverview."User Id" := CopyStr(UserId, 1, MaxStrLen(CashKeeperOverview."User Id"));
                 CashKeeperOverview.Insert(true);
             end;
         end;

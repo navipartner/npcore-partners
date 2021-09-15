@@ -8,12 +8,12 @@ codeunit 6150852 "NPR POS Action - Item Price"
         PriceInfoHtml: Label '<center><table border="0"><tr><td align="left">%1</td><td align="right"><h2>%2</h2></td></tr><tr><td align="left">%3</td><td align="right"><h2>%4</h2></td></tr><tr><td align="left">%5</td><td align="right"><h2>%6</h2></td></tr></table>';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('ITEM_PRICE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;

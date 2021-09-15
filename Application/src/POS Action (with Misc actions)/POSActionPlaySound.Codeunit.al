@@ -1,11 +1,11 @@
 codeunit 6150786 "NPR POS Action - Play Sound"
 {
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PLAY_SOUND');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -105,10 +105,10 @@ codeunit 6150786 "NPR POS Action - Play Sound"
     begin
         if not EanBoxEvent.Get(ActionCode()) then begin
             EanBoxEvent.Init();
-            EanBoxEvent.Code := ActionCode();
+            EanBoxEvent.Code := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent.Code));
             EanBoxEvent."Module Name" := EanBoxEventModuleName;
             EanBoxEvent.Description := CopyStr(EanBoxEventDesc, 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitID();
             EanBoxEvent.Insert(true);

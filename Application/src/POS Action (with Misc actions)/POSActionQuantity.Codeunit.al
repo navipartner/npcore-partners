@@ -5,12 +5,12 @@ codeunit 6150808 "NPR POS Action: Quantity"
         MustBeNegativeErr: Label 'Quantity must be negative.';
         ReadingErr: Label 'reading in %1 of %2';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('QUANTITY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -20,7 +20,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
     var
         ActionDescriptionLbl: Label 'This is a build in function to change quantity.';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
             Sender.RegisterWorkflow20(GetActionJavascript());
 
             Sender.RegisterOptionParameter('InputType', 'Ask,Fixed,Increment', 'Ask');
@@ -89,7 +89,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
                 end;
         end;
 
-        ReturnReasonCode := Context.GetString('ReturnReasonCode');
+        ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
         Quantity := Context.GetDecimalOrFail('PromptQuantity', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
         UnitPrice := Context.GetDecimal('PromptUnitPrice');
         ConstraintOption := Context.GetIntegerParameter('Constraint');
@@ -197,9 +197,9 @@ codeunit 6150808 "NPR POS Action: Quantity"
         if not EanBoxEvent.Get(EventCodeQtyStar()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeQtyStar();
-            EanBoxEvent."Module Name" := SaleLinePOS.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(SaleLinePOS.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(SaleLinePOS.FieldCaption(Quantity), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);

@@ -54,7 +54,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
         SalespersonCode: Code[20];
     begin
         JSON.SetScopeParameters(ActionCode());
-        SalespersonCode := JSON.GetStringOrFail('FixedSalespersonCode', StrSubstNo(ReadingErr, ActionCode()));
+        SalespersonCode := CopyStr(JSON.GetStringOrFail('FixedSalespersonCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(SalespersonCode));
         if SalespersonCode = '' then
             exit;
 
@@ -97,12 +97,12 @@ codeunit 6150845 "NPR POS Action: Quick Login"
         POSSale.RefreshCurrent();
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('QUICK_LOGIN');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

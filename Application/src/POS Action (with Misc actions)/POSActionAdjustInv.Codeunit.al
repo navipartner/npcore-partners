@@ -113,7 +113,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
             exit;
 
         JSON.SetScopeRoot();
-        ReturnReasonCode := JSON.GetString('ReturnReason');
+        ReturnReasonCode := CopyStr(JSON.GetString('ReturnReason'), 1, MaxStrLen(ReturnReasonCode));
 
         JSON.SetScopeParameters(ActionCode());
         case JSON.GetIntegerOrFail('InputAdjustment', ReadingErr) of
@@ -132,7 +132,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         ReadingErr: Label 'reading in OnActionFixedReturnReason';
     begin
         JSON.SetScopeParameters(ActionCode());
-        ReturnReasonCode := JSON.GetStringOrFail('FixedReturnReason', ReadingErr);
+        ReturnReasonCode := CopyStr(JSON.GetStringOrFail('FixedReturnReason', ReadingErr), 1, MaxStrLen(ReturnReasonCode));
         if ReturnReasonCode = '' then
             exit;
 
@@ -145,7 +145,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         ReturnReason: Record "Return Reason";
     begin
         JSON.SetScopeParameters(ActionCode());
-        ReturnReasonCode := JSON.GetString('FixedReturnReason');
+        ReturnReasonCode := CopyStr(JSON.GetString('FixedReturnReason'), 1, MaxStrLen(ReturnReasonCode));
         if ReturnReason.Get(ReturnReasonCode) then;
         if PAGE.RunModal(0, ReturnReason) <> ACTION::LookupOK then
             exit;
@@ -222,12 +222,12 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         ItemJnlPostLine.Run(TempItemJnlLine);
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('ADJUST_INVENTORY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.4');
     end;
