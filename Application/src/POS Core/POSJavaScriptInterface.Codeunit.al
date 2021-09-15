@@ -110,7 +110,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, 'OnAction'));
     end;
 
-    procedure InvokeAction("Action": Text; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
+    procedure InvokeAction("Action": Text[20]; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
     var
         POSAction: Record "NPR POS Action";
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
@@ -339,7 +339,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ParametersToken: JsonToken;
         Parameters: JsonObject;
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
-        ActionName: Text;
+        ActionName: Text[20];
         WorkflowId: Integer;
         Handled: Boolean;
         Success: Boolean;
@@ -349,7 +349,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ApplyDataState(Context, POSSession, FrontEnd);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ActionName := JSON.GetStringOrFail('action', ReadingActionNameErr);
+        ActionName := CopyStr(JSON.GetStringOrFail('action', ReadingActionNameErr), 1, MaxStrLen(ActionName));
         WorkflowId := JSON.GetIntegerOrFail('workflowId', ReadingWorkflowIdErr);
         ParametersToken := JSON.GetJTokenOrFail('parameters', StrSubstNo(ReadingParametersFailedErr, ActionName));
         Parameters := ParametersToken.AsObject();

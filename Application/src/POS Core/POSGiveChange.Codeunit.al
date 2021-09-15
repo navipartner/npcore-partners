@@ -55,7 +55,7 @@ codeunit 6150634 "NPR POS Give Change"
         SaleLinePOS.Reference := SalePOS.Reference;
         SaleLinePOS.Type := SaleLinePOS.Type::Payment;
         SaleLinePOS."No." := NoIn;
-        SaleLinePOS.Description := DescriptionIn;
+        SaleLinePOS.Description := CopyStr(DescriptionIn, 1, MaxStrLen(SaleLinePOS.Description));
         SaleLinePOS."Amount Including VAT" := AmountIn;
         SaleLinePOS."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
         SaleLinePOS."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";

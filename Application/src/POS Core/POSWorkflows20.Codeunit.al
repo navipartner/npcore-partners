@@ -95,7 +95,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
     begin
         Stopwatch.ResetAll();
 
-        POSSession.RetrieveSessionAction(Action, POSAction);
+        POSSession.RetrieveSessionAction(CopyStr(Action, 1, 20), POSAction);
         FrontEnd.CloneForWorkflow20(WorkflowId, FrontEnd20);
 
         Stopwatch.Start('All');

@@ -37,7 +37,7 @@ page 6150750 "NPR POS (Dragonglass)"
                     if POSSession.IsFinalized() then
                         Error(SESSION_FINALIZED_ERROR);
                     POSSession.DebugWithTimestamp('Action:' + action);
-                    JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, context, POSSession, FrontEnd, JavaScript);
+                    JavaScript.InvokeAction(CopyStr(action, 1, 20), workflowStep, workflowId, actionId, context, POSSession, FrontEnd, JavaScript);
                 end;
             }
         }
