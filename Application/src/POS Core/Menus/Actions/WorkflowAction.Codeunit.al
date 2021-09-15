@@ -47,7 +47,7 @@ codeunit 6150882 "NPR Workflow Action" implements "NPR IAction", "NPR IJsonSeria
         ActionMoniker := _workflow.Name();
 
         // Action does not exist
-        if not POSSession.IsSessionAction(_workflow.Name()) then begin
+        if not POSSession.IsSessionAction(CopyStr(_workflow.Name(), 1, 20)) then begin
             Severity := 100;
             ErrorText := StrSubstNo(TextActionDoesNotExist, _workflow.Name());
             exit(false);

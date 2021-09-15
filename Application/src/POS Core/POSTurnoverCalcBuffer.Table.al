@@ -155,9 +155,9 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         Buffer.Init();
         Buffer."Entry No." := i;
         Buffer.Indentation := 0;
-        Buffer.Description := Description;
-        Buffer."This Year" := ThisYearText;
-        Buffer."Last Year" := LastYearText;
+        Buffer.Description := CopyStr(Description, 1, MaxStrLen(Buffer.Description));
+        Buffer."This Year" := CopyStr(ThisYearText, 1, MaxStrLen(Buffer."This Year"));
+        Buffer."Last Year" := CopyStr(LastYearText, 1, MaxStrLen(Buffer."Last Year"));
         Buffer."Row Style" := 'StrongAccent';
         Buffer.Insert();
         i := i + 1;
