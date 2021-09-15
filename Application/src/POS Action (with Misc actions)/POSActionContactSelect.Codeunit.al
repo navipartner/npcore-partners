@@ -10,12 +10,12 @@ codeunit 6150866 "NPR POS Action: Contact Select"
         DESC_CONTACTPAGE: Label 'Custom Contact lookup page';
         OPTION_OPERATION: Label 'Attach,Remove';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CONTACT_SELECT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -164,7 +164,7 @@ codeunit 6150866 "NPR POS Action: Contact Select"
                         FilterPageBuilder.SetView(Contact.TableCaption, Contact.GetView(false));
                     end;
                     if FilterPageBuilder.RunModal() then
-                        POSParameterValue.Value := FilterPageBuilder.GetView(Contact.TableCaption, false);
+                        POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(Contact.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
                 end;
         end;
     end;

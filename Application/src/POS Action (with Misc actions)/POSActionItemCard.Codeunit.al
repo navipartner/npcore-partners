@@ -20,13 +20,13 @@ codeunit 6150827 "NPR POS Action: Item Card"
         end;
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
 
         exit('ITEMCARD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
 
         exit('1.2');

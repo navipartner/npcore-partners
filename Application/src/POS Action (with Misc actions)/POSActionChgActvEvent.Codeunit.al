@@ -34,12 +34,12 @@
         Captions.AddActionCaption(ActionCode(), 'Title', EventNoLbl);
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SET_ACTIVE_EVENT');
     end;
@@ -90,7 +90,7 @@
         UpdateCurrentEvent(POSSession, EventNo, not OnlyCurrentSale);
     end;
 
-    local procedure ThisDataSource(): Text
+    local procedure ThisDataSource(): Code[50]
     begin
         exit('BUILTIN_SALE');
     end;

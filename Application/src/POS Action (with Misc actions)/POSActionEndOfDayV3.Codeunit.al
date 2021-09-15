@@ -7,12 +7,12 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         EndOfDayTypeOption: Option "X-Report","Z-Report",CloseWorkshift;
         MustBeManaged: Label 'The Close Workshift function is only intended for POS units that are managed for End-of-Day. Use X-Report or Z-Report instead.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('BALANCE_V3');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.9');
     end;
@@ -72,7 +72,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         OpenUnit := JSON.GetBooleanParameter('Auto-Open Cash Drawer');
-        CashDrawerNo := JSON.GetStringParameter('Cash Drawer No.');
+        CashDrawerNo := CopyStr(JSON.GetStringParameter('Cash Drawer No.'), 1, MaxStrLen(CashDrawerNo));
 
         EndOfDayType := JSON.GetIntegerParameterOrFail('Type', ActionCode());
         if (EndOfDayType < 0) then
@@ -392,7 +392,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         BalanceEntryToPrint: Integer;
     begin
         if (FinalEndOfDay(POSUnitNo, SaleDimSetID, BalanceEntryToPrint)) then begin
-            ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnitNo, SalespersonPurchaserCode);
+            ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnitNo, CopyStr(SalespersonPurchaserCode, 1, 20));
             POSManagePOSUnit.ClosePOSUnitNo(POSUnitNo, ClosingEntryNo);
 
             Commit();

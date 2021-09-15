@@ -102,12 +102,12 @@
         SalePOS.Validate("Customer No.", Customer."No.");
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('INSERT_CUSTOMER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

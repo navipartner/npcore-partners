@@ -7,12 +7,12 @@
         EnterReceiptNoLbl: Label 'Enter Receipt Number';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PRINT_RECEIPT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.8');
     end;

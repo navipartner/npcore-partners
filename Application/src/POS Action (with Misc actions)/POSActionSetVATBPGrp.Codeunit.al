@@ -50,12 +50,12 @@ codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
         POSSession.RequestRefreshData();
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SETVATBPGRP');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

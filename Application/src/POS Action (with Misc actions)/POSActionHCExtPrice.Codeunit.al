@@ -3,12 +3,12 @@ codeunit 6150909 "NPR POS Action: HC Ext. Price"
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('HC_EXTERNALPRICE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

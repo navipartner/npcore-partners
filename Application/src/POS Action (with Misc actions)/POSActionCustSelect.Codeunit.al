@@ -10,12 +10,12 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         DESC_CUSTOMERPAGE: Label 'Custom customer lookup page';
         OPTION_OPERATION: Label 'Attach,Remove';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CUSTOMER_SELECT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -85,7 +85,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
             if PAGE.RunModal(CustomerLookupPage, Customer) <> ACTION::LookupOK then
                 exit;
         end else begin
-            Customer."No." := SpecificCustomerNo;
+            Customer."No." := CopyStr(SpecificCustomerNo, 1, MaxStrLen(Customer."No."));
         end;
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
@@ -172,7 +172,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
                         FilterPageBuilder.SetView(Customer.TableCaption, Customer.GetView(false));
                     end;
                     if FilterPageBuilder.RunModal() then
-                        POSParameterValue.Value := FilterPageBuilder.GetView(Customer.TableCaption, false);
+                        POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(Customer.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
                 end;
         end;
     end;
@@ -214,9 +214,9 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         if not EanBoxEvent.Get(EventCodeCustNo()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeCustNo();
-            EanBoxEvent."Module Name" := Customer.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(Customer.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(CustLedgerEntry.FieldCaption("Customer No."), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: Cust. Select";
             EanBoxEvent.Insert(true);

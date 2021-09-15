@@ -4,12 +4,12 @@ codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines"
         ActionDescriptionCaption: Label 'This action is used to merge similar item lines of the sale to a single one';
         NoLinesErr: Label 'No adequate sale lines are available in the current sale';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('MERGE_SIMILAR_LINES');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

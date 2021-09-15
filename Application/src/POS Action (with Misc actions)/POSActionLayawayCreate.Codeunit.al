@@ -24,12 +24,12 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         DescPrepayPaymentTerms: Label 'Payment Terms to use for each prepayment invoice. Is used for due date calculation and filtering';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('LAYAWAY_CREATE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

@@ -16,12 +16,12 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         DescSkipFeeInvoice: Label 'Skip invoicing of all service items. Can be used to cancel layaways created by mistake, bypassing all fees.';
         DescOrderPayTermsFilter: Label 'Payment Terms to use for filtering layaway orders.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('LAYAWAY_CANCEL');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -230,7 +230,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
-        SaleLinePOS.Description := Description;
+        SaleLinePOS.Description := CopyStr(Description, 1, MaxStrLen(SaleLinePOS.Description));
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 

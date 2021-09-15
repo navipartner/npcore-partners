@@ -5,12 +5,12 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         ERROR_MISSING_PARAM: Label 'Parameter %1 is missing';
         CAPTION_VOID_CONFIRM: Label 'Void the following transaction?\\From Sales Ticket No.: %1\Type: %2\Amount: %3 %4\External Ref. No.: %5';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('EFT_OPERATION');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -71,7 +71,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 
         if PaymentType = '' then
             Error(ERROR_MISSING_PARAM, 'PaymentType');
-        EFTSetup.FindSetup(SalePOS."Register No.", PaymentType);
+        EFTSetup.FindSetup(SalePOS."Register No.", CopyStr(PaymentType, 1, 10));
 
         case OperationType of
             OperationType::VoidLast:

@@ -9,12 +9,12 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         Text000: Label 'Tax Free';
         Text001: Label 'Boarding Pass';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('BOARDINGPASS');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -131,7 +131,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         BoardingPassString := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
         JSON.SetScopeRoot();
         RequiredTravelToday := JSON.GetBooleanParameterOrFail('RequiredTravelToday', ActionCode());
-        RequiredLegAirPortCode := JSON.GetStringParameterOrFail('RequiredLegAirPortCode', ActionCode());
+        RequiredLegAirPortCode := CopyStr(JSON.GetStringParameterOrFail('RequiredLegAirPortCode', ActionCode()), 1, MaxStrLen(RequiredLegAirPortCode));
         ShowTripMessage := JSON.GetBooleanParameterOrFail('ShowTripMessage', ActionCode());
         InfoCode := JSON.GetStringParameterOrFail('InfoCode', ActionCode());
 
@@ -162,7 +162,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if InfoCode <> '' then begin
-            POSInfoManagement.ProcessPOSInfoText(SaleLinePOS, SalePOS, InfoCode, TravelSaveString);
+            POSInfoManagement.ProcessPOSInfoText(SaleLinePOS, SalePOS, CopyStr(InfoCode, 1, 20), TravelSaveString);
         end;
 
         POSSession.RequestRefreshData();

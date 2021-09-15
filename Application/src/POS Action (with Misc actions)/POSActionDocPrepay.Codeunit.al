@@ -20,12 +20,12 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         DescSendDocument: Label 'Handle output via document sending profiles';
         DescPdf2NavDocument: Label 'Handle output via PDF2NAV';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SALES_DOC_PREPAY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

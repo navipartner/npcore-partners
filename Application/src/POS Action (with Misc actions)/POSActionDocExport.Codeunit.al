@@ -114,12 +114,12 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         DescCustomerTableView: Label 'Pre-filtered customer list';
         DescCustomerLookupPage: Label 'Custom customer lookup page';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SALES_DOC_EXP');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.13');
     end;
@@ -835,7 +835,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                         FilterBuilder.SetView(Customer.TableCaption, Customer.GetView(false));
                     end;
                     if FilterBuilder.RunModal() then
-                        POSParameterValue.Value := FilterBuilder.GetView(Customer.TableCaption, false);
+                        POSParameterValue.Value := CopyStr(FilterBuilder.GetView(Customer.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
                 end;
         end;
     end;

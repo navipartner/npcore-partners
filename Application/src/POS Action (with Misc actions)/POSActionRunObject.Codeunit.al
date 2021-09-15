@@ -4,12 +4,12 @@ codeunit 6150820 "NPR POS Action: Run Object"
         ActionDescription: Label 'This is a built-in action for running a page';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('RUNOBJECT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -56,7 +56,7 @@ then begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScopeParameters(ActionCode());
 
-        MenuFilterCode := JSON.GetStringOrFail('MenuFilterCode', StrSubstNo(ReadingErr, ActionCode()));
+        MenuFilterCode := CopyStr(JSON.GetStringOrFail('MenuFilterCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(MenuFilterCode));
         RunObject(MenuFilterCode, POSSession);
         Handled := true;
     end;

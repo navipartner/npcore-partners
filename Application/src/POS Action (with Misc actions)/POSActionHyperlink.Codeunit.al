@@ -3,12 +3,12 @@ codeunit 6150727 "NPR POS Action - Hyperlink"
     var
         ActionDescription: Label 'This action opens a hyperlink or loads a page in a frame';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('HYPERLINK');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

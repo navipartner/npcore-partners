@@ -3,12 +3,12 @@ codeunit 6150829 "NPR POS Action: POS Info"
     var
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('POSINFO');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -18,7 +18,7 @@ codeunit 6150829 "NPR POS Action: POS Info"
     var
         ActionDescriptionLbl: Label 'This built in function opens assignes a POS info code to POS sale or POS sale line.', MaxLength = 250;
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
             Sender.RegisterWorkflow20(
                 'await workflow.respond("SelectPosInfo");' +
                 'while ($context.AskForPosInfoText) {' +

@@ -3,12 +3,12 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
     var
         ActionDescription: Label 'EFT Request Workflow';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('EFT_PAYMENT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

@@ -17,12 +17,12 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         DESC_DISC_PROMPT: Label 'Prompt for discount percentage to use for gift card';
         ReadingErr: Label 'reading in %1 of %2';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('EFT_GIFT_CARD');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.3');
     end;

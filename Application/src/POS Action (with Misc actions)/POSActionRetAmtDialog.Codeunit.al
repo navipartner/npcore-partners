@@ -4,12 +4,12 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
         ActionDescription: Label 'Show the return amount (change) after sale ends for mPOS.';
         ConfirmEndOfSaleTitle: Label '(MPOS) End of Sale';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SHOW_RET_AMT_DIALOG');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
