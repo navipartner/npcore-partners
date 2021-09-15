@@ -80,7 +80,7 @@
             WorkDate := Today();
         end;
 
-        Rec."User ID" := UserId;
+        Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
         Rec.Insert(true);
 
         Rec.Validate("Customer No.", '');
@@ -666,7 +666,7 @@
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
     begin
         Rec := SalePOS_ToResume;
-        Rec."User ID" := UserId;
+        Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
 
         Rec."Salesperson Code" := Setup.Salesperson();
         if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then

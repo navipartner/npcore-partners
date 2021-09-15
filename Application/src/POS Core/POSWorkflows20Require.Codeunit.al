@@ -54,7 +54,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         ScriptId: Code[10];
     begin
         JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
-        ScriptId := JSON.GetStringOrFail('script', StrSubstNo(ReadingErr, MethodName()));
+        ScriptId := CopyStr(JSON.GetStringOrFail('script', StrSubstNo(ReadingErr, MethodName())), 1, MaxStrLen(ScriptId));
 
         if not WebClientDependency.Get(WebClientDependency.Type::JavaScript, ScriptId) then
             exit;
@@ -76,7 +76,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         ActionCode: Code[20];
     begin
         JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
-        ActionCode := JSON.GetStringOrFail('action', StrSubstNo(ReadingErr, MethodName()));
+        ActionCode := CopyStr(JSON.GetStringOrFail('action', StrSubstNo(ReadingErr, MethodName())), 1, MaxStrLen(ActionCode));
 
         if not POSSession.RetrieveSessionAction(ActionCode, POSAction) then begin
             if not POSAction.Get(ActionCode) or (POSAction."Workflow Engine Version" <> '2.0') or not POSAction.Workflow.HasValue() then
@@ -115,7 +115,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         ImageCode: Code[10];
     begin
         JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
-        ImageCode := JSON.GetStringOrFail('code', StrSubstNo(ReadingErr, MethodName()));
+        ImageCode := CopyStr(JSON.GetStringOrFail('code', StrSubstNo(ReadingErr, MethodName())), 1, MaxStrLen(ImageCode));
         FrontEnd.RequireResponse(ID, WebClientDependency.GetDataUri(ImageCode));
     end;
 
@@ -131,7 +131,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         DataUriLabel: Label 'data:%1;base64,%2', Locked = true;
     begin
         JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
-        ItemNo := JSON.GetStringOrFail('id', StrSubstNo(ReadingErr, MethodName()));
+        ItemNo := CopyStr(JSON.GetStringOrFail('id', StrSubstNo(ReadingErr, MethodName())), 1, MaxStrLen(ItemNo));
         if Item.Get(ItemNo) and (Item.Picture.Count > 0) then begin
             MediaId := Item.Picture.Item(1);
             Media.Get(MediaId);
