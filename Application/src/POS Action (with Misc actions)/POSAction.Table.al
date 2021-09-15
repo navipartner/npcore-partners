@@ -169,7 +169,7 @@ table 6150703 "NPR POS Action"
         if ActionInDiscovery <> '' then
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text002, Action, ActionInDiscovery));
 
-        TempDiscoveredAction.Code := Action;
+        TempDiscoveredAction.Code := CopyStr(Action, 1, MaxStrLen(TempDiscoveredAction.Code));
         if TempDiscoveredAction.Find() then begin
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, Action));
             exit;
@@ -274,7 +274,7 @@ table 6150703 "NPR POS Action"
         POSAction.SetRange(Code, Code);
         POSAction.SetRange(Version, Version);
         if POSAction.IsEmpty then begin
-            TempUpdatedActions.Code := Code;
+            TempUpdatedActions.Code := CopyStr(Code, 1, MaxStrLen(TempUpdatedActions.Code));
             TempUpdatedActions.Insert();
             exit(true);
         end;
@@ -391,11 +391,11 @@ table 6150703 "NPR POS Action"
             exit;
 
         Param."POS Action Code" := Code;
-        Param.Name := Name;
+        Param.Name := CopyStr(Name, 1, MaxStrLen(Param.Name));
         Param."Data Type" := DataType;
-        Param."Default Value" := DefaultValue;
+        Param."Default Value" := CopyStr(DefaultValue, 1, MaxStrLen(Param."Default Value"));
         if DataType = Param."Data Type"::Option then
-            Param.Options := Options;
+            Param.Options := CopyStr(Options, 1, MaxStrLen(Param.Options));
 
         if not IsTemporary then
             Param.Validate("Default Value");

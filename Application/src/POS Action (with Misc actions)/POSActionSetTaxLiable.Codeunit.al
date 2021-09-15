@@ -62,12 +62,12 @@ codeunit 6150823 "NPR POSAction: Set Tax Liable"
         POSSession.RequestRefreshData();
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SETTAXLIABLE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

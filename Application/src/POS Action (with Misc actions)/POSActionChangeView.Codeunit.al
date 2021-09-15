@@ -4,12 +4,12 @@ codeunit 6150724 "NPR POS Action - Change View"
         ActionDescription: Label 'Changes the current view.';
         RemainingLines: Label 'All lines could not be automatically deleted before selecting Login View. You need to cancel sales manually.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CHANGE_VIEW');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -58,7 +58,7 @@ codeunit 6150724 "NPR POS Action - Change View"
         ViewType := JSON.GetIntegerParameterOrFail('ViewType', ActionCode());
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        POSDefaultUserView.SetDefault(ViewType, POSUnit."No.", JSON.GetStringParameter('ViewCode'));
+        POSDefaultUserView.SetDefault(ViewType, POSUnit."No.", CopyStr(JSON.GetStringParameter('ViewCode'), 1, 10));
 
         POSSession.GetCurrentView(CurrentView);
 

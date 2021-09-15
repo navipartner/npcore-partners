@@ -81,12 +81,12 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
         exit(EntrySetSelected);
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('RETAIL_INVENTORY');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

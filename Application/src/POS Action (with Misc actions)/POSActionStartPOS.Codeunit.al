@@ -174,7 +174,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
                         if (Confirm(BalanceNow, true)) then begin
                             EoDActionName := 'BALANCE_V3';
 
-                            if (not POSSession.RetrieveSessionAction(EoDActionName, POSAction)) then
+                            if (not POSSession.RetrieveSessionAction(CopyStr(EoDActionName, 1, 20), POSAction)) then
                                 POSAction.Get(EoDActionName);
 
                             POSAction.SetWorkflowInvocationParameter('Type', 1, FrontEnd);

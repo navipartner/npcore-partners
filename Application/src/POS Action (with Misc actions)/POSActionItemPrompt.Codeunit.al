@@ -6,12 +6,12 @@ codeunit 6150843 "NPR POS Action: Item Prompt"
         Title: Label 'We need more information.';
         Caption: Label 'Item Number';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('ITEM_PROMPT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

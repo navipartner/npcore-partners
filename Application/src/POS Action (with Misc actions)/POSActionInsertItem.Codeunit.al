@@ -22,7 +22,7 @@
         exit('ITEM');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.8');
     end;
@@ -163,7 +163,7 @@
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         if JSON.SetScope('$itemTrackingOptional') then
-            InputSerial := JSON.GetString('input');
+            InputSerial := CopyStr(JSON.GetString('input'), 1, MaxStrLen(InputSerial));
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         if JSON.SetScope('$editDescription') then
@@ -196,7 +196,7 @@
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
 
         if SerialSelectionFromList then begin
-            while not SerialNumberCanBeUsedForItem(ItemReference, SerialNumberInput, UserInformationErrorWarning) do begin
+            while not SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, 20), UserInformationErrorWarning) do begin
                 if SerialNumberInput <> '' then
                     Message(UserInformationErrorWarning);
                 SerialNumberInput := '';
@@ -207,7 +207,7 @@
                     Error('');
             end;
         end else
-            if not SerialNumberCanBeUsedForItem(ItemReference, SerialNumberInput, UserInformationErrorWarning) then begin
+            if not SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, 20), UserInformationErrorWarning) then begin
                 SerialNumberInput := '';
                 JSON.InitializeJObjectParser(Context, FrontEnd);
                 JSON.SetScopeRoot();
@@ -261,7 +261,7 @@
             ItemIdentifierType::SerialNoItemCrossReference:
                 begin
 
-                    TagId := CopyStr(ItemIdentifier, 5);
+                    TagId := CopyStr(CopyStr(ItemIdentifier, 5), 1, MaxStrLen(TagId));
 
                     ItemReference.SetFilter("Reference No.", '=%1', CopyStr(TagId, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Retail Serial No.");
@@ -332,7 +332,7 @@
             Line.Validate("Serial No.", InputSerial);
 
         if CustomDescription <> '' then
-            Line.Description := CustomDescription;
+            Line.Description := CopyStr(CustomDescription, 1, MaxStrLen(Line.Description));
 
         if SetUnitPrice then begin
             Line."Unit Price" := UnitPrice;
@@ -567,9 +567,9 @@
         if not EanBoxEvent.Get(EventCodeItemNo()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemNo();
-            EanBoxEvent."Module Name" := Item.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(ItemRef.FieldCaption("Item No."), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
@@ -578,9 +578,9 @@
         if not EanBoxEvent.Get(EventCodeItemRef()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemRef();
-            EanBoxEvent."Module Name" := Item.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(ItemRef.TableCaption, 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
@@ -589,9 +589,9 @@
         if not EanBoxEvent.Get(EventCodeItemSearch()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemSearch();
-            EanBoxEvent."Module Name" := Item.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(Item.FieldCaption("Search Description"), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
@@ -600,9 +600,9 @@
         if not EanBoxEvent.Get(EventCodeSerialNoItemRef()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeSerialNoItemRef();
-            EanBoxEvent."Module Name" := Item.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(ItemRef.TableCaption, 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);

@@ -9,7 +9,7 @@ codeunit 6151175 "NPR POS Action: Change LineAm."
         exit('CHANGE_AMOUNT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -73,9 +73,9 @@ codeunit 6151175 "NPR POS Action: Change LineAm."
         if not EanBoxEvent.Get(EanEventCode()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EanEventCode();
-            EanBoxEvent."Module Name" := SaleLinePOS.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(SaleLinePOS.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(SaleLinePOS.FieldCaption(Amount), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: Change LineAm.";
             EanBoxEvent.Insert();

@@ -9,12 +9,12 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         ContinueEoD: Label 'The %1 %2 is marked as being in balancing. Do you want to continue with balancing now?';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('LOGIN-BUTTON');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

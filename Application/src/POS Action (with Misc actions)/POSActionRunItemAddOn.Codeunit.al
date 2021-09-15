@@ -1,6 +1,6 @@
 codeunit 6151128 "NPR POS Action: Run Item AddOn"
 {
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('RUN_ITEM_ADDONS');
     end;
@@ -10,7 +10,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         exit('BUILTIN_SALELINE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('2.0');
     end;
@@ -20,7 +20,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
     var
         ActionDescriptionLbl: Label 'This built-in action inserts Item AddOns for a selected POS Sale Line', MaxLength = 250;
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
+        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, CopyStr(ActionVersion(), 1, 20)) then begin
             Sender.RegisterWorkflow20(
                 'let AddonJson = await workflow.respond("GetSalesLineAddonConfigJson");' +
                 'if ($context.UserSelectionRequired) {' +
@@ -29,7 +29,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
                 '}' +
                 'await workflow.respond("SetItemAddons");');
 
-            Sender.RegisterDataSourceBinding(BuiltInSaleLine());
+            Sender.RegisterDataSourceBinding(CopyStr(BuiltInSaleLine(), 1, 50));
             Sender.RegisterTextParameter('ItemAddOnNo', '');
         end;
     end;
@@ -79,7 +79,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
         SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
 
-        AddOnNo := Context.GetStringParameter('ItemAddOnNo');
+        AddOnNo := CopyStr(Context.GetStringParameter('ItemAddOnNo'), 1, MaxStrLen(AddOnNo));
         if AddOnNo = '' then begin
             Item.Get(SaleLinePOS."No.");
             AddOnNo := Item."NPR Item AddOn No.";
@@ -216,7 +216,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
                         exit;
 
                     ItemAddOn.SetRange(Enabled, true);
-                    ItemAddOn."No." := POSParameterValue.Value;
+                    ItemAddOn."No." := CopyStr(POSParameterValue.Value, 1, MaxStrLen(ItemAddOn."No."));
                     if not ItemAddOn.Find() then begin
                         ItemAddOn.SetFilter("No.", CopyStr(StrSubstNo(ItemAddOnLbl, POSParameterValue.Value), 1, MaxStrLen(ItemAddOn."No.")));
                         ItemAddOn.FindFirst();

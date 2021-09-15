@@ -32,12 +32,12 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         Captions.AddActionCaption(ActionCode(), 'prompt', Prompt_EnterRegister);
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('SWITCH_REGISTER');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;

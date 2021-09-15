@@ -8,12 +8,12 @@ codeunit 6150871 "NPR POS Action: LayawayShow"
         DescOrderPayTermsFilter: Label 'Payment Terms to use for filtering layaway orders.';
         DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('LAYAWAY_SHOW');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

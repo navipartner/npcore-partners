@@ -130,9 +130,9 @@ table 6150704 "NPR POS Action Parameter"
             "Data Type"::Option:
                 case true of
                     "Default Value" = '':
-                        "Default Value" := GetDefaultOptionString();
+                        "Default Value" := CopyStr(GetDefaultOptionString(), 1, MaxStrLen("Default Value"));
                     Evaluate(Integer, "Default Value"):
-                        "Default Value" := GetOptionString(Integer);
+                        "Default Value" := CopyStr(GetOptionString(Integer), 1, MaxStrLen("Default Value"));
                     GetOptionInt("Default Value") >= 0:
                         exit;
                     else
@@ -144,7 +144,7 @@ table 6150704 "NPR POS Action Parameter"
     local procedure ValidateOptions()
     begin
         if GetOptionInt("Default Value") = -1 then
-            "Default Value" := GetDefaultOptionString();
+            "Default Value" := CopyStr(GetDefaultOptionString(), 1, MaxStrLen("Default Value"));
     end;
 
     procedure GetOptionInt(Value: Text) Result: Integer

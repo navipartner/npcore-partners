@@ -5,12 +5,12 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
         Title: Label 'Item Card';
         NotAllowed: Label 'Cannot open the Item Inventory Overview for this line.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('ITEMINVOV');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;

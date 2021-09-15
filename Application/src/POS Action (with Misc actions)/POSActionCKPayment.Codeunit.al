@@ -11,12 +11,12 @@
         NoNegativeCashBackErr: Label 'It is not allowed to enter an amount that is different from what is stated on the receipt for this payment type';
         NegativeCashBackErr: Label 'It is not allowed to enter an negative amount';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CK_PAYMENT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.40');
     end;
@@ -117,7 +117,7 @@
                 begin
                     POSSession.ClearActionState();
 
-                    PaymentTypeNo := JSON.GetStringOrFail('paymenttypeno', StrSubstNo(ReadingErr, ActionCode()));
+                    PaymentTypeNo := CopyStr(JSON.GetStringOrFail('paymenttypeno', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(PaymentTypeNo));
                     AmountToCapture := JSON.GetDecimalOrFail('amounttocapture', StrSubstNo(ReadingErr, ActionCode()));
                     NumpadAmount := AmountToCapture;
 

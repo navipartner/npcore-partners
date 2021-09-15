@@ -17,7 +17,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit('PAYMENT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.6');
     end;
@@ -101,7 +101,7 @@ codeunit 6150725 "NPR POS Action: Payment"
             POSSession.ChangeViewPayment();
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
-        PaymentNo := JSON.GetStringOrFail('paymentNo', StrSubstNo(ReadingErr, ActionCode()));
+        PaymentNo := CopyStr(JSON.GetStringOrFail('paymentNo', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(PaymentNo));
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -180,10 +180,10 @@ codeunit 6150725 "NPR POS Action: Payment"
             exit;
 
         POSParameterValue.InitForMenuButton(POSMenuButton);
-        POSParameterValue."Action Code" := ActionCode();
-        POSParameterValue.Name := Name;
+        POSParameterValue."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(POSParameterValue."Action Code"));
+        POSParameterValue.Name := CopyStr(Name, 1, MaxStrLen(POSParameterValue.Name));
         POSParameterValue."Data Type" := DataType;
-        POSParameterValue.Value := DefaultValue;
+        POSParameterValue.Value := CopyStr(DefaultValue, 1, MaxStrLen(POSParameterValue.Value));
         POSParameterValue.Insert();
     end;
 
@@ -206,7 +206,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetSetup(Setup);
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScopeParameters(ActionCode());
-        PaymentMethodCode := JSON.GetStringOrFail('paymentNo', StrSubstNo(ReadingErr, ActionCode()));
+        PaymentMethodCode := CopyStr(JSON.GetStringOrFail('paymentNo', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(PaymentMethodCode));
 
         POSSession.GetPaymentLine(POSPaymentLine);
         if not POSPaymentMethod.Get(PaymentMethodCode) then

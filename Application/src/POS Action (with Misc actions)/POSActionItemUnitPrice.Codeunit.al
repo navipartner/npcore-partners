@@ -6,12 +6,12 @@ codeunit 6150857 "NPR POS Action: Item UnitPrice"
         Text001: Label 'Item not found';
         Text002: Label 'Invalid Unit Price';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('ITEM_UNIT_PRICE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -166,9 +166,9 @@ codeunit 6150857 "NPR POS Action: Item UnitPrice"
         if not EanBoxEvent.Get(EventCodeItemUnitPrice()) then begin
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeItemUnitPrice();
-            EanBoxEvent."Module Name" := Item.TableCaption;
+            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(Text000, 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);

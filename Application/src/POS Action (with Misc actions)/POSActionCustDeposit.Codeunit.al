@@ -12,12 +12,12 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         OPTION_DEPOSITTYPE: Label 'Apply To Customer Entries,Invoice No. Prompt,Amount Prompt,Match Amount To Customer Balance,Cr. Memo No. Prompt';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CUSTOMER_DEPOSIT');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
@@ -120,10 +120,10 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     local procedure DocumentNoPrompt(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
-        InvoiceNo: Text;
+        InvoiceNo: Text[20];
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        InvoiceNo := GetInput(JSON, 'Prompt');
+        InvoiceNo := CopyStr(GetInput(JSON, 'Prompt'), 1, MaxStrLen(InvoiceNo));
 
         if (InvoiceNo = '') then
             exit;
@@ -134,10 +134,10 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
     local procedure CrMemoNoPrompt(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
-        CrMemoNo: Text;
+        CrMemoNo: Text[20];
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        CrMemoNo := GetInput(JSON, 'Prompt');
+        CrMemoNo := CopyStr(GetInput(JSON, 'Prompt'), 1, MaxStrLen(CrMemoNo));
 
         if (CrMemoNo = '') then
             exit;
@@ -284,7 +284,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
                         FilterPageBuilder.SetView(CustLedgerEntry.TableCaption, CustLedgerEntry.GetView(false));
                     end;
                     if FilterPageBuilder.RunModal() then
-                        POSParameterValue.Value := FilterPageBuilder.GetView(CustLedgerEntry.TableCaption, false);
+                        POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(CustLedgerEntry.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
                 end;
         end;
     end;

@@ -3,12 +3,12 @@ codeunit 6151140 "NPR POS Action: Change UOM"
     var
         ActionDescriptionCaption: Label 'Change unit of measure for POS sales line';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CHANGE_UOM');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

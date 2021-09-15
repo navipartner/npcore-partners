@@ -17,12 +17,12 @@
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('CROSS_REF_RETURN');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.2');
     end;
@@ -133,7 +133,7 @@
         if (DelChr(ReferenceNumber, '<', ' ') = '') then
             Error(RefNoBlankErr);
 
-        FindGlobalSaleByReferenceNo(FrontEnd, POSSession, Context, ReferenceNumber, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
+        FindGlobalSaleByReferenceNo(FrontEnd, POSSession, Context, CopyStr(ReferenceNumber, 1, 50), TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
     end;
 
     local procedure CheckSetup(POSSession: Codeunit "NPR POS Session"): Boolean
@@ -352,7 +352,7 @@
         POSSession.GetSaleLine(POSSaleLine);
 
         JSON.SetScopeRoot();
-        ReturnReasonCode := JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode()));
+        ReturnReasonCode := CopyStr(JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(ReturnReasonCode));
 
         UpdateLineNos(SalePOS, TempNpGpPOSSalesLine);
 
@@ -393,7 +393,7 @@
             SaleLinePOS."Return Reason Code" := ReturnReasonCode;
             SaleLinePOS.Modify(true);
 
-            POSCrossRefMgt.InitReference(SaleLinePOS.SystemId, TempNpGpPOSSalesLine."Global Reference", SaleLinePOS.TableName(), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
+            POSCrossRefMgt.InitReference(SaleLinePOS.SystemId, TempNpGpPOSSalesLine."Global Reference", CopyStr(SaleLinePOS.TableName(), 1, 250), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
         until not FullSale or (TempNpGpPOSSalesLine.Next() = 0);
 
         POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
@@ -485,7 +485,7 @@
             EanBoxEvent.Code := EventCodeExchLabel();
             EanBoxEvent."Module Name" := ModuleNameCaption;
             EanBoxEvent.Description := EANDescriptionCaption;
-            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."Action Code" := CopyStr(ActionCode(), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: NpGp Return";
             EanBoxEvent.Insert(true);

@@ -124,13 +124,13 @@ table 6150705 "NPR POS Parameter Value"
     begin
         OnValidateValue(Rec);
         Param."Data Type" := "Data Type";
-        Param.Options := GetOptions();
+        Param.Options := CopyStr(GetOptions(), 1, MaxStrLen(Param.Options));
         if Param."Data Type" = Param."Data Type"::Boolean then
             OptionsCaption := BoolOptionMLCaptions();
         OnGetParameterOptionStringCaption(Rec, OptionsCaption);
         if OptionsCaption <> '' then
             if TryGetBaseOptionStringValue(Param.Options, OptionsCaption, Value, BaseOption) then
-                Value := BaseOption;
+                Value := CopyStr(BaseOption, 1, MaxStrLen(Value));
         Param.Validate("Default Value", Value);
         Value := Param."Default Value";
     end;
@@ -197,7 +197,7 @@ table 6150705 "NPR POS Parameter Value"
                 Target.Parameters().Add(Name, Value);
             "Data Type"::Option:
                 begin
-                    Param.Options := GetOptions();
+                    Param.Options := CopyStr(GetOptions(), 1, MaxStrLen(Param.Options));
                     CacheKey := StrSubstNo(CacheKeyLbl, "Action Code", Name);
                     if OptionStringCache.Contains(CacheKey) then begin
                         OptionStringCache.Get(CacheKey, OptionToken);
@@ -246,7 +246,7 @@ table 6150705 "NPR POS Parameter Value"
                 Target.Add(Name, Value);
             "Data Type"::Option:
                 begin
-                    Param.Options := GetOptions();
+                    Param.Options := CopyStr(GetOptions(), 1, MaxStrLen(Param.Options));
                     Target.Add(Name, Param.GetOptionInt(Value));
                 end;
         end;
@@ -287,7 +287,7 @@ table 6150705 "NPR POS Parameter Value"
                         POSActionParamMgt.SplitString(Options, Parts);
                     foreach Part in Parts do begin
                         TempRetailList.Number += 1;
-                        TempRetailList.Choice := Part;
+                        TempRetailList.Choice := CopyStr(Part, 1, MaxStrLen(TempRetailList.Choice));
                         TempRetailList.Insert();
                     end;
                 end;
@@ -297,7 +297,7 @@ table 6150705 "NPR POS Parameter Value"
                     POSActionParamMgt.SplitString(BoolOptionMLCaptions(), Parts);
                     foreach Part in Parts do begin
                         TempRetailList.Number += 1;
-                        TempRetailList.Choice := Part;
+                        TempRetailList.Choice := CopyStr(Part, 1, MaxStrLen(TempRetailList.Choice));
                         TempRetailList.Insert();
                     end;
                 end;

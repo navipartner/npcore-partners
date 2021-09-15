@@ -4,12 +4,12 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
         ActionDescription: Label 'This is a built-in action for running a page';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('RUNPAGE_ITEM');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;

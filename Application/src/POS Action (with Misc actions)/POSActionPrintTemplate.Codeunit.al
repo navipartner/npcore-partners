@@ -4,12 +4,12 @@ codeunit 6150834 "NPR POS Action: Print Template"
         ActionDescription: Label 'This is a built-in action for running a report';
         ReadingErr: Label 'reading in %1';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit('PRINT_TEMPLATE');
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     begin
         exit('1.0');
     end;
@@ -35,7 +35,7 @@ codeunit 6150834 "NPR POS Action: Print Template"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Template: Text;
+        Template: Text[20];
         RecordSetting: Option "Sale Line POS","Sale POS";
         "Record": Variant;
         POSSale: Codeunit "NPR POS Sale";
@@ -50,7 +50,7 @@ codeunit 6150834 "NPR POS Action: Print Template"
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScopeParameters(ActionCode());
 
-        Template := JSON.GetStringOrFail('Template', StrSubstNo(ReadingErr, ActionCode()));
+        Template := CopyStr(JSON.GetStringOrFail('Template', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(Template));
         RecordSetting := JSON.GetIntegerOrFail('Record', StrSubstNo(ReadingErr, ActionCode()));
 
         case RecordSetting of
