@@ -505,6 +505,8 @@ table 6014406 "NPR POS Sale Line"
             Caption = 'Allow Invoice Discount';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(33; "Allow Line Discount"; Boolean)
         {
@@ -588,6 +590,8 @@ table 6014406 "NPR POS Sale Line"
             AutoFormatType = 1;
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(48; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -1775,7 +1779,6 @@ table 6014406 "NPR POS Sale Line"
         TempSaleLinePOS."Currency Code" := '';
         POSSalesPriceCalcMgt.FindItemPrice(SalePOS, TempSaleLinePOS);
         "Allow Line Discount" := TempSaleLinePOS."Allow Line Discount";
-        "Allow Invoice Discount" := TempSaleLinePOS."Allow Invoice Discount";
         if not "Allow Line Discount" then
             "Discount %" := 0;
         exit(TempSaleLinePOS."Unit Price");
@@ -1815,14 +1818,13 @@ table 6014406 "NPR POS Sale Line"
         SalesLine."Line Discount Amount" := "Discount Amount";
         SalesLine.Amount := Amount;
         SalesLine."Amount Including VAT" := "Amount Including VAT";
-        SalesLine."Allow Invoice Disc." := "Allow Invoice Discount";
+        SalesLine."Allow Line Disc." := "Allow Line Discount";
         SalesLine."Customer Price Group" := "Customer Price Group";
         if CustomerGlobal."Bill-to Customer No." <> '' then
             SalesLine."Bill-to Customer No." := CustomerGlobal."Bill-to Customer No."
         else
             SalesLine."Bill-to Customer No." := SalesLine."Sell-to Customer No.";
 
-        SalesLine."Inv. Discount Amount" := "Invoice Discount Amount";
         SalesLine."Currency Code" := "Currency Code";
         SalesLine."VAT Base Amount" := "VAT Base Amount";
         SalesLine."Unit Cost" := "Unit Cost";

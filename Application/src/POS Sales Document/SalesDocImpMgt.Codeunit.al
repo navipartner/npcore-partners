@@ -7,6 +7,9 @@
         ERR_DOCUMENT_POSTED_LINE: Label '%1 %2 has partially posted lines. Aborting action.';
         DocumentFullAmountLbl: Label 'Remaining Amount for %1 %2', Comment = '%1=SalesHeader."Document Type";%2=SalesHeader."No."';
         DocumentSplitAmountLbl: Label 'Amount for %1 %2', Comment = '%1=SalesHeader."Document Type";%2=SalesHeader."No."';
+        ImportInvDiscAmtQst: Label 'Selected document contain Invoice Discount Amount. Invoice Discount Amount will be lost, and the document will be posted without it, resulting in the total amount to be higher. Do you want to continue?';
+        ConfirmInvDiscAmtLbl: Label 'Inv. Disc. Amt.';
+        ConfirmInvDiscAmtDescLbl: Label 'Confirm Inv. Disc. Amt.';
 
     procedure SalesDocumentToPOS(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header")
     begin
@@ -81,9 +84,6 @@
             SaleLinePOS.Validate("Allow Line Discount", SalesLine."Allow Line Disc.");
             SaleLinePOS.Validate("Discount %", SalesLine."Line Discount %");
             SaleLinePOS.Validate("Discount Amount", SalesLine."Line Discount Amount");
-
-            SaleLinePOS.Validate("Allow Invoice Discount", SalesLine."Allow Invoice Disc.");
-            SaleLinePOS.Validate("Invoice Discount Amount", SalesLine."Inv. Discount Amount");
 
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
             POSSaleLine.InsertLineRaw(SaleLinePOS, false);
@@ -323,6 +323,21 @@
                     SalesLine.Modify(true);
                 end;
             until SalesLine.Next() = 0;
+    end;
+
+    procedure GetImportInvDiscAmtQst(): Text
+    begin
+        Exit(ImportInvDiscAmtQst);
+    end;
+
+    procedure GetConfirmInvDiscAmtLbl(): Text
+    begin
+        Exit(ConfirmInvDiscAmtLbl);
+    end;
+
+    procedure GetConfirmInvDiscAmtDescLbl(): Text
+    begin
+        Exit(ConfirmInvDiscAmtDescLbl);
     end;
 }
 

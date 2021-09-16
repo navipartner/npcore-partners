@@ -27,7 +27,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.2');
+        exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -51,6 +51,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
             Sender.RegisterBooleanParameter('Pdf2NavDocument', false);
             Sender.RegisterBooleanParameter('PrintDocument', false);
             Sender.RegisterBooleanParameter('SelectCustomer', true);
+            Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
         end;
     end;
 
@@ -67,12 +68,8 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     var
         SalesHeader: Record "Sales Header";
         JSON: Codeunit "NPR POS JSON Management";
-        PrintPrepaymentDocument: Boolean;
+        PrintPrepaymentDocument, SelectCustomer, InputIsAmount, Send, Pdf2Nav, ConfirmInvDiscAmt : Boolean;
         PrepaymentValue: Decimal;
-        SelectCustomer: Boolean;
-        InputIsAmount: Boolean;
-        Send: Boolean;
-        Pdf2Nav: Boolean;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -85,11 +82,15 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         Send := JSON.GetBooleanParameterOrFail('SendDocument', ActionCode());
         Pdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavDocument', ActionCode());
         InputIsAmount := JSON.GetBooleanParameterOrFail('InputIsAmount', ActionCode());
+        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
 
         if not SelectDocument(POSSession, SalesHeader) then
+            exit;
+
+        if not ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
             exit;
 
         CreatePrepaymentLine(POSSession, SalesHeader, PrintPrepaymentDocument, PrepaymentValue, InputIsAmount, Send, Pdf2Nav);
@@ -139,6 +140,24 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
     end;
 
+    local procedure ConfirmImportInvDiscAmt(SalesHeader: Record "Sales Header"; ConfirmInvDiscAmt: Boolean): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+    begin
+        if ConfirmInvDiscAmt then begin
+            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+            SalesLine.SetRange("Document No.", SalesHeader."No.");
+            SalesLine.SetFilter("Inv. Discount Amount", '>%1', 0);
+            SalesLine.CalcSums("Inv. Discount Amount");
+            if SalesLine."Inv. Discount Amount" > 0 then begin
+                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
+                    exit;
+            end;
+        end;
+        exit(true);
+    end;
+
     local procedure CreatePrepaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; PrepaymentValue: Decimal; ValueIsAmount: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
@@ -171,6 +190,8 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -190,11 +211,15 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
                 Caption := CaptionSendDocument;
             'Pdf2NavDocument':
                 Caption := CaptionPdf2NavDocument;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtLbl();
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -214,6 +239,8 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
                 Caption := DescSendDocument;
             'Pdf2NavDocument':
                 Caption := DescPdf2NavDocument;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl();
         end;
     end;
 }

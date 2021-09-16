@@ -2,7 +2,7 @@ codeunit 6014638 "NPR POS Normal Tax Backward"
 {
     procedure UpdateSourceBeforeCalculateTax(var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
     begin
-        Rec."Amount Including VAT" := Round(Rec."Amount Including VAT", Currency."Amount Rounding Precision") - Rec."Invoice Discount Amount";
+        Rec."Amount Including VAT" := Round(Rec."Amount Including VAT", Currency."Amount Rounding Precision");
     end;
 
     procedure CalculateTax(var POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line"; Currency: Record Currency)
@@ -77,11 +77,9 @@ codeunit 6014638 "NPR POS Normal Tax Backward"
         POSSaleTax."Calculated Tax %" := POSSaleTaxLine."Tax %";
         POSSaleTax."Calculated Line Amount" := POSSaleTaxLine."Line Amount";
 
-        POSSaleTax."Calc. Applied Invoice Discount" := POSSaleTaxLine."Applied Invoice Discount";
         POSSaleTax."Calc. Applied Line Discount" := POSSaleTaxLine."Applied Line Discount";
         POSSaleTax."Calculated Discount %" := POSSaleTaxLine."Discount %";
         POSSaleTax."Calculated Discount Amount" := POSSaleTaxLine."Discount Amount";
-        POSSaleTax."Calculated Inv. Disc. Amount" := POSSaleTaxLine."Invoice Disc. Amount";
     end;
 
     local procedure FindSingleLine(POSSaleTax: Record "NPR POS Sale Tax"; var POSSaleTaxLine: record "NPR POS Sale Tax Line")

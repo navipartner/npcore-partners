@@ -23,7 +23,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -42,6 +42,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
             Sender.RegisterTextParameter('OrderPaymentTermsFilter', '');
             Sender.RegisterBooleanParameter('SkipFeeInvoice', false); //Can be used to cancel a layaway that was created by accident, where no fees should be invoiced.
             Sender.RegisterBooleanParameter('SelectCustomer', true);
+            Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
         end;
     end;
 
@@ -56,8 +57,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         CreditMemoNo: Text;
         OrderPaymentTermsFilter: Text;
         ServiceInvoiceNo: Text;
-        SelectCustomer: Boolean;
-        SkipFeeInvoice: Boolean;
+        SelectCustomer, SkipFeeInvoice, ConfirmInvDiscAmt : Boolean;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -68,11 +68,15 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         OrderPaymentTermsFilter := JSON.GetStringParameterOrFail('OrderPaymentTermsFilter', ActionCode());
         SkipFeeInvoice := JSON.GetBooleanParameterOrFail('SkipFeeInvoice', ActionCode());
         SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
+        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
 
         if not SelectOrder(POSSession, SalesHeader, OrderPaymentTermsFilter) then
+            exit;
+
+        if not ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
             exit;
 
         CheckForUnpostedLinkedPOSEntries(SalesHeader);
@@ -136,6 +140,24 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
             SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
+    end;
+
+    local procedure ConfirmImportInvDiscAmt(SalesHeader: Record "Sales Header"; ConfirmInvDiscAmt: Boolean): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+    begin
+        if ConfirmInvDiscAmt then begin
+            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+            SalesLine.SetRange("Document No.", SalesHeader."No.");
+            SalesLine.SetFilter("Inv. Discount Amount", '>%1', 0);
+            SalesLine.CalcSums("Inv. Discount Amount");
+            if SalesLine."Inv. Discount Amount" > 0 then begin
+                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
+                    exit;
+            end;
+        end;
+        exit(true);
     end;
 
     local procedure CreditPrepayments(var SalesHeader: Record "Sales Header"): Text
@@ -263,6 +285,8 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -276,11 +300,15 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
                 Caption := CaptionSkipFeeInvoice;
             'SelectCustomer':
                 Caption := CaptionSelectCustomer;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtLbl();
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -294,6 +322,8 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
                 Caption := DescSkipFeeInvoice;
             'SelectCustomer':
                 Caption := DescSelectCustomer;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl();
         end;
     end;
 

@@ -163,14 +163,6 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                     ToolTip = 'Specifies the value of the Discount Code field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Allow Invoice Discount"; Rec."Allow Invoice Discount")
-                {
-
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Allow Invoice Discount field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Allow Line Discount"; Rec."Allow Line Discount")
                 {
 
@@ -193,14 +185,6 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Discount field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Invoice Discount Amount"; Rec."Invoice Discount Amount")
-                {
-
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Invoice Discount Amount field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")

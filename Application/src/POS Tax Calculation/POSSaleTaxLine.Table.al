@@ -280,10 +280,8 @@ table 6014571 "NPR POS Sale Tax Line"
             "Unit Price Excl. Tax" := POSSaleTax."Source Unit Price";
         "Line Amount" := POSSaleTax."Source Line Amount";
         "Discount %" := POSSaleTax."Source Discount %";
-        "Invoice Disc. Amount" := POSSaleTax."Source Invoice Disc. Amount";
         "Discount Amount" := POSSaleTax."Source Discount Amount";
         "Allow Line Discount" := POSSaleTax."Source Allow Line Discount";
-        "Allow Invoice Discount" := POSSaleTax."Source Allow Invoice Discount";
         "Tax Group Code" := POSSaleTax."Source Tax Group Code";
         "Tax Calculation Type" := POSSaleTax."Source Tax Calc. Type";
         "Tax Area Code" := POSSaleTax."Source Tax Area Code";
