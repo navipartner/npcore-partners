@@ -131,12 +131,16 @@ table 6014570 "NPR POS Sale Tax"
             AutoFormatType = 1;
             Caption = 'Source Invoice Discount Amount';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(22; "Source Allow Invoice Discount"; Boolean)
         {
             Caption = 'Source Allow Invoice Discount';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(23; "Source Allow Line Discount"; Boolean)
         {
@@ -225,12 +229,16 @@ table 6014570 "NPR POS Sale Tax"
             AutoFormatType = 1;
             Caption = 'Calculated Inv. Disc. Amount';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(112; "Calc. Applied Invoice Discount"; Boolean)
         {
             Caption = 'Applied Invoice Discount';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(113; "Calc. Applied Line Discount"; Boolean)
         {
@@ -280,7 +288,6 @@ table 6014570 "NPR POS Sale Tax"
         "Source Currency Code" := SaleLinePOS."Currency Code";
         "Source Tax Identifier" := SaleLinePOS."VAT Identifier";
         "SOurce Tax %" := SaleLinePOS."VAT %";
-        "Source Allow Invoice Discount" := SaleLinePOS."Allow Invoice Discount";
         "Source Allow Line Discount" := SaleLinePOS."Allow Line Discount";
 
         OnAfterCopyFromSource(SaleLinePOS);
@@ -292,7 +299,6 @@ table 6014570 "NPR POS Sale Tax"
         "Source Discount Amount" := SaleLinePOS."Discount Amount";
         "Source Line Amount" := SaleLinePOS."Line Amount";
         "Source Is Positive Amount" := SaleLinePOS."Line Amount" > 0;
-        "Source Invoice Disc. Amount" := SaleLinePOS."Invoice Discount Amount";
 
         OnAfterCopyFromSourceAmounts(SaleLinePOS);
     end;

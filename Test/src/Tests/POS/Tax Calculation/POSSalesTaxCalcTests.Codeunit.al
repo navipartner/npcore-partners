@@ -2368,7 +2368,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSActiveTaxAmountLine2.Copy(POSActiveTaxAmountLine);
         POSActiveTaxCalc.GetCurrency(Currency, POSActiveTaxAmountLine."Currency Code");
 
-        TempPOSActiveTaxAmountLine."Amount Excl. Tax" := TempPOSActiveTaxAmountLine."Unit Price Excl. Tax" * TempPOSActiveTaxAmountLine.Quantity - TempPOSActiveTaxAmountLine."Discount Amount" - TempPOSActiveTaxAmountLine."Invoice Disc. Amount";
+        TempPOSActiveTaxAmountLine."Amount Excl. Tax" := TempPOSActiveTaxAmountLine."Unit Price Excl. Tax" * TempPOSActiveTaxAmountLine.Quantity - TempPOSActiveTaxAmountLine."Discount Amount";
         TempPOSActiveTaxAmountLine."Amount Excl. Tax" := Round(TempPOSActiveTaxAmountLine."Amount Excl. Tax", Currency."Amount Rounding Precision");
         TempPOSActiveTaxAmountLine."Unit Price Excl. Tax" := Round(TempPOSActiveTaxAmountLine."Unit Price Excl. Tax", Currency."Unit-Amount Rounding Precision");
 
@@ -2398,8 +2398,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
             Assert.IsFalse(POSActiveTaxAmountLine2."Applied Line Discount", 'Line Disocunt applied');
             Assert.AreEqual(0, POSActiveTaxAmountLine2."Discount %", 'Active Tax Line Discount % is not equal to zero');
             Assert.AreEqual(0, POSActiveTaxAmountLine2."Discount Amount", 'Active Tax Line Discount Amount is not equal to zero');
-            Assert.IsFalse(POSActiveTaxAmountLine2."Applied Invoice Discount", 'Invoice Discount applied');
-            Assert.AreEqual(0, POSActiveTaxAmountLine2."Invoice Disc. Amount", 'Active Invoice Discoutn Amount is not equal to zero');
         until POSActiveTaxAmountLine2.next() = 0;
     end;
 
@@ -2449,22 +2447,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
             Assert.IsTrue(POSActiveTaxAmountLine."Applied Line Discount", 'Line Disocunt not applied');
             Assert.AreEqual(SaleLinePOS."Discount %", POSActiveTaxAmountLine2."Discount %", 'Active Tax Line Discount % is not equal to source discount %');
             Assert.AreEqual(SaleLinePOS."Discount Amount", POSActiveTaxAmountLine2."Discount Amount", 'Active Tax Line Discount Amount is not equal to source discount amount');
-            Assert.IsFalse(POSActiveTaxAmountLine2."Applied Invoice Discount", 'Invoice Discount applied');
-            Assert.AreEqual(0, POSActiveTaxAmountLine2."Invoice Disc. Amount", 'Active Invoice Discoutn Amount is not equal to zero');
         until POSActiveTaxAmountLine2.Next() = 0;
-    end;
-
-    local procedure CreateSalesOrder(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; Customer: Record Customer; Item: Record Item; Qty: Decimal; InvDiscAmt: Decimal; LineDiscPct: Decimal)
-    var
-        LibrarySales: Codeunit "Library - Sales";
-    begin
-        LibrarySales.CreateSalesHeader(SalesHeader, "Sales Document Type"::Order, Customer."No.");
-        SalesHeader."Invoice Discount Amount" := InvDiscAmt;
-        SalesHeader.Modify();
-        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, "Sales Line Type"::Item, Item."No.", Qty);
-        SalesLine.Validate("Line Discount %", LineDiscPct);
-        SalesLine.validate("Inv. Discount Amount", SalesHeader."Invoice Discount Amount");
-        SalesLine.Modify();
     end;
 
     local procedure GetAmountToPay(SaleLinePOS: Record "NPR POS Sale Line"): Decimal

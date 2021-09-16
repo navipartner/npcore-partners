@@ -178,7 +178,6 @@ table 6014405 "NPR POS Sale"
                         SaleLinePOS.ModifyAll("Amount Including VAT", 0);
                         SaleLinePOS.ModifyAll("VAT Base Amount", 0);
                         SaleLinePOS.ModifyAll("Line Amount", 0);
-                        SaleLinePOS.ModifyAll("Invoice Discount Amount", 0);
                     end;
                     if SaleLinePOS.FindSet(true, false) then begin
                         repeat
@@ -493,8 +492,6 @@ table 6014405 "NPR POS Sale"
                     SaleLinePOS.ModifyAll("Amount Including VAT", 0);
                     SaleLinePOS.ModifyAll("VAT Base Amount", 0);
                     SaleLinePOS.ModifyAll("Line Amount", 0);
-                    SaleLinePOS.ModifyAll("Invoice Discount Amount", 0);
-
                     repeat
                         xSaleLinePOS := SaleLinePOS;
 
