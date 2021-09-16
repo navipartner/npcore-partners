@@ -10,7 +10,6 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         LineDiscPerCent: Decimal;
         Qty: Decimal;
         AllowLineDisc: Boolean;
-        AllowInvDisc: Boolean;
         VATPerCent: Decimal;
         PricesInclVAT: Boolean;
         VATCalcType: Enum "Tax Calculation Type";
@@ -97,7 +96,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
 
         SetUoM(Abs(SaleLinePOS.Quantity), SaleLinePOS."Qty. per Unit of Measure");
 
-        SetLineDisc(SaleLinePOS."Discount %", SaleLinePOS."Allow Line Discount", SaleLinePOS."Allow Invoice Discount");
+        SetLineDisc(SaleLinePOS."Discount %", SaleLinePOS."Allow Line Discount");
 
         Item.Get(SaleLinePOS."No.");
 
@@ -124,7 +123,6 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
 
         SaleLinePOS."Price Includes VAT" := SalePOS."Prices Including VAT";
         SaleLinePOS."Allow Line Discount" := TempSalesPriceListLine."Allow Line Disc.";
-        SaleLinePOS."Allow Invoice Discount" := TempSalesPriceListLine."Allow Invoice Disc.";
         if not SaleLinePOS."Allow Line Discount" then
             SaleLinePOS."Discount %" := 0;
     end;
@@ -260,7 +258,6 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
             Clear(BestPriceListLine);
             BestPriceListLine."Unit Price" := Item."Unit Price";
             BestPriceListLine."Allow Line Disc." := AllowLineDisc;
-            BestPriceListLine."Allow Invoice Disc." := AllowInvDisc;
         end;
 
         PriceListLine := BestPriceListLine;
@@ -306,11 +303,10 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         QtyPerUOM := QtyPerUoM2;
     end;
 
-    local procedure SetLineDisc(LineDiscPerCent2: Decimal; AllowLineDisc2: Boolean; AllowInvDisc2: Boolean)
+    local procedure SetLineDisc(LineDiscPerCent2: Decimal; AllowLineDisc2: Boolean)
     begin
         LineDiscPerCent := LineDiscPerCent2;
         AllowLineDisc := AllowLineDisc2;
-        AllowInvDisc := AllowInvDisc2;
     end;
 
     local procedure IsInMinQty(UnitofMeasureCode: Code[10]; MinQty: Decimal): Boolean

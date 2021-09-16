@@ -126,22 +126,6 @@ page 6014532 "NPR POS Sale Tax"
                         Editable = false;
                         ApplicationArea = NPRRetail;
                     }
-                    field("Source Allow Invoice Discount"; Rec."Source Allow Invoice Discount")
-                    {
-
-                        Caption = 'Allow Invoice Discount Amount';
-                        ToolTip = 'Specifies if invoice discount is allowed.';
-                        Editable = false;
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Source Invoice Disc. Amount"; Rec."Source Invoice Disc. Amount")
-                    {
-
-                        Caption = 'Invoice Discount Amount';
-                        ToolTip = 'Specifies invoice discount amount from source.';
-                        Editable = false;
-                        ApplicationArea = NPRRetail;
-                    }
                 }
             }
             part(ActiveTaxAmountLines; "NPR POS Sale Tax Lines")
@@ -212,21 +196,6 @@ page 6014532 "NPR POS Sale Tax"
 
                         Caption = 'Discount Amount';
                         ToolTip = 'Specifies discount amount if line discount is applied.';
-                        Editable = false;
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Calc. Applied Invoice Discount"; Rec."Calc. Applied Invoice Discount")
-                    {
-
-                        ToolTip = 'Specifies if invoice discount is applied.';
-                        Editable = false;
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Calc. Invoice Disc. Amount"; Rec."Calculated Inv. Disc. Amount")
-                    {
-
-                        Caption = 'Invoice Discount Amount';
-                        ToolTip = 'Specifies invoice discount amount if invoice discount is applied.';
                         Editable = false;
                         ApplicationArea = NPRRetail;
                     }

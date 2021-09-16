@@ -361,6 +361,7 @@
             POSSalesLine."Amount Incl. VAT" := -POSSalesLine."Amount Incl. VAT";
             POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := -POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)";
             POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := -POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+
             POSSalesLine."Amount Excl. VAT (LCY)" := -POSSalesLine."Amount Excl. VAT (LCY)";
             POSSalesLine."Amount Incl. VAT (LCY)" := -POSSalesLine."Amount Incl. VAT (LCY)";
             POSSalesLine."VAT Base Amount" := -POSSalesLine."VAT Base Amount";

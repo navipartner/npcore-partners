@@ -592,25 +592,4 @@ table 6150622 "NPR POS Entry Sales Line"
             Modify();
         end;
     end;
-
-    procedure UpdateLCYAmounts()
-    var
-        POSEntry: Record "NPR POS Entry";
-        GeneralLedgerSetup: Record "General Ledger Setup";
-    begin
-        GeneralLedgerSetup.Get();
-        POSEntry.Get("POS Entry No.");
-        if POSEntry."Currency Factor" > 0 then
-            POSEntry."Currency Factor" := 1;
-        "Line Dsc. Amt. Excl. VAT (LCY)" := Round("Line Discount Amount Excl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
-        "Line Dsc. Amt. Incl. VAT (LCY)" := Round("Line Discount Amount Incl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
-        "Amount Excl. VAT (LCY)" := Round("Amount Excl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
-        "Amount Incl. VAT (LCY)" := Round("Amount Incl. VAT" / POSEntry."Currency Factor", GeneralLedgerSetup."Amount Rounding Precision");
-    end;
-
-    procedure CalculateDiscountPerc()
-    begin
-        if "Amount Excl. VAT" <> 0 then
-            "Line Discount %" := ("Line Discount Amount Excl. VAT" / "Amount Excl. VAT") * 100;
-    end;
 }

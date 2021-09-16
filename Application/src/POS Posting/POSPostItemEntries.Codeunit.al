@@ -160,7 +160,7 @@
         ItemJnlLine.Amount := POSSalesLine."Amount Excl. VAT";
         if POSEntry."Prices Including VAT" then
             ItemJnlLine."Discount Amount" :=
-              (POSSalesLine."Line Discount Amount Incl. VAT" / (1 + POSSalesLine."VAT %" / 100))
+              POSSalesLine."Line Discount Amount Incl. VAT" / (1 + POSSalesLine."VAT %" / 100)
         else
             ItemJnlLine."Discount Amount" := POSSalesLine."Line Discount Amount Incl. VAT";
         ItemJnlLine."Source Type" := ItemJnlLine."Source Type"::Customer;

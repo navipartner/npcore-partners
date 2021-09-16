@@ -21,7 +21,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.3');
+        exit('1.4');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -47,6 +47,7 @@
         Sender.RegisterTextParameter('Prepaid Text', PrepaidAmountLbl);
         Sender.RegisterOptionParameter('Sorting', 'Entry No.,Reference No.,Delivery expires at', 'Entry No.');
         Sender.RegisterBooleanParameter('OpenDocument', false);
+        Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
@@ -102,6 +103,8 @@
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImportMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -109,11 +112,15 @@
         case POSParameterValue.Name of
             'OpenDocument':
                 Caption := OpenDocumentLbl;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImportMgt.GetConfirmInvDiscAmtLbl();
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImportMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -121,6 +128,8 @@
         case POSParameterValue.Name of
             'OpenDocument':
                 Caption := OpenDocumentDescriptionLbl;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImportMgt.GetConfirmInvDiscAmtDescLbl();
         end;
     end;
 
@@ -249,6 +258,7 @@
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
         RemainingAmount: Decimal;
+        ConfirmInvDiscAmt: Boolean;
     begin
         SalesInvHeader.Get(NpCsDocument."Document No.");
         POSSession.GetSaleLine(POSSaleLine);
@@ -260,6 +270,15 @@
         if SalesInvLine.IsEmpty() then
             Error(SalesLineTypeNotSupportedErr, SalesInvLine.Type::" ", SalesInvLine.Type::"G/L Account", SalesInvLine.Type::Item);
 
+        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
+        if ConfirmInvDiscAmt then begin
+            SalesInvLine.SetFilter("Inv. Discount Amount", '>%1', 0);
+            SalesInvLine.CalcSums("Inv. Discount Amount");
+            if SalesInvLine."Inv. Discount Amount" > 0 then begin
+                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
+                    exit;
+            end;
+        end;
         InsertDocumentReference(JSON, NpCsDocument, POSSaleLine, NpCsSaleLinePOSReference);
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
@@ -320,9 +339,22 @@
     local procedure ConfirmOpenDocument(JSON: Codeunit "NPR POS JSON Management"; NpCsDocument: Record "NPR NpCs Document"): Boolean
     var
         SalesHeader: Record "Sales Header";
-        OpenDocument: Boolean;
+        SalesLine: Record "Sales Line";
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        OpenDocument, ConfirmInvDiscAmt : Boolean;
     begin
         OpenDocument := JSON.GetBooleanParameterOrFail('OpenDocument', ActionCode());
+        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
+        if ConfirmInvDiscAmt then begin
+            SalesLine.SetRange("Document Type", NpCsDocument."Document Type");
+            SalesLine.SetRange("Document No.", NpCsDocument."Document No.");
+            SalesLine.SetFilter("Inv. Discount Amount", '>%1', 0);
+            SalesLine.CalcSums("Inv. Discount Amount");
+            if SalesLine."Inv. Discount Amount" > 0 then begin
+                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
+                    exit;
+            end;
+        end;
         if OpenDocument then begin
             SalesHeader."Document Type" := NpCsDocument."Document Type";
             SalesHeader."No." := NpCsDocument."Document No.";

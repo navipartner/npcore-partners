@@ -228,8 +228,6 @@
         WaiterPadLine."Allow Line Discount" := SaleLinePOS."Allow Line Discount";
         WaiterPadLine."Discount %" := SaleLinePOS."Discount %";
         WaiterPadLine."Discount Amount" := SaleLinePOS."Discount Amount";
-        WaiterPadLine."Allow Invoice Discount" := SaleLinePOS."Allow Invoice Discount";
-        WaiterPadLine."Invoice Discount Amount" := SaleLinePOS."Invoice Discount Amount";
         WaiterPadLine."Amount Excl. VAT" := SaleLinePOS.Amount;
         WaiterPadLine."Amount Incl. VAT" := SaleLinePOS."Amount Including VAT";
         WaiterPadLine."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
@@ -311,10 +309,8 @@
         SaleLinePOS."Discount Code" := WaiterPadLine."Discount Code";
 
         SaleLinePOS."Allow Line Discount" := WaiterPadLine."Allow Line Discount";
-        SaleLinePOS."Allow Invoice Discount" := WaiterPadLine."Allow Invoice Discount";
 
         SaleLinePOS."Discount %" := WaiterPadLine."Discount %";
-        SaleLinePOS."Invoice Discount Amount" := WaiterPadLine."Invoice Discount Amount";
 
         if SaleLinePOS.Type <> SaleLinePOS.Type::Comment then begin
             WaiterPad.CalcFields("Current Seating FF");

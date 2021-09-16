@@ -22,7 +22,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.3');
+        exit('1.4');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -43,6 +43,7 @@
             Sender.RegisterTextParameter('SalesDocViewString', '');
             Sender.RegisterOptionParameter('LocationFrom', 'POS Store,Location Filter Parameter', 'POS Store');
             Sender.RegisterTextParameter('LocationFilter', '');
+            Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
         end;
     end;
 
@@ -50,9 +51,11 @@
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
-        SelectCustomer: Boolean;
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        SelectCustomer, ConfirmInvDiscAmt : Boolean;
         DocumentType: Integer;
         LocationSource: Option "POS Store","Location Filter Parameter";
         LocationFilter: Text;
@@ -84,6 +87,17 @@
             exit;
 
         SalesHeader.TestField("Bill-to Customer No.");
+        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
+        if ConfirmInvDiscAmt then begin
+            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+            SalesLine.SetRange("Document No.", SalesHeader."No.");
+            SalesLine.SetFilter("Inv. Discount Amount", '>%1', 0);
+            SalesLine.CalcSums("Inv. Discount Amount");
+            if SalesLine."Inv. Discount Amount" > 0 then begin
+                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
+                    exit;
+            end;
+        end;
         POSSession.GetSale(POSSale);
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
@@ -168,6 +182,8 @@
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -183,11 +199,15 @@
                 Caption := CaptionLocationFrom;
             'LocationFilter':
                 Caption := CaptionLocationFilter;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtLbl();
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -203,6 +223,8 @@
                 Caption := DescLocationFrom;
             'LocationFilter':
                 Caption := DescLocationFilter;
+            'ConfirmInvDiscAmt':
+                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl();
         end;
     end;
 

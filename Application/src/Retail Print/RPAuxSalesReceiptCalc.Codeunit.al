@@ -18,7 +18,7 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
     begin
         if POSSalesLine.Quantity = 0 then
             exit(0);
-        exit((POSSalesLine."Amount Incl. VAT (LCY)" + POSSalesLine."Line Discount Amount Incl. VAT") / POSSalesLine.Quantity);
+        exit((POSSalesLine."Amount Incl. VAT" + POSSalesLine."Line Discount Amount Incl. VAT") / POSSalesLine.Quantity);
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionCodeunitList', '', false, false)]

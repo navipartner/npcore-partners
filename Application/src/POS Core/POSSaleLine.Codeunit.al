@@ -203,9 +203,6 @@
             else
                 if Line."Discount %" > 0 then
                     Rec.Validate("Discount %", Line."Discount %");
-
-            Rec.Validate("Allow Invoice Discount", Line."Allow Invoice Discount");
-            Rec.Validate("Invoice Discount Amount", Line."Invoice Discount Amount");
         end;
 
         if (Line."Unit Price" <> 0) and UseLinePriceVATParams then

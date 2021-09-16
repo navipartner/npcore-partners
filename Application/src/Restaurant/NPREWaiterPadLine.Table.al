@@ -190,6 +190,8 @@
             Caption = 'Allow Invoice Discount';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(64; "Allow Line Discount"; Boolean)
         {
@@ -217,6 +219,8 @@
             AutoFormatType = 1;
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used in POS';
         }
         field(68; "Currency Code"; Code[10])
         {
