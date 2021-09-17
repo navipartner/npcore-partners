@@ -1,0 +1,16 @@
+- name: Overview
+  href: overview.md
+- name: Tutorials  
+  items:
+  - name: EFT Setup
+    href: tutorial/eftsetup.md
+- name: How-To  
+  items:
+  - name: Set up MobilePay
+    href: howto/mobilepay.md
+  - name: Set up NETS Baxi
+    href: howto/netsbaxi.md
+- name: Explanations
+  items:
+  - name: Transaction Recovery
+    href: explanation/recovery.md

@@ -1,0 +1,18 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - Documentation
+
+pool:
+  name: NP Core Pipelines
+
+steps:
+- task: PowerShell@2
+  inputs:
+    targetType: 'filePath'
+    filePath: $(System.DefaultWorkingDirectory)\Documentation\.tools\deploy.ps1    
+  displayName: 'Publish documentation'
