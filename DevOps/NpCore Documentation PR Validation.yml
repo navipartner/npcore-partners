@@ -1,0 +1,11 @@
+trigger: none
+
+pool:
+  name: NP Core Pipelines
+
+steps:
+- task: PowerShell@2
+  inputs:
+    targetType: 'filePath'
+    filePath: $(System.DefaultWorkingDirectory)\Documentation\.tools\validate.ps1    
+  displayName: 'Validate Documentation'
