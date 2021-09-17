@@ -1,7 +1,0 @@
-.dragonglass {
-  .l-views {
-    @extend %container;
-    padding: map-get($layout, views-padding);
-    height: map-get($layout, views-height);
-  }
-}
