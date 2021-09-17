@@ -776,12 +776,10 @@
     local procedure FindVoucherTypes(var TempNpRvVoucherType: Record "NPR NpRv Voucher Type" temporary)
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NpRvReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
     begin
         if NpRvVoucherType.FindSet() then
             repeat
-                NpRvReturnVoucherType.SetRange("Return Voucher Type", NpRvVoucherType.Code);
-                if NpRvReturnVoucherType.IsEmpty and not TempNpRvVoucherType.Get(NpRvVoucherType.Code) then begin
+                if not TempNpRvVoucherType.Get(NpRvVoucherType.Code) then begin
                     TempNpRvVoucherType.Init();
                     TempNpRvVoucherType := NpRvVoucherType;
                     TempNpRvVoucherType.Insert();
