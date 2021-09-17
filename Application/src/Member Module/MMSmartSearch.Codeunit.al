@@ -24,23 +24,36 @@ codeunit 6014682 "NPR MM Smart Search"
         MemberFound: Boolean;
     begin
         Member.FilterGroup := -1;
-        Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
-        Member.SetFilter("First Name", '%1', '@' + SearchTerm);
-        Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
-        Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
-        Member.SetFilter("Phone No.", '%1', SearchTerm);
-        Member.SetFilter("Display Name", '%1', SearchTerm);
-        Member.FilterGroup := 0;
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."External Member No.")) then
+            Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."First Name")) then
+            Member.SetFilter("First Name", '%1', '@' + SearchTerm);
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."Last Name")) then
+            Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."E-Mail Address")) then
+            Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."Phone No.")) then
+            Member.SetFilter("Phone No.", '%1', SearchTerm);
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."Display Name")) then
+            Member.SetFilter("Display Name", '%1', SearchTerm);
 
         Member.SetLoadFields("Entry No.");
 
-        MemberFound := Member.FindSet();
-        if (MemberFound) then
-            repeat
-                Member.Mark(true);
-            until (Member.Next() = 0);
+        if (Member.GetFilters() <> '') then begin
+            MemberFound := Member.FindSet();
+            if (MemberFound) then
+                repeat
+                    Member.Mark(true);
+                until (Member.Next() = 0);
+        end;
+        Member.FilterGroup := 0;
 
-        if (not MemberFound) then begin
+        if ((not MemberFound) and (StrLen(SearchTerm) <= MaxStrLen(Membership."External Membership No."))) then begin
             Membership.SetLoadFields("Entry No.", "External Membership No.");
             Membership.SetFilter("External Membership No.", '%1', UpperCase(SearchTerm));
             if (Membership.FindSet()) then begin
@@ -59,7 +72,7 @@ codeunit 6014682 "NPR MM Smart Search"
             end;
         end;
 
-        if (not MemberFound) then begin
+        if ((not MemberFound) and (StrLen(SearchTerm) <= MaxStrLen(MemberCard."External Card No."))) then begin
             MemberCard.SetLoadFields("External Card No.", "Member Entry No.");
             MemberCard.SetFilter("External Card No.", '%1', UpperCase(SearchTerm));
             if (MemberCard.FindSet()) then begin
@@ -72,7 +85,7 @@ codeunit 6014682 "NPR MM Smart Search"
             end;
         end;
 
-        if (not MemberFound) then begin
+        if ((not MemberFound) and (StrLen(SearchTerm) <= MaxStrLen(MembershipEntry."Receipt No."))) then begin
             MembershipEntry.SetLoadFields("Membership Entry No.");
             MembershipEntry.SetFilter("Receipt No.", '=%1', UpperCase(SearchTerm));
             if (MembershipEntry.FindSet()) then begin
@@ -102,21 +115,28 @@ codeunit 6014682 "NPR MM Smart Search"
     begin
         if (not MembershipFound) then begin
             Membership.FilterGroup := -1;
-            Membership.SetFilter("External Membership No.", '%1', UpperCase(SearchTerm));
-            Membership.SetFilter("Customer No.", '%1', UpperCase(SearchTerm));
-            Membership.SetFilter("Company Name", '%1', SearchTerm);
-            Membership.FilterGroup := 0;
+            if (StrLen(SearchTerm) <= MaxStrLen(Membership."External Membership No.")) then
+                Membership.SetFilter("External Membership No.", '%1', UpperCase(SearchTerm));
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Membership."Customer No.")) then
+                Membership.SetFilter("Customer No.", '%1', UpperCase(SearchTerm));
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Membership."Company Name")) then
+                Membership.SetFilter("Company Name", '%1', SearchTerm);
 
             Membership.SetLoadFields("Entry No.");
-            if (Membership.FindSet()) then begin
+
+            if ((Membership.FindSet()) and (Membership.GetFilters <> '')) then begin
                 repeat
                     MembershipFound := true;
                     Membership.Mark(true);
                 until (Membership.Next() = 0);
             end;
+
+            Membership.FilterGroup := 0;
         end;
 
-        if (not MembershipFound) then begin
+        if ((not MembershipFound) and (StrLen(SearchTerm) <= MaxStrLen(MemberCard."External Card No."))) then begin
             MemberCard.SetLoadFields("External Card No.", "Membership Entry No.");
             MemberCard.SetFilter("External Card No.", '%1', UpperCase(SearchTerm));
             if (MemberCard.FindSet()) then begin
@@ -131,17 +151,27 @@ codeunit 6014682 "NPR MM Smart Search"
 
         if (not MembershipFound) then begin
             Member.FilterGroup := -1;
-            Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
-            Member.SetFilter("First Name", '%1', '@' + SearchTerm);
-            Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
-            Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
-            Member.SetFilter("Phone No.", '%1', SearchTerm);
-            Member.SetFilter("Display Name", '%1', SearchTerm);
-            Member.FilterGroup := 0;
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."External Member No.")) then
+                Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."First Name")) then
+                Member.SetFilter("First Name", '%1', '@' + SearchTerm);
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."Last Name")) then
+                Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."E-Mail Address")) then
+                Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."Phone No.")) then
+                Member.SetFilter("Phone No.", '%1', SearchTerm);
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."Display Name")) then
+                Member.SetFilter("Display Name", '%1', SearchTerm);
 
             Member.SetLoadFields("Entry No.");
 
-            if (Member.FindSet()) then begin
+            if ((Member.FindSet()) and (Member.GetFilters() <> '')) then begin
                 repeat
                     MembershipRole.SetLoadFields("Membership Entry No.", "Member Entry No.");
                     MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -155,9 +185,10 @@ codeunit 6014682 "NPR MM Smart Search"
                     end;
                 until (Member.Next() = 0);
             end;
+            Member.FilterGroup := 0;
         end;
 
-        if (not MembershipFound) then begin
+        if ((not MembershipFound) and (StrLen(SearchTerm) <= MaxStrLen(MembershipEntry."Receipt No."))) then begin
             MembershipEntry.SetLoadFields("Membership Entry No.");
             MembershipEntry.SetFilter("Receipt No.", '=%1', UpperCase(SearchTerm));
             if (MembershipEntry.FindSet()) then begin
@@ -182,7 +213,7 @@ codeunit 6014682 "NPR MM Smart Search"
 
         MemberCard.SetLoadFields("Entry No.");
 
-        if (not MembershipFound) then begin
+        if ((not MembershipFound) and (StrLen(SearchTerm) <= MaxStrLen(MemberCard."External Card No."))) then begin
             MemberCard2.FilterGroup := -1;
             MemberCard2.SetFilter("External Card No.", '%1', UpperCase(SearchTerm));
             MemberCard2.FilterGroup := 0;
@@ -196,7 +227,7 @@ codeunit 6014682 "NPR MM Smart Search"
             end;
         end;
 
-        if (not MembershipFound) then begin
+        if ((not MembershipFound) and (StrLen(SearchTerm) <= MaxStrLen(Membership."External Membership No."))) then begin
             Membership.FilterGroup := -1;
             Membership.SetFilter("External Membership No.", '%1', UpperCase(SearchTerm));
             Membership.FilterGroup := 0;
@@ -220,17 +251,27 @@ codeunit 6014682 "NPR MM Smart Search"
 
         if (not MembershipFound) then begin
             Member.FilterGroup := -1;
-            Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
-            Member.SetFilter("First Name", '%1', '@' + SearchTerm);
-            Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
-            Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
-            Member.SetFilter("Phone No.", '%1', SearchTerm);
-            Member.SetFilter("Display Name", '%1', SearchTerm);
-            Member.FilterGroup := 0;
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."External Member No.")) then
+                Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."First Name")) then
+                Member.SetFilter("First Name", '%1', '@' + SearchTerm);
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."Last Name")) then
+                Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."E-Mail Address")) then
+                Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."Phone No.")) then
+                Member.SetFilter("Phone No.", '%1', SearchTerm);
+
+            if (StrLen(SearchTerm) <= MaxStrLen(Member."Display Name")) then
+                Member.SetFilter("Display Name", '%1', SearchTerm);
 
             Member.SetLoadFields("Entry No.");
 
-            if (Member.FindSet()) then begin
+            if ((Member.FindSet()) and (Member.GetFilters() <> '')) then begin
                 MemberCard2.Reset();
                 repeat
                     MemberCard2.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -244,6 +285,7 @@ codeunit 6014682 "NPR MM Smart Search"
                     end;
                 until (Member.Next() = 0);
             end;
+            Member.FilterGroup := 0;
         end;
     end;
 
