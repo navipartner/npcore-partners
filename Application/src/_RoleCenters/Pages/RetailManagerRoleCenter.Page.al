@@ -40,9 +40,8 @@ page 6151241 "NPR Retail Manager Role Center"
             {
                 ApplicationArea = NPRRetail;
             }
-            part(MyjobQueue; "My Job Queue")
+            part(JobQueue; "NPR Job Queue")
             {
-                Caption = 'Job Queue';
                 ApplicationArea = NPRRetail;
 
             }
