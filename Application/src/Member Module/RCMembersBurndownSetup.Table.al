@@ -100,33 +100,41 @@ table 6060149 "NPR RC Members. Burndown Setup"
         exit(StartDate);
     end;
 
+#if BC17
     procedure GetChartType(): Integer
     var
         BusinessChart: Record "Business Chart Buffer";
     begin
-        case "Chart Type" of
-#if BC17        
-            "Chart Type"::"Stacked Area":
+        case Rec."Chart Type" of
+
+            Rec."Chart Type"::"Stacked Area":
                 exit(BusinessChart."Chart Type"::StackedArea);
-            "Chart Type"::"Stacked Area (%)":
+            Rec."Chart Type"::"Stacked Area (%)":
                 exit(BusinessChart."Chart Type"::StackedArea100);
-            "Chart Type"::"Stacked Column":
+            Rec."Chart Type"::"Stacked Column":
                 exit(BusinessChart."Chart Type"::StackedColumn);
-            "Chart Type"::"Stacked Column (%)":
+            Rec."Chart Type"::"Stacked Column (%)":
                 exit(BusinessChart."Chart Type"::StackedColumn100);
-#else   
-            "Chart Type"::"Stacked Area":
-                exit(BusinessChart."Chart Type"::StackedArea.AsInteger());
-            "Chart Type"::"Stacked Area (%)":
-                exit(BusinessChart."Chart Type"::StackedArea100.AsInteger());
-            "Chart Type"::"Stacked Column":
-                exit(BusinessChart."Chart Type"::StackedColumn.AsInteger());
-            "Chart Type"::"Stacked Column (%)":
-                exit(BusinessChart."Chart Type"::StackedColumn100.AsInteger());
-#endif             
         end;
     end;
+#else
+    procedure GetChartType(): Enum "Business Chart Type"
+    var
+        BusinessChart: Record "Business Chart Buffer";
+    begin
+        case Rec."Chart Type" of
 
+            Rec."Chart Type"::"Stacked Area":
+                exit(BusinessChart."Chart Type"::StackedArea);
+            Rec."Chart Type"::"Stacked Area (%)":
+                exit(BusinessChart."Chart Type"::StackedArea100);
+            Rec."Chart Type"::"Stacked Column":
+                exit(BusinessChart."Chart Type"::StackedColumn);
+            Rec."Chart Type"::"Stacked Column (%)":
+                exit(BusinessChart."Chart Type"::StackedColumn100);
+        end;
+    end;
+#endif
     procedure SetPeriodLength(PeriodLength: Option)
     begin
         "Period Length" := PeriodLength;
@@ -139,7 +147,7 @@ table 6060149 "NPR RC Members. Burndown Setup"
         Modify();
     end;
 
-    procedure SetValueToCalcuate(ValueToCalc: Integer)
+    procedure SetValueToCalculate(ValueToCalc: Integer)
     begin
         "Value to Calculate" := ValueToCalc;
         Modify();

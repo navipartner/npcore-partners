@@ -144,7 +144,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
 
                         trigger OnAction()
                         begin
-                            MembershipBurndownSetup.SetValueToCalcuate(MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_VALUE);
+                            MembershipBurndownSetup.SetValueToCalculate(MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_VALUE);
                             UpdateStatus();
                         end;
                     }
@@ -159,7 +159,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
 
                         trigger OnAction()
                         begin
-                            MembershipBurndownSetup.SetValueToCalcuate(MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_COUNT);
+                            MembershipBurndownSetup.SetValueToCalculate(MembershipBurndownSetup."Value to Calculate"::MEMBERSHIP_COUNT);
                             UpdateStatus();
                         end;
                     }
