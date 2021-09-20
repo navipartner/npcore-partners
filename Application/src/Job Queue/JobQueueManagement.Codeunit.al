@@ -331,6 +331,65 @@ codeunit 6014663 "NPR Job Queue Management"
         ShowAutoCreatedClause := Set;
     end;
 
+    procedure AddPosItemPostingJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueCategoryCode: Code[10];
+    begin
+        JobQueueCategoryCode := CreateAndAssignJobQueueCategory();
+        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR POS Post Item Entries JQ", CurrentDateTime() + 360 * 1000, JobQueueCategoryCode, '');
+
+        JobQueueEntry.Validate(Description, 'POS Item posting');
+        JobQueueEntry.Validate("Run on Mondays", true);
+        JobQueueEntry.Validate("Run on Tuesdays", true);
+        JobQueueEntry.Validate("Run on Wednesdays", true);
+        JobQueueEntry.Validate("Run on Thursdays", true);
+        JobQueueEntry.Validate("Run on Fridays", true);
+        JobQueueEntry.Validate("Run on Saturdays", true);
+        JobQueueEntry.Validate("Run on Sundays", true);
+        JobQueueEntry.Validate("No. of Minutes between Runs", 1);
+        JobQueueEntry.Validate(Status, JobQueueEntry.Status::Ready);
+        JobQueueEntry.Modify();
+    end;
+
+    procedure AddPosPostingJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        DF: DateFormula;
+        ParamString: Text[250];
+        JobQueueCategoryCode: Code[10];
+    begin
+        JobQueueCategoryCode := CreateAndAssignJobQueueCategory();
+        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR POS Post GL Entries JQ", CurrentDateTime() + 360 * 1000, JobQueueCategoryCode, ParamString);
+
+        JobQueueEntry.Validate("Job Queue Category Code", JobQueueCategoryCode);
+        JobQueueEntry.Validate(Description, 'POS posting');
+        evaluate(DF, '<+1D>');
+        JobQueueEntry.Validate("Next Run Date Formula", DF);
+        JobQueueEntry.Validate("Starting Time", 230000T);
+        JobQueueEntry.Validate(Status, JobQueueEntry.Status::Ready);
+        JobQueueEntry.Modify(true);
+    end;
+
+    procedure CreateAndAssignJobQueueCategory(): Code[10]
+    var
+        SalesSetup: Record "Sales & Receivables Setup";
+        JobQueueCategory: Record "Job Queue Category";
+    begin
+        JobQueueCategory.InsertRec('NPR-POST', 'Posting related tasks');
+        if not SalesSetup.Get() then begin
+            SalesSetup.Init();
+            SalesSetup."Job Queue Category Code" := JobQueueCategory.Code;
+            SalesSetup.Insert();
+        end else begin
+            if SalesSetup."Job Queue Category Code" = '' then begin
+                SalesSetup."Job Queue Category Code" := JobQueueCategory.Code;
+                SalesSetup.Modify();
+            end;
+        end;
+        exit(SalesSetup."Job Queue Category Code");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
     local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
     begin

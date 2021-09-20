@@ -24,9 +24,8 @@ codeunit 6014684 "NPR Schedule Invt. Cost Adj."
             if not ShouldBeScheduled(InventorySetup, xInventorySetup) then
                 exit;
         end;
-
+        SalesSetup.Get();
         JobQueueEntryGlobal.Reset();
-        POSPostViaJobQueue.AddJobQueueCategory();
         CreateAdjCostJobQueue();
         CreatePostInvCostToGLJobQueue();
     end;
@@ -49,7 +48,7 @@ codeunit 6014684 "NPR Schedule Invt. Cost Adj."
             010000T,
             0T,
             NextRunDateFormula,
-            POSPostViaJobQueue.JQCategoryCode(),
+            SalesSetup."Job Queue Category Code",
             JobQueueEntryGlobal)
         then begin
             JobQueueEntryGlobal."Report Output Type" := JobQueueEntryGlobal."Report Output Type"::"None (Processing only)";
@@ -77,7 +76,7 @@ codeunit 6014684 "NPR Schedule Invt. Cost Adj."
             020000T,
             040000T,
             NextRunDateFormula,
-            POSPostViaJobQueue.JQCategoryCode(),
+            SalesSetup."Job Queue Category Code",
             JobQueueEntryGlobal)
         then begin
             JobQueueEntryGlobal.Mark(true);
@@ -215,17 +214,10 @@ codeunit 6014684 "NPR Schedule Invt. Cost Adj."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales & Receivables Setup", 'OnBeforeInsertEvent', '', true, false)]
-    local procedure SetJobQueueCategory(var Rec: Record "Sales & Receivables Setup")
-    begin
-        POSPostViaJobQueue.AddJobQueueCategory();
-        Rec."Job Queue Category Code" := POSPostViaJobQueue.JQCategoryCode();
-    end;
-
     var
         JobQueueEntryGlobal: Record "Job Queue Entry";
 #if BC17
+        SalesSetup: Record "Sales & Receivables Setup";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
 #endif
-        POSPostViaJobQueue: Codeunit "NPR POS Post via Task Queue";
 }

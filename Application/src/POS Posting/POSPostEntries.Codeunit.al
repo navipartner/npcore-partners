@@ -43,6 +43,8 @@
         TextPostingDifference: Label 'POS Posting Difference';
         TaxSetup: Record "Tax Setup";
         ReadTaxSetup: Boolean;
+        _GLPostingErrorEntries: List of [Integer];
+        _ItemPostingErrorEntries: List of [Integer];
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
@@ -79,6 +81,8 @@
             POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry);
 
             Commit();
+
+            Clear(_GLPostingErrorEntries);
 
             CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost);
             CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer);
@@ -500,6 +504,8 @@
 
         Commit();
 
+        Clear(_ItemPostingErrorEntries);
+
         if POSEntry.FindSet() then
             repeat
                 if ShowProgressDialog then begin
@@ -514,7 +520,9 @@
                     if StopOnErrorVar then begin
                         POSPostItemTransaction.Run(POSEntryToPost);
                     end else begin
-                        if (not POSPostItemTransaction.Run(POSEntryToPost)) then;
+                        if (not POSPostItemTransaction.Run(POSEntryToPost)) then begin
+                            _ItemPostingErrorEntries.Add(POSEntryToPost."Entry No.");
+                        end;
                     end;
                 end;
             until POSEntry.Next() = 0;
@@ -1051,6 +1059,16 @@
         exit(false);
     end;
 
+    procedure GetGLPostingErrorEntries(var ListOut: List of [Integer])
+    begin
+        ListOut := _GLPostingErrorEntries;
+    end;
+
+    procedure GetItemPostingErrorEntries(var ListOut: List of [Integer])
+    begin
+        ListOut := _ItemPostingErrorEntries;
+    end;
+
     local procedure GetGLAccountType(POSPostingSetup: Record "NPR POS Posting Setup"): Enum "Gen. Journal Account Type"
     var
         GenJournalLine: Record "Gen. Journal Line";
@@ -1118,8 +1136,10 @@
                                     POSEntryWithError.SetRange("Document No.", POSEntry."Document No.");
                                     ProceedWithUpdate := not POSEntryWithError.IsEmpty();
                                 end;
-                                if ProceedWithUpdate then
+                                if ProceedWithUpdate then begin
                                     POSEntry.Validate("Post Entry Status", POSEntry."Post Entry Status"::"Error while Posting");
+                                    _GLPostingErrorEntries.Add(POSEntry."Entry No.");
+                                end;
                             end;
                     end;
                     POSEntry."POS Posting Log Entry No." := POSPostingLogEntryNo;
@@ -1737,18 +1757,6 @@
         GenJnlLine."VAT Difference" := 0;
         GenJnlLine.UpdateLineBalance();
         GenJnlLine.Insert();
-    end;
-
-    //[Obsolete('This function has been discontinued.', '16.0')]
-    procedure Preview(var POSEntry: Record "NPR POS Entry")
-    begin
-        Error('This function has been discontinued.');
-    end;
-
-    //[Obsolete('This function has been discontinued.', '16.0')]
-    procedure CompareToAuditRoll(var POSEntry: Record "NPR POS Entry")
-    begin
-        Error('This function has been discontinued.');
     end;
 
     local procedure SetAppliesToDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
