@@ -2154,6 +2154,8 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             LibraryPOSMasterData.CreatePOSSetup(POSSetup);
             LibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+            POSPostingProfile."POS Period Register No. Series" := '';
+            POSPostingProfile.Modify();
             LibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
             LibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
             LibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
