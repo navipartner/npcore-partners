@@ -114,6 +114,11 @@ codeunit 85003 "NPR Library - POS Mock"
     end;
 
     procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text): Boolean
+    begin
+        exit(PayAndTryEndSaleAndStartNew(POSSession, PaymentMethod, Amount, VoucherNo, True));
+    end;
+
+    procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text; PostSaleImmediately: Boolean): Boolean
     var
         POSActionPayment: Codeunit "NPR POS Action: Payment";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -143,7 +148,9 @@ codeunit 85003 "NPR Library - POS Mock"
         if NewSalePOS.SystemId = SalePOS.SystemId then
             exit(false); //Sale did not end. This is not an error, it happens in prod whenever you pay less than full amount.
 
-        POSPost(SalePOS);
+        if PostSaleImmediately then begin
+            POSPost(SalePOS);
+        end;
 
         if IsNullGuid(NewSalePOS.SystemId) then begin
             //Sale ended, but new one did not start automatically (depends on setup)

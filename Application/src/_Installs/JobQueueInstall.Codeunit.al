@@ -14,6 +14,7 @@ codeunit 6014438 "NPR Job Queue Install"
     var
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        JobQueueManagement: codeunit "NPR Job Queue Management";
     begin
         if not TaskScheduler.CanCreateTask() then
             exit;
@@ -30,8 +31,8 @@ codeunit 6014438 "NPR Job Queue Install"
         AddNcTaskListProcessingJobQueue();
         AddImportListProcessingJobQueue();
         AddJQLogEntryCleanupJobQueue();
-        AddPosItemPostingJobQueue();
-        AddPosPostingJobQueue();
+        JobQueueManagement.AddPosItemPostingJobQueue();
+        JobQueueManagement.AddPosPostingJobQueue();
         AddInventoryAdjmtJobQueues();
         AddSMSJobQueue();
 
@@ -63,30 +64,8 @@ codeunit 6014438 "NPR Job Queue Install"
         CleanupJQLogEntries.AddJQLogCleanupJob(JobQueueEntry, true);
     end;
 
-    local procedure AddPosItemPostingJobQueue()
-    var
-        POSPostViaJobQueue: Codeunit "NPR POS Post via Task Queue";
-    begin
-        POSPostViaJobQueue.AddPosItemPostingJobQueue();
-    end;
-
-    local procedure AddPosPostingJobQueue()
-    var
-        POSPostViaJobQueue: Codeunit "NPR POS Post via Task Queue";
-    begin
-        POSPostViaJobQueue.AddPosPostingJobQueue();
-    end;
-
     local procedure AddInventoryAdjmtJobQueues()
-    var
-        SalesSetup: Record "Sales & Receivables Setup";
-        POSPostViaJobQueue: Codeunit "NPR POS Post via Task Queue";
     begin
-        if SalesSetup.Get() then begin
-            POSPostViaJobQueue.AddJobQueueCategory();
-            SalesSetup."Job Queue Category Code" := POSPostViaJobQueue.JQCategoryCode();
-            SalesSetup.Modify();
-        end;
         Codeunit.Run(Codeunit::"NPR Schedule Invt. Cost Adj.");
     end;
 
@@ -117,7 +96,10 @@ codeunit 6014438 "NPR Job Queue Install"
         JobQueueCategory: Record "Job Queue Category";
         JobQueueEntry: Record "Job Queue Entry";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        JobQueueManagement: codeunit "NPR Job Queue Management";
     begin
+        JobQueueManagement.CreateAndAssignJobQueueCategory();
+
         if JobQueueCategory.Get('NPR-NC') then
             JobQueueCategory.Delete();
 

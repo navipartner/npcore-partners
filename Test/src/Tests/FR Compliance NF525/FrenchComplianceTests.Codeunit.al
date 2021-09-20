@@ -876,6 +876,8 @@ codeunit 85039 "NPR French Compliance Tests"
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultVoucherType(_VoucherType, false);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+            POSPostingProfile."POS Period Register No. Series" := '';
+            POSPostingProfile.Modify();
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);

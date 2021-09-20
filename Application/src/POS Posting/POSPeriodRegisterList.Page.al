@@ -147,52 +147,6 @@ page 6150651 "NPR POS Period Register List"
                     CurrPage.Update(false);
                 end;
             }
-            action("Preview Post Ledger Register")
-            {
-                Caption = 'Preview Post Ledger Register';
-                Image = ViewPostedOrder;
-
-                ToolTip = 'Executes the Preview Post Ledger Register action';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    POSEntryToPost: Record "NPR POS Entry";
-                    POSPostEntries: Codeunit "NPR POS Post Entries";
-                begin
-                    POSEntryToPost.SetCurrentKey("POS Period Register No.");
-                    POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
-                    POSPostEntries.SetPostItemEntries(true);
-                    POSPostEntries.SetPostPOSEntries(true);
-                    POSPostEntries.SetStopOnError(true);
-                    POSPostEntries.SetPostCompressed(false);
-                    POSPostEntries.Preview(POSEntryToPost);
-                    CurrPage.Update(false);
-                end;
-            }
-            action("Compare Preview Ledger Register to Audit Roll Posting")
-            {
-                Caption = 'Compare Preview Ledger Register to Audit Roll Posting';
-                Image = CompareCOA;
-
-                ToolTip = 'Executes the Compare Preview Ledger Register to Audit Roll Posting action';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    POSEntryToPost: Record "NPR POS Entry";
-                    POSPostEntries: Codeunit "NPR POS Post Entries";
-                begin
-                    POSEntryToPost.SetCurrentKey("POS Period Register No.");
-                    POSEntryToPost.SetRange("POS Period Register No.", Rec."No.");
-                    POSPostEntries.SetPostItemEntries(true);
-                    POSPostEntries.SetPostPOSEntries(true);
-                    POSPostEntries.SetStopOnError(true);
-                    POSPostEntries.SetPostCompressed(false);
-                    POSPostEntries.CompareToAuditRoll(POSEntryToPost);
-                    CurrPage.Update(false);
-                end;
-            }
             action("&Navigate")
             {
                 Caption = '&Navigate';

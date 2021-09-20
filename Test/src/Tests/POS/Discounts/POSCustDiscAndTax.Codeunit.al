@@ -7100,6 +7100,8 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             LibraryPOSMasterData.CreatePOSSetup(POSSetup);
             LibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+            POSPostingProfile."POS Period Register No. Series" := '';
+            POSPostingProfile.Modify();
             LibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
             LibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
             LibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
@@ -7311,6 +7313,9 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSEntry: Record "NPR POS Entry";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        GLEntry: Record "G/L Entry";
+        VATEntry: Record "VAT Entry";
     begin
         //Just in case if performance test is created and run on test company for POS test unit
         //then POS posting is terminated because POS entries are stored in database with sales tickect no.
@@ -7318,6 +7323,9 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSEntry.DeleteAll();
         POSEntrySalesLine.DeleteAll();
         POSEntryPaymentLine.DeleteAll();
+        POSEntryTaxLine.DeleteAll();
+        VATEntry.DeleteAll();
+        GLEntry.DeleteAll();
     end;
 
     local procedure CreateDiscount(Item: Record Item; LineDiscPct: Decimal): Decimal

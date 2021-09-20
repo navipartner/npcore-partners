@@ -8,6 +8,7 @@
         POSPaymentBin: record "NPR POS Payment Bin";
         POSPricingProfile: Record "NPR POS Pricing Profile";
         LibraryUtility: Codeunit "Library - Utility";
+        POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
     begin
         POSUnit.Init();
         POSUnit.Validate(
@@ -29,7 +30,7 @@
         POSUnit."Default POS Payment Bin" := POSPaymentBin."No.";
         POSUnit.Modify();
 
-        CreatePeriodRegister(POSUnit);
+        POSManagePOSUnit.OpenPosUnit(POSUnit);
         CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
     end;
 
@@ -216,21 +217,11 @@
         POSPaymentMethod.Modify();
     end;
 
-    procedure CreatePeriodRegister(var POSUnit: Record "NPR POS Unit")
-    var
-        POSPeriodRegister: Record "NPR POS Period Register";
-    begin
-        POSPeriodRegister.Init();
-        POSPeriodRegister."No." := 0;
-        POSPeriodRegister.Validate("POS Store Code", POSUnit."POS Store Code");
-        POSPeriodRegister."POS Unit No." := POSUnit."No.";
-        POSPeriodRegister.Status := POSPeriodRegister.Status::OPEN;
-        POSPeriodRegister.Insert(true);
-    end;
-
     procedure CreatePOSAuditProfile(var POSAuditProfile: Record "NPR POS Audit Profile")
     var
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryRandom: Codeunit "Library - Random";
+        LibraryNoSeries: Codeunit "NPR Library - No. Series";
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
@@ -241,8 +232,9 @@
             LibraryUtility.GenerateRandomCode(POSAuditProfile.FieldNo(Code), DATABASE::"NPR POS Audit Profile"), 1,
             LibraryUtility.GetFieldLength(DATABASE::"NPR POS Audit Profile", POSAuditProfile.FieldNo(Code))));
 
-        LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_ST_1', 'TEST_ST_999999999');
+        LibraryNoSeries.GenerateNoSeries('', NoSeries);
+        NoSeriesLine.SetRange("Series Code", NoSeries.Code);
+        NoSeriesLine.FindFirst();
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
         NoSeriesLine.Modify();
         POSAuditProfile."Sales Ticket No. Series" := NoSeries.Code;
@@ -327,6 +319,8 @@
         LibraryUtility: Codeunit "Library - Utility";
         GeneralPostingSetup: Record "General Posting Setup";
         VATPostingSetup: Record "VAT Posting Setup";
+        LibraryNoSeries: Codeunit "NPR Library - No. Series";
+
     begin
         POSPostingProfile.Init();
         POSPostingProfile.Code := LibraryUtility.GenerateRandomCode20(POSPostingProfile.FieldNo(Code), Database::"NPR POS Posting Profile");
@@ -342,6 +336,9 @@
         POSPostingProfile.Validate("Gen. Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group");
         LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 25);
         POSPostingProfile.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+
+        POSPostingProfile."Posting Compression" := POSPostingProfile."Posting Compression"::"Per POS Entry";
+        POSPostingProfile."POS Period Register No. Series" := LibraryNoSeries.GenerateNoSeries();
 
         POSPostingProfile.Modify();
     end;

@@ -411,12 +411,7 @@
             "id": "AS0034",
             "action":"Warning",
             "justification": "Unsupported table property change"
-        },   
-        {
-            "id": "AS0049",
-            "action":"Warning",
-            "justification": "Error was trown for new codeunits with Internal access"
-        },        
+        },         
         {
             "id": "AS0053",
             "action":"Hidden",
@@ -546,6 +541,11 @@
             "id": "AW0009",
             "action": "Hidden",
             "justification": "Skip 'Using Blob with subtype Bitmap is deprecated' warnings. Sticking with Blobs for now."
+        },
+        {
+            "id": "AS0049",
+            "action":"Warning",
+            "justification": "Error was trown for new codeunits with Internal access"
         }
     ]
 }

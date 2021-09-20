@@ -224,13 +224,13 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             LibraryPOSMasterData.CreatePOSSetup(POSSetup);
             LibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+            POSPostingProfile."POS Period Register No. Series" := '';
+            POSPostingProfile.Modify();
             LibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
             LibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
             LibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
-
             Initialized := true;
         end;
-
         Commit();
     end;
 

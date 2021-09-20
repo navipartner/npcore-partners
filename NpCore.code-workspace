@@ -43,10 +43,8 @@
 	"extensions": {
 		"recommendations": [
 			"ms-dynamics-smb.al",
-			"coenraads.bracket-pair-colorizer-2",
 			"eamodio.gitlens",
 			"donjayamanne.githistory",
-			"ms-vsliveshare.vsliveshare", //Much better remote code discussions than screen sharing
 			"wayou.vscode-todo-highlight",
 			"andrzejzwierzchowski.al-code-outline", //Code actions, icon browser
 			"davidfeldhoff.al-codeactions", //Code actions
