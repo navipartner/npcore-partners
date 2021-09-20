@@ -101,7 +101,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
             Codeunit::"NPR Payment Type POS Upgrade":
                 exit('PaymentTypePOS_MoveToPOSPaymentMethod');
             Codeunit::"NPR New Prices Upgrade":
-                exit('NPRNewPriceTableUpgrade-20210618');
+                exit('NPRNewPriceTableUpgrade-20210920');
             Codeunit::"NPR MCS Data Upgrade":
                 exit('NPR_MCS_Data_Upgrade');
             Codeunit::"NPR Enable Item Ref. Upgr.":
@@ -124,7 +124,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
             Codeunit::"NPR Job Queue Install":
                 exit('NPRJobQueueInstall-20210831');
             Codeunit::"NPR New Prices Install":
-                exit('NPRNewPriceTableInstall-20210618');
+                exit('NPRNewPriceTableInstall-20210920');
             Codeunit::"NPR UPG Pos Menus":
                 case UpgradeStep of
                     'AdjustSplitBillPOSActionParameters':
