@@ -79,6 +79,7 @@ page 6184481 "NPR EFT Setup"
                     EFTInterface: Codeunit "NPR EFT Interface";
                 begin
                     EFTInterface.OnConfigureIntegrationPaymentSetup(Rec);
+                    
                 end;
             }
         }
