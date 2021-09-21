@@ -102,7 +102,7 @@ table 6060042 "NPR Item Worksheet Line"
                 if "Vendor No." = '' then
                     "Vendor No." := Item."Vendor No.";
                 if "Vendor Item No." = '' then
-                    "Vendor Item No." := ItemNumberManagement.GetItemItemVendorNo(Item."No.", '', "Vendor No.");
+                    "Vendor Item No." := CopyStr(ItemNumberManagement.GetItemItemVendorNo(Item."No.", '', "Vendor No."), 1, MaxStrLen("Vendor Item No."));
 
                 if ItemWorksheetTemplate2.Get("Worksheet Template Name") then;
                 if ("Internal Bar Code" = '') and not ItemWorksheetTemplate2."Do not Apply Internal Barcode" then
@@ -1834,9 +1834,9 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheet.Init();
         end;
         if ItemWorksheet."Prices Including VAT" then
-            exit('2,1,' + GetFieldCaption(FieldNumber))
+            exit(CopyStr('2,1,' + GetFieldCaption(FieldNumber), 1, 80))
         else
-            exit('2,0,' + GetFieldCaption(FieldNumber));
+            exit(CopyStr('2,0,' + GetFieldCaption(FieldNumber), 1, 80));
     end;
 
     local procedure GetFieldCaption(FieldNumber: Integer): Text[100]
@@ -1946,12 +1946,12 @@ table 6060042 "NPR Item Worksheet Line"
             VRTGroup."Copy Naming Variety 1"::TableCodeAndItemNo:
                 begin
                     if "Item No." <> '' then
-                        exit("Variety 1 Table (Base)" + '-' + "Item No.")
+                        exit(CopyStr("Variety 1 Table (Base)" + '-' + "Item No.", 1, 40))
                     else
-                        exit("Variety 1 Table (Base)" + '-' + NewItemNoLbl);
+                        exit(CopyStr("Variety 1 Table (Base)" + '-' + NewItemNoLbl, 1, 40));
                 end;
             VRTGroup."Copy Naming Variety 1"::TableCodeAndNoSeries:
-                exit(VRTGroup."Variety 1 Table" + '-' + NewNosNoLbl);
+                exit(CopyStr(VRTGroup."Variety 1 Table" + '-' + NewNosNoLbl, 1, 40));
         end;
         exit('');
     end;
@@ -1968,12 +1968,12 @@ table 6060042 "NPR Item Worksheet Line"
             VRTGroup."Copy Naming Variety 2"::TableCodeAndItemNo:
                 begin
                     if "Item No." <> '' then
-                        exit(VRTGroup."Variety 2 Table" + '-' + "Item No.")
+                        exit(CopyStr(VRTGroup."Variety 2 Table" + '-' + "Item No.", 1, 40))
                     else
-                        exit(VRTGroup."Variety 2 Table" + '-' + NewItemNoLbl);
+                        exit(CopyStr(VRTGroup."Variety 2 Table" + '-' + NewItemNoLbl, 1, 40));
                 end;
             VRTGroup."Copy Naming Variety 2"::TableCodeAndNoSeries:
-                exit(VRTGroup."Variety 2 Table" + '-' + NewNosNoLbl);
+                exit(CopyStr(VRTGroup."Variety 2 Table" + '-' + NewNosNoLbl, 1, 40));
         end;
         exit('');
     end;
@@ -1990,12 +1990,12 @@ table 6060042 "NPR Item Worksheet Line"
             VRTGroup."Copy Naming Variety 3"::TableCodeAndItemNo:
                 begin
                     if "Item No." <> '' then
-                        exit(VRTGroup."Variety 3 Table" + '-' + "Item No.")
+                        exit(CopyStr(VRTGroup."Variety 3 Table" + '-' + "Item No.", 1, 40))
                     else
-                        exit(VRTGroup."Variety 3 Table" + '-' + NewItemNoLbl);
+                        exit(CopyStr(VRTGroup."Variety 3 Table" + '-' + NewItemNoLbl, 1, 40));
                 end;
             VRTGroup."Copy Naming Variety 3"::TableCodeAndNoSeries:
-                exit(VRTGroup."Variety 3 Table" + '-' + NewNosNoLbl);
+                exit(CopyStr(VRTGroup."Variety 3 Table" + '-' + NewNosNoLbl, 1, 40));
         end;
         exit('');
     end;
@@ -2012,12 +2012,12 @@ table 6060042 "NPR Item Worksheet Line"
             VRTGroup."Copy Naming Variety 4"::TableCodeAndItemNo:
                 begin
                     if "Item No." <> '' then
-                        exit(VRTGroup."Variety 4 Table" + '-' + "Item No.")
+                        exit(CopyStr(VRTGroup."Variety 4 Table" + '-' + "Item No.", 1, 40))
                     else
-                        exit(VRTGroup."Variety 4 Table" + '-' + NewItemNoLbl);
+                        exit(CopyStr(VRTGroup."Variety 4 Table" + '-' + NewItemNoLbl, 1, 40));
                 end;
             VRTGroup."Copy Naming Variety 4"::TableCodeAndNoSeries:
-                exit(VRTGroup."Variety 4 Table" + '-' + NewNosNoLbl);
+                exit(CopyStr(VRTGroup."Variety 4 Table" + '-' + NewNosNoLbl, 1, 40));
         end;
         exit('');
     end;
@@ -2051,7 +2051,7 @@ table 6060042 "NPR Item Worksheet Line"
                     NoSeriesMgt.InitSeries("No. Series", "No. Series", 0D, "Item No.", "No. Series");
                     Prefix := ItemNoPrefix();
                     if StrLen(Prefix + "Item No.") < MaxStrLen("Item No.") then
-                        exit(Prefix + "Item No.");
+                        exit(CopyStr(Prefix + "Item No.", 1, 20));
                     exit("Item No.");
                 end;
             ItemWorksheetTemplate."Item No. Creation by"::NoSeriesOnProcessing:
@@ -2064,7 +2064,7 @@ table 6060042 "NPR Item Worksheet Line"
                         exit('');
                     Prefix := ItemNoPrefix();
                     if StrLen(Prefix + "Vendor Item No.") < MaxStrLen("Vendor Item No.") then
-                        exit(Prefix + "Vendor Item No.");
+                        exit(CopyStr(Prefix + "Vendor Item No.", 1, 20));
                     exit("Vendor Item No.");
                 end;
         end;
@@ -2094,7 +2094,7 @@ table 6060042 "NPR Item Worksheet Line"
                     ItemWorksheetVrtValue."Worksheet Name" := "Worksheet Name";
                     ItemWorksheetVrtValue."Worksheet Line No." := "Line No.";
                     ItemWorksheetVrtValue.Type := VrtValue.Type;
-                    ItemWorksheetVrtValue.Table := VrtValue.Table;
+                    ItemWorksheetVrtValue.Table := CopyStr(VrtValue.Table, 1, MaxStrLen(ItemWorksheetVrtValue.Table));
                     ItemWorksheetVrtValue.Value := VrtValue.Value;
                     ItemWorksheetVrtValue."Sort Order" := VrtValue."Sort Order";
                     ItemWorksheetVrtValue.Description := VrtValue.Description;
@@ -2205,10 +2205,10 @@ table 6060042 "NPR Item Worksheet Line"
         LineNo: Integer;
         NewLevel: Integer;
     begin
-        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue1, "Variety 1", "Variety 1 Table (Base)");
-        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue2, "Variety 2", "Variety 2 Table (Base)");
-        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue3, "Variety 3", "Variety 3 Table (Base)");
-        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue4, "Variety 4", "Variety 4 Table (Base)");
+        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue1, "Variety 1", CopyStr("Variety 1 Table (Base)", 1, 20));
+        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue2, "Variety 2", CopyStr("Variety 2 Table (Base)", 1, 20));
+        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue3, "Variety 3", CopyStr("Variety 3 Table (Base)", 1, 20));
+        InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue4, "Variety 4", CopyStr("Variety 4 Table (Base)", 1, 20));
 
         ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetVariantLine.SetRange("Worksheet Name", "Worksheet Name");
@@ -2411,7 +2411,7 @@ table 6060042 "NPR Item Worksheet Line"
         CreateCounter: array[4] of Integer;
         LineCounter: array[4] of Integer;
         UpdateCounter: array[4] of Integer;
-        NewHeadingText: Text;
+        NewHeadingText: Text[50];
     begin
         Clear(LineCounter);
         Clear(CreateCounter);
@@ -2696,7 +2696,7 @@ table 6060042 "NPR Item Worksheet Line"
                             if not VarietyValue.Get("Variety 1", "Variety 1 Table (Base)", ItemWorksheetVar."Variety 1 Value") and
                                 (StrLen("Status Comment") < 247) then begin
                                 if "Status Comment" <> '' then
-                                    "Status Comment" := "Status Comment" + ' - ';
+                                    "Status Comment" := CopyStr("Status Comment" + ' - ', 1, MaxStrLen("Status Comment"));
                                 if IsCopyVariety(1) then
                                     "Status Comment" := CopyStr("Status Comment" + StrSubstNo(VarietyValueAddedToCopyLbl, "Variety 1", ItemWorksheetVar."Variety 1 Value"), 1, MaxStrLen("Status Comment"))
                                 else
@@ -2821,7 +2821,7 @@ table 6060042 "NPR Item Worksheet Line"
 
     local procedure ItemNoPrefix(): Code[4]
     var
-        Separator: Code[10];
+        Separator: Code[1];
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         case ItemWorksheetTemplate."Item No. Prefix" of
@@ -3097,7 +3097,7 @@ table 6060042 "NPR Item Worksheet Line"
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         EndpointManagement: Codeunit "NPR Endpoint Management";
-        QueryName: Text;
+        QueryName: Text[30];
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         QueryName := ItemWorksheetTemplate."Item Info Query Name";
@@ -3105,7 +3105,7 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheetTemplate."Item Info Query Type"::Item:
                 begin
                     if QueryName = '' then
-                        QueryName := Item.TableName;
+                        QueryName := CopyStr(Item.TableName, 1, MaxStrLen(QueryName));
                     case ItemWorksheetTemplate."Item Info Query By" of
                         ItemWorksheetTemplate."Item Info Query By"::"Vendor No. and Vendor Item No.":
                             begin
@@ -3120,7 +3120,7 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheetTemplate."Item Info Query Type"::"Item Worksheet":
                 begin
                     if QueryName = '' then
-                        QueryName := ItemWorksheetLine.TableName();
+                        QueryName := CopyStr(ItemWorksheetLine.TableName(), 1, MaxStrLen(QueryName));
                     case ItemWorksheetTemplate."Item Info Query By" of
                         ItemWorksheetTemplate."Item Info Query By"::"Vendor No. and Vendor Item No.":
                             begin

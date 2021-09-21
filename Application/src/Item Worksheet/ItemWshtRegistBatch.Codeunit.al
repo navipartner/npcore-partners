@@ -74,7 +74,7 @@ codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
         RegisteredItemWorksheet."No. Series" := ItemWorksheet."No. Series";
         RegisteredItemWorksheet."Item Worksheet Template" := ItemWorksheet."Item Template Name";
         RegisteredItemWorksheet."Registered Date Time" := CurrentDateTime;
-        RegisteredItemWorksheet."Registered by User ID" := UserId;
+        RegisteredItemWorksheet."Registered by User ID" := CopyStr(UserId, 1, MaxStrLen(RegisteredItemWorksheet."Registered by User ID"));
         RegisteredItemWorksheet."Item Group" := ItemWorksheet."Item Group";
         RegisteredItemWorksheet.Insert(true);
     end;

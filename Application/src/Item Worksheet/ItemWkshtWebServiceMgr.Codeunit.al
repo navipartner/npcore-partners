@@ -156,16 +156,21 @@
         TempInteger: Integer;
         TempText: Text;
         VendorVATRegNo: Text;
+        AttributeValueTxt: Text[250];
+        i: Integer;
+        AttributeLbl: Label 'Attribute%1', Comment = '%1 - Attribute ordinal';
     begin
         Initialize();
 
         Clear(ItemWorksheetLine);
         ItemWorksheetLine.Init();
         ItemWorksheetLine."Created Date Time" := CurrentDateTime();
+#pragma warning disable AA0139
         ItemWorksheetLine."Vendor No." := GetXmlText(Element, 'VendorNo', MaxStrLen(ItemWorksheetLine."Vendor No."), false);
 
         VendorVATRegNo := GetXmlText(Element, 'VATRegno', 0, false);
         ItemWorksheetLine."Item No." := GetXmlText(Element, 'ItemNo', MaxStrLen(ItemWorksheetLine."Item No."), false);
+#pragma warning restore
 
         FindWorksheetLine(ItemWorksheetLine."Vendor No.", VendorVATRegNo, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.");
 
@@ -194,8 +199,10 @@
         if Evaluate(TempDec, GetXmlText(Element, 'UnitPrice', 0, false)) then
             ItemWorksheetLine.Validate("Sales Price", TempDec);
 
+#pragma warning disable AA0139
         ItemWorksheetLine."Item Category Code" := GetXmlText(Element, 'ItemCategory', MaxStrLen(ItemWorksheetLine."Item Category Code"), false);
         ItemWorksheetLine."Product Group Code" := GetXmlText(Element, 'ProductGroup', MaxStrLen(ItemWorksheetLine."Product Group Code"), false);
+#pragma warning restore
         ItemWorksheetLine.Validate("Sales Price Currency Code", GetXmlText(Element, 'SalesPriceCurrencyCode', MaxStrLen(ItemWorksheetLine."Sales Price Currency Code"), false));
         ItemWorksheetLine.Validate("Purchase Price Currency Code", GetXmlText(Element, 'PurchasePriceCurrencyCode', MaxStrLen(ItemWorksheetLine."Purchase Price Currency Code"), false));
         TempText := GetXmlText(Element, 'VarietyGroup', MaxStrLen(ItemWorksheetLine."Variety Group"), false);
@@ -205,36 +212,12 @@
         if Evaluate(TempDec, GetXmlText(Element, 'RecommendedRetailPrice', 0, false)) then
             ItemWorksheetLine.Validate("Recommended Retail Price", TempDec);
 
-        TempText := GetXmlText(Element, 'Attribute1', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 1, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute2', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 2, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute3', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 3, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute4', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 4, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute5', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 5, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute6', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 6, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute7', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 7, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute8', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 8, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute9', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 9, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
-        TempText := GetXmlText(Element, 'Attribute10', 0, false);
-        if TempText <> '' then
-            NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 10, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", TempText);
+        for i := 1 to 10 do begin
+            AttributeValueTxt := CopyStr(GetXmlText(Element, StrSubstNo(AttributeLbl, i), 0, false), 1, MaxStrLen(AttributeValueTxt));
+            if AttributeValueTxt <> '' then
+                NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", i, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.", AttributeValueTxt);
+        end;
+        TempText := AttributeValueTxt;
 
         if Element.SelectNodes('Attributes', NodeList) then
             ReadWkshLineAttributes(ItemWorksheetLine, Element);
@@ -791,16 +774,16 @@
         ItemWorksheetVariantLine.Validate("Direct Unit Cost", ItemWorksheetLine."Direct Unit Cost");
         TempText := GetXmlText(Element, 'Variety1', 0, false);
         if TempText <> '' then
-            ItemWorksheetVariantLine."Variety 1 Value" := TempText;
+            ItemWorksheetVariantLine."Variety 1 Value" := CopyStr(TempText, 1, MaxStrLen(ItemWorksheetVariantLine."Variety 1 Value"));
         TempText := GetXmlText(Element, 'Variety2', 0, false);
         if TempText <> '' then
-            ItemWorksheetVariantLine."Variety 2 Value" := TempText;
+            ItemWorksheetVariantLine."Variety 2 Value" := CopyStr(TempText, 1, MaxStrLen(ItemWorksheetVariantLine."Variety 2 Value"));
         TempText := GetXmlText(Element, 'Variety3', 0, false);
         if TempText <> '' then
-            ItemWorksheetVariantLine."Variety 3 Value" := TempText;
+            ItemWorksheetVariantLine."Variety 3 Value" := CopyStr(TempText, 1, MaxStrLen(ItemWorksheetVariantLine."Variety 3 Value"));
         TempText := GetXmlText(Element, 'Variety4', 0, false);
         if TempText <> '' then
-            ItemWorksheetVariantLine."Variety 4 Value" := TempText;
+            ItemWorksheetVariantLine."Variety 4 Value" := CopyStr(TempText, 1, MaxStrLen(ItemWorksheetVariantLine."Variety 4 Value"));
         ItemWorksheetVariantLine.Validate("Existing Item No.", ItemWorksheetLine."Existing Item No.");
         ItemWorksheetVariantLine.Validate("Variety 1 Value");
         ItemWorksheetVariantLine.Validate("Variety 2 Value");
@@ -808,9 +791,9 @@
         ItemWorksheetVariantLine.Validate("Variety 4 Value");
         if (ItemWorksheetLine."Existing Item No." = '') then begin
             if (ItemWorksheetVariantLine."Internal Bar Code" = '') then
-                ItemWorksheetVariantLine."Internal Bar Code" := ItemWorksheetLine."Internal Bar Code";
+                ItemWorksheetVariantLine."Internal Bar Code" := CopyStr(ItemWorksheetLine."Internal Bar Code", 1, MaxStrLen(ItemWorksheetVariantLine."Internal Bar Code"));
             if (ItemWorksheetVariantLine."Vendors Bar Code" = '') then
-                ItemWorksheetVariantLine."Vendors Bar Code" := ItemWorksheetLine."Vendors Bar Code";
+                ItemWorksheetVariantLine."Vendors Bar Code" := CopyStr(ItemWorksheetLine."Vendors Bar Code", 1, MaxStrLen(ItemWorksheetVariantLine."Vendors Bar Code"));
         end;
         ItemWshtImpExpMgt.SetImportActionWorksheetVariantLine(ItemWorksheetLine, ActionIfVariantUnknown, ActionIfVarietyUnknown, ItemWorksheetVariantLine);
         ItemWorksheetVariantLine.Modify(true);
@@ -826,18 +809,18 @@
         AttributeKey: Record "NPR Attribute Key";
         AttributeValue: Record "NPR Attribute Value Set";
         "Code": Code[20];
-        Value: Text;
+        Value: Text[250];
     begin
         if Element.IsEmpty() then
             exit;
         if Element.Name <> 'Attribute' then
             exit;
 
-        Code := NpXmlDomMgt.GetXmlAttributeText(Element, 'Code', true);
+        Code := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, 'Code', true), 1, MaxStrLen(Code));
         if Code = '' then
             exit;
 
-        Value := Element.InnerText;
+        Value := CopyStr(Element.InnerText, 1, MaxStrLen(Value));
 
         NPRAttrManagement.GetAttributeKey(
             DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine."Worksheet Template Name",
