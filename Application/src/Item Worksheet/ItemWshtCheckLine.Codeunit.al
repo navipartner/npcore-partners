@@ -164,7 +164,7 @@
             ItemWkshtValidateTestRnr.Run();
             ErrorText := ItemWkshtValidateTestRnr.GetErrormessage();
             if ErrorText <> '' then begin
-                ProcessError(ItemWkshtLine, ErrorText, StopOnError);
+                ProcessError(ItemWkshtLine, CopyStr(ErrorText, 1, 1024), StopOnError);
             end;
         end;
         ItemWorksheetVariantLine.Reset();

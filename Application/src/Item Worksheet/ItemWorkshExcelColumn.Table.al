@@ -252,7 +252,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
                         end;
                 end;
                 if "Excel Header Text" = '' then
-                    "Excel Header Text" := "Map to Caption";
+                    "Excel Header Text" := CopyStr("Map to Caption", 1, MaxStrLen("Excel Header Text"));
             end;
         }
         field(100; "Map to Attribute Code"; Code[20])
@@ -361,7 +361,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
                         repeat
                             TempRecTempField.Init();
                             TempRecTempField."No." := I;
-                            TempRecTempField."Field Caption" := TempFieldName(I);
+                            TempRecTempField."Field Caption" := CopyStr(TempFieldName(I), 1, MaxStrLen(TempRecTempField."Field Caption"));
                             TempRecTempField.Insert();
                             I := I + 1;
                         until TempFieldName(I) = '';

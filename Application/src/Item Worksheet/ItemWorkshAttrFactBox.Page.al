@@ -338,8 +338,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
         NPRAttrVisible10: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;
         ExItemCaptionDim: array[20] of Text[20];
-        NPRAttrTextArray: array[40] of Text[100];
-        NPRExItemAttrTextArray: array[40] of Text[100];
+        NPRAttrTextArray: array[40] of Text[250];
+        NPRExItemAttrTextArray: array[40] of Text[250];
 
     procedure ShowDetails()
     begin
