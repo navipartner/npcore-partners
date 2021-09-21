@@ -31,7 +31,9 @@ page 6014491 "NPR Receipt Stats"
             {
 
                 Caption = 'Select a Period';
+#if BC17 or BC18
                 OptionCaption = 'Day,Week,Month,Quarter,Year';
+#endif
                 ToolTip = 'Specifies the value of the Select a Period field';
                 ApplicationArea = NPRRetail;
 
@@ -40,38 +42,33 @@ page 6014491 "NPR Receipt Stats"
                     case PeriodType of
                         PeriodType::Day:
                             begin
-
-                                PeriodType := PeriodType::Day;
-                                VendPeriodLength := PeriodType::Day;
+                                VendPeriodLength := VendPeriodLength::Day;
                                 Rec.SetRange("Period Type", Rec."Period Type"::Date);
                                 CurrPage.Update(true);
                             end;
                         PeriodType::Week:
                             begin
-                                PeriodType := PeriodType::Week;
-                                VendPeriodLength := PeriodType::Week;
+                                VendPeriodLength := VendPeriodLength::Week;
                                 Rec.SetRange("Period Type", Rec."Period Type"::Week);
                                 CurrPage.Update(true);
                             end;
 
                         PeriodType::Month:
                             begin
-                                VendPeriodLength := PeriodType::Month;
+                                VendPeriodLength := VendPeriodLength::Month;
                                 Rec.SetRange("Period Type", Rec."Period Type"::Month);
                                 CurrPage.Update(true);
                             end;
                         PeriodType::Quarter:
                             begin
-                                PeriodType := PeriodType::Quarter;
-                                VendPeriodLength := PeriodType::Quarter;
+                                VendPeriodLength := VendPeriodLength::Quarter;
                                 Rec.SetRange("Period Type", Rec."Period Type"::Quarter);
                                 CurrPage.Update(true);
                             end;
 
                         PeriodType::Year:
                             begin
-                                PeriodType := PeriodType::Year;
-                                VendPeriodLength := PeriodType;
+                                VendPeriodLength := VendPeriodLength::Year;
                                 Rec.SetRange("Period Type", Rec."Period Type"::Year);
                                 CurrPage.Update(true);
                             end;
@@ -83,14 +80,20 @@ page 6014491 "NPR Receipt Stats"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-
+#if BC17 or BC18
         exit(PeriodFormMgt.FindDate(CopyStr(Which, 1, 3), Rec, VendPeriodLength));
+#else
+        exit(PeriodPageMgt.FindDate(CopyStr(Which, 1, 3), Rec, VendPeriodLength));
+#endif
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
-
+#if BC17 or BC18
         exit(PeriodFormMgt.NextDate(Steps, Rec, VendPeriodLength));
+#else
+        exit(PeriodPageMgt.NextDate(Steps, Rec, VendPeriodLength));
+#endif
     end;
 
     trigger OnOpenPage()
@@ -100,8 +103,13 @@ page 6014491 "NPR Receipt Stats"
     end;
 
     var
+#if BC17 or BC18
         PeriodFormMgt: Codeunit PeriodFormManagement;
         VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
+#else
+        PeriodPageMgt: Codeunit PeriodPageManagement;
+        VendPeriodLength: Enum "Analysis Period Type";
+#endif
         PeriodType: Option Day,Week,Month,Quarter,Year;
 }
 
