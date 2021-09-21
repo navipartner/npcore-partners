@@ -21,17 +21,22 @@
         if Subtotal >= 0 then
             exit;
 
-        if ReturnVoucherType.Get(VoucherType.Code) then;
-        if VoucherType2.Get(ReturnVoucherType."Return Voucher Type") and POSPaymentMethod.Get(VoucherType2."Payment Type") then begin
-            ReturnAmount := SaleAmount - PaidAmount;
-            if POSPaymentMethod."Rounding Precision" > 0 then
-                ReturnAmount := Round(SaleAmount - PaidAmount, POSPaymentMethod."Rounding Precision");
+        ReturnVoucherType.Get(VoucherType.Code);
+        ReturnVoucherType.TestField("Return Voucher Type");
 
-            if (POSPaymentMethod."Minimum Amount" > 0) and (Abs(ReturnAmount) < (POSPaymentMethod."Minimum Amount")) then
-                exit;
-            if (VoucherType2."Minimum Amount Issue" > 0) and (Abs(ReturnAmount) < VoucherType2."Minimum Amount Issue") then
-                exit;
+        if VoucherType2.Get(ReturnVoucherType."Return Voucher Type") then begin
+            VoucherType2.TestField("Payment Type");
 
+            if POSPaymentMethod.Get(VoucherType2."Payment Type") then begin
+                ReturnAmount := SaleAmount - PaidAmount;
+                if POSPaymentMethod."Rounding Precision" > 0 then
+                    ReturnAmount := Round(SaleAmount - PaidAmount, POSPaymentMethod."Rounding Precision");
+
+                if (POSPaymentMethod."Minimum Amount" > 0) and (Abs(ReturnAmount) < (POSPaymentMethod."Minimum Amount")) then
+                    exit;
+                if (VoucherType2."Minimum Amount Issue" > 0) and (Abs(ReturnAmount) < VoucherType2."Minimum Amount Issue") then
+                    exit;
+            end;
         end;
         if not POSSession.RetrieveSessionAction(ReturnPOSActionMgt.ActionCode(), POSAction) then
             POSAction.Get(ReturnPOSActionMgt.ActionCode());
