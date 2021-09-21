@@ -46,7 +46,7 @@ jobs:
       appJsonValues:
       -  platform: '18.0.0.0'
       -  application: '18.0.0.0'
-      -  preprocessorSymbols: [BC18.4]
+      -  preprocessorSymbols: [BC18]
       -  runtime: '"7.2"'   
 
 
