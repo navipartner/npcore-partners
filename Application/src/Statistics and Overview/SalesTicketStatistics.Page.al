@@ -74,7 +74,9 @@ page 6014468 "NPR Sales Ticket Statistics"
                 {
 
                     Caption = 'Period Type';
+#if BC17 or BC18
                     OptionCaption = 'Day,Week,Month,Year';
+#endif
                     ToolTip = 'Specifies the value of the Period Type field';
                     ApplicationArea = NPRRetail;
 
@@ -136,8 +138,11 @@ page 6014468 "NPR Sales Ticket Statistics"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-
+#if BC17 or BC18
         exit(PeriodFormMgt.FindDate(CopyStr(Which, 1, 3), Rec, VendPeriodLength));
+#else
+        exit(PeriodPageMgt.FindDate(CopyStr(Which, 1, 3), Rec, VendPeriodLength));
+#endif
     end;
 
     trigger OnInit()
@@ -150,8 +155,11 @@ page 6014468 "NPR Sales Ticket Statistics"
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
-
+#if BC17 or BC18
         exit(PeriodFormMgt.NextDate(Steps, Rec, VendPeriodLength));
+#else
+        exit(PeriodPageMgt.NextDate(Steps, Rec, VendPeriodLength));
+#endif
     end;
 
     trigger OnOpenPage()
@@ -160,8 +168,13 @@ page 6014468 "NPR Sales Ticket Statistics"
     end;
 
     var
+#if BC17 or BC18
         PeriodFormMgt: Codeunit PeriodFormManagement;
         VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
+#else
+        PeriodPageMgt: Codeunit PeriodPageManagement;
+        VendPeriodLength: Enum "Analysis Period Type";
+#endif
         AmountType: Option "Net Change","Balance at Date";
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
