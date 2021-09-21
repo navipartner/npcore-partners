@@ -38,9 +38,9 @@ table 6060048 "NPR Reg. Item Wsht Var. Value"
             begin
                 if Description = '' then begin
                     if StrLen(Value) = 1 then
-                        Description := Value
+                        Description := CopyStr(Value, 1, MaxStrLen(Description))
                     else
-                        Description := CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2));
+                        Description := CopyStr(CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2)), 1, MaxStrLen(Description));
                 end;
             end;
         }

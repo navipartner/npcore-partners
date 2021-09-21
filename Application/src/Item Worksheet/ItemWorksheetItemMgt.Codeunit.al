@@ -129,11 +129,11 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
         end;
     end;
 
-    local procedure GenerateDuplicateError(ItemWorksheetLine: Record "NPR Item Worksheet Line"; ErrorText1: Text[50]; ErrorText2: Text[50]; ErrorText3: Text[50]; ErrorText4: Text[50])
+    local procedure GenerateDuplicateError(ItemWorksheetLine: Record "NPR Item Worksheet Line"; ErrorText1: Text; ErrorText2: Text; ErrorText3: Text; ErrorText4: Text)
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         AlreadyExistErr: Label '%1 %2 already exists in %3 %4.', Comment = '%1 = Error Text 1; %2 = Error Text 2; %3 = Error Text 3; %4 = Error Text 4';
-        FullErrortext: Text[512];
+        FullErrortext: Text;
     begin
         FullErrortext := StrSubstNo(AlreadyExistErr, ErrorText1, ErrorText2, ErrorText3, ErrorText4);
         ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");

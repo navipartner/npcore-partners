@@ -8,8 +8,8 @@ codeunit 6060047 "NPR Item Wsht. Imp. Exp."
         TextExportCompleteMsg: Label 'Export Complete.';
         TextExportFailedMsg: Label 'Export Failed.';
         XmlOUTStream: OutStream;
-        FromFile: Text[250];
-        ToFile: Text[250];
+        FromFile: Text;
+        ToFile: Text;
 
     procedure Export(ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var

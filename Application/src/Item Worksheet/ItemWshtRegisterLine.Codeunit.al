@@ -286,7 +286,7 @@
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                 end;
                 if StrPos(VarietyTableFrom, '-') > 0 then
-                    PrefixCode := CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1)
+                    PrefixCode := CopyStr(CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1), 1, MaxStrLen(PrefixCode))
                 else
                     PrefixCode := VarietyTableFrom;
                 NewTableCode := CopyStr(PrefixCode + '-' + SuffixCode, 1, MaxStrLen(NewTableCode));
@@ -381,7 +381,7 @@
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
                 end;
                 if StrPos(VarietyTableFrom, '-') > 0 then
-                    PrefixCode := CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1)
+                    PrefixCode := CopyStr(CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1), 1, MaxStrLen(PrefixCode))
                 else
                     PrefixCode := VarietyTableFrom;
                 NewTableCode := CopyStr(PrefixCode + '-' + SuffixCode, 1, MaxStrLen(NewTableCode));

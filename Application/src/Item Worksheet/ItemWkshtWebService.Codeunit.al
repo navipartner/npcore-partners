@@ -17,7 +17,7 @@ codeunit 6060048 "NPR Item Wksht. WebService"
         InsertImportEntry('CreateItemWorksheetLine', ImportEntry);
         ImportEntry."Document ID" := itemworksheetlines.GetMessageID();
         if (ImportEntry."Document ID" = '') then
-            ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+            ImportEntry."Document ID" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(ImportEntry."Document ID"));
 
         ImportEntry."Document Name" := StrSubstNo(DocumentNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");

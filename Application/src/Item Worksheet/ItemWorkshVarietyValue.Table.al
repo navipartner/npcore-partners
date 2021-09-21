@@ -52,7 +52,7 @@ table 6060044 "NPR Item Worksh. Variety Value"
                     if StrLen(Value) = 1 then
                         Description := CopyStr(Value, 1, MaxStrLen(Description))
                     else
-                        Description := CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2));
+                        Description := CopyStr(CopyStr(Value, 1, 1) + LowerCase(CopyStr(Value, 2)), 1, MaxStrLen(Description));
                 end;
             end;
         }
