@@ -123,8 +123,7 @@ report 6151014 "NPR NpRv Voucher 2"
             column(VoucherMessage_NpRvVoucher; "NpRv Voucher"."Voucher Message")
             {
             }
-            // column(Barcode_NpRvVoucher; TenantMedia.Content)
-            column(Barcode_NpRvVoucher; "NpRv Voucher".Barcode)
+            column(Barcode_NpRvVoucher; TempBlobBuffer."Buffer 1")
             {
             }
             column(IssueDate_NpRvVoucher; "NpRv Voucher"."Issue Date")
@@ -159,19 +158,23 @@ report 6151014 "NPR NpRv Voucher 2"
             var
                 Language: Codeunit Language;
             begin
+                BarcodeLib.GenerateBarcode("NpRv Voucher"."Reference No.", TempBlobCol1);
+                TempBlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
+
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
                 Evaluate(IssuedDate, Format("NpRv Voucher"."Issue Date"));
-                // "NPRv VOucher".GetImageContent(TenantMedia);
             end;
         }
     }
 
     var
-        // TenantMedia: Record "Tenant Media";
         EndingDate: Text;
         IssuedDate: Text;
         StartingDate: Text;
+        TempBlobBuffer: Record "NPR BLOB buffer" temporary;
+        BarcodeLib: Codeunit "NPR Barcode Image Library";
+        TempBlobCol1: Codeunit "Temp Blob";
 }
 #endif
