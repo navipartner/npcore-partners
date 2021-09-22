@@ -117,6 +117,23 @@ table 6060149 "NPR RC Members. Burndown Setup"
                 exit(BusinessChart."Chart Type"::StackedColumn100);
         end;
     end;
+#elif BC18
+    procedure GetChartType(): Integer
+    var
+        BusinessChart: Record "Business Chart Buffer";
+    begin
+        case Rec."Chart Type" of
+
+            Rec."Chart Type"::"Stacked Area":
+                exit(BusinessChart."Chart Type"::StackedArea.AsInteger());
+            Rec."Chart Type"::"Stacked Area (%)":
+                exit(BusinessChart."Chart Type"::StackedArea100.AsInteger());
+            Rec."Chart Type"::"Stacked Column":
+                exit(BusinessChart."Chart Type"::StackedColumn.AsInteger());
+            Rec."Chart Type"::"Stacked Column (%)":
+                exit(BusinessChart."Chart Type"::StackedColumn100.AsInteger());
+        end;
+    end;
 #else
     procedure GetChartType(): Enum "Business Chart Type"
     var
