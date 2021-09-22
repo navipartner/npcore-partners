@@ -192,6 +192,7 @@ report 6014419 "NPR Vendor Sales Stat"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {
