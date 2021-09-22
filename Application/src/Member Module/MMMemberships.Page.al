@@ -5,9 +5,8 @@ page 6060127 "NPR MM Memberships"
     CardPageID = "NPR MM Membership Card";
     DataCaptionExpression = Rec."External Membership No.";
     InsertAllowed = false;
-    ModifyAllowed = false;
     Editable = true;
-    PageType = List;
+    PageType = Worksheet;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Membership";
     UsageCategory = Lists;
@@ -50,9 +49,15 @@ page 6060127 "NPR MM Memberships"
                 Editable = false;
                 field("External Membership No."; Rec."External Membership No.")
                 {
-
                     ToolTip = 'Specifies the value of the External Membership No. field';
                     ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        Card: Page "NPR MM Membership Card";
+                    begin
+                        Card.SetRecord(Rec);
+                        Card.Run();
+                    end;
                 }
                 field("Community Code"; Rec."Community Code")
                 {
@@ -303,54 +308,73 @@ page 6060127 "NPR MM Memberships"
                 Caption = 'Membership';
                 Ellipsis = true;
                 Image = CustomerList;
+
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
+                Scope = Repeater;
 
-                ToolTip = 'Executes the Membership action';
+                ToolTip = 'Opens Membership Card';
                 ApplicationArea = NPRRetail;
             }
             action(Notifications)
             {
                 Caption = 'Notifications';
+                Ellipsis = true;
                 Image = Interaction;
+
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Membership Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Membership Entry No.");
+                Scope = Repeater;
 
-                ToolTip = 'Executes the Notifications action';
+                ToolTip = 'Opens Membership Notifications';
                 ApplicationArea = NPRRetail;
             }
+
             action("Arrival Log")
             {
                 Caption = 'Arrival Log';
                 Ellipsis = true;
                 Image = Log;
+
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Membership No." = FIELD("External Membership No.");
+                Scope = Repeater;
 
-                ToolTip = 'Executes the Arrival Log action';
+                ToolTip = 'Opens Arrival Log List';
                 ApplicationArea = NPRRetail;
             }
             action("Open Coupons")
             {
-                Caption = 'Open Coupons';
+                Caption = 'Coupons';
+                Ellipsis = true;
                 Image = Voucher;
+
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+
                 RunObject = Page "NPR NpDc Coupons";
                 RunPageLink = "Customer No." = FIELD("Customer No.");
+                Scope = Repeater;
 
-                ToolTip = 'Executes the Open Coupons action';
+                ToolTip = 'Opens Coupons List';
                 ApplicationArea = NPRRetail;
             }
             group("Raptor Integration")
@@ -408,23 +432,9 @@ page 6060127 "NPR MM Memberships"
                 }
             }
         }
-        area(processing)
+
+        area(Reporting)
         {
-            action("Update Customer")
-            {
-                Caption = 'Update Customer Information';
-                Image = CreateInteraction;
-
-                ToolTip = 'Executes the Update Customer Information action';
-                ApplicationArea = NPRRetail;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
-
-                trigger OnAction()
-                begin
-                    SyncContacts();
-                end;
-            }
             group(Loyalty)
             {
                 action("Loyalty Point Summary")
@@ -455,13 +465,47 @@ page 6060127 "NPR MM Memberships"
                     ApplicationArea = NPRRetail;
                 }
             }
+        }
+        area(processing)
+        {
+            action("Create Membership")
+            {
+                Caption = 'Create Membership';
+                Ellipsis = true;
+                Image = NewCustomer;
+
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+
+                RunObject = Page "NPR MM Create Membership";
+
+                ToolTip = 'Executes the Create Membership action';
+                ApplicationArea = NPRRetail;
+            }
+            action("Update Customer")
+            {
+                Caption = 'Update Customer Information';
+                Image = CreateInteraction;
+
+                ToolTip = 'Executes the Update Customer Information action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                begin
+                    SyncContacts();
+                end;
+            }
+
             action(SetNPRAttributeFilter)
             {
                 Caption = 'Set Client Attribute Filter';
                 Image = "Filter";
+                Ellipsis = true;
+
                 Promoted = true;
                 PromotedOnly = true;
-                PromotedCategory = "Report";
+                PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
 
@@ -472,12 +516,10 @@ page 6060127 "NPR MM Memberships"
                 var
                     NPRAttributeValueSet: Record "NPR Attribute Value Set";
                 begin
-
                     if (not NPRAttrManagement.SetAttributeFilter(NPRAttributeValueSet)) then
                         exit;
 
                     Rec.SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
-
                 end;
             }
         }
@@ -595,5 +637,6 @@ page 6060127 "NPR MM Memberships"
     begin
         exit(StrSubstNo(PlaceHolderLbl, GetAttributeTableId(), AttributeNumber));
     end;
+
 }
 

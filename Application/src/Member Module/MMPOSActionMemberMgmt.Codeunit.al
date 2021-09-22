@@ -884,37 +884,23 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     begin
         ExtMemberNo := '';
 
-        if (ChooseMemberWithSearchUI(Member)) then
+        if (ChooseMemberWithSearchUIWorkList(Member)) then
             ExtMemberNo := Member."External Member No.";
 
         exit(ExtMemberNo <> '');
     end;
 
-    local procedure ChooseMemberWithSearchUI(var Member: Record "NPR MM Member"): Boolean
+    local procedure ChooseMemberWithSearchUIWorkList(var Member: Record "NPR MM Member"): Boolean
     var
-        MemberSearch: Page "NPR MM Member Search Fields";
         MemberList: Page "NPR MM Members";
         PageAction: Action;
-        FullTextSearch: Label 'Are you not finding what you are looking for? Do you want to do a full text member search?';
     begin
 
-        MemberSearch.LookupMode(true);
-        PageAction := MemberSearch.RunModal();
-
-        if (PageAction = Action::LookupOK) then begin
-            Member.SetFilter("External Member No.", '=%1', MemberSearch.GetSelectedMemberNumber());
-            if (Member.FindFirst()) then
-                ;
-        end else begin
-            if (not Confirm(FullTextSearch, false)) then
-                exit(false);
-
-            MemberList.LookupMode(true);
-            MemberList.SetTableView(Member);
-            PageAction := MemberList.RunModal();
-            if (PageAction = Action::LookupOK) then
-                MemberList.GetRecord(Member);
-        end;
+        MemberList.LookupMode(true);
+        MemberList.SetTableView(Member);
+        PageAction := MemberList.RunModal();
+        if (PageAction = Action::LookupOK) then
+            MemberList.GetRecord(Member);
 
         exit(Member."External Member No." <> '');
     end;
@@ -927,7 +913,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberCardCount: Integer;
     begin
         Member.SetFilter(Blocked, '=%1', false);
-        if (not ChooseMemberWithSearchUI(Member)) then
+        if (not ChooseMemberWithSearchUIWorkList(Member)) then
             exit;
 
         MemberCard.SetCurrentKey("Member Entry No.");

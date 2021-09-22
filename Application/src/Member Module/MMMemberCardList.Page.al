@@ -7,7 +7,7 @@ page 6060130 "NPR MM Member Card List"
     InsertAllowed = false;
     ModifyAllowed = false;
     Editable = true;
-    PageType = List;
+    PageType = Worksheet;
     SourceTable = "NPR MM Member Card";
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
@@ -50,6 +50,22 @@ page 6060130 "NPR MM Member Card List"
                 {
                     ToolTip = 'Specifies the value of the External Card No. field';
                     ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        MemberCard: Page "NPR MM Member Card";
+                        MembershipCard: Page "NPR MM Membership Card";
+                        Member: Record "NPR MM Member";
+                        Membership: Record "NPR MM Membership";
+                    begin
+                        if (Member.Get(Rec."Member Entry No.")) then begin
+                            MemberCard.SetRecord(Member);
+                            MemberCard.Run();
+                        end else begin
+                            Membership.Get(Rec."Membership Entry No.");
+                            MembershipCard.SetRecord(Membership);
+                            MembershipCard.Run();
+                        end;
+                    end;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
@@ -62,18 +78,28 @@ page 6060130 "NPR MM Member Card List"
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Membership No.';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Member No.';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
                 field("Display Name"; Rec."Display Name")
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the Display Name.';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
+                }
+                field("E-Mail Address"; Rec."E-Mail Address")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the member E-Mail Address';
+                    ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
             }
         }
@@ -124,6 +150,31 @@ page 6060130 "NPR MM Member Card List"
             }
             separator(Separator6014401)
             {
+            }
+            action("Register Arrival")
+            {
+                Caption = 'Register Arrival';
+                Image = Approve;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Executes the Register Arrival action';
+                ApplicationArea = NPRRetail;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    MemberWebService: Codeunit "NPR MM Member WebService";
+                    ResponseMessage: Text;
+                begin
+
+                    if (not MemberWebService.MemberCardRegisterArrival(Rec."External Card No.", '', 'RTC-CLIENT', ResponseMessage)) then
+                        Error(ResponseMessage);
+
+                    Message(ResponseMessage);
+
+                end;
             }
             action("Arrival Log")
             {

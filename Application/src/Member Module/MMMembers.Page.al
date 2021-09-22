@@ -6,8 +6,9 @@ page 6060126 "NPR MM Members"
     DataCaptionExpression = Rec."External Member No.";
     DeleteAllowed = false;
     InsertAllowed = false;
+    ModifyAllowed = true;
     Editable = true;
-    PageType = List;
+    PageType = Worksheet;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Member";
     UsageCategory = Lists;
@@ -51,6 +52,14 @@ page 6060126 "NPR MM Members"
                 {
                     ToolTip = 'Specifies the value of the External Member No. field';
                     ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        Card: Page "NPR MM Member Card";
+                    begin
+                        Card.SetRecord(Rec);
+                        Card.Run();
+                    end;
+
                 }
                 field("First Name"; Rec."First Name")
                 {
@@ -135,30 +144,30 @@ page 6060126 "NPR MM Members"
                 Caption = 'Create Membership';
                 Ellipsis = true;
                 Image = NewCustomer;
+
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
+
+                RunObject = Page "NPR MM Create Membership";
+
                 ToolTip = 'Executes the Create Membership action';
                 ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-                    MembershipRole: Record "NPR MM Membership Role";
-                    MembershipEntryNo: Integer;
-                begin
-
-                    if (SelectMembershipSetup(MembershipSalesSetup)) then
-                        MembershipEntryNo := CreateMembership(MembershipSalesSetup);
-
-                    if (MembershipEntryNo > 0) then begin
-                        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-                        MembershipRole.FindFirst();
-                        Rec.SetFilter("Entry No.", '=%1', MembershipRole."Member Entry No.");
-                        CurrPage.Update(false);
-                    end;
-
-                end;
+            }
+            action(Members)
+            {
+                Caption = 'Edit';
+                Ellipsis = true;
+                Image = Customer;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPR MM Member Card";
+                RunPageLink = "Entry No." = FIELD("Entry No.");
+                Scope = Repeater;
+                ToolTip = 'Opens Members Card';
+                ApplicationArea = NPRRetail;
             }
             action("Register Arrival")
             {
@@ -228,30 +237,36 @@ page 6060126 "NPR MM Members"
                 Caption = 'Preferred Com. Methods';
                 Ellipsis = true;
                 Image = ChangeDimensions;
+
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+
                 RunObject = Page "NPR MM Member Communication";
                 RunPageLink = "Member Entry No." = FIELD("Entry No.");
+                Scope = Repeater;
+
                 ToolTip = 'Executes the Preferred Com. Methods action';
                 ApplicationArea = NPRRetail;
-                Scope = Repeater;
             }
             action("Arrival Log")
             {
                 Caption = 'Arrival Log';
                 Ellipsis = true;
                 Image = Log;
+
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Member No." = FIELD("External Member No.");
-                ToolTip = 'Executes the Arrival Log action';
-                ApplicationArea = NPRRetail;
                 Scope = Repeater;
+
+                ToolTip = 'Opens Arrival Log List';
+                ApplicationArea = NPRRetail;
             }
             group("Raptor Integration")
             {
@@ -345,67 +360,6 @@ page 6060126 "NPR MM Members"
                 Member.UpdateContactFromMember();
                 Member.Modify();
             until (Member.Next() = 0);
-        end;
-    end;
-
-    local procedure SelectMembershipSetup(var MembershipSalesSetup: Record "NPR MM Members. Sales Setup"): Boolean
-    var
-        MembershipSalesSetupPage: Page "NPR MM Membership Sales Setup";
-    begin
-
-        MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
-        if (MembershipSalesSetup.Count() = 1) then begin
-            exit(MembershipSalesSetup.FindFirst());
-
-        end else begin
-            MembershipSalesSetupPage.SetTableView(MembershipSalesSetup);
-            MembershipSalesSetupPage.LookupMode(true);
-            if (ACTION::LookupOK = MembershipSalesSetupPage.RunModal()) then begin
-                MembershipSalesSetupPage.GetRecord(MembershipSalesSetup);
-                exit(true);
-            end;
-        end;
-
-        exit(false);
-    end;
-
-    local procedure CreateMembership(MembershipSalesSetup: Record "NPR MM Members. Sales Setup") MembershipEntryNo: Integer
-    var
-        MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MemberCommunity: Record "NPR MM Member Community";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        MemberInfoCapturePage: Page "NPR MM Member Info Capture";
-        PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-    begin
-
-        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
-
-        MemberCommunity.Get(MembershipSetup."Community Code");
-        MemberCommunity.CalcFields("Foreign Membership");
-        MemberCommunity.TestField("Foreign Membership", false);
-
-        MemberInfoCapture.Init();
-        MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
-        MemberInfoCapture.Insert();
-
-        MemberInfoCapturePage.SetRecord(MemberInfoCapture);
-        MemberInfoCapture.SetFilter("Entry No.", '=%1', MemberInfoCapture."Entry No.");
-        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
-        Commit();
-
-        MemberInfoCapturePage.LookupMode(true);
-        PageAction := MemberInfoCapturePage.RunModal();
-
-        if (PageAction = ACTION::LookupOK) then begin
-            MemberInfoCapturePage.GetRecord(MemberInfoCapture);
-
-            case MembershipSalesSetup."Business Flow Type" of
-                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
-                    MembershipEntryNo := MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
-                else
-                    Error('Not implemented.');
-            end;
         end;
     end;
 
