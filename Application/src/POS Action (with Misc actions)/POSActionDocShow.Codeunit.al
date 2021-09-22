@@ -43,6 +43,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
     var
         JSON: Codeunit "NPR POS JSON Management";
         SelectType: Integer;
+        PageMgt: Codeunit "Page Management";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -81,7 +82,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
                 exit;
         end;
 
-        PAGE.RunModal(SalesHeader.GetCardpageID(), SalesHeader);
+        Page.RunModal(PageMgt.GetPageID(SalesHeader), SalesHeader);
     end;
 
     local procedure LookupSalesDoc(var SalesHeader: Record "Sales Header"): Boolean
