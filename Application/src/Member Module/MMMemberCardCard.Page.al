@@ -45,6 +45,7 @@ page 6060133 "NPR MM Member Card Card"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Display Name.';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
@@ -56,12 +57,14 @@ page 6060133 "NPR MM Member Card Card"
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Membership No.';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Member No.';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
             }
             group(Card)

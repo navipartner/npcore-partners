@@ -754,6 +754,7 @@ page 6060137 "NPR MM Membership Card"
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         ValidFromDate: Date;
         ValidUntilDate: Date;
+        MaxValidUntilDate: Date;
         PlaceHolder1Lbl: Label '%1 / %2 / %3', Locked = true;
         PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
         PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
@@ -766,6 +767,11 @@ page 6060137 "NPR MM Membership Card"
         if (not NeedsActivation) then begin
             MembershipManagement.GetMembershipValidDate(Rec."Entry No.", Today, ValidFromDate, ValidUntilDate);
             ShowCurrentPeriod := StrSubstNo(PlaceHolder2Lbl, ValidFromDate, ValidUntilDate);
+
+            MembershipManagement.GetMembershipMaxValidUntilDate(Rec."Entry No.", MaxValidUntilDate);
+            if (ValidUntilDate <> MaxValidUntilDate) then
+                ShowCurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MaxValidUntilDate);
+
             if (ValidUntilDate < Today) then
                 ShowCurrentPeriod := StrSubstNo(PlaceHolder3Lbl, ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
         end;
