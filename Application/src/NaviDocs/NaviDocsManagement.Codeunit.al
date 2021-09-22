@@ -308,7 +308,11 @@
             DATABASE::"Service Contract Header":
                 begin
                     RecRef.SetTable(ServiceContractHeader);
+#if BC17 or BC18
                     NaviDocsEntry."Document Type" := ServiceContractHeader."Contract Type";
+#else
+                    NaviDocsEntry."Document Type" := ServiceContractHeader."Contract Type".AsInteger();
+#endif
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
                     NaviDocsEntry."No. (Recipient)" := ServiceContractHeader."Bill-to Customer No.";
                     ServiceContractHeader.CalcFields("Bill-to Name", "Bill-to Name 2");
