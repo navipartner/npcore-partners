@@ -171,6 +171,11 @@ report 6014499 "NPR Inventory Campaign Stat."
                 PeriodDiscountLineVendorNo := "Period Discount Line".GetFilter("Vendor No.");
             end;
         }
+
+    }
+    requestpage
+    {
+
     }
 
     labels

@@ -231,6 +231,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
 
     requestpage
     {
+        SaveValues = true;
         Caption = 'Issued/Admitted Ticket Stats';
 
         layout

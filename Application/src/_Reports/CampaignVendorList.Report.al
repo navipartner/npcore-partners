@@ -168,6 +168,7 @@ report 6014497 "NPR Campaign Vendor List"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

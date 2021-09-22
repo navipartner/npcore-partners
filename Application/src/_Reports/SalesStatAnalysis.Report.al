@@ -674,6 +674,7 @@ report 6014457 "NPR Sales Stat/Analysis"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

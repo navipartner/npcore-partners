@@ -174,6 +174,7 @@ report 6014611 "NPR Sales Stats w/ Variants"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

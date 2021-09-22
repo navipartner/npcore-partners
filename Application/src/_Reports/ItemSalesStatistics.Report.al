@@ -111,6 +111,7 @@ report 6014414 "NPR Item Sales Statistics"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

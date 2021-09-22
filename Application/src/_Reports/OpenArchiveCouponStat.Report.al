@@ -115,6 +115,7 @@ report 6151598 "NPR Open/Archive Coupon Stat."
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

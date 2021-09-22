@@ -236,6 +236,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

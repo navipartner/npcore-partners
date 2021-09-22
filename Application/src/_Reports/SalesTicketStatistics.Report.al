@@ -237,6 +237,10 @@ report 6014410 "NPR Sales Ticket Statistics"
             end;
         }
     }
+    requestpage
+    {
+
+    }
 
     labels
     {

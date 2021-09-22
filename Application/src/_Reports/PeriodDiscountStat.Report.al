@@ -156,6 +156,7 @@ report 6014443 "NPR Period Discount Stat."
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

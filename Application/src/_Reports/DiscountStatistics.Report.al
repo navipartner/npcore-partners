@@ -214,6 +214,7 @@ report 6014402 "NPR Discount Statistics"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {
