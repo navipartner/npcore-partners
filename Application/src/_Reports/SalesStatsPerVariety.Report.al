@@ -184,6 +184,7 @@ report 6014615 "NPR Sales Stats Per Variety"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {
