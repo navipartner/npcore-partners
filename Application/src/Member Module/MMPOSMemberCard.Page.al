@@ -17,20 +17,27 @@ page 6060140 "NPR MM POS Member Card"
             {
                 field("External Member No."; Rec."External Member No.")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Member No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Display Name"; Rec."Display Name")
                 {
-
                     ToolTip = 'Specifies the value of the Display Name field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("First Name"; Rec."First Name")
+                {
+                    ToolTip = 'Specifies the value of the First Name field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Last Name"; Rec."Last Name")
+                {
+                    ToolTip = 'Specifies the value of the Last Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked field';
@@ -38,7 +45,6 @@ page 6060140 "NPR MM POS Member Card"
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-
                     Style = Unfavorable;
                     StyleExpr = IsInvalid;
                     ToolTip = 'Specifies the value of the Blocked At field';
@@ -46,19 +52,16 @@ page 6060140 "NPR MM POS Member Card"
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRRetail;
                 }
                 field("GDPR Approval"; MembershipRoleDisplay."GDPR Approval")
                 {
-
                     Caption = 'GDPR Approval';
                     Editable = false;
                     ToolTip = 'Specifies the value of the GDPR Approval field';
@@ -70,19 +73,16 @@ page 6060140 "NPR MM POS Member Card"
                 // field(Picture; Rec.Image)
                 field(Picture; Rec.Picture)
                 {
-
                     ToolTip = 'Specifies the value of the Picture field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Gender; Rec.Gender)
                 {
-
                     ToolTip = 'Specifies the value of the Gender field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Birthday; Rec.Birthday)
                 {
-
                     Style = Favorable;
                     StyleExpr = IsBirthday;
                     ToolTip = 'Specifies the value of the Birthday field';
@@ -90,13 +90,11 @@ page 6060140 "NPR MM POS Member Card"
                 }
                 field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
-
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Notification Method"; Rec."Notification Method")
                 {
-
                     ToolTip = 'Specifies the value of the Notification Method field';
                     ApplicationArea = NPRRetail;
                 }
@@ -105,25 +103,20 @@ page 6060140 "NPR MM POS Member Card"
             {
                 Caption = 'Membership';
                 Editable = false;
-                //The GridLayout property is only supported on controls of type Grid
-                //GridLayout = Columns;
                 field("External Membership No."; Membership."External Membership No.")
                 {
-
                     Caption = 'External Membership No.';
                     ToolTip = 'Specifies the value of the External Membership No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Membership Code"; Membership."Membership Code")
                 {
-
                     Caption = 'Membership Code';
                     ToolTip = 'Specifies the value of the Membership Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Membership."Company Name")
                 {
-
                     Caption = 'Company Name';
                     ToolTip = 'Specifies the value of the Company Name field';
                     ApplicationArea = NPRRetail;
@@ -133,7 +126,6 @@ page 6060140 "NPR MM POS Member Card"
                     ShowCaption = false;
                     field("Remaining Points"; RemainingPoints)
                     {
-
                         Caption = 'Remaining Points';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Remaining Points field';
@@ -141,7 +133,6 @@ page 6060140 "NPR MM POS Member Card"
                     }
                     field("Valid From Date"; ValidFromDate)
                     {
-
                         Caption = 'Valid From Date';
                         Visible = false;
                         ToolTip = 'Specifies the value of the Valid From Date field';
@@ -149,7 +140,6 @@ page 6060140 "NPR MM POS Member Card"
                     }
                     field("Valid Until Date"; ValidUntilDate)
                     {
-
                         Caption = 'Valid Until Date';
                         Style = Unfavorable;
                         StyleExpr = UntilDateAttentionAccent;
@@ -158,7 +148,6 @@ page 6060140 "NPR MM POS Member Card"
                     }
                     field("Remaining Amount Text"; RemainingAmountText)
                     {
-
                         Caption = 'Open / Due Amount.';
                         Style = Unfavorable;
                         StyleExpr = AccentuateDueAmount;
@@ -174,7 +163,6 @@ page 6060140 "NPR MM POS Member Card"
                 ShowFilter = false;
                 UpdatePropagation = Both;
                 ApplicationArea = NPRRetail;
-
             }
 
             part("Member Cards Subpage"; "NPR MM Member Cards ListPart")
@@ -190,7 +178,6 @@ page 6060140 "NPR MM POS Member Card"
             systempart(Control6014400; Notes)
             {
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -482,6 +469,7 @@ page 6060140 "NPR MM POS Member Card"
         RemainingAmount: Decimal;
         DueAmount: Decimal;
         DueDate: Date;
+        IsAboutToExpire: Boolean;
         PlaceHolderLbl: Label '%1 / %2', Locked = true;
     begin
         Clear(Membership);
@@ -565,7 +553,6 @@ page 6060140 "NPR MM POS Member Card"
         ValidUntilDate: Date;
         IsInvalid: Boolean;
         IsBirthday: Boolean;
-        IsAboutToExpire: Boolean;
         UntilDateAttentionAccent: Boolean;
         NeedsActivation: Boolean;
         GMembershipEntryNo: Integer;

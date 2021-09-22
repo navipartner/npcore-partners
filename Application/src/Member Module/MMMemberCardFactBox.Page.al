@@ -52,21 +52,25 @@ page 6014634 "NPR MM Member Card FactBox"
                 {
                     ToolTip = 'Specifies the value of the Display Name field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
                 field("External Member No."; Rec."External Member No.")
                 {
                     ToolTip = 'Specifies the value of the External Member No. field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
                 field("Member Blocked"; Rec."Member Blocked")
                 {
                     ToolTip = 'Specifies the value of the Member Blocked field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Member Card";
                 }
             }
 
@@ -78,21 +82,25 @@ page 6014634 "NPR MM Member Card FactBox"
                 {
                     ToolTip = 'Specifies the value of the External Membership No. field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("Company Name"; Rec."Company Name")
                 {
                     ToolTip = 'Specifies the value of the Company Name field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
                     ToolTip = 'Specifies the value of the Membership Code field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Membership Card";
                 }
                 field("Membership Blocked"; Rec."Membership Blocked")
                 {
                     ToolTip = 'Specifies the value of the Membership Blocked field';
                     ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR MM Membership Card";
                 }
 
             }

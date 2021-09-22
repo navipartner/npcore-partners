@@ -24,24 +24,7 @@ codeunit 6014682 "NPR MM Smart Search"
         MemberFound: Boolean;
     begin
         Member.FilterGroup := -1;
-        if (StrLen(SearchTerm) <= MaxStrLen(Member."External Member No.")) then
-            Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
-
-        if (StrLen(SearchTerm) <= MaxStrLen(Member."First Name")) then
-            Member.SetFilter("First Name", '%1', '@' + SearchTerm);
-
-        if (StrLen(SearchTerm) <= MaxStrLen(Member."Last Name")) then
-            Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
-
-        if (StrLen(SearchTerm) <= MaxStrLen(Member."E-Mail Address")) then
-            Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
-
-        if (StrLen(SearchTerm) <= MaxStrLen(Member."Phone No.")) then
-            Member.SetFilter("Phone No.", '%1', SearchTerm);
-
-        if (StrLen(SearchTerm) <= MaxStrLen(Member."Display Name")) then
-            Member.SetFilter("Display Name", '%1', SearchTerm);
-
+        ApplyMemberFilter(SearchTerm, Member);
         Member.SetLoadFields("Entry No.");
 
         if (Member.GetFilters() <> '') then begin
@@ -151,24 +134,7 @@ codeunit 6014682 "NPR MM Smart Search"
 
         if (not MembershipFound) then begin
             Member.FilterGroup := -1;
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."External Member No.")) then
-                Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."First Name")) then
-                Member.SetFilter("First Name", '%1', '@' + SearchTerm);
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."Last Name")) then
-                Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."E-Mail Address")) then
-                Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."Phone No.")) then
-                Member.SetFilter("Phone No.", '%1', SearchTerm);
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."Display Name")) then
-                Member.SetFilter("Display Name", '%1', SearchTerm);
-
+            ApplyMemberFilter(SearchTerm, Member);
             Member.SetLoadFields("Entry No.");
 
             if ((Member.FindSet()) and (Member.GetFilters() <> '')) then begin
@@ -251,24 +217,7 @@ codeunit 6014682 "NPR MM Smart Search"
 
         if (not MembershipFound) then begin
             Member.FilterGroup := -1;
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."External Member No.")) then
-                Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."First Name")) then
-                Member.SetFilter("First Name", '%1', '@' + SearchTerm);
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."Last Name")) then
-                Member.SetFilter("Last Name", '%1', '@' + SearchTerm);
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."E-Mail Address")) then
-                Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."Phone No.")) then
-                Member.SetFilter("Phone No.", '%1', SearchTerm);
-
-            if (StrLen(SearchTerm) <= MaxStrLen(Member."Display Name")) then
-                Member.SetFilter("Display Name", '%1', SearchTerm);
-
+            ApplyMemberFilter(SearchTerm, Member);
             Member.SetLoadFields("Entry No.");
 
             if ((Member.FindSet()) and (Member.GetFilters() <> '')) then begin
@@ -289,4 +238,30 @@ codeunit 6014682 "NPR MM Smart Search"
         end;
     end;
 
+    local procedure ApplyMemberFilter(SearchTerm: Text; var Member: Record "NPR MM Member")
+    begin
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."External Member No.")) then
+            Member.SetFilter("External Member No.", '%1', UpperCase(SearchTerm));
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."First Name")) then
+            Member.SetFilter("First Name", '%1', '@' + ConvertSpaceToWildcard(SearchTerm));
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."Last Name")) then
+            Member.SetFilter("Last Name", '%1', '@' + ConvertSpaceToWildcard(SearchTerm));
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."E-Mail Address")) then
+            Member.SetFilter("E-Mail Address", '%1', LowerCase(ConvertStr(SearchTerm, '@', '?')));
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."Phone No.")) then
+            Member.SetFilter("Phone No.", '%1', SearchTerm);
+
+        if (StrLen(SearchTerm) <= MaxStrLen(Member."Display Name")) then
+            Member.SetFilter("Display Name", '%1', '@' + ConvertSpaceToWildcard(SearchTerm));
+    end;
+
+    local procedure ConvertSpaceToWildcard(SearchTerm: Text): Text
+    var
+    begin
+        exit(ConvertStr(SearchTerm, ' ', '*') + '*');
+    end;
 }
