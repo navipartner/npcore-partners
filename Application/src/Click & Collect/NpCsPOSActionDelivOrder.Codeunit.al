@@ -340,6 +340,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
+        PageMgt: Codeunit "Page Management";
         SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
         OpenDocument, ConfirmInvDiscAmt : Boolean;
     begin
@@ -359,7 +360,7 @@
             SalesHeader."Document Type" := NpCsDocument."Document Type";
             SalesHeader."No." := NpCsDocument."Document No.";
             SalesHeader.SetRecFilter();
-            exit(PAGE.RunModal(SalesHeader.GetCardpageID(), SalesHeader) = ACTION::LookupOK);
+            exit(Page.RunModal(PageMgt.GetPageID(SalesHeader), SalesHeader) = Action::LookupOK);
         end;
         exit(true);
     end;

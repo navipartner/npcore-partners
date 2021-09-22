@@ -189,10 +189,11 @@ codeunit 6150629 "NPR POS Entry Management"
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        PageMgt: Codeunit "Page Management";
     begin
         POSEntry.TestField("Sales Document No.");
         if SalesHeader.Get(POSEntry."Sales Document Type", POSEntry."Sales Document No.") then begin
-            PAGE.Run(SalesHeader.GetCardpageID(), SalesHeader);
+            Page.Run(PageMgt.GetPageID(SalesHeader), SalesHeader);
             exit(true);
         end;
         case POSEntry."Sales Document Type" of
@@ -224,7 +225,7 @@ codeunit 6150629 "NPR POS Entry Management"
                 begin
                     SalesHeader.SetRange("Quote No.", POSEntry."Sales Document No.");
                     if SalesHeader.FindFirst() then begin
-                        PAGE.Run(SalesHeader.GetCardpageID(), SalesHeader);
+                        Page.Run(PageMgt.GetPageID(SalesHeader), SalesHeader);
                         exit(true);
                     end else begin
                         SalesInvoiceHeader.SetRange("Quote No.", POSEntry."Sales Document No.");
