@@ -12,68 +12,68 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             cuegroup(Tickets)
             {
                 Caption = 'Tickets';
-                field("Issued Tickets"; IssuedTicketsCount)
+                field("Issued Tickets"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Issued Tickets"))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Issued Tickets field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Issued Tickets';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR TM Ticket List");
                     end;
                 }
-                field("Ticket Requests"; TicketRequestsCount)
+                field("Ticket Requests"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Requests"))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket Requests field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Ticket Requests';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR TM Ticket Request");
                     end;
                 }
-                field("Ticket Types"; TicketTypesCount)
+                field("Ticket Types"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Types"))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket Type field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Ticket Types';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR TM Ticket Type");
                     end;
                 }
-                field("Ticket Admission BOM"; TicketAdmissionBOMCount)
+                field("Ticket Admission BOM"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Admission BOM"))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket BOM field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Ticket BOM';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR TM Ticket BOM");
                     end;
                 }
-                field("Ticket Schedules"; TicketSchedulesCount)
+                field("Ticket Schedules"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Schedules"))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket Schedules field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Ticket Schedules';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR TM Ticket Schedules");
                     end;
                 }
-                field("Ticket Admissions"; TicketAdmissionsCount)
+                field("Ticket Admissions"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Admissions"))))
                 {
                     ApplicationArea = NPRRetail;
                     DrillDownPageID = "NPR TM Ticket Admissions";
                     ToolTip = 'Specifies the value of the Ticket Admissions field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Ticket Admissions';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR TM Ticket Admissions");
@@ -83,35 +83,35 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             cuegroup(Members)
             {
                 Caption = 'Members';
-                field(Control6; MembersCount)
+                field(Control6; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Members))))
                 {
                     ApplicationArea = NPRRetail;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Members field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Members';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR MM Members");
                     end;
                 }
-                field(Memberships; MembershipsCount)
+                field(Memberships; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Memberships))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Memberships field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Memberships';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR MM Memberships");
                     end;
                 }
-                field(Membercards; MembercardsCount)
+                field(Membercards; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Membercards))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Membercards field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Member Cards';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR MM Member Card List");
@@ -122,36 +122,36 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             cuegroup(Master)
             {
                 Caption = 'Master';
-                field(Items; ItemCount)
+                field(Items; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Items))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Items field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Items';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"Item List");
                     end;
                 }
 
-                field(Contacts; ContactCount)
+                field(Contacts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Contacts))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Contacts field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Contacts';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"Contact List");
                     end;
 
                 }
-                field(Customers; CustomerCount)
+                field(Customers; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Customers))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Customers field';
-                    DecimalPlaces = 0 : 0;
                     Caption = 'Customers';
+
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"Customer List");
@@ -170,30 +170,37 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             Rec.Init();
             Rec.Insert();
         end;
+    end;
 
-        Rec.CalcFields("Issued Tickets", "Ticket Requests", "Ticket Types", "Ticket Admission BOM", "Ticket Schedules", "Ticket Admissions");
-        IssuedTicketsCount := Rec."Issued Tickets";
-        TicketRequestsCount := Rec."Ticket Requests";
-        TicketTypesCount := Rec."Ticket Types";
-        TicketAdmissionBOMCount := Rec."Ticket Admission BOM";
-        TicketSchedulesCount := Rec."Ticket Schedules";
-        TicketAdmissionsCount := Rec."Ticket Admissions";
-        Rec.CalcFields(Members, Memberships, Membercards);
-        MembersCount := Rec.Members;
-        MembershipsCount := Rec.Memberships;
-        MembercardsCount := Rec.Membercards;
-        Rec.CalcFields(Items, Contacts, Customers);
-        ItemCount := Rec.Items;
-        ContactCount := Rec.Contacts;
-        CustomerCount := Rec.Customers;
+    trigger OnAfterGetCurrRecord()
+    begin
+        CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR Entertai. Cue Backgrd Task");
+    end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        BackgrndTaskMgt.CopyTaskResults(Results, BackgroundTaskResults);
+    end;
+
+    trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        if (TaskId = BackgroundTaskId) then
+            BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
+    end;
+
+    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
+    begin
+        if not BackgroundTaskResults.ContainsKey(FieldNo) then
+            exit(0);
+        if not Evaluate(Result, BackgroundTaskResults.Get(FieldNo), 9) then
+            Result := 0;
     end;
 
     var
-
-        IssuedTicketsCount, TicketRequestsCount, TicketTypesCount, TicketAdmissionBOMCount, TicketSchedulesCount, TicketAdmissionsCount : Decimal;
-        MembersCount, MembershipsCount, MembercardsCount : Decimal;
-        ItemCount, CustomerCount, ContactCount : Decimal;
-
-
+        BackgroundTaskResults: Dictionary of [Text, Text];
+        BackgroundTaskId: Integer;
 }
-
