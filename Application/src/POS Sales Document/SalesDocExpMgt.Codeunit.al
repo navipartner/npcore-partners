@@ -1026,13 +1026,14 @@
     var
         SalesHeader2: Record "Sales Header";
         ApplySalespersontoDocument: Codeunit "NPR Apply Salesperson to Doc.";
+        PageMgt: Codeunit "Page Management";
     begin
         SalesHeader2 := SalesHeader;
         SalesHeader2.SetRecFilter();
 
         ApplySalespersontoDocument.SetCode(SalePOS."Salesperson Code");
         BindSubscription(ApplySalespersontoDocument);
-        PAGE.RunModal(SalesHeader.GetCardpageID(), SalesHeader2);
+        Page.RunModal(PageMgt.GetPageID(SalesHeader2), SalesHeader2);
         UnbindSubscription(ApplySalespersontoDocument);
 
         if not SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then

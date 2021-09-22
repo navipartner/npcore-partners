@@ -123,9 +123,11 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
     end;
 
     local procedure ConfirmDocument(SalesHeader: Record "Sales Header"; OpenDoc: Boolean): Boolean
+    var
+        PageMgt: Codeunit "Page Management";
     begin
         if OpenDoc then
-            exit(PAGE.RunModal(SalesHeader.GetCardpageID(), SalesHeader) = ACTION::LookupOK);
+            exit(Page.RunModal(PageMgt.GetPageID(SalesHeader), SalesHeader) = Action::LookupOK);
 
         exit(true);
     end;
