@@ -463,13 +463,23 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
     local procedure SerialNoOnAfterValidate()
     var
+#IF NOT BC17
+        WhseItemTrackingSetup: Record "Item Tracking Setup";
+#ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ExpDate: Date;
         EntriesExist: Boolean;
     begin
-        if Rec."Serial No." <> '' then
+        if Rec."Serial No." <> '' then begin
+#IF BC17
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
                 Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
+#ELSE
+            ItemTrackingMgt.GetWhseItemTrkgSetup(Rec."Item No.", WhseItemTrackingSetup);
+            ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
+                WhseItemTrackingSetup, false, EntriesExist);
+#ENDIF
+        end;
 
         if ExpDate <> 0D then
             Rec."Expiration Date" := ExpDate;
@@ -477,13 +487,23 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
     local procedure LotNoOnAfterValidate()
     var
+#IF NOT BC17
+        WhseItemTrackingSetup: Record "Item Tracking Setup";
+#ENDIF
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ExpDate: Date;
         EntriesExist: Boolean;
     begin
-        if Rec."Lot No." <> '' then
+        if Rec."Lot No." <> '' then begin
+#IF BC17
             ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
                 Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
+#ELSE
+            ItemTrackingMgt.GetWhseItemTrkgSetup(Rec."Item No.", WhseItemTrackingSetup);
+            ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
+                WhseItemTrackingSetup, false, EntriesExist);
+#ENDIF
+        end;
 
         if ExpDate <> 0D then
             Rec."Expiration Date" := ExpDate;
