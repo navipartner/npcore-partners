@@ -1,6 +1,9 @@
 ﻿codeunit 6151292 "NPR SS Action: NpRv Apply"
 {
     //this action is a SelfService variant of 'SCAN_VOUCHER' action (codeunit 6151014 "NPR NpRv Scan POSAction Mgt.")
+    var
+        VoucherTypeCode: Code[20];
+
     local procedure ActionCode(): Text[20]
     begin
         exit('SS-VOUCHER-APPLY');
@@ -8,7 +11,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
     local procedure ObjectIdentifier(): Text
@@ -31,6 +34,7 @@
             );
 
             Sender.RegisterTextParameter('VoucherTypeCode', '');
+            Sender.RegisterBooleanParameter('EndSale', true);
             Sender.RegisterBlockingUI(true);
             Sender.SetWorkflowTypeUnattended();
         end;
@@ -102,6 +106,7 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text);
     var
+        CaptionEndSale: Label 'End Sale';
         CaptionVoucherTypeCode: Label 'Voucher Type';
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -110,12 +115,15 @@
         case POSParameterValue.Name of
             'VoucherTypeCode':
                 Caption := CaptionVoucherTypeCode;
+            'EndSale':
+                Caption := CaptionEndSale;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text);
     var
+        DescEndSale: Label 'Specifies whether the system should attempt to end the sale immediately after a voucher has been applied';
         DescVoucherTypeCode: Label 'Defines retail voucher type';
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -124,6 +132,8 @@
         case POSParameterValue.Name of
             'VoucherTypeCode':
                 Caption := DescVoucherTypeCode;
+            'EndSale':
+                Caption := DescEndSale;
         end;
     end;
 
@@ -136,76 +146,73 @@
         Handled := true;
 
         ApplyVoucher(Context, POSSession, FrontEnd);
-
-        POSSession.RequestRefreshData();
+        if not DoEndSale(Context, POSSession) then
+            POSSession.RequestRefreshData();
     end;
 
     local procedure ApplyVoucher(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-        TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
-        VoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
         ReferenceNo: Text;
-        VoucherTypeCode: Text;
     begin
-        Context.SetScopeParameters(ObjectIdentifier());
-        VoucherTypeCode := UpperCase(Context.GetStringOrFail('VoucherTypeCode', ObjectIdentifier()));
-
         Context.SetScopeRoot();
         ReferenceNo := UpperCase(Context.GetStringOrFail('VourchRefNo', ObjectIdentifier()));
         if ReferenceNo = '' then
-            exit;
+            Error('');
 
-        if not VoucherType.Get(VoucherTypeCode) then
-            Clear(VoucherType);
+        GetVoucherType(Context);
+
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        TempNpRvVoucherBuffer.Init();
-        TempNpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
-        TempNpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
-        TempNpRvVoucherBuffer."Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen(TempNpRvVoucherBuffer."Reference No."));
-        TempNpRvVoucherBuffer."Redeem Date" := SalePOS.Date;
-        TempNpRvVoucherBuffer."Redeem Partner Code" := VoucherType."Partner Code";
-        TempNpRvVoucherBuffer."Redeem Register No." := SalePOS."Register No.";
-        TempNpRvVoucherBuffer."Redeem Sales Ticket No." := SalePOS."Sales Ticket No.";
-        TempNpRvVoucherBuffer."Redeem User ID" := SalePOS."Salesperson Code";
-
-        NpRvVoucherMgt.ValidateVoucher(TempNpRvVoucherBuffer);
-
-        VoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(SaleLinePOS);
 
-        SaleLinePOS."No." := VoucherType."Payment Type";
-        SaleLinePOS."Register No." := SalePOS."Register No.";
-        SaleLinePOS.Description := TempNpRvVoucherBuffer.Description;
-        SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        SaleLinePOS."Amount Including VAT" := TempNpRvVoucherBuffer.Amount;
-        POSPaymentLine.InsertPaymentLine(SaleLinePOS, 0);
-        POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, ReferenceNo, SaleLinePOS, SalePOS, POSSession, FrontEnd, POSPaymentLine, SaleLinePOS);
+    end;
 
-        NpRvSalesLine.Init();
-        NpRvSalesLine.Id := CreateGuid();
-        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
-        NpRvSalesLine."Register No." := SalePOS."Register No.";
-        NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
-        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
-        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
-        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
-        NpRvSalesLine."Voucher No." := TempNpRvVoucherBuffer."No.";
-        NpRvSalesLine."Reference No." := TempNpRvVoucherBuffer."Reference No.";
-        NpRvSalesLine."Voucher Type" := VoucherType.Code;
-        NpRvSalesLine.Description := VoucherType.Description;
-        NpRvSalesLine.Insert(true);
+    local procedure DoEndSale(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"): Boolean
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSetup: Codeunit "NPR POS Setup";
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SaleAmount: Decimal;
+        Subtotal: Decimal;
+    begin
+        if not Context.GetBooleanParameter('EndSale') then
+            exit(false);
 
-        NpRvVoucherMgt.ApplyPayment(FrontEnd, POSSession, NpRvSalesLine);
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+
+        POSSession.GetSetup(POSSetup);
+        if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision()) then
+            exit(false);
+
+        GetVoucherType(Context);
+        VoucherType.Get(VoucherTypeCode);
+        if not POSPaymentMethod.Get(VoucherType."Payment Type") then
+            exit(false);
+        if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
+            exit(false);
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
+            exit(false);
+
+        POSSession.GetSale(POSSale);
+        exit(POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod));
+    end;
+
+    local procedure GetVoucherType(Context: Codeunit "NPR POS JSON Management")
+    begin
+        VoucherTypeCode := CopyStr(UpperCase(Context.GetStringParameterOrFail('VoucherTypeCode', ObjectIdentifier())), 1, MaxStrLen(VoucherTypeCode));
     end;
 
     [IntegrationEvent(false, false)]
