@@ -26,25 +26,32 @@ page 6014585 "NPR Advanced Sales Stats"
 
                     trigger OnValidate()
                     begin
+                        case PeriodType of
+                            PeriodType::Day:
+                                begin
+                                    Day := Day::Day;
+                                end;
+                            PeriodType::Week:
+                                begin
+                                    Day := Day::Week;
+                                end;
+                            PeriodType::Month:
+                                begin
+                                    Day := Day::Month;
+                                end;
+                            PeriodType::Quarter:
+                                begin
+                                    Day := Day::Quarter;
+                                end;
+                            PeriodType::Year:
+                                begin
+                                    Day := Day::Year;
+                                end;
+                            PeriodType::Period:
+                                PeriodPeriodTypeOnValidate();
+                        end;
 
-                        if PeriodType = PeriodType::Period then
-                            PeriodPeriodTypeOnValidate();
-
-                        if PeriodType = PeriodType::Year then
-                            YearPeriodTypeOnValidate();
-
-                        if PeriodType = PeriodType::Quarter then
-                            QuarterPeriodTypeOnValidate();
-
-                        if PeriodType = PeriodType::Month then
-                            MonthPeriodTypeOnValidate();
-
-                        if PeriodType = PeriodType::Week then
-                            WeekPeriodTypeOnValidate();
-
-                        if PeriodType = PeriodType::Day then
-                            DayPeriodTypeOnValidate();
-
+                        Calc();
                         CurrPage.Update(false);
                     end;
                 }
@@ -276,13 +283,23 @@ page 6014585 "NPR Advanced Sales Stats"
                     var
                         SalesStatisticsReport: Report "NPR Advanced Sales Stat.";
                     begin
-                        SalesStatisticsReport.setFilter(ViewPosition, Day, Dim1Filter, Dim2Filter, Rec."Period Start",
+#if BC17 or BC18
+                        SalesStatisticsReport.SetFilter(ViewPosition, Day, Dim1Filter, Dim2Filter, Rec."Period Start",
                                            Rec."Period End", ItemCategoryCodeFilter, LastYearCalc,
                                            (((ViewPosition = ViewPosition::ItemGroup) and HideItemGroup) or
                                              ((ViewPosition = ViewPosition::Item) and HideItem) or
                                              ((ViewPosition = ViewPosition::Customer) and HideCustomer) or
                                              ((ViewPosition = ViewPosition::Vendor) and HideVendor) or
                                              ((ViewPosition = ViewPosition::Projectcode) and false)));
+#else
+                        SalesStatisticsReport.SetFilter(ViewPosition, PeriodToInteger(Day), Dim1Filter, Dim2Filter, Rec."Period Start",
+                                           Rec."Period End", ItemCategoryCodeFilter, LastYearCalc,
+                                           (((ViewPosition = ViewPosition::ItemGroup) and HideItemGroup) or
+                                             ((ViewPosition = ViewPosition::Item) and HideItem) or
+                                             ((ViewPosition = ViewPosition::Customer) and HideCustomer) or
+                                             ((ViewPosition = ViewPosition::Vendor) and HideVendor) or
+                                             ((ViewPosition = ViewPosition::Projectcode) and false)));
+#endif
                         SalesStatisticsReport.RunModal();
                     end;
                 }
@@ -452,7 +469,11 @@ page 6014585 "NPR Advanced Sales Stats"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
+#if BC17 or BC18
         exit(PeriodFormMan.FindDate(CopyStr(Which, 1, 3), Rec, Day));
+#else
+        exit(PeriodPageMan.FindDate(CopyStr(Which, 1, 3), Rec, Day));
+#endif
     end;
 
     trigger OnInit()
@@ -462,8 +483,11 @@ page 6014585 "NPR Advanced Sales Stats"
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
-
+#if BC17 or BC18
         exit(PeriodFormMan.NextDate(Steps, Rec, Day));
+#else
+        exit(PeriodPageMan.NextDate(Steps, Rec, Day));
+#endif
     end;
 
     trigger OnOpenPage()
@@ -481,7 +505,14 @@ page 6014585 "NPR Advanced Sales Stats"
     end;
 
     var
+#if BC17 or BC18
         PeriodFormMan: Codeunit PeriodFormManagement;
+        Day: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
+#else
+        PeriodPageMan: Codeunit PeriodPageManagement;
+        Day: Enum "Analysis Period Type";
+        IncorrectPeriodErr: Label 'Incorrect period: %1';
+#endif
         "Sale (QTY)": Decimal;
         "LastYear Sale (QTY)": Decimal;
         "Sale (LCY)": Decimal;
@@ -497,7 +528,6 @@ page 6014585 "NPR Advanced Sales Stats"
         ItemCheck: Text[250];
         CustomerCheck: Text[250];
         VendorCheck: Text[250];
-        Day: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         ViewPosition: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode;
         HideItem: Boolean;
         HideItemGroup: Boolean;
@@ -670,37 +700,6 @@ page 6014585 "NPR Advanced Sales Stats"
         end;
     end;
 
-
-    local procedure DayPeriodTypeOnValidate()
-    begin
-        Day := PeriodType;
-        Calc();
-    end;
-
-    local procedure WeekPeriodTypeOnValidate()
-    begin
-        Day := PeriodType;
-        Calc();
-    end;
-
-    local procedure MonthPeriodTypeOnValidate()
-    begin
-        Day := PeriodType;
-        Calc();
-    end;
-
-    local procedure QuarterPeriodTypeOnValidate()
-    begin
-        Day := PeriodType;
-        Calc();
-    end;
-
-    local procedure YearPeriodTypeOnValidate()
-    begin
-        Day := PeriodType;
-        Calc();
-    end;
-
     local procedure PeriodPeriodTypeOnValidate()
     var
         tblPeriode: Record "NPR Periodes";
@@ -721,7 +720,26 @@ page 6014585 "NPR Advanced Sales Stats"
             end;
         end else
             Rec.SetFilter("Period Start", '');
-        Calc();
     end;
+
+#if not BC17 and not BC18
+    local procedure PeriodToInteger(Period: Enum "Analysis Period Type"): Integer
+    begin
+        case Period of
+            Period::Day:
+                exit(PeriodType::Day);
+            Period::Week:
+                exit(PeriodType::Week);
+            Period::Month:
+                exit(PeriodType::Month);
+            Period::Quarter:
+                exit(PeriodType::Quarter);
+            Period::Year:
+                exit(PeriodType::Year);
+            else
+                Error((StrSubstNo(IncorrectPeriodErr, Format(Period))));
+        end;
+    end;
+#endif
 }
 
