@@ -1066,7 +1066,7 @@
         Success := false;
 
         StartTime := Time;
-        OpenDialog(StrSubstNo(Text200, RecRef.Caption, Total, 'Counting', 0));
+        OpenDialog(Text200);
         while not Success do begin
             Counter += 1;
             UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());
