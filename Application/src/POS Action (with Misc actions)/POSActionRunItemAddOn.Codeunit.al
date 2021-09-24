@@ -135,7 +135,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         else begin
             UserSelectionJToken := Context.GetJTokenOrFail('UserSelectedAddons', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
             if UserSelectionJToken.IsValue then
-                if UserSelectionJToken.AsValue().IsNull and not Context.GetBoolean('CompulsoryAddOn') then
+                if UserSelectionJToken.AsValue().IsNull and not CompulsoryAddOn then
                     Error('');
             RequestFrontEndRefresh := ItemAddOnMgt.InsertPOSAddOnLines(ItemAddOn, UserSelectionJToken, POSSession, AppliesToLineNo, CompulsoryAddOn);
         end;
