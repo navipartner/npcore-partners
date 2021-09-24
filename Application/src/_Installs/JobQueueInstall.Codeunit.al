@@ -14,7 +14,7 @@ codeunit 6014438 "NPR Job Queue Install"
     var
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
-        JobQueueManagement: codeunit "NPR Job Queue Management";
+        JobQueueMgt: codeunit "NPR Job Queue Management";
     begin
         if not TaskScheduler.CanCreateTask() then
             exit;
@@ -31,8 +31,9 @@ codeunit 6014438 "NPR Job Queue Install"
         AddNcTaskListProcessingJobQueue();
         AddImportListProcessingJobQueue();
         AddJQLogEntryCleanupJobQueue();
-        JobQueueManagement.AddPosItemPostingJobQueue();
-        JobQueueManagement.AddPosPostingJobQueue();
+        UpgradePOSPostingJobQueues();
+        JobQueueMgt.AddPosItemPostingJobQueue();
+        JobQueueMgt.AddPosPostingJobQueue();
         AddInventoryAdjmtJobQueues();
         AddSMSJobQueue();
 
@@ -141,5 +142,49 @@ codeunit 6014438 "NPR Job Queue Install"
                 if Format(xJobQueueEntry) <> Format(JobQueueEntry) then
                     JobQueueEntry.Modify();
             until JobQueueEntry.Next() = 0;
+    end;
+
+    local procedure UpgradePOSPostingJobQueues()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueEntry2: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", 6150631);
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                JobQueueEntry2 := JobQueueEntry;
+                case JobQueueEntry2.Description of
+                    'POS Entry posting',
+                    'POS posting':
+                        UpdateAndRescedule(JobQueueEntry2, Codeunit::"NPR POS Post GL Entries JQ", 'POS posting');
+                    'POS Entry Item posting',
+                    'POS Item posting':
+                        UpdateAndRescedule(JobQueueEntry2, Codeunit::"NPR POS Post Item Entries JQ", 'POS Item posting');
+                    else
+                        JobQueueEntry2.Cancel();
+                end;
+            until JobQueueEntry.Next() = 0;
+    end;
+
+    local procedure UpdateAndRescedule(JobQueueEntry: Record "Job Queue Entry"; ObjectIdToRun: Integer; JobDescription: Text[250])
+    var
+        JobQueueEntry2: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+    begin
+        JobQueueEntry2.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run");
+        JobQueueEntry2.SetRange("Object ID to Run", ObjectIdToRun);
+        JobQueueEntry2.SetFilter(ID, '<>%1', JobQueueEntry.ID);
+        if not JobQueueEntry2.IsEmpty() then begin
+            JobQueueEntry.Cancel();
+            exit;
+        end;
+
+        JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
+        JobQueueEntry.Validate("Object ID to Run", ObjectIdToRun);
+        JobQueueEntry.Description := JobDescription;
+        JobQueueEntry."Earliest Start Date/Time" := JobQueueMgt.NowWithDelayInSeconds(600);
+        JobQueueEntry.Modify();
+        JobQueueEntry.Restart();
     end;
 }
