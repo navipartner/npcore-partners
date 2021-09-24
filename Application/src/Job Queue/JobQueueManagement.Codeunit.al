@@ -335,11 +335,17 @@ codeunit 6014663 "NPR Job Queue Management"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategoryCode: Code[10];
+        JobQueueDescrLbl: Label 'POS Item posting', MaxLength = 250;
     begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR POS Post Item Entries JQ");
+        if not JobQueueEntry.IsEmpty() then
+            exit;
+
         JobQueueCategoryCode := CreateAndAssignJobQueueCategory();
         JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR POS Post Item Entries JQ", CurrentDateTime() + 360 * 1000, JobQueueCategoryCode, '');
 
-        JobQueueEntry.Validate(Description, 'POS Item posting');
+        JobQueueEntry.Validate(Description, JobQueueDescrLbl);
         JobQueueEntry.Validate("Run on Mondays", true);
         JobQueueEntry.Validate("Run on Tuesdays", true);
         JobQueueEntry.Validate("Run on Wednesdays", true);
@@ -358,12 +364,18 @@ codeunit 6014663 "NPR Job Queue Management"
         DF: DateFormula;
         ParamString: Text[250];
         JobQueueCategoryCode: Code[10];
+        JobQueueDescrLbl: Label 'POS posting', MaxLength = 250;
     begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR POS Post GL Entries JQ");
+        if not JobQueueEntry.IsEmpty() then
+            exit;
+
         JobQueueCategoryCode := CreateAndAssignJobQueueCategory();
         JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR POS Post GL Entries JQ", CurrentDateTime() + 360 * 1000, JobQueueCategoryCode, ParamString);
 
         JobQueueEntry.Validate("Job Queue Category Code", JobQueueCategoryCode);
-        JobQueueEntry.Validate(Description, 'POS posting');
+        JobQueueEntry.Validate(Description, JobQueueDescrLbl);
         evaluate(DF, '<+1D>');
         JobQueueEntry.Validate("Next Run Date Formula", DF);
         JobQueueEntry.Validate("Starting Time", 230000T);
@@ -375,17 +387,16 @@ codeunit 6014663 "NPR Job Queue Management"
     var
         SalesSetup: Record "Sales & Receivables Setup";
         JobQueueCategory: Record "Job Queue Category";
+        JobQueueCatDescrLbl: Label 'Posting related tasks', MaxLength = 30;
     begin
-        JobQueueCategory.InsertRec('NPR-POST', 'Posting related tasks');
         if not SalesSetup.Get() then begin
             SalesSetup.Init();
-            SalesSetup."Job Queue Category Code" := JobQueueCategory.Code;
             SalesSetup.Insert();
-        end else begin
-            if SalesSetup."Job Queue Category Code" = '' then begin
-                SalesSetup."Job Queue Category Code" := JobQueueCategory.Code;
-                SalesSetup.Modify();
-            end;
+        end;
+        if SalesSetup."Job Queue Category Code" = '' then begin
+            JobQueueCategory.InsertRec('NPR-POST', JobQueueCatDescrLbl);
+            SalesSetup."Job Queue Category Code" := JobQueueCategory.Code;
+            SalesSetup.Modify();
         end;
         exit(SalesSetup."Job Queue Category Code");
     end;
