@@ -191,16 +191,13 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
 
                         ItemAddOnLine.Type::Select:
                             begin
-                                Clear(ValueJObject);
-                                if AddOnSaleLinePOS."No." = '' then begin
-                                    ValueJObject.Add('item', ItemAddOnLineOption."Item No.");
-                                    ValueJObject.Add('variant', ItemAddOnLineOption."Variant Code");
-                                end else begin
+                                ItemAddOn_LineJObject.Add('type', 'radio');
+                                if AddOnSaleLinePOS."No." <> '' then begin
+                                    Clear(ValueJObject);
                                     ValueJObject.Add('item', AddOnSaleLinePOS."No.");
                                     ValueJObject.Add('variant', AddOnSaleLinePOS."Variant Code");
+                                    ItemAddOn_LineJObject.Add('value', ValueJObject);
                                 end;
-                                ItemAddOn_LineJObject.Add('type', 'radio');
-                                ItemAddOn_LineJObject.Add('value', ValueJObject);
 
                                 Clear(ItemAddOn_LineOptionsJArray);
                                 repeat
