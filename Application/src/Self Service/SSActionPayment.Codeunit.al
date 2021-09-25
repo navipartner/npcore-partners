@@ -56,6 +56,8 @@ codeunit 6151291 "NPR SS Action: Payment"
         PaymentHandlerWorkflow: Text;
         ForceAmount: Decimal;
     begin
+        EnsureSaleIsNotEmpty(POSSession);
+
         POSSession.GetSetup(POSSetup);
         POSPaymentMethod.Get(Context.GetStringParameterOrFail('PaymentType', ActionCode()));
 
@@ -88,6 +90,30 @@ codeunit 6151291 "NPR SS Action: Payment"
         ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
 
         POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
+    end;
+
+    local procedure EnsureSaleIsNotEmpty(POSSession: Codeunit "NPR POS Session")
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+        Setup: Codeunit "NPR POS Setup";
+        NO_SALES_LINES: Label 'There are no sales lines in the POS. You must add at least one sales line before handling payment.';
+    begin
+        POSSession.GetSetup(Setup);
+        Setup.GetPOSUnit(POSUnit);
+        PosUnit.GetProfile(POSAuditProfile);
+        if not POSAuditProfile."Allow Zero Amount Sales" then begin
+            POSSession.GetSale(POSSale);
+            POSSale.GetCurrentSale(SalePOS);
+            SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+            SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Comment);
+            if SaleLinePOS.IsEmpty() then
+                Error(NO_SALES_LINES);
+        end;
     end;
 
     local procedure GetAmountSuggestion(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"): Decimal
