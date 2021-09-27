@@ -3,7 +3,6 @@ table 6014620 "NPR POS Entry Statistics"
     DataClassification = CustomerContent;
     TableType = Temporary;
     Caption = 'POS Entry Statistics';
-
     fields
     {
         field(1; "Source System Id"; Guid)
@@ -144,7 +143,7 @@ table 6014620 "NPR POS Entry Statistics"
         {
             CalcFormula = Sum("NPR POS Entry"."Amount Excl. Tax" WHERE("POS Store Code" = field("POS Store Filter"),
                                                                         "POS Unit No." = FIELD("POS Unit Filter"),
-                                                                        "Entry Type" = const(Other),
+                                                                        "Entry Type" = const(Balancing),
                                                                         "Customer No." = field("Customer Filter"),
                                                                         "Document No." = FIELD("Document Filter"),
                                                                         "Entry Date" = FIELD("Date Filter"),
@@ -158,7 +157,7 @@ table 6014620 "NPR POS Entry Statistics"
         {
             CalcFormula = Sum("NPR POS Entry"."Amount Incl. Tax" WHERE("POS Store Code" = field("POS Store Filter"),
                                                                         "POS Unit No." = FIELD("POS Unit Filter"),
-                                                                        "Entry Type" = const(Other),
+                                                                        "Entry Type" = const(Balancing),
                                                                         "Customer No." = field("Customer Filter"),
                                                                         "Document No." = FIELD("Document Filter"),
                                                                         "Entry Date" = FIELD("Date Filter"),

@@ -940,7 +940,7 @@
         until (POSWorkshiftCheckpoint.Next() = 0);
     end;
 
-    local procedure SetTurnoverAndProfit(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
+    procedure SetTurnoverAndProfit(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
     var
         DocDeleted: Boolean;
     begin
@@ -1070,7 +1070,7 @@
         end;
     end;
 
-    local procedure SetDiscounts(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Entry Sales Line")
+    procedure SetDiscounts(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
 
         POSWorkshiftCheckpoint."Total Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
@@ -1094,7 +1094,7 @@
         end;
     end;
 
-    local procedure SetPayments(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSPaymentLine: Record "NPR POS Entry Payment Line"; LCYCode: Code[10])
+    procedure SetPayments(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSPaymentLine: Record "NPR POS Entry Payment Line"; LCYCode: Code[10])
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         IsLCY: Boolean;
