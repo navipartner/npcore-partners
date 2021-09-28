@@ -951,19 +951,18 @@
         InS: InStream;
         OutS: OutStream;
         base64Convert: Codeunit "Base64 Convert";
-        blobber: Codeunit "Temp Blob";
+        TempBlob: Codeunit "Temp Blob";
         filenameindex: Integer;
-        med: Record "Tenant Media";
-
+        TenantMedia: Record "Tenant Media";
     begin
         if DisplayContentLines.Picture.HasValue() then begin
-            blobber.CreateOutStream(OutS);
+            TempBlob.CreateOutStream(OutS);
             DisplayContentLines.Picture.ExportStream(OutS);
-            blobber.CreateInStream(InS);
+            TempBlob.CreateInStream(InS);
             Base64 := base64Convert.ToBase64(InS);
-            if (med.Get(DisplayContentLines.Picture.MediaId())) then begin
-                filenameindex := med.Description.LastIndexOf('.') + 1;
-                Extension := med.Description.Substring(filenameindex);
+            if (TenantMedia.Get(DisplayContentLines.Picture.MediaId())) then begin
+                filenameindex := TenantMedia.Description.LastIndexOf('.') + 1;
+                Extension := TenantMedia.Description.Substring(filenameindex);
             end;
 
         end;
