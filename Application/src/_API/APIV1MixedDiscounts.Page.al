@@ -18,7 +18,7 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
         {
             repeater(General)
             {
-                field(systemId; Rec.SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'systemId', Locked = true;
                 }

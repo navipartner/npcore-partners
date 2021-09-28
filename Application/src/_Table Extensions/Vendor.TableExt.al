@@ -121,6 +121,19 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             OptionCaption = 'Print,E-mail,,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
         }
+
+        field(6151479; "NPR Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
+    }
+
+    keys
+    {
+        key("NPR Key1"; "NPR Replication Counter")
+        {
+        }
     }
 }
 

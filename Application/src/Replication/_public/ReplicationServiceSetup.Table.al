@@ -242,7 +242,7 @@ table 6014588 "NPR Replication Service Setup"
     begin
         ServiceEndPoint.Setrange("Service Code", Rec."API Version");
         if not ServiceEndPoint.IsEmpty() then
-            ServiceEndPoint.DeleteAll();
+            ServiceEndPoint.DeleteAll(true);
 
         ReplicationAPI.DeleteNcImportType(Rec."API Version");
         ReplicationAPI.DeleteJobQueueEntries(Rec);
@@ -314,6 +314,7 @@ table 6014588 "NPR Replication Service Setup"
         ReplicationSetup: Record "NPR Replication Service Setup";
         ReplicationEndpoint: Record "NPR Replication Endpoint";
         ReplicationEndpoint2: Record "NPR Replication Endpoint";
+        SpecialFieldMapping: Record "NPR Rep. Special Field Mapping";
     begin
         ReplicationSetupList.LookupMode(true);
         ReplicationSetup.SetFilter("API Version", '<>%1', Rec."API Version");
@@ -333,6 +334,7 @@ table 6014588 "NPR Replication Service Setup"
                         ReplicationEndpoint2 := ReplicationEndpoint;
                         ReplicationEndpoint2."Service Code" := Rec."API Version";
                         ReplicationEndpoint2.Insert(true);
+                        SpecialFieldMapping.CopyFromEndpointToEndpoint(ReplicationEndpoint, ReplicationEndpoint2);
                     end;
                 until ReplicationEndpoint.Next() = 0;
         end;

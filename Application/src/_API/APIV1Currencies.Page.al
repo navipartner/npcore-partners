@@ -59,22 +59,22 @@ page 6014663 "NPR APIV1 - Currencies"
                     Caption = 'ISO Numeric Code';
                 }
 
-                field(unrealizedGainsAccount; Rec."Unrealized Gains Acc.")
+                field(unrealizedGainsAcc; Rec."Unrealized Gains Acc.")
                 {
                     Caption = 'Unrealized Gains Acc.';
                 }
 
-                field(realizedGainsAccount; Rec."Realized Gains Acc.")
+                field(realizedGainsAcc; Rec."Realized Gains Acc.")
                 {
                     Caption = 'Realized Gains Acc.';
                 }
 
-                field(unrealizedLossesAccount; Rec."Unrealized Losses Acc.")
+                field(unrealizedLossesAcc; Rec."Unrealized Losses Acc.")
                 {
                     Caption = 'Unrealized Losses Acc.';
                 }
 
-                field(realizedLossesAccount; Rec."Realized Losses Acc.")
+                field(realizedLossesAcc; Rec."Realized Losses Acc.")
                 {
                     Caption = 'Realized Losses Acc.';
                 }
@@ -144,17 +144,17 @@ page 6014663 "NPR APIV1 - Currencies"
                     Caption = 'Residual Losses Account';
                 }
 
-                field(convLCYRndgDebitAcc; Rec."Conv. LCY Rndg. Debit Acc.")
+                field(convLcyRndgDebitAcc; Rec."Conv. LCY Rndg. Debit Acc.")
                 {
                     Caption = 'Conv. LCY Rndg. Debit Acc.';
                 }
 
-                field(convLCYRndgCreditAcc; Rec."Conv. LCY Rndg. Credit Acc.")
+                field(convLcyRndgCreditAcc; Rec."Conv. LCY Rndg. Credit Acc.")
                 {
                     Caption = 'Conv. LCY Rndg. Credit Acc.';
                 }
 
-                field(maxVATDifferenceAllowed; Rec."Max. VAT Difference Allowed")
+                field(maxVatDifferenceAllowed; Rec."Max. VAT Difference Allowed")
                 {
                     Caption = 'Max. VAT Difference Allowed';
                 }

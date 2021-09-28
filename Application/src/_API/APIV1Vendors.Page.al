@@ -1,18 +1,18 @@
-page 6014507 "NPR APIV1 - Customers"
+page 6014410 "NPR APIV1 - Vendors"
 {
     APIGroup = 'core';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
-    ChangeTrackingAllowed = true;
     DelayedInsert = true;
-    EntityCaption = 'Customer';
-    EntitySetCaption = 'Customers';
-    EntityName = 'customer';
-    EntitySetName = 'customers';
+    EntityCaption = 'Vendor';
+    EntitySetCaption = 'Vendors';
+    EntityName = 'vendor';
+    EntitySetName = 'vendors';
     Extensible = false;
     ODataKeyFields = SystemId;
     PageType = API;
-    SourceTable = Customer;
+    SourceTable = Vendor;
+
     layout
     {
         area(content)
@@ -31,12 +31,9 @@ page 6014507 "NPR APIV1 - Customers"
                 field(displayName; Rec.Name)
                 {
                     Caption = 'Display Name';
-                    ShowMandatory = true;
 
                     trigger OnValidate()
                     begin
-                        if Rec.Name = '' then
-                            Error(BlankCustomerNameErr);
                         RegisterFieldSet(Rec.FieldNo(Name));
                     end;
                 }
@@ -44,14 +41,9 @@ page 6014507 "NPR APIV1 - Customers"
                 field(displayName2; Rec."Name 2")
                 {
                     Caption = 'Display Name 2';
-                }
-                field(type; Rec."Contact Type")
-                {
-                    Caption = 'Type';
-
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(Rec.FieldNo("Contact Type"));
+                        RegisterFieldSet(Rec.FieldNo("Name 2"));
                     end;
                 }
                 field(addressLine1; Rec.Address)
@@ -135,41 +127,15 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(Rec.FieldNo("Home Page"));
                     end;
                 }
-                field(taxLiable; Rec."Tax Liable")
-                {
-                    Caption = 'Tax Liable';
-
-                    trigger OnValidate()
-                    begin
-                        RegisterFieldSet(Rec.FieldNo("Tax Liable"));
-                    end;
-                }
-                field(taxAreaId; Rec."Tax Area ID")
-                {
-                    Caption = 'Tax Area Id';
-
-                    trigger OnValidate()
-                    var
-                        GeneralLedgerSetup: Record "General Ledger Setup";
-                    begin
-                        RegisterFieldSet(Rec.FieldNo("Tax Area ID"));
-
-                        if not GeneralLedgerSetup.UseVat() then
-                            RegisterFieldSet(Rec.FieldNo("Tax Area Code"))
-                        else
-                            RegisterFieldSet(Rec.FieldNo("VAT Bus. Posting Group"));
-                    end;
-                }
-
                 field(taxAreaCode; Rec."Tax Area Code")
                 {
                     Caption = 'Tax Area Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Tax Area Code"));
+                    end;
                 }
-                field(taxAreaDisplayName; TaxAreaDisplayNameGlobal)
-                {
-                    Caption = 'Tax Area Display Name';
-                    Editable = false;
-                }
+
                 field(taxRegistrationNumber; Rec."VAT Registration No.")
                 {
                     Caption = 'Tax Registration No.';
@@ -246,7 +212,6 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(Rec.FieldNo("Payment Terms Code"));
                     end;
                 }
-
                 field(paymentTermsCode; Rec."Payment Terms Code")
                 {
                     Caption = 'Payment Terms Code';
@@ -255,30 +220,6 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(Rec.FieldNo("Payment Terms Id"));
                         RegisterFieldSet(Rec.FieldNo("Payment Terms Code"));
                     end;
-                }
-                field(shipmentMethodId; Rec."Shipment Method Id")
-                {
-                    Caption = 'Shipment Method Id';
-
-                    trigger OnValidate()
-                    begin
-                        if Rec."Shipment Method Id" = BlankGUID then
-                            Rec."Shipment Method Code" := ''
-                        else begin
-                            if not ShipmentMethod.GetBySystemId(Rec."Shipment Method Id") then
-                                Error(ShipmentMethodIdDoesNotMatchAShipmentMethodErr);
-
-                            Rec."Shipment Method Code" := ShipmentMethod.Code;
-                        end;
-
-                        RegisterFieldSet(Rec.FieldNo("Shipment Method Id"));
-                        RegisterFieldSet(Rec.FieldNo("Shipment Method Code"));
-                    end;
-                }
-
-                field(shipmentMethodCode; Rec."Shipment Method Code")
-                {
-                    Caption = 'Shipment Method Code';
                 }
                 field(paymentMethodId; Rec."Payment Method Id")
                 {
@@ -299,24 +240,242 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(Rec.FieldNo("Payment Method Code"));
                     end;
                 }
-
                 field(paymentMethodCode; Rec."Payment Method Code")
                 {
                     Caption = 'Payment Method Code';
+                }
+                field(taxLiable; Rec."Tax Liable")
+                {
+                    Caption = 'Tax Liable';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Tax Liable"));
+                    end;
+                }
+                field(territoryCode; Rec."Territory Code")
+                {
+                    Caption = 'Territory Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Territory Code"));
+                    end;
+                }
+                field(purchaserCode; Rec."Purchaser Code")
+                {
+                    Caption = 'Purchaser Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Purchaser Code"));
+                    end;
+                }
+                field(locationCode; Rec."Location Code")
+                {
+                    Caption = 'Location Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Location Code"));
+                    end;
+                }
+                field(shipmentMethodCode; Rec."Shipment Method Code")
+                {
+                    Caption = 'Shipment Method Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Shipment Method Code"));
+                    end;
+                }
+                field(shippingAgentCode; Rec."Shipping Agent Code")
+                {
+                    Caption = 'Shipping Agent Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Shipping Agent Code"));
+                    end;
+                }
+
+                field(invoiceDiscCode; Rec."Invoice Disc. Code")
+                {
+                    Caption = 'Invoice Disc. Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Invoice Disc. Code"));
+                    end;
+                }
+
+                field(payToVendorNo; Rec."Pay-to Vendor No.")
+                {
+                    Caption = 'Pay-to Vendor No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Pay-to Vendor No."));
+                    end;
+                }
+                field(applicationMethod; Rec."Application Method")
+                {
+                    Caption = 'Application Method';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Application Method"));
+                    end;
+                }
+
+                field(partnerType; Rec."Partner Type")
+                {
+                    Caption = 'Partner Type';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Partner Type"));
+                    end;
+                }
+                field(pricesIncludingVAT; Rec."Prices Including VAT")
+                {
+                    Caption = 'Prices Including VAT';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Prices Including VAT"));
+                    end;
+                }
+                field(gln; Rec.GLN)
+                {
+                    Caption = 'GLN';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo(GLN));
+                    end;
+                }
+                field(blockPaymentTolerance; Rec."Block Payment Tolerance")
+                {
+                    Caption = 'Block Payment Tolerance';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Block Payment Tolerance"));
+                    end;
+                }
+                field(responsibilityCenter; Rec."Responsibility Center")
+                {
+                    Caption = 'Responsibility Center';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Responsibility Center"));
+                    end;
+                }
+                field(privacyBlocked; Rec."Privacy Blocked")
+                {
+                    Caption = 'Privacy Blocked';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Privacy Blocked"));
+                    end;
+                }
+                field(documentSendingProfile; Rec."Document Sending Profile")
+                {
+                    Caption = 'Document Sending Profile';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Document Sending Profile"));
+                    end;
+                }
+                field(icPartnerCode; Rec."IC Partner Code")
+                {
+                    Caption = 'IC Partner Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("IC Partner Code"));
+                    end;
+                }
+                field(prepaymentPct; Rec."Prepayment %")
+                {
+                    Caption = 'Prepayment %';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Prepayment %"));
+                    end;
+                }
+                field(creditorNo; Rec."Creditor No.")
+                {
+                    Caption = 'Creditor No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Creditor No."));
+                    end;
+                }
+                field(preferredBankAccountCode; Rec."Preferred Bank Account Code")
+                {
+                    Caption = 'Preferred Bank Account Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Preferred Bank Account Code"));
+                    end;
+                }
+                field(cashFlowPaymentTermsCode; Rec."Cash Flow Payment Terms Code")
+                {
+                    Caption = 'Cash Flow Payment Terms Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Cash Flow Payment Terms Code"));
+                    end;
+                }
+                field(primaryContactNo; Rec."Primary Contact No.")
+                {
+                    Caption = 'Primary Contact No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Primary Contact No."));
+                    end;
+                }
+                field(mobilePhoneNo; Rec."Mobile Phone No.")
+                {
+                    Caption = 'Mobile Phone No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Mobile Phone No."));
+                    end;
+                }
+
+                field(leadTimeCalculation; Rec."Lead Time Calculation")
+                {
+                    Caption = 'Lead Time Calculation';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Lead Time Calculation"));
+                    end;
                 }
 
                 field(priceCalculationMethod; Rec."Price Calculation Method")
                 {
                     Caption = 'Price Calculation Method';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Price Calculation Method"));
+                    end;
                 }
 
                 field(baseCalendarCode; Rec."Base Calendar Code")
                 {
                     Caption = 'Base Calendar Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Base Calendar Code"));
+                    end;
                 }
                 field(validateEUVatRegNo; Rec."Validate EU Vat Reg. No.")
                 {
                     Caption = 'Validate EU Vat Reg. No.';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Validate EU Vat Reg. No."));
+                    end;
+                }
+
+                field(overReceiptCode; Rec."Over-Receipt Code")
+                {
+                    Caption = 'Over-Receipt Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Over-Receipt Code"));
+                    end;
                 }
 
                 field(blocked; Rec.Blocked)
@@ -328,52 +487,36 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(Rec.FieldNo(Blocked));
                     end;
                 }
-
-                field(responsibilityCenter; Rec."Responsibility Center")
+                field(balance; Rec."Balance (LCY)")
                 {
-                    Caption = 'Responsibility Center';
+                    Caption = 'Balance';
                 }
 
-                field(privacyBlocked; Rec."Privacy Blocked")
+                field(languageCode; Rec."Language Code")
                 {
-                    Caption = 'Privacy Blocked';
-                }
-
-                field(documentSendingProfile; Rec."Document Sending Profile")
-                {
-                    Caption = 'Document Sending Profile';
-                }
-                field(icPartnerCode; Rec."IC Partner Code")
-                {
-                    Caption = 'IC Partner Code';
-                }
-
-                field(salespersonCode; Rec."Salesperson Code")
-                {
-                    Caption = 'Salesperson Code';
-                }
-                field(locationCode; Rec."Location Code")
-                {
-                    Caption = 'Location Code';
-                }
-                field(vatRegistrationNo; Rec."VAT Registration No.")
-                {
-                    Caption = 'VAT Registration No.';
-                }
-
-                field(invoiceCopies; Rec."Invoice Copies")
-                {
-                    Caption = 'Invoice Copies';
+                    Caption = 'Language Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Language Code"));
+                    end;
                 }
 
                 field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
                     Caption = 'Global Dimension 1 Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Global Dimension 1 Code"));
+                    end;
                 }
 
                 field(globalDimension2Code; Rec."Global Dimension 2 Code")
                 {
                     Caption = 'Global Dimension 2 Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Global Dimension 2 Code"));
+                    end;
                 }
 
                 field(genBusPostingGroup; Rec."Gen. Bus. Posting Group")
@@ -385,12 +528,12 @@ page 6014507 "NPR APIV1 - Customers"
                     end;
                 }
 
-                field(customerPostingGroup; Rec."Customer Posting Group")
+                field(vendorPostingGroup; Rec."Vendor Posting Group")
                 {
-                    Caption = 'Customer Posting Group';
+                    Caption = 'Vendor Posting Group';
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(Rec.FieldNo("Customer Posting Group"));
+                        RegisterFieldSet(Rec.FieldNo("Vendor Posting Group"));
                     end;
                 }
 
@@ -403,127 +546,13 @@ page 6014507 "NPR APIV1 - Customers"
                     end;
                 }
 
-                field(customerPriceGroup; Rec."Customer Price Group")
-                {
-                    Caption = 'Customer Price Group';
-                }
-
-                field(invoiceDiscCode; Rec."Invoice Disc. Code")
-                {
-                    Caption = 'Invoice Disc. Code';
-                }
-
-                field(pricesIncludingVAT; Rec."Prices Including VAT")
-                {
-                    Caption = 'Prices Including VAT';
-                }
-
-                field(customerDiscGroup; Rec."Customer Disc. Group")
-                {
-                    Caption = 'Customer Disc. Group';
-                }
-                field(allowLineDisc; Rec."Allow Line Disc.")
-                {
-                    Caption = 'Allow Line Disc.';
-                }
-
-                field(languageCode; Rec."Language Code")
-                {
-                    Caption = 'Language Code';
-                }
-
-                field(combineShipments; Rec."Combine Shipments")
-                {
-                    Caption = 'Combine Shipments';
-                }
-
-                field(gln; Rec.GLN)
-                {
-                    Caption = 'GLN';
-                }
-
-                field(creditLimitLCY; Rec."Credit Limit (LCY)")
-                {
-                    Caption = 'Credit Limit (LCY)';
-                }
-
-                field(prepaymentPct; Rec."Prepayment %")
-                {
-                    Caption = 'Prepayment %';
-                }
-
-                field(applicationMethod; Rec."Application Method")
-                {
-                    Caption = 'Application Method';
-                }
-
-                field(partnerType; Rec."Partner Type")
-                {
-                    Caption = 'Partner Type';
-                }
-
-                field(reminderTermsCode; Rec."Reminder Terms Code")
-                {
-                    Caption = 'Reminder Terms Code';
-                }
-
                 field(finChargeTermsCode; Rec."Fin. Charge Terms Code")
                 {
-                    Caption = 'Finance Charge Terms Code';
-                }
-
-                field(blockPaymentTolerance; Rec."Block Payment Tolerance")
-                {
-                    Caption = 'Block Payment Tolerance';
-                }
-
-                field(billToCustomerNo; Rec."Bill-to Customer No.")
-                {
-                    Caption = 'Bill-to Customer No.';
-                }
-                field(nprAnonymized; Rec."NPR Anonymized")
-                {
-                    Caption = 'NPR Anonymized';
-                }
-
-                field(nprAnonymizedDate; Rec."NPR Anonymized Date")
-                {
-                    Caption = 'NPR Anonymized Date';
-                }
-
-                field(nprExternalCustomerNo; Rec."NPR External Customer No.")
-                {
-                    Caption = 'NPR External Customer No.';
-                }
-
-                field(nprMagentoDisplayGroup; Rec."NPR Magento Display Group")
-                {
-                    Caption = 'NPR Magento Display Group';
-                }
-
-                field(nprMagentoPaymentGroup; Rec."NPR Magento Payment Group")
-                {
-                    Caption = 'NPR Magento Payment Group';
-                }
-
-                field(nprMagentoShippingGroup; Rec."NPR Magento Shipping Group")
-                {
-                    Caption = 'NPR Magento Shipping Group';
-                }
-
-                field(nprMagentoStoreCode; Rec."NPR Magento Store Code")
-                {
-                    Caption = 'NPR Magento Store Code';
-                }
-
-                field(nprToAnonymize; Rec."NPR To Anonymize")
-                {
-                    Caption = 'NPR To Anonymize';
-                }
-
-                field(nprToAnonymizeOn; Rec."NPR To Anonymize On")
-                {
-                    Caption = 'NPR To Anonymize On';
+                    Caption = 'Fin. Charge Terms Code';
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Fin. Charge Terms Code"));
+                    end;
                 }
 
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
@@ -536,18 +565,6 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'replicationCounter', Locked = true;
                 }
 
-                part(customerFinancialDetails; "NPR APIV1 - Cust Fin Details")
-                {
-#IF BC17            // Multiplicity can be used only with platform version 6.3;
-                    Caption = 'Multiplicity=ZeroOrOne';
-#ELSE
-                    Caption = 'Customer Financial Details';
-                    Multiplicity = ZeroOrOne;
-#ENDIF
-                    EntityName = 'customerFinancialDetail';
-                    EntitySetName = 'customerFinancialDetails';
-                    SubPageLink = SystemId = Field(SystemId);
-                }
                 part(picture; "NPR APIV1 - Pictures")
                 {
 #IF BC17            // Multiplicity can be used only with platform version 6.3;
@@ -558,30 +575,31 @@ page 6014507 "NPR APIV1 - Customers"
 #ENDIF
                     EntityName = 'picture';
                     EntitySetName = 'pictures';
-                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(1);
+                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(3);
                 }
                 part(defaultDimensions; "NPR APIV1 - Default Dimensions")
                 {
                     Caption = 'Default Dimensions';
                     EntityName = 'defaultDimension';
                     EntitySetName = 'defaultDimensions';
-                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(1);
+                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(3);
                 }
-                // part(agedAccountsReceivable; "APIV2 - Aged AR")
-                // {
-                //     Caption = 'Aged Accounts Receivable';
-                //     Multiplicity = ZeroOrOne;
-                //     EntityName = 'agedAccountsReceivable';
-                //     EntitySetName = 'agedAccountsReceivables';
-                //     SubPageLink = AccountId = Field(SystemId);
-                // }
-                // part(contactsInformation; "APIV2 - Contacts Information")
-                // {
-                //     Caption = 'Contacts Information';
-                //     EntityName = 'contactInformation';
-                //     EntitySetName = 'contactsInformation';
-                //     SubPageLink = "Related Id" = field(SystemId), "Related Type" = const(1);
-                // }
+
+                //part(agedAccountsPayable; "APIV2 - Aged AP")
+                //{
+                //    Caption = 'Aged Accounts Payable';
+                //    Multiplicity = ZeroOrOne;
+                //    EntityName = 'agedAccountsPayable';
+                //    EntitySetName = 'agedAccountsPayables';
+                //    SubPageLink = AccountId = Field(SystemId);
+                //}
+                //part(contactsInformation; "APIV2 - Contacts Information")
+                //{
+                //  Caption = 'Contacts Information';
+                //    EntityName = 'contactInformation';
+                //    EntitySetName = 'contactsInformation';
+                //    SubPageLink = "Related Id" = field(SystemId), "Related Type" = const(2);
+                //}
             }
         }
     }
@@ -590,6 +608,11 @@ page 6014507 "NPR APIV1 - Customers"
     {
     }
 
+    trigger OnInit()
+    begin
+        CurrentTransactionType := TransactionType::Update;
+    end;
+
     trigger OnAfterGetRecord()
     begin
         SetCalculatedFields();
@@ -597,14 +620,11 @@ page 6014507 "NPR APIV1 - Customers"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var
-        Customer: Record Customer;
+        Vendor: Record Vendor;
         RecRef: RecordRef;
     begin
-        if Rec.Name = '' then
-            Error(NotProvidedCustomerNameErr);
-
-        Customer.SetRange("No.", Rec."No.");
-        if not Customer.IsEmpty() then
+        Vendor.SetRange("No.", Rec."No.");
+        if not Vendor.IsEmpty() then
             Rec.Insert();
 
         Rec.Insert(true);
@@ -620,16 +640,16 @@ page 6014507 "NPR APIV1 - Customers"
 
     trigger OnModifyRecord(): Boolean
     var
-        Customer: Record Customer;
+        Vendor: Record Vendor;
     begin
-        Customer.GetBySystemId(Rec.SystemId);
+        Vendor.GetBySystemId(Rec.SystemId);
 
-        if Rec."No." = Customer."No." then
+        if Rec."No." = Vendor."No." then
             Rec.Modify(true)
         else begin
-            Customer.TransferFields(Rec, false);
-            Customer.Rename(Rec."No.");
-            Rec.TransferFields(Customer);
+            Vendor.TransferFields(Rec, false);
+            Vendor.Rename(Rec."No.");
+            Rec.TransferFields(Vendor);
         end;
 
         SetCalculatedFields();
@@ -643,53 +663,37 @@ page 6014507 "NPR APIV1 - Customers"
     var
         Currency: Record Currency;
         PaymentTerms: Record "Payment Terms";
-        ShipmentMethod: Record "Shipment Method";
         PaymentMethod: Record "Payment Method";
         TempFieldSet: Record 2000000041 temporary;
         GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
         LCYCurrencyCode: Code[10];
         CurrencyCodeTxt: Text;
-        TaxAreaDisplayNameGlobal: Text;
         CurrencyValuesDontMatchErr: Label 'The currency values do not match to a specific Currency.';
         CurrencyIdDoesNotMatchACurrencyErr: Label 'The "currencyId" does not match to a Currency.', Comment = 'currencyId is a field name and should not be translated.';
         CurrencyCodeDoesNotMatchACurrencyErr: Label 'The "currencyCode" does not match to a Currency.', Comment = 'currencyCode is a field name and should not be translated.';
         PaymentTermsIdDoesNotMatchAPaymentTermsErr: Label 'The "paymentTermsId" does not match to a Payment Terms.', Comment = 'paymentTermsId is a field name and should not be translated.';
-        ShipmentMethodIdDoesNotMatchAShipmentMethodErr: Label 'The "shipmentMethodId" does not match to a Shipment Method.', Comment = 'shipmentMethodId is a field name and should not be translated.';
         PaymentMethodIdDoesNotMatchAPaymentMethodErr: Label 'The "paymentMethodId" does not match to a Payment Method.', Comment = 'paymentMethodId is a field name and should not be translated.';
         BlankGUID: Guid;
-        NotProvidedCustomerNameErr: Label 'A "displayName" must be provided.', Comment = 'displayName is a field name and should not be translated.';
-        BlankCustomerNameErr: Label 'The blank "displayName" is not allowed.', Comment = 'displayName is a field name and should not be translated.';
-
-
-    trigger OnInit()
-    begin
-        CurrentTransactionType := TransactionType::Update;
-    end;
 
     local procedure SetCalculatedFields()
-    var
-        TaxAreaBuffer: Record "Tax Area Buffer";
     begin
         CurrencyCodeTxt := GraphMgtGeneralTools.TranslateNAVCurrencyCodeToCurrencyCode(LCYCurrencyCode, Rec."Currency Code");
-        TaxAreaDisplayNameGlobal := TaxAreaBuffer.GetTaxAreaDisplayName(Rec."Tax Area ID");
     end;
 
     local procedure ClearCalculatedFields()
     begin
         Clear(Rec.SystemId);
-        Clear(TaxAreaDisplayNameGlobal);
         TempFieldSet.DeleteAll();
     end;
 
     local procedure RegisterFieldSet(FieldNo: Integer)
     begin
-        if TempFieldSet.Get(Database::Customer, FieldNo) then
+        if TempFieldSet.Get(Database::Vendor, FieldNo) then
             exit;
 
         TempFieldSet.Init();
-        TempFieldSet.TableNo := Database::Customer;
+        TempFieldSet.TableNo := Database::Vendor;
         TempFieldSet.Validate("No.", FieldNo);
         TempFieldSet.Insert(true);
     end;
 }
-
