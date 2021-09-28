@@ -19,7 +19,7 @@ page 6014525 "NPR API V1 - Item Reference"
         {
             repeater(General)
             {
-                field(systemId; Rec.SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'systemId', Locked = true;
                 }
@@ -56,10 +56,12 @@ page 6014525 "NPR API V1 - Item Reference"
                     Caption = 'description2', Locked = true;
                 }
 #IF BC17
+#pragma warning disable AL0432
                 field(discontinueBarCode; Rec."Discontinue Bar Code")
                 {
                     Caption = 'discontinueBarCode', Locked = true;
                 }
+#pragma warning disable AL0432
 #ENDIF
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {

@@ -502,7 +502,7 @@ page 6014501 "NPR APIV1 - Items"
                 {
                     Caption = 'Special Price';
                 }
-                field(nprSpecialPricenprFrom; Rec."NPR Special Price From")
+                field(nprSpecialPriceFrom; Rec."NPR Special Price From")
                 {
                     Caption = 'Special Price From';
                 }
@@ -576,7 +576,7 @@ page 6014501 "NPR APIV1 - Items"
                 {
 
 #IF BC17            // Multiplicity can be used only with platform version 6.3;
-                    CaptionML = ENU = 'Multiplicity=ZeroOrOne';
+                    Caption = 'Multiplicity=ZeroOrOne';
 #ELSE
                     Caption = 'Unit Of Measure';
                     Multiplicity = ZeroOrOne;
@@ -588,7 +588,7 @@ page 6014501 "NPR APIV1 - Items"
                 part(picture; "NPR APIV1 - Pictures")
                 {
 #IF BC17            // Multiplicity can be used only with platform version 6.3;
-                    CaptionML = ENU = 'Multiplicity=ZeroOrOne';
+                    Caption = 'Multiplicity=ZeroOrOne';
 #ELSE
                     Caption = 'Picture';
                     Multiplicity = ZeroOrOne;

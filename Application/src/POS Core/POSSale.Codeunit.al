@@ -14,7 +14,6 @@
         Initialized: Boolean;
         Ended: Boolean;
         LastSaleRetrieved: Boolean;
-
         SetDimension01: Label 'Dimension %1 does not exist';
         SetDimension02: Label 'Dimension Value %1 does not exist for dimension %2';
         EndedSalesAmount: Decimal;
@@ -49,21 +48,6 @@
         OnAfterInitSale(Rec, FrontEnd);
 
         FrontEnd.StartTransaction(Rec);
-    end;
-
-    procedure InitializeNewWSSale(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
-    begin
-        // for POS Sales created via Web Service API we do not use FrontEnd part, but need to create and use a POS Sale Initialization for reusing existing code
-        Initialized := true;
-
-        POSUnit := POSUnitIn;
-        Setup := SetupIn;
-        This := ThisIn;
-
-        Clear(Rec);
-        Clear(LastSaleRetrieved);
-
-        InitSale();
     end;
 
     local procedure InitSale()
@@ -643,21 +627,6 @@
         OnAfterResumeSale(Rec, FrontEnd);
 
         FrontEnd.StartTransaction(Rec);
-    end;
-
-    procedure ResumeExistingWSSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
-    begin
-        // for POS Sales created via Web Service API we do not use FrontEnd part, but need to create and use a POS Sale for reusing existing code
-        Initialized := true;
-
-        POSUnit := POSUnitIn;
-        Setup := SetupIn;
-        This := ThisIn;
-
-        Clear(Rec);
-        Clear(LastSaleRetrieved);
-
-        ResumeSale(SalePOS_ToResume);
     end;
 
     local procedure ResumeSale(SalePOS_ToResume: Record "NPR POS Sale")

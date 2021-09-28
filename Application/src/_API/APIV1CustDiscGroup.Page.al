@@ -6,8 +6,8 @@ page 6014649 "NPR APIV1 - Cust Disc. Group"
     APIVersion = 'v1.0';
     Caption = 'Customer Discount Group';
     DelayedInsert = true;
-    EntityName = 'custDiscountGroup';
-    EntitySetName = 'custDiscountGroups';
+    EntityName = 'customerDiscountGroup';
+    EntitySetName = 'customerDiscountGroups';
     ODataKeyFields = SystemId;
     PageType = API;
     SourceTable = "Customer Discount Group";

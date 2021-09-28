@@ -26,6 +26,11 @@ page 6014500 "NPR Replication Endpoints"
                     ToolTip = 'Specifies Endpoint Method.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Table ID"; Rec."Table ID")
+                {
+                    ToolTip = 'Specifies Table ID.';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies Description of the Endpoint';
@@ -66,6 +71,18 @@ page 6014500 "NPR Replication Endpoints"
                     ToolTip = 'Used to get records from related company that have changed since the last synchronization.';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Run OnInsert Trigger"; Rec."Run OnInsert Trigger")
+                {
+                    ToolTip = 'Specifies if OnInsert trigger runs when inserting a new record.';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field("Run OnModify Trigger"; Rec."Run OnModify Trigger")
+                {
+                    ToolTip = 'Specifies if OnModify trigger runs when inserting a new record.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
@@ -74,6 +91,21 @@ page 6014500 "NPR Replication Endpoints"
     {
         area(Processing)
         {
+
+            action(SpecialFieldMappings)
+            {
+                Caption = 'Special Field Mappings';
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                Image = MapAccounts;
+                ToolTip = 'Open Special Field Mappings.';
+                trigger OnAction()
+                begin
+                    Rec.OpenSpecialFieldMappings();
+                end;
+            }
             action(OpenCard)
             {
                 Caption = 'Open Card';
@@ -104,7 +136,6 @@ page 6014500 "NPR Replication Endpoints"
                     ReplicationAPI.ShowErrorLogEntries(Rec."Service Code", Rec."EndPoint ID");
                 end;
             }
-
             action("Run Import")
             {
                 ApplicationArea = NPRRetail;
@@ -118,6 +149,5 @@ page 6014500 "NPR Replication Endpoints"
                 end;
             }
         }
-
     }
 }

@@ -335,6 +335,24 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         exit(JToken.AsValue().AsText());
     end;
 
+    procedure SelectJsonToken(JObject: JsonObject; Path: text; var TokenValue: text): Boolean
+    var
+        JToken: JsonToken;
+    begin
+        // selects value from JsonObject
+        IF not JObject.SelectToken(Path, JToken) then
+            Exit(false);
+
+        IF JToken.IsObject() OR Jtoken.IsArray() then
+            exit(true); //is found, but we cannot read the text value
+
+        IF JToken.AsValue().IsNull() then
+            Exit(true);
+
+        TokenValue := JToken.AsValue().AsText();
+        Exit(true);
+    end;
+
     procedure SelectJsonToken(JObject: JsonObject; Path: text; SkipMissingFieldError: Boolean): Text
     var
         JToken: JsonToken;

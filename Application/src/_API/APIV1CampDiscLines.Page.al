@@ -19,7 +19,7 @@ page 6014476 "NPR APIV1 - Camp. Disc. Lines"
         {
             repeater(General)
             {
-                field(systemId; Rec.SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'systemId', Locked = true;
                 }

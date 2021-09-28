@@ -19,7 +19,7 @@ page 6014535 "NPR APIV1 - Variety Value"
         {
             repeater(General)
             {
-                field(systemId; Rec.SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'systemId', Locked = true;
                 }

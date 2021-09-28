@@ -6,8 +6,8 @@ page 6014641 "NPR APIV1 Cust. Price Groups"
     APIVersion = 'v1.0';
     Caption = 'apiv1CustPriceGroups';
     DelayedInsert = true;
-    EntityName = 'custPriceGroup';
-    EntitySetName = 'custPriceGroups';
+    EntityName = 'customerPrGroup';
+    EntitySetName = 'customerPriceGroups';
     ODataKeyFields = SystemId;
     PageType = API;
     SourceTable = "Customer Price Group";

@@ -19,7 +19,7 @@ page 6014529 "NPR APIV1 - Variety"
         {
             repeater(General)
             {
-                field(systemId; Rec.SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'systemId', Locked = true;
                 }
@@ -47,7 +47,6 @@ page 6014529 "NPR APIV1 - Variety"
                 {
                     Caption = 'systemModifiedAt', Locked = true;
                 }
-
                 field(replicationCounter; Rec."Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;

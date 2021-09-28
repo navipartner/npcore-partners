@@ -19,7 +19,7 @@ page 6014482 "NPR API V1 - Mix. Disc. Levels"
         {
             repeater(General)
             {
-                field(systemId; Rec.SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'systemId', Locked = true;
                 }

@@ -27,7 +27,6 @@ page 6014544 "NPR API V1 - Price Lists"
                 {
                     Caption = 'Code';
                 }
-
                 field(priceType; Rec."Price Type")
                 {
                     Caption = 'Price Type';

@@ -39,8 +39,11 @@ table 6014589 "NPR Replication Endpoint"
             Caption = 'Enabled';
             trigger OnValidate()
             begin
-                IF Rec.Enabled then
+                IF Rec.Enabled then begin
                     Rec.TestField(Path);
+                    IF Rec."Endpoint Method" = Rec."Endpoint Method"::"Get BC Generic Data" then
+                        Rec.TestField("Table ID");
+                end;
             end;
         }
         field(7; "Sequence Order"; Integer)
@@ -56,6 +59,40 @@ table 6014589 "NPR Replication Endpoint"
         {
             DataClassification = CustomerContent;
             Caption = 'Endpoint Method';
+            trigger OnValidate()
+            begin
+                Rec.TestField(Enabled, false);
+            end;
+        }
+        field(10; "Table ID"; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Table ID';
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
+            trigger OnValidate()
+            var
+                Mapping: Record "NPR Rep. Special Field Mapping";
+            begin
+                Rec.TestField(Enabled, false);
+                IF CheckMappingExistForEndpoint(Mapping) then
+                    Error(SpecialFieldMappingExistErr);
+            end;
+        }
+
+        field(12; "Run OnInsert Trigger"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Run OnInsert Trigger';
+            trigger OnValidate()
+            begin
+                Rec.TestField(Enabled, false);
+            end;
+        }
+
+        field(13; "Run OnModify Trigger"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Run OnModify Trigger';
             trigger OnValidate()
             begin
                 Rec.TestField(Enabled, false);
@@ -99,6 +136,7 @@ table 6014589 "NPR Replication Endpoint"
 
     var
         RenameNotAllowedErr: Label 'Rename not allowed. Instead, delete and recreate record.';
+        SpecialFieldMappingExistErr: Label 'One or more special Field Mappings exist for this endpoint.';
 
     trigger OnRename()
     begin
@@ -106,11 +144,14 @@ table 6014589 "NPR Replication Endpoint"
     end;
 
     trigger OnDelete()
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
     begin
-        Rec.TestField(Enabled, false);
+        IF CheckMappingExistForEndpoint(Mapping) then
+            Mapping.DeleteAll(true);
     end;
 
-    procedure RegisterServiceEndPoint(pServiceCode: Code[20]; pEndPointID: Text[50]; pPath: Text[250]; pDescription: Text[100]; pEnabled: Boolean; pSeqOrder: Integer; pEndPointMethod: Enum "NPR Replication EndPoint Meth"; pReplicationCounter: BigInteger; pOdataMaxPageSize: Integer)
+    procedure RegisterServiceEndPoint(pServiceCode: Code[20]; pEndPointID: Text[50]; pPath: Text[250]; pDescription: Text[100]; pEnabled: Boolean; pSeqOrder: Integer; pEndPointMethod: Enum "NPR Replication EndPoint Meth"; pReplicationCounter: BigInteger; pOdataMaxPageSize: Integer; pTableId: Integer; pRunInsert: Boolean; pRunModify: Boolean)
     begin
         Rec."Service Code" := pServiceCode;
         Rec."EndPoint ID" := pEndPointID;
@@ -126,14 +167,49 @@ table 6014589 "NPR Replication Endpoint"
         Rec."odata.maxpagesize" := pOdataMaxPageSize;
         Rec."Replication Counter" := pReplicationCounter;
         Rec."Skip Import Entry No Data Resp" := true;
+        Rec."Table ID" := pTableId;
+        Rec."Run OnInsert Trigger" := pRunInsert;
+        Rec."Run OnModify Trigger" := pRunModify;
 
         OnRegisterServiceEndPointOnBeforeInsert();
 
         Rec.Insert();
+
+        OnRegisterServiceEndPointOnAfterInsert();
+    end;
+
+    procedure CheckMappingExistForEndpoint(var Mapping: Record "NPR Rep. Special Field Mapping"): Boolean
+    begin
+        Mapping.SetRange("Service Code", Rec."Service Code");
+        Mapping.SetRange("EndPoint ID", Rec."EndPoint ID");
+        Mapping.SetRange("Table ID", Rec."Table ID");
+        exit(NOT Mapping.IsEmpty());
+    end;
+
+    procedure OpenSpecialFieldMappings()
+    var
+        SpecFieldMappingsPage: Page "NPR Rep. Spec. Field Mappings";
+        SpecFieldMappingsRec: Record "NPR Rep. Special Field Mapping";
+    begin
+        Rec.TestField("Table ID");
+        SpecFieldMappingsRec.FilterGroup(2);
+        SpecFieldMappingsRec.SetRange("Service Code", Rec."Service Code");
+        SpecFieldMappingsRec.SetRange("EndPoint ID", Rec."EndPoint ID");
+        SpecFieldMappingsRec.SetRange("Table ID", Rec."Table ID");
+        SpecFieldMappingsRec.FilterGroup(0);
+        SpecFieldMappingsPage.SetTableView(SpecFieldMappingsRec);
+        SpecFieldMappingsPage.SetFieldsNonEditable();
+        SpecFieldMappingsPage.SetReplicationEndpoint(Rec);
+        SpecFieldMappingsPage.RunModal();
     end;
 
     [IntegrationEvent(true, false)]
     local procedure OnRegisterServiceEndPointOnBeforeInsert()
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnRegisterServiceEndPointOnAfterInsert()
     begin
     end;
 }
