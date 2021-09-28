@@ -1,0 +1,511 @@
+codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEndpoint Meth"
+{
+    Access = Internal;
+
+    var
+        DefaultFileNameLbl: Label '%1_%2';
+        ImageCouldNotBeReadErr: Label 'Image for %1 could not be read. Please check Replication Error Log Entry No. %2 for more details';
+        BLOBCouldNotBeReadErr: Label 'Blob field %1 for record %2 could not be read. Please check Replication Error Log Entry No. %3 for more details';
+        PKFieldErr: Label 'Could not find Primary Key field %1 in the API Response';
+        GetItemVariantsEventSubs: Codeunit "NPR Rep. Get Item Var. Subs.";
+
+    procedure SendRequest(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; var URI: Text; var NextLinkURI: Text)
+    var
+    begin
+        GetBCData(ReplicationSetup, ReplicationEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
+    end;
+
+    local procedure GetBCData(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; var URI: Text; var NextLinkURI: Text)
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+    begin
+        // each entity can have it's own 'Get' logic
+        URI := ReplicationAPI.CreateURI(ReplicationSetup, ReplicationEndPoint, NextLinkURI);
+        ReplicationAPI.GetBCAPIResponse(ReplicationSetup, ReplicationEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
+    end;
+
+    procedure ProcessImportedContent(Content: Codeunit "Temp Blob"; ReplicationEndPoint: Record "NPR Replication Endpoint"): Boolean
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+        JTokenEntity: JsonToken;
+        i: integer;
+    begin
+        IF ReplicationEndPoint."Table ID" = 0 then
+            exit;
+
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit;
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit;
+
+        BindEventSubscribersForReplication();
+
+        for i := 0 to JArrayValues.Count - 1 do begin
+            JArrayValues.Get(i, JTokenEntity);
+            HandleArrayElementEntity(JTokenEntity, ReplicationEndPoint);
+        end;
+
+        ReplicationAPI.UpdateReplicationCounter(JTokenEntity, ReplicationEndPoint);
+
+        UnBindEventSubscribersForReplication();
+    end;
+
+    local procedure HandleArrayElementEntity(JToken: JsonToken; ReplicationEndPoint: Record "NPR Replication Endpoint")
+    var
+        TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping" temporary;
+        ReplicationAPI: Codeunit "NPR Replication API";
+        RecRef: RecordRef;
+    begin
+        IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
+            exit;
+
+        InitializeTempSpecialFieldMapping(TempSpecialFieldMapping, ReplicationEndPoint);
+        InitializeRecRef(RecRef, JToken, TempSpecialFieldMapping, ReplicationEndPoint);
+        IF CheckFieldsChanged(RecRef, JToken, TempSpecialFieldMapping, ReplicationEndPoint) then begin
+            RecRef.Modify(ReplicationEndPoint."Run OnModify Trigger");
+            OnAfterRecordIsModified(RecRef, ReplicationEndPoint);
+        end;
+    end;
+
+    local procedure InitializeRecRef(var RecRef: RecordRef; JToken: JsonToken; var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping" temporary; ReplicationEndPoint: Record "NPR Replication Endpoint")
+    var
+        TempPKField: Record Field temporary;
+        TempFoundAPIField: Record "NPR Rep. Special Field Mapping" temporary;
+        RecRef2: RecordRef;
+        FieldRec: Record Field;
+        SystemId: Text;
+        SourceText: Text;
+        RecFoundBySystemId: Boolean;
+        ReplicationAPI: Codeunit "NPR Replication API";
+        NeedsRename: Boolean;
+    begin
+        RecRef.Open(ReplicationEndPoint."Table ID");
+        GetPrimaryKeyFields(RecRef, TempPKField);
+        IF FieldRec.Get(RecRef.Number, 2000000000) then //SystemId;
+            IF GetSourceTxt(FieldRec, JToken, SystemId, TempSpecialFieldMapping, TempFoundAPIField) then
+                IF RecRef.GetBySystemId(SystemId) then begin
+                    RecFoundBySystemId := true;
+                    RecRef2 := RecRef.Duplicate();
+                    IF TempPKField.FindSet() then
+                        repeat // check if existing record was renamed
+                            IF GetSourceTxt(TempPKField, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
+                                IF ReplicationAPI.CheckFieldValue(RecRef2, TempPKField."No.", SourceText, false) then
+                                    NeedsRename := true;
+                        until TempPKField.Next() = 0;
+
+                    If NeedsRename then begin
+                        RecRef.Delete();
+                        RecFoundBySystemId := false;
+                    end;
+                end;
+
+        IF Not RecFoundBySystemId then
+            FindRecByPKFields(RecRef, JToken, SystemId, TempPKField, TempSpecialFieldMapping, ReplicationEndPoint);
+    end;
+
+    local procedure GetPrimaryKeyFields(var RecRef: RecordRef; var TempPKField: Record Field temporary)
+    var
+        FRef: FieldRef;
+        i: Integer;
+    begin
+        for i := 1 to RecRef.KeyIndex(1).FieldCount() do begin
+            FRef := RecRef.KeyIndex(1).FieldIndex(i);
+            TempPKField.Init();
+            TempPKField.TableNo := RecRef.Number;
+            TempPKField."No." := FRef.Number;
+            TempPKField.FieldName := FRef.Name;
+            Evaluate(TempPKField.Type, Format(FRef.Type));
+            TempPKField.Len := FRef.Length;
+            TempPKField.Insert();
+        end;
+    end;
+
+    local procedure FindRecByPKFields(var RecRef: RecordRef; JToken: JsonToken; SystemID: Text; var TempPKField: Record Field; var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping"; ReplicationEndpoint: Record "NPR Replication Endpoint")
+    var
+        TempFoundAPIField: Record "NPR Rep. Special Field Mapping" temporary;
+        ReplicationAPI: Codeunit "NPR Replication API";
+        SourceText: Text;
+    begin
+        IF TempPKField.FindSet() then begin
+            repeat
+                IF GetSourceTxt(TempPKField, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
+                    ReplicationAPI.CheckFieldValue(RecRef, TempPKField."No.", SourceText, TempFoundAPIField."With Validation")
+                Else
+                    Error(PKFieldErr, TempPKField.FieldName);
+            until TempPKField.Next() = 0;
+
+            IF NOT RecRef.Find('=') then
+                InsertNewRec(RecRef, SystemID, ReplicationEndpoint);
+        end;
+    end;
+
+    local procedure InsertNewRec(var RecRef: RecordRef; SystemID: Text; ReplicationEndpoint: Record "NPR Replication Endpoint")
+    var
+        SysIdGuid: GUID;
+        FRef: FieldRef;
+    begin
+        IF SystemID <> '' then begin
+            FRef := RecRef.Field(2000000000); // systemId
+            IF Evaluate(SysIdGuid, SystemID) then begin
+                FRef.Value := SysIdGuid;
+                RecRef.Insert(ReplicationEndpoint."Run OnInsert Trigger", true);
+            end else
+                RecRef.Insert(ReplicationEndpoint."Run OnInsert Trigger");
+        end else
+            RecRef.Insert(ReplicationEndpoint."Run OnInsert Trigger");
+    end;
+
+    local procedure CheckFieldsChanged(var RecRef: RecordRef; JToken: JsonToken; var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping"; ReplicationEndPoint: Record "NPR Replication Endpoint") FieldsChanged: Boolean
+    var
+        TempFoundAPIField: Record "NPR Rep. Special Field Mapping" temporary;
+        ReplicationAPI: Codeunit "NPR Replication API";
+        Client: HttpClient; // reuse HttpClient for Blob/Media/MediaSet requests for better performance and to avoid potential errors
+        FieldRec: Record Field;
+        SourceText: Text;
+    begin
+        FieldRec.SetRange(TableNo, RecRef.Number);
+        FieldRec.SetRange(Class, FieldRec.Class::Normal);
+        FieldRec.SetRange(Enabled, true);
+        FieldRec.SetRange(IsPartOfPrimaryKey, false);
+        FieldRec.SetFilter(ObsoleteState, '<>%1', FieldRec.ObsoleteState::Removed);
+        FieldRec.SetFilter(Type, '<>%1&<>%2&<>%3', FieldRec.Type::Binary, FieldRec.Type::TableFilter, FieldRec.Type::RecordID);
+        IF FieldRec.FindSet() then
+            repeat
+                IF GetSourceTxt(FieldRec, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
+                    IF Not TempFoundAPIField.Skip then
+                        case FieldRec.Type of
+                            FieldRec.Type::Media, FieldRec.Type::MediaSet:
+                                If CheckImage(JToken, RecRef, ReplicationEndPoint, TempFoundAPIField, Client) then
+                                    FieldsChanged := true;
+                            FieldRec.Type::BLOB:
+                                IF CheckBLOB(RecRef, FieldRec."No.", SourceText, TempFoundAPIField, ReplicationEndPoint, Client) then
+                                    FieldsChanged := true;
+                            else
+                                IF ReplicationAPI.CheckFieldValue(RecRef, FieldRec."No.", SourceText, TempFoundAPIField."With Validation") then
+                                    FieldsChanged := true;
+                        end;
+            until FieldRec.Next() = 0;
+    end;
+
+    local procedure GetSourceTxt(FieldRec: Record Field; JToken: JsonToken; var SourceText: Text; var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping"; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        TextFunctions: Codeunit "NPR Text Functions";
+        APIPageFieldName: Text;
+    begin
+        Clear(TempFoundAPIField);
+        Clear(SourceText);
+        //try find by Replication Special Name Mappings settings
+        TempSpecialFieldMapping.SetRange("Field ID", FieldRec."No.");
+        IF TempSpecialFieldMapping.FindSet() then
+            repeat
+                IF ReplicationAPI.SelectJsonToken(JToken.AsObject(), GetJPathFieldFromSpecialFieldMapping(TempSpecialFieldMapping), SourceText) then begin
+                    TempFoundAPIField := TempSpecialFieldMapping;
+                    exit(true);
+                end;
+            until TempSpecialFieldMapping.Next() = 0;
+
+        // try find by Field Name in camelcase
+        APIPageFieldName := TextFunctions.Camelize(FieldRec.FieldName);
+        IF ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.' + APIPageFieldName, SourceText) then begin
+            TempFoundAPIField."API Field Name" := APIPageFieldName;
+            exit(true);
+        end;
+
+        Exit(false);
+    end;
+
+    local procedure CheckBLOB(var RecRef: RecordRef; FieldNo: integer; BlobURL: Text; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient): Boolean
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        RecRef2: RecordRef;
+        ErrLog: Record "NPR Replication Error Log";
+        ReplicationAPI: Codeunit "NPR Replication API";
+        Response: Codeunit "Temp Blob";
+        StatusCode: Integer;
+        SourceFRef: FieldRef;
+        DestinationFRef: FieldRef;
+        WebRequestHelper: Codeunit "Web Request Helper";
+    begin
+        IF NOT WebRequestHelper.IsValidUri(BlobURL) then
+            exit(false);
+
+        ServiceSetup.Get(ReplicationEndPoint."Service Code");
+        ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, BlobURL);
+
+        IF ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then
+            IF (StatusCode <> 500) then begin //if BLOB is empty, server return status code 500 --> Description: Internal Server Error
+                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', BlobURL, Response);
+                Commit();
+                Error(BLOBCouldNotBeReadErr, TempFoundAPIField."API Field Name", RecRef.RecordId, ErrLog."Entry No.");
+            end else
+                Clear(Response);
+
+        RecRef2 := RecRef.Duplicate();
+        SourceFRef := RecRef2.Field(FieldNo);
+        Response.ToFieldRef(SourceFRef);
+        DestinationFRef := RecRef.Field(FieldNo);
+        DestinationFRef.CalcField();
+        IF DestinationFRef.Value <> SourceFRef.Value then begin
+            DestinationFRef.Value := SourceFRef.Value;
+            IF TempFoundAPIField."With Validation" then
+                DestinationFRef.Validate();
+            exit(true);
+        end;
+        Exit(false);
+    end;
+
+    local procedure CheckImage(JToken: JsonToken; var RecRef: RecordRef; ReplicationEndPoint: Record "NPR Replication Endpoint"; var TempFoundAPIField: Record "NPR Rep. Special Field Mapping"; var Client: HttpClient): Boolean
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        ErrLog: Record "NPR Replication Error Log";
+        ReplicationAPI: Codeunit "NPR Replication API";
+        Response: Codeunit "Temp Blob";
+        StatusCode: Integer;
+        NewImageIStr: InStream;
+        TempBlobNewImage: Codeunit "Temp Blob";
+        TempBlobExistingImage: Codeunit "Temp Blob";
+        NewImageURL: Text;
+        MimeType: Text[100];
+        ImageWidth: Integer;
+        ImageHeight: Integer;
+        PictureJToken: JsonToken;
+    begin
+        IF NOT CheckPictureImportIsSupported(RecRef) then
+            exit(false);
+
+        IF NOT JToken.SelectToken('$.' + TempFoundAPIField."API Field Name", PictureJToken) then
+            exit(false);
+
+        NewImageURL := ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.[''pictureContent@odata.mediaReadLink'']');
+        IF NewImageURL = '' then
+            Exit(false);
+
+        IF EValuate(ImageWidth, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.width')) then;
+        IF Evaluate(ImageHeight, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.height')) then;
+        MimeType := COPYSTR(ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.contentType'), 1, 100);
+
+        IF (ImageWidth > 0) AND (ImageHeight > 0) and (MimeType <> '') then begin
+            ServiceSetup.Get(ReplicationEndPoint."Service Code");
+            ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, NewImageURL);
+
+            IF ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then begin
+                ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', NewImageURL, Response);
+                Commit();
+                Error(ImageCouldNotBeReadErr, RecRef.RecordId, ErrLog."Entry No.");
+            end;
+
+            ReadNewImage(Response, TempBlobNewImage, MimeType); // if use directly the InStream data(without read from temptable) sometimes the hash of 2 same png images is different.
+            ReadExistingImage(RecRef, TempBlobExistingImage);
+
+            If ReplicationAPI.GetImageHash(TempBlobNewImage) <> ReplicationAPI.GetImageHash(TempBlobExistingImage) then begin
+                Response.CreateInStream(NewImageIStr);
+                UpdateImage(RecRef, NewImageIStr, MimeType);
+                Exit(true);
+            end;
+        end else begin // no image
+            IF ClearImage(RecRef) then
+                Exit(true);
+        end;
+
+        exit(false);
+    end;
+
+    local procedure ReadNewImage(var ResponseTempBlob: Codeunit "Temp Blob"; var TempBlob: Codeunit "Temp Blob"; MimeType: Text)
+    var
+        IStr: InStream;
+        OStr: OutStream;
+        TempMediaRepository: Record "Media Repository" temporary;
+    begin
+        ResponseTempBlob.CreateInStream(IStr);
+        TempMediaRepository.Image.ImportStream(IStr, '', MimeType);
+        IF TempMediaRepository.Image.HasValue then begin
+            TempBlob.CreateOutStream(OStr);
+            TempMediaRepository.Image.ExportStream(OStr);
+        end;
+    end;
+
+    local procedure ReadExistingImage(var RecRef: RecordRef; var TempBlob: Codeunit "Temp Blob")
+    var
+        Media: Record "Tenant Media";
+        OStr: OutStream;
+        IStr: InStream;
+        MediaId: Guid;
+    begin
+        MediaId := GetExistingImageMediaId(RecRef);
+        IF NOT IsNullGuid(MediaId) then begin
+            Media.Get(MediaId);
+            if (Media.Content.HasValue()) then begin
+                Media.CalcFields(Content);
+                Media.Content.CreateInStream(IStr);
+                TempBlob.CreateOutStream(OStr);
+                CopyStream(OStr, IStr);
+            end;
+        end;
+    end;
+
+    local procedure GetExistingImageMediaId(RecRef: RecordRef) MediaId: Guid
+    var
+        Item: Record Item;
+        Customer: Record Customer;
+        Vendor: Record Vendor;
+    begin
+        Case RecRef.Number of
+            Database::Customer:
+                begin
+                    RecRef.SetTable(Customer);
+                    MediaId := Customer.Image.MediaId();
+                end;
+            Database::Item:
+                begin
+                    RecRef.SetTable(Item);
+                    IF Item.Picture.Count > 0 then
+                        MediaId := Item.Picture.Item(1);
+                End;
+            Database::Vendor:
+                begin
+                    RecRef.SetTable(Vendor);
+                    MediaId := Vendor.Image.MediaId();
+                end;
+        end;
+    end;
+
+    local procedure UpdateImage(var RecRef: RecordRef; IStr: InStream; MimeType: Text)
+    var
+        Item: Record Item;
+        Customer: Record Customer;
+        Vendor: Record Vendor;
+    begin
+        case RecRef.Number of
+            Database::Customer:
+                begin
+                    RecRef.SetTable(Customer);
+                    Clear(Customer.Image);
+                    Customer.Image.ImportStream(IStr, Customer.Name, MimeType);
+                    RecRef.GetTable(Customer);
+                end;
+            Database::Item:
+                begin
+                    RecRef.SetTable(Item);
+                    Clear(Item.Picture);
+                    Item.Picture.ImportStream(IStr, Item.Description, MimeType);
+                    RecRef.GetTable(Item);
+                end;
+            Database::Vendor:
+                begin
+                    RecRef.SetTable(Vendor);
+                    Clear(Vendor.Image);
+                    Vendor.Image.ImportStream(IStr, Vendor.Name, MimeType);
+                    RecRef.GetTable(Vendor);
+                end;
+        end;
+    end;
+
+    local procedure ClearImage(var RecRef: RecordRef): Boolean
+    var
+        Item: Record Item;
+        Customer: Record Customer;
+        Vendor: Record Vendor;
+    begin
+        case RecRef.Number of
+            Database::Customer:
+                begin
+                    RecRef.SetTable(Customer);
+                    if Customer.Image.HasValue then begin
+                        Clear(Customer.Image);
+                        RecRef.GetTable(Customer);
+                        exit(true);
+                    end;
+                end;
+            Database::Item:
+                begin
+                    RecRef.SetTable(Item);
+                    if Item.Picture.Count > 0 then begin
+                        Clear(Item.Picture);
+                        RecRef.GetTable(Item);
+                        exit(true);
+                    end;
+                end;
+            Database::Vendor:
+                begin
+                    RecRef.SetTable(Vendor);
+                    if Vendor.Image.HasValue then begin
+                        Clear(Vendor.Image);
+                        RecRef.GetTable(Vendor);
+                        exit(true);
+                    end;
+                end;
+        end;
+        Exit(false);
+    end;
+
+    local procedure CheckPictureImportIsSupported(RecRef: RecordRef): Boolean
+    var
+    begin
+        Exit(RecRef.Number in [Database::Customer, Database::Item, Database::Vendor]);
+    end;
+
+    local procedure GetJPathFieldFromSpecialFieldMapping(var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping") JPathField: Text
+    begin
+        IF STRPOS(TempSpecialFieldMapping."API Field Name", '@') > 0 then
+            JPathField := '$.[' + '''' + TempSpecialFieldMapping."API Field Name" + '''' + ']' // for Blob mapping is done like: apiPageBlobFieldName@odata.mediaReadLink 
+        Else
+            JPathField := '$.' + TempSpecialFieldMapping."API Field Name";
+    end;
+
+    procedure GetDefaultFileName(ServiceEndPoint: Record "NPR Replication Endpoint"): Text[100]
+    begin
+        exit(COPYSTR(StrSubstNo(DefaultFileNameLbl, ServiceEndPoint."EndPoint ID", format(Today(), 0, 9)), 1, 100));
+    end;
+
+    procedure CheckResponseContainsData(Content: Codeunit "Temp Blob"): Boolean;
+    var
+        ReplicationAPI: Codeunit "NPR Replication API";
+        JTokenMainObject: JsonToken;
+        JArrayValues: JsonArray;
+    begin
+        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+            exit(false);
+
+        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+            exit(false);
+
+        Exit(JArrayValues.Count > 0);
+    end;
+
+    local procedure InitializeTempSpecialFieldMapping(var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping" temporary; ReplicationEndpoint: Record "NPR Replication Endpoint")
+    var
+        SpecialFieldMapping: Record "NPR Rep. Special Field Mapping";
+    begin
+        TempSpecialFieldMapping.Reset();
+        TempSpecialFieldMapping.DeleteAll();
+        SpecialFieldMapping.SetRange("Service Code", ReplicationEndpoint."Service Code");
+        SpecialFieldMapping.SetRange("EndPoint ID", ReplicationEndpoint."EndPoint ID");
+        SpecialFieldMapping.SetRange("Table ID", ReplicationEndpoint."Table ID");
+        IF SpecialFieldMapping.FindSet() then
+            repeat
+                TempSpecialFieldMapping := SpecialFieldMapping;
+                TempSpecialFieldMapping.Insert();
+            until SpecialFieldMapping.Next() = 0;
+    end;
+
+    local procedure BindEventSubscribersForReplication()
+    var
+    begin
+        BindSubscription(GetItemVariantsEventSubs);
+    end;
+
+    local procedure UnBindEventSubscribersForReplication()
+    begin
+        UnbindSubscription(GetItemVariantsEventSubs)
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterRecordIsModified(var RecRef: RecordRef; ReplicationEndpoint: Record "NPR Replication Endpoint")
+    begin
+    end;
+
+}

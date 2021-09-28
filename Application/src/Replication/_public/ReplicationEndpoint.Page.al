@@ -28,6 +28,11 @@ page 6014504 "NPR Replication Endpoint"
                     ToolTip = 'Specifies Endpoint Method.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Table ID"; Rec."Table ID")
+                {
+                    ToolTip = 'Specifies Table ID.';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Path; Rec.Path)
                 {
                     ToolTip = 'Specifies the Path which will be added to the base URL when sending the request.';
@@ -50,6 +55,18 @@ page 6014504 "NPR Replication Endpoint"
                     ApplicationArea = NPRRetail;
                 }
 
+                field("Run OnInsert Trigger"; Rec."Run OnInsert Trigger")
+                {
+                    ToolTip = 'Specifies if OnInsert trigger runs when inserting a new record.';
+                    ApplicationArea = NPRRetail;
+                }
+
+                field("Run OnModify Trigger"; Rec."Run OnModify Trigger")
+                {
+                    ToolTip = 'Specifies if OnModify trigger runs when inserting a new record.';
+                    ApplicationArea = NPRRetail;
+                }
+
                 field("Skip Import Entry No Data Resp"; Rec."Skip Import Entry No Data Resp")
                 {
                     ApplicationArea = NPRRetail;
@@ -69,6 +86,20 @@ page 6014504 "NPR Replication Endpoint"
     {
         area(Navigation)
         {
+            action(SpecialFieldMappings)
+            {
+                Caption = 'Special Field Mappings';
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                Image = MapAccounts;
+                ToolTip = 'Open Special Field Mappings.';
+                trigger OnAction()
+                begin
+                    Rec.OpenSpecialFieldMappings();
+                end;
+            }
             action(Errors)
             {
                 ApplicationArea = NPRRetail;
