@@ -188,6 +188,7 @@ report 6014406 "NPR Sales Person Top 20"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {
