@@ -50,7 +50,7 @@ table 6151123 "NPR GDPR Consent Log"
         field(90; "Last Changed By"; Text[50])
         {
             Caption = 'Last Changed By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(91; "Last Changed At"; DateTime)

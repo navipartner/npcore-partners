@@ -33,7 +33,7 @@ table 6150636 "NPR POS Entry Output Log"
         field(30; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
         }
         field(31; "Salesperson Code"; Code[20])

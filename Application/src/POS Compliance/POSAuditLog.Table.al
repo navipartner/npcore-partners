@@ -119,7 +119,7 @@ table 6150637 "NPR POS Audit Log"
         field(21; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(22; "Certificate Thumbprint"; Text[250])

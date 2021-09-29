@@ -32,7 +32,7 @@ codeunit 6150913 "NPR POS HC Gen. Web Req."
     begin
         TmpHCGenericWebRequest."Entry No." := 0;
         TmpHCGenericWebRequest."Request Date" := CurrentDateTime;
-        TmpHCGenericWebRequest."Request User ID" := CopyStr(UserId, 1, 50);
+        TmpHCGenericWebRequest."Request User ID" := CopyStr(UserId, 1, MaxStrLen(TmpHCGenericWebRequest."Request User ID"));
         TmpHCGenericWebRequest."Request Code" := RequestCode;
         TmpHCGenericWebRequest."Parameter 1" := Parameters[1];
         TmpHCGenericWebRequest."Parameter 2" := Parameters[2];

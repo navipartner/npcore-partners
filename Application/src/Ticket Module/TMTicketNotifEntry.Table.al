@@ -38,7 +38,7 @@ table 6060110 "NPR TM Ticket Notif. Entry"
         field(32; "Notification Sent By User"; Text[30])
         {
             Caption = 'Notification Sent By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(35; "Notification Trigger"; Enum "NPR TM Not. Trigger")
         {

@@ -65,7 +65,7 @@ table 6014678 "NPR Endpoint Query"
         field(130; "User ID"; Text[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(150; "Processing Comment"; Text[250])
         {

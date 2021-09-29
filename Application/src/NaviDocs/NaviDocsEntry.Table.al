@@ -136,7 +136,7 @@ table 6059768 "NPR NaviDocs Entry"
         {
             Caption = 'Inserted by User';
             Editable = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(510; "Insert Date"; Date)
         {

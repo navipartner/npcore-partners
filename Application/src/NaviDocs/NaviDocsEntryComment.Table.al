@@ -52,7 +52,7 @@ table 6059769 "NPR NaviDocs Entry Comment"
         {
             Caption = 'User ID';
             Editable = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(210; Warning; Boolean)
         {

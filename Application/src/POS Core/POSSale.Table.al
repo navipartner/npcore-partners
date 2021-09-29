@@ -633,7 +633,7 @@ table 6014405 "NPR POS Sale"
         field(210; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Description = 'NPR5.54';
         }
         field(300; Amount; Decimal)

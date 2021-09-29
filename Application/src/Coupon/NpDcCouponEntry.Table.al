@@ -100,7 +100,7 @@ table 6151592 "NPR NpDc Coupon Entry"
         field(65; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             NotBlank = true;
             TableRelation = User."User Name";
             ValidateTableRelation = false;

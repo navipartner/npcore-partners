@@ -46,7 +46,7 @@ table 6014484 "NPR RFID Print Log"
         field(17; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(18; "Printed At"; DateTime)
         {

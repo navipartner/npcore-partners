@@ -54,7 +54,7 @@ table 6060138 "NPR MM Membership Notific."
         field(32; "Notification Processed By User"; Text[30])
         {
             Caption = 'Notification Processed By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(40; Blocked; Boolean)
         {

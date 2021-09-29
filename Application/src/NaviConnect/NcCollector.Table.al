@@ -121,7 +121,7 @@ table 6151525 "NPR Nc Collector"
         field(230; "Allow Request from User ID"; Text[50])
         {
             Caption = 'Allow Request from User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(240; "Request Name"; Text[30])
         {

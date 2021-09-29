@@ -197,7 +197,7 @@ table 6151198 "NPR NpCs Document"
         field(110; "Processing updated by"; Code[50])
         {
             Caption = 'Processing updated by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(113; "Processing expires at"; DateTime)
         {
@@ -311,7 +311,7 @@ table 6151198 "NPR NpCs Document"
         field(210; "Delivery updated by"; Code[50])
         {
             Caption = 'Delivery updated by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(213; "Delivery expires at"; DateTime)
         {

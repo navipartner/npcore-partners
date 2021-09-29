@@ -49,7 +49,7 @@ table 6151203 "NPR NpCs Arch. Doc. Log Entry"
         field(35; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(40; "Store Code"; Code[20])
         {

@@ -72,7 +72,7 @@ table 6060127 "NPR MM Membership"
         field(17; "Blocked By"; Code[30])
         {
             Caption = 'Blocked By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(18; "Block Reason"; Option)

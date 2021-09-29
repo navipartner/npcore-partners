@@ -182,7 +182,7 @@ table 6151023 "NPR NpRv Ext. Voucher Buffer"
         field(1015; "Issue User ID"; Code[50])
         {
             Caption = 'Issue User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(2000; "Redeem Date"; Date)
@@ -206,7 +206,7 @@ table 6151023 "NPR NpRv Ext. Voucher Buffer"
         field(2015; "Redeem User ID"; Code[50])
         {
             Caption = 'Redeem User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
     }

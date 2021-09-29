@@ -24,7 +24,7 @@ table 6014640 "NPR Tax Free Request"
         field(4; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(6; "Salesperson Code"; Code[20])
         {

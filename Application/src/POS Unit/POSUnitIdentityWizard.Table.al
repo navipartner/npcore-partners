@@ -21,7 +21,7 @@ table 6150718 "NPR POS Unit Identity Wizard"
         field(15; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(20; "Default POS Unit No."; Code[10])
         {

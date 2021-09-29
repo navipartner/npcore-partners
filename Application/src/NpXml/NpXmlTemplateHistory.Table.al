@@ -26,7 +26,7 @@ table 6151560 "NPR NpXml Template History"
         field(10; "Changed by"; Code[50])
         {
             Caption = 'Changed by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(20; "Change at"; DateTime)
         {

@@ -48,12 +48,12 @@ table 6151170 "NPR NpGp POS Sales Setup"
         field(15; "Service Username"; Text[250])
         {
             Caption = 'Service Username';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(20; "Service Password"; Guid)
         {
             Caption = 'Service Password';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserPseudonymousIdentifiers;
         }
         field(25; "Sync POS Sales Immediately"; Boolean)
         {

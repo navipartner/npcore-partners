@@ -24,7 +24,7 @@ table 6150908 "NPR HC Generic Web Request"
         field(11; "Request User ID"; Code[50])
         {
             Caption = 'Request User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(15; "Response Date"; DateTime)
         {
@@ -34,7 +34,7 @@ table 6150908 "NPR HC Generic Web Request"
         field(16; "Response User ID"; Code[50])
         {
             Caption = 'Response User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(100; "Request Code"; Code[20])
         {

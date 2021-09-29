@@ -28,7 +28,7 @@ table 6150712 "NPR POS Default User View"
         field(4; "User Name"; Code[250])
         {
             Caption = 'User Name';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
 
             TableRelation = User."User Name";
             ValidateTableRelation = false;

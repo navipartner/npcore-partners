@@ -317,7 +317,7 @@ table 6059902 "NPR Task Line"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(80; "Delete Log After"; Duration)
         {

@@ -72,7 +72,7 @@ table 6059785 "NPR TM Ticket"
         {
             Caption = 'Salesperson Code';
             Editable = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(58; "Document Date"; Date)
         {

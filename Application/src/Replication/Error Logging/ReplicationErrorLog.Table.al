@@ -45,7 +45,7 @@ table 6014584 "NPR Replication Error Log"
         field(41; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
     }
     keys

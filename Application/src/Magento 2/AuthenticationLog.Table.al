@@ -43,7 +43,7 @@ table 6151153 "NPR Authentication Log"
         field(20; "UserId"; Text[50])
         {
             Caption = 'UserId';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
     }
 

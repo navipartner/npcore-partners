@@ -91,7 +91,7 @@ table 6060148 "NPR MM Membership Auto Renew"
         field(510; "Started By"; Text[50])
         {
             Caption = 'Started By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(512; "Auto-Renew Success Count"; Integer)
         {

@@ -32,7 +32,7 @@ table 6014575 "NPR Package Printers"
         field(6; "User ID"; Guid)
         {
             TableRelation = User;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserPseudonymousIdentifiers;
         }
 
         field(7; "User Name"; text[100])

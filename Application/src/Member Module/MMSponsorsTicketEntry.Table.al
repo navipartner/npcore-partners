@@ -68,7 +68,7 @@ table 6151186 "NPR MM Sponsors. Ticket Entry"
         field(32; "Notification Sent By User"; Text[30])
         {
             Caption = 'Notification Sent By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(40; "Notification Address"; Text[100])
         {

@@ -34,7 +34,7 @@ table 6059947 "NPR CashKeeper Overview"
         field(15; "User Id"; Code[10])
         {
             Caption = 'User Id';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(16; "Lookup Timestamp"; DateTime)
         {
@@ -54,9 +54,4 @@ table 6059947 "NPR CashKeeper Overview"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

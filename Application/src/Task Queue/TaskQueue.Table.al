@@ -149,7 +149,7 @@ table 6059903 "NPR Task Queue"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(32; "Assigned Time"; DateTime)
         {
@@ -169,7 +169,7 @@ table 6059903 "NPR Task Queue"
         field(35; "Assigned to Session ID"; Integer)
         {
             Caption = 'Assigned to Session ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserPseudonymousIdentifiers;
         }
         field(40; "Object Type"; Option)
         {

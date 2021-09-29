@@ -56,7 +56,7 @@ table 6059898 "NPR Data Log Record"
         {
             Caption = 'User ID';
             Editable = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(1000; "Table Name"; Text[250])
         {

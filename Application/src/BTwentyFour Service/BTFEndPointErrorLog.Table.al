@@ -54,7 +54,7 @@ table 6014524 "NPR BTF EndPoint Error Log"
         }
         field(10; "Sent by User ID"; Code[50])
         {
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Caption = 'Sent by User ID';
         }
         field(11; "Subscription-Key"; Text[50])

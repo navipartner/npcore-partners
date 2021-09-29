@@ -61,7 +61,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
         {
             TableRelation = user."User Security ID";
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
 
         field(7; "User Name"; text[100])

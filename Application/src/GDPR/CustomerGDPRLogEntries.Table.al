@@ -53,7 +53,7 @@ table 6151070 "NPR Customer GDPR Log Entries"
         field(9; "Anonymized By"; Code[50])
         {
             Caption = 'Anonymized By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(10; "Open Journal Entries/Statement"; Boolean)
         {

@@ -39,7 +39,7 @@ table 6060113 "NPR TM Ticket Particpt. Wks."
         field(12; "Notification Sent By User"; Text[30])
         {
             Caption = 'Notification Sent By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(13; "Notifcation Created At"; DateTime)
         {
@@ -69,7 +69,7 @@ table 6060113 "NPR TM Ticket Particpt. Wks."
         field(17; "Blocked By User"; Text[30])
         {
             Caption = 'Blocked By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(20; "Ticket No."; Code[20])
         {
