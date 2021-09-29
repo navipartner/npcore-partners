@@ -115,7 +115,7 @@ table 6014674 "NPR Endpoint"
         {
             Caption = 'Allow Query from User ID';
             Description = 'CASE 234602';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(240; "Query Name"; Text[30])
         {

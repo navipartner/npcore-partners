@@ -78,7 +78,7 @@ table 6060123 "NPR TM Det. Ticket AccessEntry"
         field(21; "User ID"; Code[40])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
     }
 

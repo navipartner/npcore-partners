@@ -82,7 +82,7 @@ table 6060151 "NPR Event Word Layout"
         field(50; "Last Modified by User"; Code[50])
         {
             Caption = 'Last Modified by User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(60; "Basic Layout Description"; Text[250])

@@ -101,12 +101,12 @@ table 6014477 "NPR Tax Free Voucher"
         field(17; "Issued By User"; Code[50])
         {
             Caption = 'Issued By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(18; "Voided By User"; Code[50])
         {
             Caption = 'Voided By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(19; "Voided Date"; Date)
         {

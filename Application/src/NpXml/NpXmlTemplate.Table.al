@@ -404,7 +404,7 @@ table 6151551 "NPR NpXml Template"
         field(5300; "Last Modified by"; Code[50])
         {
             Caption = 'Last Modified by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Description = 'NC1.21';
         }
         field(5305; "Last Modified at"; DateTime)

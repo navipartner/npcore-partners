@@ -34,7 +34,7 @@ table 6151559 "NPR NpXml Template Arch."
         field(30; "Archived by"; Code[50])
         {
             Caption = 'Archived by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(31; "Archived at"; DateTime)
         {

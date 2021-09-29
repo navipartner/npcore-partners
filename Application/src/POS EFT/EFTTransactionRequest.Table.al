@@ -55,7 +55,7 @@ table 6184495 "NPR EFT Transaction Request"
         field(60; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(70; "Integration Version Code"; Code[10])
         {

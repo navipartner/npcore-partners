@@ -49,7 +49,7 @@ table 6151031 "NPR NpRv Arch. Sending Log"
         field(60; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(70; "Error during Send"; Boolean)
         {

@@ -10,7 +10,7 @@ table 6014618 "NPR My Report"
             Caption = 'User ID';
             TableRelation = User."User Name";
             ValidateTableRelation = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(2; "Report No."; Integer)
         {
@@ -27,6 +27,4 @@ table 6014618 "NPR My Report"
         {
         }
     }
-
 }
-

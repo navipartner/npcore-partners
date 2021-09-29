@@ -32,7 +32,7 @@ table 6014476 "NPR Retail Price Log Entry"
         {
             Caption = 'User ID';
             TableRelation = User."User Name";
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             //This property is currently not supported
             //TestTableRelation = false;
         }

@@ -95,7 +95,7 @@ table 6151574 "NPR AF Notification Hub"
         field(101; "Created By"; Code[50])
         {
             Caption = 'Created By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(103; "Notification Delivered to Hub"; Boolean)
@@ -113,7 +113,7 @@ table 6151574 "NPR AF Notification Hub"
         field(105; "Handled By"; Code[50])
         {
             Caption = 'Handled By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(106; "Handled Register"; Code[10])
@@ -131,7 +131,7 @@ table 6151574 "NPR AF Notification Hub"
         field(108; "Cancelled By"; Code[50])
         {
             Caption = 'Cancelled By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(109; "Cancelled Register"; Code[10])
@@ -149,7 +149,7 @@ table 6151574 "NPR AF Notification Hub"
         field(111; "Completed By"; Code[50])
         {
             Caption = 'Completed By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
         field(112; "Completed Register"; Code[10])

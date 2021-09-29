@@ -73,7 +73,7 @@ table 6014588 "NPR Replication Service Setup"
         field(25; UserName; Code[50])
         {
             Caption = 'User Name';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             trigger OnValidate()
             begin
                 Rec.TestField(Enabled, false);
@@ -83,7 +83,7 @@ table 6014588 "NPR Replication Service Setup"
         field(30; "API Password Key"; GUID)
         {
             Caption = 'API Password Key';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserPseudonymousIdentifiers;
         }
 
         field(35; "OAuth2 Setup Code"; Code[20])
