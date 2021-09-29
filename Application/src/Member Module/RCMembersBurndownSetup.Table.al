@@ -9,7 +9,7 @@ table 6060149 "NPR RC Members. Burndown Setup"
         field(1; "User ID"; Text[132])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(2; "Period Length"; Option)
         {

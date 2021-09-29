@@ -56,7 +56,7 @@ table 6060139 "NPR MM Member Notific. Entry"
         field(32; "Notification Sent By User"; Text[30])
         {
             Caption = 'Notification Sent By User';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(40; Blocked; Boolean)
         {

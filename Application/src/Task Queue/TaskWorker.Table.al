@@ -18,7 +18,7 @@ table 6059907 "NPR Task Worker"
         field(2; "User ID"; Text[64])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(3; "Session ID"; Integer)
         {

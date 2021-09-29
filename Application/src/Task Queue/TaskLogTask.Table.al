@@ -100,7 +100,7 @@ table 6059904 "NPR Task Log (Task)"
         field(20; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(21; "Task Worker Group"; Code[10])
         {
@@ -116,7 +116,7 @@ table 6059904 "NPR Task Log (Task)"
         field(23; "Session ID"; Integer)
         {
             Caption = 'Session ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserPseudonymousIdentifiers;
         }
         field(40; "Object Type"; Option)
         {
@@ -217,7 +217,7 @@ table 6059904 "NPR Task Log (Task)"
         "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Task Worker Group" := TaskQueue."Task Worker Group";
         if Status = Status::Error then begin
-            TMPText := CopyStr(GetLastErrorText,1,MaxStrLen(TMPText));
+            TMPText := CopyStr(GetLastErrorText, 1, MaxStrLen(TMPText));
             TMPText := ConvertCarrigeReturn(TMPText);
             "Last Error Message BLOB".CreateOutStream(OutStream);
             OutStream.WriteText(TMPText);

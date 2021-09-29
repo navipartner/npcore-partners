@@ -51,7 +51,7 @@ table 6184601 "NPR Consignor Entry"
         field(8; "Created By"; Code[20])
         {
             Caption = 'Created By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(11; "Request XML"; BLOB)
         {

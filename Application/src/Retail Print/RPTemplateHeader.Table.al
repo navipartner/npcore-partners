@@ -79,7 +79,7 @@ table 6014446 "NPR RP Template Header"
         field(64; "Last Modified By"; Code[50])
         {
             Caption = 'Last Modified By';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(70; "Pre Processing Codeunit"; Integer)
         {

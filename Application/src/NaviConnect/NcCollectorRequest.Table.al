@@ -59,7 +59,7 @@ table 6151529 "NPR Nc Collector Request"
         field(130; "User ID"; Text[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(150; "Processing Comment"; Text[250])
         {

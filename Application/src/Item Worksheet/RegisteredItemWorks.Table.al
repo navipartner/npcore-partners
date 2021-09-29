@@ -75,7 +75,7 @@ table 6060045 "NPR Registered Item Works."
         field(200; "Registered by User ID"; Code[50])
         {
             Caption = 'Registered by User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
         }
         field(6014400; "Item Group"; Code[20])

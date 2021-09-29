@@ -25,7 +25,7 @@ table 6014559 "NPR RP Template Archive"
         field(4; "Archived by"; Code[50])
         {
             Caption = 'Archived by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(5; "Version Comments"; Text[128])
         {

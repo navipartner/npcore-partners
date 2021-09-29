@@ -149,7 +149,7 @@ table 6151103 "NPR NpRi Reimbursement Entry"
         field(400; "Last modified by"; Code[50])
         {
             Caption = 'Last modified by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(405; "Last modified at"; DateTime)
         {

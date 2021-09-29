@@ -27,7 +27,7 @@ table 6150635 "NPR POS Posting Log"
         field(30; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
         }
         field(40; "With Error"; Boolean)

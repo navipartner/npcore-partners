@@ -35,7 +35,7 @@ table 6059908 "NPR Session Log"
         {
             Caption = 'User ID';
             TableRelation = User."User Name";
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             //This property is currently not supported
             //TestTableRelation = false;
         }

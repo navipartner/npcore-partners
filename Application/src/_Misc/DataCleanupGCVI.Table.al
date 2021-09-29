@@ -97,17 +97,17 @@ table 6060101 "NPR Data Cleanup GCVI"
         field(15; "User Created"; Code[50])
         {
             Caption = 'User Created';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(16; "User Modified"; Code[50])
         {
             Caption = 'User Modified';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(17; "User Approve Del"; Code[50])
         {
             Caption = 'User Approve Del';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(20; "Last Entry Date"; Date)
         {
@@ -159,7 +159,7 @@ table 6060101 "NPR Data Cleanup GCVI"
         field(34; "User Approve Ren"; Code[50])
         {
             Caption = 'User Approve Rename';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Description = 'NPR5.23';
         }
     }

@@ -147,7 +147,7 @@ table 6151021 "NPR NpRv Voucher Buffer"
         field(1015; "Issue User ID"; Code[50])
         {
             Caption = 'Issue User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(1020; "Issue Partner Code"; Code[20])
         {
@@ -173,7 +173,7 @@ table 6151021 "NPR NpRv Voucher Buffer"
         field(2015; "Redeem User ID"; Code[50])
         {
             Caption = 'Redeem User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(2020; "Redeem Partner Code"; Code[20])
         {

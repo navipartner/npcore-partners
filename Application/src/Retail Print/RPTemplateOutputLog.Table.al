@@ -17,14 +17,14 @@ table 6014501 "NPR RP Template Output Log"
         field(20; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(30; "Printed At"; DateTime)
         {
             Caption = 'Printed At';
             DataClassification = CustomerContent;
         }
-        field(100; "Output"; BLOB)
+        field(100; Output; BLOB)
         {
             Caption = 'Output';
             DataClassification = CustomerContent;

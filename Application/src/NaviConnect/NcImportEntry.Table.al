@@ -115,7 +115,7 @@ table 6151504 "NPR Nc Import Entry"
         field(70; "Import Started by"; Code[50])
         {
             Caption = 'Import Started by';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
             Description = 'NPR5.55';
         }
         field(80; "Server Instance Id"; Integer)
@@ -127,7 +127,7 @@ table 6151504 "NPR Nc Import Entry"
         field(90; "Session Id"; Integer)
         {
             Caption = 'Session Id';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserPseudonymousIdentifiers;
             Description = 'NPR5.55';
         }
         field(100; "Earliest Import Datetime"; DateTime)

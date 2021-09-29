@@ -57,7 +57,7 @@ table 6059897 "NPR Data Log Setup (Table)"
         {
             Caption = 'User ID';
             Editable = false;
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(120; "Last Date Modified"; DateTime)
         {

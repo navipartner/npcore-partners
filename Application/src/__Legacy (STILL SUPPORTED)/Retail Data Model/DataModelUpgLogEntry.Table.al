@@ -23,7 +23,7 @@ table 6150699 "NPR Data Model Upg. Log Entry"
         field(11; "User ID"; Text[50])
         {
             Caption = 'User ID';
-            DataClassification = CustomerContent;
+            DataClassification = EndUserIdentifiableInformation;
         }
         field(12; "Date and Time"; DateTime)
         {
