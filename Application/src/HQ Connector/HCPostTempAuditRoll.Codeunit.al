@@ -494,7 +494,7 @@
         end;
         TempVarekldLinie."Reason Code" := RevRulle."Reason Code";
         TempVarekldLinie."Bin Code" := RevRulle."Bin Code";
-
+        Vare.Get(RevRulle."No.");
         if Vare.Type <> Vare.Type::Service then
             TempVarekldLinie.Validate("Item No.", RevRulle."No.")
         else begin
