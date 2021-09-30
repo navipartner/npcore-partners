@@ -16,86 +16,86 @@ page 6150712 "NPR POS Default Views"
                 field(Type; Rec.Type)
                 {
 
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'It defines the type for which the POS view is applicable. The Values are Login, Sale, Payment, Balance, Locked, Restaurant';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Filter"; Rec."Salesperson Filter")
                 {
 
-                    ToolTip = 'Specifies the value of the Salesperson Filter field';
+                    ToolTip = 'Specifies any filter by Sales Person';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register Filter"; Rec."Register Filter")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. Filter field';
+                    ToolTip = 'Specifies any filter by POS Unit';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Starting Date field';
+                    ToolTip = 'Specifies the Starting Date for which the view is enabled';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Ending Date field';
+                    ToolTip = 'Specifies the Ending Date for which the view is enabled';
                     ApplicationArea = NPRRetail;
                 }
                 field(Monday; Rec.Monday)
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Monday field';
+                    ToolTip = 'Indicates if applicable on Monday';
                     ApplicationArea = NPRRetail;
                 }
                 field(Tuesday; Rec.Tuesday)
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Tuesday field';
+                    ToolTip = 'Indicates if applicable on Tuesday';
                     ApplicationArea = NPRRetail;
                 }
                 field(Wednesday; Rec.Wednesday)
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Wednesday field';
+                    ToolTip = 'Indicates if applicable on Wednesday';
                     ApplicationArea = NPRRetail;
                 }
                 field(Thursday; Rec.Thursday)
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Thursday field';
+                    ToolTip = 'Indicates if applicable on Thursday';
                     ApplicationArea = NPRRetail;
                 }
                 field(Friday; Rec.Friday)
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Friday field';
+                    ToolTip = 'Indicates if applicable on Friday';
                     ApplicationArea = NPRRetail;
                 }
                 field(Saturday; Rec.Saturday)
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Saturday field';
+                    ToolTip = 'Indicates if applicable on Saturday';
                     ApplicationArea = NPRRetail;
                 }
                 field(Sunday; Rec.Sunday)
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Sunday field';
+                    ToolTip = 'Indicates if applicable on Sunday';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS View Code"; Rec."POS View Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS View Code field';
+                    ToolTip = 'Specifies the POS View Code to be used';
                     ApplicationArea = NPRRetail;
                 }
             }
