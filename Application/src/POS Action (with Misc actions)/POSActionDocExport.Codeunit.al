@@ -5,6 +5,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         ERRNOSALELINES: Label 'There are no sale lines to export';
         ERR_PREPAY: Label 'Sale was exported correctly but prepayment in new sale failed: %1';
         ERR_PAY: Label 'Sale was exported correctly but payment in new sale failed: %1';
+        ERR_CUSTOMER_NOT_IN_FILTER: Label 'The customer with Customer No. %1 is not within the filter defined in the POS Action parameters', Comment = '%1 = Customer No.';
         PAYMENT_OPTION: Label 'No Payment,Prepayment Percent,Prepayment Amount,Pay & Post';
         PAYMENT_OPTION_SPLIT: Label 'No Payment,Prepayment Percent,Prepayment Amount,Split Pay & Post,Full Pay & Post';
         PAYMENT_OPTION_DESC: Label 'Select document payment';
@@ -113,6 +114,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionCustomerLookupPage: Label 'Customer Lookup Page';
         DescCustomerTableView: Label 'Pre-filtered customer list';
         DescCustomerLookupPage: Label 'Custom customer lookup page';
+        CaptionEnforceCustomerFilter: Label 'Enforce Customer Filter';
+        DescEnforceCustomerFilter: Label 'Enforce that the selected customer is within the defined filter in "CustomerTableView"';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -121,7 +124,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.13');
+        exit('1.14');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -191,6 +194,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             Sender.RegisterTextParameter('PaymentMethodCode', '');
             Sender.RegisterTextParameter('CustomerTableView', '');
             Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
+            Sender.RegisterBooleanParameter('EnforceCustomerFilter', false);
         end;
     end;
 
@@ -246,6 +250,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         if (JSON.GetBooleanParameter('SelectCustomer')) then begin
             CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
             CustomerLookupPage := JSON.GetIntegerParameterOrFail('CustomerLookupPage', ActionCode());
+
             if not SelectCustomer(SalePOS, POSSale, CustomerTableView, CustomerLookupPage) then
                 SalePOS.TestField("Customer No.");
         end;
@@ -383,10 +388,24 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     end;
 
     local procedure ValidateSale(var SalePOS: Record "NPR POS Sale"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
+    var
+        CustomerTableView: Text;
+        Customer: Record Customer;
     begin
         if JSON.GetBooleanParameterOrFail('BlockEmptySale', ActionCode()) then begin
             if not SaleLinesExists(SalePOS) then
                 Error(ERRNOSALELINES);
+        end;
+
+        CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
+        if CustomerTableView <> '' then begin
+            if JSON.GetBooleanParameterOrFail('EnforceCustomerFilter', ActionCode()) then begin
+                Customer.SetView(CustomerTableView);
+                Customer.FilterGroup(40);
+                Customer.SetRange("No.", SalePOS."Customer No.");
+                if Customer.IsEmpty then
+                    Error(ERR_CUSTOMER_NOT_IN_FILTER, SalePOS."Customer No.");
+            end;
         end;
 
         RetailSalesDocMgt.TestSalePOS(SalePOS);
@@ -685,6 +704,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := CaptionCustomerTableView;
             'CustomerLookupPage':
                 Caption := CaptionCustomerLookupPage;
+            'EnforceCustomerFilter':
+                Caption := CaptionEnforceCustomerFilter;
         end;
     end;
 
@@ -783,6 +804,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := DescCustomerTableView;
             'CustomerLookupPage':
                 Caption := DescCustomerLookupPage;
+            'EnforceCustomerFilter':
+                Caption := DescEnforceCustomerFilter;
         end;
     end;
 
