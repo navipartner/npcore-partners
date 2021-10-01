@@ -341,7 +341,7 @@ page 6151502 "NPR Nc Task List"
         Rec.SetFilter("Task Processor Code", TaskProcessorFilter);
 
         if ShowProcessed then
-            Rec.SetRange(Processed, true)
+            Rec.SetRange(Processed)
         else
             Rec.SetRange(Processed, false);
 
@@ -385,6 +385,7 @@ page 6151502 "NPR Nc Task List"
     local procedure ProcessManually()
     var
         Task: Record "NPR Nc Task";
+        Task2: Record "NPR Nc Task";
         Counter: Integer;
         Window: Dialog;
     begin
@@ -395,7 +396,8 @@ page 6151502 "NPR Nc Task List"
             repeat
                 Counter += 1;
                 Window.Update(1, Counter);
-                SyncMgt.ProcessTask(Task);
+                Task2 := Task;
+                SyncMgt.ProcessTask(Task2);
             until Task.Next() = 0;
         Window.Close();
         CurrPage.Update(false);
