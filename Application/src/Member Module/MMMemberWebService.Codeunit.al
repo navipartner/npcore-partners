@@ -1148,7 +1148,7 @@ codeunit 6060128 "NPR MM Member WebService"
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        AttempArrival: Codeunit "NPR MM Attempt Member Arrival";
+        AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MembershipMgr: Codeunit "NPR MM Membership Mgt.";
         LimitLogEntry: Integer;
@@ -1159,6 +1159,8 @@ codeunit 6060128 "NPR MM Member WebService"
     begin
 
         MembershipEntryNo := MembershipMgr.GetMembershipFromExtMemberNo(ExternalMemberNo);
+        if (ExternalMemberCardNo <> '') then
+            MembershipEntryNo := MembershipMgr.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ResponseMessage);
 
         if (not Membership.Get(MembershipEntryNo)) then;
         if (not MembershipSetup.Get(Membership."Membership Code")) then;
@@ -1196,9 +1198,9 @@ codeunit 6060128 "NPR MM Member WebService"
         if (MembershipSetup."Ticket Item Barcode" = '') then
             exit(0);
 
-        AttempArrival.AttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member);
-        if AttempArrival.run() then
-            ResponseCode := AttempArrival.GetAttemptMemberArrivalResponse(ResponseMessage);
+        AttemptArrival.AttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member, MembershipEntryNo);
+        if AttemptArrival.run() then
+            ResponseCode := AttemptArrival.GetAttemptMemberArrivalResponse(ResponseMessage);
 
         MemberLimitationMgr.UpdateLogEntry(LimitLogEntry, ResponseCode, ResponseMessage);
 
