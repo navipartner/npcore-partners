@@ -144,6 +144,15 @@ table 6059811 "NPR Retail Sales Cue"
             CalcFormula = count("Sales Header" where("Shipped Not Invoiced" = filter(true)));
             Editable = false;
         }
+
+        field(107; "Failed imports"; Integer)
+        {
+            Caption = 'Failed imports in the import list';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Nc Import Entry" where("Runtime Error" = const(true)));
+            Editable = false;
+        }
+
     }
 
     keys
