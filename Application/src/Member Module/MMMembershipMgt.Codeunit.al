@@ -3937,14 +3937,19 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 Member.Country := CountryRegion.Name;
 
         if (MemberInfoCapture.Country <> '') and (MemberInfoCapture."Country Code" = '') then begin
-            CountryName := MemberInfoCapture.Country;
-            if (StrLen(MemberInfoCapture.Country) > 1) then
-                CountryName := StrSubstNo(PlaceHolderLbl, UpperCase(CopyStr(MemberInfoCapture.Country, 1, 1)), LowerCase(CopyStr(MemberInfoCapture.Country, 2)));
-
-            CountryRegion.SetFilter(Name, '=%1|=%2|=%3', CountryName, UpperCase(CountryName), MemberInfoCapture.Country);
-            if (CountryRegion.FindFirst()) then begin
+            if (CountryRegion.Get(UpperCase(CopyStr(MemberInfoCapture.Country, 1, MaxStrLen(CountryRegion.Code))))) then begin
                 Member."Country Code" := CountryRegion.Code;
                 Member.Country := CountryRegion.Name;
+            end else begin
+                CountryName := MemberInfoCapture.Country;
+                if (StrLen(MemberInfoCapture.Country) > 1) then
+                    CountryName := StrSubstNo(PlaceHolderLbl, UpperCase(CopyStr(MemberInfoCapture.Country, 1, 1)), LowerCase(CopyStr(MemberInfoCapture.Country, 2)));
+
+                CountryRegion.SetFilter(Name, '=%1|=%2|=%3', CountryName, UpperCase(CountryName), MemberInfoCapture.Country);
+                if (CountryRegion.FindFirst()) then begin
+                    Member."Country Code" := CountryRegion.Code;
+                    Member.Country := CountryRegion.Name;
+                end;
             end;
         end;
 
