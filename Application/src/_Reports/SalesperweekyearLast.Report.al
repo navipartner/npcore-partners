@@ -172,6 +172,8 @@ report 6014456 "NPR Sales per week year/Last"
 
     requestpage
     {
+        SaveValues = true;
+
         Caption = 'Date Comparisson';
 
         layout
