@@ -643,6 +643,17 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    procedure InitializeTelemetricsMetadata()
+    var
+        Request: Codeunit "NPR Front-End: Generic";
+    begin
+        Request.SetMethod('InitializeTelemetricsMetadata');
+        Request.GetContent().Add('tenantId', TenantId());
+        Request.GetContent().Add('userId', UserId());
+        Request.GetContent().Add('companyName', CompanyName());
+        InvokeFrontEndAsync(Request);
+    end;
+
     // TODO: Request must be of an interface type that describes all stargate requests
     procedure InvokeDevice(Request: DotNet NPRNetRequest0; ActionName: Text; Step: Text)
     var
