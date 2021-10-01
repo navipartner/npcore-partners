@@ -162,6 +162,7 @@ report 6014417 "NPR Inventory per Date"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

@@ -168,6 +168,7 @@ report 6014540 "NPR Items With Low Sales"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

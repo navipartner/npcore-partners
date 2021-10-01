@@ -686,6 +686,7 @@ report 6014400 "NPR Inventory by age"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {
