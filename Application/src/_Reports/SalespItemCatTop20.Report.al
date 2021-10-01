@@ -279,6 +279,7 @@ report 6014405 "NPR Salesp./Item Cat Top 20"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

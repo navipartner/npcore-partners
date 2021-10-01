@@ -128,6 +128,7 @@ report 6014439 "NPR Item Sales Postings"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {

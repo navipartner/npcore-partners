@@ -215,6 +215,8 @@ report 6014431 "NPR S.Person Trx by Item Gr."
 
     requestpage
     {
+        SaveValues = true;
+
 
         layout
         {
