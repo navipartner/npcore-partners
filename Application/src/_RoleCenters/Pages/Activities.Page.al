@@ -41,6 +41,42 @@ page 6151255 "NPR Activities"
                         CurrPage.Update(false);
                     end;
                 }
+
+                field("Failed tasks"; Rec."Failed Webshop Payments")
+                {
+                    Caption = 'Failed capturing of payments';
+                    ToolTip = 'Specifies the value of the Failed Webshop Payments field';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    begin
+                        Page.RunModal(Page::"NPR Magento Payment Line List");
+                        CurrPage.Update(false);
+                    end;
+                }
+
+
+
+
+
+                field("Failed imports in the import list"; Rec."Failed imports")
+                {
+                    Caption = 'Failed imports in the import list';
+                    ToolTip = 'Specifies the amount of failed import entries';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        ImportEntry: Record "NPR Nc Import Entry";
+                    begin
+                        ImportEntry.SetRange("Runtime Error", true);
+
+                        Page.RunModal(Page::"NPR Nc Import List", ImportEntry);
+                        CurrPage.Update(false);
+                    end;
+                }
+
+
             }
             cuegroup(Control6150624)
             {
@@ -93,6 +129,9 @@ page 6151255 "NPR Activities"
                     end;
                 }
             }
+
+
+
         }
     }
 
@@ -150,4 +189,6 @@ page 6151255 "NPR Activities"
     var
         BackgroundTaskResults: Dictionary of [Text, Text];
         BackgroundTaskId: Integer;
+
+
 }
