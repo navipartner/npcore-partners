@@ -3,7 +3,7 @@ page 6151428 "NPR Magento Item Cstm Options"
     Caption = 'Magento Item Custom Options';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = Card;
+    PageType = List;
     UsageCategory = None;
     SourceTable = "NPR Magento Item Custom Option";
     SourceTableTemporary = true;
@@ -22,59 +22,62 @@ page 6151428 "NPR Magento Item Cstm Options"
             group("Custom Options")
             {
                 Caption = 'Custom Options';
-                field(Enabled; Rec.Enabled)
+                repeater(Control6150615)
                 {
+                    field(Enabled; Rec.Enabled)
+                    {
 
-                    ToolTip = 'Specifies the value of the Enabled field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Custom Option No."; Rec."Custom Option No.")
-                {
+                        ToolTip = 'Specifies the value of the Enabled field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Custom Option No."; Rec."Custom Option No.")
+                    {
 
-                    ToolTip = 'Specifies the value of the Custom Option No. field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Description; Rec.Description)
-                {
+                        ToolTip = 'Specifies the value of the Custom Option No. field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Description; Rec.Description)
+                    {
 
-                    ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Type; Rec.Type)
-                {
+                        ToolTip = 'Specifies the value of the Description field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Type; Rec.Type)
+                    {
 
-                    ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Required; Rec.Required)
-                {
+                        ToolTip = 'Specifies the value of the Type field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Required; Rec.Required)
+                    {
 
-                    ToolTip = 'Specifies the value of the Required field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Max Length"; Rec."Max Length")
-                {
+                        ToolTip = 'Specifies the value of the Required field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Max Length"; Rec."Max Length")
+                    {
 
-                    ToolTip = 'Specifies the value of the Max Length field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Position; Rec.Position)
-                {
+                        ToolTip = 'Specifies the value of the Max Length field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Position; Rec.Position)
+                    {
 
-                    ToolTip = 'Specifies the value of the Position field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Price; Rec.Price)
-                {
+                        ToolTip = 'Specifies the value of the Position field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Price; Rec.Price)
+                    {
 
-                    ToolTip = 'Specifies the value of the Price field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Price Type"; Rec."Price Type")
-                {
+                        ToolTip = 'Specifies the value of the Price field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Price Type"; Rec."Price Type")
+                    {
 
-                    ToolTip = 'Specifies the value of the Price Type field';
-                    ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Price Type field';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
             part(OptionValues; "NPR Magento Itm Cstm Opt.Value")
