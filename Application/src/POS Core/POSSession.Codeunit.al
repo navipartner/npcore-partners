@@ -132,6 +132,8 @@ codeunit 6150700 "NPR POS Session"
         UI.InitializeTheme(POSUnit);
         DebugWithTimestamp('InitializeAdminTemplates');
         UI.InitializeAdministrativeTemplates(POSUnit);
+        DebugWithTimestamp('InitializeTelemetricsMetadata');
+        Frontend.InitializeTelemetricsMetadata();
         InitializedUI := true;
     end;
 
