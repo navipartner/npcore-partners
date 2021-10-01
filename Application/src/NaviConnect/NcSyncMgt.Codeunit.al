@@ -229,6 +229,7 @@
     procedure ProcessTasks(TaskProcessor: Record "NPR Nc Task Processor"; MaxRetry: Integer)
     var
         Task: Record "NPR Nc Task";
+        Task2: Record "NPR Nc Task";
     begin
         if MaxRetry < 1 then
             MaxRetry := 1;
@@ -239,7 +240,8 @@
         Task.SetFilter("Process Count", '<%1', MaxRetry);
         if Task.FindSet() then
             repeat
-                ProcessTask(Task);
+                Task2 := Task;
+                ProcessTask(Task2);
                 if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
                     exit;
             until Task.Next() = 0;
