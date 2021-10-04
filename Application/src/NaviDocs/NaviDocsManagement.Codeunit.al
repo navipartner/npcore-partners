@@ -445,11 +445,11 @@
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         EmailDocumentManagement: Codeunit "NPR E-mail Doc. Mgt.";
-        ErrorMessage: Text[1024];
+        ErrorMessage: Text;
     begin
         if NaviDocsEntry."E-mail (Recipient)" = '' then
             if ReportID <> 0 then
-                NaviDocsEntry."E-mail (Recipient)" := EmailDocumentManagement.GetMailReceipients(RecRef, ReportID);
+                NaviDocsEntry."E-mail (Recipient)" := CopyStr(EmailDocumentManagement.GetMailReceipients(RecRef, ReportID), 1, MaxStrLen(NaviDocsEntry."E-mail (Recipient)"));
         if NaviDocsEntry."E-mail (Recipient)" = '' then begin
             InsertComment(NaviDocsEntry, Error004, true);
             exit(false);
@@ -541,7 +541,7 @@
 
         NaviDocsHandlingProfile.Init();
         NaviDocsHandlingProfile.Code := Code;
-        NaviDocsHandlingProfile.Description := Description;
+        NaviDocsHandlingProfile.Description := CopyStr(Description, 1, MaxStrLen(NaviDocsHandlingProfile.Description));
         NaviDocsHandlingProfile."Report Required" := ReportRequired;
         NaviDocsHandlingProfile."Default for Print" := DefaultForPrint;
         NaviDocsHandlingProfile."Default for E-Mail" := DefaultForEmail;
@@ -1069,7 +1069,7 @@
         NaviDocsEntry."Entry No." := 0;
         NaviDocsEntry.Validate("Record ID", RecRef.RecordId);
         NaviDocsEntry.Validate("Table No.", RecRef.Number);
-        NaviDocsEntry."Document Description" := POSEntry.TableCaption;
+        NaviDocsEntry."Document Description" := CopyStr(POSEntry.TableCaption, 1, MaxStrLen(NaviDocsEntry."Document Description"));
         NaviDocsEntry."No." := POSEntry."Document No.";
         NaviDocsEntry."Posting Date" := POSEntry."Entry Date";
 
@@ -1097,7 +1097,7 @@
         end;
 
         NaviDocsEntry.Validate("Document Handling Profile", HandlingProfile);
-        NaviDocsEntry."E-mail (Recipient)" := Recipient;
+        NaviDocsEntry."E-mail (Recipient)" := CopyStr(Recipient, 1, MaxStrLen(NaviDocsEntry."E-mail (Recipient)"));
         NaviDocsEntry."Report No." := ReportNo;
         NaviDocsEntry."Delay sending until" := DelayUntil;
         NaviDocsEntry."Template Code" := TemplateCode;

@@ -223,7 +223,7 @@ table 6059768 "NPR NaviDocs Entry"
     trigger OnInsert()
     begin
         "Entry No." := 0;
-        "Insert User ID" := UserId;
+        "Insert User ID" := CopyStr(UserId, 1, MaxStrLen("Insert User ID"));
         "Insert Date" := Today();
         "Insert Time" := Time;
     end;
