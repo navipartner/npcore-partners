@@ -77,7 +77,7 @@ table 6059769 "NPR NaviDocs Entry Comment"
         "Insert Date" := Today();
         "Insert Time" := Time;
 
-        "User ID" := UserId;
+        "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
     end;
 
 }
