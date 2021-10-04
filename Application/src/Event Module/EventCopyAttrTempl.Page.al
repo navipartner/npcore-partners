@@ -45,7 +45,7 @@ page 6060156 "NPR Event Copy Attr./Templ."
                         CopySuccess := true;
                     end;
                 CopyWhat::CustTemplate, CopyWhat::TeamTemplate:
-                    CopySuccess := EventMgt.CopyTemplates(FromEventNo, ToEventNo, CopyWhat, ResponseMsg);
+                    CopySuccess := EventMgt.CopyReportLayouts(FromEventNo, ToEventNo, CopyWhat, ResponseMsg);
             end;
             if CopySuccess then
                 Message(CopySuccessTxt)

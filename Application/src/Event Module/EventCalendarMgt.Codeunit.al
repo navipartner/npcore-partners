@@ -249,7 +249,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::" ";
         JobPlanningLine.Modify();
         exit(JobPlanningLine."NPR Calendar Item Status" = JobPlanningLine."NPR Calendar Item Status"::Sent);
-
     end;
 
     procedure RemoveFromCalendar(var Job: Record Job)
@@ -308,7 +307,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
             CalendarType::MeetingRequest:
                 RemoveMultipleLinesFromCalendar(JobPlanningLine, CancelMsg);
         end;
-
     end;
 
     local procedure RemoveMultipleLinesFromCalendar(var JobPlanningLine: Record "Job Planning Line"; CancelMsg: Text)
@@ -397,334 +395,134 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         exit(true);
     end;
 
+
     procedure ProcessCalendarItem(var RecRef: RecordRef; ActionToTake: Option Send,Remove): Boolean
     var
-        ExchService: DotNet NPRNetExchangeService;
-        AppointmentItem: DotNet NPRNetAppointment;
-        ItemId: DotNet NPRNetItemId;
-        MessageBody: DotNet NPRNetMessageBody;
-        BodyType: DotNet NPRNetBodyType;
-        TimeZoneInfo: DotNet NPRNetTimeZoneInfo;
-        StringList: DotNet NPRNetStringList;
-        BodyText: Text;
+        EventBodyText: Text;
         EMailTemplateHeader: Record "NPR E-mail Template Header";
-        EMailTemplateLine: Record "NPR E-mail Templ. Line";
         RecRef2: RecordRef;
-        CommentLine: Record "Comment Line";
-        CalendarItemID: Text;
+        CalendarCategory, CalendarItemID : Text;
         Job: Record Job;
         JobPlanningLine: Record "Job Planning Line";
-        FileName: Text;
-        LegacyFreeBusyStatus: DotNet NPRNetLegacyFreeBusyStatus;
-        UseTemplate: Boolean;
+        ReminderMinutesBeforeStart: Integer;
+        ShowAsBusy, UseTemplate : Boolean;
         EventExchIntTemplate: Record "NPR Event Exch. Int. Template";
-        EndingDate: Date;
-        StartingTime: Time;
-        EndingTime: Time;
         EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail";
-        TimeZoneId: Text;
-        ServerTimeZoneId: Text;
-        TimeZone: Record "Time Zone";
-        ServerOffSet: Duration;
-        DateTimeWithOffSet: DateTime;
-        SenderOffSet: Duration;
-        TimeSpan: DotNet NPRNetTimeSpan;
-        CustomOffSet: Duration;
+        Subject, TimeZoneId, EventRequest : Text;
+        AllDayEvent: Boolean;
+        StartingDateTime: DateTime;
+        EndingDateTime: DateTime;
+        GraphAPIManagement: Codeunit "NPR Graph API Management";
+        JAAttendees: JsonArray;
     begin
-        case RecRef.Number of
-            DATABASE::Job:
-                begin
-                    RecRef.SetTable(Job);
-                    CalendarItemID := Job."NPR Calendar Item ID";
-                    if not EventEWSMgt.InitializeExchService(RecRef.RecordId, Job, ExchService, 1) then
-                        exit(false);
-                    UseTemplate := UseTemplateArr[1];
-                    EventExchIntTemplate := EventExchIntTemplateArr[1];
-                end;
-            DATABASE::"Job Planning Line":
-                begin
-                    RecRef.SetTable(JobPlanningLine);
-                    Job.Get(JobPlanningLine."Job No.");
-                    CalendarItemID := JobPlanningLine."NPR Calendar Item ID";
-                    if not EventEWSMgt.InitializeExchService(RecRef.RecordId, Job, ExchService, 2) then
-                        exit(false);
-                    UseTemplate := UseTemplateArr[2];
-                    EventExchIntTemplate := EventExchIntTemplateArr[2];
-                end;
-        end;
-
-        Clear(AppointmentItem);
-
-        AppointmentItem := AppointmentItem.Appointment(ExchService);
+        GetTemplates(RecRef, CalendarItemID, Job, JobPlanningLine, UseTemplate, EventExchIntTemplate);
+        EventEWSMgt.GetEventExchIntEmail(EventExchIntEmail);
 
         if CalendarItemID <> '' then begin
-            if not GetCalendarItem(CalendarItemID, ExchService, AppointmentItem) then begin
+            if not GraphAPIManagement.GetEvent(EventExchIntEmail, CalendarItemID) then begin
                 ProcessCalendarItemID(0, RecRef, '');
                 exit(true);
             end;
             if ActionToTake = ActionToTake::Remove then begin
-                if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Delete', 0) then
+                if not GraphAPIManagement.DeleteEvent(EventExchIntEmail, CalendarItemID) then
                     exit(false);
                 ProcessCalendarItemID(0, RecRef, '');
+                ResetAtendeeResponse(RecRef, Job, JobPlanningLine);
                 exit(true);
             end;
         end;
 
-        if UseTemplate then
-            if not EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then
-                Clear(EMailTemplateHeader);
+        GetAppointmentTemplate(EMailTemplateHeader, ReminderMinutesBeforeStart, EventExchIntTemplate, CalendarCategory, UseTemplate);
+
+        GetTimeZone(EventExchIntEmail, TimeZoneId);
+        GetSubject(EMailTemplateHeader, RecRef2, Job, EventExchIntTemplate, UseTemplate, Subject);
+        GetTimes(RecRef, Job, JobPlanningLine, EventExchIntTemplate, AllDayEvent, StartingDateTime, EndingDateTime);
+        GetAttendees(RecRef, JobPlanningLine, JAAttendees);
+        GetEventBodyContent(EventBodyText, EMailTemplateHeader, RecRef2, Job, UseTemplate, EventExchIntTemplate);
+
+        if Job.Status = Job.Status::Open then begin
+            ShowAsBusy := true;
+        end;
+
+        EventRequest := GraphAPIManagement.CreateEventRequest(Subject, StartingDateTime, EndingDateTime, TimeZoneId, ShowAsBusy, ReminderMinutesBeforeStart, JAAttendees, EventBodyText, CalendarCategory);
+        if CalendarItemID = '' then begin
+            CalendarItemID := GraphAPIManagement.SendEventRequest(EventExchIntEmail, EventRequest);
+        end else
+            GraphAPIManagement.SendEventRequestUpdate(EventExchIntEmail, EventRequest, CalendarItemID);
+        ProcessCalendarItemID(1, RecRef, CalendarItemID);
 
         if EventEWSMgt.IncludeAttachmentCheck(Job, 1) then
-            if EventEWSMgt.CreateAttachment(Job, 1, EMailTemplateHeader, FileName) then begin
-                if CalendarItemID <> '' then
-                    AppointmentItem.Attachments.Clear();
-                AppointmentItem.Attachments.AddFileAttachment(FileName);
-            end;
-
-        EventEWSMgt.GetEventExchIntEmail(EventExchIntEmail);
-        TimeZoneInfo := TimeZoneInfo.Local;
-        ServerTimeZoneId := TimeZoneInfo.Id;
-        ApplySubstituteTimeZone(ServerTimeZoneId);
-        TimeZoneId := ServerTimeZoneId;
-        if EventExchIntEmail."Time Zone No." <> 0 then begin
-            TimeZone.Get(EventExchIntEmail."Time Zone No.");
-            if TimeZone.ID <> TimeZoneInfo.Id then
-                TimeZoneId := TimeZone.ID;
-        end;
-        ApplySubstituteTimeZone(TimeZoneId);
-
-        if EventExchIntEmail."Time Zone Custom Offset (Min)" <> 0 then
-            CustomOffSet := TimeSpan.FromMinutes(EventExchIntEmail."Time Zone Custom Offset (Min)");
-
-        TimeZoneInfo := TimeZoneInfo.FindSystemTimeZoneById(ServerTimeZoneId);
-        ServerOffSet := TimeZoneInfo.GetUtcOffset(CurrentDateTime);
-        TimeZoneInfo := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
-        SenderOffSet := TimeZoneInfo.GetUtcOffset(CurrentDateTime);
-
-        AppointmentItem.StartTimeZone := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
-        AppointmentItem.EndTimeZone := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
-
-        if CalendarItemID <> '' then begin
-            if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Update', 0) then
-                exit(false);
-        end else
-            if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Save', 0) then
-                exit(false);
-        ItemId := AppointmentItem.Id;
-        ProcessCalendarItemID(1, RecRef, ItemId.UniqueId);
-
-        if UseTemplate and EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then begin
-            RecRef2.GetTable(Job);
-            AppointmentItem.Subject := EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject);
-        end else
-            AppointmentItem.Subject := Job.Description;
-
-        case RecRef.Number of
-            DATABASE::Job:
-                begin
-                    EndingDate := Job."Ending Date";
-                    StartingTime := Job."NPR Starting Time";
-                    EndingTime := Job."NPR Ending Time";
-                    AppointmentItem.IsAllDayEvent := IsAllDayEvent(StartingTime, EndingTime, EventExchIntTemplate."Lasts Whole Day (Appointment)");
-
-                    if AppointmentItem.IsAllDayEvent then begin
-                        EndingDate := CalcDate('<1D>', EndingDate);
-                        StartingTime := 000000T;
-                        EndingTime := 000000T;
-                        if EventExchIntTemplate."First Day Only (Appointment)" then
-                            EndingDate := CalcDate('<1D>', Job."Starting Date");
-                    end;
-                    DateTimeWithOffSet := CreateDateTime(Job."Starting Date", StartingTime) + (ServerOffSet - SenderOffSet) + CustomOffSet;
-                    AppointmentItem.Start := DateTimeWithOffSet;
-                    DateTimeWithOffSet := CreateDateTime(EndingDate, EndingTime) + (ServerOffSet - SenderOffSet) + CustomOffSet;
-                    AppointmentItem."End" := DateTimeWithOffSet;
-                end;
-            DATABASE::"Job Planning Line":
-                begin
-                    DateTimeWithOffSet := CreateDateTime(JobPlanningLine."Planning Date", JobPlanningLine."NPR Starting Time") + (ServerOffSet - SenderOffSet) + CustomOffSet;
-                    AppointmentItem.Start := DateTimeWithOffSet;
-                    DateTimeWithOffSet := CreateDateTime(JobPlanningLine."Planning Date", JobPlanningLine."NPR Ending Time") + (ServerOffSet - SenderOffSet) + CustomOffSet;
-                    AppointmentItem."End" := DateTimeWithOffSet;
-                    AppointmentItem.RequiredAttendees.Add(JobPlanningLine."NPR Resource E-Mail");
-                end;
-        end;
-
-        BodyText := '<font face="Calibri">';
-
-        if UseTemplate and EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then begin
-            EMailTemplateLine.SetRange("E-mail Template Code", EMailTemplateHeader.Code);
-            if EMailTemplateLine.FindSet() then
-                repeat
-                    BodyText += EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateLine."Mail Body Line") + '</br>';
-                until EMailTemplateLine.Next() = 0;
-        end else
-            BodyText += Job.FieldCaption("No.") + ': ' + Job."No." + '</br>' +
-                        Job.FieldCaption(Description) + ': ' + Job.Description + '</br>';
-        BodyText += '</br>';
-        if UseTemplate and EventExchIntTemplate."Include Comments (Calendar)" then begin
-            CommentLine.SetRange("Table Name", CommentLine."Table Name"::Job);
-            CommentLine.SetRange("No.", Job."No.");
-            if CommentLine.FindSet() then
-                repeat
-                    BodyText += CommentLine.Comment + '</br>'
-                until CommentLine.Next() = 0;
-        end;
-        BodyText += '</font>';
-        AppointmentItem.Body := MessageBody.MessageBody(BodyType.HTML, BodyText);
-
-        AppointmentItem.LegacyFreeBusyStatus := LegacyFreeBusyStatus.Tentative;
-
-        if Job.Status = Job.Status::Open then begin //NAV2017
-            AppointmentItem.LegacyFreeBusyStatus := LegacyFreeBusyStatus.Busy;
-            if UseTemplate and (EventExchIntTemplate."Conf. Color Categ. (Calendar)" <> '') then begin
-                StringList := AppointmentItem.Categories;
-                if not StringList.Contains(EventExchIntTemplate."Conf. Color Categ. (Calendar)") then
-                    AppointmentItem.Categories.Add(EventExchIntTemplate."Conf. Color Categ. (Calendar)");
-            end;
-        end;
-
-        if UseTemplate then begin
-            AppointmentItem.IsReminderSet := EventExchIntTemplate."Reminder Enabled (Calendar)";
-            AppointmentItem.ReminderMinutesBeforeStart := EventExchIntTemplate."Reminder (Minutes) (Calendar)";
-        end;
-        case RecRef.Number of
-            DATABASE::Job:
-                begin
-                    if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Update', 0) then
-                        exit(false);
-                    RecRef.Get(Job.RecordId);
-                end;
-            DATABASE::"Job Planning Line":
-                if not RunAppointmentItemMethodWithLog(RecRef.RecordId, AppointmentItem, 'Update', 1) then
-                    exit(false);
-        end;
+            AddAttachments(Job, EventExchIntEmail, CalendarItemID);
 
         exit(true);
     end;
 
-    [TryFunction]
-    local procedure GetCalendarItem(CalendarItemID: Text; ExchService: DotNet NPRNetExchangeService; var AppointmentItem: DotNet NPRNetAppointment)
-    var
-        ItemId: DotNet NPRNetItemId;
-    begin
-        Clear(ItemId);
-        ItemId := ItemId.ItemId(CalendarItemID);
-        AppointmentItem := AppointmentItem.Bind(ExchService, ItemId);
-    end;
-
     procedure GetCalendarAttendeeResponses(Job: Record Job)
     var
-        RecRef: RecordRef;
-        JobPlanningLine: Record "Job Planning Line";
+        EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail";
+        GraphAPIManagement: Codeunit "NPR Graph API Management";
+        EventContent, Response, Email : Text;
+        JOEventContent: JsonObject;
+        JToken, JTAttendee, JTResponse, JTEmail : JsonToken;
+        JArray: JsonArray;
+        i: Integer;
     begin
-        EventEWSMgt.CheckStatus(Job, true);
+        Job.TestField("NPR Calendar Item ID");
 
-        JobsSetup.Get();
-        EventEWSMgt.OrganizerAccountSet(Job, true, false);
-        RecRef.GetTable(Job);
-        EventEWSMgt.SetJobPlanLineFilter(Job, JobPlanningLine);
-        if JobPlanningLine.FindSet() then
-            repeat
-                GetCalendarAttendeeResponse(JobPlanningLine);
-            until JobPlanningLine.Next() = 0;
-    end;
+        EventExchIntEmail.Get(Job."NPR Organizer E-Mail");
 
-    procedure GetCalendarAttendeeResponseAction(var JobPlanningLine: Record "Job Planning Line")
-    begin
-        GetCalendarAttendeeResponse(JobPlanningLine);
+        EventContent := GraphAPIManagement.GetEventContent(EventExchIntEmail, Job."NPR Calendar Item ID");
+        If EventContent = '' then
+            exit;
+        JOEventContent.ReadFrom(EventContent);
+        JOEventContent.SelectToken('attendees', JToken);
+        JArray := JToken.AsArray();
+        for i := 0 to JArray.Count() - 1 do begin
+            JArray.Get(i, JTAttendee);
+            if JTAttendee.SelectToken('status.response', JTResponse) then
+                Response := JTResponse.AsValue().AsText();
+            if JTAttendee.SelectToken('emailAddress.address', JTEmail) then
+                Email := JTEmail.AsValue().AsText();
+            UpdateJobLineResponse(Job, Email, Response);
+        end;
     end;
 
     procedure GetCalendarAttendeeResponse(var JobPlanningLine: Record "Job Planning Line"): Boolean
     var
         Job: Record Job;
-        RecRef: RecordRef;
-        Response: Text;
-        ResponseType: DotNet NPRNetMeetingResponseType;
+        EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail";
+        GraphAPIManagement: Codeunit "NPR Graph API Management";
+        EventContent, Response, Email : Text;
+        JOEventContent: JsonObject;
+        JToken, JTAttendee, JTResponse, JTEmail : JsonToken;
+        JArray: JsonArray;
+        i: Integer;
     begin
         Job.Get(JobPlanningLine."Job No.");
         EventEWSMgt.CheckStatus(Job, true);
 
-        if JobPlanningLine."NPR Calendar Item ID" = '' then
-            exit(false);
+        JobPlanningLine.TestField("NPR Calendar Item ID");
+        EventExchIntEmail.Get(Job."NPR Organizer E-Mail");
 
-        JobsSetup.Get();
-        EventEWSMgt.OrganizerAccountSet(Job, true, false);
-        RecRef.GetTable(JobPlanningLine);
-        if not ProcessAttendeeReponseWithLog(JobPlanningLine, Response) then begin
-            JobPlanningLine."NPR Calendar Item Status" := JobPlanningLine."NPR Calendar Item Status"::Error;
-            JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::" ";
-        end else begin
-            case Response of
-                ResponseType.Unknown.ToString():
-                    JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::Unknown;
-                ResponseType.Organizer.ToString():
-                    JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::Organizer;
-                ResponseType.Tentative.ToString():
-                    JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::Tentative;
-                ResponseType.Accept.ToString():
-                    JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::Accepted;
-                ResponseType.Decline.ToString():
-                    JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::Declined;
-                ResponseType.NoResponseReceived.ToString():
-                    JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::"No Response";
+        EventContent := GraphAPIManagement.GetEventContent(EventExchIntEmail, JobPlanningLine."NPR Calendar Item ID");
+        if EventContent = '' then
+            exit(false);
+        JOEventContent.ReadFrom(EventContent);
+        JOEventContent.SelectToken('attendees', JToken);
+        JArray := JToken.AsArray();
+        for i := 0 to JArray.Count() - 1 do begin
+            JArray.Get(i, JTAttendee);
+            if JTAttendee.SelectToken('status.response', JTResponse) then
+                Response := JTResponse.AsValue().AsText();
+            if JTAttendee.SelectToken('emailAddress.address', JTEmail) then
+                Email := JTEmail.AsValue().AsText();
+            if JobPlanningLine."NPR Resource E-Mail" = Email then begin
+                JobPlanningLine."NPR Meeting Request Response" := ConvertResponse(Response);
+                JobPlanningLine."NPR Calendar Item Status" := JobPlanningLine."NPR Calendar Item Status"::Received;
+                JobPlanningLine.Modify();
             end;
-            JobPlanningLine."NPR Calendar Item Status" := JobPlanningLine."NPR Calendar Item Status"::Received;
         end;
-        JobPlanningLine.Modify();
         exit(JobPlanningLine."NPR Calendar Item Status" = JobPlanningLine."NPR Calendar Item Status"::Received);
-
-    end;
-
-    procedure ProcessAttendeeReponseWithLog(var JobPlanningLine: Record "Job Planning Line"; var Response: Text): Boolean
-    var
-        ResponseContext: Label 'RESPONSE';
-        ActivityDescription: Label 'Getting Response..';
-        SuccessfullResponse: Label 'Response obtained: %1';
-        ActivityLog: Record "Activity Log";
-    begin
-        if not ProcessAttendeeResponse(JobPlanningLine, Response) then begin
-            ActivityLog.LogActivity(JobPlanningLine.RecordId, 1, ResponseContext, ActivityDescription, CopyStr(GetLastErrorText, 1, MaxStrLen(ActivityLog."Activity Message")));
-            exit(false);
-        end;
-        if JobPlanningLine."NPR Calendar Item ID" = '' then begin
-            ActivityLog.LogActivity(JobPlanningLine.RecordId, 1, ErrorContext, ActivityDescription, CantFindCalendar);
-            exit(false);
-        end;
-        ActivityLog.LogActivity(JobPlanningLine.RecordId, 0, ResponseContext, ActivityDescription, StrSubstNo(SuccessfullResponse, Response));
-        exit(true);
-    end;
-
-    [TryFunction]
-    procedure ProcessAttendeeResponse(var JobPlanningLine: Record "Job Planning Line"; var Response: Text)
-    var
-        ExchService: DotNet NPRNetExchangeService;
-        AppointmentItem: DotNet NPRNetAppointment;
-        Attendee: DotNet NPRNetAttendee;
-        i: Integer;
-        CantFindEmailError: Label 'No calendar requests have been sent to this e-mail %1. Please resend the request.';
-        Job: Record Job;
-        j: Integer;
-    begin
-        Clear(AppointmentItem);
-        Job.Get(JobPlanningLine."Job No.");
-        EventEWSMgt.InitializeExchService(JobPlanningLine.RecordId, Job, ExchService, 2);
-        AppointmentItem := AppointmentItem.Appointment(ExchService);
-        if not GetCalendarItem(JobPlanningLine."NPR Calendar Item ID", ExchService, AppointmentItem) then begin
-            JobPlanningLine."NPR Calendar Item ID" := '';
-            exit;
-        end;
-        if AppointmentItem.RequiredAttendees.Count() = 0 then
-            exit;
-        i := -1;
-        j := -1;
-        foreach Attendee in AppointmentItem.RequiredAttendees do begin
-            i += 1;
-            if LowerCase(Attendee.Address) = LowerCase(JobPlanningLine."NPR Resource E-Mail") then
-                j := i;
-        end;
-        if j = -1 then
-            Error(CantFindEmailError, JobPlanningLine."NPR Resource E-Mail");
-        Response := AppointmentItem.RequiredAttendees.Item(j).ResponseType.ToString();
     end;
 
     local procedure GetMsgDialogText(): Text
@@ -744,6 +542,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
 
         exit((StartTime = 0T) and (EndTime = 0T));
     end;
+
 
     local procedure ProcessCalendarItemID("Action": Option Reset,Assign,Get; var RecRef: RecordRef; CalendarID: Text): Text
     var
@@ -767,83 +566,6 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                 end;
             Action::Get:
                 exit(Format(FieldRef));
-        end;
-    end;
-
-    local procedure RunAppointmentItemMethodWithLog(RecordId: RecordID; var AppointmentItem: DotNet NPRNetAppointment; MethodName: Text; SendMode: Integer): Boolean
-    var
-        ActivityLog: Record "Activity Log";
-        Context: Text;
-        ActivityDescription: Text;
-    begin
-        if not RunAppointmentItemMethod(AppointmentItem, MethodName, SendMode, Context, ActivityDescription) then begin
-            if not RunAppointmentItemMethod(AppointmentItem, MethodName, SendMode, Context, ActivityDescription) then begin
-                ActivityLog.LogActivity(RecordId, 1, Context, ActivityDescription, CopyStr(GetLastErrorText, 1, MaxStrLen(ActivityLog."Activity Message")));
-                exit(false);
-            end;
-        end;
-        exit(true);
-    end;
-
-    local procedure RunAppointmentItemMethod(var AppointmentItem: DotNet NPRNetAppointment; MethodName: Text; SendMode: Integer; var Context: Text; var ActivityDescription: Text): Boolean
-    var
-        DeleteContext: Label 'DELETE';
-        DeleteDescription: Label 'Removing calendar item...';
-        SaveContext: Label 'SAVE';
-        SaveDescription: Label 'Saving calendar item...';
-        UpdateContext: Label 'UPDATE';
-        UpdateDescription: Label 'Updating calendar item...';
-    begin
-        case MethodName of
-            'Delete':
-                begin
-                    Context := DeleteContext;
-                    ActivityDescription := DeleteDescription;
-                    exit(AppointmentItemDelete(AppointmentItem));
-                end;
-            'Save':
-                begin
-                    Context := SaveContext;
-                    ActivityDescription := SaveDescription;
-                    exit(AppointmentItemSave(AppointmentItem));
-                end;
-            'Update':
-                begin
-                    Context := UpdateContext;
-                    ActivityDescription := UpdateDescription;
-                    exit(AppointmentItemUpdate(AppointmentItem, SendMode));
-                end;
-        end;
-    end;
-
-    [TryFunction]
-    local procedure AppointmentItemDelete(var AppointmentItem: DotNet NPRNetAppointment)
-    var
-        DeleteMode: DotNet NPRNetDeleteMode;
-        SendCancellationsMode: DotNet NPRNetSendCancellationsMode;
-    begin
-        AppointmentItem.Delete(DeleteMode.HardDelete, SendCancellationsMode.SendToAllAndSaveCopy);
-    end;
-
-    [TryFunction]
-    local procedure AppointmentItemSave(var AppointmentItem: DotNet NPRNetAppointment)
-    var
-        SendInvitationsMode: DotNet NPRNetSendInvitationsMode;
-    begin
-        AppointmentItem.Save(SendInvitationsMode.SendToNone);
-    end;
-
-    [TryFunction]
-    local procedure AppointmentItemUpdate(var AppointmentItem: DotNet NPRNetAppointment; SendMode: Option "None",AllAndSendCopy)
-    var
-        ConflictResolutionMode: DotNet NPRNetConflictResolutionMode;
-        SendInviteCancelMode: DotNet NPRNetSendInvitationsOrCancellationsMode;
-    begin
-        case SendMode of
-            SendMode::None:
-                AppointmentItem.Update(ConflictResolutionMode.AlwaysOverwrite, SendInviteCancelMode.SendToNone);
-            SendMode::AllAndSendCopy:
-                AppointmentItem.Update(ConflictResolutionMode.AlwaysOverwrite, SendInviteCancelMode.SendToAllAndSaveCopy);
         end;
     end;
 
@@ -890,29 +612,12 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                                                   JobPlanningLine.FieldCaption("NPR Ending Time"));
     end;
 
-    local procedure ApplySubstituteTimeZone(var TimeZoneId: Text)
-    var
-        TimeZone: Record "Time Zone";
-    begin
-        //-NPR5.46 [323953]
-        //some timezones have different types between .NET and EWS and error occurs
-        //one of those is Russian Standard Time
-        //quickest workaround is to use other timezones of same offset
-        TimeZone.SetRange(ID, TimeZoneId);
-        if TimeZone.FindFirst() then
-            case TimeZone.ID of
-                'Russian Standard Time':
-                    TimeZoneId := 'Belarus Standard Time';
-            end;
-        //+NPR5.46 [323953]
-    end;
 
     local procedure GetExchTemplate(RecRef: RecordRef; CalendarType: Integer)
     var
         Job: Record Job;
         JobPlanningLine: Record "Job Planning Line";
     begin
-        //-NPR5.48 [342511]
         //CalendarType: 1 = Appointment, 2 = Meeting Request
         case RecRef.Number of
             DATABASE::Job:
@@ -926,7 +631,218 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                 end;
         end;
         UseTemplateArr[CalendarType] := EventEWSMgt.UseTemplate(Job, 1, CalendarType, EventExchIntTemplateArr[CalendarType]);
-        //+NPR5.48 [342511]
     end;
+
+    local procedure GetEventBodyContent(var BodyText: Text; EMailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef2: RecordRef; var Job: Record Job; UseTemplate: Boolean; var EventExchIntTemplate: Record "NPR Event Exch. Int. Template")
+    var
+        EMailTemplateLine: Record "NPR E-mail Templ. Line";
+        CommentLine: Record "Comment Line";
+    begin
+        BodyText := '<font face="Calibri">';
+
+        if UseTemplate and EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then begin
+            EMailTemplateLine.SetRange("E-mail Template Code", EMailTemplateHeader.Code);
+            if EMailTemplateLine.FindSet() then
+                repeat
+                    BodyText += EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateLine."Mail Body Line") + '</br>';
+                until EMailTemplateLine.Next() = 0;
+        end else
+            BodyText += Job.FieldCaption("No.") + ': ' + Job."No." + '</br>' +
+                        Job.FieldCaption(Description) + ': ' + Job.Description + '</br>';
+        BodyText += '</br>';
+        if UseTemplate and EventExchIntTemplate."Include Comments (Calendar)" then begin
+            CommentLine.SetRange("Table Name", CommentLine."Table Name"::Job);
+            CommentLine.SetRange("No.", Job."No.");
+            if CommentLine.FindSet() then
+                repeat
+                    BodyText += CommentLine.Comment + '</br>'
+                until CommentLine.Next() = 0;
+        end;
+        BodyText += '</font>';
+    end;
+
+
+
+    local procedure GetTemplates(var RecRef: RecordRef; var CalendarItemID: Text; var Job: Record Job; var JobPlanningLine: Record "Job Planning Line"; var UseTemplate: Boolean; var EventExchIntTemplate: Record "NPR Event Exch. Int. Template"): Boolean
+    var
+        Source: Text;
+    begin
+        case RecRef.Number of
+            DATABASE::Job:
+                begin
+                    RecRef.SetTable(Job);
+                    CalendarItemID := Job."NPR Calendar Item ID";
+                    UseTemplate := UseTemplateArr[1];
+                    EventExchIntTemplate := EventExchIntTemplateArr[1];
+                end;
+            DATABASE::"Job Planning Line":
+                begin
+                    RecRef.SetTable(JobPlanningLine);
+                    Job.Get(JobPlanningLine."Job No.");
+                    CalendarItemID := JobPlanningLine."NPR Calendar Item ID";
+                    UseTemplate := UseTemplateArr[2];
+                    EventExchIntTemplate := EventExchIntTemplateArr[2];
+                end;
+        end;
+        EventEWSMgt.GetOrganizerSetup(Job, Source);
+    end;
+
+    local procedure AttendeeFromPlanningLine(JobPlanningLine: Record "Job Planning Line") JOAttendee: JsonObject;
+    var
+        JOEmailAddress: JsonObject;
+    begin
+        JOAttendee.Add('type', 'required');
+        JOEmailAddress.Add('name', JobPlanningLine.Description);
+        JOEmailAddress.Add('address', JobPlanningLine."NPR Resource E-Mail");
+        JOAttendee.Add('emailAddress', JOEmailAddress);
+    end;
+
+
+
+    local procedure GetTimeZone(var EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; var TimeZoneId: Text)
+    var
+        TimeZone: Record "Time Zone";
+    begin
+        if EventExchIntEmail."Time Zone No." <> 0 then begin
+            TimeZone.Get(EventExchIntEmail."Time Zone No.");
+            TimeZoneId := TimeZone.ID;
+        end;
+    end;
+
+    local procedure GetSubject(var EMailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef2: RecordRef; var Job: Record Job; var EventExchIntTemplate: Record "NPR Event Exch. Int. Template"; UseTemplate: Boolean; var Subject: Text)
+    begin
+        if UseTemplate and EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then begin
+            RecRef2.GetTable(Job);
+            Subject := EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject);
+        end else
+            Subject := Job.Description;
+    end;
+
+    local procedure UpdateJobLineResponse(Job: Record Job; Email: Text; Response: Text)
+    var
+        JobPlanningLine: Record "Job Planning Line";
+    begin
+        If Email = '' then
+            exit;
+        JobPlanningLine.SetRange("Job No.", Job."No.");
+        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
+        JobPlanningLine.SetRange("NPR Resource E-Mail", Email);
+        if JobPlanningLine.FindFirst() then begin
+            JobPlanningLine."NPR Meeting Request Response" := ConvertResponse(Response);
+            JobPlanningLine.Modify();
+        end;
+    end;
+
+    local procedure ConvertResponse(Response: Text) MeetingRequestResponse: Enum "NPR Meeting Request Response"
+    begin
+        case Response of
+            'none', 'notResponded':
+                exit(MeetingRequestResponse::"No Response");
+            'organizer':
+                exit(MeetingRequestResponse::Organizer);
+            'tentativelyAccepted':
+                exit(MeetingRequestResponse::Tentative);
+            'accepted':
+                exit(MeetingRequestResponse::Accepted);
+            'declined':
+                exit(MeetingRequestResponse::Declined);
+            else
+                exit(MeetingRequestResponse::" ");
+        end;
+    end;
+
+    local procedure AddAttachments(Job: Record Job; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; CalendarItemID: Text)
+    var
+        EventReportLayout: Record "NPR Event Report Layout";
+        AttachmentTempBlob: Codeunit "Temp Blob";
+        GraphAPIManagement: Codeunit "NPR Graph API Management";
+        Base64Convert: Codeunit "Base64 Convert";
+        AttachmentStream: InStream;
+        AttachmentName, AttachmentExtension, AttachmentRequest : Text;
+    begin
+        if CalendarItemID = '' then
+            exit;
+        EventReportLayout.Reset();
+        EventReportLayout.SetRange("Event No.", Job."No.");
+        EventReportLayout.SetRange(Usage, EventReportLayout.Usage::Team);
+        if EventReportLayout.FindSet() then
+            repeat
+                if EventEWSMgt.CreateAttachment(EventReportLayout, Job, EventReportLayout.Usage::Team - 1, AttachmentTempBlob, AttachmentName, AttachmentExtension) then
+                    AttachmentTempBlob.CreateInStream(AttachmentStream);
+                AttachmentRequest := GraphAPIManagement.CreateAttachmentRequest(Base64Convert.ToBase64(AttachmentStream), AttachmentName);
+                GraphAPIManagement.AddAttachment(EventExchIntEmail, AttachmentRequest, CalendarItemID);
+            until EventReportLayout.Next() = 0;
+    end;
+
+    local procedure GetTimes(var RecRef: RecordRef; Job: Record Job; JobPlanningLine: Record "Job Planning Line"; EventExchIntTemplate: Record "NPR Event Exch. Int. Template"; var AllDayEvent: Boolean; var StartingDateTime: DateTime; var EndingDateTime: DateTime)
+    begin
+        case RecRef.Number of
+            DATABASE::Job:
+                begin
+                    EndingDateTime := CreateDateTime(Job."Ending Date", Job."NPR Ending Time");
+                    StartingDateTime := CreateDateTime(Job."Starting Date", Job."NPR Starting Time");
+                    AllDayEvent := IsAllDayEvent(Job."NPR Starting Time", Job."NPR Ending Time", EventExchIntTemplate."Lasts Whole Day (Appointment)");
+
+                    if AllDayEvent then begin
+                        EndingDateTime := CreateDateTime(CalcDate('<1D>', Job."Ending Date"), 0T);
+                        StartingDateTime := CreateDateTime(Job."Starting Date", 0T);
+                        if EventExchIntTemplate."First Day Only (Appointment)" then
+                            EndingDateTime := CreateDateTime(CalcDate('<1D>', Job."Starting Date"), 0T);
+                    end;
+                end;
+            DATABASE::"Job Planning Line":
+                begin
+                    StartingDateTime := CreateDateTime(JobPlanningLine."Planning Date", JobPlanningLine."NPR Starting Time");
+                    EndingDateTime := CreateDateTime(JobPlanningLine."Planning Date", JobPlanningLine."NPR Ending Time");
+                end;
+        end;
+    end;
+
+    local procedure GetAttendees(var RecRef: RecordRef; JobPlanningLine: Record "Job Planning Line"; JAAttendees: JsonArray)
+    begin
+        case RecRef.Number of
+            DATABASE::"Job Planning Line":
+                begin
+                    JAAttendees.Add(AttendeeFromPlanningLine(JobPlanningLine));
+                end;
+        end;
+    end;
+
+    local procedure GetAppointmentTemplate(var EMailTemplateHeader: Record "NPR E-mail Template Header"; var ReminderMinutesBeforeStart: Integer; EventExchIntTemplate: Record "NPR Event Exch. Int. Template"; var CalendarCategory: Text; UseTemplate: Boolean)
+    begin
+        if UseTemplate then begin
+            if not EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then
+                Clear(EMailTemplateHeader);
+            if EventExchIntTemplate."Reminder Enabled (Calendar)" then
+                ReminderMinutesBeforeStart := EventExchIntTemplate."Reminder (Minutes) (Calendar)";
+            CalendarCategory := EventExchIntTemplate."Conf. Color Categ. (Calendar)";
+        end;
+    end;
+
+    local procedure ResetAtendeeResponse(RecRef: RecordRef; Job: Record Job; var JobPlanningLine: Record "Job Planning Line")
+    begin
+        case RecRef.Number of
+            DATABASE::Job:
+                begin
+                    ResetAtendeeResponse(Job);
+                end;
+            DATABASE::"Job Planning Line":
+                begin
+                    JobPlanningLine."NPR Meeting Request Response" := JobPlanningLine."NPR Meeting Request Response"::" ";
+                end;
+        end;
+    end;
+
+    local procedure ResetAtendeeResponse(Job: Record Job)
+    var
+        JobPlanningLine: Record "Job Planning Line";
+    begin
+        JobPlanningLine.SetRange("Job No.", Job."No.");
+        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
+        JobPlanningLine.SetRange("NPR Calendar Item ID", '');
+        JobPlanningLine.SetFilter("NPR Resource E-Mail", '<>%1');
+        JobPlanningLine.ModifyAll("NPR Meeting Request Response", JobPlanningLine."NPR Meeting Request Response"::" ");
+    end;
+
 }
 

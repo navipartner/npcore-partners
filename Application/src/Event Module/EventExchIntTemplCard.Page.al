@@ -71,6 +71,11 @@ page 6151580 "NPR Event Exch.Int.Templ. Card"
                         ToolTip = 'Specifies the value of the For Event Status field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Open E-mail dialog"; Rec."Open E-mail dialog")
+                    {
+                        ToolTip = 'Specifies the value of the Open E-mail dialog field.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
             group(Calendar)
