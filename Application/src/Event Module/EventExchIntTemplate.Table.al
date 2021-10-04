@@ -94,13 +94,11 @@ table 6060150 "NPR Event Exch. Int. Template"
         {
             Caption = 'Reminder Enabled (Calendar)';
             DataClassification = CustomerContent;
-            Description = 'NPR5.35';
         }
         field(80; "Reminder (Minutes) (Calendar)"; Integer)
         {
             Caption = 'Reminder (Minutes) (Calendar)';
             DataClassification = CustomerContent;
-            Description = 'NPR5.35';
 
             trigger OnValidate()
             begin
@@ -112,27 +110,28 @@ table 6060150 "NPR Event Exch. Int. Template"
         {
             Caption = 'First Day Only (Appointment)';
             DataClassification = CustomerContent;
-            Description = 'NPR5.36';
         }
         field(100; "Ticket URL Placeholder(E-Mail)"; Text[30])
         {
             Caption = 'Ticket URL Placeholder(E-Mail)';
             DataClassification = CustomerContent;
-            Description = 'NPR5.43';
         }
         field(110; "Auto. Send. Enabled (E-Mail)"; Boolean)
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(120; "Auto.Send.Event Status(E-Mail)"; Option)
         {
             Caption = 'For Event Status';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             OptionCaption = 'Planning,Quote,Order,Completed,,,,,,Postponed,Cancelled,Ready to be Invoiced';
             OptionMembers = Planning,Quote,"Order",Completed,,,,,,Postponed,Cancelled,"Ready to be Invoiced";
+        }
+        field(130; "Open E-mail dialog"; Boolean)
+        {
+            Caption = 'Open E-mail dialog';
+            DataClassification = CustomerContent;
         }
     }
 

@@ -3,7 +3,6 @@ page 6060150 "NPR Event Card"
     Caption = 'Event Card';
     PageType = Card;
     UsageCategory = Administration;
-
     PromotedActionCategories = 'New,Process,Report,Prices,Tickets';
     RefreshOnActivate = true;
     SourceTable = Job;
@@ -1436,24 +1435,19 @@ page 6060150 "NPR Event Card"
                     ToolTip = 'View or add attributes which will be associated with this event. Attributes are custom made labels that let you track different statistics per event or can be used as a set of multiple cross-labels for which you can define values.';
                     ApplicationArea = NPRRetail;
                 }
-                action(WordLayouts)
+
+                action(ReportLayout)
                 {
-                    Caption = 'Word Layouts';
-                    Image = Quote;
+                    Caption = 'Report Layouts';
+                    Image = Print;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
 
-                    ToolTip = 'View or add a word document with specific layout/data for this event.';
+                    ToolTip = 'View or add a report with specific layout/data for this event.';
                     ApplicationArea = NPRRetail;
-
-                    trigger OnAction()
-                    var
-                        EventWordLayouts: Page "NPR Event Word Layouts";
-                    begin
-                        EventWordLayouts.SetEvent(Rec);
-                        EventWordLayouts.RunModal();
-                    end;
+                    RunObject = page "NPR Event Report Layouts";
+                    RunPageLink = "Event No." = field("No.");
                 }
                 action(ExchIntTemplates)
                 {

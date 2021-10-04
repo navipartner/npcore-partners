@@ -8,12 +8,12 @@
         JobsSetup: Record "Jobs Setup";
         GLSetup: Record "General Ledger Setup";
         JobReg: Record "Job Register";
-        EventEWSMgt: Codeunit "NPR Event EWS Management";
+
         ContinueMsg: Label 'Do you want to continue?';
         EventEmailMgt: Codeunit "NPR Event Email Management";
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
         RelatedJobEntriesExistErr: Label 'You can''t change %1 as there are related %2 or %3 associated with it.';
-        EventVersionSpecificMgt: Codeunit "NPR Event Vers. Specific Mgt.";
+
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
         EventTicketMgt: Codeunit "NPR Event Ticket Mgt.";
         AmountRoundingPrecision: Decimal;
@@ -50,9 +50,9 @@
         if Rec."NPR Source Job No." <> Rec."No." then begin
             Job.Get(Rec."NPR Source Job No.");
             EventAttrMgt.CopyAttributes('', Rec."NPR Source Job No.", Rec."No.", ReturnMsg);
-            CopyTemplates(Rec."NPR Source Job No.", Rec."No.", 0, ReturnMsg);
             CopyExchIntTemplates(Rec."NPR Source Job No.", Rec."No.", ReturnMsg);
             CopyComments(Rec."NPR Source Job No.", Rec."No.", ReturnMsg);
+            CopyReportLayouts(Rec."NPR Source Job No.", Rec."No.", 0, ReturnMsg);
             Rec."NPR Source Job No." := Rec."No.";
         end;
         Rec.Validate("NPR Event Status");
@@ -98,7 +98,7 @@
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterDeleteEvent', '', false, false)]
     local procedure JobOnAfterDelete(var Rec: Record Job; RunTrigger: Boolean)
     var
-        EventWordLayout: Record "NPR Event Word Layout";
+        EventReportLayout: Record "NPR Event Report Layout";
         EventAttribute: Record "NPR Event Attribute";
         EventExchIntTempEntry: Record "NPR Event Exch.Int.Temp.Entry";
     begin
@@ -111,11 +111,11 @@
         EventAttribute.SetRange("Job No.", Rec."No.");
         EventAttribute.DeleteAll(true);
 
-        EventWordLayout.SetRange("Source Record ID", Rec.RecordId);
-        EventWordLayout.DeleteAll();
-
         EventExchIntTempEntry.SetRange("Source Record ID", Rec.RecordId);
         EventExchIntTempEntry.DeleteAll();
+
+        EventReportLayout.SetRange("Event No.", Rec."No.");
+        EventReportLayout.DeleteAll();
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
@@ -844,140 +844,8 @@
         end;
     end;
 
-    procedure CopyTemplates(FromEventNo: Code[20]; ToEventNo: Code[20]; CopyWhatHere: Option All,Customer,Team; var ReturnMsg: Text): Boolean
-    var
-        JobFrom: Record Job;
-        JobTo: Record Job;
-        EventWordLayoutFrom: Record "NPR Event Word Layout";
-        EventWordLayoutTo: Record "NPR Event Word Layout";
-    begin
-        JobFrom.Get(FromEventNo);
-        JobTo.Get(ToEventNo);
-        EventWordLayoutFrom.SetRange("Source Record ID", JobFrom.RecordId);
-        if CopyWhatHere > 0 then
-            EventWordLayoutFrom.SetRange(Usage, CopyWhatHere);
-        if EventWordLayoutFrom.FindSet() then begin
-            repeat
-                EventWordLayoutFrom.CalcFields(Layout, "XML Part", "Request Page Parameters");
-                EventWordLayoutTo.Init();
-                EventWordLayoutTo := EventWordLayoutFrom;
-                EventWordLayoutTo."Source Record ID" := JobTo.RecordId;
-                EventWordLayoutTo.Insert(true);
-            until EventWordLayoutFrom.Next() = 0;
-            exit(true);
-        end;
-        ReturnMsg := NothingToCopyTxt;
-        exit(false);
-    end;
 
-    procedure MergeAndSaveWordLayout(EventWordLayout: Record "NPR Event Word Layout"; SaveAs: Option Word,Pdf; FileName: Text)
-    var
-        Job: Record Job;
-        RecRef: RecordRef;
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        DataTypeMgt: Codeunit "Data Type Management";
-        InStrWordDoc: InStream;
-        InStrParameters: InStream;
-        OutStrWordDoc, OutStr : OutStream;
-        InStrXmlData: InStream;
-        FileExtension: Text;
-        ExtensionMismatch: Label 'Provided file extension %1 can''t be used on file type %2.';
-        EMailTemplateHeader: Record "NPR E-mail Template Header";
-        Parameters: Text;
-    begin
-        EventWordLayout.GetJobFromRecID(Job);
-        Job.SetRecFilter();
-        ValidateAndUpdateWordLayoutOnRecord(EventWordLayout);
-        EventWordLayout.CalcFields(Layout);
-        EventWordLayout.Layout.CreateInStream(InStrWordDoc);
-        if EventWordLayout."Request Page Parameters".HasValue() then begin
-            EventWordLayout.CalcFields("Request Page Parameters");
-            EventWordLayout."Request Page Parameters".CreateInStream(InStrParameters);
-            InStrParameters.ReadText(Parameters);
-        end;
-        ValidateWordLayoutCheckOnly(EventWordLayout."Report ID", InStrWordDoc);
-        TempBlob.CreateOutStream(OutStrWordDoc);
 
-        Case EventWordLayout.Usage of
-            EventWordLayout.Usage::Customer:
-                begin
-                    DataTypeMgt.GetRecordRef(Job, RecRef);
-                    TempBlob.CreateOutStream(OutStr);
-                    Report.SaveAs(Report::"NPR Event Customer Template", Parameters, ReportFormat::Xml, OutStr, RecRef);
-                end;
-            EventWordLayout.Usage::Team:
-                begin
-                    DataTypeMgt.GetRecordRef(Job, RecRef);
-                    TempBlob.CreateOutStream(OutStr);
-                    Report.SaveAs(Report::"NPR Event Team Template", Parameters, ReportFormat::Xml, OutStr, RecRef);
-                end;
-        end;
-        TempBlob.CreateInStream(InStrXmlData);
-        EventVersionSpecificMgt.WordXMLMergerMergeWordDocument(InStrWordDoc, InStrXmlData, OutStrWordDoc, OutStrWordDoc);
-
-        FileExtension := 'docx';
-        if SaveAs = SaveAs::Pdf then begin
-            FileExtension := 'pdf';
-            ConvertWordToPdf(TempBlob);
-        end;
-
-        if FileName = '' then begin
-            FileName := EventEWSMgt.CreateFileName(Job, EMailTemplateHeader) + '.' + FileExtension;
-        end else begin
-            if FileMgt.GetExtension(FileName) <> FileExtension then
-                Error(ExtensionMismatch, FileMgt.GetExtension(FileName), Format(SaveAs));
-        end;
-        FileMgt.BLOBExport(TempBlob, FileName, true);
-    end;
-
-    local procedure ValidateWordLayoutCheckOnly(ReportID: Integer; DocumentStream: InStream)
-    var
-        ValidationErrors: Text;
-        ValidationErrorFormat: Text;
-        TemplateAfterUpdateValidationErr: Label 'The automatic update could not resolve all the conflicts in the current Word layout. For example, the layout uses fields that are missing in the report design or the report ID is wrong.\The following errors were detected:\%1\You must manually update the layout to match the current report design.';
-    begin
-        ValidationErrors := EventVersionSpecificMgt.WordXMLMergerValidateWordDocumentTemplate(DocumentStream, REPORT.WordXmlPart(ReportID, true));
-        if ValidationErrors <> '' then begin
-            ValidationErrorFormat := TemplateAfterUpdateValidationErr;
-            Message(ValidationErrorFormat, ValidationErrors);
-        end;
-    end;
-
-    local procedure ValidateAndUpdateWordLayoutOnRecord(EventWordLayout: Record "NPR Event Word Layout"): Boolean
-    var
-        DocumentStream: InStream;
-        ValidationErrors: Text;
-        TemplateValidationUpdateQst: Label 'The Word layout does not comply with the current report design (for example, fields are missing or the report ID is wrong).\The following errors were detected during the layout validation:\%1\Do you want to run an automatic update?';
-        TemplateValidationErr: Label 'The Word layout does not comply with the current report design (for example, fields are missing or the report ID is wrong).\The following errors were detected during the document validation:\%1\You must update the layout to match the current report design.';
-    begin
-        EventWordLayout.CalcFields(Layout);
-        EventWordLayout.Layout.CreateInStream(DocumentStream);
-        EventVersionSpecificMgt.WordXMLMergerConstructor();
-        ValidationErrors := EventVersionSpecificMgt.WordXMLMergerValidateWordDocumentTemplate(DocumentStream, REPORT.WordXmlPart(EventWordLayout."Report ID", true));
-        if ValidationErrors <> '' then begin
-            if Confirm(TemplateValidationUpdateQst, false, ValidationErrors) then begin
-                ValidationErrors := EventWordLayout.TryUpdateLayout(false);
-                Commit();
-                exit(true);
-            end;
-            Error(TemplateValidationErr, ValidationErrors);
-        end;
-        exit(false);
-
-    end;
-
-    procedure ConvertWordToPdf(var TempBlob: Codeunit "Temp Blob")
-    var
-        TempBlobPdf: Codeunit "Temp Blob";
-        InStreamWordDoc: InStream;
-        OutStreamPdfDoc: OutStream;
-    begin
-        TempBlob.CreateInStream(InStreamWordDoc);
-        TempBlobPdf.CreateOutStream(OutStreamPdfDoc);
-        EventVersionSpecificMgt.PdfWriterConvertToPdf(InStreamWordDoc, OutStreamPdfDoc);
-        TempBlob := TempBlobPdf;
-    end;
 
     local procedure GetOverCapacitateResourceSetup(JobPlanningLine: Record "Job Planning Line") SetupValue: Integer
     var
@@ -1103,13 +971,9 @@
 
     local procedure CopyComments(FromEventNo: Code[20]; ToEventNo: Code[20]; var ReturnMsg: Text): Boolean
     var
-        JobFrom: Record Job;
-        JobTo: Record Job;
         CommentLineFrom: Record "Comment Line";
         CommentLineTo: Record "Comment Line";
     begin
-        JobFrom.Get(FromEventNo);
-        JobTo.Get(ToEventNo);
         CommentLineFrom.SetRange("Table Name", CommentLineFrom."Table Name"::Job);
         CommentLineFrom.SetRange("No.", FromEventNo);
         if CommentLineFrom.FindSet() then
@@ -1118,6 +982,27 @@
                 CommentLineTo."No." := ToEventNo;
                 CommentLineTo.Insert();
             until CommentLineFrom.Next() = 0;
+        ReturnMsg := NothingToCopyTxt;
+        exit(false);
+    end;
+
+    procedure CopyReportLayouts(FromEventNo: Code[20]; ToEventNo: Code[20]; CopyWhat: Option " ",Customer,Team; var ReturnMsg: Text): Boolean
+    var
+        EventReportLayoutFrom: Record "NPR Event Report Layout";
+        EventReportLayoutTo: Record "NPR Event Report Layout";
+    begin
+        EventReportLayoutFrom.SetRange("Event No.", FromEventNo);
+        if CopyWhat > 0 then
+            EventReportLayoutFrom.SetRange(Usage, CopyWhat);
+        if EventReportLayoutFrom.FindSet() then begin
+            repeat
+                EventReportLayoutFrom.CalcFields("Request Page Parameters");
+                EventReportLayoutTo := EventReportLayoutFrom;
+                EventReportLayoutTo."Event No." := ToEventNo;
+                EventReportLayoutTo.Insert();
+            until EventReportLayoutFrom.Next() = 0;
+            exit(true);
+        end;
         ReturnMsg := NothingToCopyTxt;
         exit(false);
     end;
@@ -2130,6 +2015,8 @@
         if not Job.IsEmpty then
             Error(BlockDeleteErr, Job."No.", Format(Job."NPR Event Status"), JobsSetup.TableCaption);
     end;
+
+
 
     procedure SetBufferMode()
     begin

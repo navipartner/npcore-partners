@@ -1,7 +1,7 @@
 ﻿codeunit 6060151 "NPR Event EWS Management"
 {
     var
-        EventVersionSpecificMgt: Codeunit "NPR Event Vers. Specific Mgt.";
+
         ExchItemType: Option "E-Mail",Appointment,"Meeting Request";
         EventExchIntEmailGlobal: Record "NPR Event Exch. Int. E-Mail";
         ExchTemplateCaption: Label 'Please select a %1 template...';
@@ -41,7 +41,7 @@
         exit(not SearchForDefaultAccount);
     end;
 
-    local procedure GetOrganizerSetup(Job: Record Job; var Source: Text)
+    procedure GetOrganizerSetup(Job: Record Job; var Source: Text)
     var
         Resource: Record Resource;
         UserName: Text;
@@ -80,22 +80,7 @@
         exit(Status.AsInteger() > 0);
     end;
 
-    procedure InitializeExchService(RecordId: RecordID; Job: Record Job; var ExchService: DotNet NPRNetExchangeService; ExchItemType2: Option "E-Mail",Appointment,"Meeting Request"): Boolean
-    var
-        Uri: DotNet NPRNetUri;
-        Source: Text;
-    begin
-        ExchItemType := ExchItemType2;
-        GetOrganizerSetup(Job, Source);
-        EventVersionSpecificMgt.ExchServiceWrapperConstructor(EventExchIntEmailGlobal."E-Mail", GetEmailPassword(EventExchIntEmailGlobal));
-        EventVersionSpecificMgt.ExchServiceWrapperService(ExchService);
-        if EventExchIntEmailGlobal."Exchange Server Url" = '' then begin
-            exit(false);
-        end;
-        Uri := Uri.Uri(EventExchIntEmailGlobal."Exchange Server Url");
-        ExchService.Url := Uri;
-        exit(true);
-    end;
+
 
     procedure SetJobPlanLineFilter(Job: Record Job; var JobPlanningLine: Record "Job Planning Line")
     begin
@@ -131,9 +116,11 @@
 
     local procedure CustomizedLayoutFound(Job: Record Job; Usage: Option): Boolean
     var
-        EventWordLayout: Record "NPR Event Word Layout";
+        EventReportLayout: Record "NPR Event Report Layout";
     begin
-        exit(EventWordLayout.Get(Job.RecordId, Usage + 1) and EventWordLayout.Layout.HasValue);
+        EventReportLayout.SetRange("Event No.", Job."No.");
+        EventReportLayout.SetRange(Usage, Usage + 1);
+        exit(not EventReportLayout.IsEmpty());
     end;
 
     local procedure BaseReportLayoutExists(Usage: Option Customer,Team): Boolean
@@ -182,23 +169,34 @@
 
     end;
 
-    procedure CreateAttachment(Job: Record Job; Usage: Option; EMailTemplateHeader: Record "NPR E-mail Template Header"; var FileName: Text): Boolean
+
+
+    procedure CreateAttachment(EventReportLayout: Record "NPR Event Report Layout"; Job: Record Job; MailFor: Option Customer,Team; var AttachmentTempBlob: Codeunit "Temp Blob"; var AttachmentName: Text; var AttachmentExtension: Text) Sucess: Boolean
     var
-        EventWordLayout: Record "NPR Event Word Layout";
-        EventMgt: Codeunit "NPR Event Management";
-        TempBlob: Codeunit "Temp Blob";
-        InStr: InStream;
+        ReportLayoutSelectionLocal: Record "Report Layout Selection";
+        OutStream: OutStream;
+        RecRef: RecordRef;
     begin
-        FileName := CreateFilePath(Job, Format(CreateGuid() + '.' + 'pdf'), EMailTemplateHeader);
-        if CustomizedLayoutFound(Job, Usage) then begin
-            EventWordLayout.Get(Job.RecordId, Usage + 1);
-            EventMgt.MergeAndSaveWordLayout(EventWordLayout, 1, FileName);
-        end else begin
-            EventMgt.SaveReportAs(Job, Usage, 1, TempBlob);
-            TempBlob.CreateInStream(InStr);
-            DownloadFromStream(Instr, 'Export', '', 'All Files (*.*)|*.*', FileName);
+
+        ReportLayoutSelectionLocal.SetTempLayoutSelected(EventReportLayout."Layout Code");
+        Job.SetRecFilter();
+        RecRef.GetTable(Job);
+        AttachmentTempBlob.CreateOutStream(OutStream);
+        case MailFor of
+            MailFor::Customer:
+                begin
+                    AttachmentExtension := '.pdf';
+                    AttachmentName := EventReportLayout.Description + AttachmentExtension;
+                    Sucess := Report.SaveAs(EventReportLayout."Report ID", EventReportLayout.GetParameters(), ReportFormat::Pdf, OutStream, RecRef);
+                end;
+            MailFor::Team:
+                begin
+                    AttachmentExtension := '.docx';
+                    AttachmentName := EventReportLayout.Description + AttachmentExtension;
+                    Sucess := Report.SaveAs(EventReportLayout."Report ID", EventReportLayout.GetParameters(), ReportFormat::Word, OutStream, RecRef);
+                end;
         end;
-        exit(true);
+        ReportLayoutSelectionLocal.SetTempLayoutSelected('');
     end;
 
     procedure UseTemplate(Job: Record Job; TemplateFor: Integer; ExchItemType: Integer; var EventExchIntTemplate: Record "NPR Event Exch. Int. Template"): Boolean
@@ -322,54 +320,7 @@
         exit(false);
     end;
 
-    procedure SetEmailPassword(var EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail")
-    var
-        EventStdDialog: Page "NPR Event Standard Dialog";
-    begin
-        EventExchIntEmail.TestField("E-Mail");
-        EventStdDialog.UseForPassword();
-        if EventStdDialog.RunModal() = ACTION::OK then
-            SaveEmailPassword(EventExchIntEmail, EventStdDialog.GetPassword());
-    end;
 
-    procedure SaveEmailPassword(var EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; PasswordText: Text)
-    var
-        CryptographyManagement: Codeunit "Cryptography Management";
-        OutStream: OutStream;
-    begin
-        if CryptographyManagement.IsEncryptionPossible() then
-            PasswordText := CryptographyManagement.Encrypt(PasswordText);
-        EventExchIntEmail.Password.CreateOutStream(OutStream);
-        OutStream.Write(PasswordText);
-    end;
-
-    procedure GetEmailPassword(EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail") PasswordText: Text
-    var
-        InStream: InStream;
-        CryptographyManagement: Codeunit "Cryptography Management";
-        PasswordNotSet: Label 'Password is not set for %1 %2. Please set it before using this e-mail account.';
-    begin
-        if not EventExchIntEmail.Password.HasValue() then
-            Error(PasswordNotSet, EventExchIntEmail.FieldCaption("E-Mail"), EventExchIntEmail."E-Mail");
-        EventExchIntEmail.CalcFields(Password);
-        EventExchIntEmail.Password.CreateInStream(InStream);
-        InStream.Read(PasswordText);
-        if CryptographyManagement.IsEncryptionPossible() then
-            exit(CryptographyManagement.Decrypt(PasswordText));
-        exit(PasswordText);
-    end;
-
-    procedure TestEmailServerConnection(var EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail")
-    var
-        ExchService: DotNet NPRNetExchangeService;
-        ConnectionSuccessMsg: Label 'Connection succeeded.';
-    begin
-        EventExchIntEmail.TestField("E-Mail");
-        EventVersionSpecificMgt.ExchServiceWrapperConstructor(EventExchIntEmail."E-Mail", GetEmailPassword(EventExchIntEmail));
-        EventVersionSpecificMgt.ExchServiceWrapperService(ExchService);
-        EventExchIntEmailGlobal := EventExchIntEmail;
-        Message(ConnectionSuccessMsg);
-    end;
 
     local procedure PrepareExchIntSummary(Job: Record Job; var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer")
     var

@@ -12,150 +12,56 @@ report 6060150 "NPR Event Customer Template"
         dataitem(Job; Job)
         {
             DataItemTableView = sorting("No.");
-            column(No_Job; Job."No.")
-            {
-            }
-            column(Description_Job; Job.Description)
-            {
-            }
-            column(BilltoCustomerNo_Job; Job."Bill-to Customer No.")
-            {
-            }
-            column(StartingDate_Job; FormatDate(Job."Starting Date"))
-            {
-            }
-            column(EndingDate_Job; FormatDate(Job."Ending Date"))
-            {
-            }
-            column(PersonResponsibleName_Job; Resource.Name)
-            {
-            }
-            column(JobPostingGroup_Job; Job."Job Posting Group")
-            {
-            }
-            column(Blocked_Job; Job.Blocked)
-            {
-            }
-            column(LastDateModified_Job; FormatDate(Job."Last Date Modified"))
-            {
-            }
-            column(BilltoName_Job; Job."Bill-to Name")
-            {
-            }
-            column(BilltoAddress_Job; Job."Bill-to Address")
-            {
-            }
-            column(BilltoAddress2_Job; Job."Bill-to Address 2")
-            {
-            }
-            column(BilltoCity_Job; Job."Bill-to City")
-            {
-            }
-            column(BilltoPostCode_Job; Job."Bill-to Post Code")
-            {
-            }
-            column(BilltoCountryRegionCode_Job; Job."Bill-to Country/Region Code")
-            {
-            }
-            column(CurrencyCode_Job; Job."Currency Code")
-            {
-            }
-            column(BilltoContactNo_Job; Job."Bill-to Contact No.")
-            {
-            }
-            column(BilltoContact_Job; Job."Bill-to Contact")
-            {
-            }
-            column(InvoiceCurrencyCode_Job; Job."Invoice Currency Code")
-            {
-            }
-            column(StartingTime_Job; FormatTime(Job."NPR Starting Time"))
-            {
-            }
-            column(EndingTime_Job; FormatTime(Job."NPR Ending Time"))
-            {
-            }
-            column(PreparationPeriod_Job; Job."NPR Preparation Period")
-            {
-            }
-            column(EventStatus_Job; Job."NPR Event Status")
-            {
-            }
-            column(SalespersonName_Job; SalespersonPurchaser.Name)
-            {
-            }
-            column(BilltoEMail_Job; Job."NPR Bill-to E-Mail")
-            {
-            }
-            column(PhoneNo_Job; Customer."Phone No.")
-            {
-            }
-            column(CommentsForCustomer_Job; CommentsForCustomer)
-            {
-            }
-            column(CreationDate_Job; FormatDate(Job."Creation Date"))
-            {
-            }
-            column(VATRegistrationNo_Job; Customer."VAT Registration No.")
-            {
-            }
+            column(No_Job; Job."No.") { }
+            column(Description_Job; Job.Description) { }
+            column(BilltoCustomerNo_Job; Job."Bill-to Customer No.") { }
+            column(StartingDate_Job; FormatDate(Job."Starting Date")) { }
+            column(EndingDate_Job; FormatDate(Job."Ending Date")) { }
+            column(PersonResponsibleName_Job; Resource.Name) { }
+            column(JobPostingGroup_Job; Job."Job Posting Group") { }
+            column(Blocked_Job; Job.Blocked) { }
+            column(LastDateModified_Job; FormatDate(Job."Last Date Modified")) { }
+            column(BilltoName_Job; Job."Bill-to Name") { }
+            column(BilltoAddress_Job; Job."Bill-to Address") { }
+            column(BilltoAddress2_Job; Job."Bill-to Address 2") { }
+            column(BilltoCity_Job; Job."Bill-to City") { }
+            column(BilltoPostCode_Job; Job."Bill-to Post Code") { }
+            column(BilltoCountryRegionCode_Job; Job."Bill-to Country/Region Code") { }
+            column(CurrencyCode_Job; Job."Currency Code") { }
+            column(BilltoContactNo_Job; Job."Bill-to Contact No.") { }
+            column(BilltoContact_Job; Job."Bill-to Contact") { }
+            column(InvoiceCurrencyCode_Job; Job."Invoice Currency Code") { }
+            column(StartingTime_Job; FormatTime(Job."NPR Starting Time")) { }
+            column(EndingTime_Job; FormatTime(Job."NPR Ending Time")) { }
+            column(PreparationPeriod_Job; Job."NPR Preparation Period") { }
+            column(EventStatus_Job; Job."NPR Event Status") { }
+            column(SalespersonName_Job; SalespersonPurchaser.Name) { }
+            column(BilltoEMail_Job; Job."NPR Bill-to E-Mail") { }
+            column(PhoneNo_Job; Customer."Phone No.") { }
+            column(CommentsForCustomer_Job; CommentsForCustomer) { }
+            column(CreationDate_Job; FormatDate(Job."Creation Date")) { }
+            column(VATRegistrationNo_Job; Customer."VAT Registration No.") { }
             dataitem("Job Task"; "Job Task")
             {
                 DataItemLink = "Job No." = FIELD("No.");
-                column(JobTaskNo_JobTask; "Job Task"."Job Task No.")
-                {
-                }
-                column(Description_JobTask; "Job Task".Description)
-                {
-                }
-                column(JobTaskType_JobTask; "Job Task"."Job Task Type")
-                {
-                }
-                column(JobPostingGroup_JobTask; "Job Task"."Job Posting Group")
-                {
-                }
-                column(ScheduleTotalCost_JobTask; "Job Task"."Schedule (Total Cost)")
-                {
-                }
-                column(ScheduleTotalPrice_JobTask; "Job Task"."Schedule (Total Price)")
-                {
-                }
-                column(UsageTotalCost_JobTask; "Job Task"."Usage (Total Cost)")
-                {
-                }
-                column(UsageTotalPrice_JobTask; "Job Task"."Usage (Total Price)")
-                {
-                }
-                column(ContractTotalCost_JobTask; "Job Task"."Contract (Total Cost)")
-                {
-                }
-                column(ContractTotalPrice_JobTask; "Job Task"."Contract (Total Price)")
-                {
-                }
-                column(ContractInvoicedPrice_JobTask; "Job Task"."Contract (Invoiced Price)")
-                {
-                }
-                column(ContractInvoicedCost_JobTask; "Job Task"."Contract (Invoiced Cost)")
-                {
-                }
-                column(OutstandingOrders_JobTask; "Job Task"."Outstanding Orders")
-                {
-                }
-                column(AmtRcdNotInvoiced_JobTask; "Job Task"."Amt. Rcd. Not Invoiced")
-                {
-                }
-                column(RemainingTotalCost_JobTask; "Job Task"."Remaining (Total Cost)")
-                {
-                }
-                column(RemainingTotalPrice_JobTask; "Job Task"."Remaining (Total Price)")
-                {
-                }
-                column(StartDate_JobTask; FormatDate("Job Task"."Start Date"))
-                {
-                }
-                column(EndDate_JobTask; FormatDate("Job Task"."End Date"))
-                {
-                }
+                column(JobTaskNo_JobTask; "Job Task"."Job Task No.") { }
+                column(Description_JobTask; "Job Task".Description) { }
+                column(JobTaskType_JobTask; "Job Task"."Job Task Type") { }
+                column(JobPostingGroup_JobTask; "Job Task"."Job Posting Group") { }
+                column(ScheduleTotalCost_JobTask; "Job Task"."Schedule (Total Cost)") { }
+                column(ScheduleTotalPrice_JobTask; "Job Task"."Schedule (Total Price)") { }
+                column(UsageTotalCost_JobTask; "Job Task"."Usage (Total Cost)") { }
+                column(UsageTotalPrice_JobTask; "Job Task"."Usage (Total Price)") { }
+                column(ContractTotalCost_JobTask; "Job Task"."Contract (Total Cost)") { }
+                column(ContractTotalPrice_JobTask; "Job Task"."Contract (Total Price)") { }
+                column(ContractInvoicedPrice_JobTask; "Job Task"."Contract (Invoiced Price)") { }
+                column(ContractInvoicedCost_JobTask; "Job Task"."Contract (Invoiced Cost)") { }
+                column(OutstandingOrders_JobTask; "Job Task"."Outstanding Orders") { }
+                column(AmtRcdNotInvoiced_JobTask; "Job Task"."Amt. Rcd. Not Invoiced") { }
+                column(RemainingTotalCost_JobTask; "Job Task"."Remaining (Total Cost)") { }
+                column(RemainingTotalPrice_JobTask; "Job Task"."Remaining (Total Price)") { }
+                column(StartDate_JobTask; FormatDate("Job Task"."Start Date")) { }
+                column(EndDate_JobTask; FormatDate("Job Task"."End Date")) { }
                 dataitem(TextLine; "Job Planning Line")
                 {
                     DataItemLink = "Job No." = FIELD("Job No."), "Job Task No." = FIELD("Job Task No.");
@@ -297,39 +203,17 @@ report 6060150 "NPR Event Customer Template"
             dataitem("Event Attribute Set 1"; "NPR Event Attr. Row Value")
             {
                 DataItemTableView = SORTING("Template Name", "Line No.");
-                column(AtributeDescription_EventAttributeSet1; "Event Attribute Set 1".Description)
-                {
-                }
-                column(ColumnCaption1_EventAttributeSet1; ColumnCaption[1])
-                {
-                }
-                column(ColumnCaption2_EventAttributeSet1; ColumnCaption[2])
-                {
-                }
-                column(ColumnCaption3_EventAttributeSet1; ColumnCaption[3])
-                {
-                }
-                column(ColumnCaption4_EventAttributeSet1; ColumnCaption[4])
-                {
-                }
-                column(ColumnCaption5_EventAttributeSet1; ColumnCaption[5])
-                {
-                }
-                column(AttributeValue1_EventAttributeSet1; AttributeValue[1])
-                {
-                }
-                column(AttributeValue2_EventAttributeSet1; AttributeValue[2])
-                {
-                }
-                column(AttributeValue3_EventAttributeSet1; AttributeValue[3])
-                {
-                }
-                column(AttributeValue4_EventAttributeSet1; AttributeValue[4])
-                {
-                }
-                column(AttributeValue5_EventAttributeSet1; AttributeValue[5])
-                {
-                }
+                column(AtributeDescription_EventAttributeSet1; "Event Attribute Set 1".Description) { }
+                column(ColumnCaption1_EventAttributeSet1; ColumnCaption[1]) { }
+                column(ColumnCaption2_EventAttributeSet1; ColumnCaption[2]) { }
+                column(ColumnCaption3_EventAttributeSet1; ColumnCaption[3]) { }
+                column(ColumnCaption4_EventAttributeSet1; ColumnCaption[4]) { }
+                column(ColumnCaption5_EventAttributeSet1; ColumnCaption[5]) { }
+                column(AttributeValue1_EventAttributeSet1; AttributeValue[1]) { }
+                column(AttributeValue2_EventAttributeSet1; AttributeValue[2]) { }
+                column(AttributeValue3_EventAttributeSet1; AttributeValue[3]) { }
+                column(AttributeValue4_EventAttributeSet1; AttributeValue[4]) { }
+                column(AttributeValue5_EventAttributeSet1; AttributeValue[5]) { }
 
                 trigger OnAfterGetRecord()
                 var
@@ -355,39 +239,17 @@ report 6060150 "NPR Event Customer Template"
             dataitem("Event Attribute Set 2"; "NPR Event Attr. Row Value")
             {
                 DataItemTableView = SORTING("Template Name", "Line No.");
-                column(AtributeDescription_EventAttributeSet2; "Event Attribute Set 2".Description)
-                {
-                }
-                column(ColumnCaption1_EventAttributeSet2; ColumnCaption[1])
-                {
-                }
-                column(ColumnCaption2_EventAttributeSet2; ColumnCaption[2])
-                {
-                }
-                column(ColumnCaption3_EventAttributeSet2; ColumnCaption[3])
-                {
-                }
-                column(ColumnCaption4_EventAttributeSet2; ColumnCaption[4])
-                {
-                }
-                column(ColumnCaption5_EventAttributeSet2; ColumnCaption[5])
-                {
-                }
-                column(AttributeValue1_EventAttributeSet2; AttributeValue[1])
-                {
-                }
-                column(AttributeValue2_EventAttributeSet2; AttributeValue[2])
-                {
-                }
-                column(AttributeValue3_EventAttributeSet2; AttributeValue[3])
-                {
-                }
-                column(AttributeValue4_EventAttributeSet2; AttributeValue[4])
-                {
-                }
-                column(AttributeValue5_EventAttributeSet2; AttributeValue[5])
-                {
-                }
+                column(AtributeDescription_EventAttributeSet2; "Event Attribute Set 2".Description) { }
+                column(ColumnCaption1_EventAttributeSet2; ColumnCaption[1]) { }
+                column(ColumnCaption2_EventAttributeSet2; ColumnCaption[2]) { }
+                column(ColumnCaption3_EventAttributeSet2; ColumnCaption[3]) { }
+                column(ColumnCaption4_EventAttributeSet2; ColumnCaption[4]) { }
+                column(ColumnCaption5_EventAttributeSet2; ColumnCaption[5]) { }
+                column(AttributeValue1_EventAttributeSet2; AttributeValue[1]) { }
+                column(AttributeValue2_EventAttributeSet2; AttributeValue[2]) { }
+                column(AttributeValue3_EventAttributeSet2; AttributeValue[3]) { }
+                column(AttributeValue4_EventAttributeSet2; AttributeValue[4]) { }
+                column(AttributeValue5_EventAttributeSet2; AttributeValue[5]) { }
 
                 trigger OnAfterGetRecord()
                 var
@@ -415,9 +277,7 @@ report 6060150 "NPR Event Customer Template"
             {
                 DataItemLink = "No." = FIELD("No.");
                 DataItemTableView = SORTING("Table Name", "No.", "Line No.") WHERE("Table Name" = CONST(Job));
-                column(Comment_CommentLine; "Comment Line".Comment)
-                {
-                }
+                column(Comment_CommentLine; "Comment Line".Comment) { }
             }
 
             trigger OnAfterGetRecord()

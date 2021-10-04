@@ -11,6 +11,7 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
             Caption = 'E-Mail';
             DataClassification = CustomerContent;
             ExtendedDatatype = EMail;
+
         }
         field(10; "Search E-Mail"; Code[50])
         {
@@ -21,6 +22,8 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
         {
             Caption = 'Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced with Token';
         }
         field(30; "Exchange Server Url"; Text[250])
         {
@@ -77,6 +80,21 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
             DataClassification = CustomerContent;
             Description = 'NPR5.46';
         }
+        field(100; "Access Token"; Blob)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Access Token';
+        }
+        field(110; "Acces Token Valid Until"; DateTime)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Acces Token Valid Until';
+        }
+        field(120; "Refresh Token"; Blob)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Refresh Token';
+        }
     }
 
     keys
@@ -109,19 +127,8 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
     var
         EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail";
         EMailExists: Label '%1 %2 already exists.';
-        EventEWSMgt: Codeunit "NPR Event EWS Management";
 
-    procedure SetPassword()
-    begin
-        EventEWSMgt.SetEmailPassword(Rec);
-        Modify();
-    end;
 
-    procedure TestServerConnection()
-    begin
-        EventEWSMgt.TestEmailServerConnection(Rec);
-        Modify();
-    end;
 
     local procedure UpdateSearchEmail()
     begin
@@ -130,5 +137,26 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
             Error(EMailExists, FieldCaption("E-Mail"), "E-Mail");
         "Search E-Mail" := "E-Mail";
     end;
-}
 
+
+    procedure GetAccessToken(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+    begin
+        CalcFields("Access Token");
+        "Access Token".CreateInStream(InStream, TextEncoding::UTF8);
+        exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
+    end;
+
+    procedure GetRefreshToken(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+    begin
+        CalcFields("Refresh Token");
+        "Refresh Token".CreateInStream(InStream, TextEncoding::UTF8);
+        exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
+    end;
+
+}
