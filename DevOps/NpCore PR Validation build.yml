@@ -19,37 +19,6 @@ pool:
 jobs:
 - template: YAML/Templates/Build/MainBuild.yml@scriptsRepo
   parameters:
-    containerDefinitions:
-    - name: BC17
-      containerImageName: npretail.azurecr.io/np/dynamicsnav:17.3.20469.20605-w1
-
-      artifactUrl: ''
-      endpointName: npretail_ACR
-      serverInstanceName: BC
-      licenseSecureFileName: 'DEV_BC OP 17.flf'
-      
-      majorVersion: 1700    
-      appJsonValues: 
-      - platform: '17.0.0.0'
-      - application: '17.0.0.0'
-      - preprocessorSymbols: [BC17]
-      - runtime: '"6.0"'
-
-    - name: BC18
-      containerImageName: npretail.azurecr.io/np/dynamicsnav:18.4.28601.29139-w1
-      artifactUrl: ''
-      endpointName: npretail_ACR
-      serverInstanceName: BC
-      licenseSecureFileName: 'DEV_BC OP 18.flf'
-
-      majorVersion: 1804
-      appJsonValues:
-      -  platform: '18.0.0.0'
-      -  application: '18.0.0.0'
-      -  preprocessorSymbols: [BC18]
-      -  runtime: '"7.2"'   
-
-
     scriptsRepo: scriptsRepo
     stepList:
     - checkout: self
