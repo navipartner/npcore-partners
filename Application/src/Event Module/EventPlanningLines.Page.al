@@ -708,7 +708,7 @@ page 6014549 "NPR Event Planning Lines"
 
                         trigger OnAction()
                         begin
-                            EventCalendarMgt.GetCalendarAttendeeResponseAction(Rec);
+                            EventCalendarMgt.GetCalendarAttendeeResponse(Rec);
                             CurrPage.Update(false);
                         end;
                     }

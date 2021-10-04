@@ -134,7 +134,7 @@ codeunit 6060153 "NPR Event Email Management"
         ActivityDescription: Label 'Processing Mail Item...';
         SuccessfulMailItem: Label 'Successfully sent an e-mail.';
     begin
-        if not ProcessMailItem(RecRef, MailFor) then begin
+        if not ProcessMailItemNew(RecRef, MailFor) then begin
             ActivityLog.LogActivity(RecRef.RecordId, 1, '', ActivityDescription, CopyStr(GetLastErrorText, 1, MaxStrLen(ActivityLog."Activity Message")));
             exit(false);
         end;
@@ -142,25 +142,22 @@ codeunit 6060153 "NPR Event Email Management"
         exit(true);
     end;
 
-    procedure ProcessMailItem(var RecRef: RecordRef; MailFor: Option Customer,Team): Boolean
+
+    procedure ProcessMailItemNew(var RecRef: RecordRef; MailFor: Option Customer,Team): Boolean
     var
-        ExchService: DotNet NPRNetExchangeService;
         Job: Record Job;
         JobPlanningLine: Record "Job Planning Line";
-        EmailMessage: DotNet NPRNetEmailMessage;
-        EMailTemplateLine: Record "NPR E-mail Templ. Line";
         RecRef2: RecordRef;
         BodyText: Text;
-        MessageBody: DotNet NPRNetMessageBody;
-        BodyType: DotNet NPRNetBodyType;
-        FileName: Text;
         ResourceGroup: Record "Resource Group";
         EMailTemplateHeader: Record "NPR E-mail Template Header";
-        ParsedLine: Text;
-        ParsedSuffix: Text;
-        JobPlanningLineTickets: Record "Job Planning Line";
-        EventTicketMgt: Codeunit "NPR Event Ticket Mgt.";
-        CollectedURLs: Text;
+        Recipients, CcRecipients, BCCRecipients : List of [Text];
+        EmailMessage: Codeunit "Email Message";
+        Email: Codeunit Email;
+#IF NOT BC17
+        EmailRelationType: Enum "Email Relation Type";
+#ENDIF
+        EmailAccount: Record "Email Account";
     begin
         case RecRef.Number of
             DATABASE::Job:
@@ -176,119 +173,111 @@ codeunit 6060153 "NPR Event Email Management"
                 end;
         end;
 
-        if not EventEWSMgt.InitializeExchService(RecRef.RecordId, Job, ExchService, 0) then
-            exit(false);
-        EmailMessage := EmailMessage.EmailMessage(ExchService);
-
         case MailFor of
             MailFor::Customer:
-                AddEMailRecipient(EmailMessage, 0, Job."NPR Bill-to E-Mail");
+                Recipients.Add(Job."NPR Bill-to E-Mail");
             MailFor::Team:
                 if JobPlanningLine.FindSet() then
                     repeat
-                        AddEMailRecipient(EmailMessage, 0, JobPlanningLine."NPR Resource E-Mail");
+                        Recipients.Add(JobPlanningLine."NPR Resource E-Mail");
                         if JobPlanningLine."Resource Group No." <> '' then begin
                             ResourceGroup.Get(JobPlanningLine."Resource Group No.");
                             if ResourceGroup."NPR E-Mail" <> '' then
-                                AddEMailRecipient(EmailMessage, 1, ResourceGroup."NPR E-Mail");
+                                CcRecipients.Add(ResourceGroup."NPR E-Mail");
                         end;
                     until JobPlanningLine.Next() = 0;
         end;
 
         if UseTemplate and (EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code")) then begin
             RecRef2.GetTable(Job);
-            EmailMessage.Subject := EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject);
-            EMailTemplateLine.SetRange("E-mail Template Code", EMailTemplateHeader.Code);
-            if EMailTemplateLine.FindSet() then begin
-                BodyText := '<font face="Calibri">';
-                repeat
-                    JobPlanningLineTickets.SetRange("Job No.", Job."No.");
-                    JobPlanningLineTickets.SetRange("NPR Ticket Collect Status", JobPlanningLineTickets."NPR Ticket Collect Status"::Collected);
-                    ParsedLine := EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateLine."Mail Body Line") + '</br>';
-                    if (EventExchIntTemplate."Ticket URL Placeholder(E-Mail)" <> '') and
-                      (StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") > 0) and
-                      not JobPlanningLineTickets.IsEmpty then begin
-                        ParsedSuffix := CopyStr(ParsedLine, StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") + StrLen(EventExchIntTemplate."Ticket URL Placeholder(E-Mail)"));
-                        ParsedLine := CopyStr(ParsedLine, 1, StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") - 1);
-                        CollectedURLs := '';
-                        JobPlanningLineTickets.FindSet();
-                        repeat
-                            if CollectedURLs <> '' then
-                                CollectedURLs += ', ';
-                            CollectedURLs += '<a href="' + EventTicketMgt.GetTicketURL(JobPlanningLineTickets) + '">' + JobPlanningLineTickets.Description + '</a>';
-                        until JobPlanningLineTickets.Next() = 0;
-                        BodyText += ParsedLine + CollectedURLs + ParsedSuffix;
-                    end else
-                        BodyText += ParsedLine;
-                until EMailTemplateLine.Next() = 0;
-                BodyText += '</br></font>';
-                EmailMessage.Body := MessageBody.MessageBody(BodyType.HTML, BodyText);
-            end;
-        end else
-            EmailMessage.Subject := EventEWSMgt.CreateFileName(Job, EMailTemplateHeader);
+            CreateBody(BodyText, EMailTemplateHeader.Code, Job."No.", RecRef2);
+        end;
 
-        if EventEWSMgt.CreateAttachment(Job, MailFor, EMailTemplateHeader, FileName) then
-            EmailMessage.Attachments.AddFileAttachment(FileName);
+        GetEmailAccount(EmailAccount, Job);
 
-        if not EMailMessageSendAndSaveCopyWithLog(RecRef.RecordId, EmailMessage) then
-            exit(false);
-        exit(true);
+        EmailMessage.Create(Recipients, EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject), BodyText, true, CcRecipients, BCCRecipients);
+        AddAttachment(MailFor, Job, EmailMessage);
+#IF NOT BC17
+        Email.AddRelation(EmailMessage, Database::Job, Job.SystemId, EmailRelationType::"Primary Source");
+#ENDIF
+        if EventExchIntTemplate."Open E-mail dialog" then
+            Email.OpenInEditorModally(EmailMessage, EmailAccount)
+        else
+            Email.Send(EmailMessage, EmailAccount);
     end;
 
-    local procedure AddEMailRecipient(var EmailMessage: DotNet NPRNetEmailMessage; RecipientType: Option "To",Cc,Bcc; EMail: Text)
+    local procedure CreateBody(var BodyText: Text; EmailTemplateHeaderCode: Code[20]; JobNo: Code[20]; RecRef2: RecordRef)
     var
-        EMailAddress: DotNet NPRNetEmailAddress;
-        EMailAddressCollection: DotNet NPRNetEmailAddressCollection;
-        EMailEnumerator: DotNet NPRNetIEnumerator_Of_T;
-        Found: Boolean;
+        EMailTemplateLine: Record "NPR E-mail Templ. Line";
+        ParsedLine, ParsedSuffix, CollectedURLs : Text;
+        JobPlanningLineTickets: Record "Job Planning Line";
+        EventTicketMgt: Codeunit "NPR Event Ticket Mgt.";
     begin
-        case RecipientType of
-            RecipientType::"To":
-                EMailAddressCollection := EmailMessage.ToRecipients;
-            RecipientType::Cc:
-                EMailAddressCollection := EmailMessage.CcRecipients;
-            RecipientType::Bcc:
-                EMailAddressCollection := EmailMessage.BccRecipients;
+        EMailTemplateLine.SetRange("E-mail Template Code", EmailTemplateHeaderCode);
+        if EMailTemplateLine.FindSet() then begin
+            BodyText := '<font face="Calibri">';
+            repeat
+                JobPlanningLineTickets.SetRange("Job No.", JobNo);
+                JobPlanningLineTickets.SetRange("NPR Ticket Collect Status", JobPlanningLineTickets."NPR Ticket Collect Status"::Collected);
+                ParsedLine := EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateLine."Mail Body Line") + '</br>';
+                if (EventExchIntTemplate."Ticket URL Placeholder(E-Mail)" <> '') and
+                  (StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") > 0) and
+                  not JobPlanningLineTickets.IsEmpty then begin
+                    ParsedSuffix := CopyStr(ParsedLine, StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") + StrLen(EventExchIntTemplate."Ticket URL Placeholder(E-Mail)"));
+                    ParsedLine := CopyStr(ParsedLine, 1, StrPos(ParsedLine, EventExchIntTemplate."Ticket URL Placeholder(E-Mail)") - 1);
+                    CollectedURLs := '';
+                    JobPlanningLineTickets.FindSet();
+                    repeat
+                        if CollectedURLs <> '' then
+                            CollectedURLs += ', ';
+                        CollectedURLs += '<a href="' + EventTicketMgt.GetTicketURL(JobPlanningLineTickets) + '">' + JobPlanningLineTickets.Description + '</a>';
+                    until JobPlanningLineTickets.Next() = 0;
+                    BodyText += ParsedLine + CollectedURLs + ParsedSuffix;
+                end else
+                    BodyText += ParsedLine;
+            until EMailTemplateLine.Next() = 0;
+            BodyText += '</br></font>';
         end;
-
-        EMailAddress := EMailAddress.EmailAddress();
-        EMailEnumerator := EMailAddressCollection.GetEnumerator();
-        while EMailEnumerator.MoveNext() and not Found do begin
-            EMailAddress := EMailEnumerator.Current();
-            Found := EMailAddress.Address = EMail;
-        end;
-
-        if not Found then
-            case RecipientType of
-                RecipientType::"To":
-                    EmailMessage.ToRecipients.Add(EMail);
-                RecipientType::Cc:
-                    EmailMessage.CcRecipients.Add(EMail);
-                RecipientType::Bcc:
-                    EmailMessage.BccRecipients.Add(EMail);
-            end;
     end;
 
-    local procedure EMailMessageSendAndSaveCopyWithLog(RecordId: RecordID; EmailMessage: DotNet NPRNetEmailMessage): Boolean
+    local procedure AddAttachment(var MailFor: Option Customer,Team; var Job: Record Job; var EmailMessage: Codeunit "Email Message")
     var
-        ActivityLog: Record "Activity Log";
-        SendContext: Label 'E-MAIL SEND';
-        ActivityDescription: Label 'Sending...';
+        EventReportLayout: Record "NPR Event Report Layout";
+        AttachmentTempBlob: Codeunit "Temp Blob";
+        AttachmentStream: InStream;
+        AttachmentName: Text;
+        AttachmentExtension: Text;
     begin
-        if not EMailMessageSendAndSaveCopy(EmailMessage) then begin
-            //try again
-            if not EMailMessageSendAndSaveCopy(EmailMessage) then begin
-                ActivityLog.LogActivity(RecordId, 1, SendContext, ActivityDescription, CopyStr(GetLastErrorText, 1, MaxStrLen(ActivityLog."Activity Message")));
-                exit(false);
-            end;
-        end;
-        exit(true);
+
+        EventReportLayout.Reset();
+        EventReportLayout.SetRange("Event No.", Job."No.");
+        EventReportLayout.SetRange(Usage, MailFor + 1);
+        if EventReportLayout.FindSet() then
+            repeat
+                if EventEWSMgt.CreateAttachment(EventReportLayout, Job, MailFor, AttachmentTempBlob, AttachmentName, AttachmentExtension) then begin
+                    AttachmentTempBlob.CreateInStream(AttachmentStream);
+                    EmailMessage.AddAttachment(AttachmentName, AttachmentExtension, AttachmentStream);
+                    Clear(AttachmentTempBlob);
+                end;
+            until EventReportLayout.Next() = 0;
     end;
 
-    [TryFunction]
-    local procedure EMailMessageSendAndSaveCopy(EmailMessage: DotNet NPRNetEmailMessage)
+    local procedure GetEmailAccount(var EmailAccount: Record "Email Account"; Job: Record Job)
+    var
+        EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail";
+        EmailAccountCodeunit: Codeunit "Email Account";
+        NoEmailAccountsErr: Label 'There are no Email Accounts created. First create Email Accounts';
     begin
-        EmailMessage.SendAndSaveCopy();
+        EmailAccountCodeunit.GetAllAccounts(false, EmailAccount);
+        if EmailAccount.IsEmpty() then
+            Error(NoEmailAccountsErr);
+
+        EventEWSMgt.GetEventExchIntEmail(EventExchIntEMail);
+        if EventExchIntEMail."E-Mail" <> '' then
+            EmailAccount.SetRange("Email Address", EventExchIntEMail."E-Mail")
+        else
+            EmailAccount.SetRange("Email Address", Job."NPR Organizer E-Mail");
+        EmailAccount.FindFirst();
     end;
 
     procedure SetEventExcIntTemplate(EventExchIntTemplateHere: Record "NPR Event Exch. Int. Template")
