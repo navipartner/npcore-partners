@@ -39,17 +39,20 @@
 		"CRS.RemovePrefixFromFilename": true,
 		"CRS.DisableCRSSnippets": true,
 		"CRS.OnSaveAlFileAction": "Rename",
+		"editor.bracketPairColorization.enabled": true
 	},
 	"extensions": {
 		"recommendations": [
 			"ms-dynamics-smb.al",
 			"eamodio.gitlens",
-			"donjayamanne.githistory",
+			"donjayamanne.githistory",			
 			"wayou.vscode-todo-highlight",
 			"andrzejzwierzchowski.al-code-outline", //Code actions, icon browser
 			"davidfeldhoff.al-codeactions", //Code actions
 			"wbrakowski.al-navigator", //Code actions
-			"waldo.crs-al-language-extension" //Auto file naming with proper prefix
+			"waldo.crs-al-language-extension", //Auto file naming with proper prefix,
+			"ban.spellright", //Spell checking in comments and markdown documentation
+			"docsmsft.docs-preview", //Better preview of markdown for documentation
 		]
 	},
 	"tasks": {

@@ -3,9 +3,13 @@ trigger: none
 pool:
   name: NP Core Pipelines
 
+variables:
+  docfxUrl: 'https://github.com/dotnet/docfx/releases/download/v2.58.4/docfx.zip'
+
 steps:
 - task: PowerShell@2
   inputs:
     targetType: 'filePath'
-    filePath: $(System.DefaultWorkingDirectory)\Documentation\.tools\validate.ps1    
+    filePath: '$(System.DefaultWorkingDirectory)\Documentation\.tools\validate.ps1'
+    arguments: "-workspaceFolder $(System.DefaultWorkingDirectory) -docfxUrl $(docfxUrl)"
   displayName: 'Validate Documentation'

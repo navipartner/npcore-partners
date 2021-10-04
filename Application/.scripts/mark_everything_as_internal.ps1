@@ -3,7 +3,7 @@
 
 
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
-$ErrorActionPreference = “Stop”
+$ErrorActionPreference = 'Stop';
 
 function Get-ObjectType {
     param (
