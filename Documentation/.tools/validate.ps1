@@ -1,16 +1,26 @@
-$folder = "./docfx/download"
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory=$false)]
+    [string]$workspaceFolder = "../..",  #if .ps1 file is executed directly in cloned project
+    [Parameter(Mandatory=$false)]
+    [string]$docfxUrl = "https://github.com/dotnet/docfx/releases/download/v2.58.4/docfx.zip"
+)
+$ErrorActionPreference = 'Stop';
 
-#Download docfx
-$url = "https://github.com/dotnet/docfx/releases/download/v2.58.4/docfx.zip"
+Write-Host "Cleaning and creating docfx folders"
 
-Remove-Item $folder -Recurse -ErrorAction Ignore
-New-Item -ItemType Directory -Force -Path $folder
+$downloadFolder = ($workspaceFolder + "/Documentation/.tools/docfx/download")
+Remove-Item $downloadFolder -Recurse -ErrorAction Ignore
+New-Item -ItemType Directory -Force -Path $downloadFolder
 
-Invoke-WebRequest -OutFile ($folder+"/docfx.zip") $url
-Expand-Archive -Path ($folder+"/docfx.zip") -DestinationPath $folder
+Write-Host "Downloading docfx"
 
-#run docfx 
-& ($folder + "/docfx.exe") "./docfx/docfx.json" "--warningsAsErrors"
+Invoke-WebRequest -OutFile ($downloadFolder+"/docfx.zip") $docfxUrl
+Expand-Archive -Path ($downloadFolder+"/docfx.zip") -DestinationPath $downloadFolder
+
+Write-Host "Executing docfx"
+
+& ($downloadFolder + "/docfx.exe") ($workspaceFolder + "/Documentation/.tools/docfx/docfx.json") "--warningsAsErrors"
 
 if (-Not ($LastExitCode -eq 0)) {
     throw "docfx returned one or more errors"

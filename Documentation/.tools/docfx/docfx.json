@@ -8,7 +8,7 @@
           "toc.yml",
           "*.md"          
         ],
-        "src": "../../manual"
+        "src": "../../product"
       }
     ],
     "resource": [
@@ -17,7 +17,7 @@
           "images/**",
           "**/images/**"
         ],
-        "src": "../../manual"
+        "src": "../../product"
       }
     ],
     "markdownEngineName": "markdig",
