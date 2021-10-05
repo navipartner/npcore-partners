@@ -39,8 +39,7 @@
 		"CRS.ObjectNamePrefix": "NPR ",
 		"CRS.RemovePrefixFromFilename": true,
 		"CRS.DisableCRSSnippets": true,
-		"CRS.OnSaveAlFileAction": "Rename",
-		"editor.bracketPairColorization.enabled": true
+		"CRS.OnSaveAlFileAction": "Rename"
 	},
 	"extensions": {
 		"recommendations": [
