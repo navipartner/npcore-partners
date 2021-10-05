@@ -651,7 +651,31 @@
         Request.GetContent().Add('tenantId', TenantId());
         Request.GetContent().Add('userId', UserId());
         Request.GetContent().Add('companyName', CompanyName());
+        Request.GetContent().Add('appVersion', GetAppVersion());
+        Request.GetContent().Add('environmentType', GetEnvType());
         InvokeFrontEndAsync(Request);
+    end;
+
+    local procedure GetAppVersion(): Text
+    var
+        ModuleInfo: ModuleInfo;
+    begin
+        NavApp.GetCurrentModuleInfo(ModuleInfo);
+        exit(Format(ModuleInfo.AppVersion));
+    end;
+
+    local procedure GetEnvType(): Text
+    var
+        EnvInfo: Codeunit "Environment Information";
+    begin
+        if EnvInfo.IsOnPrem() then
+            exit('OnPrem');
+
+        if EnvInfo.IsProduction() then
+            exit('Production');
+
+        if EnvInfo.IsSandbox() then
+            exit('Sandbox');
     end;
 
     // TODO: Request must be of an interface type that describes all stargate requests
