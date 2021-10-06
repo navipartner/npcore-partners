@@ -5,36 +5,26 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     {
         addfirst(content)
         {
-            field("NPR Search"; _TurboSearch)
+            field("NPR Search"; _SearchTerm)
             {
                 Editable = true;
-                Caption = 'Fast Search';
+                Caption = 'Smart Search';
                 ApplicationArea = NPRRetail;
                 ToolTip = 'This search is optimized to search relevant columns only.';
                 trigger OnValidate()
                 var
                     Item: Record Item;
+                    SmartSearch: Codeunit "NPR Smart Search";
                 begin
                     Rec.Reset();
                     Rec.ClearMarks();
                     Rec.MarkedOnly(false);
-                    if (_TurboSearch = '') then begin
+                    if (_SearchTerm = '') then begin
                         CurrPage.Update(false);
                         exit;
                     end;
 
-                    Item.FilterGroup := -1;
-                    Item.SetFilter("No.", '%1', UpperCase(_TurboSearch));
-                    Item.SetFilter(Description, '%1', _TurboSearch);
-                    Item.SetFilter("Description 2", '%1', _TurboSearch);
-                    Item.SetFilter("Search Description", '%1', _TurboSearch);
-                    Item.FilterGroup := 0;
-
-                    Item.SetLoadFields("No.");
-                    if (Item.FindSet()) then
-                        repeat
-                            Item.Mark(true);
-                        until (Item.Next() = 0);
+                    SmartSearch.SearchItem(_SearchTerm, Item);
 
                     Rec.Copy(Item);
                     Rec.SetLoadFields();
@@ -497,5 +487,5 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         Error_NoBarcodeMatch: Label 'No item found for value %1';
         Text001: Label 'Item No.';
         RetailInventoryEnabled: Boolean;
-        _TurboSearch: Text[100];
+        _SearchTerm: Text[100];
 }

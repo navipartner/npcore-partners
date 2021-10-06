@@ -131,7 +131,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         if SaleLinePOS.Type = SaleLinePOS.Type::Item then
             if Item.Get(SaleLinePOS."No.") then;
 
-        if PAGE.RunModal(PAGE::"Item List", Item) = ACTION::LookupOK then
+        if PAGE.RunModal(PAGE::"NPR Items Smart Search", Item) = ACTION::LookupOK then
             ItemNo := Item."No.";
 
         JSON.SetContext('selected_itemno', ItemNo);
