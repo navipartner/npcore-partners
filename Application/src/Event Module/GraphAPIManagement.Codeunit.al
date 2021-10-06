@@ -5,18 +5,21 @@ codeunit 6014606 "NPR Graph API Management"
 
     internal procedure GetAccessToken(EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail")
     var
-        OAuth2: Codeunit OAuth2;
         Scopes: List of [Text];
+#IF NOT BC17
         PromptInteraction: Enum "Prompt Interaction";
-        AccessToken, TokenCache : Text;
-        RedirectURL, AuthCodeError : Text;
+        OAuth2: Codeunit OAuth2;
+        RedirectURL: Text;
+#ENDIF
+        AccessToken, TokenCache, AuthCodeError : Text;
         AccesTokenMsg: Label 'Access token acquired.';
     begin
         AddScopes(Scopes);
         GetTestGraphAPISetup();
+#IF NOT BC17
         OAuth2.GetDefaultRedirectURL(RedirectURL);
         OAuth2.AcquireTokenAndTokenCacheByAuthorizationCode(GraphApiSetup."Client Id", GraphApiSetup."Client Secret", GraphApiSetup."OAuth Authority Url", RedirectURL, Scopes, PromptInteraction::Login, AccessToken, TokenCache, AuthCodeError);
-
+#ENDIF
         if (AccessToken = '') or (AuthCodeError <> '') then
             Error(AuthCodeError);
 
