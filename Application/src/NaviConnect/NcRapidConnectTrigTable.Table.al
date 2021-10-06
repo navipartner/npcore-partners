@@ -2,6 +2,8 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
 {
     Caption = 'Nc RapidConnect Trigger Table';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used - Inter-company synchronizations will happen via the API replication module';
 
     fields
     {
@@ -10,7 +12,6 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
             Caption = 'Setup Code';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Nc RapidConnect Setup";
         }
         field(5; "Table ID"; Integer)
         {
@@ -18,20 +19,6 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
-
-            trigger OnLookup()
-            var
-                NcRapidConnectSetupMgt: Codeunit "NPR Nc RapidConnect Setup Mgt.";
-                ObjectId: Integer;
-            begin
-                if NcRapidConnectSetupMgt.LookupTriggerTableID("Setup Code", ObjectId) then
-                    Validate("Table ID", ObjectId);
-            end;
-
-            trigger OnValidate()
-            begin
-                TestTableID();
-            end;
         }
         field(10; "Table Name"; Text[30])
         {
@@ -61,35 +48,30 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
         }
         field(1000; "Package Code"; Code[20])
         {
-            CalcFormula = Lookup("NPR Nc RapidConnect Setup"."Package Code" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Package Code';
+            DataClassification = CustomerContent;
             Editable = false;
-            FieldClass = FlowField;
             TableRelation = "Config. Package";
         }
         field(1005; "Export Enabled"; Boolean)
         {
-            CalcFormula = Lookup("NPR Nc RapidConnect Setup"."Export Enabled" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Export Enabled';
+            DataClassification = CustomerContent;
             Editable = false;
-            FieldClass = FlowField;
         }
         field(1010; "Task Processor Code"; Code[20])
         {
-            CalcFormula = Lookup("NPR Nc RapidConnect Setup"."Task Processor Code" WHERE(Code = FIELD("Setup Code")));
             Caption = 'Task Processor Code';
+            DataClassification = CustomerContent;
             Editable = false;
-            FieldClass = FlowField;
             TableRelation = "NPR Nc Task Processor";
         }
         field(1015; "Trigger Fields"; Integer)
         {
-            CalcFormula = Count("NPR Nc RapidConnect Trig.Field" WHERE("Setup Code" = FIELD("Setup Code"),
-                                                                       "Table ID" = FIELD("Table ID")));
             Caption = 'Trigger Fields';
+            DataClassification = CustomerContent;
             Description = 'NC2.14';
             Editable = false;
-            FieldClass = FlowField;
         }
     }
 
@@ -99,19 +81,5 @@ table 6151091 "NPR Nc RapidConnect Trig.Table"
         {
         }
     }
-
-    var
-        TableNotIncludedInConfigPackageErr: Label 'Table ID %1 is not included in Config. Package %2', Comment = '%1=Rec."Table ID";%2=Rec."Package Code"';
-
-    local procedure TestTableID()
-    var
-        NcRapidConnectSetupMgt: Codeunit "NPR Nc RapidConnect Setup Mgt.";
-    begin
-        if NcRapidConnectSetupMgt.IsValidTableID("Setup Code", "Table ID") then
-            exit;
-
-        CalcFields("Package Code");
-        Error(TableNotIncludedInConfigPackageErr, Rec."Table ID", Rec."Package Code");
-    end;
 }
 

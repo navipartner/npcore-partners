@@ -2,6 +2,8 @@ table 6151092 "NPR Nc RapidConn. Endpoint"
 {
     Caption = 'Nc RapidConnect Endpoint';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used - Inter-company synchronizations will happen via the API replication module';
 
     fields
     {
@@ -10,7 +12,6 @@ table 6151092 "NPR Nc RapidConn. Endpoint"
             Caption = 'Setup Code';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Nc RapidConnect Setup";
         }
         field(5; "Endpoint Code"; Code[20])
         {
