@@ -151,11 +151,12 @@ codeunit 6060153 "NPR Event Email Management"
         BodyText: Text;
         ResourceGroup: Record "Resource Group";
         EMailTemplateHeader: Record "NPR E-mail Template Header";
-        Recipients, CcRecipients, BCCRecipients : List of [Text];
-        EmailMessage: Codeunit "Email Message";
-        Email: Codeunit Email;
+        Recipients, CcRecipients : List of [Text];
 #IF NOT BC17
         EmailRelationType: Enum "Email Relation Type";
+         EmailMessage: Codeunit "Email Message";
+        Email: Codeunit Email;
+        BCCRecipients : List of [Text];
 #ENDIF
         EmailAccount: Record "Email Account";
     begin
@@ -195,15 +196,18 @@ codeunit 6060153 "NPR Event Email Management"
 
         GetEmailAccount(EmailAccount, Job);
 
+
+#IF NOT BC17
         EmailMessage.Create(Recipients, EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject), BodyText, true, CcRecipients, BCCRecipients);
         AddAttachment(MailFor, Job, EmailMessage);
-#IF NOT BC17
+
         Email.AddRelation(EmailMessage, Database::Job, Job.SystemId, EmailRelationType::"Primary Source");
-#ENDIF
+
         if EventExchIntTemplate."Open E-mail dialog" then
             Email.OpenInEditorModally(EmailMessage, EmailAccount)
         else
             Email.Send(EmailMessage, EmailAccount);
+#ENDIF
     end;
 
     local procedure CreateBody(var BodyText: Text; EmailTemplateHeaderCode: Code[20]; JobNo: Code[20]; RecRef2: RecordRef)
@@ -239,7 +243,7 @@ codeunit 6060153 "NPR Event Email Management"
             BodyText += '</br></font>';
         end;
     end;
-
+#IF NOT BC17
     local procedure AddAttachment(var MailFor: Option Customer,Team; var Job: Record Job; var EmailMessage: Codeunit "Email Message")
     var
         EventReportLayout: Record "NPR Event Report Layout";
@@ -261,7 +265,7 @@ codeunit 6060153 "NPR Event Email Management"
                 end;
             until EventReportLayout.Next() = 0;
     end;
-
+#ENDIF
     local procedure GetEmailAccount(var EmailAccount: Record "Email Account"; Job: Record Job)
     var
         EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail";
