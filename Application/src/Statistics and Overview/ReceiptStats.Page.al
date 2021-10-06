@@ -31,9 +31,7 @@ page 6014491 "NPR Receipt Stats"
             {
 
                 Caption = 'Select a Period';
-#if BC17 or BC18
                 OptionCaption = 'Day,Week,Month,Quarter,Year';
-#endif
                 ToolTip = 'Specifies the value of the Select a Period field';
                 ApplicationArea = NPRRetail;
 
