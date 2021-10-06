@@ -7,6 +7,10 @@ param (
 )
 $ErrorActionPreference = 'Stop';
 
+Write-Host "workspaceFolder:" $workspaceFolder
+Write-Host "docfxUrl:" $docfxUrl
+Write-Host "------------"
+
 Write-Host "Cleaning and creating docfx folders"
 
 $downloadFolder = ($workspaceFolder + "/Documentation/.tools/docfx/download")
