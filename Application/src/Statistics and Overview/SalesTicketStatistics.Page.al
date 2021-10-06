@@ -74,9 +74,7 @@ page 6014468 "NPR Sales Ticket Statistics"
                 {
 
                     Caption = 'Period Type';
-#if BC17 or BC18
                     OptionCaption = 'Day,Week,Month,Year';
-#endif
                     ToolTip = 'Specifies the value of the Period Type field';
                     ApplicationArea = NPRRetail;
 
