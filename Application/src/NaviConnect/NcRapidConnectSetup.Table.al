@@ -2,8 +2,8 @@ table 6151090 "NPR Nc RapidConnect Setup"
 {
     Caption = 'Nc RapidConnect Setup';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Nc RapidConnect Setup";
-    LookupPageID = "NPR Nc RapidConnect Setup";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used - Inter-company synchronizations will happen via the API replication module';
 
     fields
     {
@@ -120,19 +120,5 @@ table 6151090 "NPR Nc RapidConnect Setup"
         {
         }
     }
-
-    trigger OnDelete()
-    var
-        NcRapidConnectEndpoint: Record "NPR Nc RapidConn. Endpoint";
-        NcRapidConnectTrigger: Record "NPR Nc RapidConnect Trig.Table";
-    begin
-        NcRapidConnectTrigger.SetRange("Setup Code", Code);
-        if NcRapidConnectTrigger.FindFirst() then
-            NcRapidConnectTrigger.DeleteAll();
-
-        NcRapidConnectEndpoint.SetRange("Setup Code", Code);
-        if NcRapidConnectEndpoint.FindFirst() then
-            NcRapidConnectEndpoint.DeleteAll();
-    end;
 }
 

@@ -2,8 +2,8 @@ table 6151093 "NPR Nc RapidConnect Trig.Field"
 {
     Caption = 'Nc RapidConnect Trigger Field';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Nc RapidConnect Trg.Fields";
-    LookupPageID = "NPR Nc RapidConnect Trg.Fields";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used - Inter-company synchronizations will happen via the API replication module';
 
     fields
     {
@@ -12,7 +12,6 @@ table 6151093 "NPR Nc RapidConnect Trig.Field"
             Caption = 'Setup Code';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Nc RapidConnect Setup";
         }
         field(5; "Table ID"; Integer)
         {
