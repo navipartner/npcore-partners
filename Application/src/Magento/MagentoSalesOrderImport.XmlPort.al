@@ -124,6 +124,11 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                     }
+                    textelement(invoice_email)
+                    {
+                        MinOccurs = Zero;
+                        MaxOccurs = Once;
+                    }
                 }
                 tableelement(tempcustomer2; Customer)
                 {
