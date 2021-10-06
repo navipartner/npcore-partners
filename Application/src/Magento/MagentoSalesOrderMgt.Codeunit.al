@@ -470,6 +470,7 @@
         XNodeList: XmlNodeList;
         OrderNo: Code[20];
         CurrencyFactor: Decimal;
+        InvoiceEmail: Text;
     begin
         Initialize();
         Clear(SalesHeader);
@@ -522,6 +523,11 @@
         SetFieldText(RecRef, 13637, NpXmlDomMgt.GetXmlText(XmlElement2, 'email', MaxStrLen(Customer."E-Mail"), false));
         SetFieldText(RecRef, 13630, NpXmlDomMgt.GetXmlText(XmlElement2, 'ean', MaxStrLen(Customer.GLN), false));
         RecRef.SetTable(SalesHeader);
+
+        InvoiceEmail := NpXmlDomMgt.GetXmlText(XmlElement2, 'invoice_email', MaxStrLen(SalesHeader."NPR Bill-to E-mail"), false);
+        if InvoiceEmail <> '' then
+            SalesHeader."NPR Bill-to E-mail" := InvoiceEmail;
+
         case MagentoSetup."Customer Update Mode" of
             MagentoSetup."Customer Update Mode"::Fixed:
                 begin
