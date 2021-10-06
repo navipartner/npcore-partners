@@ -234,6 +234,8 @@
         if MaxRetry < 1 then
             MaxRetry := 1;
 
+        SyncEndTime := CurrentDateTime() + GetMaxSyncDuration();
+
         Task.SetCurrentKey("Task Processor Code", Processed);
         Task.SetRange("Task Processor Code", TaskProcessor.Code);
         Task.SetRange(Processed, false);
@@ -690,7 +692,10 @@
     #endregion Constants
 
     #region UI
-
+    local procedure GetMaxSyncDuration(): Duration
+    begin
+        exit(120000T - 113000T);
+    end;
     #endregion UI
 
     #region events
