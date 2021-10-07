@@ -715,6 +715,11 @@ page 6151401 "NPR Magento Setup"
                         ToolTip = 'Specifies the value of the Post Memberships on Import field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Prevent posting if commented"; Rec."Prevent posting if commented")
+                    {
+                        ToolTip = 'Specifies if automatic Post On Import will be skipped if WEB Order has comments (Record links)';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
             part(Control6151459; "NPR Magento Setup PostOnImport")
