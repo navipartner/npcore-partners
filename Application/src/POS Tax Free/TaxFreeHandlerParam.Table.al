@@ -23,12 +23,6 @@ table 6014642 "NPR Tax Free Handler Param."
             Caption = 'Value';
             DataClassification = CustomerContent;
 
-            trigger OnLookup()
-            begin
-                if "Data Type" = "Data Type"::Option then
-                    LookupOption();
-            end;
-
             trigger OnValidate()
             begin
                 ValidateValue();
@@ -175,11 +169,6 @@ table 6014642 "NPR Tax Free Handler Param."
             "Data Type"::Option:
                 Error('Not implemented');
         end;
-    end;
-
-    local procedure LookupOption()
-    begin
-        Error('Not implemented');
     end;
 
     procedure AddParameter(ParamName: Text; DataType: Integer)

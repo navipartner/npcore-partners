@@ -32,10 +32,6 @@ page 6151335 "NPR Restaurant Activities"
                     Caption = 'Pending Reservations';
                     ToolTip = 'Specifies the value of the Pending Reservations field';
                     ApplicationArea = NPRRetail;
-                    trigger OnDrillDown()
-                    begin
-                        DrillDownPendingReservations();
-                    end;
                 }
             }
             cuegroup(TableStatus)
@@ -378,11 +374,6 @@ page 6151335 "NPR Restaurant Activities"
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");  //?
         Rec.CopyFilter("POS Unit Filter", POSEntry."POS Unit No.");
         Page.run(Page::"NPR POS Entries", POSEntry);
-    end;
-
-    local procedure DrillDownPendingReservations()
-    begin
-        Error('Not supported yet');
     end;
 
     var
