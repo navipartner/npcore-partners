@@ -288,16 +288,10 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
         AddToBuffer(StrSubstNo(TempPattern, rotate, font, hexp, vexp, point, row, column, d));
     end;
 
-    procedure TrueType()
-    begin
-        Error('NOT IMPLEMENTED!');
-    end;
-
     local procedure AddToBuffer(Text: Text[1024])
     begin
         AddTextToBuffer(Text);
     end;
-
 
     local procedure AddTextToBuffer(Text: Text[1024])
     begin
