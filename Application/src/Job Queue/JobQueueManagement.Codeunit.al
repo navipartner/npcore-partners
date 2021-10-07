@@ -9,7 +9,7 @@ codeunit 6014663 "NPR Job Queue Management"
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         ShowAutoCreatedClause: Boolean;
-        ParamNameAndValueLbl: Label '%1=%2';
+        ParamNameAndValueLbl: Label '%1=%2', Locked = true;
 
     procedure ScheduleNcTaskProcessing(TaskProcessorCode: Code[20]; EnableTaskListUpdate: Boolean; JobQueueCatagoryCode: Code[10])
     var

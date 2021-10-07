@@ -13,7 +13,7 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
     begin
         JQParamStrMgt.Parse(Rec."Parameter String");
 
-        Evaluate(TriggerCode, JQParamStrMgt.GetText(NcTriggerScheduler.GetParamName()));
+        Evaluate(TriggerCode, JQParamStrMgt.GetParamValueAsText(NcTriggerScheduler.GetParamName()));
         if TriggerCode = '' then
             exit;
 
