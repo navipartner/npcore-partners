@@ -5,8 +5,6 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 
     var
         APIIntegrationLbl: Label 'Replication API Integration - %1', Comment = '%1=API Version';
-        ProcessImportListLbl: Label 'process_import_list', Locked = true;
-        ImportTypeParameterLbl: Label 'import_type', locked = true;
         ImportTypeDescriptionLbl: Label 'Replication integration. Run all enabled services';
 
         ReplicationSetupErr: Label 'Replication Setup is missing or it is disabled';
@@ -30,15 +28,20 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     procedure Update(JobQueueEntry: Record "Job Queue Entry"; ImportType: Record "NPR Nc Import Type")
     var
         DummyServiceEndPoint: Record "NPR Replication Endpoint";
-        ImportListProcessing: Codeunit "NPR Nc Import List Processing";
+        JQImportType: Record "NPR Nc Import Type";
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
+        NcImportListProcessing: Codeunit "NPR Nc Import List Processing";
         EndPointIDFilter: Text;
     begin
-        if not ImportListProcessing.HasParameter(JobQueueEntry, ImportTypeParameterLbl) then
+        JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
+        if not JQParamStrMgt.ContainsParam(NcImportListProcessing.ParamImportType()) then
             exit;
-        if ImportType.Code <> ImportListProcessing.GetParameterValue(JobQueueEntry, ImportTypeParameterLbl) then
+        if not NcImportListProcessing.FilterImportType(JQParamStrMgt.GetParamValueAsText(NcImportListProcessing.ParamImportType()), JQImportType) then
             exit;
-        if ImportListProcessing.HasParameter(JobQueueEntry, DummyServiceEndPoint.TableName()) then
-            EndPointIDFilter := ImportListProcessing.GetParameterValue(JobQueueEntry, DummyServiceEndPoint.TableName());
+        JQImportType.Code := ImportType.Code;
+        if not JQImportType.Find() then
+            exit;
+        EndPointIDFilter := JQParamStrMgt.GetParamValueAsText(DummyServiceEndPoint.TableName());
 
         SendWebRequests(ImportType, EndPointIDFilter);
     end;
@@ -185,8 +188,9 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategory: Record "Job Queue Category";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        ParamWithProcessImportList: Label '%1=%2,%3';
-        ParamWithoutProcessImportList: Label '%1=%2';
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
+        NcImportListProcessing: Codeunit "NPR Nc Import List Processing";
+        ParamNameAndValueLbl: Label '%1=%2', locked = true;
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Nc Import List Processing");
@@ -207,16 +211,17 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             JobQueueEntry."No. of Minutes between Runs" := ServiceSetup.JobQueueMinutesBetweenRun
         else
             JobQueueEntry."No. of Minutes between Runs" := 10;
+
+        Clear(JQParamStrMgt);
+        JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcImportListProcessing.ParamImportType(), ServiceSetup."API Version"));
         IF ServiceSetup.JobQueueProcessImportList THEN
-            JobQueueEntry."Parameter String" := StrSubstNo(ParamWithProcessImportList, ImportTypeParameterLbl, ServiceSetup."API Version", ProcessImportListLbl)
-        else
-            JobQueueEntry."Parameter String" := StrSubstNo(ParamWithoutProcessImportList, ImportTypeParameterLbl, ServiceSetup."API Version");
+            JQParamStrMgt.AddToParamDict(NcImportListProcessing.ParamProcessImport());
 
         CreateJobQueueCategory(JobQueueCategory);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR Nc Import List Processing",
-            JobQueueEntry."Parameter String",
+            JQParamStrMgt.GetParamListAsCSString(),
             CopyStr(Strsubstno(APIIntegrationLbl, ServiceSetup."API Version"), 1, MaxStrLen(JobQueueEntry.Description)),
             CurrentDateTime(),
             JobQueueEntry."Starting Time",

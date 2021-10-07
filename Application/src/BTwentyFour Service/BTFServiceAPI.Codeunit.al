@@ -8,9 +8,7 @@ codeunit 6014641 "NPR BTF Service API"
         ResponseContentNotFoundMsg: Label 'Response content not found. Instead, check out Response Note to see error details: %1.';
         EmptyContentErr: Label 'Nothing to import';
         APIIntegrationLbl: Label 'BTwentyFour API Integration - %1', Comment = '%1=API Endpoint ID';
-        ProcessImportListLbl: Label 'process_import_list', Locked = true;
         ServiceEndPointsNotFoundLbl: Label '%1 not found for %2: %3 or endpoints exist but they are not enabled. Try to navigate to service endpoints through the setup by running an action "Show Setup Page"', Comment = '%1=ServiceEndPoint.TableCaption();%2=ServiceSetup.TableCaption();%3=ServiceSetup.Code';
-        ImportTypeParameterLbl: Label 'import_type', locked = true;
         BearerTokenLbl: Label 'bearer %1', locked = true;
         ClassIdTok: Label 'classid=%1', Locked = true;
 
@@ -263,7 +261,9 @@ codeunit 6014641 "NPR BTF Service API"
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueCategory: Record "Job Queue Category";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        PlaceHolder5Lbl: Label '%1=%2,%3=%4,%5', locked = true;
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
+        NcImportListProcessing: Codeunit "NPR Nc Import List Processing";
+        ParamNameAndValueLbl: Label '%1=%2', locked = true;
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Import List Processing");
@@ -271,11 +271,16 @@ codeunit 6014641 "NPR BTF Service API"
         if JobQueueEntry.FindFirst() then
             exit;
 
+        Clear(JQParamStrMgt);
+        JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcImportListProcessing.ParamImportType(), ServiceEndPoint."EndPoint ID"));
+        JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, ServiceEndPoint.TableName(), ServiceEndPoint.RecordId()));
+        JQParamStrMgt.AddToParamDict(NcImportListProcessing.ParamProcessImport());
+
         CreateJobQueueCategory(JobQueueCategory, ServiceEndPoint);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             CODEUNIT::"NPR Nc Import List Processing",
-            StrSubstNo(PlaceHolder5Lbl, ImportTypeParameterLbl, ServiceEndPoint."EndPoint ID", ServiceEndPoint.TableName(), ServiceEndPoint.RecordId(), ProcessImportListLbl),
+            JQParamStrMgt.GetParamListAsCSString(),
             CopyStr(Strsubstno(APIIntegrationLbl, ServiceEndPoint."EndPoint ID"), 1, MaxStrLen(JobQueueEntry.Description)),
             CurrentDateTime(),
             070000T,
@@ -380,15 +385,20 @@ codeunit 6014641 "NPR BTF Service API"
 
     procedure GetJobQueueParameters(JobQueueEntry: Record "Job Queue Entry"; ImportType: Record "NPR Nc Import Type"; var EndPointIDFilter: Text)
     var
+        JQImportType: Record "NPR Nc Import Type";
         ServiceEndPoint: Record "NPR BTF Service EndPoint";
-        ImportListProcessing: Codeunit "NPR Nc Import List Processing";
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
+        NcImportListProcessing: Codeunit "NPR Nc Import List Processing";
     begin
-        if not ImportListProcessing.HasParameter(JobQueueEntry, ImportTypeParameterLbl) then
+        JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
+        if not JQParamStrMgt.ContainsParam(NcImportListProcessing.ParamImportType()) then
             exit;
-        if ImportType.Code <> ImportListProcessing.GetParameterValue(JobQueueEntry, ImportTypeParameterLbl) then
+        if not NcImportListProcessing.FilterImportType(JQParamStrMgt.GetParamValueAsText(NcImportListProcessing.ParamImportType()), JQImportType) then
             exit;
-        if ImportListProcessing.HasParameter(JobQueueEntry, ServiceEndPoint.TableName()) then
-            EndPointIDFilter := ImportListProcessing.GetParameterValue(JobQueueEntry, ServiceEndPoint.TableName());
+        JQImportType.Code := ImportType.Code;
+        if not JQImportType.Find() then
+            exit;
+        EndPointIDFilter := JQParamStrMgt.GetParamValueAsText(ServiceEndPoint.TableName());
 
         if EndPointIDFilter = '' then
             EndPointIDFilter := Format(JobQueueEntry."Record ID to Process");

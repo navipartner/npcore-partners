@@ -12,9 +12,9 @@ codeunit 6060058 "NPR Item Wksht. TaskQueue Mgt."
         // Expected "Parameter String" like TEMPLATE_NAME=template,BATCH_NAME=batch,REGISTER_ITEM_WKSHT
         JQParamStrMgt.Parse(Rec."Parameter String");
 
-        Register := JQParamStrMgt.GetBoolean(ParamRegisterItemWksht());
-        evaluate(TemplateName, JQParamStrMgt.GetText(ParamTemplateName()));
-        evaluate(BatchName, JQParamStrMgt.GetText(ParamBatchName()));
+        Register := JQParamStrMgt.GetParamValueAsBoolean(ParamRegisterItemWksht());
+        evaluate(TemplateName, JQParamStrMgt.GetParamValueAsText(ParamTemplateName()));
+        evaluate(BatchName, JQParamStrMgt.GetParamValueAsText(ParamBatchName()));
 
         Commit();
         if Register then

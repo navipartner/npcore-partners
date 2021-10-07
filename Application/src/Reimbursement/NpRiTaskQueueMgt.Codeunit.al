@@ -9,10 +9,10 @@ codeunit 6151106 "NPR NpRi Task Queue Mgt."
         // Expected "Parmeter String" like: RUN_DATA_COLLECTIONS,RUN_REIMBURSEMENTS
         JQParamStrMgt.Parse(Rec."Parameter String");
 
-        if JQParamStrMgt.GetBoolean(ParamRunDataCollections()) then
+        if JQParamStrMgt.GetParamValueAsBoolean(ParamRunDataCollections()) then
             RunDataCollections();
 
-        if JQParamStrMgt.GetBoolean(ParamRunReimbursements()) then
+        if JQParamStrMgt.GetParamValueAsBoolean(ParamRunReimbursements()) then
             RunReimbursements();
     end;
 

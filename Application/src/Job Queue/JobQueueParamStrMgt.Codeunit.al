@@ -3,6 +3,7 @@ codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
     var
         ParamString: Text;
         ParamDict: Dictionary of [Text, Text];
+        Initialized: Boolean;
 
     procedure Parse(_ParamString: Text)
     var
@@ -12,62 +13,74 @@ codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
         ClearParamDict();
 
         ParamString := _ParamString;
-
         KeyValueList := ParamString.Split(',');
-
         foreach KeyValuePair in KeyValueList do
             AddToParamDict(KeyValuePair, ParamDict);
+
+        Initialized := true;
     end;
 
     procedure ParamStringContains(SubString: Text): Boolean
     begin
-        if ParamString = '' then
+        MakeSureIsInitialized();
+        if (ParamString = '') or (SubString = '') then
             exit(false);
-
         exit(ParamString.Contains(SubString));
     end;
 
     procedure HasParams(): Boolean
     begin
+        MakeSureIsInitialized();
         exit(ParamDict.Count() > 0);
     end;
 
     procedure ContainsParam(ParamKey: Text): Boolean
     begin
+        MakeSureIsInitialized();
+        if ParamKey = '' then
+            exit(false);
         exit(ParamDict.ContainsKey(ParamKey));
     end;
 
-    procedure GetText(ParamKey: Text) ParamValue: Text
+    procedure GetParamValueAsText(ParamKey: Text): Text
     begin
-        ParamValue := '';
-        if ParamDict.ContainsKey(ParamKey) then
-            exit(ParamDict.Get(ParamKey));
+        MakeSureIsInitialized();
+        if ParamKey <> '' then
+            if ParamDict.ContainsKey(ParamKey) then
+                exit(ParamDict.Get(ParamKey));
+        exit('');
     end;
 
-    procedure GetBoolean(ParamKey: Text) ParamValue: Boolean
+    procedure GetParamValueAsBoolean(ParamKey: Text) ParamValue: Boolean
     var
         R: Text;
     begin
+        MakeSureIsInitialized();
         ParamValue := false;
-        if ParamDict.ContainsKey(ParamKey) then begin
-            R := ParamDict.Get(ParamKey);
-            if R = '' then // if only parameter name is present
-                ParamValue := true
-            else
-                evaluate(ParamValue, ParamDict.Get(ParamKey));
-        end;
+        if ParamKey <> '' then
+            if ParamDict.ContainsKey(ParamKey) then begin
+                R := ParamDict.Get(ParamKey);
+                if R = '' then // if only parameter name is present
+                    ParamValue := true
+                else
+                    evaluate(ParamValue, ParamDict.Get(ParamKey));
+            end;
     end;
 
-    procedure GetInteger(ParamKey: Text) ParamValue: Integer
+    procedure GetParamValueAsInteger(ParamKey: Text) ParamValue: Integer
     begin
+        MakeSureIsInitialized();
         ParamValue := 0;
-        if ParamDict.ContainsKey(ParamKey) then
-            evaluate(ParamValue, ParamDict.Get(ParamKey));
+        if ParamKey <> '' then
+            if ParamDict.ContainsKey(ParamKey) then
+                evaluate(ParamValue, ParamDict.Get(ParamKey));
     end;
 
     procedure ClearParamDict()
     begin
         Clear(ParamDict);
+        ParamString := '';
+        Initialized := false;
     end;
 
     procedure AddToParamDict(KeyValuePair: Text)
@@ -81,6 +94,8 @@ codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
         K: Text;
         V: Text;
     begin
+        Initialized := true;
+
         KVList := KeyValuePair.Split('=');
 
         if not KVList.Get(1, K) then
@@ -112,5 +127,13 @@ codeunit 6014501 "NPR Job Queue Param. Str. Mgt."
             end;
 
         exit(ResultString);
+    end;
+
+    local procedure MakeSureIsInitialized()
+    var
+        NotInitializedErr: Label 'A method call was made on an uninitialized instance of the Job Queue Param. Str. Mgt. codeunit, that requires an active and initialized instance to succeed. This is a critical programming error. Please contact system vendor.';
+    begin
+        if not Initialized then
+            Error(NotInitializedErr);
     end;
 }
