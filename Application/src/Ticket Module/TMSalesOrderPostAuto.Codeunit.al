@@ -16,9 +16,9 @@ codeunit 6060124 "NPR TM Sales Order Post. Auto"
         // Expected "Parmeter String" like: SKIP_PAYMENT,POST_TICKET,POST_MEMBER 
         JQParamStrMgt.Parse(Rec."Parameter String");
 
-        SkipPaymentCheck := JQParamStrMgt.GetBoolean(ParamSkipPayment());
-        PostTicket := JQParamStrMgt.GetBoolean(ParamPostTicket());
-        PostMember := JQParamStrMgt.GetBoolean(ParamPostMember());
+        SkipPaymentCheck := JQParamStrMgt.GetParamValueAsBoolean(ParamSkipPayment());
+        PostTicket := JQParamStrMgt.GetParamValueAsBoolean(ParamPostTicket());
+        PostMember := JQParamStrMgt.GetParamValueAsBoolean(ParamPostMember());
 
         if SalesHeader.FindSet() then
             repeat

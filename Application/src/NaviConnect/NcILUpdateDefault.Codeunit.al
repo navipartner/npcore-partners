@@ -12,10 +12,12 @@ codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpda
 
     procedure Update(JobQueueEntry: Record "Job Queue Entry"; ImportType: Record "NPR Nc Import Type")
     var
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcImpListProcessing: Codeunit "NPR Nc Import List Processing";
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
-        if NcImpListProcessing.HasParameter(JobQueueEntry, NcImpListProcessing.ParamDownloadFtp()) then begin
+        JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
+        if JQParamStrMgt.ContainsParam(NcImpListProcessing.ParamDownloadFtp()) then begin
             NcSyncMgt.DownloadFtpType(ImportType);
             Commit();
         end;

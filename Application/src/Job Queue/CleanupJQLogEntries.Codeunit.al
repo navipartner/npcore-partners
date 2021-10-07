@@ -18,7 +18,7 @@ codeunit 6014664 "NPR Cleanup JQ Log Entries"
         if JobQueueEntry."Parameter String" <> '' then begin
             JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
             if JQParamStrMgt.ContainsParam(ParamClearBeforeDF()) then
-                if Evaluate(PurgeDateFormula, JQParamStrMgt.GetText(ParamClearBeforeDF())) then
+                if Evaluate(PurgeDateFormula, JQParamStrMgt.GetParamValueAsText(ParamClearBeforeDF())) then
                     PurgeUntil := CalcDate(PurgeDateFormula, Today);
         end;
         if (PurgeUntil = 0D) or (PurgeUntil >= Today) then
