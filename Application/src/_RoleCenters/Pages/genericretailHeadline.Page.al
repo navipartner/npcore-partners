@@ -12,7 +12,8 @@ page 6014511 "NPR generic retail Headline"
             group(Greeting)
             {
                 ShowCaption = false;
-                Visible = UserGreetingVisible;
+
+                Visible = false;
                 field(GreetingText; GreetingText)
                 {
 
@@ -54,7 +55,7 @@ page 6014511 "NPR generic retail Headline"
     }
     trigger OnOpenPage()
     begin
-        ComputeDefaultFieldsVisibility();
+
         HeadlineManagement.GetUserGreetingText(GreetingText);
         NPRVersion := StrSubstNo(NPRVersionTxt, LicenseInformation.GetRetailVersion());
     end;
@@ -63,13 +64,10 @@ page 6014511 "NPR generic retail Headline"
         HeadlineManagement: Codeunit "NPR NP Retail Headline Mgt.";
         GreetingText: Text[250];
         NPRetailTxt: Label 'Want to learn more about NP Retail?';
-        UserGreetingVisible: Boolean;
+
         LicenseInformation: Codeunit "NPR License Information";
         NPRVersionTxt: Label 'You are currently on version %1', Comment = '%1 is the NP Retail version number';
         NPRVersion: Text[250];
 
-    local procedure ComputeDefaultFieldsVisibility()
-    begin
-        UserGreetingVisible := HeadlineManagement.ShouldUserGreetingBeVisible();
-    end;
+
 }
