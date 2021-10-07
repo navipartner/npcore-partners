@@ -362,6 +362,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Caption = 'Attached Payment Bins';
                 Editable = false;
                 ShowFilter = false;
+                SubPageLink = "POS Unit No." = field("POS Unit No.");
                 ApplicationArea = NPRRetail;
             }
         }
