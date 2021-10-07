@@ -501,6 +501,11 @@ table 6151401 "NPR Magento Setup"
             Caption = 'Post Memberships on Import';
             DataClassification = CustomerContent;
         }
+        field(740; "Prevent posting if commented"; Boolean)
+        {
+            Caption = 'Prevent posting if commented';
+            DataClassification = CustomerContent;
+        }
         field(750; "Send Order Confirmation"; Boolean)
         {
             Caption = 'Send Order Confirmation';

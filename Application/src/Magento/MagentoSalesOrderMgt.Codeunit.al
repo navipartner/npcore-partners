@@ -23,6 +23,7 @@
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         SalesPost: Codeunit "Sales-Post";
         Initialized: Boolean;
+        OrderHasComments: Boolean;
         Error001: Label 'Xml Element sell_to_customer is missing';
         Error002: Label 'Item %1 does not exist in %2';
         Error003: Label 'Error during E-mail Confirmation: %1';
@@ -176,6 +177,7 @@
 
             RecordLinkManagement.WriteNote(RecordLink, Note);
             RecordLink.Modify(true);
+            OrderHasComments := true;
             OnAfterInsertCommentLine(CurrImportType, CurrImportEntry, XmlElement, SalesHeader, RecordLink);
         end;
     end;
@@ -185,6 +187,7 @@
         XNode: XmlNode;
         XNodeList: XmlNodeList;
     begin
+        OrderHasComments := false;
         XmlElement.SelectNodes('comments/comment_line', XNodeList);
         foreach XNode in XNodeList do begin
             InsertCommentLine(XNode.AsXmlElement(), SalesHeader);
@@ -1398,6 +1401,9 @@
     var
         ReleaseSalesDoc: Codeunit "Release Sales Document";
     begin
+        if MagentoSetup."Prevent posting if commented" and OrderHasComments then
+            exit;
+
         if not HasLinesToPostOnImport(SalesHeader) then
             exit;
 
