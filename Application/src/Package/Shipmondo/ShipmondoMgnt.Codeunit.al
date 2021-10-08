@@ -7,8 +7,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         RequestString: Text;
         RequestURL: Text;
         Text0001: Label 'Login Details Missing';
-        Err0001: Label 'Pakkelabels Return the following  error: %1';
-        ErrorTextFound: Text;
+        ShipmondoErr: Label 'The following error occured while trying to create Shipmondo shipment:\\%1';
 
     local procedure SetProductAndServices(var PakkelabelsShipment: Record "NPR Pacsoft Shipment Document") services: Text;
     var
@@ -446,28 +445,22 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     var
         SalesShptHeader: Record "Sales Shipment Header";
         SalesSetup: Record "Sales & Receivables Setup";
-        RecRefShipment: RecordRef;
-        LastErrorText: Text;
+        ShipmondoTryCreateShipment: Codeunit "NPR Shipmondo Try Create Shpt.";
     begin
         if not InitPackageProvider() then
             exit;
 
-        begin
-            if SalesHeader.Ship then
-                if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
-                    ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then
-                    if SalesShptHeader.GET(SalesShptHdrNo) then begin
-                        RecRefShipment.GETTABLE(SalesShptHeader);
-                        AddEntry(RecRefShipment, false, true);
-                        if ErrorTextFound <> '' then
-                            MESSAGE(Err0001, ErrorTextFound);
-                    end;
-            COMMIT();
-            ERROR('');
+        if not SalesHeader.Ship then
+            exit;
+
+        if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
+            ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then begin
+            if SalesShptHeader.GET(SalesShptHdrNo) then begin
+                if not ShipmondoTryCreateShipment.Run(SalesShptHeader) then // This will incur a commit
+                    if GuiAllowed then
+                        Message(ShipmondoErr, GetLastErrorText());
+            end;
         end;
-        LastErrorText := GETLASTERRORTEXT;
-        if LastErrorText <> '' then
-            MESSAGE(LastErrorText);
     end;
 
     local procedure InitPackageProvider(): Boolean;
