@@ -12,7 +12,7 @@ pool:
 
 variables:
   docfxUrl: 'https://github.com/dotnet/docfx/releases/download/v2.58.4/docfx.zip'
-  azureBlobStorageUrl: 'https://npdocs.blob.core.windows.net/$$web'
+  azureBlobStorageUrl: 'https://npdocs.blob.core.windows.net/`$web'
   azureCopyUrl: 'https://azcopyvnext.azureedge.net/release20210920/azcopy_windows_amd64_10.12.2.zip'
 
 steps:
