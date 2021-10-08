@@ -1,8 +1,5 @@
 codeunit 6150716 "NPR POS Stargate Management"
 {
-    // NPR5.33/VB  /20170628  CASE 282239 Modified logic to properly handle Stargate errors and issues.
-    // NPR5.37/VB /20170929  CASE 291777 Short-term solution for just-in-time Stargate synchronization in Major Tom
-
     EventSubscriberInstance = Manual;
 
     trigger OnRun()
@@ -233,24 +230,20 @@ codeunit 6150716 "NPR POS Stargate Management"
         StargatePackage: Record "NPR POS Stargate Package";
         Package: DotNet NPRNetPackage;
         Request: DotNet NPRNetPackageRequest;
-        IOFile: DotNet NPRNetFile;
-        TempFile: File;
-        TempFileName: Text;
+        InStr: InStream;
+        JsonContent: Text;
         State: Option SendingRequest,InstallingAssemblies,RepeatingRequest;
     begin
         SetState(ActionName, State::InstallingAssemblies);
 
         if (not StargateMethod.Get(Method)) or (not StargatePackage.Get(StargateMethod."Package Name")) then
             ThrowUnsupportedStargateMethodError(FrontEnd, Method, ActionName);
-        TempFile.CreateTempFile();
-        TempFileName := TempFile.Name;
-        TempFile.Close();
         StargatePackage.CalcFields(JSON);
-        StargatePackage.JSON.Export(TempFileName);
-        Package := Package.FromJsonString(IOFile.ReadAllText(TempFileName));
+        StargatePackage.JSON.CreateInStream(InStr);
+        InStr.ReadText(JsonContent);
+        Package := Package.FromJsonString(JSONContent);
         Package.Name := StargatePackage.Name;
         Package.Version := StargatePackage.Version;
-        Erase(TempFileName);
 
         Request := Package.ToRequest();
         FrontEnd.InvokeDeviceInternal(Request, ActionName, Step, false);

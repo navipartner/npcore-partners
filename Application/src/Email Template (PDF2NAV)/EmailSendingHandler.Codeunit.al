@@ -57,7 +57,9 @@ codeunit 6014553 "NPR Email Sending Handler"
         TempBLOB.CreateOutStream(Outstr);
         CopyStream(Outstr, InStr);
         TempAttachment.SetAttachmentFileFromBlob(TempBLOB);
+#pragma warning disable AL0667
         TempAttachment."Attachment File".Export(FileName);
+#pragma warning restore
         case true of
             EmailItem."Attachment File Path" = '':
                 begin
