@@ -1,5 +1,6 @@
 codeunit 6014604 "NPR Text Functions"
 {
+#IF BC17
     procedure Camelize(InputString: Text): Text
     var
         DotNetRegEx: Codeunit DotNet_Regex;
@@ -28,5 +29,34 @@ codeunit 6014604 "NPR Text Functions"
 
         exit(TB.ToText());
     end;
+
+#ELSE
+    procedure Camelize(InputString: Text): Text
+    var
+        Regex: Codeunit Regex;
+        TempString: Text;
+        Word: Text;
+        Words: List of [Text];
+        i: Integer;
+        TB: TextBuilder;
+    begin
+        TempString := Regex.Replace(InputString, '[^a-zA-Z0-9 ]', ' ', 10000);
+        TempString := Regex.Replace(TempString, '[ ]{2,}', ' ', 10000).Trim(); //more than one space
+
+        Words := TempString.Split(' ');
+        for i := 1 to Words.Count() do begin
+            IF Words.Get(i, Word) then
+                Case i of
+                    1:
+                        Word := Word.ToLower();
+                    else
+                        Word := Format(Word[1]).ToUpper() + Word.Substring(2).ToLower();
+                End;
+            TB.Append(Word);
+        end;
+
+        exit(TB.ToText());
+    end;
+#ENDIF
 
 }
