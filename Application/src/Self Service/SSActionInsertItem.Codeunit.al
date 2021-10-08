@@ -806,7 +806,7 @@
         Item.FindLast();
         if ItemIdentifierString = Item."No." then
             exit(true);
-        ItemList.Editable(false);
+        ItemList.Editable(true);
         ItemList.LookupMode(true);
         ItemList.SetTableView(Item);
         if ItemList.RunModal() = ACTION::LookupOK then begin
