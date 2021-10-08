@@ -20,19 +20,19 @@ page 6150702 "NPR POS Menu Buttons"
                 field(Caption; Rec.Caption)
                 {
 
-                    ToolTip = 'Specifies the value of the Caption field';
+                    ToolTip = 'Specifies the caption which will be displayed on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field(Tooltip; Rec.Tooltip)
                 {
 
-                    ToolTip = 'Specifies the value of the Tooltip field';
+                    ToolTip = 'Specifies what will be displayed when the cursor hovers over the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Action Type"; Rec."Action Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Action Type field';
+                    ToolTip = 'Specifies what type of action is triggered by clicking the button';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -45,7 +45,7 @@ page 6150702 "NPR POS Menu Buttons"
 
                     Style = Unfavorable;
                     StyleExpr = NeedParameterRefresh;
-                    ToolTip = 'Specifies the value of the Action Code field';
+                    ToolTip = 'Specifies what workflow is defined for the action';
                     ApplicationArea = NPRRetail;
                 }
                 field("Data Source Name"; Rec."Data Source Name")
@@ -58,103 +58,103 @@ page 6150702 "NPR POS Menu Buttons"
                 field(Blocked; Rec.Blocked)
                 {
 
-                    ToolTip = 'Specifies the value of the Blocked field';
+                    ToolTip = 'Specifies whether the action is blocked or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Plus/Minus Buttons"; Rec."Show Plus/Minus Buttons")
                 {
 
-                    ToolTip = 'Specifies the value of the Show Plus/Minus Buttons field';
+                    ToolTip = 'Specifies whether or not plus/minus buttons will be displayed';
                     ApplicationArea = NPRRetail;
                 }
                 field("Background Color"; Rec."Background Color")
                 {
 
-                    ToolTip = 'Specifies the value of the Background Color field';
+                    ToolTip = 'Specifies the background color that is displayed on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Foreground Color"; Rec."Foreground Color")
                 {
 
-                    ToolTip = 'Specifies the value of the Foreground Color field';
+                    ToolTip = 'Specifies the foreground color that is displayed on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
 
-                    ToolTip = 'Specifies the value of the Icon Class field';
+                    ToolTip = 'Specifies the logo that is used on the button';
                     ApplicationArea = NPRRetail;
                 }
                 field("Background Image Url"; Rec."Background Image Url")
                 {
 
-                    ToolTip = 'Specifies the value of the Background Image Url field';
+                    ToolTip = 'Specifies the url for the background image';
                     ApplicationArea = NPRRetail;
                 }
                 field("Caption Position"; Rec."Caption Position")
                 {
 
-                    ToolTip = 'Specifies the value of the Caption Position field';
+                    ToolTip = 'Specifies where on the button the caption should be';
                     ApplicationArea = NPRRetail;
                 }
                 field("Custom Class Attribute"; Rec."Custom Class Attribute")
                 {
 
-                    ToolTip = 'Specifies the value of the Custom Class Attribute field';
+                    ToolTip = 'Specifies what the custom class attribute is';
                     ApplicationArea = NPRRetail;
                 }
                 field(Bold; Rec.Bold)
                 {
 
-                    ToolTip = 'Specifies the value of the Bold field';
+                    ToolTip = 'Specifies whether or not the caption should be in bold lettering';
                     ApplicationArea = NPRRetail;
                 }
                 field("Font Size"; Rec."Font Size")
                 {
 
-                    ToolTip = 'Specifies the value of the Font Size field';
+                    ToolTip = 'Specifies the font size';
                     ApplicationArea = NPRRetail;
                 }
                 field("Position X"; Rec."Position X")
                 {
 
-                    ToolTip = 'Specifies the value of the Position X field';
+                    ToolTip = 'Specifies the position of the button on the x-axis';
                     ApplicationArea = NPRRetail;
                 }
                 field("Position Y"; Rec."Position Y")
                 {
 
-                    ToolTip = 'Specifies the value of the Position Y field';
+                    ToolTip = 'Specifies the position of the button on the y-axis';
                     ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
 
-                    ToolTip = 'Specifies the value of the Enabled field';
+                    ToolTip = 'Specifies whether or not the button is enabled or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Secure Method Code"; Rec."Secure Method Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Secure Method Code field';
+                    ToolTip = 'Specifies if the button has been assigned a secure method code';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register Type"; Rec."Register Type")
                 {
 
-                    ToolTip = 'Specifies the value of the POS View Profile field';
+                    ToolTip = 'Specifies if the button has been allocated to a POS view profile';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies if the button has been allocated to a POS Unit';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ToolTip = 'Specifies if the button has been allocated to a salesperson';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -175,7 +175,7 @@ page 6150702 "NPR POS Menu Buttons"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Refresh Action Code Parameters action';
+                ToolTip = 'Refreshes the Action Code Parameters';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -192,7 +192,7 @@ page 6150702 "NPR POS Menu Buttons"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Update Tooltips action';
+                ToolTip = 'Updates the tooltips';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -214,7 +214,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Left';
 
-                    ToolTip = 'Executes the Unindent action';
+                    ToolTip = 'Unindents the selected button';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -233,7 +233,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Right';
 
-                    ToolTip = 'Executes the Indent action';
+                    ToolTip = 'Indents the selected button';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -256,7 +256,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Up';
 
-                    ToolTip = 'Executes the Move Up action';
+                    ToolTip = 'Moves the selected button up';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -275,7 +275,7 @@ page 6150702 "NPR POS Menu Buttons"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Down';
 
-                    ToolTip = 'Executes the Move Down action';
+                    ToolTip = 'Moves the selected button down';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -297,7 +297,7 @@ page 6150702 "NPR POS Menu Buttons"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Parameters action';
+                ToolTip = 'View/edit the parameters';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -321,7 +321,7 @@ page 6150702 "NPR POS Menu Buttons"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Popup Menu action';
+                ToolTip = 'View/edit the connected popup menu';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -338,7 +338,7 @@ page 6150702 "NPR POS Menu Buttons"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Caption Localization action';
+                ToolTip = 'View/edit the caption localizations';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
