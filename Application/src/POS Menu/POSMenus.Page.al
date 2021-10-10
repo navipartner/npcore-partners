@@ -22,31 +22,31 @@ page 6150701 "NPR POS Menus"
                 field(Caption; Rec.Caption)
                 {
 
-                    ToolTip = 'Specifies the value of the Caption field';
+                    ToolTip = 'Specifies what the caption is';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
-                    ToolTip = 'Specifies the value of the Blocked field';
+                    ToolTip = 'Specifies whether it"s blocked or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register Type"; Rec."Register Type")
                 {
 
-                    ToolTip = 'Specifies the value of the POS View Profile field';
+                    ToolTip = 'Specifies what POS View Profile is assigned';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies what POS Unit is assigned';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ToolTip = 'Specifies what salesperson is assigned';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -68,7 +68,7 @@ page 6150701 "NPR POS Menus"
                 RunObject = Page "NPR POS Menu Buttons";
                 RunPageLink = "Menu Code" = FIELD(Code);
 
-                ToolTip = 'Executes the Buttons action';
+                ToolTip = 'Create/delete and edit POS Menu buttons';
                 ApplicationArea = NPRRetail;
             }
             action(ExportPackageSelected)
@@ -76,7 +76,7 @@ page 6150701 "NPR POS Menus"
                 Caption = 'Export Package (Selected)';
                 Image = Export;
 
-                ToolTip = 'Executes the Export Package (Selected) action';
+                ToolTip = 'Exports the selected package';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -93,7 +93,7 @@ page 6150701 "NPR POS Menus"
                 Caption = 'Export Package (All)';
                 Image = Export;
 
-                ToolTip = 'Executes the Export Package (All) action';
+                ToolTip = 'Exports all the packages';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -109,7 +109,7 @@ page 6150701 "NPR POS Menus"
                 Caption = 'Import Package From File';
                 Image = Import;
 
-                ToolTip = 'Executes the Import Package From File action';
+                ToolTip = 'Imports a package from a file';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
