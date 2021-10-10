@@ -24,25 +24,25 @@ page 6150703 "NPR POS Actions"
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies what the description is';
                     ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
 
-                    ToolTip = 'Specifies the value of the Version field';
+                    ToolTip = 'Specifies what version it is';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
-                    ToolTip = 'Specifies the value of the Blocked field';
+                    ToolTip = 'Specifies whether or not it is blocked';
                     ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
 
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies what type of action it is';
                     ApplicationArea = NPRRetail;
                 }
                 field("Workflow Defined"; Rec.Workflow.HasValue())
@@ -69,13 +69,13 @@ page 6150703 "NPR POS Actions"
                 field("<Blocking UI>"; Rec."Codeunit ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Codeunit ID field';
+                    ToolTip = 'Specifies the codeunit ID of the connected codeunit';
                     ApplicationArea = NPRRetail;
                 }
                 field("Secure Method Code"; Rec."Secure Method Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Secure Method Code field';
+                    ToolTip = 'Specifies if the action has been assigned a secure method code';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -95,7 +95,7 @@ page 6150703 "NPR POS Actions"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Refresh Workflow action';
+                ToolTip = 'Refreshes the workflow';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -117,7 +117,7 @@ page 6150703 "NPR POS Actions"
                 RunObject = Page "NPR POS Action Param.";
                 RunPageLink = "POS Action Code" = FIELD(Code);
 
-                ToolTip = 'Executes the Parameters action';
+                ToolTip = 'View/edit parameters';
                 ApplicationArea = NPRRetail;
             }
             action(Workflow)
@@ -132,7 +132,7 @@ page 6150703 "NPR POS Actions"
                 RunObject = Page "NPR POS Action Workflow";
                 RunPageLink = "POS Action Code" = FIELD(Code);
 
-                ToolTip = 'Executes the Workflow action';
+                ToolTip = 'View/edit workflow';
                 ApplicationArea = NPRRetail;
             }
         }
