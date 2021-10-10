@@ -49,19 +49,19 @@ jobs:
       -  preprocessorSymbols: [BC18]
       -  runtime: '"7.2"'
 
-    # - name: BC19
-    #   containerImageName: npretail.azurecr.io/np/dynamicsnav:19.0.29894.30693-w1
-    #   artifactUrl: ''
-    #   endpointName: npretail_ACR
-    #   serverInstanceName: BC
-    #   licenseSecureFileName: 'DEV_BC OP 18.flf'
+    - name: BC19
+      containerImageName: npretail.azurecr.io/np/dynamicsnav:19.0.29894.30693-w1
+      artifactUrl: ''
+      endpointName: npretail_ACR
+      serverInstanceName: BC
+      licenseSecureFileName: 'DEV_BC OP 18.flf'
 
-    #   majorVersion: 1900
-    #   appJsonValues:
-    #   -  platform: '19.0.0.0'
-    #   -  application: '1.0.0.0'
-    #   -  preprocessorSymbols: [BC19]
-    #   -  runtime: '"7.2"'  
+      majorVersion: 1900
+      appJsonValues:
+      -  platform: '19.0.0.0'
+      -  application: '1.0.0.0'
+      -  preprocessorSymbols: [BC19]
+      -  runtime: '"7.2"'  
 
     scriptsRepo: scriptsRepo
     stepList:
