@@ -61,7 +61,9 @@ jobs:
       -  platform: '19.0.0.0'
       -  application: '1.0.0.0'
       -  preprocessorSymbols: [BC19]
-      -  runtime: '"7.2"'  
+      -  runtime: '"7.2"'
+      -  applicationInsightsConnectionString: '"InstrumentationKey=eed7264a-4861-43ac-88d1-dd554a6b5f08;"'
+      -  applicationInsightsKey: ''
 
     scriptsRepo: scriptsRepo
     stepList:
