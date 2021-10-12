@@ -1,3 +1,4 @@
+#if BC17 or BC18
 codeunit 6014502 "NPR Enable Item Ref. Upgr."
 {
     Subtype = Upgrade;
@@ -70,3 +71,4 @@ codeunit 6014502 "NPR Enable Item Ref. Upgr."
         LogMessageStopwatch.LogFinish();
     end;
 }
+#endif
