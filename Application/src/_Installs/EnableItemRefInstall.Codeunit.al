@@ -1,3 +1,4 @@
+#if BC17 or BC18
 codeunit 6014503 "NPR Enable Item Ref. Install"
 {
     Subtype = Install;
@@ -14,3 +15,4 @@ codeunit 6014503 "NPR Enable Item Ref. Install"
         EnableItemRefUpgr.AutoEnableItemReference();
     end;
 }
+#endif

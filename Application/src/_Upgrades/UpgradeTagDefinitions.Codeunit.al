@@ -30,7 +30,9 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Payment Type POS Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR MCS Data Upgrade"));
+#if BC17 or BC18
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Enable Item Ref. Upgr."));
+#endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", 'RemoveSourceCode'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NP Retail Setup Upgrade", 'UpgradeFiedsToDedicatedSetups'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Aux. Tables"));
@@ -105,8 +107,10 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRNewPriceTableUpgrade-20210920');
             Codeunit::"NPR MCS Data Upgrade":
                 exit('NPR_MCS_Data_Upgrade');
+#if BC17 or BC18                
             Codeunit::"NPR Enable Item Ref. Upgr.":
                 exit('AutoEnableItemReference-20210324');
+#endif                
             Codeunit::"NPR NP Retail Setup Upgrade":
                 case UpgradeStep of
                     'RemoveSourceCode':
