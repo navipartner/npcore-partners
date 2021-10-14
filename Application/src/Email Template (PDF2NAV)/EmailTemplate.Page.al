@@ -120,18 +120,6 @@ page 6059791 "NPR E-mail Template"
                                 RecRef.SetTable(Rec);
                                 Rec.Modify(true);
                             end;
-
-                            // Clear(TextEditorPage);
-                            // Rec.CalcFields("HTML Template");
-                            // HtmlText := '';
-                            // Rec."HTML Template".CreateInStream(Instream, TEXTENCODING::UTF8);
-                            // Instream.ReadText(HtmlText);
-                            // if TextEditorPage.EditText(HtmlText) then begin
-                            //     Clear(Rec."HTML Template");
-                            //     Rec."HTML Template".CreateOutStream(Outstream, TEXTENCODING::UTF8);
-                            //     Outstream.WriteText(HtmlText);
-                            //     Rec.Modify();
-                            // end;
                         end;
                     }
                 }
