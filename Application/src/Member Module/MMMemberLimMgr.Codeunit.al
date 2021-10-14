@@ -11,17 +11,22 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
     procedure LogMemberCardArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; ResponseMessage: Text; ResponseCode: Integer): Integer
     var
-        ExternalMemberNo: Code[20];
-        ExternalMembershipNo: Code[20];
-        MembershipCode: Code[20];
-        IgnoreMessage: Text;
+        MemberCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
+        Member: Record "NPR MM Member";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         LogEntryNo: Integer;
     begin
 
-        GetExternalMemberNo(ExternalMemberCardNo, ExternalMemberNo, IgnoreMessage);
-        GetExternalMembershipNo(ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, IgnoreMessage);
+        if (MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo))) then begin
+            if (not Membership.Get(MemberCard."Membership Entry No.")) then
+                Clear(Membership);
+            if (not Member.Get(MemberCard."Member Entry No.")) then
+                Clear(Member);
+            ExternalMemberCardNo := MemberCard."External Card No.";
+        end;
 
-        InternalLogArrival(ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, LogEntryNo, ResponseMessage, ResponseCode, 0);
+        InternalLogArrival(Membership."External Membership No.", Member."External Member No.", ExternalMemberCardNo, AdmissionCode, ScannerStationId, LogEntryNo, ResponseMessage, ResponseCode, 0);
 
         exit(ResponseCode);
     end;
@@ -30,12 +35,13 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
     begin
 
         CheckLimitMemberCardArrival(1, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
+        exit(ReUseLogEntryNo);
     end;
 
     procedure POS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) LogEntryNo: Integer
     begin
-
         CheckLimitMemberCardArrival(0, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
+        exit(ReUseLogEntryNo);
     end;
 
     procedure UpdateLogEntry(EntryNo: Integer; MessageCode: Integer; MessageText: Text)
@@ -107,42 +113,56 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
     local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
-        ExternalMemberNo: Code[20];
-        ExternalMembershipNo: Code[20];
-        MembershipCode: Code[20];
+        MemberCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
+        Member: Record "NPR MM Member";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         NewResponseMessage: Text;
         NewResponseCode: Integer;
-        IgnoreMessage: Text;
+        MembershipNotFoundLbl: Label 'Membership not found.';
     begin
 
-        // Log the sent message and code
+        // We are logging an external ResponseMessage. 
         if (ResponseCode <> 0) then begin
-
-            // LogMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
-            GetExternalMemberNo(ExternalMemberCardNo, ExternalMemberNo, IgnoreMessage);
-            GetExternalMembershipNo(ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, IgnoreMessage);
-            InternalLogArrival(ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode, 0);
-
+            if (MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo))) then
+                InternalLogArrival(Membership."External Membership No.", Member."External Member No.", ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode, 0);
             exit;
         end;
 
-        // Figure out who we are - be careful with references...
-        if (ResponseCode = 0) then
-            if (not GetExternalMemberNo(ExternalMemberCardNo, ExternalMemberNo, NewResponseMessage)) then
+        NewResponseCode := 0;
+        if (MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo))) then begin
+            if (not Member.Get(MemberCard."Member Entry No.")) then begin
                 NewResponseCode := -9998;
+                MembershipManagement.ValidateGetMember(MemberCard."Member Entry No.", MemberCard."Membership Entry No.", NewResponseMessage);
+                Clear(Member);
+            end;
 
-        if (ResponseCode = 0) then
-            if (not GetExternalMembershipNo(ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, NewResponseMessage)) then
+            if (not Membership.Get(MemberCard."Membership Entry No.")) then begin
                 NewResponseCode := -9999;
+                Clear(Membership);
+                NewResponseMessage := MembershipNotFoundLbl;
+            end;
+            ExternalMemberCardNo := MemberCard."External Card No.";
 
-        // if we can not resolve who we are, dont bother checking the rules
-        if (ResponseCode <> 0) then begin
-            InternalLogArrival(ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, NewResponseMessage, NewResponseCode, 0);
+            if (NewResponseCode = 0) then begin
+                if (MembershipManagement.ValidateGetMember(MemberCard."Member Entry No.", MemberCard."Membership Entry No.", NewResponseMessage) = 0) then
+                    NewResponseCode := -9898;
+            end;
+
+        end else begin
             exit;
         end;
 
-        RuleNo := CheckAndLogArrival(ClientType, MembershipCode, ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
+        // We are logging internal problem. 
+        if (NewResponseCode <> 0) then begin
+            InternalLogArrival(Membership."External Membership No.", Member."External Member No.", ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, NewResponseMessage, NewResponseCode, 0);
+            exit;
+        end;
+
+        RuleNo := CheckAndLogArrival(ClientType, Membership."Membership Code", Membership."External Membership No.", Member."External Member No.", ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
+
+
 
     local procedure CheckAndLogArrival(ClientType: Option POS,WS; MembershipCode: Code[20]; ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
@@ -388,32 +408,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         end;
 
         exit(MatchCount >= MembershipLimitationSetup."Event Limit");
-    end;
-
-    local procedure GetExternalMembershipNo(ExternalCardNo: Text[100]; var ExternalMembershipNo: Code[20]; var MembershipCode: Code[20]; var ResponseMessage: Text): Boolean
-    var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        Membership: Record "NPR MM Membership";
-    begin
-
-        if (Membership.Get(MembershipManagement.GetMembershipFromExtCardNo(ExternalCardNo, Today, ResponseMessage))) then begin
-            ExternalMembershipNo := Membership."External Membership No.";
-            MembershipCode := Membership."Membership Code";
-        end;
-
-        exit(ExternalMembershipNo <> '');
-    end;
-
-    local procedure GetExternalMemberNo(ExternalCardNo: Text[100]; var ExternalMemberNo: Code[20]; var ResponseMessage: Text): Boolean
-    var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        Member: Record "NPR MM Member";
-    begin
-
-        if (Member.Get(MembershipManagement.GetMemberFromExtCardNo(ExternalCardNo, Today, ResponseMessage))) then
-            ExternalMemberNo := Member."External Member No.";
-
-        exit(ExternalMemberNo <> '');
     end;
 
     local procedure IsTemporaryCard(ExternalCardNo: Code[100]): Boolean

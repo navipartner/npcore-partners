@@ -208,6 +208,18 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         exit(MembershipSetup."Ticket Item Barcode");
     end;
 
+    procedure POS_GetExternalTicketItemForMembership(MembershipEntryNo: Integer) TicketItemBarcode: Code[50]
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        Membership.Get(MembershipEntryNo);
+        MembershipSetup.Get(Membership."Membership Code");
+        MembershipSetup.TestField("Ticket Item Barcode");
+
+        exit(MembershipSetup."Ticket Item Barcode");
+    end;
+
     procedure PrintMembershipOnEndOfSales(SalesReceiptNo: Code[20])
     begin
 
