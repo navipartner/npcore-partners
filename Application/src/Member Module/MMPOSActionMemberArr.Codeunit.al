@@ -119,11 +119,12 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
     local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20])
     var
-        Member: Record "NPR MM Member";
+        //Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         ThisShouldBeEmpty_SaleLinePOS: Record "NPR POS Sale Line";
+        ExternalTicketNo: Text[30];
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -147,6 +148,10 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
             POSWorkflowMethod::Automatic,
             POSWorkflowMethod::GuestCheckin:
                 begin
+                    LogEntryNo := MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
+                    Commit();
+
+                    MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
                     MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
                     Commit();
 
@@ -157,17 +162,20 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
                     Membership.Get(MemberCard."Membership Entry No.");
                     MembershipSetup.Get(Membership."Membership Code");
 
-                    MembershipEvents.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
+                    MembershipEvents.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
 
-                    ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
+                    ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(MemberCard."Membership Entry No.");
 
                     if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-                        MemberTicketManager.MemberFastCheckIn(ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1, '');
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, 1, '', ExternalTicketNo);
 
                     if (POSWorkflowType = POSWorkflowMethod::GuestCheckin) then begin
-                        MemberTicketManager.PromptForMemberGuestArrival(ExternalMemberCardNo, AdmissionCode, Token);
-                        MemberTicketManager.MemberFastCheckIn(ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1, Token);
+                        MemberTicketManager.PromptForMemberGuestArrival(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, Token);
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, 1, Token, ExternalTicketNo);
                     end;
+
+                    MemberLimitationMgr.UpdateLogEntry(LogEntryNo, 0, ExternalTicketNo);
+                    Commit();
 
                 end;
         end;

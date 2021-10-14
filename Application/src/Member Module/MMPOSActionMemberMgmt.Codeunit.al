@@ -325,7 +325,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ItemDescription := '';
         MembershipEvents.OnCustomItemDescription(MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Entry No.", ItemDescription);
 
-        ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
+        ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(Membership."Entry No.");
         AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo(PlaceHolderLbl, Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
 
         case MembershipSetup."Member Information" of
@@ -338,7 +338,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
             MembershipSetup."Member Information"::NAMED:
                 begin
-                    Member.Get(MembershipManagement.GetMemberFromExtCardNo(ExternalMemberCardNo, Today, ResponseMessage));
+                    Member.Get(MemberCard."Member Entry No.");
                     UpdatePOSSalesInfo(SaleLinePOS, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
                     MembershipEvents.OnAssociateSaleWithMember(POSSession, Membership."External Membership No.", Member."External Member No.");
                 end;

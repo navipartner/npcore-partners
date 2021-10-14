@@ -13,7 +13,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         MEMBERSHIP_NOT_ACTIVE: Label 'Membership for member %1, is not active.';
         INVALID_EXTERNAL_ITEM: Label 'The ticket item %1 is not valid in context of membership %2, admission code %3.';
         NOT_SAME_MEMBER: Label 'All request lines need to have the same member number.';
-        ErrorReason: Text;
         MEMBERGUEST_TICKET: Label 'Setup for %1 has an invalid entry for membership code %2, admission code %3, item %4. Setup does not match setup in %5.';
         MISSING_CROSSREF: Label 'The external number %1 does not translate to an item. Check Item Reference for setup.';
         WELCOME: Label 'Welcome %1.';
@@ -137,6 +136,25 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
 
     procedure PromptForMemberGuestArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; var TicketToken: Text[100]): Boolean
     var
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipEntryNo: Integer;
+        MemberEntryNo: Integer;
+        ErrorReason: Text;
+    begin
+        ErrorReason := '';
+        MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
+        if (MembershipEntryNo = 0) then
+            Error(ErrorReason);
+
+        MemberEntryNo := MembershipManagement.GetMemberFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
+        if (MemberEntryNo = 0) then
+            Error(ErrorReason);
+
+        exit(PromptForMemberGuestArrival(MembershipEntryNo, MemberEntryNo, AdmissionCode, TicketToken));
+    end;
+
+    internal procedure PromptForMemberGuestArrival(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; var TicketToken: Text[100]): Boolean
+    var
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
@@ -144,7 +162,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         TicketAttempCreate: Codeunit "NPR Ticket Attempt Create";
         TicketRequestMini: Page "NPR TM Ticket Req. Mini";
         PageAction: Action;
@@ -152,19 +169,14 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         ResponseCode: Integer;
         SaleLinePOS: Record "NPR POS Sale Line";
         Token: Code[100];
-        MembershipEntryNo: Integer;
-        MemberEntryNo: Integer;
+
+
         ReusedToken: Text[100];
         PlaceHolderLbl: Label '%1 [%2;%3]', Locked = true;
     begin
 
-        MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
-        if (not Membership.Get(MembershipEntryNo)) then
-            Error(ErrorReason);
-
-        MemberEntryNo := MembershipManagement.GetMemberFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
-        if (not Member.Get(MemberEntryNo)) then
-            Error(ErrorReason);
+        Membership.Get(MembershipEntryNo);
+        Member.Get(MemberEntryNo);
 
         if (not BuildMemberGuestRequest(MembershipEntryNo, MemberEntryNo, TempTicketReservationRequest)) then
             exit;
@@ -254,10 +266,29 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         exit(true);
     end;
 
-    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100])
+    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
+    var
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberEntryNo: Integer;
+        MembershipEntryNo: Integer;
+        ErrorReason: Text;
+    begin
+
+        ErrorReason := '';
+        MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
+        if (MembershipEntryNo = 0) then
+            Error(ErrorReason);
+
+        MemberEntryNo := MembershipManagement.GetMemberFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
+        if (MemberEntryNo = 0) then
+            Error(ErrorReason);
+
+        MemberFastCheckIn(MembershipEntryNo, MemberEntryNo, ExternalItemNo, AdmissionCode, Qty, TicketTokenToIgnore, ExternalTicketNo);
+    end;
+
+    internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
         Ticket: Record "NPR TM Ticket";
         TicketToPrint: Record "NPR TM Ticket";
@@ -265,22 +296,16 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MemberEntryNo: Integer;
         TicketNo: Code[20];
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
         TicketIsReused: Boolean;
-        MembershipEntryNo: Integer;
+        ErrorReason: Text;
     begin
 
-        MemberEntryNo := MembershipManagement.GetMemberFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
-        if (not Member.Get(MemberEntryNo)) then
-            Error(ErrorReason);
-
-        MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
-        if (MembershipEntryNo = 0) then
-            Error(ErrorReason);
+        Membership.Get(MembershipEntryNo);
+        Member.Get(MemberEntryNo);
 
         if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
             Error(MISSING_CROSSREF);
@@ -325,9 +350,10 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Message(WELCOME, Member."Display Name");
 
         if (TicketToPrint.GetFilters() <> '') then begin
-            Membership.Get(MembershipEntryNo);
             MembershipSetup.Get(Membership."Membership Code");
             PrintTicket(MembershipSetup, TicketToPrint);
+            if (TicketToPrint.find()) then
+                ExternalTicketNo := TicketToPrint."External Ticket No.";
         end;
 
     end;
