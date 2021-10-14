@@ -24,6 +24,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                 textelement(possaleslinesreq)
                 {
                     MaxOccurs = Once;
+                    MinOccurs = Zero;
                     XmlName = 'pos_sales_lines';
                     tableelement(tempsalelineposreq; "NPR POS Sale Line")
                     {
