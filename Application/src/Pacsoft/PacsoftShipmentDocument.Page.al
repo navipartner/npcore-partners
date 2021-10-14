@@ -127,6 +127,12 @@ page 6014486 "NPR Pacsoft Shipment Document"
                     ToolTip = 'Specifies the value of the Shipment Date field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Shipping Method Code"; Rec."Shipping Method Code")
+                {
+
+                    ToolTip = 'Specifies the value of the Shipping Method Code field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
 
@@ -137,6 +143,13 @@ page 6014486 "NPR Pacsoft Shipment Document"
                     begin
                         CurrPage.Update();
                     end;
+                }
+
+                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
+                {
+
+                    ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Package Code"; Rec."Package Code")
                 {
