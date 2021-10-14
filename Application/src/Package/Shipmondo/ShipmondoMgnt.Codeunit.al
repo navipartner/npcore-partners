@@ -604,6 +604,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         SalesShipmentLine: Record "Sales Shipment Line";
         DocFound: Boolean;
     begin
+        if not InitPackageProvider() then
+            exit;
 
         ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
         ShipmentDocument.SETRANGE(RecordID, RecRef.RECORDID);
@@ -623,8 +625,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
                 begin
                     RecRef.SETTABLE(SalesShipmentHeader);
                     if SalesShipmentHeader.FIND() then begin
-                        ;
-
 
                         if SalesShipmentHeader."Shipment Method Code" = '' then exit;
                         if CheckNetWeight(SalesShipmentHeader) = false then exit;
