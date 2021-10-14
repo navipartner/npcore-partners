@@ -4777,7 +4777,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
                 // try remote number with integration code to parse the scanned card data
                 if (MembershipEntryNo = 0) then begin
-                    ForeignMembershipMgr.FormatForeignCardnumberFromScan(ForeignMembershipSetup."Community Code", ForeignMembershipSetup."Manager Code", ExternalCardNo, FormatedCardNumber);
+                    ForeignMembershipMgr.FormatForeignCardNumberFromScan(ForeignMembershipSetup."Community Code", ForeignMembershipSetup."Manager Code", ExternalCardNo, FormatedCardNumber);
                     MembershipEntryNo := GetMembershipFromExtCardNoWorker(FormatedCardNumber, ReferenceDate, RemoteReasonText, CardEntryNo);
                 end;
 
@@ -4914,10 +4914,8 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     procedure GetMemberFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var NotFoundReasonText: Text) MemberEntryNo: Integer
     var
-        MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
-        Membership: Record "NPR MM Membership";
-        MembershipRole: Record "NPR MM Membership Role";
+        MemberCard: Record "NPR MM Member Card";
         MembershipEntryNo: Integer;
         CardEntryNo: Integer;
     begin
@@ -4946,20 +4944,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             exit(0);
         end;
 
-        if (Member.Blocked) then begin
-            NotFoundReasonText := StrSubstNo(MEMBER_BLOCKED, Member."External Member No.", Member."Blocked At");
-            exit(0);
-        end;
-
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MemberCard."Membership Entry No.");
-        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberCard."Member Entry No.");
-        MembershipRole.SetFilter(Blocked, '=%1', false);
-        if (MembershipRole.IsEmpty()) then begin
-            NotFoundReasonText := StrSubstNo(MEMBER_ROLE_BLOCKED, Member."External Member No.", Membership."External Membership No.");
-            exit(0);
-        end;
-
-        exit(Member."Entry No.");
+        exit(ValidateGetMember(MemberCard."Member Entry No.", MemberCard."Membership Entry No.", NotFoundReasonText));
 
     end;
 
@@ -5212,5 +5197,35 @@ codeunit 6060127 "NPR MM Membership Mgt."
 #pragma warning disable AA0139
         exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
 #pragma warning restore
+    end;
+
+    internal procedure ValidateGetMember(MemberEntryNo: Integer; MembershipEntryNo: Integer; var NotFoundReasonText: Text): Integer
+    var
+        Member: Record "NPR MM Member";
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+
+        if (not Member.Get(MemberEntryNo)) then begin
+            NotFoundReasonText := StrSubstNo(NOT_FOUND, Member.TableCaption, MemberEntryNo);
+            exit(0);
+        end;
+
+        if (Member.Blocked) then begin
+            NotFoundReasonText := StrSubstNo(MEMBER_BLOCKED, Member."External Member No.", Member."Blocked At");
+            exit(0);
+        end;
+
+        if (Membership.Get(MembershipEntryNo)) then begin
+            MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+            MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+            MembershipRole.SetFilter(Blocked, '=%1', false);
+            if (MembershipRole.IsEmpty()) then begin
+                NotFoundReasonText := StrSubstNo(MEMBER_ROLE_BLOCKED, Member."External Member No.", Membership."External Membership No.");
+                exit(0);
+            end;
+        end;
+
+        exit(Member."Entry No.");
     end;
 }

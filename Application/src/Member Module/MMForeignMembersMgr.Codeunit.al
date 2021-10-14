@@ -16,7 +16,7 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
         OnDiscoverExternalMembershipMgr(ForeignMembershipSetup);
     end;
 
-    procedure FormatForeignCardnumberFromScan(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardnumber: Text[100]; var FormatedCardnumber: Text[100])
+    procedure FormatForeignCardNumberFromScan(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardnumber: Text[100]; var FormatedCardnumber: Text[100])
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         IsHandled: Boolean;
@@ -60,17 +60,14 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
                 if (not IsHandled) then
                     Error(NotHandled, ForeignMembercardNumber, ForeignValidationSetup.FieldCaption("Community Code"), ForeignValidationSetup."Community Code");
 
+                if (IsValid) then begin
+                    FormatForeignCardNumberFromScan(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, FormatedCardNumber);
+                    MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(FormatedCardNumber, Today, NotValidReason);
+                end;
+
             until ((ForeignValidationSetup.Next() = 0) or (IsValid));
         end;
 
-        if (IsValid) then begin
-
-            FormatForeignCardnumberFromScan(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, FormatedCardNumber);
-
-            //MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo (ForeignMembercardNumber, TODAY, NotValidReason);
-            MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(FormatedCardNumber, Today, NotValidReason);
-
-        end;
     end;
 
     procedure SynchronizeLoyaltyPoints(CommunityCode: Code[20]; ManagerCode: Code[20]; MembershipEntryNo: Integer; ScannedCardNumber: Text[100])
