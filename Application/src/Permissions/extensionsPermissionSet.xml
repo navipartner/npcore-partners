@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PermissionSets>
-  <PermissionSet RoleID=NPRetail RoleName=NPRetail>
+  <PermissionSet RoleID="NPRetail" RoleName="NPRetail">
     <Permission>
       <ObjectID>6014400</ObjectID>
       <ObjectType>0</ObjectType>
