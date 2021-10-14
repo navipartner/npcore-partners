@@ -252,7 +252,7 @@
                 EmailSendingHandler.HtmlMessage(TempEmailItem, true);
                 EmailTemplateHeader.CalcFields("HTML Template");
                 if EmailTemplateHeader."HTML Template".HasValue() then begin
-                    EmailTemplateHeader."HTML Template".CreateInStream(InStream, TEXTENCODING::UTF8);
+                    EmailTemplateHeader."HTML Template".CreateInStream(InStream);
                     while not InStream.EOS do begin
                         HtmlLine := '';
                         InStream.ReadText(HtmlLine);

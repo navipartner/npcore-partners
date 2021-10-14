@@ -172,7 +172,7 @@ codeunit 6014553 "NPR Email Sending Handler"
         BodyText: Text;
     begin
         EmailItem.CalcFields(Body);
-        EmailItem.Body.CreateInStream(InStr);
+        EmailItem.Body.CreateInStream(InStr, TextEncoding::UTF8);
         InStr.Read(BodyText);
         BodyText += TextLine;
         EmailItem.SetBodyText(BodyText);
