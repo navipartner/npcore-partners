@@ -302,9 +302,16 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
     end;
 
     local procedure IsReadyForArchivation(NpCsDocument: Record "NPR NpCs Document"): Boolean
+    var
+        ReadyForArchivation: Boolean;
+        Handled: Boolean;
     begin
         if not NpCsDocument.FindFirst() then
             exit(false);
+
+        OnIsReadyForArchivation(NpCsDocument, ReadyForArchivation, Handled);
+        if Handled then
+            exit(ReadyForArchivation);
 
         case NpCsDocument."Delivery Status" of
             NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired:
@@ -317,5 +324,15 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         end;
 
         exit(false);
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnIsComplete(NpCsDocument: Record "NPR NpCs Document"; var IsComplete: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIsReadyForArchivation(NpCsDocument: Record "NPR NpCs Document"; var IsReadyForArchivation: Boolean; var IsHandled: Boolean)
+    begin
     end;
 }
