@@ -297,6 +297,14 @@ page 6151249 "NPR Entertainment RC"
                     Image = ShowMatrix;
                     ApplicationArea = NPRRetail;
                 }
+                action(TicketWizard)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Create all required setup for a ticket from a single page.';
+                    Caption = 'Ticket Wizard';
+                    Image = Action;
+                    RunObject = Codeunit "NPR TM Ticket Wizard";
+                }
             }
             group(ActionGroup18)
             {
