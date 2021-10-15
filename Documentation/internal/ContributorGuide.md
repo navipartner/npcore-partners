@@ -1,7 +1,14 @@
 # Contributor guide 
-This document guides you through the process of standardizing and delivering documentation that complies with our users' needs.
+This document guides you through the process of standardizing and delivering external documentation that complies with our users' needs.
 
 It's recommended that you read through the whole guide as a part of the onboarding process for delivering documentation, but its main purpose is that of a reference which you can turn to whenever you're not sure how to structure your topics. If you have dilemmas about the technical side of the documentation process, refer to the Technical Guide.
+
+## Which documentation is considered to be external?
+Whenever you're not sure which documents should be structured in the way described in this guide, this is a good rule of thumb:
+All documents that describe something customers ask consultants to help them with on a regular or a semi-regular basis are potential candidates for external documentation. 
+
+
+However, all documents that deal with back-end stuff that would be more suitable for developers or hosting should be added to the /internal/ folder exclusively.
 
  ## Before you start writing a new topic, ask yourself...
 
