@@ -98,7 +98,13 @@
     end;
 
     local procedure IsComplete(NpCsDocument: Record "NPR NpCs Document"): Boolean
+    var
+        Complete: Boolean;
+        Handled: Boolean;
     begin
+        NpCsWorkflowMgt.OnIsComplete(NpCsDocument, Complete, Handled);
+        if Handled then
+            exit(Complete);
         if NpCsDocument."Delivery Status" in [NpCsDocument."Delivery Status"::Delivered] then
             exit(true);
 
