@@ -1,8 +1,15 @@
 # Glossary 
 
-This topic contains the list of Business Central-specific terms that should be used in your topics to ensure that our documentation is standardized.
+This topic contains the list of terms that is used in external and internal documentation, that may be unfamiliar to new employees. 
 
 - **Role Center** - the Business Center landing page.
 - **Role Explorer** - opened from the **Role Center** by clicking the burger icon (three vertical lines in the top-right corner). Each element on the role explorer is an action that opens a page. Accordingly, you can also use the role explorer as a means to navigate in Business Central.
 - **Tell Me** - the popup window that displays when you click the **Search** button.
-- **Major Tom**   - desktop POS software developed by NaviPartner
+- **NP Core** - This repository. Contains the entire back-end architecture to support POS processes.
+- **Major Tom**   - desktop POS software developed by NaviPartner. It is written in C# and it embeds the web client, prevents accidental interaction with the browser, and serves as a middleware between the web browser and the local hardware.
+- **Transcendence** - Stand-alone control add-in written to support previous version of NP Retail in C/SIDE and C/AL. Transcendence is no longer maintained, except for critical fixes.
+- **Dragonglass** - Control add-in that supersedes Transcendence as POS  front-end AI  and the NP Core app. Dragonglass also embeds chunks of Transcendence as failover to support execution of Workflows v1 front-end actions.
+- **Workflows** - A feature of NP Retail front end responsible for coordinating business logic that executes in response to button clicks in POS. There are two versions of workflows. Both version of workflows allow AL developers to write JavaScript code that executes in the front end, that invokes any back-end code only when necessary.
+- **Workflows v1** - First iteration of workflows, based on custom-built API, that allows structuring AL code in the back end to support asynchronous behavior of JavaScript that's executing in the front end. Workflows v1 are an essential part of the Transcendence front-end framework. Workflows v1 were designed primarily with AL developers in mind, requiring minimum understanding of JavaScript while still being able to write most of front-end logic.
+- **Workflows v2** - 	Second iteration of workflows, based on JavaScript built-in [Promises API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) . This iteration is far more robust, it coordinates the entire execution of business logic from the front end, and includes some features Workflows v1 was uncapable of, such as parallel execution, nesting, sequencing, and similar. Workflows v2 are an essential part of Dragonglass.
+- **Stargate** - Communication layer that spans all three levels of NP Retail: back end (AL), front end (JavaScript) and Major Tom (C#). Stargate is based on request messages constructed from .NET classes created through DotNet variables in AL, which are then serialized into JSON, passed on to JavaScript, which then passes them on to Major Tom, which then deserializes them and executes using the same version of the assembly that was used to create the request in the back end. Stargate had two iterations based on the Transcendence front-end framework, and is currently being heavily refactored to support robust and simple Workflows v2 coordination through Dragonglass.
