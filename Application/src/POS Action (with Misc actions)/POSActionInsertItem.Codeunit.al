@@ -674,7 +674,11 @@
         if EanBoxSetupEvent."Event Code" <> EventCodeItemSearch() then
             exit;
 
-        SetItemSearchFilter(EanBoxValue, Item);
+        SetItemSearchFilter(EanBoxValue, Item, false);
+        if Item.IsEmpty() then
+            exit;
+
+        SetItemSearchFilter(EanBoxValue, Item, true);
         if not Item.IsEmpty() then
             InScope := true;
     end;
@@ -709,7 +713,7 @@
         Item: Record Item;
         ItemList: Page "NPR Items Smart Search";
     begin
-        SetItemSearchFilter(ItemIdentifierString, Item);
+        SetItemSearchFilter(ItemIdentifierString, Item, true);
         if not Item.FindFirst() then
             exit(false);
 
@@ -729,7 +733,7 @@
         end;
     end;
 
-    local procedure SetItemSearchFilter(ItemIdentifierString: Text; var Item: Record Item)
+    local procedure SetItemSearchFilter(ItemIdentifierString: Text; var Item: Record Item; IncludeBlockedFilter: Boolean)
     var
         SearchFilter: Text;
         SearchString: Text;
@@ -745,6 +749,8 @@
 
         Item.SetCurrentKey("Search Description");
         Item.SetFilter("Search Description", SearchFilter);
-        Item.SetRange(Blocked, false);
+        if IncludeBlockedFilter then
+            Item.SetRange(Blocked, false);
+        Item.SetLoadFields("No.");
     end;
 }
