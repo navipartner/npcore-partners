@@ -16,6 +16,8 @@ table 6014469 "NPR SalesPost Pdf2Nav Setup"
             OptionCaption = 'Both Std. NAV and Pdf2Nav,Std. NAV Only,Pdf2Nav Only';
             OptionMembers = "Both Std. NAV and Pdf2Nav","Std. NAV Only","Pdf2Nav Only";
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Pdf2Nav removed from standard email functions.';
         }
         field(20; "Always Print Ship"; Boolean)
         {
