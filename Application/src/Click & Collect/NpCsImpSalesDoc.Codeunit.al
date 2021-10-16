@@ -27,7 +27,6 @@
         Text004: Label 'Item %1 could not be mapped in line no. %2';
         Text005: Label 'Order received from Store %1';
         Text006: Label 'Order updated from Store %1 to Store %2';
-        Text007: Label 'Customer Create is not allowed when Customer Update Mode is %1. Please go to Magento Setup and choose Create or Create and Update.';
 
     local procedure ImportSalesDoc(Element: XmlElement)
     var
@@ -199,7 +198,6 @@
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
-        MagentoSetup: Record "NPR Magento Setup";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         RecRef: RecordRef;
@@ -207,17 +205,11 @@
         CustNo: Code[20];
         ConfigTemplateCode: Code[10];
         PrevRec: Text;
-        NewCustomer: Boolean;
     begin
-        MagentoSetup.Get();
         if not FindCustomer(Element, Customer) then begin
-            if not (MagentoSetup."Customer Update Mode" in [MagentoSetup."Customer Update Mode"::Create, MagentoSetup."Customer Update Mode"::"Create and Update"]) then
-                Error(Text007, MagentoSetup."Customer Update Mode");
-
             Customer.Init();
             Customer."No." := '';
             Customer.Insert(true);
-            NewCustomer := true;
         end;
 
         StoreCode := GetFromStoreCode(Element);
@@ -228,30 +220,28 @@
             NpCsDocumentMapping.Modify(true);
         end;
 
-        if (NewCustomer) or (MagentoSetup."Customer Update Mode" in [MagentoSetup."Customer Update Mode"::"Create and Update", MagentoSetup."Customer Update Mode"::Update]) then begin
-            PrevRec := Format(Customer);
+        PrevRec := Format(Customer);
 
-            ConfigTemplateCode := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false), 1, MaxStrLen(ConfigTemplateHeader.Code));
-            if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
-                RecRef.GetTable(Customer);
-                ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
-                RecRef.SetTable(Customer);
-            end;
-
-            Customer.Validate(Name, NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name', MaxStrLen(Customer.Name), true));
-            Customer."Name 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', MaxStrLen(Customer."Name 2"), true), 1, MaxStrLen(Customer."Name 2"));
-            Customer.Address := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address', MaxStrLen(Customer.Address), true), 1, MaxStrLen(Customer.Address));
-            Customer."Address 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address_2', MaxStrLen(Customer."Address 2"), true), 1, MaxStrLen(Customer."Address 2"));
-            Customer."Post Code" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/post_code', MaxStrLen(Customer."Post Code"), true), 1, MaxStrLen(Customer."Post Code"));
-            Customer.City := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/city', MaxStrLen(Customer.City), true), 1, MaxStrLen(Customer.City));
-            Customer.Validate("Country/Region Code", NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/country_code', MaxStrLen(Customer."Country/Region Code"), true));
-            Customer.Contact := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/contact', MaxStrLen(Customer.Contact), true), 1, MaxStrLen(Customer.Contact));
-            Customer."Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true), 1, MaxStrLen(Customer."Phone No."));
-            Customer."E-Mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true), 1, MaxStrLen(Customer."E-Mail"));
-
-            if PrevRec <> Format(Customer) then
-                Customer.Modify(true);
+        ConfigTemplateCode := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false), 1, MaxStrLen(ConfigTemplateHeader.Code));
+        if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
+            RecRef.GetTable(Customer);
+            ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
+            RecRef.SetTable(Customer);
         end;
+
+        Customer.Validate(Name, NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name', MaxStrLen(Customer.Name), true));
+        Customer."Name 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', MaxStrLen(Customer."Name 2"), true), 1, MaxStrLen(Customer."Name 2"));
+        Customer.Address := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address', MaxStrLen(Customer.Address), true), 1, MaxStrLen(Customer.Address));
+        Customer."Address 2" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address_2', MaxStrLen(Customer."Address 2"), true), 1, MaxStrLen(Customer."Address 2"));
+        Customer."Post Code" := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/post_code', MaxStrLen(Customer."Post Code"), true), 1, MaxStrLen(Customer."Post Code"));
+        Customer.City := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/city', MaxStrLen(Customer.City), true), 1, MaxStrLen(Customer.City));
+        Customer.Validate("Country/Region Code", NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/country_code', MaxStrLen(Customer."Country/Region Code"), true));
+        Customer.Contact := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/contact', MaxStrLen(Customer.Contact), true), 1, MaxStrLen(Customer.Contact));
+        Customer."Phone No." := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true), 1, MaxStrLen(Customer."Phone No."));
+        Customer."E-Mail" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true), 1, MaxStrLen(Customer."E-Mail"));
+
+        if PrevRec <> Format(Customer) then
+            Customer.Modify(true);
     end;
 
     local procedure UpdateSalesHeader(Element: XmlElement; var SalesHeader: Record "Sales Header")
@@ -531,7 +521,8 @@
             NpCsWorkflow."Customer Mapping"::"Fixed Customer No.", NpCsWorkflow."Customer Mapping"::"Customer No. from Source":
                 begin
                     CustNo := CopyStr(NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(Customer."No."), true), 1, MaxStrLen(Customer."No."));
-                    exit(Customer.Get(CustNo));
+                    Customer.Get(CustNo);
+                    exit(true);
                 end;
         end;
 
