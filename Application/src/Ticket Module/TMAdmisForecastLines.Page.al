@@ -203,7 +203,11 @@ page 6151139 "NPR TM Admis. Forecast Lines"
         LINE_Description: Text;
         LINE_StartTime: Text;
         PageStatisticsOption: Option INITIAL,RESERVATION,UTILIZATION_PCT,CAPACITY_PCT;
+#if BC17 or BC18
         PagePeriodOption: Option ACTUAL,DAY,WEEK,MONTH,QUARTER,YEAR;
+#else
+        PagePeriodOption: Enum "Analysis Period Type";
+#endif
         CellValueLbl: Label '%1%', Locked = true;
 
     local procedure MATRIX_OnDrillDown(ColumnOrdinal: Integer)
@@ -217,7 +221,11 @@ page 6151139 "NPR TM Admis. Forecast Lines"
         AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', Rec."Schedule Code");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
 
+#if BC17 or BC18
         if (PagePeriodOption = PagePeriodOption::ACTUAL) then begin
+#else
+        if (PagePeriodOption = PagePeriodOption::"Accounting Period") then begin
+#endif
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', MatrixRecords[ColumnOrdinal]."Admission Start Date");
         end else begin
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '%1..%2', MatrixRecords[ColumnOrdinal]."Admission Start Date", MatrixRecords[ColumnOrdinal]."Admission End Date");
@@ -248,7 +256,11 @@ page 6151139 "NPR TM Admis. Forecast Lines"
         end;
     end;
 
+#if BC17 or BC18
     procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period")
+#else    
+    procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Enum "Analysis Period Type")
+#endif    
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         i: Integer;
@@ -293,7 +305,11 @@ page 6151139 "NPR TM Admis. Forecast Lines"
         AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', Rec."Schedule Code");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
 
+#if BC17 or BC18
         if (PagePeriodOption = PagePeriodOption::ACTUAL) then begin
+#else
+        if (PagePeriodOption = PagePeriodOption::"Accounting Period") then begin
+#endif
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', MatrixRecords[ColumnOrdinal]."Admission Start Date");
         end else begin
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '%1..%2', MatrixRecords[ColumnOrdinal]."Admission Start Date", MatrixRecords[ColumnOrdinal]."Admission End Date");
