@@ -128,7 +128,9 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'View by';
                         Importance = Additional;
+#if BC17 or BC18
                         OptionCaption = 'Day,Week,Month,Quarter,Year,Accounting Period';
+#endif
                         ToolTip = 'Specifies the value of the View by field';
 
                         trigger OnValidate()
@@ -514,7 +516,11 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         VariantCodeFilter: Text;
         DisplayOption: Option "COUNT",COUNT_TREND,TREND;
         TrendPeriodType: Option PERIOD,YEAR;
+#if BC17 or BC18
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
+#else
+        PeriodType: Enum "Analysis Period Type";
+#endif
         TicketStatisticsFilter: Record "NPR TM Ticket Access Stats";
         InternalDateFilter: Text;
         VerticalTotalText: Text;
@@ -636,7 +642,11 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
     local procedure FindPeriod(SearchText: Text[3])
     var
         Calendar: Record Date;
+#if BC17 or BC18
         PeriodFormMgt: Codeunit PeriodFormManagement;
+#else
+        PeriodPageMgt: Codeunit PeriodPageManagement;
+#endif
         Date1: Date;
         Date2: Date;
         TicketStatistics: Record "NPR TM Ticket Access Stats";
@@ -645,8 +655,13 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         if (DateFactFilter <> '') then begin
             Calendar.SetFilter("Period Start", DateFactFilter);
 
+#if BC17 or BC18
             if (not PeriodFormMgt.FindDate('-', Calendar, PeriodType)) then
                 PeriodFormMgt.FindDate('-', Calendar, PeriodType::Day);
+#else
+            if (not PeriodPageMgt.FindDate('-', Calendar, PeriodType)) then
+                PeriodPageMgt.FindDate('-', Calendar, PeriodType::Day);
+#endif
 
             Calendar.SetRange("Period Start");
         end;
@@ -654,7 +669,11 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         if Calendar."Period Start" = 0D then
             Calendar."Period Start" := Today();
 
+#if BC17 or BC18
         PeriodFormMgt.FindDate(SearchText, Calendar, PeriodType);
+#else
+        PeriodPageMgt.FindDate(SearchText, Calendar, PeriodType);
+#endif
         Date1 := Calendar."Period Start";
         Date2 := Calendar."Period End";
 

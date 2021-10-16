@@ -17,11 +17,19 @@
         ProgressCurrentCount: Integer;
         AdHocEntryCounter: Integer;
 
+#if BC17 or BC18
     procedure FindRec(DimOption: Option Item,"Ticket Type","Admission Date","Admission Hour",Period,"Admission Code","Variant Code"; var DimCodeBuffer: Record "Dimension Code Buffer"; Which: Text; var FactFilter: Record "NPR TM Ticket Access Fact"; PeriodType: Option; PeriodFilter: Text; var PeriodInitialized: Boolean; InternalDateFilter: Text[30]) Found: Boolean
+#else
+    procedure FindRec(DimOption: Option Item,"Ticket Type","Admission Date","Admission Hour",Period,"Admission Code","Variant Code"; var DimCodeBuffer: Record "Dimension Code Buffer"; Which: Text; var FactFilter: Record "NPR TM Ticket Access Fact"; PeriodType: Enum "Analysis Period Type"; PeriodFilter: Text; var PeriodInitialized: Boolean; InternalDateFilter: Text[30]) Found: Boolean
+#endif
     var
         TicketFact: Record "NPR TM Ticket Access Fact";
         Period: Record Date;
+#if BC17 or BC18
         PeriodFormMgt: Codeunit PeriodFormManagement;
+#else
+        PeriodPageMgt: Codeunit PeriodPageManagement;
+#endif
     begin
 
         TicketFact."Fact Code" := DimCodeBuffer.Code;
@@ -80,7 +88,11 @@
                         if (not PeriodInitialized and (InternalDateFilter <> '')) then
                             Period.SetFilter("Period Start", InternalDateFilter);
 
+#if BC17 or BC18
                     Found := PeriodFormMgt.FindDate(CopyStr(Which, 1, 3), Period, PeriodType);
+#else
+                    Found := PeriodPageMgt.FindDate(CopyStr(Which, 1, 3), Period, PeriodType);
+#endif
                     if Found then
                         CopyPeriodToBuf(Period, DimCodeBuffer, PeriodFilter);
 
@@ -104,12 +116,19 @@
 
         exit(Found);
     end;
-
+#if BC17 or BC18
     procedure NextRec(DimOption: Option Item,"Ticket Type","Admission Date","Admission Hour",Period,"Admission Code","Variant Code"; var DimCodeBuffer: Record "Dimension Code Buffer"; Steps: Integer; var FactFilter: Record "NPR TM Ticket Access Fact"; PeriodType: Option; PeriodFilter: Text) ResultSteps: Integer
+#else    
+    procedure NextRec(DimOption: Option Item,"Ticket Type","Admission Date","Admission Hour",Period,"Admission Code","Variant Code"; var DimCodeBuffer: Record "Dimension Code Buffer"; Steps: Integer; var FactFilter: Record "NPR TM Ticket Access Fact"; PeriodType: Enum "Analysis Period Type"; PeriodFilter: Text) ResultSteps: Integer
+#endif
     var
         TicketFact: Record "NPR TM Ticket Access Fact";
         Period: Record Date;
+#if BC17 or BC18
         PeriodFormMgt: Codeunit PeriodFormManagement;
+#else
+        PeriodPageMgt: Codeunit PeriodPageManagement;
+#endif
     begin
 
         TicketFact.SetCurrentKey("Fact Name", "Fact Code");
@@ -164,7 +183,11 @@
                         Period.SetFilter("Period Start", PeriodFilter);
 
                     Period."Period Start" := DimCodeBuffer."Period Start";
+#if BC17 or BC18
                     ResultSteps := PeriodFormMgt.NextDate(Steps, Period, PeriodType);
+#else
+                    ResultSteps := PeriodPageMgt.NextDate(Steps, Period, PeriodType);
+#endif
                     if (ResultSteps <> 0) then
                         CopyPeriodToBuf(Period, DimCodeBuffer, PeriodFilter);
                 end;
@@ -291,7 +314,11 @@
         exit(AdmissionTotal);
     end;
 
+#if BC17 or BC18
     procedure FormatCellValue(LineFactOption: Option; LineFactCode: Code[20]; ColumnFactOption: Option; ColumnFactCode: Code[20]; ColumnFilter: Boolean; var TicketStatisticsFilter: Record "NPR TM Ticket Access Stats"; PeriodFilter: Text; DisplayOption: Option "COUNT",COUNT_TREND,TREND; PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period"; TrendPeriodType: Option PERIOD,YEAR; AdmissionDefinition: Option) CellValue: Text
+#else
+    procedure FormatCellValue(LineFactOption: Option; LineFactCode: Code[20]; ColumnFactOption: Option; ColumnFactCode: Code[20]; ColumnFilter: Boolean; var TicketStatisticsFilter: Record "NPR TM Ticket Access Stats"; PeriodFilter: Text; DisplayOption: Option "COUNT",COUNT_TREND,TREND; PeriodType: Enum "Analysis Period Type"; TrendPeriodType: Option PERIOD,YEAR; AdmissionDefinition: Option) CellValue: Text
+#endif    
     var
         AdmissionCount: Decimal;
         AdmissionCount2: Decimal;
@@ -420,28 +447,49 @@
         end;
     end;
 
+#if BC17 or BC18
     procedure FindMatrixPeriod(SearchText: Text[3]; PeriodStartFilter: Text; PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period"; TrendPeriodType: Option PERIOD,YEAR) MatrixDateFilter: Text
+#else    
+    procedure FindMatrixPeriod(SearchText: Text[3]; PeriodStartFilter: Text; PeriodType: Enum "Analysis Period Type"; TrendPeriodType: Option PERIOD,YEAR) MatrixDateFilter: Text
+#endif
     var
         TicketStatistics: Record "NPR TM Ticket Access Stats";
         Calendar: Record Date;
+#if BC17 or BC18
         PeriodFormMgt: Codeunit PeriodFormManagement;
+#else
+        PeriodPageMgt: Codeunit PeriodPageManagement;
+#endif
     begin
 
         if (PeriodStartFilter <> '') then begin
             Calendar.SetFilter("Period Start", PeriodStartFilter);
+#if BC17 or BC18
             if (not PeriodFormMgt.FindDate('+', Calendar, PeriodType)) then
                 PeriodFormMgt.FindDate('+', Calendar, PeriodType::Day);
+#else
+            if (not PeriodPageMgt.FindDate('+', Calendar, PeriodType)) then
+                PeriodPageMgt.FindDate('+', Calendar, PeriodType::Day);
+#endif
 
             Calendar.SetRange("Period Start");
         end;
 
         if (TrendPeriodType = TrendPeriodType::PERIOD) then begin
+#if BC17 or BC18
             PeriodFormMgt.FindDate(SearchText, Calendar, PeriodType);
+#else
+            PeriodPageMgt.FindDate(SearchText, Calendar, PeriodType);
+#endif
             TicketStatistics.SetRange("Admission Date Filter", Calendar."Period Start", Calendar."Period End");
         end;
 
         if (TrendPeriodType = TrendPeriodType::YEAR) then begin
+#if BC17 or BC18
             PeriodFormMgt.FindDate('', Calendar, PeriodType);
+#else
+            PeriodPageMgt.FindDate('', Calendar, PeriodType);
+#endif
             TicketStatistics.SetRange("Admission Date Filter", CalcDate('<-1Y>', Calendar."Period Start"), CalcDate('<-1Y>', Calendar."Period End"));
         end;
 
