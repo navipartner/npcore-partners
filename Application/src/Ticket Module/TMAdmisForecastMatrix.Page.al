@@ -48,7 +48,9 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Periodtype';
+#if BC17 or BC18
                         OptionCaption = 'Actual,Day,Week,Month,Quarter,Year';
+#endif
                         ToolTip = 'Specifies the value of the Periodtype field';
 
                         trigger OnValidate()
@@ -163,7 +165,11 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
     var
         PageAdmissionCode: Code[20];
         PageStatisticsOption: Option INITIAL,RESERVATION,UTILIZATION_PCT,CAPACITY_PCT;
+#if BC17 or BC18
         PagePeriodOption: Option ACTUAL,DAY,WEEK,MONTH,QUARTER,YEAR;
+#else
+        PagePeriodOption: Enum "Analysis Period Type";
+#endif
         MATRIX_MatrixRecords: array[32] of Record "NPR TM Admis. Schedule Entry";
         MATRIX_CaptionSet: array[32] of Text[80];
         MATRIX_CaptionRange: Text;
@@ -188,7 +194,11 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
         if (MATRIX_SetWanted = MATRIX_SetWanted::Initial) then
             MATRIX_PrimKeyFirstCaptionInCu := '';
 
+#if BC17 or BC18
         if (PagePeriodOption = PagePeriodOption::ACTUAL) then begin
+#else
+        if (PagePeriodOption = PagePeriodOption::"Accounting Period") then begin
+#endif
             TempAdmSchEntry.Reset();
             if (TempAdmSchEntry.IsTemporary()) then TempAdmSchEntry.DeleteAll();
 
@@ -240,10 +250,17 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
 
         end else begin
 
+#if BC17 or BC18
             MatrixMgt.GeneratePeriodMatrixData(
               MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, false,
               PagePeriodOption - 1, '', MATRIX_PrimKeyFirstCaptionInCu,
               MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns, MATRIX_PeriodRecords);
+#else
+            MatrixMgt.GeneratePeriodMatrixData(
+              MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, false,
+              PagePeriodOption, '', MATRIX_PrimKeyFirstCaptionInCu,
+              MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns, MATRIX_PeriodRecords);
+#endif
 
             for i := 1 to MATRIX_CurrentNoOfColumns do begin
                 MATRIX_MatrixRecords[i]."Admission Code" := PageAdmissionCode;
