@@ -55,7 +55,11 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
             trigger OnLookup()
             var
                 TimeZone: Record "Time Zone";
+#if BC17 or BC18
                 TimeZones: Page "Time Zones";
+#else
+                TimeZones: Page "Time Zones Lookup";
+#endif
             begin
                 if TimeZone.Get("Time Zone No.") then
                     TimeZones.SetRecord(TimeZone);
