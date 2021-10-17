@@ -54,7 +54,11 @@ codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
         CreateMap(ChartToStatusMap);
         for MembershipEntryContext := 1 to ArrayLen(ChartToStatusMap) do begin
             MembershipEntry.Context := ChartToStatusMap[MembershipEntryContext];
+#if BC17 or BC18
             BusChartBuf.AddMeasure(Format(MembershipEntry.Context), MembershipEntry.Context, BusChartBuf."Data Type"::Decimal, MembershipBurndownSetup.GetChartType());
+#else
+            BusChartBuf.AddMeasure(Format(MembershipEntry.Context), MembershipEntry.Context, BusChartBuf."Data Type"::Decimal, MembershipBurndownSetup.GetChartType().AsInteger());
+#endif
         end;
 
         if (CalcPeriods(FromDate, ToDate, BusChartBuf)) then begin
