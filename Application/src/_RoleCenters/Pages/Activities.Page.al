@@ -44,7 +44,7 @@ page 6151255 "NPR Activities"
 
                 field("Failed tasks"; Rec."Failed Webshop Payments")
                 {
-                    Caption = 'Failed capturing of payments';
+                    Caption = 'Failed Capturing of Payments';
                     ToolTip = 'Specifies the value of the Failed Webshop Payments field';
                     ApplicationArea = NPRRetail;
 
@@ -61,7 +61,7 @@ page 6151255 "NPR Activities"
 
                 field("Failed imports in the import list"; Rec."Failed imports")
                 {
-                    Caption = 'Failed imports in the import list';
+                    Caption = 'Failed Imports in the Import list';
                     ToolTip = 'Specifies the amount of failed import entries';
                     ApplicationArea = NPRRetail;
 
