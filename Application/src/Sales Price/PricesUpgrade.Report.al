@@ -36,7 +36,9 @@ report 6014409 "NPR Prices Upgrade"
     trigger OnPostReport()
     var
         FeatureDataUpdateStatus: Record "Feature Data Update Status";
+#pragma warning disable AL0432
         FeaturePriceCalculation: Codeunit "Feature - Price Calculation";
+#pragma warning restore
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         PreviewRecordsLbl: Label 'Old prices found. Do you want to review data before upgrade?';
         ConfirmUpgradeLbl: Label 'Upgrade can take some time depending on the record count. Do you want to continue?';
@@ -48,7 +50,9 @@ report 6014409 "NPR Prices Upgrade"
                 if Confirm(PreviewRecordsLbl) then
                     FeaturePriceCalculation.ReviewData();
                 if Confirm(ConfirmUpgradeLbl) then begin
+#pragma warning disable AL0432
                     PriceCalculationMgt.TestIsEnabled();
+#pragma warning restore
                     FeatureDataUpdateStatus."Feature Key" := 'SalesPrice';
                     FeatureDataUpdateStatus."Company Name" := CopyStr(CompanyName(), 1, 30);
                     FeaturePriceCalculation.UpdateData(FeatureDataUpdateStatus);
@@ -70,7 +74,9 @@ report 6014409 "NPR Prices Upgrade"
     var
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
     begin
+#pragma warning disable AL0432
         PriceCalculationMgt.TestIsEnabled();
+#pragma warning restore
         DeleteRecords();
     end;
 
