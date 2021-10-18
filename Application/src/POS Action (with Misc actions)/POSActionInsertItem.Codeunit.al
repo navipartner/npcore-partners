@@ -743,7 +743,7 @@
 
         SearchString := CopyStr(ItemIdentifierString, 1, MaxStrLen(Item."Search Description"));
         SearchString := UpperCase(SearchString);
-        SearchFilter := '*' + SearchString + '*';
+        SearchFilter := SearchString + '*';
         if ItemIdentifierString = '' then
             SearchFilter := StrSubstNo(SearchFilterLbl, '');
 
