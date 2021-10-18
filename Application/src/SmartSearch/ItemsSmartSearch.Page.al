@@ -1203,16 +1203,6 @@ page 6059771 "NPR Items Smart Search"
                     RunPageView = SORTING("Item No.");
                     ToolTip = 'View the list of vendors who can supply the item, and at which lead time.';
                 }
-                action(Prices)
-                {
-                    ApplicationArea = Advanced;
-                    Caption = 'Prices';
-                    Image = Price;
-                    RunObject = Page "Purchase Prices";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
-                    ToolTip = 'View or set up different prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
-                }
                 action(Action125)
                 {
                     ApplicationArea = Prepayments;
