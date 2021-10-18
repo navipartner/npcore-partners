@@ -202,23 +202,6 @@
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"My Settings", 'OnBeforeLanguageChange', '', true, true)]
-    local procedure OnBeforeUpdateLanguage(OldLanguageId: Integer; NewLanguageId: Integer)
-    begin
-        OnInvalidateHeadlines();
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"My Settings", 'OnBeforeWorkdateChange', '', true, true)]
-    local procedure OnBeforeUpdateWorkdate(OldWorkdate: Date; NewWorkdate: Date)
-    begin
-        OnInvalidateHeadlines();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInvalidateHeadlines()
-    begin
-    end;
-
     procedure GetTopSalesToday(var HigestTodaySales: Text)
     var
         POSEntry: Record "NPR POS Entry";
