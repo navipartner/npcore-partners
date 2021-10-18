@@ -1,6 +1,15 @@
 # POS (Point of Sale) units
 
-POS units are a central part of the POS sales solution. They consist of hardware and software elements that enable services and item sale transactions at retail locations. The transactions can be recorded and a receipt can be printed out or sent to the buyer via email or text. 
+POS units are a central part of the POS sales solution. They consist of hardware and software elements that enable services and item sale transactions at retail locations. The transactions can be recorded and a receipt can be printed out or sent to the buyer via email or text.   
+
+The reasons why POS units can make business operations easier are multifaceted:
+ - **faster and more efficient operations**   
+   regardless of its size, each business has many operation categories (purchasing materials, dispatching items, processing payments, managing bookings and appointments, and so on); it's difficult to keep track of all those operations without some form of categorization and automation.
+ - **efficient inventory and employee management**   
+   they are capable of tracking the real-time status of inventory, setting reordering triggers, and even providing recommendations for future purchases based on the customers' purchasing history.
+ - **exhaustive business reporting**  
+   can be used for recording transactions on paper or spreadsheets; gives access to the full picture, to help strategize marketing efforts and boost sales.
+
 
 In brief, the POS units help streamline retail operations by automating the transaction process and tracking important sales data. 
 
