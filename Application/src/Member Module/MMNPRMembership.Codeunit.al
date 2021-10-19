@@ -5,7 +5,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         InvalidXml: Label 'An invalid XML was returned:\%1';
         MemberCardValidation: Label 'Service %1 at %2 could not validate membercard %3.';
 
-    [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnDiscoverExternalMembershipMgr', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnDiscoverExternalMembershipMgr', '', true, true)]
     local procedure OnDiscover(var Sender: Record "NPR MM Foreign Members. Setup")
     begin
         Sender.RegisterManager(GetManagerCode(), 'NaviPartner Foreign NPR Membership Management');

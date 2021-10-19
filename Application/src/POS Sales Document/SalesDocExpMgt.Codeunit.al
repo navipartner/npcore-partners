@@ -1,4 +1,4 @@
-﻿codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
+codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 {
     Permissions = TableData "NPR POS Entry" = rimd;
 
@@ -1164,7 +1164,7 @@ then
             error(CUSTOMER_CREDIT_CHECK_FAILED);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150729, 'OnDiscoverPOSSalesWorkflows', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, false)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
         Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, CurrCodeunitId(), 'OnFinishCreditSale');

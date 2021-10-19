@@ -6,7 +6,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Caption_CustomerName: Label 'Customer Name';
         Caption_ContactName: Label 'Contact Name';
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         Sale: Record "NPR POS Sale";
@@ -43,7 +43,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnRefreshDataSet', '', false, false)]
     local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
@@ -56,7 +56,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnSetPosition', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnSetPosition', '', false, false)]
     local procedure SetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
@@ -70,7 +70,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnReadDataSourceVariables', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnReadDataSourceVariables', '', false, false)]
     local procedure ReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row"; var Handled: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
@@ -127,7 +127,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnIsDataSourceModified', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnIsDataSourceModified', '', false, false)]
     local procedure Modified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
@@ -139,7 +139,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Modified := Sale.GetModified();
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150708, 'OnDiscoverDataSource', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Data Source Discovery", 'OnDiscoverDataSource', '', false, false)]
     local procedure OnDiscoverDataSource(var Rec: Record "NPR POS Data Source Discovery")
     begin
         Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');

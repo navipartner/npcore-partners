@@ -1,24 +1,24 @@
-﻿codeunit 6151521 "NPR Nc Trigger Scheduler"
+codeunit 6151521 "NPR Nc Trigger Scheduler"
 {
-    [EventSubscriber(ObjectType::Table, 6151520, 'OnBeforeInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Trigger", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertNcTriggerInsertTaskLine(var Rec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin
         InsertTaskLine(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151520, 'OnBeforeDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Trigger", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure OnBeforeDeleteNcTriggerDeleteTaskLine(var Rec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin
         DeleteTaskLine(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151520, 'OnBeforeRenameEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Trigger", 'OnBeforeRenameEvent', '', false, false)]
     local procedure OnBeforeRenameNcTriggerRenameTaskLine(var Rec: Record "NPR Nc Trigger"; var xRec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin
         RenameTriggerLine(xRec, Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151520, 'OnBeforeModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Trigger", 'OnBeforeModifyEvent', '', false, false)]
     local procedure OnBeforeModifyNcTriggerModifyTaskLine(var Rec: Record "NPR Nc Trigger"; var xRec: Record "NPR Nc Trigger"; RunTrigger: Boolean)
     begin
         ModfiyTriggerLine(xRec, Rec);

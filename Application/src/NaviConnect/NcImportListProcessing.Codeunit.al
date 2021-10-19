@@ -68,7 +68,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         exit(not NcImportType.IsEmpty);
     end;
 
-    [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
@@ -86,7 +86,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         Rec.Validate("Parameter String", CopyStr(JQParamStrMgt.GetParamListAsCSString(), 1, MaxStrLen(Rec."Parameter String")));
     end;
 
-    [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Parameter String', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Parameter String', true, true)]
     local procedure OnValidateJobQueueEntryParameterString(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";

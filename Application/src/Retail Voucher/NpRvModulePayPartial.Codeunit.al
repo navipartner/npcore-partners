@@ -46,7 +46,7 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         MagentoPaymentLine.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
     begin
         if VoucherModule.Get(VoucherModule.Type::"Apply Payment", ModuleCode()) then
@@ -60,7 +60,7 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         VoucherModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnHasApplyPaymentSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnHasApplyPaymentSetup', '', true, true)]
     local procedure OnHasApplyPaymentSetup(VoucherType: Record "NPR NpRv Voucher Type"; var HasApplySetup: Boolean)
     begin
         if not IsSubscriber(VoucherType) then
@@ -69,14 +69,14 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         HasApplySetup := false;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnSetupApplyPayment', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnSetupApplyPayment', '', true, true)]
     local procedure OnSetupApplyPayment(var VoucherType: Record "NPR NpRv Voucher Type")
     begin
         if not IsSubscriber(VoucherType) then
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunApplyPayment', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunApplyPayment', '', true, true)]
     local procedure OnRunApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; var Handled: Boolean)
     begin
         if Handled then
@@ -89,7 +89,7 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         ApplyPayment(FrontEnd, POSSession, VoucherType, SaleLinePOSVoucher);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunApplyPaymentSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunApplyPaymentSalesDoc', '', true, true)]
     local procedure OnRunApplyPaymentSalesDoc(VoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean)
     begin
         if Handled then

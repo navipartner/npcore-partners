@@ -35,7 +35,7 @@ codeunit 6184500 "NPR CleanCash Wrapper"
     end;
 
     // Subscriber to Footer Event in printing
-    [EventSubscriber(ObjectType::Codeunit, 6014534, 'OnSalesReceiptFooter', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Aux: Event Publishers", 'OnSalesReceiptFooter', '', true, false)]
     local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text)
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
@@ -54,7 +54,7 @@ codeunit 6184500 "NPR CleanCash Wrapper"
 
 
     // Insert the workflow step in  POS Workflows
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
@@ -83,7 +83,7 @@ codeunit 6184500 "NPR CleanCash Wrapper"
 
 
     // The methods subscribes to event posted during end of sale
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure CreateCleanCashOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";

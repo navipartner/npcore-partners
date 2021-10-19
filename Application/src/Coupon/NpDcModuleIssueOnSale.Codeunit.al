@@ -1,4 +1,4 @@
-﻿codeunit 6151600 "NPR NpDc Module Issue: OnSale"
+codeunit 6151600 "NPR NpDc Module Issue: OnSale"
 {
     var
         Text000: Label 'Issue Coupon - Default';
@@ -9,7 +9,7 @@
         Text005: Label 'Enter Quantity';
         Text006: Label 'Checks On-Sale Discount Coupons on Sale Line Insert';
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
     var
         NpDcSaleLinePOSNewCoupon: Record "NPR NpDc SaleLinePOS NewCoupon";
@@ -27,7 +27,7 @@
         PrintCoupons(TempCoupon);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
     local procedure AddNewOnSaleCoupons(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
@@ -43,7 +43,7 @@
         AddNewCoupons(SalePOS);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterDeletePOSSaleLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterDeletePOSSaleLine', '', true, true)]
     local procedure OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
@@ -57,7 +57,7 @@
         AddNewCoupons(SalePOS);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterSetQuantity', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantity', '', true, true)]
     local procedure OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
@@ -217,7 +217,7 @@
         exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverIssueCouponAction(var Sender: Record "NPR POS Action")
     begin
         if not Sender.DiscoverAction(
@@ -239,14 +239,14 @@
         Sender.RegisterBooleanParameter('InstantIssue', false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeIssueCouponCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(IssueCouponActionCode(), 'IssueCouponTitle', Text004);
         Captions.AddActionCaption(IssueCouponActionCode(), 'Quantity', Text005);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -488,7 +488,7 @@
         until SaleLinePOS.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
         if CouponModule.Get(CouponModule.Type::"Issue Coupon", ModuleCode()) then
@@ -502,7 +502,7 @@
         CouponModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnHasIssueCouponSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnHasIssueCouponSetup', '', true, true)]
     local procedure OnHasIssueCouponsSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasIssueSetup: Boolean)
     begin
         if not IsSubscriber(CouponType) then
@@ -511,7 +511,7 @@
         HasIssueSetup := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnSetupIssueCoupon', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnSetupIssueCoupon', '', true, true)]
     local procedure OnSetupIssueCoupon(var CouponType: Record "NPR NpDc Coupon Type")
     var
         NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup";
@@ -528,7 +528,7 @@
         PAGE.Run(PAGE::"NPR NpDc Iss.OnSale Setup", NpDcIssueOnSaleSetup);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunIssueCoupon', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnRunIssueCoupon', '', true, true)]
     local procedure OnRunIssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; var Handled: Boolean)
     begin
         if Handled then
@@ -566,7 +566,7 @@
         exit('ON-SALE');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then

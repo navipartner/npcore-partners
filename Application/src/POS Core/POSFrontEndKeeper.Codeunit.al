@@ -20,7 +20,7 @@ codeunit 6150717 "NPR POS Front End Keeper"
         Initialized := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150700, 'OnDetectFramework', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", 'OnDetectFramework', '', false, false)]
     local procedure DetectFrontEnd(var FrontEndOut: Codeunit "NPR POS Front End Management"; var POSSessionOut: Codeunit "NPR POS Session"; var Active: Boolean)
     begin
         FrontEndOut := FrontEnd;
@@ -28,7 +28,7 @@ codeunit 6150717 "NPR POS Front End Keeper"
         Active := Initialized;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnDetectFramework', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Front End Management", 'OnDetectFramework', '', false, false)]
     local procedure DetectFramework(var FrameworkOut: Interface "NPR Framework Interface"; var POSSessionOut: Codeunit "NPR POS Session"; var Handled: Boolean)
     begin
         FrameworkOut := Framework;

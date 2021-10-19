@@ -64,7 +64,7 @@ codeunit 6150719 "NPR POS Action Management"
         InitializeDiscoveryState(TempDiscoveryState);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnActionDiscovered', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnActionDiscovered', '', false, false)]
     local procedure OnActionDiscovered(var Rec: Record "NPR POS Action")
     var
         TempNewDiscoveryState: Record "Event Subscription" temporary;

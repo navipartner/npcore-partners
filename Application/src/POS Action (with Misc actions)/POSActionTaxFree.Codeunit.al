@@ -158,7 +158,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAttemptEndSale', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAttemptEndSale', '', false, false)]
     local procedure OnAttemptEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -204,7 +204,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150798, 'OnBeforeReverseSalesTicket', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeReverseSalesTicket', '', false, false)]
     local procedure OnBeforeReverseSalesTicket(SalesTicketNo: Code[20])
     var
         TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";

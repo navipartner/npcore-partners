@@ -16,7 +16,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         exit('TEMPLATE');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150641, 'OnEjectPaymentBin', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Bin Eject Mgt.", 'OnEjectPaymentBin', '', false, false)]
     local procedure OnEjectPaymentBin(POSPaymentBin: Record "NPR POS Payment Bin"; var Ejected: Boolean)
     var
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
@@ -36,7 +36,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         Ejected := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150641, 'OnLookupBinInvokeMethods', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Bin Eject Mgt.", 'OnLookupBinInvokeMethods', '', false, false)]
     local procedure OnLookupBinInvokeMethods(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;
@@ -45,7 +45,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         tmpRetailList.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150641, 'OnShowInvokeParameters', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Bin Eject Mgt.", 'OnShowInvokeParameters', '', false, false)]
     local procedure OnShowInvokeParameters(POSPaymentBin: Record "NPR POS Payment Bin")
     var
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
@@ -57,7 +57,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         POSPaymentBinInvokeMgt.ShowGenericParameters(POSPaymentBin);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150633, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Paym. Bin Eject Param.", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(PaymentBinInvokeParameter: Record "NPR POS Paym. Bin Eject Param."; var Caption: Text)
     var
         PaymentBin: Record "NPR POS Payment Bin";
@@ -73,7 +73,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150633, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Paym. Bin Eject Param.", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(PaymentBinInvokeParameter: Record "NPR POS Paym. Bin Eject Param."; var Caption: Text)
     var
         PaymentBin: Record "NPR POS Payment Bin";
@@ -89,7 +89,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150633, 'OnAfterValidateEvent', 'Value', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Paym. Bin Eject Param.", 'OnAfterValidateEvent', 'Value', false, false)]
     local procedure OnValidateParameter(var Rec: Record "NPR POS Paym. Bin Eject Param."; var xRec: Record "NPR POS Paym. Bin Eject Param."; CurrFieldNo: Integer)
     var
         PaymentBin: Record "NPR POS Payment Bin";
@@ -109,7 +109,7 @@ codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150633, 'OnLookupParameter', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Paym. Bin Eject Param.", 'OnLookupParameter', '', false, false)]
     local procedure OnLookupParameter(var POSPaymentBinEjectParam: Record "NPR POS Paym. Bin Eject Param.")
     var
         PaymentBin: Record "NPR POS Payment Bin";

@@ -14,7 +14,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'RefundPaymentEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'RefundPaymentEvent', '', true, true)]
     local procedure OnRefundPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line");
     begin
         if PaymentGateway."Capture Codeunit Id" <> CurrCodeunitId() then
@@ -25,7 +25,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         RefundPayment(PaymentGateway, PaymentLine);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'CancelPaymentEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', true, true)]
     local procedure OnCancelPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if PaymentGateway."Capture Codeunit Id" <> CurrCodeunitId() then

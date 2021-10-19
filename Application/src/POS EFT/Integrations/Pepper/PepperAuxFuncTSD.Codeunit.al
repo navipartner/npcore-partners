@@ -227,7 +227,7 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
         FrontEnd.InvokeDevice(AuxRequest, 'Pepper_EftAux', 'EftEndWorkshift');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', false, false)]
     local procedure OnDeviceResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
 
@@ -237,7 +237,7 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
         // Pepper has a VOID response. Actual Return Data is on the CloseForm Event
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";

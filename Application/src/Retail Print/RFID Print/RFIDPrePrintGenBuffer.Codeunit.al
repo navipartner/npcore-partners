@@ -84,7 +84,7 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
         exit(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014547, 'OnBeforePrintMatrix', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnBeforePrintMatrix', '', false, false)]
     local procedure OnBeforeMatrixPrint(var RecRef: RecordRef; TemplateHeader: Record "NPR RP Template Header"; var Skip: Boolean)
     var
         RFIDPrintLog: Record "NPR RFID Print Log";

@@ -1,4 +1,4 @@
-﻿codeunit 6151198 "NPR NpCs Upd. Order Status"
+codeunit 6151198 "NPR NpCs Upd. Order Status"
 {
     var
         Text000: Label 'Collect in Store Document is first Processed by Store and then Delivered';
@@ -6,7 +6,7 @@
         Text002: Label 'Collect Document has been deleted in Store';
 
 
-    [EventSubscriber(ObjectType::Codeunit, 6151196, 'OnInitWorkflowModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpCs Workflow Mgt.", 'OnInitWorkflowModules', '', true, true)]
     local procedure OnInitWorkflowModules(var NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
     begin
         if not NpCsWorkflowModule.WritePermission then
@@ -23,7 +23,7 @@
         NpCsWorkflowModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151196, 'UpdateOrderStatus', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpCs Workflow Mgt.", 'UpdateOrderStatus', '', true, true)]
     local procedure UpdateOrderStatus(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     var
         NpCsStore: Record "NPR NpCs Store";

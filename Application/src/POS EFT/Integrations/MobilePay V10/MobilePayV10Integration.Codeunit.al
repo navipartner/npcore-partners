@@ -410,7 +410,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforePauseFrontEnd', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforePauseFrontEnd', '', false, false)]
     local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
         if not EFTTransactionRequest.IsType(Tok_INTEGRATIONTYPE) then
@@ -419,7 +419,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
         Skip := not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND])
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforeResumeFrontEnd', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforeResumeFrontEnd', '', false, false)]
     local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     var
         POSSession: Codeunit "NPR POS Session";

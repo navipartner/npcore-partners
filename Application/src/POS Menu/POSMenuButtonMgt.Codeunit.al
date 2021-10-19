@@ -1,6 +1,6 @@
 codeunit 6150644 "NPR POS Menu Button Mgt."
 {
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnAfterActionUpdated', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnAfterActionUpdated', '', false, false)]
     local procedure OnAfterActionUpdated("Action": Record "NPR POS Action")
     var
         POSMenuButton: Record "NPR POS Menu Button";
@@ -14,7 +14,7 @@ codeunit 6150644 "NPR POS Menu Button Mgt."
             until POSMenuButton.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150701, 'OnAfterRenameEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Menu Button", 'OnAfterRenameEvent', '', false, false)]
     local procedure OnAfterPOSMenuButtonRename(var Rec: Record "NPR POS Menu Button"; var xRec: Record "NPR POS Menu Button"; RunTrigger: Boolean)
     var
         POSParameterValue: Record "NPR POS Parameter Value";

@@ -49,7 +49,7 @@ codeunit 6184520 "NPR EFT Adyen Cloud Sign Dia."
         Model.AddScript(Javascript());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnProtocolUIResponse', '', false, false)]
     local procedure OnSignatureDialogResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     var
         Confirmed: Boolean;

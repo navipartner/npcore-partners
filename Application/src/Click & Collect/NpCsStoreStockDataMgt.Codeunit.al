@@ -1,4 +1,4 @@
-﻿codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
+codeunit 6151222 "NPR NpCs Store Stock Data Mgt."
 {
     TableNo = "NPR Data Log Record";
 
@@ -17,7 +17,7 @@
             until TempStockkeepingUnit.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151222, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpCs Store Stock Setup", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnAfterModifyStoreStockSetup(var Rec: Record "NPR NpCs Store Stock Setup"; var xRec: Record "NPR NpCs Store Stock Setup"; RunTrigger: Boolean)
     begin
         if not RunTrigger then

@@ -1,4 +1,4 @@
-﻿codeunit 6014476 "NPR Retail Price Log Mgt."
+codeunit 6014476 "NPR Retail Price Log Mgt."
 {
     trigger OnRun()
     begin
@@ -637,7 +637,7 @@
         exit('QUERY_RETAIL_PRICE_LOG');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014475, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Price Log Setup", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertRetailUnitPriceLogSetup(var Rec: Record "NPR Retail Price Log Setup"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -647,7 +647,7 @@
             EnablePriceLog(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014475, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Price Log Setup", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyRetailUnitPriceLogSetup(var Rec: Record "NPR Retail Price Log Setup"; var xRec: Record "NPR Retail Price Log Setup"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then

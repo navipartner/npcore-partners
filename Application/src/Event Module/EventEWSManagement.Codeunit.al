@@ -1,4 +1,4 @@
-﻿codeunit 6060151 "NPR Event EWS Management"
+codeunit 6060151 "NPR Event EWS Management"
 {
     var
 
@@ -7,7 +7,7 @@
         ExchTemplateCaption: Label 'Please select a %1 template...';
         SkipLookup: Boolean;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
         Resource: Record Resource;

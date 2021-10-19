@@ -1,4 +1,4 @@
-﻿codeunit 6150705 "NPR POS Sale"
+codeunit 6150705 "NPR POS Sale"
 {
     var
         LastSalePOSEntry: Record "NPR POS Entry";
@@ -778,7 +778,7 @@
         exit('FINISH_SALE');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150729, 'OnDiscoverPOSSalesWorkflows', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
         Sender.DiscoverPOSSalesWorkflow(OnFinishSaleCode(), Text000, CurrCodeunitId(), 'OnFinishSale');

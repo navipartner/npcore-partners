@@ -1,4 +1,4 @@
-﻿codeunit 6059973 "NPR Variety Lookup Functions"
+codeunit 6059973 "NPR Variety Lookup Functions"
 {
     TableNo = "NPR Variety Field Setup";
 
@@ -69,7 +69,7 @@
         PAGE.RunModal(0, VarietyValue);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownEvent', '', false, false)]
     local procedure CU6059971_OnDrillDown(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup")
     begin
         if not (VrtFieldSetup."OnDrillDown Codeunit ID" = CODEUNIT::"NPR Variety Lookup Functions") then

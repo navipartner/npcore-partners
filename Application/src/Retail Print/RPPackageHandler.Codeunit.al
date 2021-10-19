@@ -1,4 +1,4 @@
-﻿codeunit 6014585 "NPR RP Package Handler"
+codeunit 6014585 "NPR RP Package Handler"
 {
     var
         ImportedMessage: Label 'Templates imported:\Created: %1\Replaced: %2';
@@ -138,7 +138,7 @@
         ManagedPackageMgt.DeployPackageFromURL(AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl') + '/retailprinttemplates/templates.json');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014628, 'OnLoadPackage', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Managed Package Mgt.", 'OnLoadPackage', '', false, false)]
     local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JObject: JsonToken; LoadType: Option File,Blob,Download)
     var
         TempImportWorksheet: Record "NPR RP Imp. Worksh." temporary;

@@ -1,6 +1,6 @@
 codeunit 6151562 "NPR NpXml Xml Value Sub."
 {
-    [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure GetBase64(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
         TempBlob: Codeunit "Temp Blob";
@@ -31,7 +31,7 @@ codeunit 6151562 "NPR NpXml Xml Value Sub."
         XmlValue := Base64Convert.ToBase64(ByteText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure GetStockQty(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
         Item: Record Item;

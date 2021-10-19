@@ -19,7 +19,7 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
         WriteText(Output);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnRunNcTriggerTask', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Trigger Task Mgt.", 'OnRunNcTriggerTask', '', false, false)]
     local procedure OnRunNcTriggerTaskProcessExport(TriggerCode: Code[20]; var Output: Text; var NcTask: Record "NPR Nc Task"; var Handled: Boolean; var CurrentIteration: Integer; var MaxIterations: Integer; var Filename: Text; var Subject: Text; var Body: Text)
     begin
         if Handled then
@@ -30,7 +30,7 @@ codeunit 6151523 "NPR Nc Trigger Sample Sub."
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnSetupNcTriggers', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Trigger Task Mgt.", 'OnSetupNcTriggers', '', false, false)]
     local procedure OnSetupNcTriggersInsertNcTrigger()
     var
         NcTrigger: Record "NPR Nc Trigger";

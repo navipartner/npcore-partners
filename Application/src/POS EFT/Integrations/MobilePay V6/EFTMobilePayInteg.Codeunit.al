@@ -56,7 +56,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         exit('MOBILEPAY');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
         tmpEFTIntegrationType.Init();
@@ -66,7 +66,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         tmpEFTIntegrationType.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
@@ -81,7 +81,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTSetup.ShowEftPOSUnitParameters();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationPaymentSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
@@ -94,7 +94,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTSetup.ShowEftPaymentParameters();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         HardwareIdLbl: Label '%1_%2_%3', Locked = true;
@@ -116,7 +116,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateLookupTransactionRequest', '', false, false)]
     local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -125,7 +125,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         //TODO: Implement API request looking up transaction results so lost results can be recovered later in case of error.
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         EFTMobilePayProtocol: Codeunit "NPR EFT MobilePay Prot.";
@@ -137,7 +137,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTMobilePayProtocol.SendEftDeviceRequest(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184514, 'OnAfterProtocolResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT MobilePay Prot.", 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
@@ -145,7 +145,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184484, 'OnValidateParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit Gen.Param.", 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidatePOSUnitGenParameter(var Parameter: Record "NPR EFTType POSUnit Gen.Param.")
     var
         EFTMobilePayIntegration: Codeunit "NPR EFT MobilePay Integ.";
@@ -159,7 +159,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184484, 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit Gen.Param.", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyPOSUnitGenParameter(var Rec: Record "NPR EFTType POSUnit Gen.Param."; var xRec: Record "NPR EFTType POSUnit Gen.Param."; RunTrigger: Boolean)
     var
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
@@ -183,7 +183,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184485, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Setup", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertEFTSetup(var Rec: Record "NPR EFT Setup"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary or (not RunTrigger) then
@@ -193,7 +193,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         Rec.TestField("POS Unit No.");
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184485, 'OnAfterRenameEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Setup", 'OnAfterRenameEvent', '', false, false)]
     local procedure OnAfterRenameEFTSetup(var Rec: Record "NPR EFT Setup"; var xRec: Record "NPR EFT Setup"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary or (not RunTrigger) then

@@ -1,4 +1,4 @@
-﻿codeunit 6151010 "NPR NpRv Voucher Mgt."
+codeunit 6151010 "NPR NpRv Voucher Mgt."
 {
     TableNo = "NPR NpRv Voucher";
 
@@ -20,7 +20,7 @@
             NpRvSalesLine.DeleteAll();
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -35,7 +35,7 @@
         NpRvSalesLine.DeleteAll();
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151015, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteNpRvSalesLine(var Rec: Record "NPR NpRv Sales Line"; RunTrigger: Boolean)
     var
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
@@ -96,7 +96,7 @@
             until NpRvSalesLine.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         Voucher: Record "NPR NpRv Voucher";
@@ -115,7 +115,7 @@
         until VoucherEntry.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnAfterDebitSalePostEvent', '', true, true)]
     local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     var
         Voucher: Record "NPR NpRv Voucher";

@@ -1,4 +1,4 @@
-﻿codeunit 6060146 "NPR MM POS Action: Member Loy."
+codeunit 6060146 "NPR MM POS Action: Member Loy."
 {
     var
         ActionDescription: Label 'This action is capable of redeeming member points and applying them as a coupon.';
@@ -18,7 +18,7 @@
         exit('1.3');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     var
         FunctionOptionString: Text;
@@ -51,14 +51,14 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode(), 'LoyaltyWindowTitle', LoyaltyWindowTitle);
         Captions.AddActionCaption(ActionCode(), 'MemberCardPrompt', MemberCardPrompt);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "NPR POS JSON Management";
@@ -78,7 +78,7 @@
         FrontEnd.SetActionContext(ActionCode(), Context);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSSalesInfo: Record "NPR MM POS Sales Info";
@@ -136,7 +136,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnCancelDiscountApplication', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnCancelDiscountApplication', '', true, true)]
     local procedure OnCancelDiscountApplication(Coupon: Record "NPR NpDc Coupon"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
     var
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -336,7 +336,7 @@
         exit('LOYALTY');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     var
         MemberCommunity: Record "NPR MM Member Community";
@@ -352,7 +352,7 @@
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         DataType: Enum "NPR Data Type";
@@ -367,7 +367,7 @@
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSSale: Codeunit "NPR POS Sale";
@@ -417,7 +417,7 @@
     end;
 
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         MMMemberCard: Record "NPR MM Member Card";
@@ -438,7 +438,7 @@
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
 
@@ -452,7 +452,7 @@
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeMemberSelect(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         MMMemberCard: Record "NPR MM Member Card";

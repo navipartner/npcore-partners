@@ -552,7 +552,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
     end;
 
-    procedure DeleteCoupon(var LoyaltyDeleteCoupon: XMLport 6151189);
+    procedure DeleteCoupon(var LoyaltyDeleteCoupon: XMLport "NPR MM Loyalty Delete Coupont");
     var
         ImportEntry: Record "NPR Nc Import Entry";
         Coupon: Record "NPR NpDc Coupon";

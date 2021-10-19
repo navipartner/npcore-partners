@@ -1,4 +1,4 @@
-﻿codeunit 6059972 "NPR Variety Clone Data"
+codeunit 6059972 "NPR Variety Clone Data"
 {
     trigger OnRun()
     begin
@@ -935,7 +935,7 @@
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059972, 'GetNewVariantCode', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Clone Data", 'GetNewVariantCode', '', true, true)]
     local procedure CreateVariantCodeFromNoSeries(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]; var NewVariantCode: Code[10])
     var
         VarietySetup: Record "NPR Variety Setup";

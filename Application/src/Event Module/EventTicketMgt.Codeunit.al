@@ -9,7 +9,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         ChangeQtyActionText: Label 'edit the quantity for';
         IssueTicketActionText: Label 'issue';
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure JobPlanningLineOnAfterInsert(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -25,7 +25,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         Rec.Modify();
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnBeforeDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure JobPlanningLineOnBeforeDelete(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -39,7 +39,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
             Error('');
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
         Job: Record Job;
@@ -56,7 +56,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Quantity', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Quantity', false, false)]
     local procedure JobPlanningLineQuantityOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
         Job: Record Job;
@@ -73,7 +73,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Ticket Token', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'NPR Ticket Token', false, false)]
     local procedure JobPlanningLineTicketTokenOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if Rec."NPR Ticket Token" = '' then
@@ -83,7 +83,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
                 Rec.Validate("NPR Ticket Collect Status", Rec."NPR Ticket Collect Status"::"Not Collected");
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Ticket Collect Status', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'NPR Ticket Collect Status', false, false)]
     local procedure JobPlanningLineTicketCollectStatusOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
         TMTicketResRequest: Record "NPR TM Ticket Reservation Req.";

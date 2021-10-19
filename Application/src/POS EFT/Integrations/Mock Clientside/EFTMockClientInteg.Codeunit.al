@@ -1,4 +1,4 @@
-﻿codeunit 6184511 "NPR EFT Mock Client Integ."
+codeunit 6184511 "NPR EFT Mock Client Integ."
 {
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
@@ -36,7 +36,7 @@
         exit('MOCK_CLIENT_SIDE');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
         tmpEFTIntegrationType.Init();
@@ -46,7 +46,7 @@
         tmpEFTIntegrationType.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
         //Any non standard EFT operations are registered here:
@@ -64,7 +64,7 @@
         tmpEFTAuxOperation.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     var
         Blob1: Codeunit "Temp Blob";
@@ -84,7 +84,7 @@
         EFTSetup.ShowEftPOSUnitParameters();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationPaymentSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
     var
         Blob1: Codeunit "Temp Blob";
@@ -103,7 +103,7 @@
         EFTSetup.ShowEftPaymentParameters();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateBeginWorkshiftRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateBeginWorkshiftRequest', '', false, false)]
     local procedure OnCreateBeginWorkshiftRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -114,7 +114,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateEndWorkshiftRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateEndWorkshiftRequest', '', false, false)]
     local procedure OnCreateEndWorkshiftRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -125,7 +125,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -140,7 +140,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateRefundRequest', '', false, false)]
     local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -155,7 +155,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVoidRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVoidRequest', '', false, false)]
     local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -167,7 +167,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVerifySetupRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVerifySetupRequest', '', false, false)]
     local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -178,7 +178,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateLookupTransactionRequest', '', false, false)]
     local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -189,7 +189,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateAuxRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateAuxRequest', '', false, false)]
     local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -200,7 +200,7 @@
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateGiftCardLoadRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateGiftCardLoadRequest', '', false, false)]
     local procedure OnCreateGiftCardLoadRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         //-NPR5.51 [359385]
@@ -217,7 +217,7 @@
         //+NPR5.51 [359385]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterFinancialCommit', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -227,7 +227,7 @@
         EftTransactionRequest.PrintReceipts(false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         EFTMockClientProtocol: Codeunit "NPR EFT Mock Client Prot.";
@@ -239,7 +239,7 @@
         EFTMockClientProtocol.SendEftDeviceRequest(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
     local procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "NPR POS Session"; var tmpEFTSetup: Record "NPR EFT Setup" temporary)
     var
         POSSetup: Codeunit "NPR POS Setup";
@@ -259,7 +259,7 @@
         tmpEFTSetup.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184512, 'OnAfterProtocolResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Mock Client Prot.", 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
@@ -267,7 +267,7 @@
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184481, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType Paym. BLOB Param.", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnSetPaymentBlobParameterName(Parameter: Record "NPR EFTType Paym. BLOB Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -281,7 +281,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184481, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType Paym. BLOB Param.", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnSetPaymentBlobParameterDescription(Parameter: Record "NPR EFTType Paym. BLOB Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -295,17 +295,17 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184481, 'OnLookupParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType Paym. BLOB Param.", 'OnLookupParameterValue', '', false, false)]
     local procedure OnLookupPaymentBlobParameterValue(var Parameter: Record "NPR EFTType Paym. BLOB Param.")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184481, 'OnValidateParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType Paym. BLOB Param.", 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidatePaymentBlobParameterValue(var Parameter: Record "NPR EFTType Paym. BLOB Param.")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184483, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Type Pay. Gen. Param.", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnSetPaymentGenParameterName(Parameter: Record "NPR EFT Type Pay. Gen. Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -319,7 +319,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184483, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Type Pay. Gen. Param.", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnSetPaymentGenParameterDescription(Parameter: Record "NPR EFT Type Pay. Gen. Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -333,22 +333,22 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184483, 'OnGetParameterOptionStringCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Type Pay. Gen. Param.", 'OnGetParameterOptionStringCaption', '', false, false)]
     local procedure OnSetPaymentGenParameterOptionCaption(Parameter: Record "NPR EFT Type Pay. Gen. Param."; var Caption: Text)
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184483, 'OnLookupParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Type Pay. Gen. Param.", 'OnLookupParameterValue', '', false, false)]
     local procedure OnLookupPaymentGenParameterValue(var Parameter: Record "NPR EFT Type Pay. Gen. Param."; var Handled: Boolean)
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184483, 'OnValidateParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Type Pay. Gen. Param.", 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidatePaymentGenParameterValue(var Parameter: Record "NPR EFT Type Pay. Gen. Param.")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184482, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit BLOBParam.", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnSetUnitBlobParameterName(Parameter: Record "NPR EFTType POSUnit BLOBParam."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -360,7 +360,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184482, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit BLOBParam.", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnSetUnitBlobParameterDescription(Parameter: Record "NPR EFTType POSUnit BLOBParam."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -372,17 +372,17 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184482, 'OnLookupParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit BLOBParam.", 'OnLookupParameterValue', '', false, false)]
     local procedure OnLookupUnitBlobParameterValue(var Parameter: Record "NPR EFTType POSUnit BLOBParam.")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184482, 'OnValidateParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit BLOBParam.", 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidateUnitBlobParameterValue(var Parameter: Record "NPR EFTType POSUnit BLOBParam.")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184484, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit Gen.Param.", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnSetUnitGenParameterName(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -398,7 +398,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184484, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit Gen.Param.", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnSetUnitGenParameterDescription(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -414,7 +414,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184484, 'OnGetParameterOptionStringCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit Gen.Param.", 'OnGetParameterOptionStringCaption', '', false, false)]
     local procedure OnSetUnitGenParameterOptionCaption(Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Caption: Text)
     begin
         if Parameter."Integration Type" <> IntegrationType() then
@@ -426,12 +426,12 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184484, 'OnLookupParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit Gen.Param.", 'OnLookupParameterValue', '', false, false)]
     local procedure OnLookupUnitGenParameterValue(var Parameter: Record "NPR EFTType POSUnit Gen.Param."; var Handled: Boolean)
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184484, 'OnValidateParameterValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFTType POSUnit Gen.Param.", 'OnValidateParameterValue', '', false, false)]
     local procedure OnValidateUnitGenParameterValue(var Parameter: Record "NPR EFTType POSUnit Gen.Param.")
     var
         RegEx: Codeunit "NPR RegEx";

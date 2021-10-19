@@ -1,4 +1,4 @@
-﻿
+
 codeunit 6151019 "NPR NpRv Module Valid.: Global"
 {
     var
@@ -11,13 +11,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ErrorXmlNode: XmlNode;
         XmlDOMMgt: codeunit "XML DOM Management";
 
-    [EventSubscriber(ObjectType::Table, 6151024, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Partner", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertPartner(var Rec: Record "NPR NpRv Partner"; RunTrigger: Boolean)
     begin
         ValidateGlobalVoucherSetups(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151024, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Partner", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyPartner(var Rec: Record "NPR NpRv Partner"; var xRec: Record "NPR NpRv Partner"; RunTrigger: Boolean)
     begin
         ValidateGlobalVoucherSetups(Rec);
@@ -106,7 +106,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
     begin
         if VoucherModule.Get(VoucherModule.Type::"Validate Voucher", ModuleCode()) then
@@ -120,7 +120,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         VoucherModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnHasValidateVoucherSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnHasValidateVoucherSetup', '', true, true)]
     local procedure OnHasValidateVoucherSetup(VoucherType: Record "NPR NpRv Voucher Type"; var HasValidateSetup: Boolean)
     begin
         if not IsSubscriber(VoucherType) then
@@ -129,7 +129,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         HasValidateSetup := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnSetupValidateVoucher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnSetupValidateVoucher', '', true, true)]
     local procedure OnSetupValidateVoucher(var VoucherType: Record "NPR NpRv Voucher Type")
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
@@ -150,7 +150,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         PAGE.Run(PAGE::"NPR NpRv Global Voucher Setup", NpRvGlobalVoucherSetup);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunValidateVoucher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunValidateVoucher', '', true, true)]
     local procedure OnRunValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
     begin
         if Handled then
@@ -163,7 +163,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         ReserveVoucher(TempNpRvVoucherBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151015, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NPR NpRv Sales Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -237,7 +237,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151014, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher Entry", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertVoucherEntry(var Rec: Record "NPR NpRv Voucher Entry"; RunTrigger: Boolean)
     var
         NpRvPartner: Record "NPR NpRv Partner";

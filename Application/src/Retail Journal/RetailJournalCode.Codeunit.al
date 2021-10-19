@@ -1,4 +1,4 @@
-﻿codeunit 6014467 "NPR Retail Journal Code"
+codeunit 6014467 "NPR Retail Journal Code"
 {
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
@@ -614,7 +614,7 @@
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014413, 'OnBeforePrintRetailJournal', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Label Library", 'OnBeforePrintRetailJournal', '', true, true)]
     local procedure PrintRetailJournalList(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
     begin
         if ReportType <> REPORT::"NPR Retail Journal List" then

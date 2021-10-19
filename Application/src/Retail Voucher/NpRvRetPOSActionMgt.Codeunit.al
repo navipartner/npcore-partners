@@ -12,13 +12,13 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
     begin
         DiscoverIssueReturnVoucherAction(Sender);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         InitializeIssueReturnVoucherCaptions(Captions);
@@ -79,7 +79,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         Captions.AddActionCaption(ActionCode(), 'Amount', Text003);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
     local procedure OnLookupVoucherTypeCode(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
@@ -97,7 +97,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
             POSParameterValue.Value := NpRvVoucherType.Code;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, true)]
     local procedure OnValidateVoucherTypeCode(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
@@ -122,7 +122,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         NpRvVoucherType.Get(POSParameterValue.Value);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
@@ -172,7 +172,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         FrontEnd.SetActionContext(ActionCode(), Context);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
