@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>5bce67ad-83b8-4c9e-afcb-936bbd9bb1ec</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -1496,38 +1497,6 @@
               </Border>
             </Style>
           </Tablix>
-          <Textbox Name="Textbox24">
-            <CanGrow>true</CanGrow>
-            <KeepTogether>true</KeepTogether>
-            <Paragraphs>
-              <Paragraph>
-                <TextRuns>
-                  <TextRun>
-                    <Value>=First(Fields!ExclVatCaption.Value)</Value>
-                    <Style>
-                      <FontSize>7pt</FontSize>
-                      <FontWeight>Bold</FontWeight>
-                    </Style>
-                  </TextRun>
-                </TextRuns>
-                <Style />
-              </Paragraph>
-            </Paragraphs>
-            <rd:DefaultName>Textbox24</rd:DefaultName>
-            <Top>0.8432in</Top>
-            <Height>0.25in</Height>
-            <Width>4.01026in</Width>
-            <ZIndex>1</ZIndex>
-            <Style>
-              <Border>
-                <Style>None</Style>
-              </Border>
-              <PaddingLeft>2pt</PaddingLeft>
-              <PaddingRight>2pt</PaddingRight>
-              <PaddingTop>2pt</PaddingTop>
-              <PaddingBottom>2pt</PaddingBottom>
-            </Style>
-          </Textbox>
         </ReportItems>
         <Height>2.77673cm</Height>
         <Style />
@@ -1884,6 +1853,7 @@ End Function
   </Variables>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>4ed93cbb-c1bd-48ff-aa4f-8a82a76a8b6d</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>

@@ -258,7 +258,7 @@ report 6014406 "NPR Sales Person Top 20"
         I: Integer;
         Multipl: Integer;
         ShowQty: Integer;
-        TurnoverPctCaptionLbl: Label '% of turnover';
+        TurnoverPctCaptionLbl: Label '% of Turnover';
         DiscountPctCaptionLbl: Label 'Discount Amount %';
         ExclVatCaption_Lbl: Label 'excl. VAT';
         Text001: Label 'Order By : %1';

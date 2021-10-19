@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>b60c3478-9719-48a4-a2b8-149c2239194f</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -1266,7 +1267,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Parameters!PageNoinAd.Value</Value>
+                                                    <Value />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>7pt</FontSize>
@@ -1527,6 +1528,7 @@
                                               <PaddingBottom>2pt</PaddingBottom>
                                             </Style>
                                           </Textbox>
+                                          <rd:Selected>true</rd:Selected>
                                         </CellContents>
                                       </TablixCell>
                                       <TablixCell>
@@ -2406,7 +2408,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Pagenoinadvert_PeriodDiscountLine.Value</Value>
+                                                    <Value EvaluationMode="Constant" />
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>7pt</FontSize>
@@ -3321,6 +3323,7 @@
                 </FilterValues>
               </Filter>
             </Filters>
+            <Top>0.02648cm</Top>
             <Left>0.02646cm</Left>
             <Height>1.10625in</Height>
             <Width>11.70995in</Width>
@@ -3331,10 +3334,10 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>2.80988cm</Height>
+        <Height>2.83634cm</Height>
         <Style />
       </Body>
-      <Width>29.86321cm</Width>
+      <Width>29.76974cm</Width>
       <Page>
         <PageHeader>
           <Height>3.3528cm</Height>
@@ -3426,7 +3429,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>2.89452cm</Top>
-              <Left>0.02646cm</Left>
+              <Left>0.05385cm</Left>
               <Height>10pt</Height>
               <Width>3.15cm</Width>
               <ZIndex>2</ZIndex>
@@ -4061,6 +4064,7 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>d50d215a-b59c-4bbb-b311-ded3ab0c6e98</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>

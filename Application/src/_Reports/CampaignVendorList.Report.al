@@ -4,7 +4,7 @@ report 6014497 "NPR Campaign Vendor List"
     RDLCLayout = './src/_Reports/layouts/Campaign Vendor List.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'Inventory Campaign Stat.';
+    Caption = 'Campaign Vendor List';
     PreviewMode = PrintLayout;
     DataAccessIntent = ReadOnly;
 
@@ -19,10 +19,10 @@ report 6014497 "NPR Campaign Vendor List"
             column(CompanyInfoPicture; CompanyInfo.Picture)
             {
             }
-            column(VendorNo; Vendor1."No.")
+            column(VendorNo; "No.")
             {
             }
-            column(VendorName; Vendor1.Name)
+            column(VendorName; Name)
             {
             }
             column(Inventory; Item.Inventory)
@@ -41,35 +41,35 @@ report 6014497 "NPR Campaign Vendor List"
             {
                 CalcFields = "Quantity Sold", Turnover;
                 RequestFilterFields = "Vendor No.";
-                column(PeriodLineItemNo; "Period Discount Line"."Item No.")
+                column(PeriodLineItemNo; "Item No.")
                 {
                     AutoFormatType = 1;
                 }
-                column(Code_PeriodDiscountLine; "Period Discount Line".Code)
+                column(Code_PeriodDiscountLine; Code)
                 {
                 }
-                column(PeriodLineDesc; "Period Discount Line".Description)
-                {
-                    AutoFormatType = 1;
-                }
-                column(UnitCostPurchase_PeriodDiscountLine; "Period Discount Line"."Unit Cost Purchase")
-                {
-                }
-                column(VariantCode_PeriodDiscountLine; "Period Discount Line"."Variant Code")
-                {
-                }
-                column(PeriodLineUnitPrice; "Period Discount Line"."Unit Price")
+                column(PeriodLineDesc; Description)
                 {
                     AutoFormatType = 1;
                 }
-                column(PeriodLineCampaignUnitPrice; "Period Discount Line"."Campaign Unit Price")
+                column(UnitCostPurchase_PeriodDiscountLine; "Unit Cost Purchase")
+                {
+                }
+                column(VariantCode_PeriodDiscountLine; "Variant Code")
+                {
+                }
+                column(PeriodLineUnitPrice; "Unit Price")
                 {
                     AutoFormatType = 1;
                 }
-                column(QuantitySold_PeriodDiscountLine; "Period Discount Line"."Quantity Sold")
+                column(PeriodLineCampaignUnitPrice; "Campaign Unit Price")
+                {
+                    AutoFormatType = 1;
+                }
+                column(QuantitySold_PeriodDiscountLine; "Quantity Sold")
                 {
                 }
-                column(QuantitySold_PeriodDiscountLine_caption; "Period Discount Line".FieldCaption("Quantity Sold"))
+                column(QuantitySold_PeriodDiscountLine_caption; FieldCaption("Quantity Sold"))
                 {
                 }
                 dataitem("Retail Comment"; "NPR Retail Comment")
@@ -119,25 +119,25 @@ report 6014497 "NPR Campaign Vendor List"
             dataitem("Mixed Discount Line"; "NPR Mixed Discount Line")
             {
                 DataItemTableView = WHERE("Disc. Grouping Type" = FILTER(Item));
-                column(No_MixedDiscountLine; "Mixed Discount Line"."No.")
+                column(No_MixedDiscountLine; "No.")
                 {
                 }
-                column(Code_MixedDiscountLine; "Mixed Discount Line".Code)
+                column(Code_MixedDiscountLine; Code)
                 {
                 }
-                column(Unitcost_MixedDiscountLine; "Mixed Discount Line"."Unit cost")
+                column(Unitcost_MixedDiscountLine; "Unit cost")
                 {
                 }
-                column(Unitprice_MixedDiscountLine; "Mixed Discount Line"."Unit price")
+                column(Unitprice_MixedDiscountLine; "Unit price")
                 {
                 }
-                column(UnitpriceinclVAT_MixedDiscountLine; "Mixed Discount Line"."Unit price incl. VAT")
+                column(UnitpriceinclVAT_MixedDiscountLine; "Unit price incl. VAT")
                 {
                 }
-                column(VariantCode_MixedDiscountLine; "Mixed Discount Line"."Variant Code")
+                column(VariantCode_MixedDiscountLine; "Variant Code")
                 {
                 }
-                column(Description_MixedDiscountLine; "Mixed Discount Line".Description)
+                column(Description_MixedDiscountLine; Description)
                 {
                 }
 
@@ -198,7 +198,7 @@ report 6014497 "NPR Campaign Vendor List"
 
     labels
     {
-        Report_Lbl = 'Campaign sales statistics';
+        Report_Lbl = 'Campaign Vendor List';
         Page_Lbl = 'Page';
         ItemNo_Lbl = 'No.';
         ItemDescription_Lbl = 'Description';
