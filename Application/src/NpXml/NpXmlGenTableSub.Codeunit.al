@@ -1,6 +1,6 @@
-﻿codeunit 6151561 "NPR NpXml Gen. Table Sub."
+codeunit 6151561 "NPR NpXml Gen. Table Sub."
 {
-    [EventSubscriber(ObjectType::Codeunit, 6151551, 'OnSetupGenericChildTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Mgt.", 'OnSetupGenericChildTable', '', true, true)]
     local procedure SetupStockkeepingUnit(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var
         Item: Record Item;
@@ -59,7 +59,7 @@
         ChildRecRef.GetTable(TempStockkeepingUnit);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151551, 'OnSetupGenericChildTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Mgt.", 'OnSetupGenericChildTable', '', true, true)]
     local procedure SetupVariantTranslation(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var
         MagentoStoreItem: Record "NPR Magento Store Item";
@@ -96,7 +96,7 @@
         ChildRecRef.GetTable(TempItemVariant);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151553, 'OnSetupGenericParentTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Trigger Mgt.", 'OnSetupGenericParentTable', '', true, true)]
     local procedure SetupLinkStockkeepingUnit(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
     var
         Item: Record Item;

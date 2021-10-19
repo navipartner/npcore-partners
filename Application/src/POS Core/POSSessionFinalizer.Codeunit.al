@@ -10,7 +10,7 @@ codeunit 6150745 "NPR POS Session Finalizer"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 9170, 'OnRoleCenterOpen', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Conf./Personalization Mgt.", 'OnRoleCenterOpen', '', true, true)]
     local procedure OnRoleCenterOpen()
     var
         POSSession: Codeunit "NPR POS Session";

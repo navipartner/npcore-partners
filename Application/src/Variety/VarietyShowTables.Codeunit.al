@@ -40,7 +40,7 @@ codeunit 6059975 "NPR Variety ShowTables"
         exit(LookupValue);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownEvent', '', false, false)]
     local procedure C6059971_OnDrillDownEvent(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024])
     var
         RecRef: RecordRef;

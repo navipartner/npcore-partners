@@ -1,4 +1,4 @@
-﻿codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
+codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
 {
 
     trigger OnRun()
@@ -72,7 +72,7 @@
         exit(Coupon."No.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
         if CouponModule.Get(CouponModule.Type::"Issue Coupon", ModuleCode()) then
@@ -86,7 +86,7 @@
         CouponModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnHasIssueCouponSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnHasIssueCouponSetup', '', true, true)]
     local procedure OnHasIssueCouponsSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasIssueSetup: Boolean)
     begin
         if not IsSubscriber(CouponType) then
@@ -95,7 +95,7 @@
         HasIssueSetup := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnSetupIssueCoupon', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnSetupIssueCoupon', '', true, true)]
     local procedure OnSetupIssueCoupon(var CouponType: Record "NPR NpDc Coupon Type")
     begin
         if not IsSubscriber(CouponType) then
@@ -104,7 +104,7 @@
         PAGE.Run(PAGE::"NPR MM Loyalty Point Setup");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunIssueCoupon', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnRunIssueCoupon', '', true, true)]
     local procedure OnRunIssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; var Handled: Boolean)
     begin
         if Handled then

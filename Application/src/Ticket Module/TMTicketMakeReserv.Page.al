@@ -1,4 +1,4 @@
-﻿page 6060113 "NPR TM Ticket Make Reserv."
+page 6060113 "NPR TM Ticket Make Reserv."
 {
     Caption = 'Make your reservation';
     DataCaptionExpression = GetDataCaptionExpr();
@@ -843,8 +843,8 @@
 
     local procedure IsRescheduleAllowed(ExtAdmSchEntryNo: Integer) RescheduleAllowed: Boolean;
     var
-        Ticket: Record 6059785;
-        TicketManagement: Codeunit 6059784;
+        Ticket: Record "NPR TM Ticket";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
 
         RescheduleAllowed := true;

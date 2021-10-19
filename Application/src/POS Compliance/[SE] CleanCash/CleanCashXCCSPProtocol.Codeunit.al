@@ -174,7 +174,7 @@ codeunit 6014477 "NPR CleanCash XCCSP Protocol" implements "NPR CleanCash XCCSP 
     end;
 
     // Provides value to the dropdown selection box on POS Audit Profile Card when activating CleanCash
-    [EventSubscriber(ObjectType::Codeunit, 6150619, 'OnLookupAuditHandler', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
     local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         tmpRetailList.Number += 1;

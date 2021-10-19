@@ -1,4 +1,4 @@
-﻿codeunit 6151594 "NPR NpDc Module Apply: Default"
+codeunit 6151594 "NPR NpDc Module Apply: Default"
 {
     var
         Text000: Label 'Apply Discount - Default';
@@ -222,7 +222,7 @@
         exit(SaleLinePOSCoupon."Line No." + 10000);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
         if CouponModule.Get(CouponModule.Type::"Apply Discount", ModuleCode()) then
@@ -236,7 +236,7 @@
         CouponModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnHasApplyDiscountSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnHasApplyDiscountSetup', '', true, true)]
     local procedure OnHasApplyDiscountSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasApplySetup: Boolean)
     begin
         if not IsSubscriber(CouponType) then
@@ -245,14 +245,14 @@
         HasApplySetup := false;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnSetupApplyDiscount', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnSetupApplyDiscount', '', true, true)]
     local procedure OnSetupApplyDiscount(var CouponType: Record "NPR NpDc Coupon Type")
     begin
         if not IsSubscriber(CouponType) then
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunApplyDiscount', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnRunApplyDiscount', '', true, true)]
     local procedure OnRunApplyDiscount(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var Handled: Boolean)
     begin
         if Handled then

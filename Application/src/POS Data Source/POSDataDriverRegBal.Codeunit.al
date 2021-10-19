@@ -1,7 +1,7 @@
 codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
 {
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         DataType: Enum "NPR Data Type";
@@ -59,7 +59,7 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnRefreshDataSet', '', false, false)]
     local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         DataRow: Codeunit "NPR Data Row";
@@ -115,7 +115,7 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnSetPosition', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnSetPosition', '', false, false)]
     local procedure SetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
     begin
         if DataSource <> GetSourceNameText() then
@@ -124,7 +124,7 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnIsDataSourceModified', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnIsDataSourceModified', '', false, false)]
     local procedure Modified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
     begin
         if DataSource <> GetSourceNameText() then
@@ -133,7 +133,7 @@ codeunit 6150714 "NPR POS Data Driver: Reg. Bal."
         Modified := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150708, 'OnDiscoverDataSource', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Data Source Discovery", 'OnDiscoverDataSource', '', false, false)]
     local procedure OnDiscoverDataSource(var Rec: Record "NPR POS Data Source Discovery")
     begin
         Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');

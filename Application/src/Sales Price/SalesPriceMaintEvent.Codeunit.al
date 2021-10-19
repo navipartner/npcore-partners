@@ -5,7 +5,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         EventTest();
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
     local procedure ItemOnAfterModifyEvent(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     begin
         if not RunTrigger then
@@ -19,25 +19,25 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         UpdateSalesPricesForStaff(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'Last Direct Cost', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Last Direct Cost', true, true)]
     local procedure OnAfterValidateLastDirectCostEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     begin
         UpdateSalesPricesForStaff(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'Price/Profit Calculation', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Price/Profit Calculation', true, true)]
     local procedure OnAfterValidatePriceProfitCalcEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     begin
         UpdateSalesPricesForStaff(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'Unit Price', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Unit Price', true, true)]
     local procedure OnAfterValidateUnitPriceEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     begin
         UpdateSalesPricesForStaff(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterPostItemJnlLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterPostItemJnlLine', '', true, true)]
     local procedure OnAfterPostItemJournalLine(var ItemJournalLine: Record "Item Journal Line")
     var
         Item: Record Item;

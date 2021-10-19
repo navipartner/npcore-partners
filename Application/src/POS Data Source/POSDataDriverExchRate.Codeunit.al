@@ -16,7 +16,7 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
         exit('FC');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     begin
 
@@ -26,7 +26,7 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
         Extensions.Add(ThisExtension());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -45,7 +45,7 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";

@@ -405,7 +405,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         exit(false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
     local procedure OnBeforeSetQuantityOnReverseSales(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         PosRmaLine: Record "NPR POS RMA Line";

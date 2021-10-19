@@ -1,4 +1,4 @@
-﻿codeunit 6151151 "NPR M2 Account Manager"
+codeunit 6151151 "NPR M2 Account Manager"
 {
     trigger OnRun()
     begin
@@ -185,7 +185,7 @@
         exit(false);
     end;
 
-    [EventSubscriber(ObjectType::Page, 5050, 'OnAfterActionEvent', 'NPR ResetMagentoPassword', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Contact Card", 'OnAfterActionEvent', 'NPR ResetMagentoPassword', true, true)]
     local procedure P5050ResetMagentoPasswordSubscriber(var Rec: Record Contact)
     var
         Contact: Record Contact;

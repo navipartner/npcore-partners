@@ -11,7 +11,7 @@ codeunit 6060153 "NPR Event Email Management"
         NoEmailTemplate: Label 'No email template was found/selected. Email will be sent without one. Do you want to continue?';
         EmailCounter: Integer;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterInsertEvent', '', false, false)]
     local procedure JobOnAfterInsert(var Rec: Record Job; RunTrigger: Boolean)
     begin
         if not RunTrigger then
@@ -24,7 +24,7 @@ codeunit 6060153 "NPR Event Email Management"
         Rec.Modify();
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
     local procedure JobBilltoCustomerNoOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     var
         Cust: Record Customer;
@@ -39,7 +39,7 @@ codeunit 6060153 "NPR Event Email Management"
             Rec."NPR Bill-to E-Mail" := '';
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure JobPlanningLineOnAfterInsert(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -154,9 +154,9 @@ codeunit 6060153 "NPR Event Email Management"
         Recipients, CcRecipients : List of [Text];
 #IF NOT BC17
         EmailRelationType: Enum "Email Relation Type";
-         EmailMessage: Codeunit "Email Message";
+        EmailMessage: Codeunit "Email Message";
         Email: Codeunit Email;
-        BCCRecipients : List of [Text];
+        BCCRecipients: List of [Text];
 #ENDIF
         EmailAccount: Record "Email Account";
     begin

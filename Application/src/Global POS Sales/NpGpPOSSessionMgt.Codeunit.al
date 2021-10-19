@@ -9,7 +9,7 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         NcSyncMgt.ProcessTask(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
@@ -34,7 +34,7 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnAfterDebitSalePostEvent', '', true, true)]
     local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     var
         POSUnit: Record "NPR POS Unit";

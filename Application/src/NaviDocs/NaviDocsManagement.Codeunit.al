@@ -1,4 +1,4 @@
-﻿codeunit 6059767 "NPR NaviDocs Management"
+codeunit 6059767 "NPR NaviDocs Management"
 {
     TableNo = "NPR NaviDocs Entry";
 
@@ -1009,7 +1009,7 @@
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014464, 'OnBeforeSendReport', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR E-mail Doc. Mgt.", 'OnBeforeSendReport', '', true, true)]
     local procedure EMailDocMgtSendReportEvent(RecVariant: Variant; Silent: Boolean; var OverruleMail: Boolean)
     var
         NaviDocsHandlingProfile: Record "NPR NaviDocs Handling Profile";
@@ -1046,7 +1046,7 @@
         OverruleMail := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnBeforeAddDocumentEntryExt', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnBeforeAddDocumentEntryExt', '', true, true)]
     local procedure OnBeforeAddPOSEntryDocumentEntry(var InsertedEntryNo: BigInteger; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text; var TemplateCode: Code[20]; var DelayUntil: DateTime)
     var
         POSEntry: Record "NPR POS Entry";

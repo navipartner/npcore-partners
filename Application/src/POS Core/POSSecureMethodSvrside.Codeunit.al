@@ -17,7 +17,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         exit('SecureMethod');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnCustomMethod_SecureMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
@@ -94,7 +94,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
 
     #endregion
 
-    [EventSubscriber(ObjectType::Table, 6150725, 'OnDiscoverSecureMethods', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Secure Method", 'OnDiscoverSecureMethods', '', true, true)]
     local procedure OnDiscoverSecureMethods(var Sender: Record "NPR POS Secure Method")
     begin
 
@@ -105,7 +105,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         Sender.DiscoverSecureMethod(RetaiAdminPasswordMethodCode(), Text008, Sender.Type::"Password Server");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150736, 'OnSecureMethodValidatePassword', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Secure Method Svrside", 'OnSecureMethodValidatePassword', '', true, true)]
     local procedure OnValidatePassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; Method: Text; Password: Text; POSUnit: Record "NPR POS Unit"; var Handled: Boolean)
     begin
 

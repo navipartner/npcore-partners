@@ -824,7 +824,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         exit(MailReceipients);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
@@ -841,7 +841,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         exit(CODEUNIT::"NPR E-mail Doc. Mgt.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure EmailReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";

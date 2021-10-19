@@ -162,7 +162,7 @@ page 6014537 "NPR APIV1 - Item Categories"
     end;
 
     var
-        TempFieldSet: Record 2000000041 temporary;
+        TempFieldSet: Record Field temporary;
 
     local procedure RegisterFieldSet(FieldNo: Integer)
     begin

@@ -1,4 +1,4 @@
-﻿// TODO: Case 430713
+// TODO: Case 430713
 //       UI in this Codeunit can be replaced with Workflows 2.0 simplePayment dialog.
 //       https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object?anchor=code-example%3A-%60simplepayment%60-dialog
 
@@ -38,7 +38,7 @@ codeunit 6184535 "NPR EFT NETSCloud Trx Dialog"
         Model.AddScript(Javascript());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnProtocolUIResponse', '', false, false)]
     local procedure OnTransactionDialogResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     begin
         if ModelID <> ActiveModelID then

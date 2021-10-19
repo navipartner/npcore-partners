@@ -18,7 +18,7 @@ codeunit 6014430 "NPR Apply Salesperson to Doc."
         SalespersonCode := Value;
     end;
 
-    [EventSubscriber(ObjectType::Table, 36, 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifySalesHeader(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary or (not RunTrigger) then

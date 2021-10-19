@@ -1,4 +1,4 @@
-﻿codeunit 6014416 "NPR Mixed Discount Management"
+codeunit 6014416 "NPR Mixed Discount Management"
 {
     var
         TempCustDiscGroup: Record "Customer Discount Group" temporary;
@@ -1354,13 +1354,13 @@
         exit(DiscountPriority."Discount No. Series");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'InitDiscountPriority', '', true, true)]
     local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
         GetOrInit(DiscountPriority);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014455, 'ApplyDiscount', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'ApplyDiscount', '', true, true)]
     local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     begin
         if not IsSubscribedDiscount(DiscountPriority) then
@@ -1369,7 +1369,7 @@
         ApplyMixDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014455, 'OnFindActiveSaleLineDiscounts', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]
     local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";

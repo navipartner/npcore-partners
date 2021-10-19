@@ -26,61 +26,61 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnInitJob', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnInitJob', '', false, false)]
     local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
         Init(DeviceSettings);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLineFeed', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnLineFeed', '', false, false)]
     local procedure OnLineFeed()
     begin
         LineFeed();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnPrintData', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
         PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Bold, POSPrintBuffer.Underline, POSPrintBuffer.DoubleStrike, POSPrintBuffer.Align, POSPrintBuffer.Width);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupFont', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnLookupFont', '', false, false)]
     local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
     begin
         LookupOK := SelectFont(Value);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnLookupCommand', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnLookupCommand', '', false, false)]
     local procedure OnLookupCommand(var LookupOK: Boolean; var Value: Text)
     begin
         LookupOK := SelectCommand(Value);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetPageWidth', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetPageWidth', '', false, false)]
     local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
     begin
         Width := GetPageWidth(FontFace);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetTargetEncoding', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetTargetEncoding', '', false, false)]
     local procedure OnGetTargetEncoding(var TargetEncoding: Text)
     begin
         TargetEncoding := 'utf-8';
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetPrintBytes', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnGetPrintBytes', '', false, false)]
     local procedure OnGetPrintBytes(var PrintBytes: Text)
     begin
         PrintBytes := PrintBuffer;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnSetPrintBytes', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnSetPrintBytes', '', false, false)]
     local procedure OnSetPrintBytes(var PrintBytes: Text)
     begin
         PrintBuffer := PrintBytes;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnBuildDeviceList', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Printer Interf.", 'OnBuildDeviceList', '', false, false)]
     local procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         tmpRetailList.Number += 1;

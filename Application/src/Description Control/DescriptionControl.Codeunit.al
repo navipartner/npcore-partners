@@ -91,14 +91,14 @@ codeunit 6059969 "NPR Description Control"
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 5777, 'OnAfterValidateEvent', 'Item No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnAfterValidateEvent', 'Item No.', true, true)]
     local procedure T5777OnAfterValidateEventItemNo(var Rec: Record "Item Reference"; var xRec: Record "Item Reference"; CurrFieldNo: Integer)
     begin
         if (Rec."Item No." <> xRec."Item No.") or (Rec.Description = '') then
             Rec.Description := GetItemRefDescription(Rec."Item No.", Rec."Variant Code");
     end;
 
-    [EventSubscriber(ObjectType::Table, 5777, 'OnAfterValidateEvent', 'Variant Code', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnAfterValidateEvent', 'Variant Code', true, true)]
     local procedure T5777OnAfterValidateEventVariantCode(var Rec: Record "Item Reference"; var xRec: Record "Item Reference"; CurrFieldNo: Integer)
     begin
         if (Rec."Variant Code" <> xRec."Variant Code") or (Rec.Description = '') then

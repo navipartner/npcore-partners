@@ -1,4 +1,4 @@
-﻿codeunit 6060150 "NPR Event Management"
+codeunit 6060150 "NPR Event Management"
 {
     Permissions = TableData "Job Ledger Entry" = imd,
                   TableData "Job Register" = imd,
@@ -32,7 +32,7 @@
         BlockDeleteErr: Label 'You can''t delete event %1 as it is in status %2. Please check %3 for blocked statuses.';
         BufferMode: Boolean;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterInsertEvent', '', false, false)]
     local procedure JobOnAfterInsert(var Rec: Record Job; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -59,7 +59,7 @@
         Rec.Modify();
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterModifyEvent', '', false, false)]
     local procedure JobOnAfterModify(var Rec: Record Job; var xRec: Record Job; RunTrigger: Boolean)
     var
         JobTask: Record "Job Task";
@@ -89,13 +89,13 @@
             end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure JobOnBeforeDelete(var Rec: Record Job; RunTrigger: Boolean)
     begin
         BlockDeleteIfInStatus(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterDeleteEvent', '', false, false)]
     local procedure JobOnAfterDelete(var Rec: Record Job; RunTrigger: Boolean)
     var
         EventReportLayout: Record "NPR Event Report Layout";
@@ -118,7 +118,7 @@
         EventReportLayout.DeleteAll();
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
     local procedure JobEventStatusOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     var
         JobPlanningLine: Record "Job Planning Line";
@@ -158,7 +158,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'Starting Date', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'Starting Date', false, false)]
     local procedure JobStartingDateOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     var
         CalculatedDate: Date;
@@ -197,25 +197,25 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Starting Time', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'NPR Starting Time', false, false)]
     local procedure JobStartingTimeOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     begin
         CheckTime(Rec."Starting Date", Rec."Ending Date", Rec."NPR Starting Time", Rec."NPR Ending Time");
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Ending Time', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'NPR Ending Time', false, false)]
     local procedure JobEndingTimeOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     begin
         CheckTime(Rec."Starting Date", Rec."Ending Date", Rec."NPR Starting Time", Rec."NPR Ending Time");
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
     local procedure JobBilltoCustomerNoOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     begin
         Rec."NPR Event Customer No." := Rec."Bill-to Customer No.";
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Event Customer No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'NPR Event Customer No.', false, false)]
     local procedure JobEventCustomerNoOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     var
         JobLedgerEntry: Record "Job Ledger Entry";
@@ -252,7 +252,7 @@
         RecRef.SetTable(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure JobPlanningLineOnAfterInsert(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -271,7 +271,7 @@
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterDeleteEvent', '', false, false)]
     local procedure JobPlanningLineOnAfterDelete(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     begin
         if not RunTrigger then
@@ -279,19 +279,19 @@
         DeleteActivityLog(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Line Type', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Line Type', false, false)]
     local procedure JobPlanningLineLineTypeOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         CheckResAvailability(Rec, xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Planning Date', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Planning Date', false, false)]
     local procedure JobPlanningLinePlanningDateOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         CheckResAvailability(Rec, xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnBeforeValidateEvent', 'Type', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnBeforeValidateEvent', 'Type', false, false)]
     local procedure JobPlanningLineTypeOnBeforeValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
         Job: Record Job;
@@ -311,7 +311,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if (Rec.Type = Rec.Type::Resource) and (CurrFieldNo = Rec.FieldNo("No.")) then
@@ -319,7 +319,7 @@
         FindJobUnitPriceInclVAT(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Starting Time', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'NPR Starting Time', false, false)]
     local procedure JobPlanningLineStartingTimeOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if CurrFieldNo = Rec.FieldNo("NPR Starting Time") then begin
@@ -329,7 +329,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Ending Time', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'NPR Ending Time', false, false)]
     local procedure JobPlanningLineEndingTimeOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if CurrFieldNo = Rec.FieldNo("NPR Ending Time") then begin
@@ -339,7 +339,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Quantity', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Quantity', false, false)]
     local procedure JobPlanningLineQuantityOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if Rec.Type = Rec.Type::Resource then begin
@@ -356,31 +356,31 @@
         CalcLineAmountInclVAT(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Unit Price', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Unit Price', false, false)]
     local procedure JobPlanningLineUnitPriceOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         UpdateUnitPriceInclVAT(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Line Discount Amount', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Line Discount Amount', false, false)]
     local procedure JobPlanningLineLineDiscountAmountOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         CalcLineAmountInclVAT(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Line Discount %', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Line Discount %', false, false)]
     local procedure JobPlanningLineLineDiscountPctOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         CalcLineAmountInclVAT(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
     local procedure JobPlanningLineEventStatusOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         CheckResAvailability(Rec, xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1022, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line Invoice", 'OnAfterInsertEvent', '', false, false)]
     local procedure JobPlanningLineInvoiceOnAfterInsert(var Rec: Record "Job Planning Line Invoice"; RunTrigger: Boolean)
     var
         SalesHeader: Record "Sales Header";
@@ -394,7 +394,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnBeforeModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeModifyEvent', '', true, true)]
     local procedure SalesLineOnBeforeModify(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; RunTrigger: Boolean)
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
@@ -416,7 +416,7 @@
         JobPostLine.TestSalesLine(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure SalesLineOnBeforeDelete(var Rec: Record "Sales Line"; RunTrigger: Boolean)
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
@@ -445,7 +445,7 @@
             Rec."Job Contract Entry No." := JobPlanningLine."Job Contract Entry No.";
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'Job Contract Entry No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Job Contract Entry No.', true, true)]
     local procedure SalesLineJobContractEntryNoOnAfterValidate(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     begin
         if CheckJobsSetup(0) then
@@ -456,7 +456,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, true)]
     local procedure SalesPostOnBeforePostSale(var SalesHeader: Record "Sales Header")
     begin
         if CheckJobsSetup(0) then
@@ -464,7 +464,7 @@
         CheckSalesDoc(SalesHeader);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure SalesPostOnAfterPostSale(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
         PostedDocNo: Code[20];
@@ -486,7 +486,7 @@
         PostEventSalesDoc(JobPlanningLineInvoice, PostedDocType, PostedDocNo, SalesHeader."Posting Date");
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure SaleLinePOSOnAfterDelete(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
@@ -515,7 +515,7 @@
             until JobPlanningLineInvoice.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150615, 'OnAfterPostPOSEntryBatch', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Post Entries", 'OnAfterPostPOSEntryBatch', '', true, true)]
     local procedure POSPostEntriesOnAfterPostPOSEntryBatch(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
     var
         POSEntry2: Record "NPR POS Entry";
@@ -546,7 +546,7 @@
             until POSEntry2.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl", 'OnAfterLoadFromQuote', '', true, true)]
     local procedure POSActionLoadFromQuoteOnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
@@ -568,7 +568,7 @@
             until JobPlanningLineInvoice.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Page, 463, 'OnAfterActionEvent', 'NPR SetStatusToBlockEventDelete', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Jobs Setup", 'OnAfterActionEvent', 'NPR SetStatusToBlockEventDelete', true, true)]
     local procedure SetStatusesToBlockEventDelete(var Rec: Record "Jobs Setup")
     var
         GenericMultipleCheckList: Page "NPR Gen. Multiple Check List";

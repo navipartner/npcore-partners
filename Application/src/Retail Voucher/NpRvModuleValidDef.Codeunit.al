@@ -36,7 +36,7 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
             Error(Text004);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
     begin
         if VoucherModule.Get(VoucherModule.Type::"Validate Voucher", ModuleCode()) then
@@ -50,7 +50,7 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
         VoucherModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnHasValidateVoucherSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnHasValidateVoucherSetup', '', true, true)]
     local procedure OnHasValidateVoucherSetup(VoucherType: Record "NPR NpRv Voucher Type"; var HasValidateSetup: Boolean)
     begin
         if VoucherType."Validate Voucher Module" <> ModuleCode() then
@@ -59,14 +59,14 @@ codeunit 6151015 "NPR NpRv Module Valid.: Def."
         HasValidateSetup := false;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnSetupValidateVoucher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnSetupValidateVoucher', '', true, true)]
     local procedure OnSetupValidateVoucher(var VoucherType: Record "NPR NpRv Voucher Type")
     begin
         if VoucherType."Validate Voucher Module" <> ModuleCode() then
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunValidateVoucher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunValidateVoucher', '', true, true)]
     local procedure OnRunValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
     begin
         if Handled then

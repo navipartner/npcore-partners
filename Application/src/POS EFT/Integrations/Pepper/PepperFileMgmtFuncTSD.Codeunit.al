@@ -144,7 +144,7 @@ codeunit 6184495 "NPR Pepper FileMgmt. Func. TSD"
         FrontEnd.InvokeDevice(FileMgtRequest, 'Pepper_EftFileMgt', 'EftEndWorkshift');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', false, false)]
     local procedure OnDeviceResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
 

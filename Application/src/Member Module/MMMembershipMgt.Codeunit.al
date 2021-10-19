@@ -5035,7 +5035,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(MemberCard."Entry No.");
     end;
 
-    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateFindRecords', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateFindRecords', '', true, true)]
     local procedure OnAfterNavigateFindRecordsSubscriber(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
     var
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -5049,7 +5049,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateShowRecords', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
     local procedure OnAfterNavigateShowRecordsSubscriber(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean)
     var
         MembershipEntry: Record "NPR MM Membership Entry";

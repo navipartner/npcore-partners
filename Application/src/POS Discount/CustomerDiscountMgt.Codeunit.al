@@ -1,4 +1,4 @@
-﻿codeunit 6014433 "NPR Customer Discount Mgt."
+codeunit 6014433 "NPR Customer Discount Mgt."
 {
     trigger OnRun()
     begin
@@ -65,7 +65,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'InitDiscountPriority', '', true, true)]
     local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
         if DiscountPriority.Get(DiscSourceTableId()) then
@@ -79,7 +79,7 @@
         DiscountPriority.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014455, 'ApplyDiscount', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'ApplyDiscount', '', true, true)]
     local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
     begin
         if not IsSubscribedDiscount(DiscountPriority) then
@@ -88,7 +88,7 @@
         ApplyCustomerDiscount(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014455, 'OnFindActiveSaleLineDiscounts', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]
     local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     var
         DiscountPriority: Record "NPR Discount Priority";

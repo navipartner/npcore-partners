@@ -73,7 +73,7 @@ codeunit 6151508 "NPR Nc Task List Processing"
         exit(MaxRetry);
     end;
 
-    [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
@@ -95,7 +95,7 @@ codeunit 6151508 "NPR Nc Task List Processing"
         Rec.Validate("Parameter String", CopyStr(JQParamStrMgt.GetParamListAsCSString(), 1, MaxStrLen(Rec."Parameter String")));
     end;
 
-    [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Parameter String', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Parameter String', true, true)]
     local procedure OnValidateJobQueueEntryParameterString(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";

@@ -1,6 +1,6 @@
 codeunit 6014411 "NPR Event Dimension Mgt"
 {
-    [EventSubscriber(ObjectType::Codeunit, 408, 'OnAfterSetupObjectNoList', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::DimensionManagement, 'OnAfterSetupObjectNoList', '', true, false)]
     local procedure DimensionMgtOnLoadDimensions(var TempAllObjWithCaption: Record AllObjWithCaption temporary)
     begin
         InsertObject(TempAllObjWithCaption, DATABASE::"Item Category");

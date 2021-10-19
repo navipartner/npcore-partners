@@ -1,4 +1,4 @@
-﻿codeunit 6151525 "NPR Nc Endpoint Email Mgt."
+codeunit 6151525 "NPR Nc Endpoint Email Mgt."
 {
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     var
@@ -182,13 +182,13 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Trigger Task Mgt.", 'OnAfterGetOutputTriggerTask', '', false, false)]
     local procedure OnAfterGetOutputTriggerTaskFTPOutput(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     begin
         ProcessNcEndpoints(NcTriggerCode, Output, NcTask, Filename, Subject, Body);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151531, 'OnSetupEndpointTypes', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint Type", 'OnSetupEndpointTypes', '', false, false)]
     local procedure OnSetupEndpointTypeInsertEndpointTypeCode()
     var
         NcEndpointEmail: Record "NPR Nc Endpoint E-mail";
@@ -201,7 +201,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151533, 'OnOpenEndpointSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint", 'OnOpenEndpointSetup', '', false, false)]
     local procedure OnOpenEndpointSetupOpenPage(var Sender: Record "NPR Nc Endpoint"; var Handled: Boolean)
     var
         NcEndpointEmail: Record "NPR Nc Endpoint E-mail";
@@ -225,7 +225,7 @@
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151533, 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnDeleteEndpoint(var Rec: Record "NPR Nc Endpoint"; RunTrigger: Boolean)
     var
         NcEndpointEmail: Record "NPR Nc Endpoint E-mail";
@@ -234,7 +234,7 @@
             NcEndpointEmail.Delete(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151519, 'OnRunEndpoint', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Endpoint Mgt.", 'OnRunEndpoint', '', true, true)]
     local procedure OnRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint")
     var
         NcEndpointEmail: Record "NPR Nc Endpoint E-mail";

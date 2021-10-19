@@ -50,49 +50,49 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         exit(StrPos(UpperCase(Text), DeviceCode()) > 0);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnInitJob', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnInitJob', '', false, false)]
     local procedure OnInitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
         Init(DeviceSettings);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnEndJob', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnEndJob', '', false, false)]
     local procedure OnEndJob()
     begin
         EndJob();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrintData', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrintData', '', false, false)]
     local procedure OnPrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     begin
         PrintData(POSPrintBuffer.Text, POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.X, POSPrintBuffer.Y);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnLookupFont', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupFont', '', false, false)]
     local procedure OnLookupFont(var LookupOK: Boolean; var Value: Text)
     begin
         LookupOK := SelectFont(Value);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnLookupDeviceSetting', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnLookupDeviceSetting', '', false, false)]
     local procedure OnLookupDeviceSetting(var LookupOK: Boolean; var tmpDeviceSetting: Record "NPR RP Device Settings" temporary)
     begin
         LookupOK := SelectDeviceSetting(tmpDeviceSetting);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnGetPageWidth', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPageWidth', '', false, false)]
     local procedure OnGetPageWidth(FontFace: Text[30]; var Width: Integer)
     begin
         Width := GetPageWidth(FontFace);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnGetTargetEncoding', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetTargetEncoding', '', false, false)]
     local procedure OnGetTargetEncoding(var TargetEncoding: Text)
     begin
         TargetEncoding := GetEncoding();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrepareJobForHTTP', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrepareJobForHTTP', '', false, false)]
     local procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text; var HTTPEndpoint: Text; var Supported: Boolean)
     begin
         FormattedTargetEncoding := GetEncoding();
@@ -100,26 +100,26 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib."
         Supported := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrepareJobForBluetooth', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnPrepareJobForBluetooth', '', false, false)]
     local procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text; var Supported: Boolean)
     begin
         FormattedTargetEncoding := GetEncoding();
         Supported := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnGetPrintBytes', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnGetPrintBytes', '', false, false)]
     local procedure OnGetPrintBytes(var PrintBytes: Text)
     begin
         PrintBytes := PrintBuffer;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnSetPrintBytes', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnSetPrintBytes', '', false, false)]
     local procedure OnSetPrintBytes(var PrintBytes: Text)
     begin
         PrintBuffer := PrintBytes;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnBuildDeviceList', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Printer Interf.", 'OnBuildDeviceList', '', false, false)]
     local procedure OnBuildDeviceList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         tmpRetailList.Number += 1;

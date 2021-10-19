@@ -130,7 +130,7 @@ codeunit 6014580 "NPR Object Output Mgt."
         exit(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014547, 'OnSendPrintJob', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnSendPrintJob', '', false, false)]
     local procedure OnSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
     var
         ObjectOutput: Record "NPR Object Output Selection";
@@ -191,7 +191,7 @@ codeunit 6014580 "NPR Object Output Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014549, 'OnSendPrintJob', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnSendPrintJob', '', false, false)]
     local procedure OnSendLinePrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Line Printer Interf."; NoOfPrints: Integer)
     var
         ObjectOutput: Record "NPR Object Output Selection";
@@ -252,7 +252,7 @@ codeunit 6014580 "NPR Object Output Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014547, 'OnGetDeviceType', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnGetDeviceType', '', false, false)]
     local procedure OnGetMatrixDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
     var
         ObjectOutput: Record "NPR Object Output Selection";
@@ -263,7 +263,7 @@ codeunit 6014580 "NPR Object Output Mgt."
             DeviceType := ObjectOutput."Output Path";
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014549, 'OnGetDeviceType', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnGetDeviceType', '', false, false)]
     local procedure OnGetLineDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
     var
         ObjectOutput: Record "NPR Object Output Selection";

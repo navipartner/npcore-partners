@@ -4,7 +4,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         ReadingErr: Label 'executing WYSIWYG editor';
         SettingScopeErr: Label 'setting scope in WYSIWYG editor';
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnWysiwygMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";

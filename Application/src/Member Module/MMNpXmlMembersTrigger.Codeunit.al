@@ -5,7 +5,7 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151553, 'OnSetupGenericParentTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Trigger Mgt.", 'OnSetupGenericParentTable', '', true, true)]
     local procedure IsContactMembershipInfoComplete(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
     var
         Contact: Record Contact;
@@ -92,7 +92,7 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151553, 'OnSetupGenericParentTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Trigger Mgt.", 'OnSetupGenericParentTable', '', true, true)]
     local procedure IsMembershipValidForExport(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
     var
         Membership: Record "NPR MM Membership";

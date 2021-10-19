@@ -53,7 +53,7 @@ codeunit 6150618 "NPR POS Entry Output Log Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014581, 'OnAfterRunReportSelectionType', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Retail Report Select. Mgt.", 'OnAfterRunReportSelectionType', '', false, false)]
     local procedure OnAfterRunReportSelectionTypeCreatePOSEntryOutputLog(ReportSelectionRetail: Record "NPR Report Selection Retail"; RecRef: RecordRef)
     begin
         if ReportSelectionRetail."Report Type" in [ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)",

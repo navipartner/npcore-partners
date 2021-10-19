@@ -1,4 +1,4 @@
-﻿codeunit 6059979 "NPR Variety Calculations"
+codeunit 6059979 "NPR Variety Calculations"
 {
 
     trigger OnRun()
@@ -18,7 +18,7 @@
         CalculatedForItem: Code[20];
         ScheduledReceipt: Decimal;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupInventoryPerLocation(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         TempInvBuffer: Record "Inventory Buffer" temporary;
@@ -59,7 +59,7 @@
             PAGE.RunModal(6059976, TempInvBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupLocation(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         Location: Record Location;
@@ -78,7 +78,7 @@
             PAGE.RunModal(0, Location);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupItemReference(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         ItemReference: Record "Item Reference";
@@ -97,7 +97,7 @@
             PAGE.RunModal(0, ItemReference);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupAvailabilityByEvent(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
@@ -112,7 +112,7 @@
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByEvent());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupAvailabilityByVariant(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
@@ -127,7 +127,7 @@
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByVariant());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupAvailabilityByLocation(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
@@ -142,7 +142,7 @@
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByLocation());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupAvailabilityByPeriod(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
@@ -157,7 +157,7 @@
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByPeriod());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupAvailabilityByTimeLine(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
         Item: Record Item;
@@ -173,7 +173,7 @@
         ItemAvailByTimeline.Run();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetItemReference(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     var
         ItemRef: Record "Item Reference";
@@ -187,7 +187,7 @@
             FieldValue := ItemRef."Reference No.";
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetQuantityAvailable(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetQuantityAvailable') then
@@ -198,7 +198,7 @@
         FieldValue := Format(QtyAvailable);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetExpectedInventory(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetExpectedInventory') then
@@ -209,7 +209,7 @@
         FieldValue := Format(ExpectedInventory);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetProjAvailableBalance(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetProjAvailableBalance') then
@@ -220,7 +220,7 @@
         FieldValue := Format(ProjAvailableBalance);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetPlannedOrderReleases(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetPlannedOrderReleases') then
@@ -231,7 +231,7 @@
         FieldValue := Format(PlannedOrderReleases);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetScheduledRcpt(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetScheduledRcpt') then
@@ -242,7 +242,7 @@
         FieldValue := Format(ScheduledReceipt);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetPlannedOrderRcpt(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetPlannedOrderRcpt') then
@@ -253,7 +253,7 @@
         FieldValue := Format(PlannedOrderRcpt);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetGrossRequirement(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetGrossRequirement') then
@@ -264,7 +264,7 @@
         FieldValue := Format(GrossRequirement);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetQuantityAvailableToPromise(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     var
         AvailableToPromise: Codeunit "Available to Promise";
@@ -296,7 +296,7 @@
             LookaheadDateformula));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetQuantityAvailableToPromise2(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
         if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetQuantityAvailableToPromise2') then

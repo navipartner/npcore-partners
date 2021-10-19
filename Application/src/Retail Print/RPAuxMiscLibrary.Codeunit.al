@@ -288,7 +288,7 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     end;
 
 
-    [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionCodeunitList', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionCodeunitList', '', false, false)]
     local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
     var
         AllObj: Record AllObj;
@@ -299,7 +299,7 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         tmpAllObj.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionList', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnBuildFunctionList', '', false, false)]
     local procedure OnBuildFunctionList(CodeunitID: Integer; var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux - Misc. Library" then
@@ -345,7 +345,7 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         AddFunction(tmpRetailList, 'RECEIPT_REPRINT_COUNT');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014445, 'OnFunction', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnFunction', '', false, false)]
     local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
     begin
         if CodeunitID <> CODEUNIT::"NPR RP Aux - Misc. Library" then

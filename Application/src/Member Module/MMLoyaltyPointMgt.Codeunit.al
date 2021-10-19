@@ -19,7 +19,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         EXPIRE_FORMULA: Label '%1  is expected to be greater than %2.';
         SUBTOTAL_ZERO: Label 'The SubTotal parameter must not be zero when discount type is based on "discount %" for %1 %2.';
 
-    [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterInsertValueEntry', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterInsertValueEntry', '', true, true)]
     local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line")
     var
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
@@ -128,7 +128,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
           );
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnDiscoverPointAssignmentSaleWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
@@ -143,7 +143,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         Rec.Enabled := false;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure PointAssignmentOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
@@ -1777,7 +1777,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertRmaEntry', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertRmaEntry', '', true, true)]
     local procedure OnReturnSale(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         RMALine: Record "NPR POS RMA Line";

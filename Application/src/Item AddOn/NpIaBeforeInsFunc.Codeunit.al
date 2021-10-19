@@ -1,6 +1,6 @@
 codeunit 6151129 "NPR NpIa Before Ins. Func."
 {
-    [EventSubscriber(ObjectType::Codeunit, 6151125, 'BeforeInsertPOSAddOnLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpIa Item AddOn Mgt.", 'BeforeInsertPOSAddOnLine', '', true, true)]
     local procedure UnitPriceFromMaster(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -22,7 +22,7 @@ codeunit 6151129 "NPR NpIa Before Ins. Func."
         NpIaItemAddOnLine."Unit Price" := (SaleLinePOS."Amount Including VAT" / SaleLinePOS.Quantity) * (NpIaItemAddOnLineSetup."Unit Price % from Master" / 100);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151125, 'HasBeforeInsertSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpIa Item AddOn Mgt.", 'HasBeforeInsertSetup', '', true, true)]
     local procedure UnitPriceFromMasterHasSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var HasSetup: Boolean)
     begin
         if HasSetup then
@@ -35,7 +35,7 @@ codeunit 6151129 "NPR NpIa Before Ins. Func."
         HasSetup := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151125, 'RunBeforeInsertSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpIa Item AddOn Mgt.", 'RunBeforeInsertSetup', '', true, true)]
     local procedure UnitPriceFromMasterRunSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var Handled: Boolean)
     var
         NpIaItemAddOnLineSetup: Record "NPR NpIa ItemAddOn Line Setup";
@@ -60,7 +60,7 @@ codeunit 6151129 "NPR NpIa Before Ins. Func."
         PAGE.Run(PAGE::"NPR NpIa ItemAddOn Line Setup", NpIaItemAddOnLineSetup);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151126, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpIa Item AddOn Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteAddOnLine(var Rec: Record "NPR NpIa Item AddOn Line"; RunTrigger: Boolean)
     var
         NpIaItemAddOnLineSetup: Record "NPR NpIa ItemAddOn Line Setup";

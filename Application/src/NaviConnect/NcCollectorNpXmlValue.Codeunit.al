@@ -1,4 +1,4 @@
-﻿codeunit 6151530 "NPR Nc Collector NpXml Value"
+codeunit 6151530 "NPR Nc Collector NpXml Value"
 {
     TableNo = "NPR NpXml Custom Val. Buffer";
 
@@ -32,7 +32,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure OnGetXMLValueMarkAsProcessed(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
         NcCollection: Record "NPR Nc Collection";
@@ -56,7 +56,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151551, 'OnSetupGenericChildTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Mgt.", 'OnSetupGenericChildTable', '', true, true)]
     local procedure CollectionLine2Item(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var
         Item: Record Item;

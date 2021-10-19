@@ -1,4 +1,4 @@
-﻿codeunit 6151526 "NPR Nc Endpoint File Mgt."
+codeunit 6151526 "NPR Nc Endpoint File Mgt."
 {
     var
         TextFileDownloadedLbl: Label 'The file was downloaded.';
@@ -143,13 +143,13 @@
             DownloadFromStream(InStr, 'Save file as...', NcEndpointFile.Path, 'All Files|*.*', NcTaskOutput.Name);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Trigger Task Mgt.", 'OnAfterGetOutputTriggerTask', '', false, false)]
     local procedure OnAfterGetOutputTriggerTaskFileOutput(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     begin
         ProcessNcEndpoints(NcTriggerCode, Output, NcTask, Filename);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151531, 'OnSetupEndpointTypes', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint Type", 'OnSetupEndpointTypes', '', false, false)]
     local procedure OnSetupEndpointTypeInsertEndpointTypeCode()
     var
         NcEndpointFile: Record "NPR Nc Endpoint File";
@@ -162,7 +162,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151533, 'OnOpenEndpointSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint", 'OnOpenEndpointSetup', '', false, false)]
     local procedure OnOpenEndpointSetupOpenPage(var Sender: Record "NPR Nc Endpoint"; var Handled: Boolean)
     var
         NcEndpointFile: Record "NPR Nc Endpoint File";
@@ -186,7 +186,7 @@
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151533, 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnDeleteEndpoint(var Rec: Record "NPR Nc Endpoint"; RunTrigger: Boolean)
     var
         NcEndpointFile: Record "NPR Nc Endpoint File";
@@ -195,7 +195,7 @@
             NcEndpointFile.Delete(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151519, 'OnRunEndpoint', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Endpoint Mgt.", 'OnRunEndpoint', '', true, true)]
     local procedure OnRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint")
     var
         NcEndpointFile: Record "NPR Nc Endpoint File";

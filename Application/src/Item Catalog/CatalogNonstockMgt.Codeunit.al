@@ -1,4 +1,4 @@
-﻿codeunit 6060063 "NPR Catalog Nonstock Mgt."
+codeunit 6060063 "NPR Catalog Nonstock Mgt."
 {
     local procedure CopyNonstockAttributesToItem(var NonstockItem: Record "Nonstock Item")
     var
@@ -57,7 +57,7 @@
         NPRAttributeValueSet.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Table, 5718, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Nonstock Item", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyItemNoUpdateAttributes(var Rec: Record "Nonstock Item"; var xRec: Record "Nonstock Item"; RunTrigger: Boolean)
     begin
         if Rec."Item No." = '' then

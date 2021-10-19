@@ -378,7 +378,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Table, 36, 'OnAfterValidateEvent', 'Shipping Agent Service Code', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Shipping Agent Service Code', false, false)]
     local procedure OnAfterModifyShippingAgentSerEventSalesHeader(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer);
     begin
         if Rec.ISTEMPORARY then
@@ -386,7 +386,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         ValidateShipmentMethodCode(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'Quantity', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Quantity', false, false)]
     local procedure OnAfterModifyQtyEventSalesLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer);
     var
         SalesHeader: Record "Sales Header";
@@ -413,7 +413,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
     end;
 
 
-    [EventSubscriber(ObjectType::Page, 6014574, 'GetPackageProvider', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Setup", 'GetPackageProvider', '', true, true)]
     local procedure IdentifyMe_GetPackageProvider(var Sender: Page "NPR Pacsoft Setup"; var tmpAllObjWithCaption: Record AllObjWithCaption temporary);
     var
         AllObjWithCaption: Record AllObjWithCaption;
@@ -429,7 +429,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostSalesDoc', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, false)]
     local procedure C80OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
     var
         RecRefSalesHeader: RecordRef;
@@ -440,7 +440,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         TestFieldPakkelabels(RecRefSalesHeader);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
     local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]);
     var
         SalesShptHeader: Record "Sales Shipment Header";
@@ -734,7 +734,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             CreateShipment(ShipmentDocument, Silent)
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014440, 'OnAfterActionEvent', 'SendDocument', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Shipment Documents", 'OnAfterActionEvent', 'SendDocument', true, true)]
     local procedure P6014440OnAfterActionEventSendDoc(var Rec: Record "NPR Pacsoft Shipment Document");
     begin
         if not InitPackageProvider() then
@@ -742,7 +742,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         CreateShipment(Rec, false)
     end;
 
-    [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'NPR PrintShipmentDocument', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Posted Sales Shipment", 'OnAfterActionEvent', 'NPR PrintShipmentDocument', true, true)]
     local procedure P130OnAfterActionEventCreatePackage(var Rec: Record "Sales Shipment Header");
     var
         SalesShptHeader: Record "Sales Shipment Header";
@@ -781,7 +781,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014440, 'OnAfterActionEvent', 'PrintDocument', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Shipment Documents", 'OnAfterActionEvent', 'PrintDocument', false, false)]
     local procedure P6014440OnAfterActionEventPrintDocument(var Rec: Record "NPR Pacsoft Shipment Document");
     var
         JToken: JsonToken;
@@ -797,7 +797,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 36, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterModifyEvent', '', true, true)]
     local procedure T36OnAfterModifyEvent(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; RunTrigger: Boolean);
     var
         ForeignShipmentMapping: Record "NPR Pakke Foreign Shipm. Map.";
@@ -818,7 +818,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014574, 'OnAfterActionEvent', 'Check Balance', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Setup", 'OnAfterActionEvent', 'Check Balance', false, false)]
     local procedure GetBalance(var Rec: Record "NPR Pacsoft Setup");
     var
         Jtoken: JsonToken;
@@ -831,7 +831,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         message(GetJsonText(JToken, 'amount', 0));
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014575, 'OnAfterActionEvent', 'GetPrinter', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Package Printers", 'OnAfterActionEvent', 'GetPrinter', false, false)]
     local procedure FetchPrinters(var Rec: Record "NPR Package Printers");
     begin
         GetPrinters(1, false);

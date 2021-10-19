@@ -48,7 +48,7 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
             Error(Text002, Coupon."Max Use per Sale");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
         if CouponModule.Get(CouponModule.Type::"Validate Coupon", ModuleCode()) then
@@ -62,7 +62,7 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
         CouponModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnHasValidateCouponSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnHasValidateCouponSetup', '', true, true)]
     local procedure OnHasValidateCouponSetup(CouponType: Record "NPR NpDc Coupon Type"; var HasValidateSetup: Boolean)
     begin
         if not IsSubscriber(CouponType) then
@@ -71,14 +71,14 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
         HasValidateSetup := false;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnSetupValidateCoupon', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnSetupValidateCoupon', '', true, true)]
     local procedure OnSetupValidateCoupon(var CouponType: Record "NPR NpDc Coupon Type")
     begin
         if not IsSubscriber(CouponType) then
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunValidateCoupon', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpDc Coupon Module Mgt.", 'OnRunValidateCoupon', '', true, true)]
     local procedure OnRunValidateCoupon(SalePOS: Record "NPR POS Sale"; Coupon: Record "NPR NpDc Coupon"; var Handled: Boolean)
     begin
         if Handled then

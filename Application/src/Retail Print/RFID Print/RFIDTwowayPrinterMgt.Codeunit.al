@@ -82,7 +82,7 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059830, 'OnSetRFIDHandlerCodeunit', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RFID Two-way Printer Mgt.", 'OnSetRFIDHandlerCodeunit', '', false, false)]
     local procedure OnSubscribeSetRFIDHandlerCodeunit(CodeunitID: Integer)
     begin
         if HandlerCodeunit = CodeunitID then
@@ -93,7 +93,7 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
         HandlerCodeunit := CodeunitID;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014580, 'OnBeforeSendMatrixPrint', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Object Output Mgt.", 'OnBeforeSendMatrixPrint', '', false, false)]
     local procedure OnBeforeSendMatrixObjectOutput(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer; var Skip: Boolean)
     var
         i: Integer;
@@ -123,7 +123,7 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014413, 'OnBeforePrintRetailJournal', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Label Library", 'OnBeforePrintRetailJournal', '', false, false)]
     local procedure OnBeforePrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
     begin
         Skip := true;

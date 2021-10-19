@@ -166,7 +166,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         SMSManagement.SendSMS(Voucher."Phone No.", SMSTemplateHeader."Alt. Sender", SMSMessage);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
     begin
         if VoucherModule.Get(VoucherModule.Type::"Send Voucher", ModuleCode()) then
@@ -180,7 +180,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         VoucherModule.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnHasSendVoucherSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnHasSendVoucherSetup', '', true, true)]
     local procedure OnHasSendVoucherSetup(VoucherType: Record "NPR NpRv Voucher Type"; var HasSendSetup: Boolean)
     begin
         if not IsSubscriber(VoucherType) then
@@ -189,7 +189,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         HasSendSetup := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnSetupSendVoucher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnSetupSendVoucher', '', true, true)]
     local procedure OnSetupSendVoucher(var VoucherType: Record "NPR NpRv Voucher Type")
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
@@ -226,7 +226,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunSendVoucher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunSendVoucher', '', true, true)]
     local procedure OnRunSendVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; var Handled: Boolean)
     begin
         if Handled then

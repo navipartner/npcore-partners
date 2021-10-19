@@ -1,11 +1,11 @@
-﻿codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
+codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
 {
     var
         NoDaysSetErr: Label 'You need to set at least one day of the week.';
         RecreateConfirm: Label 'This line will be deleted and recreated. Any related grouping lines will be deleted and recreated per new setup. Do you want to continue?';
         Desc2AsPeriod: Label 'From %1 to %2, total: %3 lines';
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure JobPlanningLineOnAfterDelete(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         JobPlanningLine: Record "Job Planning Line";

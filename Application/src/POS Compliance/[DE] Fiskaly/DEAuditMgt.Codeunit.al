@@ -66,7 +66,7 @@ codeunit 6014444 "NPR DE Audit Mgt."
     end;
 
     // Insert the workflow step in  POS Workflows
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     var
         Text000: Label 'Create Sales in DE Fiskaly';

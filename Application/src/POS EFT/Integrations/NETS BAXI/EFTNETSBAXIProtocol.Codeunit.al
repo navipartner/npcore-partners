@@ -548,7 +548,7 @@ codeunit 6184541 "NPR EFT NETS BAXI Protocol"
         exit('EFT_' + EFTNETSBAXIIntegration.IntegrationType());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', false, false)]
     local procedure Device_Response(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         EFTNETSBAXIRespParser: Codeunit "NPR EFT NETS BAXI Resp. Pars.";
@@ -570,7 +570,7 @@ codeunit 6184541 "NPR EFT NETS BAXI Protocol"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', false, false)]
     local procedure AppGateway_Response(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
         EFTNETSBAXIRespParser: Codeunit "NPR EFT NETS BAXI Resp. Pars.";

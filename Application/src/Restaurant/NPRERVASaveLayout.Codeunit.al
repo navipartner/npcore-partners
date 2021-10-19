@@ -1,4 +1,4 @@
-﻿codeunit 6150683 "NPR NPRE RVA: Save Layout"
+codeunit 6150683 "NPR NPRE RVA: Save Layout"
 {
     local procedure ActionCode(): Code[20]
     begin
@@ -277,8 +277,8 @@
 
     procedure CreateNoSeries(NoSeriesCode: Code[20]; Desc: Text; StartNumber: Code[20]): Code[20];
     var
-        NoSeries: Record 308;
-        NoSeriesLine: Record 309;
+        NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
     begin
         if NoSeries.Get(NoSeriesCode) then
             exit(NoSeriesCode);

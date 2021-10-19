@@ -309,7 +309,7 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTWrapper.ShowVarietyMatrix(Rec, 0);
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'NPR Variety Group', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'NPR Variety Group', true, false)]
     local procedure T27OnAfterValVarietyGroup(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     var
         VrtGroup: Record "NPR Variety Group";

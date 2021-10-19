@@ -20,7 +20,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         exit('FLEXIITERM');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
         tmpEFTIntegrationType.Init();
@@ -30,7 +30,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         tmpEFTIntegrationType.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
@@ -43,7 +43,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         EFTSetup.ShowEftPOSUnitParameters();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationPaymentSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
@@ -55,7 +55,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         EFTSetup.ShowEftPaymentParameters();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -67,7 +67,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateRefundRequest', '', false, false)]
     local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -79,7 +79,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateGiftCardLoadRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateGiftCardLoadRequest', '', false, false)]
     local procedure OnCreateGiftcardLoadRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         //-NPR5.51 [359385]
@@ -92,7 +92,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         //+NPR5.51 [359385]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         EFTFlexiitermProtocol: Codeunit "NPR EFT Flexiiterm Prot.";
@@ -104,7 +104,7 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         EFTFlexiitermProtocol.SendRequest(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184516, 'OnAfterProtocolResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Flexiiterm Prot.", 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";

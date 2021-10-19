@@ -1,4 +1,4 @@
-﻿codeunit 6060119 "NPR TM Ticket Request Manager"
+codeunit 6060119 "NPR TM Ticket Request Manager"
 {
 
     trigger OnRun()
@@ -1528,7 +1528,7 @@
 
     // ****************** NP-Pass eTicket Integration
 
-    [EventSubscriber(ObjectType::Codeunit, 6060119, 'OnAfterBlockTicketPublisher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR TM Ticket Request Manager", 'OnAfterBlockTicketPublisher', '', true, true)]
     local procedure OnAfterBlockTicketSubscriber(TicketNo: Code[20])
     var
         ResponseText: Text;
@@ -1537,7 +1537,7 @@
         SendETicketVoidRequest(TicketNo, true, ResponseText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060119, 'OnAfterUnblockTicketPublisher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR TM Ticket Request Manager", 'OnAfterUnblockTicketPublisher', '', true, true)]
     local procedure OnAfterUnblockTicketSubscriber(TicketNo: Code[20])
     var
         ResponseText: Text;
@@ -1546,7 +1546,7 @@
         SendETicketVoidRequest(TicketNo, false, ResponseText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060119, 'OnAfterConfirmTicketChangeRequestPublisher', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR TM Ticket Request Manager", 'OnAfterConfirmTicketChangeRequestPublisher', '', true, true)]
     local procedure OnAfterConfirmTicketChangeRequestSubscriber(Token: Text[100]);
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";

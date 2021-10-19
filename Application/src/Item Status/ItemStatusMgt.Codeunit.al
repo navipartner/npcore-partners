@@ -1,4 +1,4 @@
-﻿codeunit 6060055 "NPR Item Status Mgt."
+codeunit 6060055 "NPR Item Status Mgt."
 {
     // NPR5.25\BR  \20160720  CASE 246088 Object Created
 
@@ -10,7 +10,7 @@
     var
         TextErrorStatusNotActive: Label 'Item %1 has status %2. This status does not have %3 activated.';
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnInsertItemSetInitalStatus(var Rec: Record Item; RunTrigger: Boolean)
     var
         ItemStatus: Record "NPR Item Status";
@@ -25,7 +25,7 @@
             Rec.Validate("NPR Item Status", CreateInitialStatus());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 21, 'OnAfterCheckItemJnlLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Check Line", 'OnAfterCheckItemJnlLine', '', true, true)]
     local procedure OnAfterCheckItemJnlLineCheckIfAllowed(var ItemJnlLine: Record "Item Journal Line")
     var
         Item: Record Item;
@@ -49,7 +49,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteItemCheckIfAllowed(var Rec: Record Item; RunTrigger: Boolean)
     var
         ItemStatus: Record "NPR Item Status";
@@ -64,7 +64,7 @@
             Error(TextErrorStatusNotActive, Rec."No.", ItemStatus.Description, ItemStatus.FieldCaption("Delete Allowed"));
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnBeforeRenameEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeRenameEvent', '', true, true)]
     local procedure OnBeforeRenameItemCheckIfAllowed(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
         ItemStatus: Record "NPR Item Status";
@@ -79,7 +79,7 @@
             Error(TextErrorStatusNotActive, xRec."No.", ItemStatus.Description, ItemStatus.FieldCaption("Rename Allowed"));
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnBeforeValidateEvent', 'No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeValidateEvent', 'No.', true, true)]
     local procedure OnBeforeValidateNoSalesLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         Item: Record Item;
@@ -99,7 +99,7 @@
             Error(TextErrorStatusNotActive, Item."No.", ItemStatus.Description, ItemStatus.FieldCaption("Sales Insert"));
     end;
 
-    [EventSubscriber(ObjectType::Table, 39, 'OnBeforeValidateEvent', 'No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnBeforeValidateEvent', 'No.', true, true)]
     local procedure OnBeforeValidateNoPurchaseLine(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var
         Item: Record Item;

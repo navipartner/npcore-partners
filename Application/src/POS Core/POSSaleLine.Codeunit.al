@@ -1,4 +1,4 @@
-﻿codeunit 6150706 "NPR POS Sale Line"
+codeunit 6150706 "NPR POS Sale Line"
 {
     trigger OnRun()
     begin
@@ -524,7 +524,7 @@
         exit('AFTER_INSERT_LINE');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150729, 'OnDiscoverPOSSalesWorkflows', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
         Sender.DiscoverPOSSalesWorkflow(OnBeforeInsertSaleLineCode(), Text000, CurrCodeunitId(), 'OnBeforeInsertSaleLine');

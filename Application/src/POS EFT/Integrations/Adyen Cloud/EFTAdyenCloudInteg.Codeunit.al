@@ -1,4 +1,4 @@
-﻿codeunit 6184517 "NPR EFT Adyen Cloud Integ."
+codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 {
 
     trigger OnRun()
@@ -32,7 +32,7 @@
         exit('ADYEN_CLOUD');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
         tmpEFTIntegrationType.Init();
@@ -42,7 +42,7 @@
         tmpEFTIntegrationType.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
         //Any non standard EFT operations are registered here:
@@ -84,7 +84,7 @@
         tmpEFTAuxOperation.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
@@ -95,7 +95,7 @@
         EFTSetup.ShowEftPOSUnitParameters();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationPaymentSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
@@ -108,7 +108,7 @@
         PAGE.RunModal(PAGE::"NPR EFT Adyen Paym. Type Setup", EFTAdyenPaymentTypeSetup);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -127,7 +127,7 @@
         EftTransactionRequest.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateLookupTransactionRequest', '', false, false)]
     local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
@@ -151,7 +151,7 @@
         EftTransactionRequest.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateRefundRequest', '', false, false)]
     local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
@@ -180,7 +180,7 @@
         EftTransactionRequest.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVoidRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVoidRequest', '', false, false)]
     local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
@@ -206,7 +206,7 @@
         EftTransactionRequest.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVerifySetupRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVerifySetupRequest', '', false, false)]
     local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -219,7 +219,7 @@
         EftTransactionRequest.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateAuxRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateAuxRequest', '', false, false)]
     local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -232,7 +232,7 @@
         EftTransactionRequest.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
@@ -247,7 +247,7 @@
         EFTAdyenCloudProtocol.SendEftDeviceRequest(EftTransactionRequest, true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterFinancialCommit', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
@@ -257,7 +257,7 @@
             Message(GetLastErrorText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterPaymentConfirm', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterPaymentConfirm', '', false, false)]
     local procedure OnAfterPaymentConfirm(EftTransactionRequest: Record "NPR EFT Transaction Request"; var DoNotResume: Boolean)
     var
         EFTAdyenCloudSignDialog: Codeunit "NPR EFT Adyen Cloud Sign Dia.";
@@ -282,7 +282,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforePauseFrontEnd', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforePauseFrontEnd', '', false, false)]
     local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
         if not EFTTransactionRequest.IsType(IntegrationType()) then
@@ -294,7 +294,7 @@
         //POS is not robust against Pause & Resume without client ping-pong so we skip both for SETUP,VOID,LOOKUP operations as they are all server-side synchronous API requests in Adyen
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforeResumeFrontEnd', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforeResumeFrontEnd', '', false, false)]
     local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";

@@ -7,7 +7,7 @@ report 6014495 "NPR Whse. - Shipment"
     ApplicationArea = NPRRetail;
     Caption = 'Whse. - Shipment';
     DataAccessIntent = ReadOnly;
-    
+
     dataset
     {
         dataitem("Warehouse Shipment Header"; "Warehouse Shipment Header")

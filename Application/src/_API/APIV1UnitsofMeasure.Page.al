@@ -98,7 +98,7 @@ page 6014489 "NPR APIV1 - Units of Measure"
     end;
 
     var
-        TempFieldSet: Record 2000000041 temporary;
+        TempFieldSet: Record Field temporary;
 
     local procedure RegisterFieldSet(FieldNo: Integer)
     begin

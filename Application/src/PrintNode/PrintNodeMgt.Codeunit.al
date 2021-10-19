@@ -154,7 +154,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
         exit('');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnAddHandlingProfilesToLibrary', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnAddHandlingProfilesToLibrary', '', true, true)]
     local procedure AddNaviDocsHandlingProfile()
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
@@ -167,7 +167,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
         exit('PRINTNODE-PDF');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnManageDocument', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnManageDocument', '', true, true)]
     local procedure HandleNaviDocsDocument(var IsDocumentHandled: Boolean; ProfileCode: Code[20]; var NaviDocsEntry: Record "NPR NaviDocs Entry"; ReportID: Integer; var WithSuccess: Boolean; var ErrorMessage: Text)
     var
         TempBlob: Codeunit "Temp Blob";

@@ -71,7 +71,7 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
         exit(RetailReportSelection."Report ID");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014464, 'SendReportEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR E-mail Doc. Mgt.", 'SendReportEvent', '', false, false)]
     local procedure SendReport(RecVariant: Variant; Silent: Boolean)
     var
         RecRef: RecordRef;

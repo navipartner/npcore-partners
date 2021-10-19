@@ -53,7 +53,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         CreateLogEntryMembership(MembershipSetup."GDPR Agreement No.", MembershipSetup."GDPR Mode", MembershipEntry."Membership Entry No.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151120, 'OnNewAgreementVersion', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR GDPR Management", 'OnNewAgreementVersion', '', true, true)]
     local procedure OnNewAgreementVersion(AgreementNo: Code[20])
     var
         MembershipSetup: Record "NPR MM Membership Setup";

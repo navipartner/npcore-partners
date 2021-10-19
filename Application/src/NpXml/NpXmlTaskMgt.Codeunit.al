@@ -123,7 +123,7 @@ codeunit 6151550 "NPR NpXml Task Mgt."
             until NpXmlTemplate.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151501, 'IsUniqueTask', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'IsUniqueTask', '', true, true)]
     local procedure IsUniqueTask(TaskProcessor: Record "NPR Nc Task Processor"; var TempTask: Record "NPR Nc Task" temporary; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary; var IsUnique: Boolean; var Checked: Boolean)
     var
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
