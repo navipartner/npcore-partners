@@ -1,4 +1,4 @@
-﻿codeunit 6184850 "NPR FR Audit Mgt."
+codeunit 6184850 "NPR FR Audit Mgt."
 {
     SingleInstance = true;
 
@@ -997,7 +997,7 @@
         Clear(CertificateLoaded);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150619, 'OnLookupAuditHandler', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
     local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         tmpRetailList.Number += 1;
@@ -1005,7 +1005,7 @@
         tmpRetailList.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150619, 'OnArchiveWorkshiftPeriod', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnArchiveWorkshiftPeriod', '', true, true)]
     local procedure OnArchiveWorkshiftPeriod(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         FRPeriodArchive: XMLport "NPR FR Audit Archive";
@@ -1040,7 +1040,7 @@
         Clear(InStream);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150619, 'OnHandleAuditLogBeforeInsert', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogBeforeInsert', '', true, true)]
     local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
     var
         POSUnit: Record "NPR POS Unit";
@@ -1099,7 +1099,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014534, 'OnSalesReceiptFooter', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Aux: Event Publishers", 'OnSalesReceiptFooter', '', true, true)]
     local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text)
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
@@ -1140,7 +1140,7 @@
         LinePrintMgt.AddTextField(1, TemplateLine.Align, PrintSignature);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150619, 'OnValidateLogRecords', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnValidateLogRecords', '', true, true)]
     local procedure OnValidateLogRecords(var POSAuditLog: Record "NPR POS Audit Log"; var Handled: Boolean)
     var
         BaseValue: Text;
@@ -1208,7 +1208,7 @@
         Error(''); //Rollback modifications to entries done while recalculating & verifying signature.
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150627, 'OnAfterCreateBalancingEntry', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterCreateBalancingEntry', '', false, false)]
     local procedure OnAfterCreateBalancingEntry(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         POSEntry: Record "NPR POS Entry";

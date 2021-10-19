@@ -3,7 +3,7 @@ codeunit 6151205 "NPR NpCs POSSession Mgt."
     var
         Text000: Label 'Deliver and Print Collect in Store Document';
 
-    [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnAfterDeletePOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
         NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
@@ -65,7 +65,7 @@ codeunit 6151205 "NPR NpCs POSSession Mgt."
         NpCsCollectMgt.UpdateDeliveryStatus(NpCsDocument, NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Document Type"::"POS Entry", NpCsSaleLinePOSReference."Sales Ticket No.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure DeliverCollectDocument(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         NpCsDocument: Record "NPR NpCs Document";
@@ -87,7 +87,7 @@ codeunit 6151205 "NPR NpCs POSSession Mgt."
         until NpCsDocument.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then

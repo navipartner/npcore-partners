@@ -1,4 +1,4 @@
-﻿codeunit 6014586 "NPR RP Template Mgt."
+codeunit 6014586 "NPR RP Template Mgt."
 {
     trigger OnRun()
     begin
@@ -241,7 +241,7 @@
         DownloadFromStream(InStream, 'Export archived template to file', '', 'JSON File (*.json)|*.json', FileName);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnAfterModifyEvent', '', false, false)]
     local procedure OnAfterModifyTemplateLine(var Rec: Record "NPR RP Template Line"; var xRec: Record "NPR RP Template Line"; RunTrigger: Boolean)
     var
         RPTemplateLine: Record "NPR RP Template Line";
@@ -269,7 +269,7 @@
             until RPTemplateLine.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertTemplateLine(var Rec: Record "NPR RP Template Line"; RunTrigger: Boolean)
     var
         RPTemplateLine: Record "NPR RP Template Line";
@@ -287,7 +287,7 @@
             until RPTemplateLine.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014445, 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR RP Template Line", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnAfterDeleteTemplateLine(var Rec: Record "NPR RP Template Line"; RunTrigger: Boolean)
     var
         RPTemplateLine: Record "NPR RP Template Line";

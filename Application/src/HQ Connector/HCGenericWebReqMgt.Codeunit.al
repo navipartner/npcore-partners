@@ -13,7 +13,7 @@ codeunit 6150911 "NPR HC Generic Web Req. Mgt."
         if not IsProcessed then
             ProcessRequest(TmpHCGenericWebRequest, IsProcessed);
         TmpHCGenericWebRequest."Response Date" := CurrentDateTime;
-        TmpHCGenericWebRequest."Response User ID" := CopyStr(UserId,1,MaxStrLen(TmpHCGenericWebRequest."Response User ID"));
+        TmpHCGenericWebRequest."Response User ID" := CopyStr(UserId, 1, MaxStrLen(TmpHCGenericWebRequest."Response User ID"));
         TmpHCGenericWebRequest.Modify();
     end;
 

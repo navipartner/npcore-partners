@@ -8,7 +8,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         SaleLine: Record "NPR POS Sale Line";
@@ -56,7 +56,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnSetPosition', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnSetPosition', '', false, false)]
     local procedure SetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
     var
         PaymentLine: Codeunit "NPR POS Payment Line";
@@ -73,7 +73,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150708, 'OnDiscoverDataSource', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Data Source Discovery", 'OnDiscoverDataSource', '', false, false)]
     local procedure OnDiscoverDataSource(var Rec: Record "NPR POS Data Source Discovery")
     begin
         //-NPR5.36 [287688]

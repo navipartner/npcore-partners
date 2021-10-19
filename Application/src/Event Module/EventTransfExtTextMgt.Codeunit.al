@@ -1,4 +1,4 @@
-﻿codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
+codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
 {
     var
         GLAcc: Record "G/L Account";
@@ -11,7 +11,7 @@
         AutoText: Boolean;
         Text000: Label 'There is not enough space to insert extended text lines.';
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnAfterDeleteJobPlanningLine(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         JobPlanningLine: Record "Job Planning Line";

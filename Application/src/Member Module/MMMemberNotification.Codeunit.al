@@ -999,7 +999,7 @@ codeunit 6060136 "NPR MM Member Notification"
     [TryFunction]
     procedure MagentoApiPost_b2b_customer(Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
-        MagentoSetup: Record 6151401;
+        MagentoSetup: Record "NPR Magento Setup";
         ApiUrl: Text;
     begin
 
@@ -1018,7 +1018,7 @@ codeunit 6060136 "NPR MM Member Notification"
     [TryFunction]
     procedure MagentoApiPost_Membership(Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
-        MagentoSetup: Record 6151401;
+        MagentoSetup: Record "NPR Magento Setup";
         ApiUrl: Text;
         ApiLbl: Label '%1membership/', Locked = true;
     begin
@@ -1184,7 +1184,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
@@ -1204,7 +1204,7 @@ codeunit 6060136 "NPR MM Member Notification"
         exit(CODEUNIT::"NPR MM Member Notification");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
 

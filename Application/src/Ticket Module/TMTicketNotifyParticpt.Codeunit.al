@@ -318,7 +318,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         exit(PageAction = Action::LookupOK);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059784, 'OnDetailedTicketEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR TM Ticket Management", 'OnDetailedTicketEvent', '', true, true)]
     local procedure OnNotifyStakeholder(DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -388,7 +388,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059784, 'OnSelloutThresholdReached', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR TM Ticket Management", 'OnSelloutThresholdReached', '', true, true)]
     local procedure OnSellOutReached(SellOutEventType: Option NA,TICKET,WAITINGLIST; Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; AdmittedCount: Integer; MaxCapacity: Integer);
     var
         Schedule: Record "NPR TM Admis. Schedule";

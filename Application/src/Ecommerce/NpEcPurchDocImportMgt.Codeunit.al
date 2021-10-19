@@ -300,7 +300,7 @@ codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
     end;
 
 
-    [EventSubscriber(ObjectType::Table, 38, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Header", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePurchHeader(var Rec: Record "Purchase Header"; RunTrigger: Boolean)
     var
         NpEcDocument: Record "NPR NpEc Document";
@@ -341,7 +341,7 @@ codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
         NpEcDocument.DeleteAll();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 90, 'OnAfterPostPurchaseDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterPostPurchaseDoc', '', true, true)]
     local procedure OnAfterPostPurchDoc(var PurchaseHeader: Record "Purchase Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PurchRcpHdrNo: Code[20]; RetShptHdrNo: Code[20]; PurchInvHdrNo: Code[20]; PurchCrMemoHdrNo: Code[20])
     var
         NpEcDocument: Record "NPR NpEc Document";

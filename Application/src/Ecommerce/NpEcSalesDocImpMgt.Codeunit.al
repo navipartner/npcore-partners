@@ -1,4 +1,4 @@
-﻿codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
+codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
 {
     var
         XmlAttributeIsMissingInElementErr: Label 'Xml attribute %1 is missing in <%2>', Comment = '%1=Xml attribute name;%2=Xml element name';
@@ -588,7 +588,7 @@
         SalesHeader.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Table, 36, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteSalesHeader(var Rec: Record "Sales Header"; RunTrigger: Boolean)
     var
         NpEcDocument: Record "NPR NpEc Document";
@@ -629,7 +629,7 @@
         NpEcDocument.DeleteAll();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
         NpEcDocument: Record "NPR NpEc Document";

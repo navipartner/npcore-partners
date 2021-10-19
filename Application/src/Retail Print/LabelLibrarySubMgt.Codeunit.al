@@ -1,6 +1,6 @@
 codeunit 6014447 "NPR Label Library Sub. Mgt."
 {
-    [EventSubscriber(ObjectType::Page, 7302, 'OnAfterActionEvent', 'NPR PrintLabel', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::Bins, 'OnAfterActionEvent', 'NPR PrintLabel', false, false)]
     local procedure BinsOnAfterActionEventPrintLabel(var Rec: Record Bin)
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -8,13 +8,13 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Bin Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 5740, 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Transfer Order", 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
     local procedure TransferOrderOnAfterActionEventRetailPrint(var Rec: Record "Transfer Header")
     begin
         ChooseLabel(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 5740, 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Transfer Order", 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
     local procedure TransferOrderOnAfterActionEventPriceLabel(var Rec: Record "Transfer Header")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -22,13 +22,13 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 50, 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Purchase Order", 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
     local procedure PurchaseOrderOnAfterActionEventRetailPrint(var Rec: Record "Purchase Header")
     begin
         ChooseLabel(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 50, 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Purchase Order", 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
     local procedure PurchaseOrderOnAfterActionEventPriceLabel(var Rec: Record "Purchase Header")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -37,13 +37,13 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 51, 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Purchase Invoice", 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
     local procedure PurchaseInvoiceOnAfterActionEventRetailPrint(var Rec: Record "Purchase Header")
     begin
         ChooseLabel(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 51, 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Purchase Invoice", 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
     local procedure PurchaseInvoiceOnAfterActionEventPriceLabel(var Rec: Record "Purchase Header")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -51,7 +51,7 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 40, 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Item Journal", 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
     local procedure ItemJournalOnAfterActionEventPriceLabel(var Rec: Record "Item Journal Line")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -59,7 +59,7 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014402, 'OnAfterActionEvent', 'PriceLabel', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Retail Item Journal", 'OnAfterActionEvent', 'PriceLabel', false, false)]
     local procedure RetailItemJournalOnAfterActionEventPriceLabel(var Rec: Record "Item Journal Line")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -67,13 +67,13 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'RetailPrint', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Campaign Discount", 'OnAfterActionEvent', 'RetailPrint', true, true)]
     local procedure CampaignDiscountOnAfterActionEventRetailPrint(var Rec: Record "NPR Period Discount")
     begin
         ChooseLabel(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'PriceLabel', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Campaign Discount", 'OnAfterActionEvent', 'PriceLabel', true, true)]
     local procedure CampaignDiscountOnAfterActionEventPriceLabel(var Rec: Record "NPR Period Discount")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -81,13 +81,13 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 5743, 'OnAfterActionEvent', 'NPR RetailPrint', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Posted Transfer Shipment", 'OnAfterActionEvent', 'NPR RetailPrint', true, true)]
     local procedure TransferShipmentOrderOnAfterActionEventRetailPrint(var Rec: Record "Transfer Shipment Header")
     begin
         ChooseLabel(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 5743, 'OnAfterActionEvent', 'NPR PriceLabel', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Posted Transfer Shipment", 'OnAfterActionEvent', 'NPR PriceLabel', true, true)]
     local procedure TransferShipmentOrderOnAfterActionEventPriceLabel(var Rec: Record "Transfer Shipment Header")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -95,13 +95,13 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 5745, 'OnAfterActionEvent', 'NPR RetailPrint', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Posted Transfer Receipt", 'OnAfterActionEvent', 'NPR RetailPrint', true, true)]
     local procedure TransferReceiptOrderOnAfterActionEventRetailPrint(var Rec: Record "Transfer Receipt Header")
     begin
         ChooseLabel(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 5745, 'OnAfterActionEvent', 'NPR PriceLabel', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Posted Transfer Receipt", 'OnAfterActionEvent', 'NPR PriceLabel', true, true)]
     local procedure TransferReceiptOrderOnAfterActionEventPriceLabel(var Rec: Record "Transfer Receipt Header")
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";

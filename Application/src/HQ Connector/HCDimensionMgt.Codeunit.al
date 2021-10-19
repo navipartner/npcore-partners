@@ -3,7 +3,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
     var
         DimensionMgt: Codeunit DimensionManagement;
 
-    [EventSubscriber(ObjectType::Table, 352, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterInsertEvent', '', true, true)]
     local procedure DefaultDimensionOnAfterInsert(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         GLSetup: Record "General Ledger Setup";
@@ -17,7 +17,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
             UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
     end;
 
-    [EventSubscriber(ObjectType::Table, 352, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterModifyEvent', '', true, true)]
     local procedure DefaultDimensionOnAfterModify(var Rec: Record "Default Dimension"; var xRec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         GLSetup: Record "General Ledger Setup";
@@ -31,7 +31,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
             UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
     end;
 
-    [EventSubscriber(ObjectType::Table, 352, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterDeleteEvent', '', true, true)]
     local procedure DefaultDimensionOnAfterDelete(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         GLSetup: Record "General Ledger Setup";
@@ -45,7 +45,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
             UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", '');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 408, 'OnAfterSetupObjectNoList', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::DimensionManagement, 'OnAfterSetupObjectNoList', '', true, true)]
     local procedure DimensionMgtOnAfterSetupObjectNoList(var TempAllObjWithCaption: Record AllObjWithCaption temporary)
     begin
         DimensionMgt.InsertObject(TempAllObjWithCaption, DATABASE::"NPR HC Register");

@@ -1,4 +1,4 @@
-﻿codeunit 6014555 "NPR Attribute Management"
+codeunit 6014555 "NPR Attribute Management"
 {
     // Guide for implementation on entity:
     // Shortcut Attributes: Example on item page/form
@@ -398,7 +398,7 @@
         page.Run();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCaptionClassTranslate', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterCaptionClassTranslate', '', false, false)]
     local procedure C1_OnAfterCaptionClassTranslate(Language: Integer; CaptionExpression: Text[1024]; var Caption: Text[1024])
     var
         AttributeManagement: Codeunit "NPR Attribute Management";
@@ -417,7 +417,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseDelete', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseDelete', '', true, true)]
     local procedure C1_OnAfterOnDatabaseDelete(RecRef: RecordRef)
     var
         AttributeID: Record "NPR Attribute ID";
@@ -459,7 +459,7 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseRename', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseRename', '', true, true)]
     local procedure C1_OnAfterOnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
     var
         AttributeID: Record "NPR Attribute ID";

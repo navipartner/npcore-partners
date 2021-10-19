@@ -115,7 +115,7 @@ codeunit 6014490 "NPR GE Assisted Setup Subs"
     end;
 
     /* GRAPHAPI WIZARD */
-    
+
     local procedure AddGraphAPIWizard()
     var
         AssistedSetup: Codeunit "Guided Experience";

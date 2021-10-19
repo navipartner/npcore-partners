@@ -327,7 +327,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ApplicationArea = NPRRetail;
                         trigger OnValidate()
                         var
-                            PrintTagsPage: Page 6014417;
+                            PrintTagsPage: Page "NPR Print Tags";
                         begin
 
                             CLEAR(PrintTagsPage);
@@ -853,9 +853,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        RetailJournalHeader: Record 6014451;
-                        RetailJournalLine: Record 6014422;
-                        InputDialog: Page 6014449;
+                        RetailJournalHeader: Record "NPR Retail Journal Header";
+                        RetailJournalLine: Record "NPR Retail Journal Line";
+                        InputDialog: Page "NPR Input Dialog";
                         TempInt: Integer;
                         TempQty: Integer;
                         t001: Label 'Quantity to be transfered to UPDATED?';
@@ -907,8 +907,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        ReportSelectionRetail: Record 6014404;
-                        PrintLabelAndDisplay: Codeunit 6014413;
+                        ReportSelectionRetail: Record "NPR Report Selection Retail";
+                        PrintLabelAndDisplay: Codeunit "NPR Label Library";
                     begin
                         PrintLabelAndDisplay.ResolveVariantAndPrintItem(Rec, ReportSelectionRetail."Report Type"::"Price Label");
                     end;
@@ -936,7 +936,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        VRTWrapper: Codeunit 6059970;
+                        VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
                         VRTWrapper.ShowVarietyMatrix(Rec, 0);
                     end;
@@ -955,7 +955,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        VRTWrapper: Codeunit 6059970;
+                        VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
                         VRTWrapper.ShowMaintainItemMatrix(Rec, 0);
                     end;
@@ -1065,8 +1065,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        PeriodDiscountLine: Record 6014414;
-                        CampaignDiscountLines: Page 6014454;
+                        PeriodDiscountLine: Record "NPR Period Discount Line";
+                        CampaignDiscountLines: Page "NPR Campaign Discount Lines";
                     begin
                         CLEAR(CampaignDiscountLines);
                         CampaignDiscountLines.EDITABLE(FALSE);
@@ -1090,8 +1090,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        MixedDiscountLine: Record 6014412;
-                        MixedDiscountLines: Page 6014451;
+                        MixedDiscountLine: Record "NPR Mixed Discount Line";
+                        MixedDiscountLines: Page "NPR Mixed Discount Lines";
 
                     begin
                         CLEAR(MixedDiscountLines);
@@ -1126,7 +1126,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        MagentoVariantPictureList: page 6151413;
+                        MagentoVariantPictureList: page "NPR Magento Item Pict. List";
                     begin
                         Rec.TestField("No.");
                         Rec.FilterGroup(2);
@@ -1165,8 +1165,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        MagentoStoreItem: Record 6151420;
-                        MagentoItemMgt: Codeunit 6151407;
+                        MagentoStoreItem: Record "NPR Magento Store Item";
+                        MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
                     begin
                         MagentoItemMgt.SetupMultiStoreData(Rec);
                         MagentoStoreItem.FILTERGROUP(0);
@@ -1191,8 +1191,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        MagentoDisplayConfig: Record 6151435;
-                        MagentoDisplayConfigPage: page 6151443;
+                        MagentoDisplayConfig: Record "NPR Magento Display Config";
+                        MagentoDisplayConfigPage: page "NPR Magento Display Config";
                     begin
                         MagentoDisplayConfig.SETRANGE("No.", Rec."No.");
                         MagentoDisplayConfig.SETRANGE(Type, MagentoDisplayConfig.Type::Item);

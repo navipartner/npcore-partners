@@ -1,4 +1,4 @@
-﻿codeunit 6060064 "NPR Nonstock Purchase Mgt."
+codeunit 6060064 "NPR Nonstock Purchase Mgt."
 {
     var
         ItemUnitofMeasure: Record "Item Unit of Measure";
@@ -193,13 +193,13 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Page, 54, 'OnAfterActionEvent', 'NPR Nonstockitems', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"Purchase Order Subform", 'OnAfterActionEvent', 'NPR Nonstockitems', true, true)]
     local procedure OnAfterNonstockitems(var Rec: Record "Purchase Line")
     begin
         ShowNonstock(Rec, '');
     end;
 
-    [EventSubscriber(ObjectType::Table, 39, 'OnBeforeValidateEvent', 'Item Reference No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnBeforeValidateEvent', 'Item Reference No.', false, false)]
     local procedure OnBeforeValidateItemReferenceNo(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var
         Item: Record Item;

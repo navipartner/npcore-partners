@@ -15,7 +15,7 @@ codeunit 6151135 "NPR Ticket App Area Mgmt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Application Area Mgmt. Facade", 'OnSetExperienceTier', '', false, false)]
-    local procedure EnableAdvancedApplicationAreaOnSetExperienceTier(ExperienceTierSetup: record 9176; var TempApplicationAreaSetup: record 9178 temporary; var ApplicationAreasSet: boolean)
+    local procedure EnableAdvancedApplicationAreaOnSetExperienceTier(ExperienceTierSetup: record "Experience Tier Setup"; var TempApplicationAreaSetup: record "Application Area Setup" temporary; var ApplicationAreasSet: boolean)
     begin
     end;
 

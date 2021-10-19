@@ -1,4 +1,4 @@
-﻿codeunit 6060105 "NPR POS Input Box Setup Mgt."
+codeunit 6060105 "NPR POS Input Box Setup Mgt."
 {
 
 
@@ -47,7 +47,7 @@
         EanBoxSetupEvent.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6060106, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Ean Box Event", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnAfterInsertEanBoxEvent(var Rec: Record "NPR Ean Box Event"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -98,7 +98,7 @@
         OnInitEanBoxParameters(EanBoxEvent);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6060107, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Ean Box Setup Event", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertEanBoxSetupEvent(var Rec: Record "NPR Ean Box Setup Event"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -107,7 +107,7 @@
         InitEanBoxSetupEventParameters(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6060107, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Ean Box Setup Event", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyEanBoxSetupEvent(var Rec: Record "NPR Ean Box Setup Event"; var xRec: Record "NPR Ean Box Setup Event"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -214,7 +214,7 @@
         until EanBoxParameter.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnAfterActionUpdated', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnAfterActionUpdated', '', true, true)]
     local procedure OnAfterPOSActionUpdated("Action": Record "NPR POS Action")
     var
         EanBoxEvent: Record "NPR Ean Box Event";

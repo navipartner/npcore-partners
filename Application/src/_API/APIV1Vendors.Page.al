@@ -664,7 +664,7 @@ page 6014410 "NPR APIV1 - Vendors"
         Currency: Record Currency;
         PaymentTerms: Record "Payment Terms";
         PaymentMethod: Record "Payment Method";
-        TempFieldSet: Record 2000000041 temporary;
+        TempFieldSet: Record Field temporary;
         GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
         LCYCurrencyCode: Code[10];
         CurrencyCodeTxt: Text;

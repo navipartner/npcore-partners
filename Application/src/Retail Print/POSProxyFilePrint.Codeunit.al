@@ -42,7 +42,7 @@ codeunit 6151001 "NPR POS Proxy: File Print"
         FrontEnd.InvokeDevice(PrintRequest, ProtocolName(), 'PRINT');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', false, false)]
     local procedure Print_Response(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Stargate: Codeunit "NPR POS Stargate Management";

@@ -7,7 +7,7 @@ report 6060127 "NPR MM Member Card Print QR"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
-    
+
     dataset
     {
         dataitem("MM Member Card"; "NPR MM Member Card")

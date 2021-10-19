@@ -43,7 +43,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         CalendarCaptionLbl: Label 'Select a valid from date and the lines to include';

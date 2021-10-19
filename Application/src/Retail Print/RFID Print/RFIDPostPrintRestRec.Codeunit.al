@@ -26,7 +26,7 @@ codeunit 6059833 "NPR RFID PostPrint Rest. Rec."
         RecRef.GetTable(OriginalRetailJournalLine);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014547, 'OnAfterPrintMatrix', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Matrix Print Mgt.", 'OnAfterPrintMatrix', '', false, false)]
     local procedure OnAfterPrintMatrix(var RecRef: RecordRef; TemplateHeader: Record "NPR RP Template Header")
     begin
         if TemplateHeader."Post Processing Codeunit" <> CODEUNIT::"NPR RFID PostPrint Rest. Rec." then

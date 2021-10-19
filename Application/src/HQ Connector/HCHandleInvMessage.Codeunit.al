@@ -9,7 +9,7 @@ codeunit 6150912 "NPR HC Handle Inv. Message"
         InventoryText: Label 'Inventory is %1';
         InventoryInLocationsText: Label 'Inventory in Location(s):';
 
-    [EventSubscriber(ObjectType::Codeunit, 6150911, 'OnProcessRequest', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR HC Generic Web Req. Mgt.", 'OnProcessRequest', '', true, true)]
     local procedure OnProcessRequestReturnInventoryMessage(RequestCode: Code[20]; Parameter: array[6] of Text; var Response: array[4] of Text; var IsProcessed: Boolean; var ErrorDescription: Text)
     begin
         if RequestCode <> 'INVENTORYMESSAGE' then

@@ -1,4 +1,4 @@
-﻿codeunit 6184516 "NPR EFT Flexiiterm Prot."
+codeunit 6184516 "NPR EFT Flexiiterm Prot."
 {
     SingleInstance = true;
 
@@ -243,7 +243,7 @@
         exit(JsonConvert.SerializeObject(Object));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', false, false)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     begin
 

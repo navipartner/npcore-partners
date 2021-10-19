@@ -15,7 +15,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         exit('MM_LOYALTY_PWP');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
 
@@ -26,7 +26,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         tmpEFTIntegrationType.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
@@ -55,7 +55,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         LoyaltyPointsMgrClient.ValidateServiceRequest(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateRefundRequest', '', false, false)]
     local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
@@ -84,7 +84,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         LoyaltyPointsMgrClient.ValidateServiceRequest(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVoidRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVoidRequest', '', false, false)]
     local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
 
@@ -102,7 +102,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         Message('VOID');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         POSFrontEnd: Codeunit "NPR POS Front End Management";
@@ -155,7 +155,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         EFTInterface.EftIntegrationResponse(EFTTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterFinancialCommit', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
 
@@ -165,7 +165,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         EftTransactionRequest.PrintReceipts(false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterPaymentConfirm', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterPaymentConfirm', '', false, false)]
     local procedure OnAfterPaymentConfirm(EftTransactionRequest: Record "NPR EFT Transaction Request"; var DoNotResume: Boolean)
     begin
 
@@ -173,7 +173,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforePauseFrontEnd', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforePauseFrontEnd', '', false, false)]
     local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
 
@@ -184,7 +184,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         Skip := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforeResumeFrontEnd', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforeResumeFrontEnd', '', false, false)]
     local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
 
@@ -196,7 +196,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         Skip := false;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeEndSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', true, true)]
     local procedure OnBeforeEndSale(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR POS Sale")
     var
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
@@ -207,7 +207,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
             LoyaltyPointsMgrClient.PrepareServiceRequest(EFTTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";

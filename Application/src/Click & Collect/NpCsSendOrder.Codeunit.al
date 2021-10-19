@@ -235,7 +235,7 @@ codeunit 6151197 "NPR NpCs Send Order"
     end;
 
 
-    [EventSubscriber(ObjectType::Codeunit, 6151196, 'OnInitWorkflowModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpCs Workflow Mgt.", 'OnInitWorkflowModules', '', true, true)]
     local procedure OnInitWorkflowModules(var NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
     begin
         if not NpCsWorkflowModule.WritePermission then

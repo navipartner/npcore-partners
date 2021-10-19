@@ -10,7 +10,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         UseTemplateArr: array[2] of Boolean;
         EventExchIntTemplateArr: array[2] of Record "NPR Event Exch. Int. Template";
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterInsertEvent', '', false, false)]
     local procedure JobOnAfterInsert(var Rec: Record Job; RunTrigger: Boolean)
     begin
         if not RunTrigger then
@@ -24,7 +24,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         Rec.Modify();
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterModifyEvent', '', false, false)]
     local procedure JobOnAfterModify(var Rec: Record Job; var xRec: Record Job; RunTrigger: Boolean)
     begin
         if not RunTrigger then
@@ -43,7 +43,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
             end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Organizer E-Mail', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'NPR Organizer E-Mail', false, false)]
     local procedure JobOrganizerEmailOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     var
         JobPlanningLine: Record "Job Planning Line";
@@ -58,7 +58,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure JobPlanningLineOnAfterInsert(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -76,7 +76,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         Rec.Modify();
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterModifyEvent', '', false, false)]
     local procedure JobPlanningLineOnAfterModify(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -98,7 +98,7 @@ codeunit 6060152 "NPR Event Calendar Mgt."
             end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnBeforeDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnBeforeDeleteEvent', '', false, false)]
     local procedure JobPlanningLineOnBeforeDelete(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         Job: Record Job;
@@ -115,14 +115,14 @@ codeunit 6060152 "NPR Event Calendar Mgt."
                 Error('');
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure JobPlanningLineNoOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if Rec."No." <> xRec."No." then
             CheckForCalendarAndRemove(Rec, xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Resource E-Mail', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'NPR Resource E-Mail', false, false)]
     local procedure JobPlanningLineResourceEMailOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if Rec."NPR Resource E-Mail" <> xRec."NPR Resource E-Mail" then
