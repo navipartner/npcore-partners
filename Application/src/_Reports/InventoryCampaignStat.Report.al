@@ -10,6 +10,7 @@ report 6014499 "NPR Inventory Campaign Stat."
     dataset
     {
         dataitem("Period Discount"; "NPR Period Discount")
+
         {
             RequestFilterFields = "Code";
             column(PeriodDiscountLineVendorNo; PeriodDiscountLineVendorNo)

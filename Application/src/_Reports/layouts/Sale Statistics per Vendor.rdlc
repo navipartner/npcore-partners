@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>7b528bd3-df31-4a0b-bf62-5c2e0a84641b</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -18,7 +19,7 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>10.54866in</Width>
+                  <Width>10.61118in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -119,16 +120,16 @@
                               <TablixBody>
                                 <TablixColumns>
                                   <TablixColumn>
-                                    <Width>2.87017cm</Width>
+                                    <Width>2.79081cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.74836cm</Width>
+                                    <Width>1.82779cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>2.12707cm</Width>
+                                    <Width>2.12704cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.82758cm</Width>
+                                    <Width>1.98634cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
                                     <Width>2.0527cm</Width>
@@ -1285,7 +1286,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=Fields!Inventory.Value</Value>
+                                                    <Value>=Fields!Inventory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                       <Format>=Fields!Net_Change_ItemFormat.Value</Format>
@@ -1812,7 +1813,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value EvaluationMode="Auto">=SUM(Fields!Inventory.Value)</Value>
+                                                    <Value>=SUM(Fields!Inventory.Value)</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                       <FontWeight>Normal</FontWeight>
@@ -2492,7 +2493,7 @@
                               <Top>0.69322cm</Top>
                               <Left>0.10331cm</Left>
                               <Height>2.16189cm</Height>
-                              <Width>26.6903cm</Width>
+                              <Width>26.8491cm</Width>
                               <ZIndex>1</ZIndex>
                               <Style>
                                 <Border>
@@ -2569,7 +2570,7 @@
             <Top>0.02185in</Top>
             <Left>0.02375in</Left>
             <Height>1.12406in</Height>
-            <Width>10.54866in</Width>
+            <Width>10.61118in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -3228,7 +3229,7 @@
         <Height>3.55887cm</Height>
         <Style />
       </Body>
-      <Width>26.88567cm</Width>
+      <Width>27.01273cm</Width>
       <Page>
         <PageHeader>
           <Height>2.61537cm</Height>
@@ -3541,6 +3542,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>e5312241-5a2d-4c23-96c5-3ed16c3c0839</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
