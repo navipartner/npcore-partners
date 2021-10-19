@@ -18,6 +18,12 @@ page 6060079 "NPR TM Ticket Setup"
                     ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Authorization Code Scheme field';
                 }
+                field("Retire Used Tickets After"; Rec."Retire Used Tickets After")
+                {
+                    ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the amount of time until a used ticket and its associated information may be deleted. Does not affect generated statistics.';
+                }
+
             }
             group("Ticket Print")
             {
@@ -264,16 +270,17 @@ page 6060079 "NPR TM Ticket Setup"
                 begin
                     TicketWizardMgr.Run();
                 end;
-
             }
 
             action(DemoData)
             {
                 ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Create DEMO Data';
+                Caption = 'Create Demo Data';
                 ToolTip = 'Creates the NPR Demo Setup used when demonstrating ticketing.';
                 Image = CarryOutActionMessage;
                 Promoted = false;
+                Ellipsis = true;
+
                 trigger OnAction()
                 var
                     TicketDemoSetup: Codeunit "NPR TM Ticket Create Demo Data";
@@ -281,6 +288,23 @@ page 6060079 "NPR TM Ticket Setup"
                     TicketDemoSetup.CreateTicketDemoData(false);
                 end;
             }
+
+            action(RetireTicketData)
+            {
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Delete Obsolete Ticket Data';
+                ToolTip = 'This action will delete obsolete ticket data, including unused schedule entries.';
+                Image = DeleteExpiredComponents;
+                Promoted = false;
+                Ellipsis = true;
+                trigger OnAction()
+                var
+                    RetentionTicketData: Codeunit "NPR TM Retention Ticket Data";
+                begin
+                    RetentionTicketData.MainWithConfirm();
+                end;
+            }
+
 
             action(DeployRapidPackageFromAzureBlob)
             {
