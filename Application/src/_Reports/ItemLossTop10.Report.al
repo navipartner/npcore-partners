@@ -36,9 +36,10 @@ report 6014543 "NPR Item - Loss - Top 10"
                 ItemReportSorting.DeleteAll();
             end;
         }
-        dataitem("Item Report Sorting"; "NPR TEMP Buffer")
+        dataitem(ItemReportSorting; "NPR TEMP Buffer")
         {
             DataItemTableView = SORTING(Template, "Line No.");
+            UseTemporary = true;
             column(USERID; UserId)
             {
             }
@@ -132,11 +133,11 @@ report 6014543 "NPR Item - Loss - Top 10"
             trigger OnAfterGetRecord()
             begin
                 Rank += 1;
-                ItemNo := CopyStr("Item Report Sorting".Template, 1, MaxStrLen(ItemNo));
+                ItemNo := CopyStr(ItemReportSorting.Template, 1, MaxStrLen(ItemNo));
                 ItemDescription := '';
                 if Item1.Get(ItemNo) then
                     ItemDescription := Item1.Description;
-                ItemCostAmount := "Item Report Sorting"."Decimal 2";
+                ItemCostAmount := ItemReportSorting."Decimal 2";
                 ShrinkagePct := Pct("Decimal 3", "Decimal 4");
 
                 if Rank = 1 then
@@ -147,8 +148,8 @@ report 6014543 "NPR Item - Loss - Top 10"
                     ProgressText := '';
 
                 if Rank <= NoOfRecordsToPrint then
-                    ItemCostAmountTotal_Top := ItemCostAmountTotal_Top + "Item Report Sorting"."Decimal 2";
-                ItemCostAmountTotal := ItemCostAmountTotal + "Item Report Sorting"."Decimal 2";
+                    ItemCostAmountTotal_Top := ItemCostAmountTotal_Top + ItemReportSorting."Decimal 2";
+                ItemCostAmountTotal := ItemCostAmountTotal + ItemReportSorting."Decimal 2";
                 ItemCostAmount_Pct := Pct(ItemCostAmountTotal_Top, ItemCostAmountTotal);
             end;
 
@@ -235,7 +236,6 @@ report 6014543 "NPR Item - Loss - Top 10"
         Text002: Label 'Sorted by ''Quantity''';
         Text003: Label 'Sorted by ''Cost Amount''';
         Text004: Label 'Sorted by ''Shrinkage %''';
-        ItemReportSorting: Record "NPR TEMP Buffer";
         ShrinkagePct: Decimal;
         Rank: Integer;
         MaxAmt: Decimal;
