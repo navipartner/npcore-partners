@@ -1,3 +1,0 @@
-# NETS BAXI
-
-Howto setup
