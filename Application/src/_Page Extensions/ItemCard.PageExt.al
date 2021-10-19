@@ -87,16 +87,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         }
 
-        addafter(Inventory)
-        {
-            field("NPR Sales (Qty.)"; Rec."Sales (Qty.)")
-            {
-
-                ToolTip = 'Specifies the value of the Sales (Qty.) field';
-                ApplicationArea = NPRRetail;
-            }
-        }
-
         addafter("Service Item Group")
         {
             field("NPR Group sale"; Rec."NPR Group sale")
