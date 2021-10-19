@@ -7,6 +7,7 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
         StreamOut: OutStream;
         StreamIn: InStream;
         TextWhole: Text;
+        TextLine: Text[1024];
     begin
         TextWhole := '';
         case TextType of
@@ -22,9 +23,9 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                     PepperConfiguration.TestField(Version);
                     PepperVersion.Get(PepperConfiguration.Version);
                     PepperVersion.TestField(PepperVersion."XMLport Configuration");
-                    TempBlob.CreateOutStream(StreamOut);
+                    TempBlob.CreateOutStream(StreamOut, TextEncoding::UTF8);
                     XMLPORT.Export(PepperVersion."XMLport Configuration", StreamOut);
-                    TempBlob.CreateInStream(StreamIn);
+                    TempBlob.CreateInStream(StreamIn, TextEncoding::UTF8);
                 end;
             TextType::AdditionalParameters:
                 begin
@@ -34,7 +35,10 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                     PepperConfiguration."Additional Parameters".CreateInStream(StreamIn, TEXTENCODING::UTF8);
                 end;
         end;
-        StreamIn.ReadText(TextWhole);
+        repeat
+            StreamIn.Read(TextLine);
+            TextWhole := TextWhole + TextLine;
+        until StreamIn.EOS;
         exit(TextWhole);
     end;
 
