@@ -1,12 +1,5 @@
 table 6060111 "NPR TM Ticket Setup"
 {
-    // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
-    // TM1.27/TSA /20171218 CASE 300395 Added field Timeout (ms)
-    // TM1.38/TSA /20181012 CASE 332109 Adding NP-Pass for tickets
-    // TM1.38/TSA /20181026 CASE 308962 Added some boolean fields to control prepaid / postpaid ticket creation flow
-    // TM1.46/TSA /20200320 CASE 397084 Added needed setup field in ordet to create tickets from a simple wizard
-    // TM1.48/TSA /20200623 CASE 399259 Added controll of description fields exported to ticket server
-
     Caption = 'Ticket Setup';
     DataClassification = CustomerContent;
 
@@ -63,6 +56,13 @@ table 6060111 "NPR TM Ticket Setup"
         {
             Caption = 'Authorization Code Scheme';
             DataClassification = CustomerContent;
+        }
+
+        field(85; "Retire Used Tickets After"; DateFormula)
+        {
+            Caption = 'Retire Tickets After';
+            DataClassification = CustomerContent;
+            InitValue = '<2Y>';
         }
         field(100; "Print Server Generator URL"; Text[200])
         {
