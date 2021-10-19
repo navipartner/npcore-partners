@@ -3,6 +3,8 @@
     "content": [
       {
         "files": [
+          "api/**.md",
+          "api/**/toc.yml",                    
           "articles/**.md",
           "articles/**/toc.yml",                    
           "toc.yml",
@@ -26,7 +28,7 @@
     "fileMetadataFiles": [],
     "template": [
       "default",
-      "templates/material"    
+      "templates/darkfx"    
     ],
     "postProcessors": [
       "ExtractSearchIndex"

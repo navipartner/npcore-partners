@@ -14,7 +14,9 @@ Write-Host "------------"
 Write-Host "Cleaning and creating docfx folders"
 
 $downloadFolder = ($workspaceFolder + "\Documentation\.tools\docfx\download")
+$buildFolder = ($workspaceFolder + "\Documentation\.tools\docfx\_site")
 Remove-Item $downloadFolder -Recurse -ErrorAction Ignore
+Remove-Item $buildFolder -Recurse -ErrorAction Ignor
 New-Item -ItemType Directory -Force -Path $downloadFolder
 
 Write-Host "Downloading docfx"
@@ -29,3 +31,7 @@ Write-Host "Executing docfx"
 if (-Not ($LastExitCode -eq 0)) {
     throw "docfx returned one or more errors"
 }
+
+Write-Host "Copying API library and openapi files into _site folder"
+Copy-Item -Path ($workspaceFolder + "\Documentation\openapi\*") -Destination ($buildFolder + "\api\") -Recurse
+Copy-Item ($workspaceFolder + "\Documentation\.tools\rapidocs\sandbox.html") -Destination ($buildFolder + "\api\")
