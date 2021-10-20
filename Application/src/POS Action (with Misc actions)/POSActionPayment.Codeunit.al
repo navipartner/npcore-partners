@@ -515,8 +515,10 @@ codeunit 6150725 "NPR POS Action: Payment"
 
             // IsEmpty has a covering index and should be fast.
             SecondaryEFTTransactionRequest.SetFilter("Initiated from Entry No.", '=%1', EFTTransactionRequest."Entry No.");
-            if (SecondaryEFTTransactionRequest.IsEmpty()) then
+            if (SecondaryEFTTransactionRequest.IsEmpty()) then begin
+                SetEftError(EFTTransactionRequest, POSSession); //TODO: Remove workaround to BC17 message bug
                 exit(false);
+            end;
 
             SecondaryEFTTransactionRequest.FindLast();
             if ((SecondaryEFTTransactionRequest."Pepper Transaction Type Code" = EFTTransactionRequest."Pepper Transaction Type Code") and
@@ -526,7 +528,7 @@ codeunit 6150725 "NPR POS Action: Payment"
                 exit(not SecondaryEFTTransactionRequest.Successful);
             end;
 
-            SetEftError(EFTTransactionRequest, POSSession);  //TODO: Remove workaround to BC17 message bug
+            SetEftError(SecondaryEFTTransactionRequest, POSSession);  //TODO: Remove workaround to BC17 message bug
             exit(true);
         end;
 
@@ -535,7 +537,7 @@ codeunit 6150725 "NPR POS Action: Payment"
 
     local procedure SetEftError(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSSession: Codeunit "NPR POS Session")
     var
-        TRX_ERROR: Label '%1 failed\%2\%3\%4';
+        TRX_ERROR: Label '<h2>%1 failed</h2><br>%2<br><br>%3<br>%4';
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         Context: Codeunit "NPR POS JSON Management";
     begin

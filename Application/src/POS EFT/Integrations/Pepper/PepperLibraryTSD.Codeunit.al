@@ -22,7 +22,8 @@
         DEMO_TRANSACTION: Label '***** NOTICE *****\\This is a demo transaction.\\ *** DEMO *** DEMO *** DEMO ***';
         SupportedAuxFunction: Option ,ABORT,PANSUPPRESSIONON,PANSUPPRESSIONOFF,CUSTOMMENU,TICKETREPRINT,SUMMARYREPORT,DIAGNOSTICS,SYSTEMINFO,DISPWITHNUMINPUT,TINAACTIVATION,TINADEACTIVATION,TINAQUERY,SHOWCUSTOMMENU;
         PepperDescription: Label 'Interface';
-        EftPaymentFailed: Label 'Payment was declined.\\%2 (%1)';
+        // TODO Consider restore after BC17
+        // EftPaymentFailed: Label 'Payment was declined.\\%2 (%1)';
         SharedEFTSetup: Record "NPR EFT Setup";
 
     local procedure InitializePepperSetup(RegisterNo: Code[10])
@@ -1746,8 +1747,10 @@
 
         EftTransactionRequest.PrintReceipts(false);
 
-        if (not EftTransactionRequest.Successful) then
-            Message(EftPaymentFailed, EftTransactionRequest."Result Code", EftTransactionRequest."Result Description");
+        // TODO - consider restoring when Pepper is not used in BC17
+        // This message is now shown by Payment Workflow.
+        // if (not EftTransactionRequest.Successful) then
+        //    Message(EftPaymentFailed, EftTransactionRequest."Result Code", EftTransactionRequest."Result Description");
 
     end;
 
