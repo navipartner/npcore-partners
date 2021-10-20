@@ -1,59 +1,40 @@
-# MobilePay V10
+# Set up integration with MobilePay in NP Retail
 
-## How to set up MobilePay
-* Let's find "**EFT Setup**" as the initial configuration place for MobilePay.  
+MobilePay is a digital wallet suitable for online purchases. This is a popular mobile payment method which enables online purchase with just one swipe. 
 
-  ![Find EFT Setup agenda](images/EftSetupFindAgenda.png)
+From the customer’s side, the payment flow when purchasing from an online store is as follows: 
+ - The customer enters the mobile phone number connected to the MobilePay application 
+ - Customer accepts the payment in the MobilePay application
+ - The payment is charged to the card the customer linked to the MobilePay application 
 
-* Now we have to link a selected **POS Unit** with **EFT configurations** for MobilePay.
+However, to enable MobilePay, the following procedure needs to be performed in NP Retail first:
 
-  ![Empty EFT Setup record](images/EftSetupRecEmpty.png)
+1. From the Role Center search for **EFT Setup** and open it.   
+   The **EFT Setup** window is displayed.
+2. Open the Payment Type POS dropdown and link the selected POS unit with EFT configurations for MobilePay.    
+3. Select the appropriate **POS Unit No.** and the **EFT Integration Type**.     
+   For example, **MOBILEPAY_V10** will enable MobilePay V10 for the selected POS unit).
+4. Navigate to the **Payment Type Parameters** in the ribbon.  
+5. Fill in all the fields.   
+    - Environment can be either **Production** or **Sandbox**, depending on whether you wish all customers to have access to the MobilePay setup or not. 
+    - An appropriate **Merchant VAT Number** should be populated for the MobilePay setup to be operational.
+    - The **Log Level** option should ideally be set to **Errors** in production environments to avoid logging of all details.
+6. Click **Close**.
+7. Open the **POS Unit Parameters**.  
+   These parameters need to be configured for each POS unit.
+8. Select the store by clicking the ellipsis button next to the **Store ID** field and finding the one you want in the list.
+> [!NOTE]
+> The list is populated according to the data in the MobilePay database.
+9. Proceed to the registration of the POS unit in the MobilePay backend.
+> [!NOTE]
+> Mobile payments can be integrated via existing payment systems or automatic payment points on-site.  
 
-  ![Configured EFT Setup record](images/EftSetupRecConfigured.png)
+- If you are using a Bluetooth device or an existing QR code, and you have a **Beacon ID (Box/QR)**, enter it into the corresponding field.
+- If you’re using an MPOS, or another setup able to render QR code automatically, keep the field blank, as it will be automatically populated.
+- You can also leave it empty if you don’t use a physical device, and print it once it’s being set in MobilePay.
+10. Enable the **Only QR** toggle switch if you’re sure you’re only using the QR code (no physical device). 
+11. Once you’re finished with the creation of the MobilePay unit, click **Create in MobilePay** in **Actions**.   
+    A confirmation message is displayed.
 
-  * Important is to select correct "**POS Unit No.**" and "**EFT Integration Type**" ("**MOBILEPAY_V10**" which will *enable* MobilePay V10 for the selected **POS Unit**).
-
-* Now we should set up "**Payment Type Parameters**" which are common for the selected **Payment Type** (value in "**Payment Type POS**" field). Let's click on the button "**Payment Type Parameters**".
-
-  ![Run Payment Type Parameters setup](images/RunPaymentTypeParametersSetup.png)
-
-  * "**Environment**" should be "**Production**" for all customers and it's default value for a new setup. "**Sandbox**" is for the internal purposes of NaviPartner only, for development and test purposes.
-  
-  * "**Merchant VAT Number**" is important as it works as a key to establish communication context with MobilePay backend (during authentication phase).
-  
-  * "**Log Level**" should be set to "**Errors**" by default in production environments to avoid extreme logging of all possible details.
-
-  ![Configured Payment Type Parameters](images/PaymentTypeParametersConfigured.png)
-
-
-* Now we can close the previous page ("**Payment Type Parameters**") and let's continue with "**POS Unit Parameters**" which has to be configured for each **POS Unit**. Select the **POS Unit** and click on "**POS Unit Parameters**" button.
-
-  ![Run POS Unit Parameters setup](images/RunPosUnitParametersSetup.png)
-
-  * "**Store ID**" - you have to click on *assist edit* button (three dots) and select the store from the list. This list is populated dynamically based on the real data existing in MobilePay database (backend).
-  
-    ![List of stores coming from MobilePay database](images/StoreListBasedOnMobilePayData.png)
-
-  ![Store ID configured](images/PosUnitParamsStoreConfigured.png)
-
-    * Once you have "**Store ID**" assigned you can proceed to the registration of the **POS Unit** in the MobilePay backend. But first of all you need to know if you setup is using some already existing identifier (either a **Bluetooth** device or an existing **QR code**).
-  
-      * And if yes, you have to fill-in the ID to "**Beacon ID (Box/QR)**" field.   
-  
-      * If you use an **MPOS** device or any other setup able to render dynamically any QR code, you can keep the field blank and it will be generated for you.   
-
-      * In the same way you can leave it blank if you don't have any QR sticker yet (and you don't use a physical device - white box) and you can print it once it's being set in MobilePay.   
-
-    * You should also select "**Only QR**" as "**TRUE**" only if you are sure you are using only QR code (no physical device). We believe you can also keep this flag "**FALSE**" even if you are using QR codes only. These should be still supported even if "**Only QR**" is set to "**FALSE**".         
-  
-    * So once you decided what is your scenario with QR or boxes and you have configured properly the values, you can proceed with the registration of the POS unit in MobilePay backend. Please, click on **Actions**->**Create in Mobilepay** and that's all. The success should be confirmed with a confirmation dialog otherwise you will see an error message with some details that should be used to identify the problem.
-
-      ![Action to create POS in MobilePay backend](images/CreatePosInMobilePayAction.png)
-
-      ![POS successfully registered in MobilePay backend](images/PosRegisteredInMobilePay.png)
-
-    * If you decide to unregister **POS Unit** in MobilePay backend you have to do that using action called **Actions**->**Delete in Mobilepay**. The **POS Unit** will be deleted in MobilePay, "**MobilePay POS ID**" will be blanked but "**Beacon ID (Box/QR)**" will be preserved locally in order to be able reuse easily QR/Box code if needed.
-
-      ![Action to deleted POS in MobilePay backend](images/RemovePosFromMobilePayAction.png)
-
-      ![POS successfully deleted in MobilePay backend](images/PosRemovedFromMobilePay.png)
+**Next steps:**
+ - If you decide you need to unregister a POS unit in MobilePay, you simply need to click **Delete in MobilePay** option in **Actions**. The **Beacon ID (Box/QR)** will be preserved locally, and it will be possible to reuse it.
