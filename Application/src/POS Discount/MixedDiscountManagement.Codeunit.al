@@ -8,6 +8,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
     var
         TempMixedDiscount: Record "NPR Mixed Discount" temporary;
         TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary;
+        Handled: Boolean;
     begin
         GLSetup.Get();
         GLSetup.TestField("Amount Rounding Precision");
@@ -32,6 +33,11 @@ codeunit 6014416 "NPR Mixed Discount Management"
         TempMixedDiscount.SetRange("Mix Type", TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::Combination);
         TempMixedDiscount.Ascending(false);
         TempMixedDiscount.FindSet();
+
+        OnBeforeApplyMixedDiscounts(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, Handled);
+        if Handled then
+            exit;
+
         repeat
             ApplyMixDiscount(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS);
         until (TempMixedDiscount.Next() = 0);
@@ -1577,5 +1583,10 @@ codeunit 6014416 "NPR Mixed Discount Management"
         TempCustDiscGroup.Code := '';
         if not TempCustDiscGroup.Find() then
             TempCustDiscGroup.Insert();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeApplyMixedDiscounts(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempPOSSaleLine: Record "NPR POS Sale Line" temporary; var Handled: Boolean)
+    begin
     end;
 }
