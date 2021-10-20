@@ -112,11 +112,13 @@ codeunit 6014468 "NPR UPG Item Group"
         FromDefaultDimension.SetRange("No.", FromItemGroup."No.");
         if FromDefaultDimension.FindSet() then
             repeat
-                ToDefaultDimension.Init();
-                ToDefaultDimension.TransferFields(FromDefaultDimension);
-                ToDefaultDimension."Table ID" := Database::"Item Category";
-                ToDefaultDimension."No." := ToItemCategory.Code;
-                ToDefaultDimension.Insert(true);
+                if not ToDefaultDimension.Get(Database::"Item Category", ToItemCategory.Code, FromDefaultDimension."Dimension Code") then begin
+                    ToDefaultDimension.Init();
+                    ToDefaultDimension.TransferFields(FromDefaultDimension);
+                    ToDefaultDimension."Table ID" := Database::"Item Category";
+                    ToDefaultDimension."No." := ToItemCategory.Code;
+                    ToDefaultDimension.Insert(true);
+                end;
             until FromDefaultDimension.Next() = 0;
     end;
 
