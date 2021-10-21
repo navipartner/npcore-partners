@@ -107,7 +107,6 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
-        LocationLayout.Init();
         LocationLayout.Code := CopyStr(GetStringValue(ComponentObject, 'id'), 1, MaxStrLen(LocationLayout.Code));
         if LocationLayout.Find() then begin
             RestaurantSetup.Get();
@@ -115,15 +114,10 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
                 RestaurantSetup."Component No. Series" := CreateNoSeries('NPR-NPRE', 'NPRE Component Numbering', 'C10000');
                 RestaurantSetup.Modify();
             end;
-
-            LocationLayout.Init();
-
             LocationLayout.Code := NoSeriesManagement.GetNextNo(RestaurantSetup."Component No. Series", Today, true);
-
         end;
-
+        LocationLayout.Init();
         TransferToLocationLayout(ComponentObject, LocationLayout);
-
         LocationLayout.TestField(Code);
         LocationLayout.Insert(true);
     end;
@@ -151,6 +145,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
     begin
         SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location")));
 
+        LocationLayout."Seating No." := CopyStr(GetStringValue(ComponentObject, 'user_friendly_id'), 1, MaxStrLen(LocationLayout."Seating No."));
         LocationLayout.Type := CopyStr(GetStringValue(ComponentObject, 'type'), 1, MaxStrLen(LocationLayout.Type));
         LocationLayout.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(LocationLayout.Description));
         LocationLayout."Seating Location" := CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(LocationLayout."Seating Location"));
@@ -179,6 +174,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
     begin
         SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location")));
 
+        Seating."Seating No." := CopyStr(GetStringValue(ComponentObject, 'user_friendly_id'), 1, MaxStrLen(Seating."Seating No."));
         Seating.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(Seating.Description));
         Seating."Seating Location" := CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location"));
         if ComponentObject.get('capacity', JToken) then

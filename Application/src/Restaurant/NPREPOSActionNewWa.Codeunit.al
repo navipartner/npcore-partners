@@ -254,13 +254,14 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
         Handled := true;
 
-        DataSource.AddColumn('TableNo', 'Pre-selected Seating (table) code', DataType::String, true);
-        DataSource.AddColumn('WaiterPadNo', 'Pre-selected Waiter Pad No.', DataType::String, true);
+        DataSource.AddColumn('TableId', 'Pre-selected seating internal Id', DataType::String, true);
+        DataSource.AddColumn('TableNo', 'Pre-selected seating number', DataType::String, true);
+        DataSource.AddColumn('WaiterPadNo', 'Pre-selected waiter pad No.', DataType::String, true);
         DataSource.AddColumn('NoOfGuests', 'Number of guests', DataType::Integer, true);
-        DataSource.AddColumn('TableStatus', 'Seating (table) status', DataType::String, true);
+        DataSource.AddColumn('TableStatus', 'Seating status', DataType::String, true);
         DataSource.AddColumn('WPadStatus', 'Waiter pad status', DataType::String, true);
         DataSource.AddColumn('MealFlowStatus', 'Meal flow status', DataType::String, true);
-        DataSource.AddColumn('AssignedWaiter', 'Assigned Waiter', DataType::String, true);
+        DataSource.AddColumn('AssignedWaiter', 'Assigned waiter', DataType::String, true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
@@ -295,7 +296,8 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         if not Salesperson.get(WaiterPad."Assigned Waiter Code") then
             Salesperson.Init();
 
-        DataRow.Add('TableNo', SalePOS."NPRE Pre-Set Seating Code");
+        DataRow.Add('TableId', SalePOS."NPRE Pre-Set Seating Code");
+        DataRow.Add('TableNo', Seating."Seating No.");
         DataRow.Add('WaiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
         DataRow.Add('NoOfGuests', SalePOS."NPRE Number of Guests");
         DataRow.Add('TableStatus', Seating."Status Description FF");
