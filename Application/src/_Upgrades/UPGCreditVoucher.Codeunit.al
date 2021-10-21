@@ -25,7 +25,7 @@ codeunit 6150921 "NPR UPG Credit Voucher"
         LogMessageStopwatch.LogFinish();
     end;
 
-    local procedure Upgrade()
+    procedure Upgrade()
     begin
         CreditVoucher2RetailVoucher();
     end;

@@ -25,7 +25,7 @@ codeunit 6150923 "NPR UPG Gift Voucher"
         LogMessageStopwatch.LogFinish();
     end;
 
-    local procedure Upgrade()
+    procedure Upgrade()
     begin
         GiftVoucher2RetailVoucher();
     end;
