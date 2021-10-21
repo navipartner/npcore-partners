@@ -2,7 +2,7 @@ report 6014612 "NPR Inventory per Variant/date"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Variant at date.rdlc';
-    Caption = 'Inventory Per Date';
+    Caption = 'Inventory Per Variant at Date';
     Description = 'Inventory per Variant at date';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
