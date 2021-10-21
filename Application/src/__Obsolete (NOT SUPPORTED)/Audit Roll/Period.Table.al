@@ -301,8 +301,8 @@ table 6014423 "NPR Period"
 
             trigger OnLookup()
             begin
-                LookUpShortcutDimCode(1, "Shortcut Dimension 1 Code");
-                Validate("Shortcut Dimension 1 Code", "Shortcut Dimension 1 Code");
+                if LookUpShortcutDimCode(1, "Shortcut Dimension 1 Code") then
+                    Validate("Shortcut Dimension 1 Code", "Shortcut Dimension 1 Code");
             end;
 
             trigger OnValidate()
@@ -320,8 +320,8 @@ table 6014423 "NPR Period"
 
             trigger OnLookup()
             begin
-                LookUpShortcutDimCode(2, "Shortcut Dimension 2 Code");
-                Validate("Shortcut Dimension 2 Code", "Shortcut Dimension 2 Code");
+                if LookUpShortcutDimCode(2, "Shortcut Dimension 2 Code") then
+                    Validate("Shortcut Dimension 2 Code", "Shortcut Dimension 2 Code");
             end;
 
             trigger OnValidate()
@@ -524,9 +524,9 @@ table 6014423 "NPR Period"
         Modify();
     end;
 
-    procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20]): Boolean
     begin
-        NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
+        exit(NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode));
     end;
 }
 
