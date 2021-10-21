@@ -391,4 +391,11 @@ table 6150684 "NPR NPRE Color Table"
         NPREColorTable."RGB Color Code (Hex)" := RGBHexCode;
         NPREColorTable.Modify();
     end;
+
+    procedure RGBHexCode(IncludeHashMark: Boolean): Text
+    begin
+        if IncludeHashMark and ("RGB Color Code (Hex)" <> '') then
+            exit('#' + "RGB Color Code (Hex)");
+        exit("RGB Color Code (Hex)");
+    end;
 }

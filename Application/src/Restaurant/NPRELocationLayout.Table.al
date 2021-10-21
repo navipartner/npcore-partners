@@ -21,6 +21,11 @@ table 6150685 "NPR NPRE Location Layout"
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Seating Location";
         }
+        field(5; "Seating No."; Text[20])
+        {
+            Caption = 'Seating No.';
+            DataClassification = CustomerContent;
+        }
         field(10; Description; Text[50])
         {
             Caption = 'Description';
@@ -39,5 +44,7 @@ table 6150685 "NPR NPRE Location Layout"
         {
             Clustered = true;
         }
+        key(Key2; "Seating Location", "Seating No.")
+        { }
     }
 }

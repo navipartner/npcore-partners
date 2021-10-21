@@ -11,40 +11,18 @@ page 6150660 "NPR NPRE Waiter Pad"
     {
         area(content)
         {
-            group(Control6014423)
+            group(General)
             {
-                ShowCaption = false;
+                Caption = 'General';
                 field("Start Time"; Rec."Start Time")
                 {
-
                     Caption = 'Opened';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Opened field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Current Seating FF"; Rec."Current Seating FF")
-                {
-
-                    Caption = 'Seating';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Seating field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Current Seating Description"; Rec."Current Seating Description")
-                {
-
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Seating Description field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Assigned Waiter Code"; Rec."Assigned Waiter Code")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the waiter assigned to the waiterpad';
-                }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
@@ -53,16 +31,19 @@ page 6150660 "NPR NPRE Waiter Pad"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Number of Guests field';
                 }
+                field("Assigned Waiter Code"; Rec."Assigned Waiter Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the waiter assigned to the waiterpad';
+                }
                 field(Status; Rec.Status)
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Status field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Status Description FF"; Rec."Status Description FF")
                 {
-
                     Caption = 'Waiter Pad Status';
                     DrillDown = false;
                     ToolTip = 'Specifies the value of the Waiter Pad Status field';
@@ -82,14 +63,12 @@ page 6150660 "NPR NPRE Waiter Pad"
                 }
                 field("Serving Step Code"; Rec."Serving Step Code")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Serving Step Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Step Description"; Rec."Serving Step Description")
                 {
-
                     Caption = 'Serving Step';
                     DrillDown = false;
                     ToolTip = 'Specifies the value of the Serving Step field';
@@ -109,18 +88,52 @@ page 6150660 "NPR NPRE Waiter Pad"
                 }
                 field("Pre-receipt Printed"; Rec."Pre-receipt Printed")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Pre-receipt Printed field';
                     ApplicationArea = NPRRetail;
                 }
             }
+            group(Seating)
+            {
+                Caption = 'Seating';
+                field("Current Seating Code"; Rec."Current Seating FF")
+                {
+                    Caption = 'Code';
+                    Editable = false;
+                    ToolTip = 'Specifies internal unique Id of the first seating currently assigned to the waiter pad';
+                    ApplicationArea = NPRRetail;
+                    Importance = Promoted;
+                }
+                field("Current Seating No."; Seating."Seating No.")
+                {
+                    Caption = 'No.';
+                    Editable = false;
+                    ToolTip = 'Specifies a user friendly id (table number) of the first seating currently assigned to the waiter pad';
+                    ApplicationArea = NPRRetail;
+                    Importance = Promoted;
+                }
+                field("Current Seating Description"; Seating.Description)
+                {
+                    Caption = 'Description';
+                    Editable = false;
+                    ToolTip = 'Specifies description of the first seating currently assigned to the waiter pad';
+                    ApplicationArea = NPRRetail;
+                    Importance = Promoted;
+                }
+                field("No. of Seatings Assigned"; Rec."Multiple Seating FF")
+                {
+                    Caption = 'Assigned Seatings';
+                    Editable = false;
+                    ToolTip = 'Specifies the total number of seatings currently assigned to the waiter pad';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+
             part(WaiterPadLinesSubpage; "NPR NPRE Waiter Pad Subform")
             {
                 SubPageLink = "Waiter Pad No." = FIELD("No.");
                 UpdatePropagation = Both;
                 ApplicationArea = NPRRetail;
-
             }
             group(ClosingStatus)
             {
@@ -128,21 +141,18 @@ page 6150660 "NPR NPRE Waiter Pad"
                 Editable = false;
                 field(Closed; Rec.Closed)
                 {
-
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Closed field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Date"; Rec."Close Date")
                 {
-
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Close Date field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Time"; Rec."Close Time")
                 {
-
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Close Time field';
                     ApplicationArea = NPRRetail;
@@ -172,7 +182,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                         ToolTip = 'Notify kitchen of all ordered items regardless of serving step and print categories';
                         ApplicationArea = NPRRetail;
 
-
                         trigger OnAction()
                         begin
                             HospitalityPrint.PrintWaiterPadPreOrderToKitchenPressed(Rec, true);
@@ -188,7 +197,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare next set of items based on current serving step and print categories';
                         ApplicationArea = NPRRetail;
-
 
                         trigger OnAction()
                         begin
@@ -206,7 +214,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                         ToolTip = 'Ask kitchen to prepare set of items belonging to a specific serving step';
                         ApplicationArea = NPRRetail;
 
-
                         trigger OnAction()
                         begin
                             HospitalityPrint.SelectAndRequestRunServingStepToKitchen(Rec);
@@ -222,7 +229,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare selected waiter pad lines regardless of serving step and print categories';
                         ApplicationArea = NPRRetail;
-
 
                         trigger OnAction()
                         var
@@ -248,7 +254,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Print Pre Receipt action';
                     ApplicationArea = NPRRetail;
 
@@ -272,7 +277,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Move seating action';
                     ApplicationArea = NPRRetail;
 
@@ -289,7 +293,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Merge waiter pad action';
                     ApplicationArea = NPRRetail;
 
@@ -308,7 +311,6 @@ page 6150660 "NPR NPRE Waiter Pad"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Close waiter pad action';
                     ApplicationArea = NPRRetail;
 
@@ -323,7 +325,7 @@ page 6150660 "NPR NPRE Waiter Pad"
 
     trigger OnAfterGetCurrRecord()
     begin
-        Rec.UpdateCurrentSeatingDescription();
+        Rec.GetCurrentSeating(Seating);
     end;
 
     trigger OnOpenPage()
@@ -332,6 +334,7 @@ page 6150660 "NPR NPRE Waiter Pad"
     end;
 
     var
+        Seating: Record "NPR NPRE Seating";
         HospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
         NPHWaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
 
