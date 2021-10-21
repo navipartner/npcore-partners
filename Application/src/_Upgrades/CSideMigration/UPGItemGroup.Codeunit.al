@@ -3,11 +3,6 @@ codeunit 6014468 "NPR UPG Item Group"
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()
-    begin
-        Upgrade();
-    end;
-
-    local procedure Upgrade()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
@@ -20,13 +15,19 @@ codeunit 6014468 "NPR UPG Item Group"
             exit;
         end;
 
-        UpgradeItemGroup();
-        UpgradeItemGroupOnItem();
-        UpgradeSalesPriceMaintGroups();
+        Upgrade();
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Item Group"));
 
         LogMessageStopwatch.LogFinish();
+    end;
+
+    procedure Upgrade()
+
+    begin
+        UpgradeItemGroup();
+        UpgradeItemGroupOnItem();
+        UpgradeSalesPriceMaintGroups();
     end;
 
     procedure UpgradeItemGroup()
