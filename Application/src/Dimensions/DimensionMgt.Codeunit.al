@@ -225,7 +225,7 @@
     end;
     #endregion
     #region LookupDimValueCode
-    procedure LookupDimValueCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    procedure LookupDimValueCode(FieldNumber: Integer; var ShortcutDimCode: Code[20]): Boolean
     var
         DimVal: Record "Dimension Value";
         GLSetup: Record "General Ledger Setup";
@@ -240,7 +240,9 @@
             DimMgt.CheckDim(DimVal."Dimension Code");
             DimMgt.CheckDimValue(DimVal."Dimension Code", DimVal.Code);
             ShortcutDimCode := DimVal.Code;
+            exit(true);
         end;
+        exit(false);
     end;
     #endregion
     #region ValidateDimValueCode

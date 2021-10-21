@@ -147,12 +147,14 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
                 case DimensionSource of
                     DimensionSource::SHORTCUT1:
                         begin
-                            SalePOS.LookUpShortcutDimCode(1, DimensionValue);
+                            if not SalePOS.LookUpShortcutDimCode(1, DimensionValue) then
+                                Error('');
                             POSSale.SetShortcutDimCode1(DimensionValue);
                         end;
                     DimensionSource::SHORTCUT2:
                         begin
-                            SalePOS.LookUpShortcutDimCode(2, DimensionValue);
+                            if not SalePOS.LookUpShortcutDimCode(2, DimensionValue) then
+                                Error('');
                             POSSale.SetShortcutDimCode2(DimensionValue);
                         end;
                     DimensionSource::ANY:
@@ -161,9 +163,11 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
                             if DimensionCode = '' then begin
                                 SalePOS.ShowDocDim();
                                 SalePOS.Modify();
-                            end else
-                                if LookupDimensionValue(DimensionCode, DimensionValue) then
-                                    SetDimensionValue(JSON, POSSale, DimensionSource, WithCreate, DimensionValue);
+                            end else begin
+                                if not LookupDimensionValue(DimensionCode, DimensionValue) then
+                                    Error('');
+                                SetDimensionValue(JSON, POSSale, DimensionSource, WithCreate, DimensionValue);
+                            end;
                         end;
                 end;
         end;
