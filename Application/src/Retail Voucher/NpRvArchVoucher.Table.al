@@ -74,6 +74,20 @@ table 6151018 "NPR NpRv Arch. Voucher"
             Caption = 'Allow Top-up';
             DataClassification = CustomerContent;
         }
+        field(63; "Print Object Type"; Enum "NPR Print Object Type")
+        {
+            Caption = 'Print Object Type';
+            DataClassification = CustomerContent;
+            InitValue = Template;
+        }
+        field(64; "Print Object ID"; Integer)
+        {
+            Caption = 'Print Object ID';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Print Object Type" = CONST(Codeunit)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit)) ELSE
+            IF ("Print Object Type" = CONST(Report)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            BlankZero = true;
+        }
         field(65; "Print Template Code"; Code[20])
         {
             Caption = 'Print Template Code';

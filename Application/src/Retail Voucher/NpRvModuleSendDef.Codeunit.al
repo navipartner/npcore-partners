@@ -81,13 +81,37 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
 
     local procedure TrySendVoucherViaPrint(var Voucher: Record "NPR NpRv Voucher")
     var
+        LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
+        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
+        ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        if Voucher.Find() then;
-        if Voucher."Print Template Code" = '' then
+        if not Voucher.Find() or (Voucher."Print Object Type" = Voucher."Print Object Type"::No_Print) then
             exit;
         Voucher.SetRecFilter();
-        RPTemplateMgt.PrintTemplate(Voucher."Print Template Code", Voucher, 0);
+
+        case Voucher."Print Object Type" of
+            Voucher."Print Object Type"::Template:
+                begin
+                    if Voucher."Print Template Code" = '' then
+                        exit;
+                    RPTemplateMgt.PrintTemplate(Voucher."Print Template Code", Voucher, 0);
+                end;
+
+            Voucher."Print Object Type"::Codeunit,
+            Voucher."Print Object Type"::Report:
+                begin
+                    if Voucher."Print Object ID" = 0 then
+                        exit;
+                    if Voucher."Print Object Type" = Voucher."Print Object Type"::Codeunit then begin
+                        if (ObjectOutputMgt.GetCodeunitOutputPath(Voucher."Print Object ID") <> '') then
+                            LinePrintMgt.ProcessCodeunit(Voucher."Print Object ID", Voucher)
+                        else
+                            Codeunit.Run(Voucher."Print Object ID", Voucher);
+                    end else
+                        ReportPrinterInterface.RunReport(Voucher."Print Object ID", false, false, Voucher);
+                end;
+        end;
     end;
 
     procedure SendVoucherViaEmail(Voucher: Record "NPR NpRv Voucher") LastErrorText: Text
@@ -206,7 +230,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
 
         case Selection of
             VoucherType."Send Method via POS"::Print:
-                begin
+                if VoucherType."Print Object Type" = VoucherType."Print Object Type"::Template then begin
                     VoucherType.TestField("Print Template Code");
                     RPTemplateHeader.Get(VoucherType."Print Template Code");
                     PAGE.Run(PAGE::"NPR RP Template Card", RPTemplateHeader);
