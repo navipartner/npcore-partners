@@ -31,6 +31,8 @@ table 6151013 "NPR NpRv Voucher"
 
                 "No. Series" := VoucherType."No. Series";
                 "Arch. No. Series" := VoucherType."Arch. No. Series";
+                "Print Object Type" := VoucherType."Print Object Type";
+                "Print Object ID" := VoucherType."Print Object ID";
                 "Print Template Code" := VoucherType."Print Template Code";
                 "E-mail Template Code" := VoucherType."E-mail Template Code";
                 "SMS Template Code" := VoucherType."SMS Template Code";
@@ -94,6 +96,20 @@ table 6151013 "NPR NpRv Voucher"
         {
             Caption = 'Allow Top-up';
             DataClassification = CustomerContent;
+        }
+        field(63; "Print Object Type"; Enum "NPR Print Object Type")
+        {
+            Caption = 'Print Object Type';
+            DataClassification = CustomerContent;
+            InitValue = Template;
+        }
+        field(64; "Print Object ID"; Integer)
+        {
+            Caption = 'Print Object ID';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Print Object Type" = CONST(Codeunit)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit)) ELSE
+            IF ("Print Object Type" = CONST(Report)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            BlankZero = true;
         }
         field(65; "Print Template Code"; Code[20])
         {

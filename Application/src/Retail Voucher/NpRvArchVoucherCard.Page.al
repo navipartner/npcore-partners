@@ -132,37 +132,51 @@ page 6151021 "NPR NpRv Arch. Voucher Card"
                     }
                     field("Send via Print"; Rec."Send via Print")
                     {
-
                         ToolTip = 'Specifies the value of the Send via Print field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Object Type"; Rec."Print Object Type")
+                    {
+                        Enabled = Rec."Send via Print";
+                        ToolTip = 'Specifies the print object type for the voucher type';
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnValidate()
+                        begin
+                            UpdateControls();
+                        end;
+                    }
+                    field("Print Object ID"; Rec."Print Object ID")
+                    {
+                        Enabled = Rec."Send via Print" and not PrintUsingTemplate;
+                        ToolTip = 'Specifies the print object Id for the voucher type';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Template Code"; Rec."Print Template Code")
                     {
-
+                        Enabled = Rec."Send via Print" and PrintUsingTemplate;
                         ToolTip = 'Specifies the value of the Print Template Code field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Send via E-mail"; Rec."Send via E-mail")
                     {
-
                         ToolTip = 'Specifies the value of the Send via E-mail field';
                         ApplicationArea = NPRRetail;
                     }
                     field("E-mail Template Code"; Rec."E-mail Template Code")
                     {
-
+                        Enabled = Rec."Send via E-mail";
                         ToolTip = 'Specifies the value of the E-mail Template Code field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Send via SMS"; Rec."Send via SMS")
                     {
-
                         ToolTip = 'Specifies the value of the Send via SMS field';
                         ApplicationArea = NPRRetail;
                     }
                     field("SMS Template Code"; Rec."SMS Template Code")
                     {
-
+                        Enabled = Rec."Send via SMS";
                         ToolTip = 'Specifies the value of the SMS Template Code field';
                         ApplicationArea = NPRRetail;
                     }
@@ -335,5 +349,17 @@ page 6151021 "NPR NpRv Arch. Voucher Card"
             }
         }
     }
-}
 
+    var
+        PrintUsingTemplate: Boolean;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        UpdateControls();
+    end;
+
+    local procedure UpdateControls()
+    begin
+        PrintUsingTemplate := Rec."Print Object Type" = Rec."Print Object Type"::Template;
+    end;
+}
