@@ -47,6 +47,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Sales Pr. Maint. Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Customer Templates"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Retail Journal"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpRv Print Object Type"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -153,6 +154,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRCustomerTemplates-20210906');
             Codeunit::"NPR Upgrade Retail Journal":
                 exit('NPRRetailJournal-20210912');
+            Codeunit::"NPR UPG NpRv Print Object Type":
+                exit('InitializeVoucherPrintObjectType_20211021');
         end;
     end;
 }

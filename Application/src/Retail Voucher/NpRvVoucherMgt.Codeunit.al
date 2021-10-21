@@ -702,6 +702,8 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         ArchVoucher."Arch. No." := Voucher."No.";
         ArchVoucher."Account No." := Voucher."Account No.";
         ArchVoucher."Provision Account No." := Voucher."Provision Account No.";
+        ArchVoucher."Print Object Type" := Voucher."Print Object Type";
+        ArchVoucher."Print Object ID" := Voucher."Print Object ID";
         ArchVoucher."Print Template Code" := Voucher."Print Template Code";
         ArchVoucher."Customer No." := Voucher."Customer No.";
         ArchVoucher."Contact No." := Voucher."Contact No.";
