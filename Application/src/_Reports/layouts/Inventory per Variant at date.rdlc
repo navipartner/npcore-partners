@@ -7,7 +7,7 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>b9fdac00-f0ef-4506-8895-0d7e5bcbc1cb</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -2934,25 +2934,6 @@
                 <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
-            <Image Name="Picutre">
-              <Source>Database</Source>
-              <Value>=Convert.ToBase64String(Fields!CompanyInfoPicture.Value)</Value>
-              <MIMEType>image/bmp</MIMEType>
-              <Sizing>Fit</Sizing>
-              <Left>15.39428cm</Left>
-              <Height>43.49984pt</Height>
-              <Width>5.10746cm</Width>
-              <ZIndex>8</ZIndex>
-              <Visibility>
-                <Hidden>=iif(IsNothing(Fields!CompanyInfoPicture.Value) = true,true,false)</Hidden>
-              </Visibility>
-              <DataElementOutput>NoOutput</DataElementOutput>
-              <Style>
-                <Border />
-                <FontFamily>Segoe UI</FontFamily>
-                <FontSize>8pt</FontSize>
-              </Style>
-            </Image>
             <Rectangle Name="Rectangle1">
               <ReportItems>
                 <Textbox Name="Textbox563">
@@ -3269,7 +3250,7 @@
               <Top>1.78124in</Top>
               <Height>0.21876in</Height>
               <Width>8.08192in</Width>
-              <ZIndex>9</ZIndex>
+              <ZIndex>8</ZIndex>
               <Style>
                 <Border>
                   <Color>LightGrey</Color>
@@ -3313,6 +3294,7 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <Top>0in</Top>
               <Height>13.50473pt</Height>
               <Width>20.52256cm</Width>
               <Style>
@@ -3337,6 +3319,7 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <Top>0in</Top>
               <Left>15.45778cm</Left>
               <Height>13.50473pt</Height>
               <Width>5.06478cm</Width>
@@ -3450,6 +3433,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>c37614d2-ff5a-4dc5-9162-b14376b3da86</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
