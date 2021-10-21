@@ -71,5 +71,7 @@ table 6150666 "NPR NPRE Seating Location"
         key(Key1; "Code")
         {
         }
+        key(Key2; "Restaurant Code")
+        { }
     }
 }

@@ -2,6 +2,8 @@ table 6150662 "NPR NPRE Seat.: WaiterPadLink"
 {
     Caption = 'Seating - Waiter Pad Link';
     DataClassification = CustomerContent;
+    LookupPageId = "NPR NPRE Seat.: WaiterPadLink";
+    DrillDownPageId = "NPR NPRE Seat.: WaiterPadLink";
 
     fields
     {
@@ -23,11 +25,15 @@ table 6150662 "NPR NPRE Seat.: WaiterPadLink"
         {
             Caption = 'No. Of Waiter Pad For Seating';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with a FlowField "No. Of Waiter Pads For Seating"';
         }
         field(11; "No. Of Seating For Waiter Pad"; Integer)
         {
             Caption = 'No. Of Seating For Waiter Pad';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with a FlowField "No. Of Seatings For Waiter Pad"';
         }
         field(12; "Seating Description FF"; Text[50])
         {
@@ -45,7 +51,20 @@ table 6150662 "NPR NPRE Seat.: WaiterPadLink"
         {
             Caption = 'Closed';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
+        }
+        field(30; "No. Of Waiter Pads For Seating"; Integer)
+        {
+            Caption = 'No. Of Waiter Pads For Seating';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = count("NPR NPRE Seat.: WaiterPadLink" where("Seating Code" = field("Seating Code"), Closed = field(Closed)));
+        }
+        field(31; "No. Of Seatings For Waiter Pad"; Integer)
+        {
+            Caption = 'No. Of Seatings For Waiter Pad';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = count("NPR NPRE Seat.: WaiterPadLink" where("Waiter Pad No." = field("Waiter Pad No."), Closed = field(Closed)));
         }
     }
 

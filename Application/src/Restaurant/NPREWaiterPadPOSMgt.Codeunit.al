@@ -451,17 +451,19 @@
 
     procedure MoveWaiterPadToNewSeatingUI(var WaiterPad: Record "NPR NPRE Waiter Pad")
     var
-        Seating: Record "NPR NPRE Seating";
+        CurrentSeating: Record "NPR NPRE Seating";
+        NewSeating: Record "NPR NPRE Seating";
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
         WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
-        Seating.Get(SeatingManagement.UILookUpSeating('', ''));
+        NewSeating.Get(SeatingManagement.UILookUpSeating('', ''));
 
         WaiterPad.CalcFields("Current Seating FF");
+        WaiterPad.GetCurrentSeating(CurrentSeating);
 
-        if not Confirm(StrSubstNo(CFRM_Move_seating, WaiterPad."No.", WaiterPad.Description, WaiterPad."Current Seating Description", Seating.Description), true) then
+        if not Confirm(StrSubstNo(CFRM_Move_seating, WaiterPad."No.", WaiterPad.Description, CurrentSeating.Description, NewSeating.Description), true) then
             exit;
-        WaiterPadManagement.ChangeSeating(WaiterPad."No.", WaiterPad."Current Seating FF", Seating.Code);
+        WaiterPadManagement.ChangeSeating(WaiterPad."No.", WaiterPad."Current Seating FF", NewSeating.Code);
     end;
 
     procedure MergeWaiterPadUI(var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean

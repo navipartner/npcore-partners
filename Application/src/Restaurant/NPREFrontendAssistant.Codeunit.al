@@ -171,8 +171,10 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
     begin
         Request.SetMethod('UpdateWaiterPadData');
 
-        if RestaurantCode <> '' then
+        if RestaurantCode <> '' then begin
+            SeatingLocation.SetCurrentKey("Restaurant Code");
             SeatingLocation.SetRange("Restaurant Code", RestaurantCode);
+        end;
         //if LocationCode <> '' then
         //    SeatingLocation.SetRange(Code, LocationCode);
 
@@ -180,6 +182,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
         SeatingWaiterPadLink.SetRange(Closed, false);
         if SeatingLocation.FindSet() then
             repeat
+                Seating.SetCurrentKey("Seating Location");
                 Seating.SetRange("Seating Location", SeatingLocation.Code);
                 if Seating.FindSet() then
                     repeat
@@ -237,6 +240,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
         PropertiesString: Text;
         AddToList: Boolean;
     begin
+        SeatingLocation.SetCurrentKey("Restaurant Code");
         Request.SetMethod('UpdateRestaurantLayout');
         if RestaurantCode <> '' then begin
             SeatingLocation.FilterGroup(2);
@@ -258,7 +262,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                         LocationContent.Add('caption', SeatingLocation.Description);
                         LocationContent.Add('restaurantId', SeatingLocation."Restaurant Code");
 
-                        // sync new seating entries created in backend?
+                        Seating.SetCurrentKey("Seating Location");
                         Seating.SetRange("Seating Location", SeatingLocation.Code);
                         if Seating.FindSet() then
                             repeat
@@ -267,18 +271,25 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                                     LocationLayout.Type := 'table';
                                     LocationLayout.Insert();
                                 end;
-                                LocationLayout.Description := Seating.Description;
-                                LocationLayout."Seating Location" := SeatingLocation.Code;
-                                LocationLayout.Modify();
+                                if (LocationLayout."Seating No." <> Seating."Seating No.") or
+                                   (LocationLayout.Description <> Seating.Description) or
+                                   (LocationLayout."Seating Location" <> SeatingLocation.Code)
+                                then begin
+                                    LocationLayout."Seating No." := Seating."Seating No.";
+                                    LocationLayout.Description := Seating.Description;
+                                    LocationLayout."Seating Location" := SeatingLocation.Code;
+                                    LocationLayout.Modify();
+                                end;
                             until Seating.Next() = 0;
 
                         Clear(ComponentList);
-                        LocationLayout.Reset();
+                        LocationLayout.SetCurrentKey("Seating Location");
                         LocationLayout.SetRange("Seating Location", SeatingLocation.Code);
                         if LocationLayout.FindSet() then
                             repeat
                                 Clear(ComponentContent);
                                 ComponentContent.Add('id', LocationLayout.Code);
+                                ComponentContent.Add('user_friendly_id', LocationLayout."Seating No.");
                                 ComponentContent.Add('type', LocationLayout.Type);
                                 ComponentContent.Add('caption', LocationLayout.Description);
                                 if LocationLayout."Frontend Properties".HasValue() then begin
@@ -295,7 +306,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                                         ComponentContent.Add('blocked', Seating.Blocked);
                                         ComponentContent.Add('statusId', Seating.Status);
                                         ComponentContent.Add('capacity', Seating.Capacity);
-                                        ComponentContent.Add('color', Seating.RgbColorCodeHex());
+                                        ComponentContent.Add('color', Seating.RGBColorCodeHex(true));
                                     end;
                                 end else
                                     AddToList := true;
@@ -480,7 +491,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
                 StatusObjectContent.Add('ordinal', NPREFlowStatus."Flow Order");
                 StatusObjectContent.Add('caption', NPREFlowStatus.Description);
                 if ColorTable.Get(NPREFlowStatus.Color) then
-                    StatusObjectContent.Add('color', ColorTable."RGB Color Code (Hex)")
+                    StatusObjectContent.Add('color', ColorTable.RGBHexCode(false))
                 else
                     StatusObjectContent.Add('color', '');
                 StatusObjectContent.Add('icon', NPREFlowStatus."Icon Class");
@@ -497,6 +508,6 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
             exit('');
         if not ColorTable.get(FlowStatus.Color) then
             ColorTable.Init();
-        exit(ColorTable."RGB Color Code (Hex)");
+        exit(ColorTable.RGBHexCode(false));
     end;
 }

@@ -11,12 +11,22 @@ table 6150665 "NPR NPRE Seating"
         {
             Caption = 'Code';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                UpdateSeatingNo();
+            end;
         }
         field(3; "Seating Location"; Code[10])
         {
             Caption = 'Seating Location';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Seating Location".Code;
+        }
+        field(5; "Seating No."; Text[20])
+        {
+            Caption = 'Seating No.';
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[50])
         {
@@ -103,6 +113,14 @@ table 6150665 "NPR NPRE Seating"
     keys
     {
         key(Key1; "Code")
+        { }
+        key(Key2; "Seating Location", "Seating No.")
+        { }
+    }
+
+    fieldgroups
+    {
+        fieldgroup(DropDown; Code, "Seating No.", Description)
         {
         }
     }
@@ -119,6 +137,7 @@ table 6150665 "NPR NPRE Seating"
     trigger OnInsert()
     begin
         UpdateCurrentWaiterPadDescription();
+        UpdateSeatingNo();
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR NPRE Seating", Code,
           "Global Dimension 1 Code", "Global Dimension 2 Code");
@@ -160,7 +179,7 @@ table 6150665 "NPR NPRE Seating"
         Modify();
     end;
 
-    procedure RgbColorCodeHex(): Text
+    procedure RGBColorCodeHex(IncludeHashMark: Boolean): Text
     var
         ColorTable: Record "NPR NPRE Color Table";
         FlowStatus: Record "NPR NPRE Flow Status";
@@ -193,6 +212,12 @@ table 6150665 "NPR NPRE Seating"
                         end;
             until SeatingWaiterPadLink.Next() = 0;
 
-        exit(ColorTable."RGB Color Code (Hex)");
+        exit(ColorTable.RGBHexCode(IncludeHashMark));
+    end;
+
+    local procedure UpdateSeatingNo()
+    begin
+        if ("Seating No." = xRec."Code") or ("Seating No." = '') then
+            "Seating No." := "Code";
     end;
 }

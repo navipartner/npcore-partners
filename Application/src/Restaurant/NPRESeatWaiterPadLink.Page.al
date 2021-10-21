@@ -15,51 +15,24 @@ page 6150662 "NPR NPRE Seat.: WaiterPadLink"
             {
                 field("Seating Code"; Rec."Seating Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Seating Code field';
+                    ToolTip = 'Specifies the seating code assigned to the waiter pad';
                     ApplicationArea = NPRRetail;
                 }
                 field("Waiter Pad No."; Rec."Waiter Pad No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Waiter Pad No. field';
+                    ToolTip = 'Specifies the waiter pad No. the seating is assigned to';
                     ApplicationArea = NPRRetail;
                 }
-                field("No. Of Waiter Pad For Seating"; Rec."No. Of Waiter Pad For Seating")
+                field("No. Of Waiter Pads For Seating"; Rec."No. Of Waiter Pads For Seating")
                 {
-
-                    ToolTip = 'Specifies the value of the No. Of Waiter Pad For Seating field';
+                    ToolTip = 'Specifies the total number of waiter pads the seating is currently assigned to';
                     ApplicationArea = NPRRetail;
                 }
-                field("No. Of Seating For Waiter Pad"; Rec."No. Of Seating For Waiter Pad")
+                field("No. Of Seatings For Waiter Pad"; Rec."No. Of Seatings For Waiter Pad")
                 {
-
-                    ToolTip = 'Specifies the value of the No. Of Seating For Waiter Pad field';
+                    ToolTip = 'Specifies the total number of seatings currently assigned to the waiter pad';
                     ApplicationArea = NPRRetail;
                 }
-            }
-        }
-    }
-
-    actions
-    {
-        area(processing)
-        {
-            action("Change Seating")
-            {
-                Caption = 'Change Seating';
-                Image = "Action";
-
-                ToolTip = 'Executes the Change Seating action';
-                ApplicationArea = NPRRetail;
-            }
-            action("Change Waiter Pad")
-            {
-                Caption = 'Change Waiter Pad';
-                Image = View;
-
-                ToolTip = 'Executes the Change Waiter Pad action';
-                ApplicationArea = NPRRetail;
             }
         }
     }

@@ -30,7 +30,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         field(16; "Current Seating FF"; Code[20])
         {
             CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Seating Code" WHERE("Waiter Pad No." = FIELD("No.")));
-            Caption = 'Current Seating';
+            Caption = 'Current Seating Code';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -61,6 +61,8 @@ table 6150660 "NPR NPRE Waiter Pad"
         {
             Caption = 'Seating Description';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by procedure GetCurrentSeating(), as the field could contain an outdated value';
         }
         field(30; Status; Code[10])
         {
@@ -179,27 +181,11 @@ table 6150660 "NPR NPRE Waiter Pad"
         OnDeleteWaiterPad(Rec);
     end;
 
-    trigger OnInsert()
+    procedure GetCurrentSeating(var Seating: Record "NPR NPRE Seating")
     begin
-        UpdateCurrentSeatingDescription();
-    end;
-
-    trigger OnModify()
-    begin
-        UpdateCurrentSeatingDescription();
-    end;
-
-    procedure UpdateCurrentSeatingDescription()
-    var
-        NPHSeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-    begin
-        CalcFields("Current Seating FF");
-        if "Current Seating FF" <> '' then begin
-            if NPHSeatingWaiterPadLink.Get("Current Seating FF", "No.") then begin
-                NPHSeatingWaiterPadLink.CalcFields("Seating Description FF");
-                "Current Seating Description" := NPHSeatingWaiterPadLink."Seating Description FF";
-            end;
-        end;
+        Rec.CalcFields("Current Seating FF");
+        if not Seating.Get(Rec."Current Seating FF") then
+            Clear(Seating);
     end;
 
     local procedure OnDeleteWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
