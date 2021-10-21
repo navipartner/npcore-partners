@@ -12,6 +12,8 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         FRefNewerRepCounter: FieldRef;
         ReplicationKeyIndex: Integer;
     begin
+        if SetupDisabled() then
+            exit;
         FRefReplicationCounter := RecRef.Field(ReplicationCounterFieldNo);
         FRefReplicationCounter.Value := RecRef.Field(0).Value; //SQL Timestamp
 
@@ -47,6 +49,14 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
                         exit(i);
                 end;
         end;
+    end;
+
+    local procedure SetupDisabled(): Boolean
+    var
+        ReplicationServiceSetup: Record "NPR Replication Service Setup";
+    begin
+        ReplicationServiceSetup.SetRange(Enabled, true);
+        exit(ReplicationServiceSetup.IsEmpty());
     end;
     #endregion
 
