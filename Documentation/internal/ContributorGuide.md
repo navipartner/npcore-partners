@@ -35,6 +35,10 @@ However, all documents that deal with back-end stuff that would be more suitable
   We will create a glossary that you can refer to when you need reassurance.
 - **Test the validity of information**  
   Don't write from memory no matter how familiar with the subject you are. It's absolutely necessary to perform testing in the app before or during the writing.
+- **All GUI elements should be written in the bold font**   
+  You shouldn't indicate that something is a GUI element by using quotation marks.
+- **Features should be written with first letters of each word capitalized**   
+  Feature names shouldn't be bold or indicated by quotation marks.
 
 ## Documentation sections and structure
 There are two topic structures that you can choose from, depending on the subject, knowledge levels, and the goal of the reader.
@@ -103,7 +107,7 @@ It shouldn't be too big - don't distract users with unnecessary information. Scr
 
 The screenshot clearly indicates which part of the screen is of interest and which button needs to be clicked to achieve the desired outcome.
 
-It also helps to frame the button that users need to find.
+It also helps to frame the screenshot with a subtle dark-grey frame and put a smaller, red frame around the button that users need to find.
 
 
 I recommend the [Greenshot](https://getgreenshot.org/downloads/) screenshot-capturing tool, since it's easy to use and has many useful options.
