@@ -23,6 +23,11 @@ page 6060079 "NPR TM Ticket Setup"
                     ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
                     ToolTip = 'Specifies the amount of time until a used ticket and its associated information may be deleted. Does not affect generated statistics.';
                 }
+                field("Duration Retire Tickets (Min.)"; Rec."Duration Retire Tickets (Min.)")
+                {
+                    ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the max duration (in minutes) the retire ticket job is allowed to run. Specify -1 for indefinite. ';
+                }
 
             }
             group("Ticket Print")
@@ -304,8 +309,22 @@ page 6060079 "NPR TM Ticket Setup"
                     RetentionTicketData.MainWithConfirm();
                 end;
             }
+            action(AddRecurringJobToRetireTicketData)
+            {
+                Caption = 'Schedule Ticket Data Cleanup';
+                ToolTip = 'Adds a new periodic job, responsible for obsolete ticket data cleanup, including unused schedule entries.';
+                Image = AddAction;
+                ApplicationArea = NPRTicketAdvanced;
 
-
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    RetentionTicketData: Codeunit "NPR TM Retention Ticket Data";
+                begin
+                    if RetentionTicketData.AddTicketDataRetentionJobQueue(JobQueueEntry, false) then
+                        Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
+                end;
+            }
             action(DeployRapidPackageFromAzureBlob)
             {
                 Caption = 'Deploy Rapid Package From Azure';
