@@ -37,6 +37,7 @@ codeunit 6014438 "NPR Job Queue Install"
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1')) then begin
             UpdateRetenPolicyJobQueueEntry();
+            AddTicketDataRetentionJobQueue();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         end;
 
@@ -64,6 +65,18 @@ codeunit 6014438 "NPR Job Queue Install"
         CleanupJQLogEntries: Codeunit "NPR Cleanup JQ Log Entries";
     begin
         CleanupJQLogEntries.AddJQLogCleanupJob(JobQueueEntry, true);
+    end;
+
+    local procedure AddTicketDataRetentionJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        RetentionTicketData: Codeunit "NPR TM Retention Ticket Data";
+    begin
+        if not TicketSetup.ReadPermission() then
+            exit;
+        if TicketSetup.Get() then
+            RetentionTicketData.AddTicketDataRetentionJobQueue(JobQueueEntry, true);
     end;
 
     local procedure AddInventoryAdjmtJobQueues()

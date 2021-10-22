@@ -64,6 +64,12 @@ table 6060111 "NPR TM Ticket Setup"
             DataClassification = CustomerContent;
             InitValue = '<2Y>';
         }
+        Field(86; "Duration Retire Tickets (Min.)"; Integer)
+        {
+            Caption = 'Duration Retire Tickets (Min.)';
+            DataClassification = CustomerContent;
+            InitValue = 50;
+        }
         field(100; "Print Server Generator URL"; Text[200])
         {
             Caption = 'Print Server Generator URL';
