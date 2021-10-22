@@ -257,7 +257,7 @@ codeunit 6014608 "NPR Replication Register"
     begin
         // ITEM
         sender.RegisterService(ItemsServiceCodeLbl,
-            GetAPIServiceURL(), ItemsServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), ItemsServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterItemServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -266,7 +266,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // CUSTOMER
         sender.RegisterService(CustServiceCodeLbl,
-            GetAPIServiceURL(), CustServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), CustServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterCustServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -275,7 +275,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // VENDOR
         sender.RegisterService(VendServiceCodeLbl,
-            GetAPIServiceURL(), VendServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), VendServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterVendServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -284,7 +284,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // NP RETAIL
         sender.RegisterService(NPRetailServiceCodeLbl,
-            GetAPIServiceURL(), NPRetailServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), NPRetailServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterNPRetailServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -293,7 +293,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // DIMENSIONS
         sender.RegisterService(DimensionsServiceCodeLbl,
-            GetAPIServiceURL(), DimensionsServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), DimensionsServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterDimensionsServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -302,7 +302,7 @@ codeunit 6014608 "NPR Replication Register"
 
         // MISC
         sender.RegisterService(MiscServiceCodeLbl,
-            GetAPIServiceURL(), MiscServiceNameLbl, false, "NPR Replication API Auth. Type"::Basic, 'DEFAULT');
+            GetAPIServiceURL(), MiscServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterMiscellaneousServiceEndPoints();
         IF sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
@@ -757,6 +757,9 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("Phone No."), 'phoneNumber', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("Mobile Phone No."), 'mobilePhoneNumber', 0, false, false);
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("E-Mail"), 'email', 0, false, false);
