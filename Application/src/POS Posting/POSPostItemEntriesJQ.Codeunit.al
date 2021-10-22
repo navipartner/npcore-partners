@@ -35,8 +35,7 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
             end;
         until POSEntry.Next() = 0;
 
-        if ErrorCount > 0 then begin
-            Error(ErrMessage, ErrorCount);
-        end
+        if ErrorCount > 0 then
+            Message(ErrMessage, ErrorCount);
     end;
 }
