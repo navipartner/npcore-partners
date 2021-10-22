@@ -133,7 +133,7 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                     'AddJobQueues':
                         exit('NPRJobQueueInstall-20210924');
                     'UpdateJobQueues1':
-                        exit('NPRJobQueueUpdate-20211014');
+                        exit('NPRJobQueueUpdate-20211020');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');
