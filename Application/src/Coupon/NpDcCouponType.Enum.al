@@ -7,9 +7,9 @@ enum 6014462 "NPR NpDc Coupon Type"
     {
         Caption = 'Item';
     }
-    value(1; "Item Group")
+    value(1; "Item Categories")
     {
-        Caption = 'Item Group';
+        Caption = 'Item Categories';
     }
     value(2; "Item Disc. Group")
     {

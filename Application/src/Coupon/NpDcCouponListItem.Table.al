@@ -27,7 +27,7 @@ table 6151596 "NPR NpDc Coupon List Item"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item)) Item
             ELSE
-            IF (Type = CONST("Item Group")) "Item Category"
+            IF (Type = CONST("Item Categories")) "Item Category"
             ELSE
             IF (Type = CONST("Item Disc. Group")) "Item Discount Group"
             ELSE
@@ -48,7 +48,7 @@ table 6151596 "NPR NpDc Coupon List Item"
                             "Unit Price" := Item."Unit Price";
                             "Profit %" := Item."Profit %";
                         end;
-                    Type::"Item Group":
+                    Type::"Item Categories":
                         begin
                             ItemCategory.Get("No.");
                             Description := ItemCategory.Description;

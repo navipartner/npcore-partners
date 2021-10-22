@@ -148,7 +148,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
                 begin
                     SaleLinePOS.SetRange("No.", NpDcCouponListItem."No.");
                 end;
-            NpDcCouponListItem.Type::"Item Group":
+            NpDcCouponListItem.Type::"Item Categories":
                 begin
                     SaleLinePOS.SetFilter("No.", '<>%1', '');
                     SaleLinePOS.SetRange("Item Category Code", NpDcCouponListItem."No.");
@@ -178,7 +178,7 @@ codeunit 6151597 "NPR NpDc Module Valid. Item L."
                 begin
                     SaleLinePOS.SetRange("No.", NpDcCouponListItem."No.");
                 end;
-            NpDcCouponListItem.Type::"Item Group":
+            NpDcCouponListItem.Type::"Item Categories":
                 begin
                     SaleLinePOS.SetFilter("No.", '<>%1', '');
                     SaleLinePOS.SetRange("Item Category Code", NpDcCouponListItem."No.");
