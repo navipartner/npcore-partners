@@ -1,4 +1,4 @@
-codeunit 6014462 "NPR UPG NpRv Print Object Type"
+codeunit 6014689 "NPR UPG NpRv Print Object Type"
 {
     Subtype = Upgrade;
 
