@@ -328,6 +328,11 @@
             "justification": "'Caption' is being deprecated in the versions: '1.0' or greater. This property does not have any effect on report columns. This warning will become an error in a future release."
         },
         {
+            "id": "AS0004",
+            "action": "Warning",
+            "justification": "Temporarily disabled for PR 9185."
+        },  
+        {
             "id": "AS0006",
             "action": "Warning",
             "justification": "Temporarily disabled for PR 53324."
@@ -385,7 +390,7 @@
         {
             "id": "AS0028",
             "action":"Hidden",
-            "justification": "Reducing the array size of a parameter in events and external procedures is should not be performed."
+            "justification": "Reducing the array size of a parameter in events and external procedures should not be performed."
         },
         {
             "id": "AS0029",

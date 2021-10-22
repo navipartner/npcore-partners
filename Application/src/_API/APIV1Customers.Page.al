@@ -117,6 +117,16 @@ page 6014507 "NPR APIV1 - Customers"
                         RegisterFieldSet(Rec.FieldNo("Phone No."));
                     end;
                 }
+
+                field(mobilePhoneNumber; Rec."Mobile Phone No.")
+                {
+                    Caption = 'Mobile Phone No.';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Mobile Phone No."));
+                    end;
+                }
                 field(email; Rec."E-Mail")
                 {
                     Caption = 'Email';

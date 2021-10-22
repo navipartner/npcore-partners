@@ -41,13 +41,21 @@ table 6014588 "NPR Replication Service Setup"
             trigger OnValidate()
             var
                 ReplicationAPI: Codeunit "NPR Replication API";
-                Auth: Interface "NPR Replication API IAuthorization";
+                iAuth: Interface "NPR API IAuthorization";
+#IF BC17
+                AuthorizationDetailsDict: Dictionary of [Text, Text];
+#ENDIF
             begin
                 IF Enabled then begin
                     Rec."Service URL" := COPYSTR(ReplicationAPI.VerifyServiceURL(Rec."Service URL"), 1, MaxStrLen(Rec."Service URL"));
                     CheckFromCompany();
-                    Auth := Rec.AuthType;
-                    Auth.CheckMandatoryValues(Rec);
+                    iAuth := Rec.AuthType;
+#IF BC17
+                    iAuth.GetAuthorizationDetailsDict(Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code", AuthorizationDetailsDict);
+                    iAuth.CheckMandatoryValues(AuthorizationDetailsDict);
+#ELSE
+                    iAuth.CheckMandatoryValues(iAuth.GetAuthorizationDetailsDict(Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code"));
+#ENDIF
                     IF GuiAllowed Then
                         IF NOT Confirm(EnableServiceConfirm) then
                             Error('');
@@ -60,7 +68,7 @@ table 6014588 "NPR Replication Service Setup"
                 end;
             end;
         }
-        field(20; AuthType; Enum "NPR Replication API Auth. Type")
+        field(20; AuthType; Enum "NPR API Auth. Type")
         {
             Caption = 'Auth. Type';
             DataClassification = CustomerContent;
@@ -89,7 +97,7 @@ table 6014588 "NPR Replication Service Setup"
         field(35; "OAuth2 Setup Code"; Code[20])
         {
             DataClassification = CustomerContent;
-            TableRelation = "OAuth 2.0 Setup";
+            TableRelation = "NPR OAuth Setup";
             Caption = 'OAuth2.0 Setup Code';
             trigger OnValidate()
             begin
@@ -247,6 +255,9 @@ table 6014588 "NPR Replication Service Setup"
         ReplicationAPI.DeleteNcImportType(Rec."API Version");
         ReplicationAPI.DeleteJobQueueEntries(Rec);
         ReplicationAPI.DeleteJobQueueCategory();
+
+        IF Rec.HasApiPassword() then
+            RemoveApiPassword();
     end;
 
     trigger OnRename()
@@ -285,7 +296,7 @@ table 6014588 "NPR Replication Service Setup"
         Clear("Api Password Key");
     end;
 
-    procedure RegisterService(pAPIVersion: Code[20]; pServiceUrl: Text[100]; pName: Text[100]; pEnabled: Boolean; pAuthType: Enum "NPR Replication API Auth. Type"; pTenant: Text[50])
+    procedure RegisterService(pAPIVersion: Code[20]; pServiceUrl: Text[100]; pName: Text[100]; pEnabled: Boolean; pAuthType: Enum "NPR API Auth. Type"; pTenant: Text[50])
     begin
         Rec."API Version" := pAPIVersion;
         IF Rec.FIND() then
@@ -342,13 +353,21 @@ table 6014588 "NPR Replication Service Setup"
 
     procedure FillExternalCompany()
     var
-        Auth: Interface "NPR Replication API IAuthorization";
+        iAuth: Interface "NPR API IAuthorization";
         TempCompany: Record Company temporary;
+#IF BC17
+        AuthorizationDetailsDict: Dictionary of [Text, Text];
+#ENDIF
     begin
         Rec.TestField(Enabled, false);
         Rec.TestField("Service URL");
-        Auth := Rec.AuthType;
-        Auth.CheckMandatoryValues(Rec);
+        iAuth := Rec.AuthType;
+#IF BC17
+        iAuth.GetAuthorizationDetailsDict(Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code", AuthorizationDetailsDict);
+        iAuth.CheckMandatoryValues(AuthorizationDetailsDict);
+#ELSE
+        iAuth.CheckMandatoryValues(iAuth.GetAuthorizationDetailsDict(Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code"));
+#ENDIF
         IF GetExternalCompany(TempCompany) Then begin
             Rec.Validate("From Company Name - External", TempCompany.Name);
             Rec.Validate("From Company ID - External", TempCompany.Id);
@@ -370,7 +389,7 @@ table 6014588 "NPR Replication Service Setup"
 
     procedure GetExternalCompany(var TempCompany: Record Company temporary): Boolean
     var
-        iAuth: Interface "NPR Replication API IAuthorization";
+        iAuth: Interface "NPR API IAuthorization";
         ReplicationAPI: Codeunit "NPR Replication API";
         Client: HttpClient;
         Headers: HttpHeaders;
@@ -383,6 +402,9 @@ table 6014588 "NPR Replication Service Setup"
         JToken: JsonToken;
         JArray: JsonArray;
         i: Integer;
+#IF BC17
+        AuthorizationDetailsDict: Dictionary of [Text, Text];
+#ENDIF
     begin
         TempCompany.Reset();
         IF NOT TempCompany.IsEmpty then
@@ -395,7 +417,13 @@ table 6014588 "NPR Replication Service Setup"
 
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
-        Headers.Add('Authorization', iAuth.GetAuthorizationValue(Rec));
+#IF BC17
+        iAuth.GetAuthorizationDetailsDict(Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code", AuthorizationDetailsDict);
+        Headers.Add('Authorization', iAuth.GetAuthorizationValue(AuthorizationDetailsDict));
+#ELSE
+        Headers.Add('Authorization', iAuth.GetAuthorizationValue(iAuth.GetAuthorizationDetailsDict(
+            Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code")));
+#ENDIF
         IF not ReplicationAPI.IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt, StatusCode) then
             Error(ErrorTxt);
 
@@ -431,7 +459,7 @@ table 6014588 "NPR Replication Service Setup"
 
     procedure TestConnection()
     var
-        iAuth: Interface "NPR Replication API IAuthorization";
+        iAuth: Interface "NPR API IAuthorization";
         ReplicationAPI: Codeunit "NPR Replication API";
         Client: HttpClient;
         Headers: HttpHeaders;
@@ -443,18 +471,24 @@ table 6014588 "NPR Replication Service Setup"
         ResponseText: Text;
         Response: Codeunit "Temp Blob";
         OutStr: OutStream;
+        AuthDetailsDict: Dictionary of [Text, Text];
     begin
         Rec."Service URL" := COPYSTR(ReplicationAPI.VerifyServiceURL(Rec."Service URL"), 1, MaxStrLen(Rec."Service URL"));
         CheckFromCompany();
         iAuth := Rec.AuthType;
-        iAuth.CheckMandatoryValues(Rec);
+#IF BC17
+        iAuth.GetAuthorizationDetailsDict(Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code", AuthDetailsDict);
+#ELSE
+        AuthDetailsDict := iAuth.GetAuthorizationDetailsDict(Rec.UserName, Rec.GetApiPassword(), Rec."OAuth2 Setup Code");
+#ENDIF
+        iAuth.CheckMandatoryValues(AuthDetailsDict);
         RequestMessage.Method := 'GET';
         URI := Rec."Service URL" + '/v2.0/companies';
         AddTenantToURL(URI);
 
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
-        Headers.Add('Authorization', iAuth.GetAuthorizationValue(Rec));
+        Headers.Add('Authorization', iAuth.GetAuthorizationValue(AuthDetailsDict));
         IF not ReplicationAPI.IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt, StatusCode) then
             Error(ErrorTxt);
 

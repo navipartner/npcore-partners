@@ -333,7 +333,7 @@ page 6014495 "NPR Replication Setup Card"
 
     local procedure BasicAuthVisible(): Boolean
     var
-        iAuth: Interface "NPR Replication API IAuthorization";
+        iAuth: Interface "NPR API IAuthorization";
     begin
         iAuth := Rec.AuthType;
         IsBasicAuthVisible := iAuth.IsEnabled(Rec, Rec.FieldName(AuthType), Format(Rec.AuthType::Basic));
@@ -341,7 +341,7 @@ page 6014495 "NPR Replication Setup Card"
 
     local procedure OAuth2Visible(): Boolean
     var
-        iAuth: Interface "NPR Replication API IAuthorization";
+        iAuth: Interface "NPR API IAuthorization";
     begin
         iAuth := Rec.AuthType;
         IsOAuth2Visible := iAuth.IsEnabled(Rec, Rec.FieldName(AuthType), Format(Rec.AuthType::OAuth2));
