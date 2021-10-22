@@ -35,9 +35,7 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
             end;
         until POSEntry.Next() = 0;
 
-        if ErrorCount > 0 then begin
-            Error(ErrMessage, ErrorCount);
-        end
+        if ErrorCount > 0 then
+            Message(ErrMessage, ErrorCount);
     end;
 }
-
