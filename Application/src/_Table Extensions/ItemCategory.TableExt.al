@@ -137,6 +137,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             CalcFormula = - Sum("NPR Aux. Item Ledger Entry".Quantity
                                 WHERE(
                                     "Entry Type" = CONST(Sale),
+                                    "Item Category Code" = FIELD("Code"),
                                     "Posting Date" = FIELD("NPR Date Filter"),
                                     "Vendor No." = FIELD("NPR Vendor Filter"),
                                     "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter"),
