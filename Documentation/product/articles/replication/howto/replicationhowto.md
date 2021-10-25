@@ -8,7 +8,8 @@ This topic describes the process of configuring the Replication Setup. As soon a
 2. Open the first **CUST_NPAPI V1** setup.
 3. Enter the necessary information in order to enable the setup (the setup is disabled by default).
  > [!IMPORTANT]
- > If the replication is made from an external database, state the correct external URL to the **Service Base URL** field and enable the **External Database** toggle switch.
+ > If the replication is made from an external database, state the correct external URL to the **Service Base URL** field and enable the **External Database** toggle switch.           
+ 
 4. Press the ellipsis button next to the **From Company Name** field and select the company from which you want to import data.   
    If the **External Company** is disabled, you can select a company from the current database, otherwise the system makes a web API request to the external database to retrieve companies and you can select a company from that database.
 5. The **From Company Id** is automatically populated. This field is used by the system when it makes API requests to retrieve data from the selected company.
