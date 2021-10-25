@@ -21,19 +21,23 @@ This topic describes the process of configuring the Replication Setup. As soon a
 > [!Note]  	
 > When enabling the Replication Setup, a Naviconnect Import Type and a Job Queue Entry are created in the background, so the import is done automatically based on setup of these records.
 
-## Endpoints
+## Next steps
 
-The import is done based on the **Endpoints** subpage setup.
+After you're done configuring the **General** Replication Setup options, you can also configure the **Endpoints** and **Special Field Mappings**.
 
-Here, you can choose to:
+### Configuring Endpoints
+
+The import is done based on the **Endpoints** subpage setup. If necessary, you can configure it.
+
+It is possible to:
 - disable specific endpoints (which will stop importing data for those tables)
 - change the order in which tables are imported
 - update the **Replication Counter** field
 - add new endpoint configuration
 
-## Special Field Mappings
+### Configuring Special Field Mappings
 
-In general, the fields for each table (endpoint) are mapped automatically. In the API page used as a webservice, most fields are named like the table field in the CamelCase.    
+In general, the fields for each table (endpoint) are mapped automatically. In the API page used as a webservice, most fields are named like the table fields in the CamelCase.    
 
 **Example:**   
 **Customer Posting Group** --> **customerPostingGroup**
