@@ -12,3 +12,5 @@
   href: ticket/toc.yml
 - name: Member Module
   href: member/toc.yml
+- name: Data Replication Module
+  href: replication/toc.yml
