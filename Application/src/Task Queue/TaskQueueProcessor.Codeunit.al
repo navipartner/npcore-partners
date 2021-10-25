@@ -42,7 +42,8 @@ codeunit 6059902 "NPR Task Queue Processor"
         Success: Boolean;
         CurrLangID: Integer;
     begin
-        TaskLine.Get(TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.");
+        if not TaskLine.Get(TaskQueue."Task Template", TaskQueue."Task Batch", TaskQueue."Task Line No.") then
+            exit;
 
         if not CheckValid2RunNow(TaskLine, TaskQueue) then begin
             //Calculate a new runtime and stop executing the task now
