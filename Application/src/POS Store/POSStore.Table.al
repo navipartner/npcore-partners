@@ -321,6 +321,26 @@ table 6150614 "NPR POS Store"
             ObsoleteReason = 'Moved to POS Posting Profile';
             ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
+
+        field(860; "Auto Process Ext. POS Sales"; Boolean)
+        {
+            Caption = 'Auto Process External POS Sales';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                ExtPOSSaleProcessor: Codeunit "NPR Ext. POS Sale Processor";
+                POSStore: Record "NPR POS Store";
+            begin
+                IF Rec."Auto Process Ext. POS Sales" then
+                    ExtPOSSaleProcessor.RegisterNcImportType('EXTPOSSALES')
+                else begin
+                    POSStore.SetFilter(Code, '<>%1', Rec.Code);
+                    POSStore.SetRange("Auto Process Ext. POS Sales", true);
+                    IF POSStore.IsEmpty() then
+                        ExtPOSSaleProcessor.DeleteNCImportType('EXTPOSSALES');
+                end;
+            end;
+        }
     }
 
     keys
