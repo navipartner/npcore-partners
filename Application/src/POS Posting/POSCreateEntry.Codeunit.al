@@ -1005,7 +1005,6 @@
         POSAuditLog: Record "NPR POS Audit Log";
         RMAEntryLbl: Label '%1|%2|%3', Locked = true;
     begin
-
         if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
             exit;
 
@@ -1226,7 +1225,17 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertPOSEntryFromExternalPOSSale(var ExtSalePOS: Record "NPR External POS Sale"; var POSEntry: Record "NPR POS Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertPOSEntryFromExternalPOSSale(var ExtSalePOS: Record "NPR External POS Sale"; var POSEntry: Record "NPR POS Entry")
     begin
     end;
 
@@ -1236,7 +1245,17 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertPOSSalesLineFromExternalPOSSale(ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSSalesLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertPOSSalesLineFromExternalPOSSale(ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     begin
     end;
 
@@ -1245,8 +1264,19 @@
     begin
     end;
 
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertPOSPaymentLineFromExternalPOSSale(ExtSalePOS: Record "NPR External POS Sale"; SaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Entry Payment Line")
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSPaymentLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Entry Payment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertPOSPaymentLineFromExternalPOSSale(ExtSalePOS: Record "NPR External POS Sale"; SaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Entry Payment Line")
     begin
     end;
 
@@ -1257,6 +1287,16 @@
 
     [IntegrationEvent(FALSE, FALSE)]
     local procedure OnAfterInsertRmaEntry(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(FALSE, FALSE)]
+    local procedure OnAfterInsertRmaEntryFromExternalPOSSale(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreatePOSEntryFromExternalPOSSale(var ExtSalePOS: Record "NPR External POS Sale")
     begin
     end;
 
@@ -1378,4 +1418,485 @@
     begin
         POSEntryOut := GlobalPOSEntry;
     end;
+
+    #region External POS Sale
+    procedure CreatePOSEntryFromExternalPOSSale(var ExtPOSSale: Record "NPR External POS Sale")
+    var
+        POSPeriodRegister: Record "NPR POS Period Register";
+        POSEntry: Record "NPR POS Entry";
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSUnit: Record "NPR POS Unit";
+        POSEntryManagement: Codeunit "NPR POS Entry Management";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        POSUnitManager: Codeunit "NPR POS Manage POS Unit";
+        ExtSaleCancelled: Boolean;
+        WasModified: Boolean;
+    begin
+        Clear(GlobalPOSEntry);
+        ValidateSaleHeaderExt(ExtPOSSale);
+
+        OnBeforeCreatePOSEntryFromExternalPOSSale(ExtPOSSale);
+
+        if not GetPOSPeriodRegisterExt(ExtPOSSale, POSPeriodRegister, true) then begin
+            POSUnit.Get(ExtPOSSale."Register No.");
+            POSUnitManager.OpenPOSUnit(POSUnit);
+        end;
+
+        ExtSaleCancelled := IsCancelledSaleExt(ExtPOSSale);
+
+        if ExtSaleCancelled then begin
+            InsertPOSEntryExt(POSPeriodRegister, ExtPOSSale, POSEntry, POSEntry."Entry Type"::"Cancelled Sale");
+            POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted";
+            POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::"Not To Be Posted";
+        end else begin
+            InsertPOSEntryExt(POSPeriodRegister, ExtPOSSale, POSEntry, POSEntry."Entry Type"::"Direct Sale");
+        end;
+
+        CreateLinesExt(POSEntry, ExtPOSSale);
+
+        POSEntryManagement.RecalculatePOSEntry(POSEntry, WasModified);
+        POSEntry.Modify();
+
+        if ExtSaleCancelled then begin
+            POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CANCEL_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CANCEL_SALE_END, '')
+        end else begin
+            POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+            POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::DIRECT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_DIRECT_SALE_END, '');
+        end;
+
+        OnAfterInsertPOSEntryFromExternalPOSSale(ExtPOSSale, POSEntry);
+        GlobalPOSEntry := POSEntry;
+
+        ExtPOSSale."Converted To POS Entry" := true;
+        ExtPOSSale."POS Entry System Id" := POSEntry.SystemId;
+        ExtPOSSale."Has Conversion Error" := false;
+        ExtPOSSale."Last Conversion Error Message" := '';
+        ExtPOSSale.Modify();
+    end;
+
+    local procedure IsUniqueDocumentNoExt(ExtSalePOS: Record "NPR External POS Sale"): Boolean
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        POSEntry.SetRange("Document No.", ExtSalePOS."Sales Ticket No.");
+        exit(POSEntry.IsEmpty());
+    end;
+
+    local procedure ValidateSaleHeaderExt(ExtSalePOS: Record "NPR External POS Sale")
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        ExtSalePOS.TestField("Sales Ticket No.");
+        ExtSalePOS.TestField("POS Store Code");
+        ExtSalePOS.TestField("Register No.");
+        if not IsUniqueDocumentNoExt(ExtSalePOS) then
+            Error(ERR_DOCUMENT_NO_CLASH, POSEntry.FieldCaption("Document No."), ExtSalePOS."Sales Ticket No.", POSEntry.TableCaption);
+    end;
+
+    local procedure GetPOSPeriodRegisterExt(var ExtSalePOS: Record "NPR External POS Sale"; var POSPeriodRegister: Record "NPR POS Period Register"; CheckOpen: Boolean): Boolean
+    begin
+        exit(GetPOSPeriodRegisterForPOSUnit(ExtSalePOS."Register No.", POSPeriodRegister, CheckOpen));
+    end;
+
+    local procedure IsCancelledSaleExt(ExtSalePOS: Record "NPR External POS Sale"): Boolean
+    var
+        ExtSaleLinePOS: Record "NPR External POS Sale Line";
+    begin
+        ExtSaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+        ExtSaleLinePOS.SetRange("Register No.", ExtSalePOS."Register No.");
+        ExtSaleLinePOS.SetRange("Sales Ticket No.", ExtSalePOS."Sales Ticket No.");
+        ExtSaleLinePOS.SetRange(Type, ExtSaleLinePOS.Type::Comment);
+        ExtSaleLinePOS.SetRange("Sale Type", ExtSaleLinePOS."Sale Type"::Cancelled);
+        exit(not ExtSaleLinePOS.IsEmpty());
+    end;
+
+    local procedure InsertPOSEntryExt(var POSPeriodRegister: Record "NPR POS Period Register"; var ExtSalePOS: Record "NPR External POS Sale"; var POSEntry: Record "NPR POS Entry"; EntryType: Option)
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalespersonLbl: Label '%1: %2', Locked = true;
+    begin
+        POSEntry.Init();
+        POSEntry."Entry No." := 0; //Autoincrement;
+        POSEntry."POS Period Register No." := POSPeriodRegister."No.";
+        POSEntry."POS Store Code" := ExtSalePOS."POS Store Code";
+        POSEntry."POS Unit No." := ExtSalePOS."Register No.";
+        POSEntry."Document No." := ExtSalePOS."Sales Ticket No.";
+        POSEntry."Entry Date" := ExtSalePOS.Date;
+        POSEntry."Entry Type" := EntryType;
+
+        FiscalNoCheckExt(POSEntry, ExtSalePOS);
+
+        POSEntry."Salesperson Code" := ExtSalePOS."Salesperson Code";
+        POSEntry."Customer No." := ExtSalePOS."Customer No.";
+
+        POSEntry."Event No." := ExtSalePOS."Event No.";
+        POSEntry."Shortcut Dimension 1 Code" := ExtSalePOS."Shortcut Dimension 1 Code";
+        POSEntry."Shortcut Dimension 2 Code" := ExtSalePOS."Shortcut Dimension 2 Code";
+        POSEntry."Dimension Set ID" := ExtSalePOS."Dimension Set ID";
+        POSEntry.SystemId := ExtSalePOS.SystemId;
+        POSEntry."Starting Time" := ExtSalePOS."Start Time";
+        POSEntry."Ending Time" := Time;
+        POSEntry."Posting Date" := ExtSalePOS.Date;
+        POSEntry."Document Date" := ExtSalePOS.Date;
+        POSEntry."Currency Code" := '';//All sales are in LCY for now (Payments can  be in FCY of course)
+        POSEntry."Country/Region Code" := ExtSalePOS."Country Code";
+        POSEntry."Tax Area Code" := ExtSalePOS."Tax Area Code";
+        POSEntry."Prices Including VAT" := ExtSalePOS."Prices Including VAT";
+        POSEntry."External Document No." := ExtSalePOS."External Document No.";
+
+        OnBeforeInsertPOSEntryFromExternalPOSSale(ExtSalePOS, POSEntry);
+
+        if POSEntry.Description = '' then begin
+            case POSEntry."Entry Type" of
+                POSEntry."Entry Type"::"Direct Sale":
+                    POSEntry.Description := CopyStr(StrSubstNo(TXT_SALES_TICKET, POSEntry."Document No."), 1, MaxStrLen(POSEntry.Description));
+                POSEntry."Entry Type"::Balancing:
+                    begin
+                        if (not SalespersonPurchaser.Get(ExtSalePOS."Salesperson Code")) then
+                            SalespersonPurchaser.Name := StrSubstNo(SalespersonLbl, SalespersonPurchaser.TableCaption, ExtSalePOS."Salesperson Code");
+                        POSEntry.Description := SalespersonPurchaser.Name;
+                    end;
+
+                POSEntry."Entry Type"::"Cancelled Sale":
+                    begin
+                        SaleLinePOS.SetRange("Register No.", ExtSalePOS."Register No.");
+                        SaleLinePOS.SetRange("Sales Ticket No.", ExtSalePOS."Sales Ticket No.");
+                        if SaleLinePOS.FindFirst() and (SaleLinePOS.Description <> '') then
+                            POSEntry.Description := SaleLinePOS.Description
+                        else
+                            POSEntry.Description := CANCEL_SALE;
+                    end;
+            end;
+        end;
+
+        POSEntry.Insert(false, true);
+    end;
+
+    local procedure FiscalNoCheckExt(var POSEntry: Record "NPR POS Entry"; ExtSalePOS: Record "NPR External POS Sale")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+
+        POSUnit.Get(POSEntry."POS Unit No.");
+        if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then begin
+            FillFiscalNo(POSEntry, '', ExtSalePOS.Date);
+            exit;
+        end;
+
+        case POSEntry."Entry Type" of
+            POSEntry."Entry Type"::"Direct Sale":
+                FillFiscalNo(POSEntry, POSAuditProfile."Sale Fiscal No. Series", ExtSalePOS.Date);
+
+            POSEntry."Entry Type"::"Cancelled Sale":
+                if POSAuditProfile."Fill Sale Fiscal No. On" = POSAuditProfile."Fill Sale Fiscal No. On"::All then
+                    FillFiscalNo(POSEntry, POSAuditProfile."Sale Fiscal No. Series", ExtSalePOS.Date);
+
+            POSEntry."Entry Type"::"Credit Sale":
+                FillFiscalNo(POSEntry, POSAuditProfile."Credit Sale Fiscal No. Series", ExtSalePOS.Date);
+
+            POSEntry."Entry Type"::Balancing:
+                FillFiscalNo(POSEntry, POSAuditProfile."Balancing Fiscal No. Series", ExtSalePOS.Date);
+        end;
+
+    end;
+
+    local procedure CreateLinesExt(var POSEntry: Record "NPR POS Entry"; var ExtSalePOS: Record "NPR External POS Sale")
+    var
+        ExtSaleLinePOS: Record "NPR External POS Sale Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+    begin
+        ExtSaleLinePOS.SetRange("External POS Sale Entry No.", ExtSalePOS."Entry No.");
+        if ExtSaleLinePOS.FindSet() then begin
+            repeat
+                case ExtSaleLinePOS."Sale Type" of
+                    ExtSaleLinePOS."Sale Type"::Sale,
+                    ExtSaleLinePOS."Sale Type"::Deposit:
+                        begin
+                            InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, false, POSSalesLine);
+                            InsertPOSTaxAmountExt(POSEntryTaxLine, ExtSaleLinePOS, POSEntry)
+                        end;
+                    ExtSaleLinePOS."Sale Type"::"Out payment":
+                        if ExtSaleLinePOS.Type = ExtSaleLinePOS.Type::"G/L Entry" then begin
+                            InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, true, POSSalesLine);
+                        end else
+                            InsertPOSPaymentLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSPaymentLine);
+                    ExtSaleLinePOS."Sale Type"::Comment:
+                        ; //To-do Comments
+                    ExtSaleLinePOS."Sale Type"::"Debit Sale":
+                        begin
+                            InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, false, POSSalesLine);
+                            InsertPOSTaxAmountExt(POSEntryTaxLine, ExtSaleLinePOS, POSEntry)
+                        end;
+                    ExtSaleLinePOS."Sale Type"::"Open/Close":
+                        ; //To do Open / Close
+                    ExtSaleLinePOS."Sale Type"::Payment:
+                        InsertPOSPaymentLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSPaymentLine);
+                end;
+            until ExtSaleLinePOS.Next() = 0;
+        end;
+    end;
+
+    local procedure InsertPOSTaxAmountExt(var POSEntryTaxLine: Record "NPR POS Entry Tax Line"; ExtPOSSaleLine: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryTaxCalcExt: codeunit "NPR External POS Tax Calc";
+    begin
+        POSEntryTaxCalcExt.PostExternalPOSSalesLineTaxAmount(POSEntryTaxLine, ExtPOSSaleLine, POSEntry);
+    end;
+
+    local procedure InsertPOSSaleLineExt(ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Entry Sales Line")
+    var
+        PricesIncludeTax: Boolean;
+    //POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
+    //POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        POSSalesLine.Init();
+        POSSalesLine."POS Entry No." := POSEntry."Entry No.";
+        POSSalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        POSSalesLine."Line No." := ExtSaleLinePOS."Line No.";
+        POSSalesLine.SetRecFilter();
+        if not POSSalesLine.IsEmpty() then
+            repeat
+                POSSalesLine."Line No." := POSSalesLine."Line No." + 10000;
+                POSSalesLine.SetRecFilter();
+            until POSSalesLine.IsEmpty();
+
+        POSSalesLine.Reset();
+
+        POSSalesLine."POS Store Code" := ExtSalePOS."POS Store Code";
+        POSSalesLine."POS Unit No." := ExtSaleLinePOS."Register No.";
+        POSSalesLine."Document No." := ExtSaleLinePOS."Sales Ticket No.";
+        POSSalesLine."Customer No." := ExtSalePOS."Customer No.";
+        POSSalesLine."Salesperson Code" := ExtSalePOS."Salesperson Code";
+
+        case ExtSaleLinePOS.Type of
+            ExtSaleLinePOS.Type::Item:
+                POSSalesLine.Type := POSSalesLine.Type::Item;
+            ExtSaleLinePOS.Type::"G/L Entry":
+                POSSalesLine.Type := POSSalesLine.Type::"G/L Account";
+            else
+                ;//Add silent error comment line
+        end;
+
+        case ExtSaleLinePOS."Sale Type" of
+            ExtSaleLinePOS."Sale Type"::Deposit:
+                if ExtSaleLinePOS.Type = ExtSaleLinePOS.Type::Customer then
+                    POSSalesLine.Type := POSSalesLine.Type::Customer;
+
+            ExtSaleLinePOS."Sale Type"::"Out payment":
+                //This is currently the only way to see the difference between a Rounding and a Payout line!
+                if ExtSaleLinePOS."Discount Type" = ExtSaleLinePOS."Discount Type"::Rounding then
+                    POSSalesLine.Type := POSSalesLine.Type::Rounding
+                else
+                    if ExtSaleLinePOS."Gen. Posting Type" <> ExtSaleLinePOS."Gen. Posting Type"::Purchase then
+                        POSSalesLine.Type := POSSalesLine.Type::"G/L Account"
+                    else
+                        POSSalesLine.Type := POSSalesLine.Type::Payout;
+        end;
+
+
+        POSSalesLine."Exclude from Posting" := ExcludeFromPostingExt(ExtSaleLinePOS);
+        POSSalesLine."No." := ExtSaleLinePOS."No.";
+        POSSalesLine."Variant Code" := ExtSaleLinePOS."Variant Code";
+        POSSalesLine."Location Code" := ExtSaleLinePOS."Location Code";
+        POSSalesLine."Posting Group" := ExtSaleLinePOS."Posting Group";
+        POSSalesLine.Description := ExtSaleLinePOS.Description;
+
+        POSSalesLine."Gen. Posting Type" := ExtSaleLinePOS."Gen. Posting Type";
+        POSSalesLine."Gen. Bus. Posting Group" := ExtSaleLinePOS."Gen. Bus. Posting Group";
+        POSSalesLine."VAT Bus. Posting Group" := ExtSaleLinePOS."VAT Bus. Posting Group";
+        POSSalesLine."Gen. Prod. Posting Group" := ExtSaleLinePOS."Gen. Prod. Posting Group";
+        POSSalesLine."VAT Prod. Posting Group" := ExtSaleLinePOS."VAT Prod. Posting Group";
+        POSSalesLine."Tax Area Code" := ExtSaleLinePOS."Tax Area Code";
+        POSSalesLine."Tax Liable" := ExtSaleLinePOS."Tax Liable";
+        POSSalesLine."Tax Group Code" := ExtSaleLinePOS."Tax Group Code";
+        POSSalesLine."Use Tax" := ExtSaleLinePOS."Use Tax";
+
+        POSSalesLine."Unit of Measure Code" := ExtSaleLinePOS."Unit of Measure Code";
+        POSSalesLine.Quantity := ExtSaleLinePOS.Quantity;
+        POSSalesLine."Quantity (Base)" := ExtSaleLinePOS."Quantity (Base)";
+        POSSalesLine."Qty. per Unit of Measure" := ExtSaleLinePOS."Qty. per Unit of Measure";
+        POSSalesLine."Unit Price" := ExtSaleLinePOS."Unit Price";
+        POSSalesLine."Unit Cost (LCY)" := ExtSaleLinePOS."Unit Cost (LCY)";
+        POSSalesLine."Unit Cost" := ExtSaleLinePOS."Unit Cost";
+        POSSalesLine."VAT %" := ExtSaleLinePOS."VAT %";
+        POSSalesLine."VAT Identifier" := ExtSaleLinePOS."VAT Identifier";
+        POSSalesLine."VAT Calculation Type" := ExtSaleLinePOS."VAT Calculation Type";
+
+        POSSalesLine."Discount Type" := ExtSaleLinePOS."Discount Type";
+        POSSalesLine."Discount Authorised by" := ExtSalePOS."User ID";
+
+        POSSalesLine."Reason Code" := ExtSaleLinePOS."Reason Code";
+        POSSalesLine."Line Discount %" := ExtSaleLinePOS."Discount %";
+
+        PricesIncludeTax := ExtSalePOS."Prices Including VAT";
+        if PricesIncludeTax then begin
+            POSSalesLine."Line Discount Amount Incl. VAT" := ExtSaleLinePOS."Discount Amount";
+            POSSalesLine."Line Discount Amount Excl. VAT" := ExtSaleLinePOS."Discount Amount" / (1 + (ExtSaleLinePOS."VAT %" / 100));
+        end else begin
+            POSSalesLine."Line Discount Amount Excl. VAT" := ExtSaleLinePOS."Discount Amount";
+            POSSalesLine."Line Discount Amount Incl. VAT" := (1 + (ExtSaleLinePOS."VAT %" / 100)) * ExtSaleLinePOS."Discount Amount";
+        end;
+
+        POSSalesLine."Amount Excl. VAT" := ExtSaleLinePOS.Amount;
+        POSSalesLine."Amount Incl. VAT" := ExtSaleLinePOS."Amount Including VAT";
+        POSSalesLine."VAT Base Amount" := ExtSaleLinePOS."VAT Base Amount";
+        POSSalesLine."Line Amount" := ExtSaleLinePOS."Line Amount";
+
+        if ((ExtSaleLinePOS."Sale Type" = ExtSaleLinePOS."Sale Type"::"Out payment")
+          and (ExtSaleLinePOS."Discount Type" <> ExtSaleLinePOS."Discount Type"::Rounding)) then
+            POSSalesLine."Line Amount" *= -1;
+
+        POSSalesLine."Amount Excl. VAT (LCY)" := ExtSaleLinePOS.Amount * POSEntry."Currency Factor";
+        POSSalesLine."Amount Incl. VAT (LCY)" := ExtSaleLinePOS."Amount Including VAT" * POSEntry."Currency Factor";
+
+        POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := POSSalesLine."Line Discount Amount Excl. VAT" * POSEntry."Currency Factor";
+        POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := POSSalesLine."Line Discount Amount Incl. VAT" * POSEntry."Currency Factor";
+
+        POSSalesLine.SystemId := ExtSaleLinePOS.SystemId;
+
+        POSSalesLine."Item Category Code" := ExtSaleLinePOS."Item Category Code";
+
+        POSSalesLine."Serial No." := ExtSaleLinePOS."Serial No.";
+        POSSalesLine."Return Reason Code" := ExtSaleLinePOS."Return Reason Code";
+
+        CreateRMAEntryExt(POSEntry, ExtSalePOS, ExtSaleLinePOS);
+
+        POSSalesLine."Shortcut Dimension 1 Code" := ExtSaleLinePOS."Shortcut Dimension 1 Code";
+        POSSalesLine."Shortcut Dimension 2 Code" := ExtSaleLinePOS."Shortcut Dimension 2 Code";
+        POSSalesLine."Dimension Set ID" := ExtSaleLinePOS."Dimension Set ID";
+        if ReverseSign then begin
+            POSSalesLine.Quantity := -POSSalesLine.Quantity;
+            POSSalesLine."Line Discount Amount Excl. VAT" := -POSSalesLine."Line Discount Amount Excl. VAT";
+            POSSalesLine."Line Discount Amount Incl. VAT" := -POSSalesLine."Line Discount Amount Incl. VAT";
+            POSSalesLine."Amount Excl. VAT" := -POSSalesLine."Amount Excl. VAT";
+            POSSalesLine."Amount Incl. VAT" := -POSSalesLine."Amount Incl. VAT";
+            POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := -POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)";
+            POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := -POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+
+            POSSalesLine."Amount Excl. VAT (LCY)" := -POSSalesLine."Amount Excl. VAT (LCY)";
+            POSSalesLine."Amount Incl. VAT (LCY)" := -POSSalesLine."Amount Incl. VAT (LCY)";
+            POSSalesLine."VAT Base Amount" := -POSSalesLine."VAT Base Amount";
+            POSSalesLine."Quantity (Base)" := -POSSalesLine."Quantity (Base)";
+            POSSalesLine."VAT Difference" := -POSSalesLine."VAT Difference";
+        end;
+        OnBeforeInsertPOSSalesLineFromExternalPOSSale(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSSalesLine);
+        POSSalesLine.Insert(false, true);
+        OnAfterInsertPOSSalesLineFromExternalPOSSale(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSSalesLine);
+    end;
+
+    procedure ExcludeFromPostingExt(ExtSaleLinePOS: Record "NPR External POS Sale Line"): Boolean
+    begin
+        if ExtSaleLinePOS.Type in [ExtSaleLinePOS.Type::Comment] then
+            exit(true);
+
+        exit(ExtSaleLinePOS."Sale Type" in [ExtSaleLinePOS."Sale Type"::Comment, ExtSaleLinePOS."Sale Type"::"Debit Sale", ExtSaleLinePOS."Sale Type"::"Open/Close"]);
+    end;
+
+    local procedure InsertPOSPaymentLineExt(ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Entry Payment Line")
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        POSPaymentLine.Init();
+        POSPaymentLine."POS Entry No." := POSEntry."Entry No.";
+        POSPaymentLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        POSPaymentLine."Line No." := ExtSaleLinePOS."Line No.";
+
+        POSPaymentLine.SetRecFilter();
+        if not POSPaymentLine.IsEmpty() then
+            repeat
+                POSPaymentLine."Line No." := POSPaymentLine."Line No." + 10000;
+                POSPaymentLine.SetRecFilter();
+            until POSPaymentLine.IsEmpty();
+        POSPaymentLine.Reset();
+
+        POSPaymentLine."POS Store Code" := ExtSalePOS."POS Store Code";
+        POSPaymentLine."POS Unit No." := ExtSaleLinePOS."Register No.";
+        POSPaymentLine."Document No." := ExtSaleLinePOS."Sales Ticket No.";
+
+#pragma warning disable AA0139
+        if (not POSPaymentMethod.Get(ExtSaleLinePOS."No.")) then
+            POSPaymentMethod.Init();
+        POSPaymentLine."POS Payment Method Code" := ExtSaleLinePOS."No.";
+#pragma warning restore
+
+        POSPaymentLine."POS Payment Bin Code" := SelectUnitBin(POSPaymentLine."POS Unit No.");
+
+        POSPaymentLine.Description := ExtSaleLinePOS.Description;
+        if ExtSaleLinePOS."Currency Amount" <> 0 then begin
+            POSPaymentLine.Amount := ExtSaleLinePOS."Currency Amount";
+            POSPaymentLine."Payment Amount" := ExtSaleLinePOS."Currency Amount";
+        end else begin
+            POSPaymentLine.Amount := ExtSaleLinePOS."Amount Including VAT";
+            POSPaymentLine."Payment Amount" := ExtSaleLinePOS."Amount Including VAT";
+        end;
+        POSPaymentLine."Amount (LCY)" := ExtSaleLinePOS."Amount Including VAT";
+        POSPaymentLine."Amount (Sales Currency)" := ExtSaleLinePOS."Amount Including VAT"; //Sales Currency is always LCY for now
+        POSPaymentLine."Currency Code" := POSPaymentMethod."Currency Code";
+
+        POSPaymentLine.SystemId := ExtSaleLinePOS.SystemId;
+
+        POSPaymentLine."Shortcut Dimension 1 Code" := ExtSaleLinePOS."Shortcut Dimension 1 Code";
+        POSPaymentLine."Shortcut Dimension 2 Code" := ExtSaleLinePOS."Shortcut Dimension 2 Code";
+        POSPaymentLine."Dimension Set ID" := ExtSaleLinePOS."Dimension Set ID";
+
+        POSPaymentLine."VAT Base Amount (LCY)" := ExtSaleLinePOS."Amount Including VAT";
+        if (ExtSaleLinePOS."VAT Base Amount" <> 0) then begin
+            POSPaymentLine."VAT Amount (LCY)" := ExtSaleLinePOS."Amount Including VAT" - ExtSaleLinePOS."VAT Base Amount";
+            POSPaymentLine."VAT Base Amount (LCY)" := ExtSaleLinePOS."VAT Base Amount";
+        end;
+
+        POSPaymentLine."VAT Bus. Posting Group" := ExtSaleLinePOS."VAT Bus. Posting Group";
+        POSPaymentLine."VAT Prod. Posting Group" := ExtSaleLinePOS."VAT Prod. Posting Group";
+
+        CreatePaymentLineBinEntry(POSPaymentLine);
+
+        OnBeforeInsertPOSPaymentLineFromExternalPOSSale(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSPaymentLine);
+        POSPaymentLine.Insert(false, true);
+        OnAfterInsertPOSPaymentLineFromExternalPOSSale(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSPaymentLine);
+    end;
+
+    local procedure CreateRMAEntryExt(POSEntry: Record "NPR POS Entry"; ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line")
+    var
+        PosRmaLine: Record "NPR POS RMA Line";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        POSAuditLog: Record "NPR POS Audit Log";
+        RMAEntryLbl: Label '%1|%2|%3', Locked = true;
+    begin
+        if (ExtSaleLinePOS."Return Sale Sales Ticket No." = '') then
+            exit;
+
+        if (ExtSaleLinePOS.Quantity >= 0) then
+            exit;
+
+        if (ExtSaleLinePOS.Type <> ExtSaleLinePOS.Type::Item) then
+            exit;
+
+        if (ExtSaleLinePOS."Sale Type" <> ExtSaleLinePOS."Sale Type"::Sale) then
+            exit;
+
+        // Only referenced return sales
+        PosRmaLine."Entry No." := 0;
+        PosRmaLine."POS Entry No." := POSEntry."Entry No.";
+
+        PosRmaLine."Sales Ticket No." := ExtSaleLinePOS."Return Sale Sales Ticket No.";
+        PosRmaLine."Return Ticket No." := ExtSaleLinePOS."Sales Ticket No.";
+        PosRmaLine."Return Line No." := ExtSaleLinePOS."Line No.";
+
+        PosRmaLine."Returned Item No." := ExtSaleLinePOS."No.";
+        PosRmaLine."Returned Quantity" := ExtSaleLinePOS.Quantity;
+
+        PosRmaLine."Return Reason Code" := ExtSaleLinePOS."Return Reason Code";
+        PosRmaLine.Insert();
+
+        OnAfterInsertRmaEntryFromExternalPOSSale(PosRmaLine, POSEntry, ExtSalePOS, ExtSaleLinePOS);
+
+        POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId(), POSAuditLog."Action Type"::ITEM_RMA, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", '',
+          StrSubstNo(RMAEntryLbl, PosRmaLine."Return Line No.", PosRmaLine."Sales Ticket No.", PosRmaLine."Return Reason Code"));
+
+    end;
+    #endregion
 }

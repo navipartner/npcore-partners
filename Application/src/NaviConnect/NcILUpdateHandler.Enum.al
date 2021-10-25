@@ -33,4 +33,10 @@ enum 6151500 "NPR Nc IL Update Handler" implements "NPR Nc Import List IUpdate"
         Caption = 'Replication API';
         Implementation = "NPR Nc Import List IUpdate" = "NPR Replication API";
     }
+
+    value(40; "ExternalPOSSale")
+    {
+        Caption = 'External POS Sale';
+        Implementation = "NPR Nc Import List IUpdate" = "NPR Get External POS Sale";
+    }
 }

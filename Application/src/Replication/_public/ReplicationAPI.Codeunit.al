@@ -180,6 +180,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         ImportType.Description := Copystr(ImportTypeDescriptionLbl, 1, MaxStrLen(ImportType.Description));
         ImportType."Import List Update Handler" := ImportType."Import List Update Handler"::ReplicationAPI;
         ImportType."Import Codeunit ID" := Codeunit::"NPR Replication Import Entry";
+        ImportType."Keep Import Entries for" := 7 * 24 * 60 * 60 * 1000; // 7 days
         ImportType.Insert(true);
     end;
 

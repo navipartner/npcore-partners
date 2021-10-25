@@ -97,6 +97,12 @@ page 6150615 "NPR POS Store Card"
                     ToolTip = 'Specifies the value of the Registration No. field';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Auto Process Ext. POS Sales"; Rec."Auto Process Ext. POS Sales")
+                {
+                    ToolTip = 'Specifies the value of the Auto Process Ext. POS Sales field';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Communication)
             {
