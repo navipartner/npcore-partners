@@ -1,48 +1,46 @@
-# Replication Module Configuration
+# Configure Replication Module
 
-This topic describes the process of configuring Replication Setup. As soon as you completed all necessary setup, data will be syncronized automatically in current company from the company setup as **From Company**
+This topic describes the process of configuring the Replication Setup. As soon as you complete the necessary setup, data will be synchronized automatically in the current company from the company stated in the **From Company** field.
 
-## Steps
 
-- Open page **Replication API Setup List**. You will notice that multiple predefined Setups are created automatically grouped by master data (ex: Customer related data, Vendor related data etc.)
-- Open the first **CUST_NPAPI V1** Setup.
-- By default the setup is disabled. You need to enter necessary information before you can enable it.
-- If Replication is made from an external database: change the predefined **Service Base URL** to the external Service Base URL and enable **External Database**
-- Press Assist Edit of field **From Company Name** and select the company from which you want to import data. In case **External Company** is disabled, you can select a company from the current database, otherwise the system makes a web api request to the external database to retrieve companies and you can select a company from that database.
-- The **From Company Id** is automatically filled in by the system. This field is used by the system when it makes API requests to retrieve data from the selected company.
-- Enter the **From Company Tenant** if you work in a multitenant environment. Otherwise, this field can remain empty.
-- Select the **Authorization Type**: Basic or OAuth 2.0.
-- Enter Credentials.
-- Press Action **Test Connection** to see if the connection can be established.
-- If connection was successful, press "Enable".
-	>[!Note]   
-	> System asks: "Are you sure you want to enable service? This action will start importing from Source Company all data created or modified with a Replication Counter greater than the one setup for each Endpoint."
-- After confirmation, the Replication Setup is enabled and newly or modified data in the **From Company** will be imported into the current company.
-	>[!Note]  	
-	> When Enabling a Replication Setup, the system creates in backgroud a Naviconnect Import Type and a Job Queue Entry so the import is done automatically based on setup on these records.
+1. Open the **Replication API Setup List** page.  
+   Multiple predefined setups are created automatically and grouped according to the master data, for example customer-related data, vendor-related data, and so on)
+2. Open the first **CUST_NPAPI V1** setup.
+3. Enter the necessary information in order to enable the setup (the setup is disabled by default).
+ > [!IMPORTANT]
+ > If the replication is made from an external database, state the correct external URL to the **Service Base URL** field and enable the **External Database** toggle switch.
+4. Press the ellipsis button next to the **From Company Name** field and select the company from which you want to import data.   
+   If the **External Company** is disabled, you can select a company from the current database, otherwise the system makes a web API request to the external database to retrieve companies and you can select a company from that database.
+5. The **From Company Id** is automatically populated. This field is used by the system when it makes API requests to retrieve data from the selected company.
+6. Enter the **From Company Tenant** if you work in a multitenant environment.
+7. Select the authorization type and the necessary credentials, then enable the authorization if needed.
+8. Press **Test Connection** to see if the connection can be established.
+9. Press **Enable** if the connection was successful.
+    After confirmation, the Replication Setup is enabled and all data in the **From Company** will be imported into the current company.
+> [!Note]  	
+> When enabling the Replication Setup, a Naviconnect Import Type and a Job Queue Entry are created in the background, so the import is done automatically based on setup of these records.
 
-![ReplicationSetupPage](images/ReplicationSetupPage.jpg) 
+## Endpoints
 
-## Other Features
-
-### Endpoints
-
-The Import is done based on the **Enpoints** subpage setup.
+The import is done based on the **Endpoints** subpage setup.
 
 Here, you can choose to:
-1. Disable specific endpoints (which will stop importing data for those tables).
-2. Change the order of the tables import.
-3. Update the Replication Counter field.
-4. Add new endpoint configuration.
+- disable specific endpoints (which will stop importing data for those tables)
+- change the order in which tables are imported
+- update the **Replication Counter** field
+- add new endpoint configuration
 
-![ReplicationSetupEndpoints](images/ReplicationSetupEndpoints.jpg)
+## Special Field Mappings
 
-### Special Field Mappings
+In general, the fields for each table (endpoint) are mapped automatically. In the API page used as a webservice, most fields are named like the table field in the CamelCase.    
 
-Generally the fields for each table (endpoint) are mapped automatically: in the API page used as webservice most fields are named as the table field in camel case. Example: **Customer Posting Group** --> customerPostingGroup.
+**Example:**   
+**Customer Posting Group** --> **customerPostingGroup**
 
-But there are some special cases when the field names are different. You can use **Special Fields Mappings** page to map these.
-Example:
+However, there are special cases when the field names are different. You can use the **Special Fields Mappings** page to map these. This page is accessed by clicking the **Manage** button, followed by the **Special Field Mappings** button in the **Endpoints** panel. 
+
+**Example:**
+
 ![ReplicationSetupEndpointFieldMappings](images/ReplicationSetupEndpointsFieldMappings.jpg)  
 
 
