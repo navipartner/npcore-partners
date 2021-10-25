@@ -240,7 +240,6 @@ table 6014588 "NPR Replication Service Setup"
         RenameNotAllowedErr: Label 'Rename not allowed. Instead, delete and recreate record.';
         ExternalURLErr: Label 'Service Base URL must refer to an external database.', Locked = true;
         InternalURLErr: Label 'Service Base URL must refer to internal database.', Locked = true;
-
         EnableServiceConfirm: Label 'Are you sure you want to enable service? This action will start importing from Source Company all data created or modified with a Replication Counter greater than the one setup for each Endpoint.';
 
     trigger OnDelete()

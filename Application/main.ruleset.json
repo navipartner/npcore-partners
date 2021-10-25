@@ -269,7 +269,7 @@
         },
         {
             "id": "AA0233",
-            "action":"Error",
+            "action":"Hidden",
             "justification": "The 'FindFirst', 'FindLast' and 'Get' methods must be used without the Next() method."
         },        
         {
