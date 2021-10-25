@@ -36,7 +36,8 @@ However, all documents that deal with back-end stuff that would be more suitable
 - **Test the validity of information**  
   Don't write from memory no matter how familiar with the subject you are. It's absolutely necessary to perform testing in the app before or during the writing.
 - **All GUI elements should be written in the bold font**   
-  You shouldn't indicate that something is a GUI element by using quotation marks.
+  You shouldn't indicate that something is a GUI element by using quotation marks.  
+  (In this example, the colon is bold because the customer types the colon.)
 - **Features should be written with first letters of each word capitalized**   
   Feature names shouldn't be bold or indicated by quotation marks.
 
@@ -131,7 +132,7 @@ To ensure that the documentation style is unified, the following recommendations
 - **Don't be abstract**  
   Basically, if you're intimately acquainted with the subject, your writing should automatically become more straight-to-the-point.
 - **Avoid gender-specific language**  
-  Don't use he
+  Don't use he/she.
 - **Avoid unnecessary information**  
   Put yourself in the users' shoes and separate information that you personally think is interesting, and information that users need.
 
