@@ -40,6 +40,8 @@ However, all documents that deal with back-end stuff that would be more suitable
   (In this example, the colon is bold because the customer types the colon.)
 - **Features should be written with first letters of each word capitalized**   
   Feature names shouldn't be bold or indicated by quotation marks.
+- **Add screenshots ONLY when they add value to the article/topic**   
+  If you can explain something with text, don't add screenshots at all. If we have too many screenshots and the GUI is changed, 
 
 ## Documentation sections and structure
 There are two topic structures that you can choose from, depending on the subject, knowledge levels, and the goal of the reader.
@@ -56,7 +58,7 @@ How-to guides should consist of a short description and a procedure divided into
  
  - Focus on answering a single question or completing a single task.
  - Name the guide well. The name should tell the reader exactly what the guide does.
- - Provide a series of steps.
+ - Provide a series of steps organized as a numbered list, not as bullet points.
  - Don't explain concepts.
  
  Follow this structure:  
@@ -95,6 +97,7 @@ Explanations are understanding-oriented. They contain descriptions, explanations
   - Provide only the information users may be interested in; don't explain too much.
   - Write sentences that provide useful information. Sentences like "The login field is used for logging in." are unnecessary.
   - Don't instruct or provide technical reference.
+  - When listing something, use bulleted lists, not numbered lists.
 
 ## Creating screenshots
 Although it's highly recommended to replace screenshots with text in documentation due to future GUI changes, it's also important to have a unified procedure and tools for taking and formatting screenshots.
