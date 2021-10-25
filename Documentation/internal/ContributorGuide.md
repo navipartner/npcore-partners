@@ -60,6 +60,7 @@ How-to guides should consist of a short description and a procedure divided into
  - Name the guide well. The name should tell the reader exactly what the guide does.
  - Provide a series of steps organized as a numbered list, not as bullet points.
  - Don't explain concepts.
+ - Begin the optional steps with (Optional), so that users can immediately identify them as such.
  
  Follow this structure:  
   
@@ -126,6 +127,8 @@ To ensure that the documentation style is unified, the following recommendations
 
 - **If you can, use the present tense and active voice**  
   They are easier to read and understand. They also improve searchability.
+- **Don't use abbreviations.**   
+  Instead of "e.g.", use "for example", "such as", or "like". The same goes for all other abbreviations ("etc." -> "and so on"; "i.e." -> "that is").
 - **Use the sentence-style capitalization in headings**  
   (For example, write "Point of sale", not "Point of Sale")
 - **Write brief and meaningful text**  
