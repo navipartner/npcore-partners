@@ -4,11 +4,11 @@ This topic describes the process of configuring the Replication Setup. As soon a
 
 
 1. Open the **Replication API Setup List** page.  
-   Multiple predefined setups are created automatically and grouped according to the master data, for example customer-related data, vendor-related data, and so on)
+   Multiple predefined setups are created automatically and grouped according to the master data, for example customer-related data, vendor-related data, and so on.
 2. Open the first **CUST_NPAPI V1** setup.
 3. Enter the necessary information in order to enable the setup (the setup is disabled by default).
  > [!IMPORTANT]
- > If the replication is made from an external database, state the correct external URL to the **Service Base URL** field and enable the **External Database** toggle switch.           
+ > If the replication is made from an external database, state the correct external URL in the **Service Base URL** field and enable the **External Database** toggle switch.           
  
 4. Press the ellipsis button next to the **From Company Name** field and select the company from which you want to import data.   
    If the **External Company** is disabled, you can select a company from the current database, otherwise the system makes a web API request to the external database to retrieve companies and you can select a company from that database.
@@ -16,7 +16,7 @@ This topic describes the process of configuring the Replication Setup. As soon a
 6. Enter the **From Company Tenant** if you work in a multitenant environment.
 7. Select the authorization type and the necessary credentials, then enable the authorization if needed.
 8. Press **Test Connection** to see if the connection can be established.
-9. Press **Enable** if the connection was successful.
+9. Press **Enable** if the connection was successful.     
     After confirmation, the Replication Setup is enabled and all data in the **From Company** will be imported into the current company.
 > [!Note]  	
 > When enabling the Replication Setup, a Naviconnect Import Type and a Job Queue Entry are created in the background, so the import is done automatically based on setup of these records.
@@ -46,6 +46,6 @@ However, there are special cases when the field names are different. You can use
 
 **Example:**
 
-![ReplicationSetupEndpointFieldMappings](images/ReplicationSetupEndpointsFieldMappings.jpg)  
+![ReplicationSetupEndpointsFieldMappings.jpg](images/ReplicationSetupEndpointsFieldMappings.jpg)
 
 
