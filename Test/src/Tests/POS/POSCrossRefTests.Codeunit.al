@@ -265,7 +265,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
         VATPostingSetup."VAT %" := 10;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -350,11 +350,11 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
         LibraryPOSMasterData.AssignVATBusPostGroupToPOSPostingProfile(POSStore, VATBusPostingGroupCode);
     end;
 
-    local procedure AssignVATProdPostGroupToPOSSalesRoundingAcc(VATProdPostingGroupCode: Code[20])
+    local procedure AssignVATPostGroupToPOSSalesRoundingAcc(VATBusPostingGroupCode: Code[20]; VATProdPostingGroupCode: Code[20])
     var
         LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
     begin
-        LibraryPOSMasterData.AssignVATProdPostGroupToPOSSalesRoundingAcc(POSStore, VATProdPostingGroupCode);
+        LibraryPOSMasterData.AssignVATPostGroupToPOSSalesRoundingAcc(POSStore, VATBusPostingGroupCode, VATProdPostingGroupCode);
     end;
 
     local procedure CreateItem(var Item: Record Item; VATBusPostingGroupCode: Code[20]; VATProdPostingGroupCode: Code[20]; TaxGroupCode: Code[20]; PricesIncludesVAT: Boolean)

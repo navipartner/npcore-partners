@@ -72,6 +72,15 @@ codeunit 6014635 "NPR POS Full Tax" implements "NPR POS ITaxCalc"
             Error(TaxCalcTypeNotSupportedInPOS, POSSaleTax.FieldCaption("Source Tax Calc. Type"), POSSaleTax."Source Tax Calc. Type"::"Full VAT");
     end;
 
+    procedure PostPOSTaxAmountCalculationReverseSign(EntryNo: Integer; SystemId: Guid; POSSaleTax: Record "NPR POS Sale Tax")
+    var
+        Handled: Boolean;
+    begin
+        OnPostPOSTaxAmountCalculation(EntryNo, SystemId, POSSaleTax, Handled);
+        if not Handled then
+            Error(TaxCalcTypeNotSupportedInPOS, POSSaleTax.FieldCaption("Source Tax Calc. Type"), POSSaleTax."Source Tax Calc. Type"::"Full VAT");
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnPostPOSTaxAmountCalculation(EntryNo: Integer; SystemId: Guid; POSSaleTax: Record "NPR POS Sale Tax"; var Handled: Boolean)
     begin
