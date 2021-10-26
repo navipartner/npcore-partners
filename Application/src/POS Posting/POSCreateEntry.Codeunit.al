@@ -103,7 +103,6 @@
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         SalesHeaderLbl: Label '%1 %2', Locked = true;
-        ShipmentLbl: Label 'Shipment %1';
     begin
         Clear(GlobalPOSEntry);
         OnBeforeCreatePOSEntry(SalePOS);
@@ -125,10 +124,7 @@
             SetPostedSalesDocInfo(POSEntry, SalesHeader);
 
         if POSEntry.Description = '' then begin
-            if Posted and (SalesHeader.Ship and not SalesHeader.Invoice) then
-                POSEntry.Description := StrSubstNo(ShipmentLbl, SalesHeader."Last Shipping No.")
-            else
-                POSEntry.Description := StrSubstNo(SalesHeaderLbl, SalesHeader."Document Type", SalesHeader."No.");
+            POSEntry.Description := StrSubstNo(SalesHeaderLbl, SalesHeader."Document Type", SalesHeader."No.");
         end;
         POSEntry.Modify();
 
