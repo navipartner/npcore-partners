@@ -145,30 +145,26 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
     var
         Line: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        Sign: Integer;
     begin
-
+        Sign := 1;
         if (PayOption = PayOptionType::PAYIN) then
-            Amount *= -1;
+            Sign := -1;
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetNewSaleLine(Line);
 
         Line.Type := Line.Type::"G/L Entry";
         Line."Sale Type" := Line."Sale Type"::"Out payment";
-        Line."No." := AccountNo;
-        Line.Description := CopyStr(Description, 1, MaxStrLen(Line.Description));
+        Line.Validate("No.", AccountNo);
         Line."Custom Descr" := (Description <> '');
-        Line.Quantity := 1;
+        if Line."Custom Descr" then
+            Line.Description := CopyStr(Description, 1, MaxStrLen(Line.Description));
+        Line.Quantity := Sign * 1;
         Line."Amount Including VAT" := Amount;
         Line."Unit Price" := Amount;
 
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.InsertLine(Line);
-
-        POSSaleLine.GetCurrentSaleLine(Line);
-        Line.Description := CopyStr(Description, 1, MaxStrLen(Line.Description));
-
-        Line.UpdateAmounts(Line);
-
-        Line.Modify();
-
+        POSSaleLine.InsertLine(Line, false);
         POSSaleLine.RefreshCurrent();
     end;
 
