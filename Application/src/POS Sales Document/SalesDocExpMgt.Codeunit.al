@@ -12,8 +12,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         CannotDeleteItemGroupsErr: Label 'You cannot debit item groups!';
         CannotPostPaymentSalesModuleErr: Label 'Error. You can not post customer payments from the register using the sales module!';
         SalesHeaderCreatedLbl: Label '%1 %2 was created', Comment = '%1=SalesHeader."Document Type";%2=SalesHeader."No."';
-        OrderShippedLbl: Label '%1 %2 has been shipped under the number %3', Comment = '%1=SalesHeader."Document Type";%2=SalesHeader."No.";%3=SalesHeader."Last Shipping No."';
-        ShowCreationMessage, ShowPostedMessage : Boolean;
+        ShowCreationMessage: Boolean;
         OrderTypeSet: Boolean;
         CannotPostPaymentErr: Label 'You cannot post when a payment has been made';
         OneDocPerSalesTicketErr: Label 'Only one sales document can be created per sales ticket';
@@ -102,11 +101,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     procedure SetShowCreationMessage()
     begin
         ShowCreationMessage := true;
-    end;
-
-    procedure SetShowPostedMessage(_ShowPostedMessage: Boolean)
-    begin
-        ShowPostedMessage := _ShowPostedMessage;
     end;
 
     procedure SetTransferSalesPerson(TransferSalesPersonIn: Boolean)
@@ -268,51 +262,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
 
         Commit();
-    end;
-
-    procedure ProcessSalesDocumentAsShipmentInPOSSale(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SalesPost: Codeunit "Sales-Post";
-        POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
-        Posted: Boolean;
-    begin
-        CreatedSalesHeader := SalesHeader;
-        SalesHeader.TestField(Ship);
-        Posted := SalesPost.Run(SalesHeader);
-        if not Posted then
-            Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText());
-
-        POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
-
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if not SaleLinePOS.IsEmpty() then
-            SaleLinePOS.DeleteAll();
-        SalePOS.Delete();
-
-        if Posted then begin
-            if Print then
-                POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
-
-            if SendDocument then
-                POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 0);
-
-            if SendPostedPdf2Nav then
-                POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 0);
-            if ShowPostedMessage then
-                Message(OrderShippedLbl, SalesHeader."Document Type", SalesHeader."No.", SalesHeader."Last Shipping No.");
-        end;
-
-        TicketManagement.PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
-
-        Commit();
-
-        PrintRetailReceipt(SalePOS);
-
-        InvokeOnFinishCreditSaleWorkflow(SalePOS);
     end;
 
     procedure CreateSalesHeader(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")

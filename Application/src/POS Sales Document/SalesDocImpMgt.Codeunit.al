@@ -105,61 +105,6 @@
         end;
     end;
 
-    procedure SalesDocumentToPOSShipment(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SalesLine: Record "Sales Line";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR POS Sale";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSale.GetCurrentSale(SalePOS);
-
-        SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-        SalePOS.TestField("Customer No.", SalesHeader."Bill-to Customer No.");
-
-        if DocumentIsAttachedToPOSSale(SalePOS) then
-            Error(ERR_DUPLICATE_DOCUMENT);
-
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetRange(Type, SalesLine.Type::Item);
-        SalesLine.SetFilter("Qty. to Ship", '<>%1', 0);
-        SalesLine.FindSet();
-
-        repeat
-            POSSaleLine.GetNewSaleLine(SaleLinePOS);
-            SaleLinePOS.SetSkipCalcDiscount(true); //Prevent overwrite of any discounts from sales document, until lines are added,deleted,removed.            
-            SaleLinePOS.SetSkipUpdateDependantQuantity(true);
-
-            SaleLinePOS.Type := SaleLinePOS.Type::Item;
-            SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
-            SaleLinePOS.Validate("No.", SalesLine."No.");
-            SaleLinePOS.Validate("Unit of Measure Code", SalesLine."Unit of Measure Code");
-            SaleLinePOS.SetSkipUpdateDependantQuantity(false);
-            SaleLinePOS.Validate(Quantity, SalesLine."Qty. to Ship");
-            SaleLinePOS.Validate("Unit Price", 0);
-            SaleLinePOS."Bin Code" := SalesLine."Bin Code";
-            SaleLinePOS."Location Code" := SalesLine."Location Code";
-            SaleLinePOS."Shortcut Dimension 1 Code" := SalesLine."Shortcut Dimension 1 Code";
-            SaleLinePOS."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
-            SaleLinePOS.Validate("Discount Type", SalesLine."NPR Discount Type");
-            SaleLinePOS.Validate("Discount Code", SalesLine."NPR Discount Code");
-            SaleLinePOS.Validate("Allow Line Discount", SalesLine."Allow Line Disc.");
-            SaleLinePOS.Validate("Discount %", SalesLine."Line Discount %");
-            SaleLinePOS.Validate("Discount Amount", SalesLine."Line Discount Amount");
-            SaleLinePOS.Description := SalesLine.Description;
-            SaleLinePOS."Description 2" := SalesLine."Description 2";
-            SaleLinePOS."Variant Code" := SalesLine."Variant Code";
-
-            SaleLinePOS.UpdateAmounts(SaleLinePOS);
-            POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-            SaleLinePOS.SetSkipCalcDiscount(false);
-        until SalesLine.Next() = 0;
-    end;
-
     procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
     var
         PaymentAmount: Decimal;
@@ -196,34 +141,6 @@
         SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount, SaleLinePOS, SalesHeader, Pdf2Nav, Send, SyncPost);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-    end;
-
-    procedure ShipSalesDocumentFromPOS(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; var SalesDocExpMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR POS Sale";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSale.GetCurrentSale(SalePOS);
-
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-            SalePOS.TestField("Customer No.", SalesHeader."Bill-to Customer No.");
-        end else begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-            SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
-            SalePOS.Modify(true);
-            POSSale.RefreshCurrent();
-        end;
-        SalesHeader.Ship := true;
-        SalesHeader.Receive := false;
-        SalesHeader.Invoice := false;
-
-        SalesDocumentToPOSShipment(POSSession, SalesHeader);
-        Commit();
-        SalesDocExpMgt.ProcessSalesDocumentAsShipmentInPOSSale(SalePOS, SalesHeader);
     end;
 
     procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
