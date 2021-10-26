@@ -126,15 +126,23 @@ codeunit 6014468 "NPR UPG Item Group"
     local procedure UpgradeItemGroupOnItem()
     var
         Item: Record Item;
+        MagentoSetup: Record "NPR Magento Setup";
+        SpecialPricesEnabled: Boolean;
     begin
         Database.SelectLatestVersion();
         Item.SetFilter("NPR Item Group", '<>%1', '');
-        if Item.FindSet(true) then
+        if Item.FindSet(true) then begin
+            SpecialPricesEnabled := MagentoSetup."Special Prices Enabled";
+            MagentoSetup."Special Prices Enabled" := false;
+            MagentoSetup.Modify();
             repeat
                 Item."Item Category Code" := Item."NPR Item Group";
                 Item.UpdateItemCategoryId();
                 Item.Modify(true);
             until Item.Next() = 0;
+            MagentoSetup."Special Prices Enabled" := SpecialPricesEnabled;
+            MagentoSetup.Modify();
+        end;
     end;
 
     local procedure UpgradeSalesPriceMaintGroups()
