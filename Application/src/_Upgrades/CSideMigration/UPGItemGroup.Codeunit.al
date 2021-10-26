@@ -132,16 +132,22 @@ codeunit 6014468 "NPR UPG Item Group"
         Database.SelectLatestVersion();
         Item.SetFilter("NPR Item Group", '<>%1', '');
         if Item.FindSet(true) then begin
-            SpecialPricesEnabled := MagentoSetup."Special Prices Enabled";
-            MagentoSetup."Special Prices Enabled" := false;
-            MagentoSetup.Modify();
+            if MagentoSetup.Get() then begin
+                SpecialPricesEnabled := MagentoSetup."Special Prices Enabled";
+                MagentoSetup."Special Prices Enabled" := false;
+                MagentoSetup.Modify();
+            end;
+
             repeat
                 Item."Item Category Code" := Item."NPR Item Group";
                 Item.UpdateItemCategoryId();
                 Item.Modify(true);
             until Item.Next() = 0;
-            MagentoSetup."Special Prices Enabled" := SpecialPricesEnabled;
-            MagentoSetup.Modify();
+
+            if SpecialPricesEnabled then begin
+                MagentoSetup."Special Prices Enabled" := SpecialPricesEnabled;
+                MagentoSetup.Modify();
+            end;
         end;
     end;
 
