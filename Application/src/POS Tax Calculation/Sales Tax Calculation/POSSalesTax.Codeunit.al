@@ -152,6 +152,28 @@ codeunit 6014631 "NPR POS Sales Tax" implements "NPR POS ITaxCalc"
         end;
     end;
 
+    procedure PostPOSTaxAmountCalculationReverseSign(EntryNo: Integer; SystemId: Guid; POSSaleTax: Record "NPR POS Sale Tax")
+    var
+        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
+        Sign: Integer;
+    begin
+        POSEntrySalesLine.GetBySystemId(SystemId);
+        Sign := 1;
+        if POSEntrySalesLine."Amount Incl. VAT" <> 0 then
+            Sign := POSEntrySalesLine."Amount Incl. VAT" / Abs(POSEntrySalesLine."Amount Incl. VAT");
+
+        POSSaleTaxCalc.FilterLines(POSSaleTax, POSSaleTaxLine);
+        if POSSaleTaxLine.FindSet() then begin
+            InitPostTaxCalculation(POSEntryTaxLine, POSSaleTaxLine, EntryNo, POSSaleTax);
+            repeat
+                PostTaxCalculationAmountsReverseSign(POSEntryTaxLine, POSSaleTaxLine, POSSaleTax, Sign);
+            until POSSaleTaxLine.Next() = 0;
+        end;
+    end;
+
     procedure PostTaxCalculationAmounts(var POSEntryTaxLine: Record "NPR POS Entry Tax Line"; POSSaleTaxLine: Record "NPR POS Sale Tax Line"; POSSaleTax: Record "NPR POS Sale Tax")
     begin
         if POSEntryTaxLine."Tax Liable" then begin
@@ -164,9 +186,26 @@ codeunit 6014631 "NPR POS Sales Tax" implements "NPR POS ITaxCalc"
             POSEntryTaxLine."Tax Base Amount FCY" += POSSaleTax."Calculated Amount Excl. Tax";
             POSEntryTaxLine."Line Amount" += POSSaleTax."Calculated Line Amount";
             POSEntryTaxLine."Amount Including Tax" += POSSaleTax."Calculated Amount Incl. Tax";
-
             POSEntryTaxLine."Tax Amount" += POSSaleTaxLine."Tax Amount";
             POSEntryTaxLine."Calculated Tax Amount" += POSSaleTaxLine."Tax Amount";
+        end;
+        POSEntryTaxLine.Modify();
+    end;
+
+    procedure PostTaxCalculationAmountsReverseSign(var POSEntryTaxLine: Record "NPR POS Entry Tax Line"; POSSaleTaxLine: Record "NPR POS Sale Tax Line"; POSSaleTax: Record "NPR POS Sale Tax"; Sign: Integer)
+    begin
+        if POSEntryTaxLine."Tax Liable" then begin
+            POSEntryTaxLine."Tax Amount" += Sign * ABS(POSSaleTaxLine."Tax Amount");
+            POSEntryTaxLine."Calculated Tax Amount" += Sign * ABS(POSSaleTaxLine."Tax Amount");
+            POSEntryTaxLine."Amount Including Tax" += Sign * ABS(POSSaleTaxLine."Tax Amount");
+        end else begin
+            POSEntryTaxLine.Quantity += Sign * ABS(POSSaleTax."Source Quantity");
+            POSEntryTaxLine."Tax Base Amount" += Sign * ABS(POSSaleTax."Calculated Amount Excl. Tax");
+            POSEntryTaxLine."Tax Base Amount FCY" += Sign * ABS(POSSaleTax."Calculated Amount Excl. Tax");
+            POSEntryTaxLine."Line Amount" += Sign * ABS(POSSaleTax."Calculated Line Amount");
+            POSEntryTaxLine."Amount Including Tax" += Sign * ABS(POSSaleTax."Calculated Amount Incl. Tax");
+            POSEntryTaxLine."Tax Amount" += Sign * ABS(POSSaleTaxLine."Tax Amount");
+            POSEntryTaxLine."Calculated Tax Amount" += Sign * ABS(POSSaleTaxLine."Tax Amount");
         end;
         POSEntryTaxLine.Modify();
     end;

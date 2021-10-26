@@ -70,7 +70,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
@@ -124,7 +124,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -193,7 +193,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -269,7 +269,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -343,7 +343,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -416,7 +416,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -488,7 +488,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -560,7 +560,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -662,7 +662,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -770,7 +770,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -875,7 +875,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -980,7 +980,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1088,7 +1088,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1184,7 +1184,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -1256,7 +1256,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -1335,7 +1335,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1412,7 +1412,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1488,7 +1488,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1563,7 +1563,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1638,7 +1638,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -1743,7 +1743,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -1854,7 +1854,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -1962,7 +1962,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -2070,7 +2070,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -2181,7 +2181,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -2484,7 +2484,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -2582,7 +2582,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -2941,7 +2941,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -3075,7 +3075,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -3175,7 +3175,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
@@ -3230,7 +3230,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -3306,7 +3306,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -3389,7 +3389,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -3470,7 +3470,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -3550,7 +3550,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -3629,7 +3629,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -3708,7 +3708,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -3817,7 +3817,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -3932,7 +3932,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4044,7 +4044,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4156,7 +4156,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4268,7 +4268,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4368,7 +4368,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -4447,7 +4447,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -4533,7 +4533,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4617,7 +4617,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4700,7 +4700,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4782,7 +4782,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -4864,7 +4864,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -4976,7 +4976,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -5094,7 +5094,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -5209,7 +5209,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -5324,7 +5324,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -5439,7 +5439,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -5757,7 +5757,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -5861,7 +5861,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -6236,7 +6236,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -6378,7 +6378,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -6484,7 +6484,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
@@ -6534,7 +6534,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -6606,7 +6606,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -6675,7 +6675,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -6738,7 +6738,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         VATPostingSetup."VAT %" := 16;
         VATPostingSetup.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile);
@@ -6810,7 +6810,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -6879,7 +6879,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
@@ -7043,7 +7043,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         POSStore.GetProfile(POSPostingProfile);
         POSPostingProfile."Default POS Posting Setup" := POSPostingProfile."Default POS Posting Setup"::Customer;
@@ -7140,11 +7140,11 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LibraryPOSMasterData.AssignVATBusPostGroupToPOSPostingProfile(POSStore, VATBusPostingGroupCode);
     end;
 
-    local procedure AssignVATProdPostGroupToPOSSalesRoundingAcc(VATProdPostingGroupCode: Code[20])
+    local procedure AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup: Record "VAT Posting Setup")
     var
         LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
     begin
-        LibraryPOSMasterData.AssignVATProdPostGroupToPOSSalesRoundingAcc(POSStore, VATProdPostingGroupCode);
+        LibraryPOSMasterData.AssignVATPostGroupToPOSSalesRoundingAcc(POSStore, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
     end;
 
     local procedure CreateItem(var Item: Record Item; VATBusPostingGroupCode: Code[20]; VATProdPostingGroupCode: Code[20]; TaxGroupCode: Code[20]; PricesIncludesVAT: Boolean)

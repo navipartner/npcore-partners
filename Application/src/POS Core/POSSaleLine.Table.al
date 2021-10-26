@@ -2118,7 +2118,9 @@ table 6014406 "NPR POS Sale Line"
         GLAccount.CheckGLAcc();
         Description := GLAccount.Name;
         "Gen. Posting Type" := GLAccount."Gen. Posting Type";
+        "Gen. Bus. Posting Group" := GLAccount."Gen. Bus. Posting Group";
         "Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
+        "VAT Bus. Posting Group" := GLAccount."VAT Bus. Posting Group";
         "VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
         "Tax Group Code" := GLAccount."Tax Group Code";
     end;

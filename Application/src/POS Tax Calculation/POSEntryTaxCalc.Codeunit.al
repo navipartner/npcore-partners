@@ -28,4 +28,17 @@ codeunit 6014634 "NPR POS Entry Tax Calc."
         POSSaleTax.GetHandler(ITaxCalc);
         ITaxCalc.PostPOSTaxAmountCalculation(EntryNo, SystemId, POSSaleTax);
     end;
+
+    procedure PostPOSTaxAmountCalculationReverseSign(EntryNo: Integer; SystemId: Guid)
+    var
+        POSSaleTax: Record "NPR POS Sale Tax";
+        ITaxCalc: Interface "NPR POS ITaxCalc";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+    begin
+        if not POSSaleTaxCalc.Find(POSSaleTax, SystemId) then
+            exit;
+
+        POSSaleTax.GetHandler(ITaxCalc);
+        ITaxCalc.PostPOSTaxAmountCalculationReverseSign(EntryNo, SystemId, POSSaleTax);
+    end;
 }

@@ -670,7 +670,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, true);
@@ -761,7 +761,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -857,7 +857,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -942,7 +942,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, true);
@@ -1034,7 +1034,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1126,7 +1126,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1754,7 +1754,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Reverse Charge VAT");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, true);
@@ -1845,7 +1845,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -1936,7 +1936,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -2022,7 +2022,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         // [GIVEN] Tax Posting Setup
         CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Reverse Charge VAT");
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, true);
@@ -2114,7 +2114,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -2206,7 +2206,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATProdPostGroupToPOSSalesRoundingAcc(VATPostingSetup."VAT Prod. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
@@ -2357,11 +2357,11 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         LibraryPOSMasterData.AssignVATBusPostGroupToPOSPostingProfile(POSStore, VATBusPostingGroupCode);
     end;
 
-    local procedure AssignVATProdPostGroupToPOSSalesRoundingAcc(VATProdPostingGroupCode: Code[20])
+    local procedure AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup: Record "VAT Posting Setup")
     var
         LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
     begin
-        LibraryPOSMasterData.AssignVATProdPostGroupToPOSSalesRoundingAcc(POSStore, VATProdPostingGroupCode);
+        LibraryPOSMasterData.AssignVATPostGroupToPOSSalesRoundingAcc(POSStore, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
     end;
 
     local procedure CreateItem(var Item: Record Item; VATBusPostingGroupCode: Code[20]; VATProdPostingGroupCode: Code[20]; PricesIncludesVAT: Boolean)

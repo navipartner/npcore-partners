@@ -75,6 +75,7 @@
                     SaleLinePOS."Sale Type"::"Out payment":
                         if SaleLinePOS.Type = SaleLinePOS.Type::"G/L Entry" then begin
                             InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, true, POSSalesLine);
+                            InsertPOSTaxAmountReverseSign(SaleLinePOS.SystemId, POSEntry);
                         end else
                             InsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
                     SaleLinePOS."Sale Type"::Comment:
@@ -1408,6 +1409,13 @@
         POSEntryTaxCalc: codeunit "NPR POS Entry Tax Calc.";
     begin
         POSEntryTaxCalc.PostPOSTaxAmountCalculation(POSEntry."Entry No.", SystemId);
+    end;
+
+    local procedure InsertPOSTaxAmountReverseSign(SystemId: Guid; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryTaxCalc: codeunit "NPR POS Entry Tax Calc.";
+    begin
+        POSEntryTaxCalc.PostPOSTaxAmountCalculationReverseSign(POSEntry."Entry No.", SystemId);
     end;
 
     procedure GetCreatedPOSEntry(var POSEntryOut: Record "NPR POS Entry")

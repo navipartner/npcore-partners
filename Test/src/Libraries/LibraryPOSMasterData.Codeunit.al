@@ -556,7 +556,7 @@
         POSPostingProfile.Modify();
     end;
 
-    procedure AssignVATProdPostGroupToPOSSalesRoundingAcc(POSStore: Record "NPR POS Store"; VATProdPostingGroupCode: Code[20])
+    procedure AssignVATPostGroupToPOSSalesRoundingAcc(POSStore: Record "NPR POS Store"; VATBusPostingGroupCode: Code[20]; VATProdPostingGroupCode: Code[20])
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         GLAcc: Record "G/L Account";
@@ -565,6 +565,7 @@
         GLAcc."No." := POSPostingProfile."POS Sales Rounding Account";
         GLAcc.Find();
         GLAcc."VAT Prod. Posting Group" := VATProdPostingGroupCode;
+        GLAcc."VAT Bus. Posting Group" := VATBusPostingGroupCode;
         GLAcc.Modify();
     end;
 
