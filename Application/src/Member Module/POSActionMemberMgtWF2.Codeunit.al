@@ -43,7 +43,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
                 '}' +
 
                 // If function is one of the membership alteration actions, fetch the options and prompt teller to choose 
-                'if ($parameters.Function >= $parameters.Function["Renew Membership"] && $parameters.Function <= $parameters.Function["Upgrade Membership"] ) {' +
+                'if ($parameters.Function >= $parameters.Function["Regret Membership Entry"] && $parameters.Function <= $parameters.Function["Cancel Membership"] ) {' +
                     'let lookupProperties = JSON.parse (await workflow.respond ("GetMembershipAlterationLookup"));' +
                     '$context.memberCardInput = lookupProperties.cardnumber;' +
                     'let lookupDataArray = JSON.parse(lookupProperties.data);' +
@@ -412,12 +412,16 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MemberCard: Record "NPR MM Member Card";
         FunctionId: Integer;
         LookupProperties: JsonObject;
+        REGRET_OPTION: Label 'Regret options...';
         EXTEND_OPTION: Label 'Extend options...';
         RENEW_OPTION: Label 'Renew options...';
+        REGRET_NOT_VALID: Label 'There are no valid regret products for this membership at this time.';
         EXTEND_NOT_VALID: Label 'There are no valid extend products for this membership at this time.';
         RENEW_NOT_VALID: Label 'There are no valid renewal products for this membership at this time.';
         UPGRADE_NOT_VALID: Label 'There are no valid upgrade products for this membership at this time.';
+        CANCEL_NOT_VALID: Label 'There are no valid cancel products for this membership at this time.';
         UPGRADE_OPTION: Label 'Upgrade options...';
+        CANCEL_OPTION: Label 'Cancel options...';
         ExternalMemberCardNo: Text[100];
     begin
         FunctionId := Context.GetIntegerParameter('Function');
@@ -428,6 +432,12 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MembershipAlterationSetup.setfilter("From Membership Code", '=%1', Membership."Membership Code");
 
         case FunctionId of
+            3:
+                begin
+                    MembershipAlterationSetup.setfilter("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::REGRET);
+                    LookupProperties.Add('notFoundMessage', REGRET_NOT_VALID);
+                    LookupProperties.Add('title', REGRET_OPTION);
+                end;
             4:
                 begin
                     MembershipAlterationSetup.setfilter("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::RENEW);
@@ -445,6 +455,12 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
                     MembershipAlterationSetup.setfilter("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::UPGRADE);
                     LookupProperties.Add('notFoundMessage', UPGRADE_NOT_VALID);
                     LookupProperties.Add('title', UPGRADE_OPTION);
+                end;
+            7:
+                begin
+                    MembershipAlterationSetup.setfilter("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::CANCEL);
+                    LookupProperties.Add('notFoundMessage', CANCEL_NOT_VALID);
+                    LookupProperties.Add('title', CANCEL_OPTION);
                 end;
 
         end;
