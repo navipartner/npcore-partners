@@ -393,7 +393,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
         gPrimaryRequestMode: Boolean;
         gDisallowReschedule: Boolean;
         gTicketRequestEntryNo: Integer;
-        RESCHEDULE_NOT_ALLOWED: Label 'ENU=The reschedule policy disallows change at this time.';
+        RESCHEDULE_NOT_ALLOWED: Label 'The reschedule policy disallows change at this time.';
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
