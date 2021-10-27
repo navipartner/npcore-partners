@@ -571,9 +571,16 @@ page 6151245 "NPR Retail Setup RC"
                 action("Variety Setup")
                 {
                     Caption = 'Variety Setup';
+                    RunObject = Page "NPR Variety Setup";
+                    ToolTip = 'Runs the Variety Setup Page';
+                    ApplicationArea = NPRRetail;
+                }
+                action(Variety)
+                {
+                    Caption = 'Variety';
                     RunObject = page "NPR Variety";
 
-                    ToolTip = 'Executes the Variety Setup action';
+                    ToolTip = 'Runs the Variety page';
                     ApplicationArea = NPRRetail;
                 }
                 action("Variety Fields Setup")
