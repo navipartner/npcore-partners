@@ -598,6 +598,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                 begin
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
+                    TicketAccessEntry.SetFilter("Access Date", '=%1', 0D);
                     if (TicketAccessEntry.IsEmpty()) then
                         exit(false);
 

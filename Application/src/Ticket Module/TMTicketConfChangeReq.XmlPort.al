@@ -173,6 +173,11 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
                                     XmlName = 'reservation';
                                     MinOccurs = Zero;
                                     MaxOccurs = Once;
+                                    fieldattribute(ExternalID; Reservation."External Adm. Sch. Entry No.")
+                                    {
+                                        XmlName = 'external_id';
+                                        Occurrence = Optional;
+                                    }
                                     textattribute(StartDateTime)
                                     {
                                         XmlName = 'start';
@@ -199,9 +204,9 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
                                         UntilDateTime := '';
                                         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', Reservation."External Adm. Sch. Entry No.");
                                         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                                        if (AdmissionScheduleEntry.findlast()) then begin
-                                            StartDateTime := Format(createdatetime(AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time"), 0, 9);
-                                            UntilDateTime := Format(createdatetime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time"), 0, 9);
+                                        if (AdmissionScheduleEntry.FindLast()) then begin
+                                            StartDateTime := Format(CreateDatetime(AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time"), 0, 9);
+                                            UntilDateTime := Format(CreateDatetime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time"), 0, 9);
                                         end;
 
                                     end;
