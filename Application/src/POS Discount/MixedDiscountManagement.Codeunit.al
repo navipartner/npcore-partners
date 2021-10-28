@@ -45,7 +45,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         Clear(TempSaleLinePOS);
     end;
 
-    local procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
+    procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         TempImpactedItems: Record "Item Variant" temporary;
