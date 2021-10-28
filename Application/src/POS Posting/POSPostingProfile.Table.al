@@ -125,22 +125,27 @@ table 6150653 "NPR POS Posting Profile"
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "Gen. Business Posting Group";
+            TableRelation = "Gen. Business Posting Group".Code where("NPR Restricted on POS" = const(false));
 
             trigger OnValidate()
             var
                 GenBusPostingGrp: Record "Gen. Business Posting Group";
+                VatBusPostingGrp: Record "VAT Business Posting Group";
             begin
                 if xRec."Gen. Bus. Posting Group" <> "Gen. Bus. Posting Group" then
-                    if GenBusPostingGrp.ValidateVatBusPostingGroup(GenBusPostingGrp, "Gen. Bus. Posting Group") then
+                    if GenBusPostingGrp.ValidateVatBusPostingGroup(GenBusPostingGrp, "Gen. Bus. Posting Group") then begin
+                        if GenBusPostingGrp."Def. VAT Bus. Posting Group" <> '' then
+                            if VatBusPostingGrp.Get(GenBusPostingGrp."Def. VAT Bus. Posting Group") and VatBusPostingGrp."NPR Restricted on POS" then
+                                GenBusPostingGrp."Def. VAT Bus. Posting Group" := '';
                         Validate("VAT Bus. Posting Group", GenBusPostingGrp."Def. VAT Bus. Posting Group");
+                    end;
             end;
         }
         field(151; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
-            TableRelation = "VAT Business Posting Group";
+            TableRelation = "VAT Business Posting Group".Code where("NPR Restricted on POS" = const(false));
         }
         field(152; "Tax Area Code"; Code[20])
         {

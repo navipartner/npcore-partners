@@ -126,23 +126,13 @@ table 6014405 "NPR POS Sale"
                         if Cust."Customer Disc. Group" <> '' then
                             "Customer Disc. Group" := Cust."Customer Disc. Group";
 
-                        if not FoundPostingProfile then begin
-                            "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
+                        if (POSPostingProfile."Default POS Posting Setup" = POSPostingProfile."Default POS Posting Setup"::Customer) or not FoundPostingProfile then begin
+                            if not Cust.NPR_IsRestrictedOnPOS(Cust.FieldNo("Gen. Bus. Posting Group")) then
+                                "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
                             "Tax Area Code" := Cust."Tax Area Code";
                             "Tax Liable" := Cust."Tax Liable";
-                            "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
-                        end else begin
-                            if POSPostingProfile."Default POS Posting Setup" = POSPostingProfile."Default POS Posting Setup"::Customer then begin
-                                "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
-                                "Tax Area Code" := Cust."Tax Area Code";
-                                "Tax Liable" := Cust."Tax Liable";
+                            if not Cust.NPR_IsRestrictedOnPOS(Cust.FieldNo("VAT Bus. Posting Group")) then
                                 "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
-                            end else begin
-                                "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
-                                "Tax Area Code" := POSPostingProfile."Tax Area Code";
-                                "Tax Liable" := POSPostingProfile."Tax Liable";
-                                "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
-                            end;
                         end;
                     end;
                 end;
