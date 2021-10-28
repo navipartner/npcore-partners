@@ -252,4 +252,28 @@ tableextension 6014423 "NPR Customer" extends Customer
         if not SalesLinePOS.IsEmpty() then
             Error(DeleteCustActiveCashErr, Rec."No.");
     end;
+
+    procedure NPR_IsRestrictedOnPOS(CheckFieldNo: Integer): Boolean
+    var
+        GenBusPostingGroup: Record "Gen. Business Posting Group";
+        VatBusPostingGroup: Record "VAT Business Posting Group";
+    begin
+        case CheckFieldNo of
+            Rec.FieldNo("Gen. Bus. Posting Group"):
+                begin
+                    if not GenBusPostingGroup.Get(Rec."Gen. Bus. Posting Group") then
+                        GenBusPostingGroup.Init();
+                    exit(GenBusPostingGroup."NPR Restricted on POS");
+                end;
+
+            Rec.FieldNo("VAT Bus. Posting Group"):
+                begin
+                    if not VatBusPostingGroup.Get(Rec."VAT Bus. Posting Group") then
+                        VatBusPostingGroup.Init();
+                    exit(VatBusPostingGroup."NPR Restricted on POS");
+                end;
+        end;
+
+        exit(false);
+    end;
 }
