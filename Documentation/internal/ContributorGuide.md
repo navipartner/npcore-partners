@@ -64,7 +64,7 @@ How-to guides should consist of a short description and a procedure divided into
  
  Follow this structure:  
   
-![How-to structure](images\embedded_how_to_guide_contributor_auto_x2_colored.jpg)
+![How-to structure](images/embedded_how_to_guide_contributor_auto_x2_colored.jpg)
 
  **Short description**  
  The short description should contain some basic information about the topic subject. Effective short descriptions provide enough context for a reader to understand what the topic conveys. It preferably contains keywords which help the reader to identify whether the topic contains information that's relevant to them. It should consist of no longer than two sentences. 
@@ -92,7 +92,7 @@ Explanations are understanding-oriented. They contain descriptions, explanations
 
  Follow this structure:
 
-![Explanation structure](images\explanation_structure_plan.png)
+![Explanation structure](images/explanation_structure_plan.png)
 
   - Provide context.
   - Provide only the information users may be interested in; don't explain too much.
@@ -108,7 +108,7 @@ It shouldn't be too big - don't distract users with unnecessary information. Scr
 
 
 
-  ![Good screenshot example](images\Screenshot_How_To_Youtube_Example.PNG)  
+  ![Good screenshot example](images/Screenshot_How_To_Youtube_Example.PNG)  
 
 The screenshot clearly indicates which part of the screen is of interest and which button needs to be clicked to achieve the desired outcome.
 

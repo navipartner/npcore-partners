@@ -11,12 +11,12 @@ In brief, the POS units help streamline retail operations by automating the tran
 As POS units in the NP Retail solution are highly customizable, it's possible to configure each of their many aspects. To find out more, refer to one of the following links.
 
 ### Related links
- - [Create a new POS (from scratch)](www.examplelink.com)
- - [Create a new POS (using an old one as a reference)](www.examplelink.com)
- - [Configure a payment terminal for a POS unit](www.examplelink.com)
- - [Configure an opening mechanism for a POS unit cash drawer](www.examplelink.com)
- - [Configure a master/slave POS unit drawer counting](www.examplelink.com)
- - [Configure self-service for a POS unit](www.examplelink.com)
- - [POS unit fiscalization](www.examplelink.com)
- - [POS unit profiles](www.examplelink.com)
- - [POS unit tax-free profile](www.examplelink.com)
+ - [Create a new POS (from scratch)](https://www.examplelink.com)
+ - [Create a new POS (using an old one as a reference)](https://www.examplelink.com)
+ - [Configure a payment terminal for a POS unit](https://www.examplelink.com)
+ - [Configure an opening mechanism for a POS unit cash drawer](https://www.examplelink.com)
+ - [Configure a master/slave POS unit drawer counting](https://www.examplelink.com)
+ - [Configure self-service for a POS unit](https://www.examplelink.com)
+ - [POS unit fiscalization](https://www.examplelink.com)
+ - [POS unit profiles](https://www.examplelink.com)
+ - [POS unit tax-free profile](https://www.examplelink.com)
