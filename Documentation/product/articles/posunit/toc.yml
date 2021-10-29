@@ -1,5 +1,9 @@
 - name: Introduction
   href: intro.md
+- name: Explanation
+  items:
+  - name: POS (Point of Sale) units
+    href: explanation/POSUnit.md
 - name: How-To  
   items:
   - name: Create new POS Unit
