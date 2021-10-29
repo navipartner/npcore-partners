@@ -22,7 +22,7 @@ page 6151255 "NPR Activities"
 
                     trigger OnDrillDown()
                     begin
-                        Page.RunModal(Page::"NPR Nc Import List");
+                        Page.Run(Page::"NPR Nc Import List");
                         CurrPage.Update(false);
                     end;
                 }
