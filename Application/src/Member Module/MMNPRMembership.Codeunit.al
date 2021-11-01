@@ -416,19 +416,18 @@ codeunit 6060147 "NPR MM NPR Membership"
     [TryFunction]
     internal procedure TryWebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: XmlDocument; var XmlDocOut: XmlDocument)
     var
-
         ResponseText: Text;
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         WebRequest: HttpRequestMessage;
         WebResponse: HttpResponseMessage;
         WebClient: HttpClient;
+        [NonDebuggable]
         Headers: HttpHeaders;
         RequestText: Text;
-        B64Credential: Text;
-        Base64Convert: Codeunit "Base64 Convert";
-        Base64ConvertToBase64Lbl: Label '%1:%2', Locked = true;
-        BasicLbl: Label 'Basic %1', Locked = true;
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
     begin
         ReasonText := '';
 
@@ -439,26 +438,17 @@ codeunit 6060147 "NPR MM NPR Membership"
         ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
         ContentHeader.Add('SOAPAction', SoapAction);
         WebRequest.Content(RequestContent);
-
         WebRequest.GetHeaders(Headers);
-        case NPRRemoteEndpointSetup."Credentials Type" of
-            NPRRemoteEndpointSetup."Credentials Type"::NAMED:
-                begin
-                    if (NPRRemoteEndpointSetup."User Domain" <> '') then
-                        WebClient.UseWindowsAuthentication(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password", NPRRemoteEndpointSetup."User Domain")
-                    else
-                        WebClient.UseWindowsAuthentication(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password");
-                end;
 
-            NPRRemoteEndpointSetup."Credentials Type"::BASIC:
-                begin
-                    B64Credential := Base64Convert.ToBase64(StrSubstNo(Base64ConvertToBase64Lbl, NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password"));
-                    if (Headers.Contains('Authorization')) then
-                        Headers.Remove('Authorization');
-                    Headers.Add('Authorization', StrSubstNo(BasicLbl, B64Credential));
-                end;
+        iAuth := NPRRemoteEndpointSetup.AuthType;
+        case NPRRemoteEndpointSetup.AuthType of
+            NPRRemoteEndpointSetup.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password Key", AuthParamsBuff);
+            NPRRemoteEndpointSetup.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(NPRRemoteEndpointSetup."OAuth2 Setup Code", AuthParamsBuff);
         end;
-
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
         WebRequest.Method := 'POST';
         WebRequest.SetRequestUri(NPRRemoteEndpointSetup."Endpoint URI");
         WebClient.Timeout := NPRRemoteEndpointSetup."Connection Timeout (ms)";
@@ -473,7 +463,6 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         ReasonText := WebResponse.ReasonPhrase;
         Error('%1', ReasonText);
-
     end;
 
     procedure MemberCardNumberValidationRequest(ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)

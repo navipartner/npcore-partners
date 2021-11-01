@@ -259,7 +259,7 @@ codeunit 6014608 "NPR Replication Register"
         sender.RegisterService(ItemsServiceCodeLbl,
             GetAPIServiceURL(), ItemsServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterItemServiceEndPoints();
-        IF sender.Enabled then begin
+        if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
             ReplicationAPI.ScheduleJobQueueEntry(sender);
         end;
@@ -268,7 +268,7 @@ codeunit 6014608 "NPR Replication Register"
         sender.RegisterService(CustServiceCodeLbl,
             GetAPIServiceURL(), CustServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterCustServiceEndPoints();
-        IF sender.Enabled then begin
+        if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
             ReplicationAPI.ScheduleJobQueueEntry(sender);
         end;
@@ -277,7 +277,7 @@ codeunit 6014608 "NPR Replication Register"
         sender.RegisterService(VendServiceCodeLbl,
             GetAPIServiceURL(), VendServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterVendServiceEndPoints();
-        IF sender.Enabled then begin
+        if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
             ReplicationAPI.ScheduleJobQueueEntry(sender);
         end;
@@ -286,7 +286,7 @@ codeunit 6014608 "NPR Replication Register"
         sender.RegisterService(NPRetailServiceCodeLbl,
             GetAPIServiceURL(), NPRetailServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterNPRetailServiceEndPoints();
-        IF sender.Enabled then begin
+        if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
             ReplicationAPI.ScheduleJobQueueEntry(sender);
         end;
@@ -295,7 +295,7 @@ codeunit 6014608 "NPR Replication Register"
         sender.RegisterService(DimensionsServiceCodeLbl,
             GetAPIServiceURL(), DimensionsServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterDimensionsServiceEndPoints();
-        IF sender.Enabled then begin
+        if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
             ReplicationAPI.ScheduleJobQueueEntry(sender);
         end;
@@ -304,7 +304,7 @@ codeunit 6014608 "NPR Replication Register"
         sender.RegisterService(MiscServiceCodeLbl,
             GetAPIServiceURL(), MiscServiceNameLbl, false, "NPR API Auth. Type"::Basic, 'DEFAULT');
         RegisterMiscellaneousServiceEndPoints();
-        IF sender.Enabled then begin
+        if sender.Enabled then begin
             ReplicationAPI.RegisterNcImportType(sender."API Version");
             ReplicationAPI.ScheduleJobQueueEntry(sender);
         end;
@@ -383,7 +383,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Item Category";
     begin
-        IF sender."Table ID" <> Database::"Item Category" then
+        if sender."Table ID" <> Database::"Item Category" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -399,7 +399,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Unit of Measure";
     begin
-        IF sender."Table ID" <> Database::"Unit of Measure" then
+        if sender."Table ID" <> Database::"Unit of Measure" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -415,7 +415,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Variety";
     begin
-        IF sender."Table ID" <> Database::"NPR Variety" then
+        if sender."Table ID" <> Database::"NPR Variety" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -434,7 +434,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Variety Table";
     begin
-        IF sender."Table ID" <> Database::"NPR Variety Table" then
+        if sender."Table ID" <> Database::"NPR Variety Table" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -459,7 +459,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Variety Value";
     begin
-        IF sender."Table ID" <> Database::"NPR Variety Value" then
+        if sender."Table ID" <> Database::"NPR Variety Value" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -472,7 +472,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Variety Group";
     begin
-        IF sender."Table ID" <> Database::"NPR Variety Group" then
+        if sender."Table ID" <> Database::"NPR Variety Group" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -497,7 +497,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Item";
     begin
-        IF sender."Table ID" <> Database::"Item" then
+        if sender."Table ID" <> Database::"Item" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -540,7 +540,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Item Unit of Measure";
     begin
-        IF sender."Table ID" <> Database::"Item Unit of Measure" then
+        if sender."Table ID" <> Database::"Item Unit of Measure" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -559,7 +559,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Item Variant";
     begin
-        IF sender."Table ID" <> Database::"Item Variant" then
+        if sender."Table ID" <> Database::"Item Variant" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -617,7 +617,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Item Reference";
     begin
-        IF sender."Table ID" <> Database::"Item Reference" then
+        if sender."Table ID" <> Database::"Item Reference" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -677,7 +677,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Customer Price Group";
     begin
-        IF sender."Table ID" <> Database::"Customer Price Group" then
+        if sender."Table ID" <> Database::"Customer Price Group" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -690,7 +690,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Customer Discount Group";
     begin
-        IF sender."Table ID" <> Database::"Customer Discount Group" then
+        if sender."Table ID" <> Database::"Customer Discount Group" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -703,7 +703,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Customer Posting Group";
     begin
-        IF sender."Table ID" <> Database::"Customer Posting Group" then
+        if sender."Table ID" <> Database::"Customer Posting Group" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -716,7 +716,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record Customer;
     begin
-        IF sender."Table ID" <> Database::Customer then
+        if sender."Table ID" <> Database::Customer then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -782,7 +782,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo(Image), 'picture', 0, false, false);
 
-#IF BC17
+#if BC17
 #pragma warning disable AL0432
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
           Rec.FieldNo(Picture), 'picture', 0, false, true);
@@ -796,7 +796,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Price List Header";
     begin
-        IF sender."Table ID" <> Database::"Price List Header" then
+        if sender."Table ID" <> Database::"Price List Header" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -810,7 +810,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Price List Line";
     begin
-        IF sender."Table ID" <> Database::"Price List Line" then
+        if sender."Table ID" <> Database::"Price List Line" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -832,7 +832,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Salesperson/Purchaser";
     begin
-        IF sender."Table ID" <> Database::"Salesperson/Purchaser" then
+        if sender."Table ID" <> Database::"Salesperson/Purchaser" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -851,7 +851,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Customer Bank Account";
     begin
-        IF sender."Table ID" <> Database::"Customer Bank Account" then
+        if sender."Table ID" <> Database::"Customer Bank Account" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -886,7 +886,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Vendor";
     begin
-        IF sender."Table ID" <> Database::"Vendor" then
+        if sender."Table ID" <> Database::"Vendor" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -940,7 +940,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
           Rec.FieldNo(Image), 'picture', 0, false, false);
 
-#IF BC17
+#if BC17
 #pragma warning disable AL0432
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
           Rec.FieldNo(Image), 'picture', 0, false, true);
@@ -954,7 +954,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Vendor Bank Account";
     begin
-        IF sender."Table ID" <> Database::"Vendor Bank Account" then
+        if sender."Table ID" <> Database::"Vendor Bank Account" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -967,7 +967,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Vendor Posting Group";
     begin
-        IF sender."Table ID" <> Database::"Vendor Posting Group" then
+        if sender."Table ID" <> Database::"Vendor Posting Group" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1016,7 +1016,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Period Discount";
     begin
-        IF sender."Table ID" <> Database::"NPR Period Discount" then
+        if sender."Table ID" <> Database::"NPR Period Discount" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1029,7 +1029,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Period Discount Line";
     begin
-        IF sender."Table ID" <> Database::"NPR Period Discount Line" then
+        if sender."Table ID" <> Database::"NPR Period Discount Line" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1045,7 +1045,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Mixed Discount";
     begin
-        IF sender."Table ID" <> Database::"NPR Mixed Discount" then
+        if sender."Table ID" <> Database::"NPR Mixed Discount" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1091,7 +1091,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Mixed Disc. Time Interv.";
     begin
-        IF sender."Table ID" <> Database::"NPR Mixed Disc. Time Interv." then
+        if sender."Table ID" <> Database::"NPR Mixed Disc. Time Interv." then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1104,7 +1104,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Mixed Discount Level";
     begin
-        IF sender."Table ID" <> Database::"NPR Mixed Discount Level" then
+        if sender."Table ID" <> Database::"NPR Mixed Discount Level" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1120,7 +1120,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "NPR Mixed Discount Line";
     begin
-        IF sender."Table ID" <> Database::"NPR Mixed Discount Line" then
+        if sender."Table ID" <> Database::"NPR Mixed Discount Line" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1165,7 +1165,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Dimension";
     begin
-        IF sender."Table ID" <> Database::"Dimension" then
+        if sender."Table ID" <> Database::"Dimension" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1184,7 +1184,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Dimension Value";
     begin
-        IF sender."Table ID" <> Database::"Dimension Value" then
+        if sender."Table ID" <> Database::"Dimension Value" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1206,7 +1206,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Default Dimension";
     begin
-        IF sender."Table ID" <> Database::"Default Dimension" then
+        if sender."Table ID" <> Database::"Default Dimension" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1252,7 +1252,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record Location;
     begin
-        IF sender."Table ID" <> Database::Location then
+        if sender."Table ID" <> Database::Location then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1274,7 +1274,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Shipment Method";
     begin
-        IF sender."Table ID" <> Database::"Shipment Method" then
+        if sender."Table ID" <> Database::"Shipment Method" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1287,7 +1287,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Payment Terms";
     begin
-        IF sender."Table ID" <> Database::"Payment Terms" then
+        if sender."Table ID" <> Database::"Payment Terms" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1303,7 +1303,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record "Payment Method";
     begin
-        IF sender."Table ID" <> Database::"Payment Method" then
+        if sender."Table ID" <> Database::"Payment Method" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
@@ -1316,7 +1316,7 @@ codeunit 6014608 "NPR Replication Register"
         Mapping: Record "NPR Rep. Special Field Mapping";
         Rec: Record Currency;
     begin
-        IF sender."Table ID" <> Database::Currency then
+        if sender."Table ID" <> Database::Currency then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",

@@ -59,20 +59,45 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
             Caption = 'Api Url';
             DataClassification = CustomerContent;
         }
+
+        field(101; AuthType; Enum "NPR API Auth. Type")
+        {
+            Caption = 'Auth. Type';
+            DataClassification = CustomerContent;
+        }
         field(105; "Api Username"; Text[100])
         {
             Caption = 'Api Username';
             DataClassification = CustomerContent;
         }
+
         field(110; "Api Password"; Text[100])
         {
             Caption = 'Api Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with Isolated Storage Password Key';
         }
+
+        field(111; "API Password Key"; GUID)
+        {
+            Caption = 'User Password Key';
+            DataClassification = EndUserPseudonymousIdentifiers;
+        }
+
+        field(112; "OAuth2 Setup Code"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "NPR OAuth Setup";
+            Caption = 'OAuth2.0 Setup Code';
+        }
+
         field(115; "Api Domain"; Text[100])
         {
             Caption = 'Api Domain';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(120; "Processing Codeunit ID"; Integer)
         {
@@ -174,6 +199,14 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
     trigger OnModify()
     begin
         SetApiUrl();
+    end;
+
+    trigger OnDelete()
+    var
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            WebServiceAuthHelper.RemoveApiPassword("API Password Key");
     end;
 
     procedure SetApiUrl()

@@ -38,29 +38,47 @@ page 6060072 "NPR MM NPR Endpoint Setup"
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Credentials Type"; Rec."Credentials Type")
+                field(AuthType; Rec.AuthType)
                 {
-
-                    ToolTip = 'Specifies the value of the Credentials Type field';
                     ApplicationArea = NPRRetail;
-                }
-                field("User Domain"; Rec."User Domain")
-                {
+                    Tooltip = 'Specifies the Authorization Type.';
 
-                    ToolTip = 'Specifies the value of the User Domain field';
-                    ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
                 }
                 field("User Account"; Rec."User Account")
                 {
 
                     ToolTip = 'Specifies the value of the User Account field';
                     ApplicationArea = NPRRetail;
+                    Visible = IsBasicAuthVisible;
                 }
-                field("User Password"; Rec."User Password")
+
+                field("User Password"; pw)
                 {
 
                     ToolTip = 'Specifies the value of the User Password field';
                     ApplicationArea = NPRRetail;
+                    Caption = 'User Password';
+                    ExtendedDatatype = Masked;
+                    Visible = IsBasicAuthVisible;
+                    trigger OnValidate()
+                    begin
+                        if pw <> '' then
+                            WebServiceAuthHelper.SetApiPassword(pw, Rec."User Password Key")
+                        else begin
+                            if WebServiceAuthHelper.HasApiPassword(Rec."User Password Key") then
+                                WebServiceAuthHelper.RemoveApiPassword(Rec."User Password Key");
+                        end;
+                    end;
+                }
+                field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                    Visible = IsOAuth2Visible;
                 }
                 field("Endpoint URI"; Rec."Endpoint URI")
                 {
@@ -76,7 +94,6 @@ page 6060072 "NPR MM NPR Endpoint Setup"
                 }
                 field("Connection Timeout (ms)"; Rec."Connection Timeout (ms)")
                 {
-
                     ToolTip = 'Specifies the value of the Connection Timeout (ms) field';
                     ApplicationArea = NPRRetail;
                 }
@@ -87,5 +104,25 @@ page 6060072 "NPR MM NPR Endpoint Setup"
     actions
     {
     }
+
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        if WebServiceAuthHelper.HasApiPassword(Rec."User Password Key") then
+            pw := '***';
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
+    var
+        [InDataSet]
+        pw: Text[200];
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 }
 

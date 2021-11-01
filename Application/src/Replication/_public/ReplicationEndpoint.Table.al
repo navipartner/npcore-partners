@@ -39,9 +39,9 @@ table 6014589 "NPR Replication Endpoint"
             Caption = 'Enabled';
             trigger OnValidate()
             begin
-                IF Rec.Enabled then begin
+                if Rec.Enabled then begin
                     Rec.TestField(Path);
-                    IF Rec."Endpoint Method" = Rec."Endpoint Method"::"Get BC Generic Data" then
+                    if Rec."Endpoint Method" = Rec."Endpoint Method"::"Get BC Generic Data" then
                         Rec.TestField("Table ID");
                 end;
             end;
@@ -74,7 +74,7 @@ table 6014589 "NPR Replication Endpoint"
                 Mapping: Record "NPR Rep. Special Field Mapping";
             begin
                 Rec.TestField(Enabled, false);
-                IF CheckMappingExistForEndpoint(Mapping) then
+                if CheckMappingExistForEndpoint(Mapping) then
                     Error(SpecialFieldMappingExistErr);
             end;
         }
@@ -147,7 +147,7 @@ table 6014589 "NPR Replication Endpoint"
     var
         Mapping: Record "NPR Rep. Special Field Mapping";
     begin
-        IF CheckMappingExistForEndpoint(Mapping) then
+        if CheckMappingExistForEndpoint(Mapping) then
             Mapping.DeleteAll(true);
     end;
 

@@ -32,13 +32,13 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         JTokenEntity: JsonToken;
         i: integer;
     begin
-        IF ReplicationEndPoint."Table ID" = 0 then
+        if ReplicationEndPoint."Table ID" = 0 then
             exit;
 
-        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+        if Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) then
             exit;
 
-        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+        if not ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
             exit;
 
         BindEventSubscribersForReplication();
@@ -59,12 +59,12 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         ReplicationAPI: Codeunit "NPR Replication API";
         RecRef: RecordRef;
     begin
-        IF Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
+        if Not ReplicationAPI.CheckEntityReplicationCounter(JToken, ReplicationEndPoint) then
             exit;
 
         InitializeTempSpecialFieldMapping(TempSpecialFieldMapping, ReplicationEndPoint);
         InitializeRecRef(RecRef, JToken, TempSpecialFieldMapping, ReplicationEndPoint);
-        IF CheckFieldsChanged(RecRef, JToken, TempSpecialFieldMapping, ReplicationEndPoint) then begin
+        if CheckFieldsChanged(RecRef, JToken, TempSpecialFieldMapping, ReplicationEndPoint) then begin
             RecRef.Modify(ReplicationEndPoint."Run OnModify Trigger");
             OnAfterRecordIsModified(RecRef, ReplicationEndPoint);
         end;
@@ -84,25 +84,25 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
     begin
         RecRef.Open(ReplicationEndPoint."Table ID");
         GetPrimaryKeyFields(RecRef, TempPKField);
-        IF FieldRec.Get(RecRef.Number, 2000000000) then //SystemId;
-            IF GetSourceTxt(FieldRec, JToken, SystemId, TempSpecialFieldMapping, TempFoundAPIField) then
-                IF RecRef.GetBySystemId(SystemId) then begin
+        if FieldRec.Get(RecRef.Number, 2000000000) then //SystemId;
+            if GetSourceTxt(FieldRec, JToken, SystemId, TempSpecialFieldMapping, TempFoundAPIField) then
+                if RecRef.GetBySystemId(SystemId) then begin
                     RecFoundBySystemId := true;
                     RecRef2 := RecRef.Duplicate();
-                    IF TempPKField.FindSet() then
+                    if TempPKField.FindSet() then
                         repeat // check if existing record was renamed
-                            IF GetSourceTxt(TempPKField, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
-                                IF ReplicationAPI.CheckFieldValue(RecRef2, TempPKField."No.", SourceText, false) then
+                            if GetSourceTxt(TempPKField, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
+                                if ReplicationAPI.CheckFieldValue(RecRef2, TempPKField."No.", SourceText, false) then
                                     NeedsRename := true;
                         until TempPKField.Next() = 0;
 
-                    If NeedsRename then begin
+                    if NeedsRename then begin
                         RecRef.Delete();
                         RecFoundBySystemId := false;
                     end;
                 end;
 
-        IF Not RecFoundBySystemId then
+        if Not RecFoundBySystemId then
             FindRecByPKFields(RecRef, JToken, SystemId, TempPKField, TempSpecialFieldMapping, ReplicationEndPoint);
     end;
 
@@ -129,15 +129,15 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         ReplicationAPI: Codeunit "NPR Replication API";
         SourceText: Text;
     begin
-        IF TempPKField.FindSet() then begin
+        if TempPKField.FindSet() then begin
             repeat
-                IF GetSourceTxt(TempPKField, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
+                if GetSourceTxt(TempPKField, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
                     ReplicationAPI.CheckFieldValue(RecRef, TempPKField."No.", SourceText, TempFoundAPIField."With Validation")
                 Else
                     Error(PKFieldErr, TempPKField.FieldName);
             until TempPKField.Next() = 0;
 
-            IF NOT RecRef.Find('=') then
+            if not RecRef.Find('=') then
                 InsertNewRec(RecRef, SystemID, ReplicationEndpoint);
         end;
     end;
@@ -147,9 +147,9 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         SysIdGuid: GUID;
         FRef: FieldRef;
     begin
-        IF SystemID <> '' then begin
+        if SystemID <> '' then begin
             FRef := RecRef.Field(2000000000); // systemId
-            IF Evaluate(SysIdGuid, SystemID) then begin
+            if Evaluate(SysIdGuid, SystemID) then begin
                 FRef.Value := SysIdGuid;
                 RecRef.Insert(ReplicationEndpoint."Run OnInsert Trigger", true);
             end else
@@ -172,19 +172,19 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         FieldRec.SetRange(IsPartOfPrimaryKey, false);
         FieldRec.SetFilter(ObsoleteState, '<>%1', FieldRec.ObsoleteState::Removed);
         FieldRec.SetFilter(Type, '<>%1&<>%2&<>%3', FieldRec.Type::Binary, FieldRec.Type::TableFilter, FieldRec.Type::RecordID);
-        IF FieldRec.FindSet() then
+        if FieldRec.FindSet() then
             repeat
-                IF GetSourceTxt(FieldRec, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
-                    IF Not TempFoundAPIField.Skip then
+                if GetSourceTxt(FieldRec, JToken, SourceText, TempSpecialFieldMapping, TempFoundAPIField) then
+                    if Not TempFoundAPIField.Skip then
                         case FieldRec.Type of
                             FieldRec.Type::Media, FieldRec.Type::MediaSet:
-                                If CheckImage(JToken, RecRef, ReplicationEndPoint, TempFoundAPIField, Client) then
+                                if CheckImage(JToken, RecRef, ReplicationEndPoint, TempFoundAPIField, Client) then
                                     FieldsChanged := true;
                             FieldRec.Type::BLOB:
-                                IF CheckBLOB(RecRef, FieldRec."No.", SourceText, TempFoundAPIField, ReplicationEndPoint, Client) then
+                                if CheckBLOB(RecRef, FieldRec."No.", SourceText, TempFoundAPIField, ReplicationEndPoint, Client) then
                                     FieldsChanged := true;
                             else
-                                IF ReplicationAPI.CheckFieldValue(RecRef, FieldRec."No.", SourceText, TempFoundAPIField."With Validation") then
+                                if ReplicationAPI.CheckFieldValue(RecRef, FieldRec."No.", SourceText, TempFoundAPIField."With Validation") then
                                     FieldsChanged := true;
                         end;
             until FieldRec.Next() = 0;
@@ -200,9 +200,9 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         Clear(SourceText);
         //try find by Replication Special Name Mappings settings
         TempSpecialFieldMapping.SetRange("Field ID", FieldRec."No.");
-        IF TempSpecialFieldMapping.FindSet() then
+        if TempSpecialFieldMapping.FindSet() then
             repeat
-                IF ReplicationAPI.SelectJsonToken(JToken.AsObject(), GetJPathFieldFromSpecialFieldMapping(TempSpecialFieldMapping), SourceText) then begin
+                if ReplicationAPI.SelectJsonToken(JToken.AsObject(), GetJPathFieldFromSpecialFieldMapping(TempSpecialFieldMapping), SourceText) then begin
                     TempFoundAPIField := TempSpecialFieldMapping;
                     exit(true);
                 end;
@@ -210,7 +210,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
 
         // try find by Field Name in camelcase
         APIPageFieldName := TextFunctions.Camelize(FieldRec.FieldName);
-        IF ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.' + APIPageFieldName, SourceText) then begin
+        if ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.' + APIPageFieldName, SourceText) then begin
             TempFoundAPIField."API Field Name" := APIPageFieldName;
             exit(true);
         end;
@@ -230,14 +230,14 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         DestinationFRef: FieldRef;
         WebRequestHelper: Codeunit "Web Request Helper";
     begin
-        IF NOT WebRequestHelper.IsValidUri(BlobURL) then
+        if not WebRequestHelper.IsValidUri(BlobURL) then
             exit(false);
 
         ServiceSetup.Get(ReplicationEndPoint."Service Code");
         ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, BlobURL);
 
-        IF ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then
-            IF (StatusCode <> 500) then begin //if BLOB is empty, server return status code 500 --> Description: Internal Server Error
+        if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then
+            if (StatusCode <> 500) then begin //if BLOB is empty, server return status code 500 --> Description: Internal Server Error
                 ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', BlobURL, Response);
                 Commit();
                 Error(BLOBCouldNotBeReadErr, TempFoundAPIField."API Field Name", RecRef.RecordId, ErrLog."Entry No.");
@@ -249,9 +249,9 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         Response.ToFieldRef(SourceFRef);
         DestinationFRef := RecRef.Field(FieldNo);
         DestinationFRef.CalcField();
-        IF DestinationFRef.Value <> SourceFRef.Value then begin
+        if DestinationFRef.Value <> SourceFRef.Value then begin
             DestinationFRef.Value := SourceFRef.Value;
-            IF TempFoundAPIField."With Validation" then
+            if TempFoundAPIField."With Validation" then
                 DestinationFRef.Validate();
             exit(true);
         end;
@@ -274,25 +274,25 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         ImageHeight: Integer;
         PictureJToken: JsonToken;
     begin
-        IF NOT CheckPictureImportIsSupported(RecRef) then
+        if not CheckPictureImportIsSupported(RecRef) then
             exit(false);
 
-        IF NOT JToken.SelectToken('$.' + TempFoundAPIField."API Field Name", PictureJToken) then
+        if not JToken.SelectToken('$.' + TempFoundAPIField."API Field Name", PictureJToken) then
             exit(false);
 
         NewImageURL := ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.[''pictureContent@odata.mediaReadLink'']');
-        IF NewImageURL = '' then
+        if NewImageURL = '' then
             Exit(false);
 
-        IF EValuate(ImageWidth, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.width')) then;
-        IF Evaluate(ImageHeight, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.height')) then;
+        if EValuate(ImageWidth, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.width')) then;
+        if Evaluate(ImageHeight, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.height')) then;
         MimeType := COPYSTR(ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.contentType'), 1, 100);
 
-        IF (ImageWidth > 0) AND (ImageHeight > 0) and (MimeType <> '') then begin
+        if (ImageWidth > 0) AND (ImageHeight > 0) and (MimeType <> '') then begin
             ServiceSetup.Get(ReplicationEndPoint."Service Code");
             ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, NewImageURL);
 
-            IF ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then begin
+            if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then begin
                 ErrLog.InsertLog(ReplicationEndPoint."Service Code", ReplicationEndPoint."EndPoint ID", 'GET', NewImageURL, Response);
                 Commit();
                 Error(ImageCouldNotBeReadErr, RecRef.RecordId, ErrLog."Entry No.");
@@ -301,13 +301,13 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
             ReadNewImage(Response, TempBlobNewImage, MimeType); // if use directly the InStream data(without read from temptable) sometimes the hash of 2 same png images is different.
             ReadExistingImage(RecRef, TempBlobExistingImage);
 
-            If ReplicationAPI.GetImageHash(TempBlobNewImage) <> ReplicationAPI.GetImageHash(TempBlobExistingImage) then begin
+            if ReplicationAPI.GetImageHash(TempBlobNewImage) <> ReplicationAPI.GetImageHash(TempBlobExistingImage) then begin
                 Response.CreateInStream(NewImageIStr);
                 UpdateImage(RecRef, NewImageIStr, MimeType);
                 Exit(true);
             end;
         end else begin // no image
-            IF ClearImage(RecRef) then
+            if ClearImage(RecRef) then
                 Exit(true);
         end;
 
@@ -322,7 +322,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
     begin
         ResponseTempBlob.CreateInStream(IStr);
         TempMediaRepository.Image.ImportStream(IStr, '', MimeType);
-        IF TempMediaRepository.Image.HasValue then begin
+        if TempMediaRepository.Image.HasValue then begin
             TempBlob.CreateOutStream(OStr);
             TempMediaRepository.Image.ExportStream(OStr);
         end;
@@ -336,7 +336,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         MediaId: Guid;
     begin
         MediaId := GetExistingImageMediaId(RecRef);
-        IF NOT IsNullGuid(MediaId) then begin
+        if not IsNullGuid(MediaId) then begin
             Media.Get(MediaId);
             if (Media.Content.HasValue()) then begin
                 Media.CalcFields(Content);
@@ -362,7 +362,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
             Database::Item:
                 begin
                     RecRef.SetTable(Item);
-                    IF Item.Picture.Count > 0 then
+                    if Item.Picture.Count > 0 then
                         MediaId := Item.Picture.Item(1);
                 End;
             Database::Vendor:
@@ -450,7 +450,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
 
     local procedure GetJPathFieldFromSpecialFieldMapping(var TempSpecialFieldMapping: Record "NPR Rep. Special Field Mapping") JPathField: Text
     begin
-        IF STRPOS(TempSpecialFieldMapping."API Field Name", '@') > 0 then
+        if STRPOS(TempSpecialFieldMapping."API Field Name", '@') > 0 then
             JPathField := '$.[' + '''' + TempSpecialFieldMapping."API Field Name" + '''' + ']' // for Blob mapping is done like: apiPageBlobFieldName@odata.mediaReadLink 
         Else
             JPathField := '$.' + TempSpecialFieldMapping."API Field Name";
@@ -467,10 +467,10 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         JTokenMainObject: JsonToken;
         JArrayValues: JsonArray;
     begin
-        IF Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) THEN
+        if Not ReplicationAPI.GetJTokenMainObjectFromContent(Content, JTokenMainObject) then
             exit(false);
 
-        IF NOT ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
+        if not ReplicationAPI.GetJsonArrayFromJsonToken(JTokenMainObject, '$.value', JArrayValues) then
             exit(false);
 
         Exit(JArrayValues.Count > 0);
@@ -485,7 +485,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         SpecialFieldMapping.SetRange("Service Code", ReplicationEndpoint."Service Code");
         SpecialFieldMapping.SetRange("EndPoint ID", ReplicationEndpoint."EndPoint ID");
         SpecialFieldMapping.SetRange("Table ID", ReplicationEndpoint."Table ID");
-        IF SpecialFieldMapping.FindSet() then
+        if SpecialFieldMapping.FindSet() then
             repeat
                 TempSpecialFieldMapping := SpecialFieldMapping;
                 TempSpecialFieldMapping.Insert();

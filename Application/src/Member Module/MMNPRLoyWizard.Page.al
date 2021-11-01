@@ -52,19 +52,60 @@ page 6151164 "NPR MM NPR Loy. Wizard"
             group("Server Communication")
             {
                 Caption = 'Server Communication';
-                field(ServiceUser; ServiceUser)
-                {
 
-                    Caption = 'Username';
-                    ToolTip = 'Specifies the value of the Username field';
+                field(AuthType; AuthType)
+                {
+                    Caption = 'Authorization Type';
+                    ToolTip = 'Specifies the value of the Authorization Type field';
                     ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
                 }
-                field(ServicePassword; ServicePassword)
-                {
 
-                    Caption = 'Password';
-                    ToolTip = 'Specifies the value of the Password field';
-                    ApplicationArea = NPRRetail;
+                group(BasicAuth)
+                {
+                    ShowCaption = false;
+                    Visible = IsBasicAuthVisible;
+                    field(ServiceUser; ServiceUser)
+                    {
+
+                        Caption = 'Username';
+                        ToolTip = 'Specifies the value of the Username field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(ServicePassword; ServicePassword)
+                    {
+
+                        Caption = 'Password';
+                        ToolTip = 'Specifies the value of the Password field';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
+
+                group(OAuth2)
+                {
+                    ShowCaption = false;
+                    Visible = IsOAuth2Visible;
+                    field(OAuth2SetupCode; OAuth2SetupCode)
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'OAuth2 Setup Code';
+                        Editable = false;
+                        ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                        trigger OnAssistEdit()
+                        var
+                            OAuth2SetupListPage: Page "NPR OAuth Setup List";
+                            OAuth2SetupRec: Record "NPR OAuth Setup";
+                        begin
+                            OAuth2SetupListPage.LookupMode(true);
+                            if OAuth2SetupListPage.RunModal() = Action::LookupOK then begin
+                                OAuth2SetupListPage.GetRecord(OAuth2SetupRec);
+                                OAuth2SetupCode := OAuth2SetupRec.Code;
+                            end;
+                        end;
+                    }
                 }
                 field(ServiceBaseURL; ServiceBaseURL)
                 {
@@ -151,6 +192,16 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         InitializeDefaults();
     end;
 
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
 
@@ -181,6 +232,14 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         EarnRatio: Decimal;
         BurnRation: Decimal;
 
+        AuthType: Enum "NPR API Auth. Type";
+
+        OAuth2SetupCode: Code[20];
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+
     local procedure InitializeDefaults()
     begin
         PaymentMethodCode := 'MM-LOYALTY';
@@ -200,7 +259,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         IsEditable := false;
     end;
 
-    procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vUsername: Text[50]; var vPassword: Text[30]; var vDescription: Text; var vAuthCode: Text[40]; var vLoyaltyServerCompanyName: Text[80]; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
+    procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vAuthType: Enum "NPR API Auth. Type"; var vUsername: Text[50]; var vPassword: Text[30]; var vOAuthSetupCode: Code[20]; var vDescription: Text; var vAuthCode: Text[40]; var vLoyaltyServerCompanyName: Text[80]; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
     begin
 
         vCommunityCode := CommunityCode;
@@ -211,8 +270,10 @@ page 6151164 "NPR MM NPR Loy. Wizard"
 
         vBaseUrl := ServiceBaseURL;
         vTenant := TenantName;
+        vAuthType := AuthType;
         vUsername := ServiceUser;
         vPassword := ServicePassword;
+        vOAuthSetupCode := OAuth2SetupCode;
 
         vDescription := Description;
 

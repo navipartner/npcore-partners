@@ -45,7 +45,7 @@ page 6059773 "NPR OAuth Setup Card"
                         if ClientIdGlobal <> '' Then
                             Rec.SetSecret(Rec.FieldNo("Client ID"), ClientIdGlobal)
                         Else begin
-                            if Rec.HasSecret(Rec.FieldNo("Client ID")) THEN
+                            if Rec.HasSecret(Rec.FieldNo("Client ID")) then
                                 Rec.RemoveSecret(Rec.FieldNo("Client ID"));
                         end;
                     end;
@@ -62,7 +62,7 @@ page 6059773 "NPR OAuth Setup Card"
                         if ClientSecretGlobal <> '' Then
                             Rec.SetSecret(Rec.FieldNo("Client Secret"), ClientSecretGlobal)
                         Else begin
-                            if Rec.HasSecret(Rec.FieldNo("Client Secret")) THEN
+                            if Rec.HasSecret(Rec.FieldNo("Client Secret")) then
                                 Rec.RemoveSecret(Rec.FieldNo("Client Secret"));
                         end;
                     end;
@@ -117,7 +117,7 @@ page 6059773 "NPR OAuth Setup Card"
                 trigger OnAction()
                 var
                 begin
-                    IF NOT Rec.HasSecret(Rec.FieldNo("Access Token")) then
+                    if not Rec.HasSecret(Rec.FieldNo("Access Token")) then
                         Error('Token does not exist.');
                     Rec.RemoveSecret(Rec.FieldNo("Access Token"));
                     Rec."Access Token Due DateTime" := 0DT;

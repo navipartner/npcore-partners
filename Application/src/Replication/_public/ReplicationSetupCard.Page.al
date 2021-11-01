@@ -125,10 +125,10 @@ page 6014495 "NPR Replication Setup Card"
                             begin
                                 Rec.TestField(Enabled, false);
                                 if pw <> '' Then
-                                    Rec.SetApiPassword(pw)
+                                    WebServiceAuthHelper.SetApiPassword(pw, Rec."API Password Key")
                                 Else begin
-                                    if Rec.HasApiPassword() THEN
-                                        Rec.RemoveApiPassword();
+                                    if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+                                        WebServiceAuthHelper.RemoveApiPassword(Rec."API Password Key");
                                 end;
                             end;
                         }
@@ -310,41 +310,16 @@ page 6014495 "NPR Replication Setup Card"
 
     trigger OnOpenPage()
     begin
-        SetAuthenticationFieldsVisibility();
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
         IsExternalDB := Rec."External Database";
     end;
 
     trigger OnAfterGetRecord()
     begin
-        pw := Rec.GetApiPassword();
-        SetAuthenticationFieldsVisibility();
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            pw := '***';
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
         IsExternalDB := Rec."External Database";
-    end;
-
-
-    local procedure SetAuthenticationFieldsVisibility()
-    begin
-        IsBasicAuthVisible := false;
-        IsOAuth2Visible := false;
-        BasicAuthVisible();
-        IF Not IsBasicAuthVisible then
-            OAuth2Visible();
-    end;
-
-    local procedure BasicAuthVisible(): Boolean
-    var
-        iAuth: Interface "NPR API IAuthorization";
-    begin
-        iAuth := Rec.AuthType;
-        IsBasicAuthVisible := iAuth.IsEnabled(Rec, Rec.FieldName(AuthType), Format(Rec.AuthType::Basic));
-    end;
-
-    local procedure OAuth2Visible(): Boolean
-    var
-        iAuth: Interface "NPR API IAuthorization";
-    begin
-        iAuth := Rec.AuthType;
-        IsOAuth2Visible := iAuth.IsEnabled(Rec, Rec.FieldName(AuthType), Format(Rec.AuthType::OAuth2));
     end;
 
     var
@@ -353,4 +328,5 @@ page 6014495 "NPR Replication Setup Card"
 
         [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible, IsExternalDB : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 }

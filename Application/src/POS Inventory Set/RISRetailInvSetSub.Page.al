@@ -37,24 +37,49 @@ page 6151087 "NPR RIS Retail Inv. Set Sub."
                     ToolTip = 'Specifies the value of the Api Url field';
                     ApplicationArea = NPRRetail;
                 }
+                field(AuthType; Rec.AuthType)
+                {
+                    ApplicationArea = NPRRetail;
+                    Tooltip = 'Specifies the Authorization Type.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
+                }
                 field("Api Username"; Rec."Api Username")
                 {
 
                     ToolTip = 'Specifies the value of the Api Username field';
                     ApplicationArea = NPRRetail;
+                    Visible = IsBasicAuthVisible;
                 }
-                field("Api Password"; Rec."Api Password")
+
+                field("API Password"; pw)
                 {
 
-                    ToolTip = 'Specifies the value of the Api Password field';
+                    ToolTip = 'Specifies the value of the User Password field';
                     ApplicationArea = NPRRetail;
+                    Caption = 'API Password';
+                    ExtendedDatatype = Masked;
+                    Visible = IsBasicAuthVisible;
+                    trigger OnValidate()
+                    begin
+                        if pw <> '' then
+                            WebServiceAuthHelper.SetApiPassword(pw, Rec."API Password Key")
+                        else begin
+                            if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+                                WebServiceAuthHelper.RemoveApiPassword(Rec."API Password Key");
+                        end;
+                    end;
                 }
-                field("Api Domain"; Rec."Api Domain")
+                field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Api Domain field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                    Visible = IsOAuth2Visible;
                 }
+
                 field("Processing Function"; Rec."Processing Function")
                 {
 
@@ -77,4 +102,23 @@ page 6151087 "NPR RIS Retail Inv. Set Sub."
             }
         }
     }
+    trigger OnOpenPage()
+    begin
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
+            pw := '***';
+        WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+    end;
+
+    var
+        [InDataSet]
+        pw: Text[200];
+
+        [InDataSet]
+        IsBasicAuthVisible, IsOAuth2Visible : Boolean;
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 }

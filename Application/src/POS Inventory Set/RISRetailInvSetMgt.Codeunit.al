@@ -101,12 +101,12 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
     [TryFunction]
     local procedure TryRequestInventory(RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry"; var RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary; var TotalInventory: Decimal)
     var
-        Base64Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
         Client: HttpClient;
         Content: HttpContent;
+        [NonDebuggable]
         Headers: HttpHeaders;
         HeadersReq: HttpHeaders;
         InStream: InStream;
@@ -120,9 +120,9 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         Response: Text;
         WsNamespace: Text;
         XmlString: Text;
-        AuthText: Text;
-        AuthLbl: Label '%1:%2', Locked = true;
-        BasicLbl: Label 'Basic %1', Locked = true;
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
     begin
         TotalInventory := 0;
         TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
@@ -162,19 +162,22 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         XmlDoc.WriteTo(OutStream);
         TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
         Content.WriteFrom(InStream);
-
-
         Content.GetHeaders(Headers);
         if Headers.Contains('Content-Type') then
             Headers.Remove('Content-Type');
         Headers.Add('Content-Type', 'text/xml; charset=utf-8');
         Headers.Add('SOAPAction', 'GetItemInventory');
 
-        if RetailInventorySetEntry."Api Username" <> '' then begin
-            HttpWebRequest.GetHeaders(HeadersReq);
-            AuthText := StrSubstNo(AuthLbl, RetailInventorySetEntry."Api Username", RetailInventorySetEntry."Api Password");
-            HeadersReq.Add('Authorization', StrSubstNo(BasicLbl, Base64Convert.ToBase64(AuthText)));
+        HttpWebRequest.GetHeaders(HeadersReq);
+        iAuth := RetailInventorySetEntry.AuthType;
+        case RetailInventorySetEntry.AuthType of
+            RetailInventorySetEntry.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(RetailInventorySetEntry."Api Username", RetailInventorySetEntry."API Password Key", AuthParamsBuff);
+            RetailInventorySetEntry.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(RetailInventorySetEntry."OAuth2 Setup Code", AuthParamsBuff);
         end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(HeadersReq, AuthParamsBuff);
 
         HttpWebRequest.Content(Content);
         HttpWebRequest.SetRequestUri(RetailInventorySetEntry."Api Url");

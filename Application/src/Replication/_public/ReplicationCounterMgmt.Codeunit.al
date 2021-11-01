@@ -20,10 +20,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -36,10 +36,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -52,10 +52,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -67,10 +67,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -83,10 +83,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -99,10 +99,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -114,10 +114,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -130,10 +130,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -146,10 +146,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -161,10 +161,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -177,10 +177,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -193,10 +193,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -208,10 +208,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -224,10 +224,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -240,10 +240,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -256,10 +256,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -272,10 +272,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -288,10 +288,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -303,10 +303,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -319,10 +319,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -335,10 +335,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -351,10 +351,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -367,10 +367,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -383,10 +383,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -399,10 +399,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -415,10 +415,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -431,10 +431,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -447,10 +447,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -462,10 +462,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -477,10 +477,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -492,10 +492,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -508,10 +508,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -524,10 +524,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -540,10 +540,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -556,10 +556,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -572,10 +572,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -588,10 +588,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -604,10 +604,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -620,10 +620,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -636,10 +636,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -652,10 +652,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -668,10 +668,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -684,10 +684,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -700,10 +700,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -716,10 +716,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -735,10 +735,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -751,10 +751,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -766,10 +766,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -781,10 +781,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -797,10 +797,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -812,10 +812,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -827,10 +827,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -843,10 +843,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -858,10 +858,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -873,10 +873,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -889,10 +889,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -904,10 +904,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -919,10 +919,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -935,10 +935,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -950,10 +950,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -965,10 +965,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -981,10 +981,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -996,10 +996,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1011,10 +1011,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1027,10 +1027,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1042,10 +1042,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1057,10 +1057,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1073,10 +1073,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1088,10 +1088,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1103,10 +1103,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1119,10 +1119,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1134,10 +1134,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1149,10 +1149,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1165,10 +1165,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1180,10 +1180,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1195,10 +1195,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1211,10 +1211,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1226,10 +1226,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1241,10 +1241,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1257,10 +1257,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1272,10 +1272,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1287,10 +1287,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1303,10 +1303,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1318,10 +1318,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1333,10 +1333,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1348,10 +1348,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1363,10 +1363,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1378,10 +1378,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1393,10 +1393,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1408,10 +1408,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1423,10 +1423,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1438,10 +1438,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1453,10 +1453,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1468,10 +1468,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1483,10 +1483,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1498,10 +1498,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1513,10 +1513,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1528,10 +1528,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1543,10 +1543,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1558,10 +1558,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1573,10 +1573,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1588,10 +1588,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1603,10 +1603,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1618,10 +1618,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1633,10 +1633,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1648,10 +1648,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1663,10 +1663,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1678,10 +1678,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1693,10 +1693,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1708,10 +1708,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1723,10 +1723,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1738,10 +1738,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1754,10 +1754,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1769,10 +1769,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1784,10 +1784,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1800,10 +1800,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1815,10 +1815,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1830,10 +1830,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1846,10 +1846,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
@@ -1861,10 +1861,10 @@ codeunit 6014626 "NPR Replication Counter Mgmt."
         DataTypeMgmt: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
-        IF Rec.IsTemporary() then
+        if Rec.IsTemporary() then
             exit;
 
-        IF DataTypeMgmt.GetRecordRef(Rec, RecRef) THEN begin
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
         end;
