@@ -979,8 +979,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture.Insert();
 
         MemberInfoCapture."Company Name" := GetXmlText50(CreateMembershipRequest, 'companyname', MaxStrLen(MemberInfoCapture."Company Name"), false);
-
         MemberInfoCapture."Customer No." := GetXmlText20(CreateMembershipRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
+        MemberInfoCapture."Document No." := GetXmlText20(CreateMembershipRequest, 'documentno', MaxStrLen(MemberInfoCapture."Document No."), false);
 
     end;
 
