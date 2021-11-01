@@ -1006,8 +1006,8 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         ElementPath := '//AddMembershipMember_Result/member/addmember/response/member/';
         MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        DateText := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'expirydate', 10, false);
+        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'card/cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        DateText := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'card/expirydate', 10, false);
         if (not Evaluate(MemberInfoCapture."Valid Until", DateText, 9)) then
             MemberInfoCapture."Valid Until" := 0D;
 
