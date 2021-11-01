@@ -5,11 +5,11 @@
 * If you have troubles and you think these might be related to Crane, please try to resolve them in the following order:
   * Be sure you understand how Crane containers work, especially it's necessary to understand the life-cycle of Crane containers (containers can be automatically destroyed to save resources, containers start sometime fast, sometimes it can take minutes even 15 minutes could be a normal time under some circumstances). If you think you might be missing some details, use the links posted above or ask your colleagues first.
   * If you understand but still have troubles, use [Portainer](#Portainer---GUI-allowing-container-management) and check the logs (EventLogs) from there. Usually, this is what I do first when I get cases from you. And very often this is all I need to do to identify the problems.
-  * Try to use [Crane Troubleshooting](/Crane-Containers/Crane-Troubleshooting) section, maybe the problem will be described there.
+  * Try to use [Crane Troubleshooting](./Crane-Containers/Crane-Troubleshooting.md) section, maybe the problem will be described there.
   * If you still facing troubles, please, try to send the case to me. Of course, if this isn't too urgent or if you think this isn't a global problem for the entire Crane.
   * If you think this might be a general Crane problem (like a global failure affecting a lot of containers), use the dedicated channel on Teams mentioned above. It's better to discuss these problems in a public place if possible as others might benefit from this (they can see something is happening and not only to them).
   * If you need to discuss the problem with me and you have tried all previous things, please, don't hesitate and do. I will always try to help ;) if this is absolutely necessary :)
-* There is a new section with the list of [Crane Features](/Crane-Containers/Crane-Features). This is the place where all new important changes will be described (instead of using Yammer posts).
+* There is a new section with the list of [Crane Features](./Crane-Containers/Crane-Features.md). This is the place where all new important changes will be described (instead of using Yammer posts). 
 
 ---
 
@@ -19,7 +19,7 @@ Open the Job Card for the case.
 In the ribbon, click Actions, then "Request and View Containers".
 What you see on screen now is the Crane Containers List page. It shows the containers that exist for the case.
 Create a new record here, using lookup on the first column "Container Template Code" as a shortcut to fill out everything.
- If you are [unsure which template](/Crane-Containers/Crane-Features/Crane-Templates) to use then **CORE-DATA-18** (or higher BC version in the future) is a good default as it will preinstall latest npcore .app from the master branch along with a .rapidstart package that contains some POS test data.
+ If you are [unsure which template](./Crane-Containers/Crane-Features/Crane-Templates.md) to use then **CORE-DATA-18** (or higher BC version in the future) is a good default as it will preinstall latest npcore .app from the master branch along with a .rapidstart package that contains some POS test data.
 
 Then click action "Create Container" to kick off the creation flow.
 Keep in mind - creating a container takes time. This may take anywhere between 5 and 15 minutes.
