@@ -7,13 +7,13 @@ codeunit 6014672 "NPR Rep. Get Def. Dim. Subs."
     var
         DefaultDimension: Record "Default Dimension";
     begin
-        IF RecRef.Number <> Database::"Default Dimension" then
+        if RecRef.Number <> Database::"Default Dimension" then
             exit;
 
-        IF ReplicationEndpoint."Table ID" <> Database::"Default Dimension" then
+        if ReplicationEndpoint."Table ID" <> Database::"Default Dimension" then
             exit;
 
-        IF DefaultDimension.UpdateReferencedIdFields() then
+        if DefaultDimension.UpdateReferencedIdFields() then
             DefaultDimension.Modify();
     end;
 

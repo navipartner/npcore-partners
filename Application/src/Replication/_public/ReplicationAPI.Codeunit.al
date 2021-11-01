@@ -64,7 +64,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         ErrorLog: Record "NPR Replication Error Log";
     begin
         ErrorLog.SetFilter("API Version", ServiceCode);
-        IF EndPointID <> '' THEN
+        if EndPointID <> '' then
             ErrorLog.SetFilter("EndPoint ID", EndPointID);
         Page.Run(0, ErrorLog);
     end;
@@ -91,7 +91,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             ErrLog.InsertLog(ServiceSetup."API Version", ServiceSetup."Service URL", ServiceEndPointErr);
             exit;
         end;
-        IF ServiceEndPoint.FindSet() then
+        if ServiceEndPoint.FindSet() then
             repeat
                 CreateImportEntry(ServiceSetup, ServiceEndPoint, Client, ImportType, '');
             until ServiceEndPoint.Next() = 0;
@@ -111,14 +111,14 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         BatchId := CreateGuid();
         repeat
             OnBeforeSendWebRequest(Response, NextLinkURI, IsHandledSendWebRequest);
-            IF not IsHandledSendWebRequest then
+            if not IsHandledSendWebRequest then
                 SendWebRequest(ServiceSetup, ServiceEndPoint, Client, Response, StatusCode, Method, URI, NextLinkURI);
 
             if FoundErrorInResponse(Response, StatusCode) then begin
                 ErrLog.InsertLog(ServiceEndPoint."Service Code", ServiceEndPoint."EndPoint ID", Method, URI, Response);
                 Exit;
             end else begin
-                IF Not SkipImportEntryCreationForNoDataResponse(ServiceEndPoint, Response) then begin
+                if not SkipImportEntryCreationForNoDataResponse(ServiceEndPoint, Response) then begin
                     InsertImportEntry(ImportEntry, ImportType.Code, BatchId, Response, ServiceEndPoint);
                     Commit();
                 end;
@@ -160,7 +160,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     var
         EndPoint: Interface "NPR Replication IEndpoint Meth";
     begin
-        IF Not ServiceEndPoint."Skip Import Entry No Data Resp" then
+        if not ServiceEndPoint."Skip Import Entry No Data Resp" then
             exit(false);
 
         EndPoint := ServiceEndPoint."Endpoint Method";
@@ -200,22 +200,22 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             exit;
 
         clear(JobQueueEntry);
-        IF ServiceSetup.JobQueueStartTime > 0T then
+        if ServiceSetup.JobQueueStartTime > 0T then
             JobQueueEntry."Starting Time" := ServiceSetup.JobQueueStartTime
         else
             JobQueueEntry."Starting Time" := 070000T;
-        IF ServiceSetup.JobQueueEndTime > 0T then
+        if ServiceSetup.JobQueueEndTime > 0T then
             JobQueueEntry."Ending Time" := ServiceSetup.JobQueueEndTime
         else
             JobQueueEntry."Ending Time" := 230000T;
-        IF ServiceSetup.JobQueueMinutesBetweenRun > 0 THEN
+        if ServiceSetup.JobQueueMinutesBetweenRun > 0 then
             JobQueueEntry."No. of Minutes between Runs" := ServiceSetup.JobQueueMinutesBetweenRun
         else
             JobQueueEntry."No. of Minutes between Runs" := 10;
 
         Clear(JQParamStrMgt);
         JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcImportListProcessing.ParamImportType(), ServiceSetup."API Version"));
-        IF ServiceSetup.JobQueueProcessImportList THEN
+        if ServiceSetup.JobQueueProcessImportList then
             JQParamStrMgt.AddToParamDict(NcImportListProcessing.ParamProcessImport());
 
         CreateJobQueueCategory(JobQueueCategory);
@@ -265,7 +265,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Import List Processing");
         JobQueueEntry.SetRange("Record ID to Process", ServiceSetup.RecordId());
-        IF NOT JobQueueEntry.IsEmpty then
+        if not JobQueueEntry.IsEmpty then
             JobQueueEntry.DeleteAll(true);
     end;
 
@@ -275,10 +275,10 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         JobQueueEntry: Record "Job Queue Entry";
     begin
         JobQueueEntry.SetRange("Job Queue Category Code", ReplicationJobQueueCategoryCode);
-        IF NOT JobQueueEntry.IsEmpty then
+        if not JobQueueEntry.IsEmpty then
             exit;
 
-        IF JobQueueCategory.Get(ReplicationJobQueueCategoryCode) then
+        if JobQueueCategory.Get(ReplicationJobQueueCategoryCode) then
             JobQueueCategory.Delete(true);
     end;
 
@@ -307,17 +307,17 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     var
         RepCounter: BigInteger;
     begin
-        IF Not JTokenEntity.IsObject() then
+        if not JTokenEntity.IsObject() then
             exit;
 
-        IF SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter') = '' then
+        if SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter') = '' then
             Error(ReplicationCounterCannotBeEmptyErr);
 
-        IF Evaluate(RepCounter, SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter')) THEN BEGIN
-            IF RepCounter > ReplicationEndPoint."Replication Counter" then
+        if Evaluate(RepCounter, SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter')) then begin
+            if RepCounter > ReplicationEndPoint."Replication Counter" then
                 UpdateSQLTimestampEndpoint(ReplicationEndPoint, RepCounter);
             System.ClearLastError();
-        END Else
+        end else
             Error(ReplicationCounterEvaluateErr, SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter'));
     end;
 
@@ -332,10 +332,10 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         JToken: JsonToken;
     begin
         // selects value from JsonObject
-        IF not JObject.SelectToken(Path, JToken) then
+        if not JObject.SelectToken(Path, JToken) then
             Error(MissingFieldInJsonErr, Path);
 
-        IF JToken.AsValue().IsNull() then
+        if JToken.AsValue().IsNull() then
             exit('');
 
         exit(JToken.AsValue().AsText());
@@ -346,13 +346,13 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         JToken: JsonToken;
     begin
         // selects value from JsonObject
-        IF not JObject.SelectToken(Path, JToken) then
+        if not JObject.SelectToken(Path, JToken) then
             Exit(false);
 
-        IF JToken.IsObject() OR Jtoken.IsArray() then
+        if JToken.IsObject() OR Jtoken.IsArray() then
             exit(true); //is found, but we cannot read the text value
 
-        IF JToken.AsValue().IsNull() then
+        if JToken.AsValue().IsNull() then
             Exit(true);
 
         TokenValue := JToken.AsValue().AsText();
@@ -364,14 +364,14 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         JToken: JsonToken;
     begin
         // selects value from JsonObject
-        IF not JObject.SelectToken(Path, JToken) then begin
-            IF SkipMissingFieldError Then
+        if not JObject.SelectToken(Path, JToken) then begin
+            if SkipMissingFieldError then
                 Exit('')
-            Else
+            else
                 Error(MissingFieldInJsonErr, Path);
         end;
 
-        IF JToken.AsValue().IsNull() then
+        if JToken.AsValue().IsNull() then
             exit('');
 
         exit(JToken.AsValue().AsText());
@@ -410,10 +410,10 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         if StatusCode = 200 then
             exit; // successful responses
 
-        IF StatusCode in [400 .. 499] then
+        if StatusCode in [400 .. 499] then
             exit(true); // client errors
 
-        IF StatusCode in [500 .. 599] then
+        if StatusCode in [500 .. 599] then
             exit(true); // server errors
 
         Response.CreateInStream(InStr);
@@ -422,14 +422,14 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             exit(true);
 
         foreach key1 in JObject.Keys do begin
-            IF (LowerCase(key1) = 'error') or (LowerCase(key1) = 'exceptionmessage') then
+            if (LowerCase(key1) = 'error') or (LowerCase(key1) = 'exceptionmessage') then
                 exit(true);
         end;
     end;
 
     local procedure GetODataMaxPageSize(ReplicationEndpoint: Record "NPR Replication Endpoint"): integer
     begin
-        IF ReplicationEndPoint."odata.maxpagesize" > 0 then
+        if ReplicationEndPoint."odata.maxpagesize" > 0 then
             exit(ReplicationEndPoint."odata.maxpagesize");
         exit(10000); //default value. Server default is 20000, but for big responses it fails...
     end;
@@ -468,12 +468,12 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     var
         RepCounter: BigInteger;
     begin
-        IF NextLinkURI = '' then begin
+        if NextLinkURI = '' then begin
             URI := ReplicationSetup."Service URL" + ReplicationEndPoint.Path;
             RepCounter := ReplicationEndPoint."Replication Counter";
             //%1 = company ID, %2 = sqlTimestamp
             URI := StrSubstNo(URI, ReplicationSetup.GetCompanyId(), Format(RepCounter));
-            IF NOT URI.Contains('$orderby=replicationCounter') then
+            if not URI.Contains('$orderby=replicationCounter') then
                 URI += '&$orderby=replicationCounter';
             ReplicationSetup.AddTenantToURL(URI);
         end else begin
@@ -499,6 +499,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 
     procedure GetBCAPIResponse(ReplicationSetup: Record "NPR Replication Service Setup"; ReplicationEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; var Response: Codeunit "Temp Blob"; var StatusCode: Integer; var Method: code[10]; URI: Text; var NextLinkURI: Text; ImportImageRequest: Boolean)
     var
+        [NonDebuggable]
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
@@ -507,9 +508,8 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         iAuth: Interface "NPR API IAuthorization";
         ErrorTxt: Text;
         JTokenMainObject: JsonToken;
-#IF BC17
-        AuthorizationDetailsDict: Dictionary of [Text, Text];
-#ENDIF
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         iAuth := ReplicationSetup.AuthType;
         Method := 'GET';
@@ -518,17 +518,19 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
 
         RequestMessage.SetRequestUri(URI);
         RequestMessage.GetHeaders(Headers);
-#IF BC17
-        iAuth.GetAuthorizationDetailsDict(ReplicationSetup.UserName, ReplicationSetup.GetApiPassword(), ReplicationSetup."OAuth2 Setup Code", AuthorizationDetailsDict);
-        Headers.Add('Authorization', iAuth.GetAuthorizationValue(AuthorizationDetailsDict));
-#ELSE
-        Headers.Add('Authorization', iAuth.GetAuthorizationValue(iAuth.GetAuthorizationDetailsDict(
-            ReplicationSetup.UserName, ReplicationSetup.GetApiPassword(), ReplicationSetup."OAuth2 Setup Code")));
-#ENDIF
-        IF Not ImportImageRequest then
+
+        case ReplicationSetup.AuthType of
+            ReplicationSetup.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(ReplicationSetup.UserName, ReplicationSetup."API Password Key", AuthParamsBuff);
+            ReplicationSetup.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(ReplicationSetup."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+
+        iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
+        if not ImportImageRequest then
             Headers.Add('Prefer', 'odata.maxpagesize=' + Format(GetODataMaxPageSize(ReplicationEndPoint)));
 
-        IF not IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt, StatusCode) then begin
+        if not IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt, StatusCode) then begin
             CreateInternalErrorResponse('internal_bc_error', ErrorTxt, Response);
             exit;
         end;
@@ -537,7 +539,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         Clear(Response);
         Response.CreateOutStream(OutStr);
         CopyStream(OutStr, ResponseStream);
-        IF JTokenMainObject.ReadFrom(ResponseStream) then
+        if JTokenMainObject.ReadFrom(ResponseStream) then
             NextLinkURI := SelectJsonToken(JTokenMainObject.AsObject(), '$.[''@odata.nextLink'']', true); // get NextLink if there is a next page                                                                                                
     end;
 
@@ -547,7 +549,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         Crypto: Codeunit "Cryptography Management";
         IStr: InStream;
     begin
-        IF NOT TempBlob.HasValue() then
+        if not TempBlob.HasValue() then
             exit('');
 
         TempBlob.CreateInStream(IStr);
@@ -577,7 +579,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
         case lowercase(Format(FRef.Type)) OF
             'code', 'text':
                 begin
-                    IF Format(FRef.Value) <> SourceTxt then begin
+                    if Format(FRef.Value) <> SourceTxt then begin
                         FRef.Value(SourceTxt);
                         ValueChanged := true;
                     end;
@@ -585,8 +587,8 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             'boolean':
                 begin
                     GenericBool := FRef.Value;
-                    IF evaluate(GenericBool2, SourceTxt) then
-                        IF GenericBool <> GenericBool2 then begin
+                    if evaluate(GenericBool2, SourceTxt) then
+                        if GenericBool <> GenericBool2 then begin
                             FRef.Value(GenericBool2);
                             ValueChanged := true;
                         end;
@@ -594,7 +596,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             'date':
                 begin
                     GenericDate := FRef.Value;
-                    IF evaluate(GenericDate2, SourceTxt, 9) then
+                    if evaluate(GenericDate2, SourceTxt, 9) then
                         If GenericDate <> GenericDate2 then begin
                             FRef.Value(GenericDate2);
                             ValueChanged := true;
@@ -603,7 +605,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             'datetime':
                 begin
                     GenericDT := FRef.Value;
-                    IF evaluate(GenericDT2, SourceTxt, 9) then
+                    if evaluate(GenericDT2, SourceTxt, 9) then
                         If GenericDT <> GenericDT2 then begin
                             FRef.Value(GenericDT2);
                             ValueChanged := true;
@@ -612,7 +614,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             'time':
                 begin
                     GenericTime := FRef.Value;
-                    IF evaluate(GenericTime2, SourceTxt, 9) then
+                    if evaluate(GenericTime2, SourceTxt, 9) then
                         If GenericTime <> GenericTime2 then begin
                             FRef.Value(GenericTime2);
                             ValueChanged := true;
@@ -621,7 +623,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             'dateformula':
                 begin
                     GenericDateFormula := FRef.Value;
-                    IF evaluate(GenericDateFormula2, SourceTxt, 9) then
+                    if evaluate(GenericDateFormula2, SourceTxt, 9) then
                         If GenericDateFormula <> GenericDateFormula2 then begin
                             FRef.Value(GenericDateFormula2);
                             ValueChanged := true;
@@ -630,7 +632,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             'decimal':
                 begin
                     GenericDec := FRef.Value;
-                    IF evaluate(GenericDec2, SourceTxt) then
+                    if evaluate(GenericDec2, SourceTxt) then
                         If GenericDec <> GenericDec2 then begin
                             FRef.Value(GenericDec2);
                             ValueChanged := true;
@@ -639,7 +641,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
             'integer':
                 begin
                     GenericInt := FRef.Value;
-                    IF evaluate(GenericInt2, SourceTxt) then
+                    if evaluate(GenericInt2, SourceTxt) then
                         If GenericInt <> GenericInt2 then begin
                             FRef.Value(GenericInt2);
                             ValueChanged := true;
@@ -647,14 +649,14 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
                 end;
             'enum', 'option':
                 begin
-                    IF format(FRef) <> lowercase(SourceTxt) then
-                        IF Evaluate(FRef, SourceTxt) then
+                    if format(FRef) <> lowercase(SourceTxt) then
+                        if Evaluate(FRef, SourceTxt) then
                             ValueChanged := true;
                 end;
         end; // end case
 
-        IF ValueChanged then
-            IF WithValidation then
+        if ValueChanged then
+            if WithValidation then
                 FRef.Validate();
 
     end;
@@ -666,7 +668,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     begin
         Content.CreateInStream(InStr);
         Instr.ReadText(JsonTxt);
-        IF Not JToken.ReadFrom(JsonTxt) then
+        if not JToken.ReadFrom(JsonTxt) then
             Exit(false);
 
         exit(true);
@@ -676,7 +678,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     var
         JTokenResult: JsonToken;
     begin
-        IF not JToken.SelectToken(JPath, JTokenResult) then
+        if not JToken.SelectToken(JPath, JTokenResult) then
             exit(false);
 
         JArray := JTokenResult.AsArray();
@@ -688,7 +690,7 @@ codeunit 6014589 "NPR Replication API" implements "NPR Nc Import List IUpdate"
     var
         ReplicationCounterOfEntity: BigInteger;
     begin
-        IF Evaluate(ReplicationCounterOfEntity, SelectJsonToken(JToken.AsObject(), '$.replicationCounter')) then;
+        if Evaluate(ReplicationCounterOfEntity, SelectJsonToken(JToken.AsObject(), '$.replicationCounter')) then;
         Exit(NOT (ReplicationCounterOfEntity < ReplicationEndPoint."Replication Counter")); // means that we try to manually process an older version of the record which would overwrite latest changes.
     end;
 

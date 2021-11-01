@@ -171,6 +171,8 @@ codeunit 85042 "NPR Replication API Tests"
     end;
 
     local procedure CreateReplicationSetup()
+    var
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         RepSetup.Init();
         RepSetup."API Version" := LibraryUtility.GenerateRandomCode20(RepSetup.FieldNo("API Version"), Database::"NPR Replication Service Setup");
@@ -178,7 +180,7 @@ codeunit 85042 "NPR Replication API Tests"
         RepSetup."Service URL" := 'https://localhost.dynamics-retail.com:7048/bc/api';
         RepSetup.AuthType := RepSetup.AuthType::Basic;
         RepSetup.UserName := '';
-        RepSetup.SetApiPassword('');
+        WebServiceAuthHelper.SetApiPassword('', RepSetup."API Password Key");
         RepSetup.FromCompany := CompanyName;
         RepSetup."External Database" := false;
         RepSetup.Enabled := true;
