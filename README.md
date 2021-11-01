@@ -18,5 +18,5 @@ New employees should read the contributor guide and technical guide:
 [Technical Guide](./Documentation/internal/TechnicalGuide.md)
 
 ### Crane Containers
-New employees should read the documentation for creating containers in which they can test the BC and NPRetail application: 
+New employees should read the documentation for creating containers in which they can test the BC and NPRetail application:  
 [Crane Intro](./Documentation/internal/developers/CraneContainers.md)
