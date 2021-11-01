@@ -481,8 +481,10 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         FailReasonText: Text;
     begin
 
-        if ((ExternalMemberCardNo = '') and (InputMethod in [MemberSelectionMethod::NO_PROMPT, MemberSelectionMethod::CARD_SCAN])) then begin
+        if (InputMethod = MemberSelectionMethod::CARD_SCAN) then
             InputMethod := MemberSelectionMethod::NO_PROMPT;
+
+        if ((ExternalMemberCardNo = '') and (InputMethod = MemberSelectionMethod::NO_PROMPT)) then begin
             if (not ChooseMemberCard(ExternalMemberCardNo)) then
                 Error(MEMBERSHIP_NOT_SELECTED);
         end;
