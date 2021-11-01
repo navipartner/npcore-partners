@@ -33,6 +33,10 @@ xmlport 6060127 "NPR MM Create Membership"
                     {
                         MinOccurs = Zero;
                     }
+                    fieldelement(documentno; tmpmemberinfocapture."Document No.")
+                    {
+                        MinOccurs = Zero;
+                    }
                     textelement(attributes)
                     {
                         MaxOccurs = Once;
