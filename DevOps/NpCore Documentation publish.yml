@@ -6,6 +6,8 @@ trigger:
   paths:
     include:
     - Documentation
+    exclude:
+    - Documentation/internal/*
 
 pool:
   name: NP Core Pipelines
