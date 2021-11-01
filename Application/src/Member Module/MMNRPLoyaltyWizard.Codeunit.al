@@ -19,8 +19,10 @@
         MembershipCode: Code[20];
         BaseUrl: Text;
         TenantName: Text;
+        AuthType: Enum "NPR API Auth. Type";
         UserName: Text[50];
         Password: Text[30];
+        OAuthSetupCode: Code[20];
         Prefix: Code[10];
         PaymentTypeCode: Code[10];
         GL_Account: Code[20];
@@ -44,14 +46,14 @@
         if (PageAction <> ACTION::LookupOK) then
             Error('');
 
-        NPRLoyaltyWizard.GetUserSetup(CommunityCode, MembershipCode, Prefix, PaymentTypeCode, GL_Account, BaseUrl, UserName, Password, Description, AuthCode, LoyaltyCompanyName, EarnFactor, BurnFactor, TenantName);
+        NPRLoyaltyWizard.GetUserSetup(CommunityCode, MembershipCode, Prefix, PaymentTypeCode, GL_Account, BaseUrl, AuthType, UserName, Password, OAuthSetupCode, Description, AuthCode, LoyaltyCompanyName, EarnFactor, BurnFactor, TenantName);
 
         CreateCommunity(CommunityCode, Prefix, CopyStr(Description, 1, 50));
         LoyaltyCode := CreateLoyalty(StrSubstNo(CreateLoyaltyLbl, CommunityCode), CopyStr(Description, 1, 50), EarnFactor, BurnFactor);
         CreateMembership(CommunityCode, StrSubstNo(CreateMembershipLbl, Prefix, MembershipCode), LoyaltyCode, CopyStr(Description, 1, 50));
 
-        CreateEndpoints(CommunityCode, StrSubstNo(CreateEndpointsLbl, CommunityCode), BaseUrl, 0, UserName, Password, TenantName);
-        CreateEndpoints(CommunityCode, StrSubstNo(CreateEndpoints2Lbl, CommunityCode), BaseUrl, 1, UserName, Password, TenantName);
+        CreateEndpoints(CommunityCode, StrSubstNo(CreateEndpointsLbl, CommunityCode), BaseUrl, 0, AuthType, UserName, Password, OAuthSetupCode, TenantName);
+        CreateEndpoints(CommunityCode, StrSubstNo(CreateEndpoints2Lbl, CommunityCode), BaseUrl, 1, AuthType, UserName, Password, OAuthSetupCode, TenantName);
 
         CreatePOSPaymentMethod(PaymentTypeCode, BurnFactor);
         CreateEFTSetup(PaymentTypeCode);
@@ -179,9 +181,10 @@
         exit(PaymentTypeCode);
     end;
 
-    local procedure CreateEndpoints(CommunityCode: Code[20]; EndpointCode: Code[10]; BaseUrl: Text; ServiceType: Integer; Username: Text[50]; Password: Text[30]; TenantName: Text)
+    local procedure CreateEndpoints(CommunityCode: Code[20]; EndpointCode: Code[10]; BaseUrl: Text; ServiceType: Integer; AuthType: Enum "NPR API Auth. Type"; Username: Text[50]; Password: Text[30]; OAuthSetupCode: Code[20]; TenantName: Text)
     var
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         CreateEndpointsLbl: Label 'NPR %1', Locked = true;
         CreateEndpoints2Lbl: Label '%1%2', Locked = true;
         CreateEndpoints3Lbl: Label '%1%2?tenant=%3', Locked = true;
@@ -191,11 +194,15 @@
         NPRRemoteEndpointSetup.DeleteAll();
 
         NPRRemoteEndpointSetup.Code := EndpointCode;
+        NPRRemoteEndpointSetup.Insert();
+
         NPRRemoteEndpointSetup.Type := ServiceType;
         NPRRemoteEndpointSetup.Description := StrSubstNo(CreateEndpointsLbl, NPRRemoteEndpointSetup.Type);
-        NPRRemoteEndpointSetup."Credentials Type" := NPRRemoteEndpointSetup."Credentials Type"::NAMED;
+        NPRRemoteEndpointSetup.AuthType := AuthType;
         NPRRemoteEndpointSetup."User Account" := Username;
-        NPRRemoteEndpointSetup."User Password" := Password;
+        if Password <> '' then
+            WebServiceAuthHelper.SetApiPassword(Password, NPRRemoteEndpointSetup."User Password Key");
+        NPRRemoteEndpointSetup."OAuth2 Setup Code" := OAuthSetupCode;
         NPRRemoteEndpointSetup."Community Code" := CommunityCode;
 
         if (TenantName = '') then begin
@@ -215,7 +222,7 @@
         end;
 
         NPRRemoteEndpointSetup."Connection Timeout (ms)" := 8000;
-        NPRRemoteEndpointSetup.Insert();
+        NPRRemoteEndpointSetup.Modify();
     end;
 
     local procedure CreateEFTSetup(pPaymentTypeCode: Code[10])

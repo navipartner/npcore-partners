@@ -48,6 +48,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Customer Templates"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Retail Journal"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpRv Print Object Type"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'RemoteEndpoints'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'RetailInventorySets'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -156,6 +158,13 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                 exit('NPRRetailJournal-20210912');
             Codeunit::"NPR UPG NpRv Print Object Type":
                 exit('InitializeVoucherPrintObjectType_20211021');
+            Codeunit::"NPR UPG Web Service Pass":
+                case UpgradeStep of
+                    'RemoteEndpoints':
+                        exit('RemoteEndpointsPasswordUpg-20211029');
+                    'RetailInventorySets':
+                        exit('RetailInventorySetsPasswordUpg-20211029');
+                end;
         end;
     end;
 }

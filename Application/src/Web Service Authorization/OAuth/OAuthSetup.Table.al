@@ -130,14 +130,14 @@ table 6014604 "NPR OAuth Setup"
     begin
         Case FieldNo of
             Rec.FieldNo("Client ID"):
-                IF NOT IsNullGuid(Rec."Client ID") THEN
-                    IF IsolatedStorage.Get("Client ID", DataScope::Company, SecretValue) THEN;
+                if not IsNullGuid(Rec."Client ID") then
+                    if IsolatedStorage.Get("Client ID", DataScope::Company, SecretValue) then;
             Rec.FieldNo("Client Secret"):
-                IF NOT IsNullGuid(Rec."Client Secret") THEN
-                    IF IsolatedStorage.Get("Client Secret", DataScope::Company, SecretValue) THEN;
+                if not IsNullGuid(Rec."Client Secret") then
+                    if IsolatedStorage.Get("Client Secret", DataScope::Company, SecretValue) then;
             Rec.FieldNo("Access Token"):
-                IF NOT IsNullGuid(Rec."Access Token") THEN
-                    IF IsolatedStorage.Get("Access Token", DataScope::Company, SecretValue) THEN;
+                if not IsNullGuid(Rec."Access Token") then
+                    if IsolatedStorage.Get("Access Token", DataScope::Company, SecretValue) then;
         End;
     end;
 
@@ -170,11 +170,11 @@ table 6014604 "NPR OAuth Setup"
 
     trigger OnDelete()
     begin
-        IF Rec.HasSecret(Rec.FieldNo("Client Id")) then
+        if Rec.HasSecret(Rec.FieldNo("Client Id")) then
             Rec.RemoveSecret(Rec.FieldNo("Client ID"));
-        IF Rec.HasSecret(Rec.FieldNo("Client Secret")) then
+        if Rec.HasSecret(Rec.FieldNo("Client Secret")) then
             Rec.RemoveSecret(Rec.FieldNo("Client Secret"));
-        IF Rec.HasSecret(Rec.FieldNo("Access Token")) then
+        if Rec.HasSecret(Rec.FieldNo("Access Token")) then
             Rec.RemoveSecret(Rec.FieldNo("Access Token"));
     end;
 
@@ -190,7 +190,7 @@ table 6014604 "NPR OAuth Setup"
         ErrorTxt: text;
         HttpUtility: DotNet HttpUtility;
     begin
-        IF CheckExistingTokenIsValid() then // if existing token is not expired use it
+        if CheckExistingTokenIsValid() then // if existing token is not expired use it
             exit(Rec.GetSecret(Rec.FieldNo("Access Token")));
 
         Client.SetBaseAddress(GetTokenBaseAddress());
@@ -206,7 +206,7 @@ table 6014604 "NPR OAuth Setup"
         RequestHeaders.Add('Content-Type', 'application/x-www-form-urlencoded');
         RequestMessage.Content(Content);
 
-        IF not IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt) then
+        if not IsSuccessfulRequest(Client.Send(RequestMessage, ResponseMessage), ResponseMessage, ErrorTxt) then
             Error(ErrorTxt);
 
         ResponseMessage.Content().ReadAs(APIResult);
@@ -220,9 +220,9 @@ table 6014604 "NPR OAuth Setup"
         JsonTok: JsonToken;
     begin
         JsonObj.ReadFrom(JsonResponseTxt);
-        IF JsonObj.SelectToken('access_token', JsonTok) then
+        if JsonObj.SelectToken('access_token', JsonTok) then
             Rec.SetSecret(FieldNo("Access Token"), JsonTok.AsValue().AsText());
-        IF JsonObj.SelectToken('expires_in', JsonTok) then
+        if JsonObj.SelectToken('expires_in', JsonTok) then
             Rec."Access Token Due DateTime" := CurrentDateTime + (JsonTok.AsValue().AsInteger() * 1000);
 
         Rec.Modify();
@@ -230,7 +230,7 @@ table 6014604 "NPR OAuth Setup"
 
     local procedure CheckExistingTokenIsValid(): Boolean
     begin
-        IF Rec."Access Token Due DateTime" = 0DT then
+        if Rec."Access Token Due DateTime" = 0DT then
             exit(false);
         Exit((Rec."Access Token Due DateTime" - Rec."Access Token Duration Offset" * 1000) > CurrentDateTime);
     end;
@@ -238,7 +238,7 @@ table 6014604 "NPR OAuth Setup"
     local procedure GetTokenBaseAddress(): text
     begin
         Rec.TestField("Get Access Token URL");
-        IF StrPos(Rec."Get Access Token URL".ToLower(), '{aadtenantid}') > 0 then begin
+        if StrPos(Rec."Get Access Token URL".ToLower(), '{aadtenantid}') > 0 then begin
             Rec.TestField("AAD Tenant Id");
             Exit(Rec."Get Access Token URL".ToLower().Replace('{aadtenantid}', Rec."AAD Tenant Id"));
         end;
@@ -248,7 +248,7 @@ table 6014604 "NPR OAuth Setup"
     local procedure GetScope(): text
     begin
         Rec.TestField(Scope);
-        IF StrPos(Rec.Scope.ToLower(), '{clientid}') > 0 then begin
+        if StrPos(Rec.Scope.ToLower(), '{clientid}') > 0 then begin
             Rec.TestField("Client ID");
             Exit(Rec.Scope.ToLower().Replace('{clientid}', GetSecret(FieldNo("Client ID"))));
         end;

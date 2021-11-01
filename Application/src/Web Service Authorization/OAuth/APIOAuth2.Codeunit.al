@@ -2,56 +2,38 @@ codeunit 6014618 "NPR API OAuth2" implements "NPR API IAuthorization"
 {
 
     Access = Internal;
-    procedure IsEnabled(Rec: Variant; SearchForFieldName: Text; CompareAgainstValue: Text): Boolean
-    var
-        DataTypeMgt: Codeunit "Data Type Management";
-        RecRef: RecordRef;
-        FieldReference: FieldRef;
+    procedure IsEnabled(AuthTypeValue: Text; CompareAgainstValue: Text): Boolean
     begin
-        if not DataTypeMgt.GetRecordRef(Rec, RecRef) then
-            exit;
-        if not DataTypeMgt.FindFieldByName(RecRef, FieldReference, SearchForFieldName) then
-            exit;
-        exit(Format(FieldReference.Value()) = CompareAgainstValue);
+        exit(AuthTypeValue = CompareAgainstValue);
     end;
 
-    procedure GetAuthorizationValue(AuthDetailsDict: Dictionary of [Text, Text]) AuthText: Text
+    [NonDebuggable]
+    internal procedure GetAuthorizationValue(AuthParamBuff: Record "NPR Auth. Param. Buffer") AuthText: Text
     var
-        OAuthSetupCode: Text;
         NPROAuthSetup: Record "NPR OAuth Setup";
         AccessToken: Text;
         BearerTokenText: Label 'Bearer %1';
     begin
-        AuthDetailsDict.Get('OAuthSetupCode', OAuthSetupCode);
-        NPROAuthSetup.Get(OAuthSetupCode);
+        NPROAuthSetup.Get(AuthParamBuff."OAuth Setup Code");
         AccessToken := NPROAuthSetup.GetOauthToken();
         AuthText := StrSubstNo(BearerTokenText, AccessToken);
     end;
 
-    procedure CheckMandatoryValues(AuthDetailsDict: Dictionary of [Text, Text])
+    [NonDebuggable]
+    procedure SetAuthorizationValue(var Headers: HttpHeaders; AuthParamsBuff: Record "NPR Auth. Param. Buffer")
     var
-        OAuthSetupCode: Text;
+    begin
+        if (Headers.Contains('Authorization')) then
+            Headers.Remove('Authorization');
+
+        Headers.Add('Authorization', GetAuthorizationValue(AuthParamsBuff))
+    end;
+
+    procedure CheckMandatoryValues(AuthParamBuff: Record "NPR Auth. Param. Buffer")
+    var
         SettingIsMissingErr: Label 'Setting ''%1'' is missing.';
     begin
-        AuthDetailsDict.Get('OAuthSetupCode', OAuthSetupCode);
-        IF OAuthSetupCode = '' then
+        if AuthParamBuff."OAuth Setup Code" = '' then
             Error(SettingIsMissingErr, 'OAuthSetupCode');
     end;
-
-
-#IF BC17
-    [NonDebuggable]
-    procedure GetAuthorizationDetailsDict(BasicUserName: Code[50]; BasicPassword: Text; OAuthSetupCode: Code[20]; var AuthDetailsDict: Dictionary of [Text, Text]);
-    begin
-        AuthDetailsDict.Add('OAuthSetupCode', OAuthSetupCode);
-    end;
-
-#ELSE
-    [NonDebuggable]
-    procedure GetAuthorizationDetailsDict(BasicUserName: Code[50]; BasicPassword: Text; OAuthSetupCode: Code[20]) AuthDetailsDict: Dictionary of [Text, Text];
-    begin
-        AuthDetailsDict.Add('OAuthSetupCode', OAuthSetupCode);
-    end;
-#ENDIF
-
 }
