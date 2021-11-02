@@ -67,6 +67,13 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
 
                 ToolTip = 'Executes the POS Entries action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
+                begin
+                    POSEntryNavigation.OpenPOSEntryListFromContact(Rec);
+                end;
             }
         }
         addafter("Create &Interaction")
@@ -99,6 +106,17 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
 
                     ToolTip = 'Executes the Reset Magento Password action';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        M2AccountManager: Codeunit "NPR M2 Account Manager";
+                        Contact: Record Contact;
+                        ReasonText: Text;
+                    begin
+                        Contact := Rec;
+                        if not (M2AccountManager.ResetMagentoPassword(Contact, ReasonText)) then
+                            Error(ReasonText);
+                    end;
                 }
             }
         }

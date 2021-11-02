@@ -12,6 +12,13 @@ pageextension 6014438 "NPR Item Journal" extends "Item Journal"
 
                 ToolTip = 'Executes the Variety action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    VarietyWrapper: Codeunit "NPR Variety Wrapper";
+                begin
+                    VarietyWrapper.ItemJnlLineShowVariety(Rec, 0);
+                end;
             }
         }
         addafter("Page")
@@ -23,6 +30,14 @@ pageextension 6014438 "NPR Item Journal" extends "Item Journal"
 
                 ToolTip = 'Executes the Price Label action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    ReportSelectionRetail: Record "NPR Report Selection Retail";
+                    LabelLibrary: Codeunit "NPR Label Library";
+                begin
+                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
+                end;
             }
         }
     }

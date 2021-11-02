@@ -191,6 +191,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 var
                     PacsoftMgt: Codeunit "NPR Pacsoft Management";
                     PacsoftSetup: Record "NPR Pacsoft Setup";
+                    ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
                 begin
                     if Confirm(StrSubstNo(TextConfirm, Rec.FieldCaption("Entry No."), Rec."Entry No."), true) then begin
                         PacsoftSetup.Get();
@@ -199,7 +200,8 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                             Clear(Rec);
                             CurrPage.Update(false);
                         end;
-                        ;
+
+                        ShipmondoMgnt.SendDocument(Rec);
                     end;
                 end;
             }
@@ -224,7 +226,10 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
+                var
+                    ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
                 begin
+                    ShipmondoMgnt.PrintDocument(Rec);
                 end;
             }
         }

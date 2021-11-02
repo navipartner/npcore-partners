@@ -752,7 +752,11 @@ page 6014402 "NPR Retail Item Journal"
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
+                var
+                    ReportSelectionRetail: Record "NPR Report Selection Retail";
+                    LabelLibrary: Codeunit "NPR Label Library";
                 begin
+                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
                 end;
             }
         }

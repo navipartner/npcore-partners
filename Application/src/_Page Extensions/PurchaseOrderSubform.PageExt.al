@@ -105,8 +105,16 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
 
                 ToolTip = 'Executes the Variety action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    VarietyWrapper: Codeunit "NPR Variety Wrapper";
+                begin
+                    VarietyWrapper.PurchLineShowVariety(Rec, 0);
+                end;
             }
         }
+
         addafter(OrderTracking)
         {
             action("NPR Nonstockitems")
@@ -117,6 +125,13 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
 
                 ToolTip = 'Executes the Nonstoc&k Items action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    NonstockPurchaseMgt: Codeunit "NPR Nonstock Purchase Mgt.";
+                begin
+                    NonstockPurchaseMgt.ShowNonstock(Rec, '');
+                end;
             }
         }
     }

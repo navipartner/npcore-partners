@@ -98,6 +98,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
 
                 ToolTip = 'Executes the POS Entry action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
+                begin
+                    POSEntryNavigation.OpenPOSEntryListFromSalesDocument(Rec);
+                end;
             }
         }
         addafter(History)

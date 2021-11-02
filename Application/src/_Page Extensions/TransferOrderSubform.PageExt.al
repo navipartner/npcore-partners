@@ -43,6 +43,13 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
 
                 ToolTip = 'Executes the Variety action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    VarietyWrapper: Codeunit "NPR Variety Wrapper";
+                begin
+                    VarietyWrapper.TransferLineShowVariety(Rec, 0);
+                end;
             }
         }
     }

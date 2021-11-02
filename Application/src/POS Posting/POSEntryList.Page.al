@@ -992,6 +992,13 @@ page 6150652 "NPR POS Entry List"
 
                     ToolTip = 'Executes the E-mail Log action';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
+                    begin
+                        EmailDocMgt.RunEmailLog(Rec);
+                    end;
                 }
                 action(SendAsPDF)
                 {
@@ -1000,6 +1007,13 @@ page 6150652 "NPR POS Entry List"
 
                     ToolTip = 'Executes the Send as PDF action';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
+                    begin
+                        EmailDocMgt.SendReport(Rec, false);
+                    end;
                 }
             }
         }

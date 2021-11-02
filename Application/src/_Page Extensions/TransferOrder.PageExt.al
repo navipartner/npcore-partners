@@ -19,6 +19,14 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
 
                 ToolTip = 'Executes the Retail Print action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    LabelLibrary: Codeunit "NPR Label Library";
+                begin
+                    LabelLibrary.ChooseLabel(Rec);
+                end;
+
             }
             action("NPR PriceLabel")
             {
@@ -31,6 +39,14 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
 
                 ToolTip = 'Executes the Price Label action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    LabelLibrary: Codeunit "NPR Label Library";
+                    ReportSelectionRetail: Record "NPR Report Selection Retail";
+                begin
+                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
+                end;
             }
         }
         addfirst("F&unctions")
