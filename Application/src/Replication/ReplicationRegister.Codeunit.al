@@ -943,7 +943,7 @@ codeunit 6014608 "NPR Replication Register"
 #if BC17
 #pragma warning disable AL0432
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
-          Rec.FieldNo(Image), 'picture', 0, false, true);
+          Rec.FieldNo(Picture), 'picture', 0, false, true);
 #pragma warning restore
 #ENDIF
     end;
