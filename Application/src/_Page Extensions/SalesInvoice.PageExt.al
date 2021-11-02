@@ -33,6 +33,13 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
 
                 ToolTip = 'Executes the POS Entry action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
+                begin
+                    POSEntryNavigation.OpenPOSEntryListFromSalesDocument(Rec);
+                end;
             }
         }
         addafter("&Invoice")

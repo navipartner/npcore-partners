@@ -11,6 +11,14 @@ pageextension 6014478 "NPR Bins" extends Bins
 
                 ToolTip = 'Executes the Print Label action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    ReportSelectionRetail: Record "NPR Report Selection Retail";
+                    LabelLibrary: Codeunit "NPR Label Library";
+                begin
+                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Bin Label");
+                end;
             }
         }
     }

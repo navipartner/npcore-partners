@@ -17,9 +17,9 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
-                    LabelLibrarySubMgt: Codeunit "NPR Label Library Sub. Mgt.";
+                    LabelLibrary: Codeunit "NPR Label Library";
                 begin
-                    LabelLibrarySubMgt.ChooseLabel(Rec);
+                    LabelLibrary.ChooseLabel(Rec);
                 end;
             }
             action("NPR PriceLabel")
@@ -37,9 +37,9 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 trigger OnAction()
                 var
                     ReportSelectionRetail: Record "NPR Report Selection Retail";
-                    LabelLibrarySubMgt: Codeunit "NPR Label Library Sub. Mgt.";
+                    LabelLibrary: Codeunit "NPR Label Library";
                 begin
-                    LabelLibrarySubMgt.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
+                    LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
                 end;
             }
         }
