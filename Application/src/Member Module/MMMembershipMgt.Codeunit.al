@@ -22,13 +22,15 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MEMBERSHIP_CARD_REF: Label 'The membership card %1 has an invalid reference to membership. Membership entry %2 was not found.';
         MEMBER_CARD_REF: Label 'The membership card %1 has an invalid reference to member. Member entry %2 was not found.';
         CONFIRM_CANCEL: Label 'Membership %1 valid from %2 until %3, will be canceled, effective from %4.';
-        CONFIRM_REGRET: Label 'Do you want to regret creating membership %1 valid from %2 until %3.';
+        CONFIRM_REGRET: Label 'Do you want to regret subscription for membership %1 valid from %2 until %3.';
+        CONFIRM_REGRET_AUTO_RENEW: Label 'Warning: this membership is setup for auto-renewal and changing the subscriptions might make the future auto-renewal fail. Do you want to regret subscription for membership %1 valid from %2 until %3.';
+        CONFIRM_REGRET_UNDO: Label 'This action will reactivate the subscription from %2 until %3 for membership %1. Do you want to continue?';
         MISSING_TEMPLATE: Label 'The customer template %1 is not valid or not found.';
         RENEW_MEMBERSHIP: Label 'Do you want to renew the membership with %1 (%2 - %3).';
         CONFLICTING_ENTRY: Label 'There is already a membership period active in the time period %1 - %2.';
         EXTEND_MEMBERSHIP: Label 'Do you want to extend the membership with %1 (%2 - %3).';
         UPGRADE_MEMBERSHIP: Label 'Do you want to upgrade the membership with %1 (%2 - %3).';
-        EXTEND_TO_SHORT: Label 'When extending a subscription, the new until date (%1) must exceed the current subscriptons until date (%2).';
+        EXTEND_TO_SHORT: Label 'When extending a subscription, the new until date (%1) must exceed the current subscriptions until date (%2).';
         MULTIPLE_TIMEFRAMES: Label 'The operation %1 can not span multiple time frames for member entry no. %2. The new time frame %3 - %4, span current time frame entries %5 and %6.';
         NO_TIMEFRAME: Label 'Date of cancel (%1) must be within the active time frame (%2 - %3).';
         STACKING_NOT_ALLOWED: Label 'Setup does not allow stacking - having multiple open time frames.  Membership entry no %1, for date %2.';
@@ -37,7 +39,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MEMBERCARD_NOT_FOUND: Label 'The member card %1 was not found.';
         MEMBERCARD_BLOCKED: Label 'The member card %1 is blocked.';
         NO_ADMIN_MEMBER: Label 'At least one member must have an administrative role in the membership. This members information will not be synchronized to customer. Membership could not be created.';
-        MEMBERCARD_BLANK: Label 'Membercard number can''t be empty or blank.';
+        MEMBERCARD_BLANK: Label 'Member card number can''t be empty or blank.';
         INVALID_CONTACT: Label 'The contact number %1 is not valid in context of customer number %2';
         TO_MANY_MEMBERS_NO: Label '-127001';
         MEMBER_CARD_EXIST_NO: Label '-127002';
@@ -1156,9 +1158,19 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 exit(false);
             end;
 
-        if ((WithConfirm) and (GuiAllowed())) then
-            if (not Confirm(CONFIRM_REGRET, false, Membership."External Membership No.", MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date")) then
+        if ((WithConfirm) and (GuiAllowed()) and (MembershipEntry.Context <> MembershipEntry.Context::REGRET)) then begin
+            if (Membership."Auto-Renew" = Membership."Auto-Renew"::NO) then
+                if (not Confirm(CONFIRM_REGRET, false, Membership."External Membership No.", MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date")) then
+                    exit(false);
+            if (Membership."Auto-Renew" <> Membership."Auto-Renew"::NO) then
+                if (not Confirm(CONFIRM_REGRET_AUTO_RENEW, false, Membership."External Membership No.", MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date")) then
+                    exit(false);
+        end;
+
+        if ((WithConfirm) and (GuiAllowed()) and (MembershipEntry.Context = MembershipEntry.Context::REGRET)) then
+            if (not Confirm(CONFIRM_REGRET_UNDO, false, Membership."External Membership No.", MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date")) then
                 exit(false);
+
 
         ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
 
