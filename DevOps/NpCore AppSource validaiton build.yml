@@ -32,7 +32,7 @@ jobs:
       download:
         enabled: true
         deployApp: true
-    dependencies:
+    dependancies:
     - package:
         source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
         id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
