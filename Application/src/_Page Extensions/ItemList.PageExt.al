@@ -184,7 +184,15 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
                 ToolTip = 'Executes the POS Sales Entries action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
+                begin
+                    POSEntryNavigation.OpenPOSSalesLineListFromItem(Rec);
+                end;
             }
+
             action("NPR Retail Price Log Entries")
             {
                 Caption = 'Retail Price Log Entries';

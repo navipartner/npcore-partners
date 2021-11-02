@@ -568,27 +568,6 @@ codeunit 6060150 "NPR Event Management"
             until JobPlanningLineInvoice.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Jobs Setup", 'OnAfterActionEvent', 'NPR SetStatusToBlockEventDelete', true, true)]
-    local procedure SetStatusesToBlockEventDelete(var Rec: Record "Jobs Setup")
-    var
-        GenericMultipleCheckList: Page "NPR Gen. Multiple Check List";
-        OutS: OutStream;
-        OptionFilter: Text;
-    begin
-        GenericMultipleCheckList.SetOptions(GetJobEventStatusOptions(), GetBlockEventDeleteOptionFilter());
-        GenericMultipleCheckList.LookupMode(true);
-        if GenericMultipleCheckList.RunModal() = ACTION::LookupOK then begin
-            OptionFilter := GenericMultipleCheckList.GetSelectedOption();
-            if OptionFilter = '' then
-                Clear(Rec."NPR Block Event Deletion")
-            else begin
-                Rec."NPR Block Event Deletion".CreateOutStream(OutS);
-                OutS.Write(OptionFilter);
-            end;
-            Rec.Modify();
-        end;
-    end;
-
     local procedure CheckTime(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time)
     var
         Job: Record Job;
@@ -2021,6 +2000,26 @@ codeunit 6060150 "NPR Event Management"
     procedure SetBufferMode()
     begin
         BufferMode := true;
+    end;
+
+    procedure SetStatusToBlockEventDelete(var JobSetup: Record "Jobs Setup")
+    var
+        GenericMultipleCheckList: Page "NPR Gen. Multiple Check List";
+        OutS: OutStream;
+        OptionFilter: Text;
+    begin
+        GenericMultipleCheckList.SetOptions(GetJobEventStatusOptions(), GetBlockEventDeleteOptionFilter());
+        GenericMultipleCheckList.LookupMode(true);
+        if GenericMultipleCheckList.RunModal() = ACTION::LookupOK then begin
+            OptionFilter := GenericMultipleCheckList.GetSelectedOption();
+            if OptionFilter = '' then
+                Clear(JobSetup."NPR Block Event Deletion")
+            else begin
+                JobSetup."NPR Block Event Deletion".CreateOutStream(OutS);
+                OutS.Write(OptionFilter);
+            end;
+            JobSetup.Modify();
+        end;
     end;
 }
 

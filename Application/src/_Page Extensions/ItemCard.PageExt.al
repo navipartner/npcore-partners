@@ -794,6 +794,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                 ToolTip = 'Executes the POS Sales Entries action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
+                begin
+                    POSEntryNavigation.OpenPOSSalesLineListFromItem(Rec);
+                end;
             }
         }
 

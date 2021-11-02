@@ -49,6 +49,13 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
 
                 ToolTip = 'Executes the Variety action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    VarietyWrapper: Codeunit "NPR Variety Wrapper";
+                begin
+                    VarietyWrapper.SalesLineShowVariety(Rec, 0);
+                end;
             }
         }
     }

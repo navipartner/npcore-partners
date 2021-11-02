@@ -83,6 +83,14 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
 
                     ToolTip = 'Executes the Set Status to Block Event Delete action';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+
+                    var
+                        EventManagement: Codeunit "NPR Event Management";
+                    begin
+                        EventManagement.SetStatusToBlockEventDelete(Rec);
+                    end;
                 }
             }
         }

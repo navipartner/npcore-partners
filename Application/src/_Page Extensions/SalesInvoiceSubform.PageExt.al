@@ -1,4 +1,4 @@
-pageextension 6014449 "NPR Sales Invioce Subform" extends "Sales Invoice Subform"
+pageextension 6014449 "NPR Sales Invoice Subform" extends "Sales Invoice Subform"
 {
     actions
     {
@@ -16,6 +16,13 @@ pageextension 6014449 "NPR Sales Invioce Subform" extends "Sales Invoice Subform
 
                 ToolTip = 'Executes the Variety action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    VarietyWrapper: Codeunit "NPR Variety Wrapper";
+                begin
+                    VarietyWrapper.SalesLineShowVariety(Rec, 0);
+                end;
             }
         }
     }

@@ -195,7 +195,7 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    local procedure ItemJnlLineShowVariety(ItemJnlLine: Record "Item Journal Line"; ShowFieldNo: Integer)
+    procedure ItemJnlLineShowVariety(ItemJnlLine: Record "Item Journal Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
@@ -301,14 +301,6 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTCheck.PostingCheck(ItemJnlLine);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Item Card", 'OnAfterActionEvent', 'NPR VarietyMatrix', false, false)]
-    local procedure ItemCardAfterActionEventVariety(var Rec: Record Item)
-    var
-        VRTWrapper: Codeunit "NPR Variety Wrapper";
-    begin
-        VRTWrapper.ShowVarietyMatrix(Rec, 0);
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'NPR Variety Group', true, false)]
     local procedure T27OnAfterValVarietyGroup(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     var
@@ -361,60 +353,6 @@ codeunit 6059970 "NPR Variety Wrapper"
             exit;
 
         VrtCheck.ChangeItemVariety(Rec, xRec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Item Journal", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure ItemJournalAfterActionEventShowVariety(var Rec: Record "Item Journal Line")
-    begin
-        ItemJnlLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Sales Order Subform", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure SalesOrderSubformAfterActionEventShowVariety(var Rec: Record "Sales Line")
-    begin
-        SalesLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice Subform", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure SalesInvoiceSubformAfterActionEventShowVariety(var Rec: Record "Sales Line")
-    begin
-        SalesLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Purchase Order Subform", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure PurchaseOrderSubformAfterActionEventShowVariety(var Rec: Record "Purchase Line")
-    begin
-        PurchLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Purchase Return Order Subform", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure PurchReturnOrderSubformOnAfterActionEventShowVariety(var Rec: Record "Purchase Line")
-    begin
-        PurchLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Sales Quote Subform", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure SalesQuoteSubformAfterActionEventShowVariety(var Rec: Record "Sales Line")
-    begin
-        SalesLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Sales Cr. Memo Subform", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure SalesCrMemoSubformAfterActionEventShowVariety(var Rec: Record "Sales Line")
-    begin
-        SalesLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Item Reclass. Journal", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure ItemReclassJournalAfterActionEventShowVariety(var Rec: Record "Item Journal Line")
-    begin
-        ItemJnlLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Transfer Order Subform", 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure TransferOrderSubformAfterActionEventShowVariety(var Rec: Record "Transfer Line")
-    begin
-        TransferLineShowVariety(Rec, 0);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Variety Matrix", 'OnOpenPageEvent', '', false, false)]

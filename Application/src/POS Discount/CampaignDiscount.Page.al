@@ -227,6 +227,13 @@ page 6014453 "NPR Campaign Discount"
 
                     ToolTip = 'Executes the Retail Print action';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        LabelLibrary: Codeunit "NPR Label Library";
+                    begin
+                        LabelLibrary.ChooseLabel(Rec);
+                    end;
                 }
                 action(PriceLabel)
                 {
@@ -239,6 +246,14 @@ page 6014453 "NPR Campaign Discount"
 
                     ToolTip = 'Executes the Price Label action';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        ReportSelectionRetail: Record "NPR Report Selection Retail";
+                        LabelLibrary: Codeunit "NPR Label Library";
+                    begin
+                        LabelLibrary.PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
+                    end;
                 }
             }
             group("&Functions")

@@ -301,7 +301,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         output += '}';
     end;
 
-
     local procedure ExecuteCall(Method: Code[10]; Response: JsonToken; silent: boolean): Boolean;
     var
 
@@ -734,67 +733,11 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             CreateShipment(ShipmentDocument, Silent)
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Shipment Documents", 'OnAfterActionEvent', 'SendDocument', true, true)]
-    local procedure P6014440OnAfterActionEventSendDoc(var Rec: Record "NPR Pacsoft Shipment Document");
+    procedure SendDocument(var PacsoftShipmentDocument: Record "NPR Pacsoft Shipment Document")
     begin
         if not InitPackageProvider() then
             exit;
-        CreateShipment(Rec, false)
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Posted Sales Shipment", 'OnAfterActionEvent', 'NPR PrintShipmentDocument', true, true)]
-    local procedure P130OnAfterActionEventCreatePackage(var Rec: Record "Sales Shipment Header");
-    var
-        SalesShptHeader: Record "Sales Shipment Header";
-        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-        RecRef: RecordRef;
-        RecRefShipment: RecordRef;
-        text000: Label 'Do you Want to create a Package entry ?';
-        Text001: Label 'Do you want to print the Document?';
-        Jtoken: JsonToken;
-
-    begin
-        if not InitPackageProvider() then
-            exit;
-
-        RecRef.GETTABLE(Rec);
-        ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
-        ShipmentDocument.SETRANGE(RecordID, RecRef.RECORDID);
-        if ShipmentDocument.FINDLAST() then begin
-            if CONFIRM(Text001, true) then
-                if ShipmentDocument."Response Shipment ID" <> '' then begin
-                    RequestURL := 'https://app.shipmondo.com/api/public/v3/print_jobs/';
-                    RequestString := PrintJob(ShipmentDocument);
-                    if ExecuteCall('POST', Jtoken, false) then
-                        Exit;
-                end
-                else begin
-                    AddEntry(RecRef, false, false);
-
-                end;
-        end
-        else begin
-            RecRefShipment.GETTABLE(SalesShptHeader);
-            TestFieldPakkelabels(RecRefShipment);
-            if CONFIRM(text000, true) then
-                AddEntry(RecRefShipment, false, false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Shipment Documents", 'OnAfterActionEvent', 'PrintDocument', false, false)]
-    local procedure P6014440OnAfterActionEventPrintDocument(var Rec: Record "NPR Pacsoft Shipment Document");
-    var
-        JToken: JsonToken;
-    begin
-
-        if not InitPackageProvider() then
-            exit;
-
-        if Rec."Response Shipment ID" <> '' then begin
-            RequestURL := 'https://app.shipmondo.com/api/public/v3/print_jobs/';
-            RequestString := PrintJob(Rec);
-            if ExecuteCall('POST', JToken, false) then;
-        end;
+        CreateShipment(PacsoftShipmentDocument, false)
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterModifyEvent', '', true, true)]
@@ -816,25 +759,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
             Rec."Shipping Agent Service Code" := ForeignShipmentMapping."Shipping Agent Service Code";
             Rec.MODIFY(true);
         end;
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"NPR Pacsoft Setup", 'OnAfterActionEvent', 'Check Balance', false, false)]
-    local procedure GetBalance(var Rec: Record "NPR Pacsoft Setup");
-    var
-        Jtoken: JsonToken;
-    begin
-        if not InitPackageProvider() then
-            exit;
-        RequestURL := 'https://app.shipmondo.com/api/public/v3/account/balance';
-        if not ExecuteCall('GET', Jtoken, False) then
-            exit;
-        message(GetJsonText(JToken, 'amount', 0));
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"NPR Package Printers", 'OnAfterActionEvent', 'GetPrinter', false, false)]
-    local procedure FetchPrinters(var Rec: Record "NPR Package Printers");
-    begin
-        GetPrinters(1, false);
     end;
 
     procedure GetArrayLength(Jarray: JsonArray) ArrayLength: Integer;
@@ -897,6 +821,67 @@ codeunit 6014578 "NPR Shipmondo Mgnt."
         Response.ReadFrom(ResponseText);
         if (GetJsonText(Response, 'error', 0)) <> '' then
             error(ResponseText);
+    end;
+
+    procedure PrintDocument(var ShipmentDocument: Record "NPR Pacsoft Shipment Document")
+    var
+        JToken: JsonToken;
+    begin
+        if not InitPackageProvider() then
+            exit;
+
+        if ShipmentDocument."Response Shipment ID" <> '' then begin
+            RequestURL := 'https://app.shipmondo.com/api/public/v3/print_jobs/';
+            RequestString := PrintJob(ShipmentDocument);
+            if ExecuteCall('POST', JToken, false) then;
+        end;
+    end;
+
+    procedure CheckBalance()
+    var
+        Jtoken: JsonToken;
+    begin
+        if not InitPackageProvider() then
+            exit;
+        RequestURL := 'https://app.shipmondo.com/api/public/v3/account/balance';
+        if not ExecuteCall('GET', Jtoken, False) then
+            exit;
+        Message(GetJsonText(JToken, 'amount', 0));
+    end;
+
+    procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
+    var
+        SalesShptHeader: Record "Sales Shipment Header";
+        ShipmentDocument: Record "NPR Pacsoft Shipment Document";
+        RecRef: RecordRef;
+        RecRefShipment: RecordRef;
+        text000: Label 'Do you Want to create a Package entry ?';
+        Text001: Label 'Do you want to print the Document?';
+        Jtoken: JsonToken;
+    begin
+        if not InitPackageProvider() then
+            exit;
+
+        RecRef.GETTABLE(SalesShipmentHeader);
+        ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
+        ShipmentDocument.SETRANGE(RecordID, RecRef.RECORDID);
+        if ShipmentDocument.FINDLAST() then begin
+            if CONFIRM(Text001, true) then
+                if ShipmentDocument."Response Shipment ID" <> '' then begin
+                    RequestURL := 'https://app.shipmondo.com/api/public/v3/print_jobs/';
+                    RequestString := PrintJob(ShipmentDocument);
+                    if ExecuteCall('POST', Jtoken, false) then
+                        Exit;
+                end
+                else begin
+                    AddEntry(RecRef, false, false);
+                end;
+        end else begin
+            RecRefShipment.GETTABLE(SalesShptHeader);
+            TestFieldPakkelabels(RecRefShipment);
+            if CONFIRM(text000, true) then
+                AddEntry(RecRefShipment, false, false);
+        end;
     end;
 
 }

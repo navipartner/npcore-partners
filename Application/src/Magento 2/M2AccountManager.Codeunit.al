@@ -185,17 +185,6 @@ codeunit 6151151 "NPR M2 Account Manager"
         exit(false);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Contact Card", 'OnAfterActionEvent', 'NPR ResetMagentoPassword', true, true)]
-    local procedure P5050ResetMagentoPasswordSubscriber(var Rec: Record Contact)
-    var
-        Contact: Record Contact;
-        ReasonText: Text;
-    begin
-        Contact := Rec;
-        if not (ResetMagentoPassword(Contact, ReasonText)) then
-            Error(ReasonText);
-    end;
-
     procedure ShowMagentoContacts()
     var
         Customer: Record Customer;

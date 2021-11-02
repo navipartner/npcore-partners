@@ -125,6 +125,13 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                 ToolTip = 'Executes the POS Entries action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
+                begin
+                    POSEntryNavigation.OpenPOSEntryListFromCustomer(Rec);
+                end;
             }
         }
         addafter(Documents)

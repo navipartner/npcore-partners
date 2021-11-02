@@ -71,6 +71,13 @@ page 6014575 "NPR Package Printers"
                 Image = PrintCover;
                 ToolTip = 'Executes the Get printers action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
+                begin
+                    ShipmondoMgnt.GetPrinters(1, false);
+                end;
             }
         }
     }

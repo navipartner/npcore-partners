@@ -193,12 +193,6 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Purchase Order Subform", 'OnAfterActionEvent', 'NPR Nonstockitems', true, true)]
-    local procedure OnAfterNonstockitems(var Rec: Record "Purchase Line")
-    begin
-        ShowNonstock(Rec, '');
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnBeforeValidateEvent', 'Item Reference No.', false, false)]
     local procedure OnBeforeValidateItemReferenceNo(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var

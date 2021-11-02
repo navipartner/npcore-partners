@@ -229,6 +229,13 @@ page 6014574 "NPR Pacsoft Setup"
                 ToolTip = 'Executes the Check Balance action';
                 ApplicationArea = NPRRetail;
 
+                trigger OnAction()
+                var
+                    ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
+
+                begin
+                    ShipmondoMgnt.CheckBalance()
+                end;
             }
             action("Shipment Mapping(Foreign Countries)")
             {

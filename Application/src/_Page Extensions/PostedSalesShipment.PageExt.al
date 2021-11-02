@@ -97,6 +97,13 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                     ToolTip = 'Executes the Print Shipment Document action';
                     Image = Print;
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        ShipmondoMgnt: Codeunit "NPR Shipmondo Mgnt.";
+                    begin
+                        ShipmondoMgnt.PrintShipmentDocument(Rec);
+                    end;
                 }
             }
         }

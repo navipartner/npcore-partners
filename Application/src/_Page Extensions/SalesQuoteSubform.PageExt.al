@@ -12,6 +12,13 @@ pageextension 6014488 "NPR Sales Quote Subform" extends "Sales Quote Subform"
 
                 ToolTip = 'Executes the Variety action';
                 ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    VarietyWrapper: Codeunit "NPR Variety Wrapper";
+                begin
+                    VarietyWrapper.SalesLineShowVariety(Rec, 0);
+                end;
             }
         }
     }
