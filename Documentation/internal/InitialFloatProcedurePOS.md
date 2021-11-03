@@ -29,8 +29,8 @@ In certain scenarios, it doesn't generate any accounting entries:
 - (Optional) Create a new POS store.
 - Create a cash register.
 - Use the cash register ID to create a POS unit.
-4. Create a POS payment bin which is used for that POS unit.
-5. Insert the initial cash float in the POS payment bin.
+- Create a POS payment bin which is used for that POS unit.
+- Insert the initial cash float in the POS payment bin.
 
 
 
