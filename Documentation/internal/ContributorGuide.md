@@ -3,17 +3,17 @@ This document guides you through the process of standardizing and delivering ext
 
 It's recommended that you read through the whole guide as a part of the onboarding process for delivering documentation, but its main purpose is that of a reference which you can turn to whenever you're not sure how to structure your topics. If you have dilemmas about the technical side of the documentation process, refer to the Technical Guide.
 
-## Which documentation is considered to be external?
+## Which documentation is external?
 Whenever you're not sure which documents should be structured in the way described in this guide, this is a good rule of thumb:
 All documents that describe something customers ask consultants to help them with on a regular or a semi-regular basis are potential candidates for external documentation. 
 
 
 However, all documents that deal with back-end stuff that would be more suitable for developers or hosting should be added to the /internal/ folder exclusively.
 
- ## Before you start writing a new topic, ask yourself...
+ ## Before you start writing, ask yourself...
 
 > [!IMPORTANT]
-> If you're writing a topic for the first time, it's highly recommended that you first watch [the video](https://documentation.divio.com/) on documentation framework that we based our own on.
+> It's highly recommended that you first watch [the video](https://documentation.divio.com/) on documentation framework that we used as a model for our own.
 
 - **What do the readers wish to accomplish?**   
   Some users read documentation because they need help in achieving a certain goal, while others need to get acquainted with the product or its individual functionalities. These two groups of people require completely different types of documentation. 
