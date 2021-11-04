@@ -61,17 +61,25 @@ table 6151501 "NPR Nc Task Setup"
         key(Key3; "Task Processor Code", "Table No.", "Codeunit ID") { }
     }
 
+    var
+        TaskSetupAlreadyExistErr: Label 'NC Task Setup with %1: "%2", %3: "%4" and %5: "%6" already exist.', Comment = '%1 = Task Processor Code, %2 = Task Processor Code Value, %3 = Table No., %4 = Table No. Value, %5 = Codeunit ID, %6 = Codeunit ID Value';
+
     trigger OnInsert()
     begin
         "Entry No." := 0;
         if "Task Processor Code" = '' then
             "Task Processor Code" := 'nC';
+
+        CheckForDuplicates();
         UpdateDataLogSubscriber("Task Processor Code", '', "Table No.");
     end;
 
     trigger OnModify()
     begin
         TestField("Task Processor Code");
+        if (xRec."Table No." <> Rec."Table No.") or (xRec."Codeunit ID" <> Rec."Codeunit ID") or (xRec."Task Processor Code" <> Rec."Task Processor Code") then
+            CheckForDuplicates();
+
         if xRec."Task Processor Code" <> "Task Processor Code" then
             UpdateDataLogSubscriber("Task Processor Code", xRec."Task Processor Code", "Table No.");
     end;
@@ -108,6 +116,20 @@ table 6151501 "NPR Nc Task Setup"
         DataLogSubscriber."Company Name" := '';
         DataLogSubscriber."Last Log Entry No." := LastLogEntryNo;
         DataLogSubscriber.Insert(true);
+    end;
+
+    local procedure CheckForDuplicates()
+    var
+        NcTaskSetup: Record "NPR Nc Task Setup";
+    begin
+        if (Rec."Table No." = 0) or (Rec."Codeunit ID" = 0) or (Rec."Task Processor Code" = '') then
+            exit;
+
+        NcTaskSetup.SetRange("Table No.", Rec."Table No.");
+        NcTaskSetup.SetRange("Codeunit ID", Rec."Codeunit ID");
+        NcTaskSetup.SetRange("Task Processor Code", Rec."Task Processor Code");
+        if not NcTaskSetup.IsEmpty() then
+            Error(TaskSetupAlreadyExistErr, Rec.FieldCaption("Task Processor Code"), Rec."Task Processor Code", Rec.FieldCaption("Table No."), Rec."Table No.", Rec.FieldCaption("Codeunit ID"), Rec."Codeunit ID");
     end;
 }
 
