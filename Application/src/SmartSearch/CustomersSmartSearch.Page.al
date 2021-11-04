@@ -131,6 +131,21 @@ page 6014697 "NPR Customers Smart Search"
                                   "No." = FIELD("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
+
+                action(New)
+                {
+                    ApplicationArea = All;
+                    Caption = 'New';
+                    Image = NewCustomer;
+                    Promoted = true;
+                    ToolTip = 'Create a customer from a template';
+
+                    trigger OnAction()
+                    begin
+                        CreateCustomerFromTemplate();
+                    end;
+                }
+
                 group(Dimensions)
                 {
                     Caption = 'Dimensions';
@@ -860,6 +875,18 @@ page 6014697 "NPR Customers Smart Search"
         ItemReferenceMgt: Codeunit "Item Reference Management";
     begin
         ItemReferenceVisible := ItemReferenceMgt.IsEnabled();
+    end;
+
+    local procedure CreateCustomerFromTemplate()
+    var
+        Customer: Record Customer;
+        CustomerCard: Page "Customer Card";
+        CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
+    begin
+        if CustomerTemplMgt.InsertCustomerFromTemplate(Customer) then begin
+            CustomerCard.SetRecord(Customer);
+            CustomerCard.Run();
+        end;
     end;
 
     var
