@@ -362,7 +362,7 @@
     begin
         if not SalesHeader.Invoice then
             exit;
-        CheckHeader(SalesHeader);
+
 
         if SalesHeader.Correction and SalesHeader.IsCreditDocType() then begin
             //Correction (exact reversing) mode: ensure issued vouchers still have enough amount to write off
@@ -372,7 +372,8 @@
             MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
             MagentoPaymentLine.SetRange(Posted, false);
             MagentoPaymentLine.SetFilter(Amount, '<%1', 0);
-            if MagentoPaymentLine.FindSet() then
+            if MagentoPaymentLine.FindSet() then begin
+                CheckHeader(SalesHeader);
                 repeat
                     if not NpRvVoucher.Get(MagentoPaymentLine."Source No.") then begin
                         if FindArchivedVoucher(MagentoPaymentLine."Source No.", MagentoPaymentLine."No.", NpRvArchVoucher) then
@@ -385,6 +386,7 @@
                     if NpRvVoucher.Amount < -MagentoPaymentLine.Amount then
                         Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", NpRvVoucher.Amount, MagentoPaymentLine.Amount);
                 until MagentoPaymentLine.Next() = 0;
+            end;
         end;
 
         NpRvSalesLine.SetCurrentKey("Document Source", "Document Type", "Document No.", "Document Line No.");
@@ -393,11 +395,14 @@
         NpRvSalesLine.SetRange(Posted, false);
         if SalesHeader.IsCreditDocType() then begin
             NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
-            if NpRvSalesLine.FindSet() then
+            if NpRvSalesLine.FindSet() then begin
+                CheckHeader(SalesHeader);
+
                 repeat
                     if (NpRvSalesLine.Type in [NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher"]) and
                        (NpRvSalesLine."Voucher No." <> '')
                     then begin
+
                         if not NpRvVoucher.Get(NpRvSalesLine."Voucher No.") then begin
                             if FindArchivedVoucher(NpRvSalesLine."Voucher No.", NpRvSalesLine."Reference No.", NpRvArchVoucher) then
                                 Error(AlreadyArchivedErr, NpRvSalesLine."Voucher No.")
@@ -409,8 +414,10 @@
                         NpRvVoucherMgt.GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine, VoucherQty, VoucherUnitPrice);
                         if NpRvVoucher.Amount < VoucherUnitPrice then
                             Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", NpRvVoucher.Amount, VoucherUnitPrice);
+
                     end;
                 until NpRvSalesLine.Next() = 0;
+            end;
         end;
 
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
@@ -426,15 +433,18 @@
         OnBeforeReleaseSalesDoc(SalesHeader);
 
         if not NpRvSalesLine.FindSet() then
-            exit;
-        repeat
-            MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
-            NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
-            NpRvVoucher.TestField("Reference No.", NpRvSalesLine."Reference No.");
-            NpRvVoucher.CalcFields(Amount);
-            if NpRvVoucher.Amount < MagentoPaymentLine.Amount then
-                Error(Text002, MagentoPaymentLine.Amount, NpRvVoucher.Amount, NpRvVoucher."Reference No.");
-        until NpRvSalesLine.Next() = 0;
+            exit
+        else begin
+            CheckHeader(SalesHeader);
+            repeat
+                MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
+                NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
+                NpRvVoucher.TestField("Reference No.", NpRvSalesLine."Reference No.");
+                NpRvVoucher.CalcFields(Amount);
+                if NpRvVoucher.Amount < MagentoPaymentLine.Amount then
+                    Error(Text002, MagentoPaymentLine.Amount, NpRvVoucher.Amount, NpRvVoucher."Reference No.");
+            until NpRvSalesLine.Next() = 0;
+        end;
 
         TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
         SalesHeader.CalcFields("NPR Magento Payment Amount");
