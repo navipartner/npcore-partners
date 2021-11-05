@@ -33,5 +33,5 @@ if (-Not ($LastExitCode -eq 0)) {
 }
 
 Write-Host "Copying API library and openapi files into _site folder"
-Copy-Item -Path ($workspaceFolder + "\Documentation\openapi\*") -Destination ($buildFolder + "\api\") -Recurse
+Copy-Item -Path ($workspaceFolder + "\Documentation\public\openapi\*") -Destination ($buildFolder + "\api\") -Recurse
 Copy-Item ($workspaceFolder + "\Documentation\.tools\rapidocs\sandbox.html") -Destination ($buildFolder + "\api\")

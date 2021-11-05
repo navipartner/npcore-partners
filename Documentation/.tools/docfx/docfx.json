@@ -5,12 +5,12 @@
         "files": [
           "api/**.md",
           "api/**/toc.yml",                    
-          "articles/**.md",
-          "articles/**/toc.yml",                    
+          "product/**.md",
+          "product/**/toc.yml",                    
           "toc.yml",
           "*.md"          
         ],
-        "src": "../../product"
+        "src": "../../public"
       }
     ],
     "resource": [
@@ -19,7 +19,7 @@
           "images/**",
           "**/images/**"
         ],
-        "src": "../../product"
+        "src": "../../public"
       }
     ],
     "markdownEngineName": "markdig",

@@ -1,7 +1,7 @@
 # Documenting APIs
 
 ## OpenAPI files
-You can place openapi json files in the "/Documentation/openapi/" folder  
+You can place openapi json files in the "/Documentation/public/openapi" folder  
 Instead of writing everything from scratch you can use a tool such as:  
 https://github.com/microsoft/OpenAPI.NET.OData  
 To generate the rough scaffolding for your API.
@@ -96,8 +96,16 @@ You can link to the API sandbox that parses openAPI files from any published mar
 [API Playground](/api/sandbox.html?spec=openapi_file.json)
 ``
 
-It is recommended that you add a markdown article for your APIGroup under the /product/api/methods folder that links to the sandbox and any other relevant articles.
+It is recommended that you add a markdown article for your endpoint under the /public/api/methods folder that links to the sandbox and any other relevant articles.
 
-It is also recommended that you keep each APIGroup documented in the same openapi file.
+It is also recommended that you keep each endpoint documented in the same openapi file.
 
+
+## Previewing changes locally
+
+You can run the script at:
+
+Documentation/.tools/test_website_locally.ps1
+
+Which will generate the same html as the PR pipeline and serve it on http://localhost:8080 when done.
 
