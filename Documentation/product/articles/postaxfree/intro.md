@@ -1,3 +1,0 @@
-# Intro
-
-Tax Free intro
