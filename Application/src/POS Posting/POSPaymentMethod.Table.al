@@ -237,12 +237,18 @@ table 6150616 "NPR POS Payment Method"
     {
     }
 
+    trigger OnInsert()
+    begin
+        CheckReturnProcessingType();
+    end;
+
     trigger OnModify()
     var
         MinGreaterThanMax: Label 'The minimum amount has to be less than the maximum amount';
     begin
-        if rec."Minimum Amount" > rec."Maximum Amount" then
-            error(MinGreaterThanMax);
+        if Rec."Minimum Amount" > Rec."Maximum Amount" then
+            Error(MinGreaterThanMax);
+        CheckReturnProcessingType();
     end;
 
     trigger OnDelete()
@@ -264,6 +270,15 @@ table 6150616 "NPR POS Payment Method"
             Rec."Rounding Type"::Nearest:
                 exit('=');
         end;
+    end;
+
+    local procedure CheckReturnProcessingType()
+    var
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        if ReturnPOSPaymentMethod.Get(Rec."Return Payment Method Code") then
+            if ReturnPOSPaymentMethod."Processing Type" = ReturnPOSPaymentMethod."Processing Type"::EFT then
+                ReturnPOSPaymentMethod.FieldError("Processing Type");
     end;
 
 }
