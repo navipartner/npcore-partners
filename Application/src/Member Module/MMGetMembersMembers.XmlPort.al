@@ -145,7 +145,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                             MinOccurs = Zero;
                             tableelement(tmpattributevalueset; "NPR Attribute Value Set")
                             {
-                                LinkFields = "Attribute Set ID" = FIELD("Member Entry No");
+                                LinkFields = "Attribute Set ID" = field("Member Entry No");
                                 LinkTable = tmpMemberInfoResponse;
                                 MinOccurs = Zero;
                                 XmlName = 'attribute';
@@ -160,6 +160,41 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         }
                         fieldelement(notificationmethod; tmpMemberInfoResponse."Notification Method")
                         {
+                        }
+                        textelement(RequestFieldUpdate)
+                        {
+                            XmlName = 'requestfieldupdate';
+                            MinOccurs = Zero;
+                            MaxOccurs = Once;
+                            tableelement(TempRequestMemberUpdate; "NPR MM Request Member Update")
+                            {
+                                UseTemporary = true;
+                                XmlName = 'field';
+                                MinOccurs = Zero;
+                                MaxOccurs = Unbounded;
+                                LinkTable = tmpMemberInfoResponse;
+                                LinkFields = "Member Entry No." = field("Member Entry No");
+                                fieldattribute(EntryNo; TempRequestMemberUpdate."Entry No.")
+                                {
+                                    XmlName = 'entryno';
+                                }
+                                fieldattribute(FieldNo; TempRequestMemberUpdate."Field No.")
+                                {
+                                    XmlName = 'fieldno';
+                                }
+                                fieldelement(FieldCaption; TempRequestMemberUpdate.Caption)
+                                {
+                                    XmlName = 'caption';
+                                    MinOccurs = Once;
+                                    MaxOccurs = Once;
+                                }
+                                fieldelement(CurrentValue; TempRequestMemberUpdate."Current Value")
+                                {
+                                    XmlName = 'currentvalue';
+                                    MinOccurs = Once;
+                                    MaxOccurs = Once;
+                                }
+                            }
                         }
                     }
                 }
@@ -197,6 +232,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
         MemberCard: Record "NPR MM Member Card";
         NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
+        RequestMemberUpdate: Record "NPR MM Request Member Update";
     begin
 
         errordescription := '';
@@ -260,6 +296,15 @@ xmlport 6060130 "NPR MM Get Members. Members"
                     end;
                 end;
 
+                RequestMemberUpdate.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
+                RequestMemberUpdate.SetFilter(Handled, '=%1', false);
+                if (RequestMemberUpdate.FindSet()) then begin
+                    repeat
+                        TempRequestMemberUpdate.TransferFields(RequestMemberUpdate, true);
+                        TempRequestMemberUpdate.Insert();
+                    until (RequestMemberUpdate.Next() = 0);
+                end;
+
                 if (not Member.Blocked) then
                     if (tmpMemberInfoResponse.Insert()) then;
 
@@ -292,4 +337,5 @@ xmlport 6060130 "NPR MM Get Members. Members"
         status := '0';
     end;
 }
+
 

@@ -604,7 +604,7 @@
     end;
 
 
-    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Option; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text[50]; MembershipNoSeries: Code[20]; MemberNoSeries: Code[20]): Code[20];
+    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Enum "NPR MM Member Unique Identity"; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text[50]; MembershipNoSeries: Code[20]; MemberNoSeries: Code[20]): Code[20];
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin

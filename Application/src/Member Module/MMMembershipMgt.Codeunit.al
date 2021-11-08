@@ -57,6 +57,44 @@ codeunit 6060127 "NPR MM Membership Mgt."
         AGE_VERIFICATION_SETUP: Label 'Add member failed on age verification because item number for sales was not provided.';
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
 
+
+    procedure CreateMembershipInteractive(var MemberInfoCapture: Record "NPR MM Member Info Capture") ExternalCardNumber: Text[100];
+    var
+        MemberInfoCapturePage: Page "NPR MM Member Info Capture";
+        PageAction: Action;
+        AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
+        ResponseMessage: Text;
+    begin
+
+        MemberInfoCapture.SetFilter("Entry No.", '=%1', MemberInfoCapture."Entry No.");
+        MemberInfoCapturePage.SetRecord(MemberInfoCapture);
+        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+        Commit();
+
+        MemberInfoCapturePage.LookupMode(true);
+        PageAction := MemberInfoCapturePage.RunModal();
+
+        if (PageAction = Action::LookupOK) then begin
+            MemberInfoCapturePage.GetRecord(MemberInfoCapture);
+            MemberInfoCapture.SetRecFilter();
+
+            Commit();
+            AttemptCreateMembership.SetAttemptCreateMembership();
+            if (not AttemptCreateMembership.Run(MemberInfoCapture)) then
+                if (not AttemptCreateMembership.WasSuccessful(ResponseMessage)) then
+                    Error(ResponseMessage);
+
+            Commit();
+            AttemptCreateMembership.SetCreateMembership();
+            AttemptCreateMembership.Run(MemberInfoCapture);
+
+            Commit();
+            ExternalCardNumber := MemberInfoCapture."External Card No."
+
+        end;
+    end;
+
+
     procedure CreateMembershipAll(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; var MemberInfoCapture: Record "NPR MM Member Info Capture"; CreateMembershipLedgerEntry: Boolean) MembershipEntryNo: Integer
     var
         Community: Record "NPR MM Member Community";
@@ -142,6 +180,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Customer: Record Customer;
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         MemberCommunication: Record "NPR MM Member Communication";
+        RequestMemberFieldUpdate: Record "NPR MM Request Member Update";
         NPGDPRManagement: Codeunit "NPR NP GDPR Management";
         GDPRAnonymizationRequestWS: Codeunit "NPR GDPR Anon. Req. WS";
         OriginalCustomerNo: Code[20];
@@ -238,6 +277,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 if (MembershipRole.IsEmpty()) then
                     if (Member.Get(TempMembershipRole."Member Entry No.")) then
                         Member.Delete();
+
+                if (RequestMemberFieldUpdate.SetCurrentKey("Member Entry No.")) then;
+                RequestMemberFieldUpdate.SetFilter("Member Entry No.", '=%1', TempMembershipRole."Member Entry No.");
+                RequestMemberFieldUpdate.DeleteAll();
 
             until (TempMembershipRole.Next() = 0);
         end;
@@ -834,8 +877,8 @@ codeunit 6060127 "NPR MM Membership Mgt."
             exit(false);
 
         MemberInfoCapture.CalcFields(Picture);
-        // if MemberInfoCapture.Image.HasValue() then begin
-        if MemberInfoCapture.Picture.HasValue() then begin
+        // if (MemberInfoCapture.Image.HasValue()) then begin
+        if (MemberInfoCapture.Picture.HasValue()) then begin
             if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
                 // Member.Image := MemberInfoCapture.Image;
                 Member.Picture := MemberInfoCapture.Picture;
@@ -880,6 +923,21 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 begin
                     MemberInfoCapture.TestField("Social Security No.");
                     Member.SetFilter("Social Security No.", '=%1', MemberInfoCapture."Social Security No.");
+                end;
+            Community."Member Unique Identity"::EMAIL_AND_PHONE:
+                begin
+                    MemberInfoCapture.TestField("E-Mail Address");
+                    MemberInfoCapture.TestField("Phone No.");
+                    Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                    Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+                end;
+            Community."Member Unique Identity"::EMAIL_OR_PHONE:
+                begin
+                    MemberInfoCapture.TestField("E-Mail Address");
+                    MemberInfoCapture.TestField("Phone No.");
+                    Member.FilterGroup(-1);
+                    Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                    Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                 end;
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
@@ -3418,7 +3476,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
             Error(NO_LEDGER_ENTRY, Membership."External Membership No.");
 
         if (not MembershipEntry."Activate On First Use") then
-            exit; // Allready activated
+            exit; // Already activated
 
         MembershipEntry."Valid From Date" := ActivationDate;
         MembershipEntry."Valid Until Date" := CalcDate(MembershipEntry."Duration Dateformula", ActivationDate);
@@ -3983,10 +4041,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 Member."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
         end;
 
-        // if MemberInfoCapture.Image.HasValue() then begin
+        // if (MemberInfoCapture.Image.HasValue()) then begin
         // Member.Image := MemberInfoCapture.Image;
         MemberInfoCapture.CalcFields(Picture);
-        if MemberInfoCapture.Picture.HasValue() then begin
+        if (MemberInfoCapture.Picture.HasValue()) then begin
             Member.Picture := MemberInfoCapture.Picture;
         end;
 
@@ -4003,7 +4061,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit;
     end;
 
-    local procedure ValidateMemberFields(MembershipEntryNo: Integer; Member: Record "NPR MM Member"; ResponseMessage: Text): Boolean
+    procedure ValidateMemberFields(MembershipEntryNo: Integer; Member: Record "NPR MM Member"; ResponseMessage: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         Community: Record "NPR MM Member Community";
@@ -4029,6 +4087,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
                 UniqIdSet := (Member."Phone No." <> '');
             Community."Member Unique Identity"::SSN:
                 UniqIdSet := (Member."Social Security No." <> '');
+            Community."Member Unique Identity"::EMAIL_AND_PHONE:
+                UniqIdSet := (Member."E-Mail Address" <> '') AND (Member."Phone No." <> '');
+            Community."Member Unique Identity"::EMAIL_OR_PHONE:
+                UniqIdSet := (Member."E-Mail Address" <> '') OR (Member."Phone No." <> '');
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
         end;
@@ -4648,6 +4710,10 @@ codeunit 6060127 "NPR MM Membership Mgt."
                         MemberLogonId := Member."Phone No.";
                     Community."Member Unique Identity"::SSN:
                         MemberLogonId := Member."Social Security No.";
+                    Community."Member Unique Identity"::EMAIL_AND_PHONE:
+                        MemberLogonId := Member."E-Mail Address";
+                    Community."Member Unique Identity"::EMAIL_OR_PHONE:
+                        MemberLogonId := Member."E-Mail Address";
                     else
                         Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
                 end;
@@ -5139,15 +5205,15 @@ codeunit 6060127 "NPR MM Membership Mgt."
         NoFaceErr: Label 'No face detected.';
         FaceNotIdentifiedErr: Label 'Face not identified.';
     begin
-        if Camera.GetPicture(PictureStream, PictureName) then begin
+        if (Camera.GetPicture(PictureStream, PictureName)) then begin
             MCSPersonGroupsSetup.Get(TableID);
             PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
             PersonGroups.TestField(PersonGroupId);
             MCSFaceServiceAPI.DetectFaces(PictureStream, JsonFacesArr);
-            if JsonFacesArr.Count() = 0 then
+            if (JsonFacesArr.Count() = 0) then
                 Error(NoFaceErr);
             MCSFaceServiceAPI.IdentifyFace(PersonGroups.PersonGroupId, JsonFacesArr, JsonIdArr);
-            if JsonIdArr.Count() = 0 then
+            if (JsonIdArr.Count() = 0) then
                 Error(FaceNotIdentifiedErr);
             PersonId := MCSFaceServiceAPI.FindMember(PersonGroups, JsonFacesArr, JsonIdArr);
         end;
@@ -5162,7 +5228,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Clear(Camera);
         Camera.SetQuality(50);
         Camera.RunModal();
-        if Camera.HasPicture() then begin
+        if (Camera.HasPicture()) then begin
             Camera.GetPicture(PictureStream);
             MMMemberInfoCapture.Picture.CreateOutStream(OStream);
             CopyStream(OStream, PictureStream);
@@ -5179,7 +5245,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Clear(Camera);
         Camera.SetQuality(50);
         Camera.RunModal();
-        if Camera.HasPicture() then begin
+        if (Camera.HasPicture()) then begin
             Camera.GetPicture(PictureStream);
             MMMember.Picture.CreateOutStream(OStream);
             CopyStream(OStream, PictureStream);
@@ -5197,9 +5263,9 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
         RecRef.Get(MMMember.RecordId);
         MemberName := MMMember."First Name";
-        if MMMember."Middle Name" <> '' then
+        if (MMMember."Middle Name" <> '') then
             MemberName := MemberName + ' ' + MMMember."Middle Name";
-        if MMMember."Last Name" <> '' then
+        if (MMMember."Last Name" <> '') then
             MemberName := MemberName + ' ' + MMMember."Last Name";
         MCSFaceServiceAPI.DetectIdentifyPicture(RecRef, MemberName, PictureStream);
     end;

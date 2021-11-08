@@ -44,12 +44,12 @@ table 6060132 "NPR MM Member Community"
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(20; "Member Unique Identity"; Option)
+        field(20; "Member Unique Identity"; Enum "NPR MM Member Unique Identity")
         {
             Caption = 'Member Unique Identity';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,E-Mail,Phone No.,Social Security No.';
-            OptionMembers = "NONE",EMAIL,PHONENO,SSN;
+            //OptionCaption = ' ,E-Mail,Phone No.,Social Security No.';
+            //OptionMembers = "NONE",EMAIL,PHONENO,SSN;
         }
         field(21; "Create Member UI Violation"; Option)
         {

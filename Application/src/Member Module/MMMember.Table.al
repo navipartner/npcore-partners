@@ -244,10 +244,11 @@ table 6060126 "NPR MM Member"
         MembershipRole: Record "NPR MM Membership Role";
         MemberCard: Record "NPR MM Member Card";
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
+        RequestMemberUpdate: Record "NPR MM Request Member Update";
         Contact: Record Contact;
     begin
         MembershipRole.SetCurrentKey("Member Entry No.");
-        MembershipRole.SetFilter("Member Entry No.", '=%1', "Entry No.");
+        MembershipRole.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
 
         if (MembershipRole.FindSet()) then begin
             repeat
@@ -261,12 +262,17 @@ table 6060126 "NPR MM Member"
         MembershipRole.DeleteAll();
 
         if (MemberCard.SetCurrentKey("Member Entry No.")) then;
-        MemberCard.SetFilter("Member Entry No.", '=%1', "Entry No.");
+        MemberCard.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
         MemberCard.DeleteAll();
 
         if (MemberNotificationEntry.SetCurrentKey("Member Entry No.")) then;
-        MemberNotificationEntry.SetFilter("Member Entry No.", '=%1', "Entry No.");
+        MemberNotificationEntry.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
         MemberNotificationEntry.DeleteAll();
+
+        if (not RequestMemberUpdate.SetCurrentKey("Member Entry No.")) then;
+        RequestMemberUpdate.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
+        RequestMemberUpdate.DeleteAll();
+
     end;
 
     trigger OnInsert()
