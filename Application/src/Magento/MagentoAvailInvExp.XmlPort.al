@@ -36,6 +36,58 @@
                         inventory := Format(MagentoItemMgt.GetStockQty3(TempItemVariant."Item No.", TempItemVariant.Code, MagentoInventoryCompany), 0, 9);
                     end;
                 }
+                textelement(qtyOnSalesOrder)
+                {
+                    MaxOccurs = Once;
+
+                    trigger OnBeforePassVariable()
+                    var
+                        MagentoInventoryCompany: Record "NPR Magento Inv. Company";
+                    begin
+                        MagentoInventoryCompany."Location Filter" := CopyStr(LocationFilter, 1, MaxStrLen(MagentoInventoryCompany."Location Filter"));
+                        RetailInventoryBuffer."Qty. on Sales Order" := MagentoItemMgt.CalcQtyOnSalesOrder(TempItemVariant."Item No.", TempItemVariant.Code, MagentoInventoryCompany."Location Filter");
+                        qtyOnSalesOrder := Format(RetailInventoryBuffer."Qty. on Sales Order", 0, 9);
+                    end;
+                }
+                textelement(qtyOnSalesReturn)
+                {
+                    MaxOccurs = Once;
+
+                    trigger OnBeforePassVariable()
+                    var
+                        MagentoInventoryCompany: Record "NPR Magento Inv. Company";
+                    begin
+                        MagentoInventoryCompany."Location Filter" := CopyStr(LocationFilter, 1, MaxStrLen(MagentoInventoryCompany."Location Filter"));
+                        RetailInventoryBuffer."Qty. on Sales Return" := MagentoItemMgt.CalcQtyOnSalesReturn(TempItemVariant."Item No.", TempItemVariant.Code, MagentoInventoryCompany."Location Filter");
+                        qtyOnSalesOrder := Format(RetailInventoryBuffer."Qty. on Sales Return", 0, 9);
+                    end;
+                }
+                textelement(qtyOnPurchOrder)
+                {
+                    MaxOccurs = Once;
+
+                    trigger OnBeforePassVariable()
+                    var
+                        MagentoInventoryCompany: Record "NPR Magento Inv. Company";
+                    begin
+                        MagentoInventoryCompany."Location Filter" := CopyStr(LocationFilter, 1, MaxStrLen(MagentoInventoryCompany."Location Filter"));
+                        RetailInventoryBuffer."Qty. on Purch. Order" := MagentoItemMgt.CalcQtyOnPurchOrder(tempitemvariant."Item No.", tempitemvariant.Code, MagentoInventoryCompany."Location Filter");
+                        qtyOnPurchOrder := Format(RetailInventoryBuffer."Qty. on Purch. Order", 0, 9);
+                    end;
+                }
+                textelement(qtyOnPurchReturn)
+                {
+                    MaxOccurs = Once;
+
+                    trigger OnBeforePassVariable()
+                    var
+                        MagentoInventoryCompany: Record "NPR Magento Inv. Company";
+                    begin
+                        MagentoInventoryCompany."Location Filter" := CopyStr(LocationFilter, 1, MaxStrLen(MagentoInventoryCompany."Location Filter"));
+                        RetailInventoryBuffer."Qty. on Purch. Return" := MagentoItemMgt.CalcQtyOnPurchReturn(TempItemVariant."Item No.", TempItemVariant.Code, MagentoInventoryCompany."Location Filter");
+                        qtyOnPurchReturn := Format(RetailInventoryBuffer."Qty. on Purch. Return", 0, 9);
+                    end;
+                }
             }
         }
     }
@@ -49,6 +101,7 @@
     end;
 
     var
+        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
         ItemFilter: Text;
         VariantFilter: Text;
