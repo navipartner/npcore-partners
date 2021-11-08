@@ -709,14 +709,23 @@ page 6060136 "NPR MM Member Card"
             {
                 Caption = 'Member Notifications';
                 Image = InteractionLog;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
+                Ellipsis = true;
                 RunObject = Page "NPR MM Member Notific. Entry";
                 RunPageLink = "Member Entry No." = field("Entry No.");
-
                 ToolTip = 'Executes the Member Notifications action';
                 ApplicationArea = NPRRetail;
             }
+            Action("Request Member Update")
+            {
+                Caption = 'Request Member Update';
+                Image = Grid;
+                Ellipsis = true;
+                RunObject = Page "NPR MM Request Member Update";
+                RunPageLink = "Member Entry No." = field("Entry No.");
+                ToolTip = 'Request update to member information on next member card validation';
+                ApplicationArea = NPRRetail;
+            }
+
             Action("Arrival Log")
             {
                 Caption = 'Arrival Log';
@@ -728,7 +737,6 @@ page 6060136 "NPR MM Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Member No." = field("External Member No.");
-
                 ToolTip = 'Executes the Arrival Log action';
                 ApplicationArea = NPRRetail;
             }

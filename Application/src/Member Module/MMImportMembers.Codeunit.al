@@ -299,14 +299,27 @@ codeunit 6060132 "NPR MM Import Members"
                     exit(false);
                 end;
 
+            Community."Member Unique Identity"::EMAIL_AND_PHONE:
+                if ((FldEmail <> '') and (FldPhone <> '')) then begin
+                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(FldEmail));
+                    Member.SetFilter("Phone No.", '=%1', FldPhone);
+                end else begin
+                    exit(false);
+                end;
+
+            Community."Member Unique Identity"::EMAIL_OR_PHONE:
+                if ((FldEmail <> '') and (FldPhone <> '')) then begin
+                    Member.FilterGroup(-1);
+                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(FldEmail));
+                    Member.SetFilter("Phone No.", '=%1', FldPhone);
+                end else begin
+                    exit(false);
+                end;
             else
                 Error(NOT_IMPLEMENTED, Community.FieldCaption("Member Unique Identity"), Community."Member Unique Identity");
         end;
 
-        if (Member.FindFirst()) then
-            exit(false);
-
-        exit(true);
+        exit(Member.IsEmpty());
 #pragma warning restore
     end;
 

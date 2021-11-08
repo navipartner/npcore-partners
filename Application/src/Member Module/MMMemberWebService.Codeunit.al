@@ -1119,6 +1119,23 @@ codeunit 6060128 "NPR MM Member WebService"
 
     end;
 
+    procedure MemberFieldUpdate(EntryNo: Integer; CurrentValue: Text[200]; NewValue: Text[200])
+    var
+        MemberFieldUpdateMgr: Codeunit "NPR MM Request Member Upd Mgr";
+    begin
+        MemberFieldUpdateMgr.UpdateMemberField(EntryNo, CurrentValue, NewValue, 0);
+        COMMIT();
+    end;
+
+    procedure ReqeustMemberFieldUpdate(MemberCardNumber: Text[50]; FieldId: Code[10]; ScannerStationId: Code[10]): Boolean
+    var
+        MemberFieldUpdateMgr: Codeunit "NPR MM Request Member Upd Mgr";
+    begin
+
+        MemberFieldUpdateMgr.RequestFieldUpdate(MemberCardNumber, FieldId, ScannerStationId);
+        EXIT(TRUE);
+    end;
+
     procedure ResolveMemberIdentifier(var MemberIdentifier: XMLport "NPR MM Member Identifier")
     begin
 

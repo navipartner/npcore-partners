@@ -40,6 +40,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         NoPrefixForeignMemberCardNumber := RemoveLocalPrefix(ForeignMembershipSetup."Remove Local Prefix", ForeignMemberCardNumber);
 
         ValidateForeignMemberCard(NPRRemoteEndpointSetup, NoPrefixForeignMemberCardNumber, IsValid, NotValidReason);
+
         if (IsValid) then
             ReplicateMembership(NPRRemoteEndpointSetup, NoPrefixForeignMemberCardNumber, IsValid, NotValidReason);
 
@@ -189,6 +190,26 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     end;
 
+    procedure UpdateMemberField(CommunityCode: Code[20]; var RequestMemberFieldUpdate: Record "NPR MM Request Member Update"; var NotValidReason: Text) IsValid: Boolean
+    var
+        NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
+        ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
+    begin
+        NPRRemoteEndpointSetup.SetFilter("Community Code", '=%1', CommunityCode);
+        NPRRemoteEndpointSetup.SetFilter(Type, '=%1', NPRRemoteEndpointSetup.Type::MemberServices);
+        NPRRemoteEndpointSetup.SetFilter(Disabled, '=%1', false);
+        if (not NPRRemoteEndpointSetup.FindFirst()) then
+            exit(false);
+
+        ForeignMembershipSetup.SetFilter("Community Code", '=%1', CommunityCode);
+        ForeignMembershipSetup.SetFilter(Disabled, '=%1', false);
+        if (not ForeignMembershipSetup.FindFirst()) then
+            exit(false);
+
+        IsValid := UpdateMemberFieldWorker(NPRRemoteEndpointSetup, RequestMemberFieldUpdate, NotValidReason);
+        exit(IsValid);
+    end;
+
     local procedure AddLocalPrefix(Prefix: Text; String: Text): Text
     var
         PrefixLbl: Label '%1%2', Locked = true;
@@ -240,6 +261,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         RemoteInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSetup: Record "NPR MM Membership Setup";
+        TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary;
+        RequestMemberFieldUpdate: Record "NPR MM Request Member Update";
         Prefix: Code[10];
     begin
 
@@ -261,10 +284,27 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         MembershipSetup.Get(RemoteInfoCapture."Membership Code");
         if (MembershipSetup."Member Information" = MembershipSetup."Member Information"::NAMED) then
-            if (not (GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, RemoteInfoCapture, NotValidReason))) then
+            if (not (GetRemoteMember(NPRRemoteEndpointSetup, Prefix, ForeignMemberCardNumber, ForeignMembershipNumber, RemoteInfoCapture, TempRequestMemberFieldUpdate, NotValidReason))) then
                 exit;
 
         IsValid := CreateLocalMembership(RemoteInfoCapture);
+
+        if (IsValid) then begin
+            if (RequestMemberFieldUpdate.SetCurrentKey("Member Entry No.")) then;
+            RequestMemberFieldUpdate.SetFilter("Member Entry No.", '=%1', RemoteInfoCapture."Member Entry No");
+            RequestMemberFieldUpdate.SetFilter(Handled, '=%1', false);
+            RequestMemberFieldUpdate.DeleteAll();
+
+            if (TempRequestMemberFieldUpdate.FindSet()) then begin
+                repeat
+                    RequestMemberFieldUpdate.TransferFields(TempRequestMemberFieldUpdate, false);
+                    RequestMemberFieldUpdate."Entry No." := 0;
+                    RequestMemberFieldUpdate."Member Entry No." := RemoteInfoCapture."Member Entry No";
+                    RequestMemberFieldUpdate."Member No." := RemoteInfoCapture."External Member No";
+                    RequestMemberFieldUpdate.Insert();
+                until (TempRequestMemberFieldUpdate.Next() = 0);
+            end;
+        end;
 
     end;
 
@@ -306,7 +346,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(IsValid);
     end;
 
-    local procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; ForeignMembershipNumber: Code[20]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
+    local procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; ForeignMembershipNumber: Code[20]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary; var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
         XmlDocRequest: XmlDocument;
@@ -316,12 +356,12 @@ codeunit 6060147 "NPR MM NPR Membership"
         if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             exit(false);
 
-        IsValid := GetMembershipMemberResponse(Prefix, XmlDocResponse, NotValidReason, RemoteInfoCapture);
+        IsValid := GetMembershipMemberResponse(Prefix, XmlDocResponse, NotValidReason, RemoteInfoCapture, TempRequestMemberFieldUpdate);
 
         exit(IsValid);
     end;
 
-    local procedure CreateLocalMembership(MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    local procedure CreateLocalMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
@@ -400,6 +440,20 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     end;
 
+    local procedure UpdateMemberFieldWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var RequestMemberFieldUpdate: Record "NPR MM Request Member Update"; var NotValidReason: Text) IsValid: Boolean
+    var
+        SoapAction: Text;
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
+    begin
+        IsValid := true;
+        UpdateMemberFieldSoapXmlRequest(RequestMemberFieldUpdate, SoapAction, XmlDocRequest);
+        if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
+            IsValid := false;
+
+        exit(IsValid);
+    end;
+
     procedure WebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: XmlDocument; var XmlDocOut: XmlDocument): Boolean
     begin
 
@@ -451,6 +505,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         iAuth.SetAuthorizationValue(Headers, AuthParamsBuff);
         WebRequest.Method := 'POST';
         WebRequest.SetRequestUri(NPRRemoteEndpointSetup."Endpoint URI");
+        if (NPRRemoteEndpointSetup."Connection Timeout (ms)" < 100) then
+            NPRRemoteEndpointSetup."Connection Timeout (ms)" := 10 * 1000;
         WebClient.Timeout := NPRRemoteEndpointSetup."Connection Timeout (ms)";
 
         WebClient.Send(WebRequest, WebResponse);
@@ -507,7 +563,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         if (StrLen(ForeignMemberCardNumber) >= 4) then
             MemberInfoCapture."External Card No. Last 4" := CopyStr(ForeignMemberCardNumber, StrLen(ForeignMemberCardNumber) - 4 + 1);
 
-        exit(UpperCase(TextOk) = 'TRUE');
+        exit(LowerCase(TextOk) = 'true');
     end;
 
     local procedure GetMembershipRequest(ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
@@ -625,10 +681,12 @@ codeunit 6060147 "NPR MM NPR Membership"
         XmlDoc.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
     end;
 
-    local procedure GetMembershipMemberResponse(Prefix: Code[10]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    local procedure GetMembershipMemberResponse(Prefix: Code[10]; var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Element: XmlElement;
+        Node: XmlNode;
+        NodeList: XmlNodeList;
         TextOk: Text;
         ElementPath: Text;
         XmlMessage: Text;
@@ -659,6 +717,13 @@ codeunit 6060147 "NPR MM NPR Membership"
         //      <newsletter>0</newsletter>
         //      <phoneno/>
         //      <email>test0227@test.se</email>
+
+        //      <requestfieldupdate>
+        //        <field entryno="7" fieldno="35">
+        //            <caption>E-Mail Address</caption>
+        //            <currentvalue>paxocuco@mailinator.net</currentvalue>
+        //        </field>
+        //      </requestfieldupdate>
         //  </member>
         // </response>
 
@@ -702,6 +767,22 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
         MemberInfoCapture."E-Mail Address" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), false);
+
+        ElementPath := '//GetMembershipMembers_Result/member/getmembers/response/member/requestfieldupdate';
+        if (NpXmlDomMgt.FindNode(Element.AsXmlNode(), ElementPath, Node)) then begin
+            if (NpXmlDomMgt.FindNodes(Node, 'field', NodeList)) then begin
+                foreach Node in NodeList do begin
+                    Element := Node.AsXmlElement();
+                    TempRequestMemberFieldUpdate."Entry No." := TempRequestMemberFieldUpdate.Count() + 1;
+                    TempRequestMemberFieldUpdate."Remote Entry No." := NpXmlDomMgt.GetAttributeInt(Element, '', 'entryno', true);
+                    TempRequestMemberFieldUpdate."Field No." := NpXmlDomMgt.GetAttributeInt(Element, '', 'fieldno', true);
+                    TempRequestMemberFieldUpdate."Request Datetime" := CurrentDateTime();
+                    TempRequestMemberFieldUpdate."Current Value" := NpXmlDomMgt.GetXmlText(Element, '//currentvalue', MaxStrLen(TempRequestMemberFieldUpdate."Current Value"), true);
+                    TempRequestMemberFieldUpdate.Caption := NpXmlDomMgt.GetXmlText(Element, '//caption', MaxStrLen(TempRequestMemberFieldUpdate.Caption), true);
+                    TempRequestMemberFieldUpdate.Insert();
+                end;
+            end;
+        end;
 
         exit(true);
     end;
@@ -1002,6 +1083,28 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         NotValidReason := '';
         exit(true);
+    end;
+
+    LOCAL procedure UpdateMemberFieldSoapXmlRequest(RequestMemberFieldUpdate: Record "NPR MM Request Member Update"; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
+    var
+        XmlText: Text;
+    begin
+        XmlText :=
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
+            '<soapenv:Header/>' +
+            '<soapenv:Body>' +
+                '<mem:MemberFieldUpdate>' +
+                    StrSubstNo('<mem:entryNo>%1</mem:entryNo>', RequestMemberFieldUpdate."Remote Entry No.") +
+                    StrSubstNo('<mem:currentValue>%1</mem:currentValue>', RequestMemberFieldUpdate."Current Value") +
+                    StrSubstNo('<mem:newValue>%1</mem:newValue>', RequestMemberFieldUpdate."New Value") +
+                '</mem:MemberFieldUpdate>' +
+            '</soapenv:Body>' +
+            '</soapenv:Envelope>';
+
+        SoapAction := 'MemberFieldUpdate';
+
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
+        XmlDoc.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
     end;
 
     procedure XmlSafe(InText: Text): Text
