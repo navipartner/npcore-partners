@@ -1,13 +1,7 @@
 codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
 {
-    // 
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        ActionDescription: Label 'This action provides access to backend manangement function for the member module.';
+        ActionDescription: Label 'This action provides access to backend management function for the member module.';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -48,8 +42,14 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSSetup: Codeunit "NPR POS Setup";
         JSON: Codeunit "NPR POS JSON Management";
+        POSActionMemberMgmt: Codeunit "NPR MM POS Action: MemberMgmt.";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        POSStore: Record "NPR POS Store";
         ItemNumber: Code[20];
+        CardNumber: Text[100];
+        AssignToSale: Label 'Assign created membership to sale?';
     begin
 
         if (not Action.IsThisAction(ActionCode())) then
@@ -59,67 +59,48 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         ItemNumber := CopyStr(JSON.GetStringParameterOrFail('MembershipSalesSetupItemNumber', ActionCode()), 1, MaxStrLen(ItemNumber));
-        CreateMembership(ItemNumber);
+
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetSalespersonRecord(SalespersonPurchaser);
+        POSSetup.GetPOSStore(POSStore);
+
+        CardNumber := CreateMembership(ItemNumber, SalespersonPurchaser.Code, POSStore.Code);
+
+        if (CardNumber <> '') then
+            if (Confirm(AssignToSale, true)) then
+                POSActionMemberMgmt.SelectMembership(POSSession, 2, CardNumber); //2 == NoPrompt
+
     end;
 
-    local procedure CreateMembership(MemberSalesSetupItemNumber: Code[20])
+    local procedure CreateMembership(MemberSalesSetupItemNumber: Code[20]; SalespersonCode: Code[20]; StoreCode: Code[20]) ExternalCardNumber: Text[100];
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MemberInfoCapturePage: Page "NPR MM Member Info Capture";
-        MembershipPage: Page "NPR MM Membership Card";
-        PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipEntryNo: Integer;
-        Membership: Record "NPR MM Membership";
-        ResponseMessage: Text;
+        MembershipMgt: Codeunit "NPR MM Membership Mgt.";
     begin
 
         MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberSalesSetupItemNumber);
 
         MemberInfoCapture.Init();
+#pragma warning disable AA0139
+        MemberInfoCapture."Receipt No." := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890'));
+#pragma warning restore
+        MemberInfoCapture."Line No." := 1;
         MemberInfoCapture."Item No." := MemberSalesSetupItemNumber;
+        MemberInfoCapture."Document No." := SalespersonCode;
+        MemberInfoCapture."Store Code" := StoreCode;
+        MemberInfoCapture.Quantity := 1;
         MemberInfoCapture.Insert();
 
-        MemberInfoCapturePage.SetRecord(MemberInfoCapture);
-        MemberInfoCapture.SetFilter("Entry No.", '=%1', MemberInfoCapture."Entry No.");
-        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+        ExternalCardNumber := MembershipMgt.CreateMembershipInteractive(MemberInfoCapture);
+
+        if (MemberInfoCapture.Get(MemberInfoCapture."Entry No.")) then
+            MemberInfoCapture.Delete();
+
         Commit();
 
-        MemberInfoCapturePage.LookupMode(true);
-        PageAction := MemberInfoCapturePage.RunModal();
-
-        if (PageAction = ACTION::LookupOK) then begin
-            MemberInfoCapturePage.GetRecord(MemberInfoCapture);
-
-            case MembershipSalesSetup."Business Flow Type" of
-
-                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
-                    begin
-                        MembershipEntryNo := MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
-                        Membership.Get(MembershipEntryNo);
-                        MembershipPage.SetRecord(Membership);
-                        Commit();
-                        MembershipPage.RunModal();
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
-                    MembershipManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-
-                MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
-                    MembershipManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
-
-                MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
-                    begin
-                        MembershipManagement.BlockMemberCard(MembershipManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
-                        MembershipManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::ADD_CARD:
-                    MembershipManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-            end;
-
-        end;
+        exit(ExternalCardNumber);
     end;
 }
+
 

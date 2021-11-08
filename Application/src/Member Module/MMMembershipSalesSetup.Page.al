@@ -236,62 +236,41 @@ page 6060125 "NPR MM Membership Sales Setup"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberCommunity: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         MembershipPage: Page "NPR MM Membership Card";
-        PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipEntryNo: Integer;
         Membership: Record "NPR MM Membership";
-        ResponseMessage: Text;
+        ExternalCardNumber: Text[100];
+        MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+        FOREIGN_MEMBERSHIP_CREATED: Label 'Foreign membership created with card number %1';
     begin
 
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
         MemberCommunity.Get(MembershipSetup."Community Code");
         MemberCommunity.CalcFields("Foreign Membership");
-        MemberCommunity.TestField("Foreign Membership", false);
 
         MemberInfoCapture.Init();
         MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
+#pragma warning disable AA0139
+        MemberInfoCapture."Receipt No." := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890'));
+#pragma warning restore
+        MemberInfoCapture."Line No." := 1;
         MemberInfoCapture.Insert();
 
-        MemberInfoCapturePage.SetRecord(MemberInfoCapture);
-        MemberInfoCapture.SetFilter("Entry No.", '=%1', MemberInfoCapture."Entry No.");
-        MemberInfoCapturePage.SetTableView(MemberInfoCapture);
-        Commit();
+        ExternalCardNumber := MembershipMgt.CreateMembershipInteractive(MemberInfoCapture);
 
-        MemberInfoCapturePage.LookupMode(true);
-        PageAction := MemberInfoCapturePage.RunModal();
+        if (ExternalCardNumber <> '') then begin
+            if (MemberCommunity."Foreign Membership") then
+                Message(FOREIGN_MEMBERSHIP_CREATED, ExternalCardNumber);
 
-        if (PageAction = ACTION::LookupOK) then begin
-            MemberInfoCapturePage.GetRecord(MemberInfoCapture);
-
-            case MembershipSalesSetup."Business Flow Type" of
-
-                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
-                    begin
-                        MembershipEntryNo := MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
-                        Membership.Get(MembershipEntryNo);
-                        MembershipPage.SetRecord(Membership);
-                        MembershipPage.Run();
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
-                    MembershipManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-
-                MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
-                    MembershipManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
-
-                MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
-                    begin
-                        MembershipManagement.BlockMemberCard(MembershipManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
-                        MembershipManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::ADD_CARD:
-                    MembershipManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+            if (not MemberCommunity."Foreign Membership") then begin
+                Membership.Get(MemberInfoCapture."Membership Entry No.");
+                MembershipPage.SetRecord(Membership);
+                MembershipPage.Run();
             end;
         end;
+
+        if (MemberInfoCapture.Get(MemberInfoCapture."Entry No.")) then
+            MemberInfoCapture.Delete();
 
     end;
 }

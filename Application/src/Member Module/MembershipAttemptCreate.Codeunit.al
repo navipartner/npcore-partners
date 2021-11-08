@@ -10,6 +10,9 @@ codeunit 6014488 "NPR Membership Attempt Create"
 
     trigger OnRun()
     begin
+
+        ClearLastError();
+
         if (TransactionControl = TransactionControl::DoRollbackOnError) then
             CreateMembership(Rec);
 
@@ -276,7 +279,7 @@ codeunit 6014488 "NPR Membership Attempt Create"
     internal procedure WasSuccessful(var ResponseMessage: Text): Boolean
     begin
         ResponseMessage := GetLastErrorText();
-        exit(ResponseMessage = FORCED_ROLLBACK);
+        exit((ResponseMessage = '') or (ResponseMessage = FORCED_ROLLBACK));
     end;
 
 }
