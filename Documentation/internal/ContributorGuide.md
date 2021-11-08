@@ -13,7 +13,7 @@ However, all documents that deal with back-end stuff that would be more suitable
  ## Before you start writing, ask yourself...
 
 > [!IMPORTANT]
-> It's highly recommended that you first watch [the video](https://documentation.divio.com/) on documentation framework that we used as a model for our own.
+> It's highly recommended that you first watch [the video](https://documentation.divio.com/) on documentation framework that we used to model our own.
 
 - **What do the readers wish to accomplish?**   
   Some users read documentation because they need help in achieving a certain goal, while others need to get acquainted with the product or its individual functionalities. These two groups of people require completely different types of documentation. 
