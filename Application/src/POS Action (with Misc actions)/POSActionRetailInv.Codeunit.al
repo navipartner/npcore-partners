@@ -45,7 +45,7 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
 
     local procedure OnActionProcessInventorySet(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
-        TempRetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
+        RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer";
         RetailInventorySet: Record "NPR RIS Retail Inv. Set";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -59,8 +59,8 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
         if not SelectRetailInventorySetCode(JSON, RetailInventorySet) then
             exit;
 
-        RetailInventorySetMgt.ProcessInventorySet(RetailInventorySet, SaleLinePOS."No.", SaleLinePOS."Variant Code", TempRetailInventoryBuffer);
-        PAGE.RunModal(0, TempRetailInventoryBuffer);
+        RetailInventorySetMgt.ProcessInventorySet(RetailInventorySet, SaleLinePOS."No.", SaleLinePOS."Variant Code", RetailInventoryBuffer);
+        PAGE.RunModal(0, RetailInventoryBuffer);
     end;
 
     local procedure SelectRetailInventorySetCode(JSON: Codeunit "NPR POS JSON Management"; var RetailInventorySet: Record "NPR RIS Retail Inv. Set") EntrySetSelected: Boolean

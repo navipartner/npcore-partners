@@ -13,18 +13,21 @@ page 6151086 "NPR RIS Retail Inv. Set Card"
             {
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Client Type"; Rec."Client Type")
+                {
+                    ToolTip = 'Specifies the value of the web service client type. NOTE: Switching type will reset API values on entries.';
+                    ApplicationArea = NPRRetail;
+                }
             }
-            part(Control6014404; "NPR RIS Retail Inv. Set Sub.")
+            part(InventorySetEntries; "NPR RIS Retail Inv. Set Sub.")
             {
                 SubPageLink = "Set Code" = FIELD(Code);
                 ApplicationArea = NPRRetail;

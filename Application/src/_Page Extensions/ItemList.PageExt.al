@@ -442,9 +442,9 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
     trigger OnOpenPage()
     var
-        RetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
+        NPRRetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
     begin
-        RetailInventoryEnabled := RetailInventorySetMgt.GetRetailInventoryEnabled();
+        RetailInventoryEnabled := NPRRetailInventorySetMgt.IsRetailInventoryEnabled();
         NPR_SetMagentoEnabled();
     end;
 

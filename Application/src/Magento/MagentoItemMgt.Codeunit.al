@@ -341,6 +341,202 @@
         exit(StockQty);
     end;
 
+    procedure CalcQtyOnSalesOrder(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        VariantStockQty: Decimal;
+    begin
+        VariantFilter := UpperCase(VariantFilter);
+        LocationFilter := UpperCase(LocationFilter);
+
+        Qty := 0;
+        if not Item.Get(ItemNo) then
+            exit(0);
+
+        if VariantFilter <> '' then begin
+            Item.SetFilter("Variant Filter", VariantFilter);
+            Item.SetFilter("Location Filter", LocationFilter);
+            Item.CalcFields("Qty. on Sales Order");
+            Qty := Item."Qty. on Sales Order";
+            if Qty < 0 then
+                Qty := 0;
+
+            exit(Qty);
+        end;
+
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if ItemVariant.FindSet() then begin
+            Qty := 0;
+            VariantStockQty := 0;
+            repeat
+                Item.SetFilter("Variant Filter", ItemVariant.Code);
+                Item.SetFilter("Location Filter", LocationFilter);
+                Item.CalcFields("Qty. on Sales Order");
+                VariantStockQty := Item."Qty. on Sales Order";
+                if VariantStockQty < 0 then
+                    VariantStockQty := 0;
+
+                Qty += VariantStockQty;
+            until ItemVariant.Next() = 0;
+
+            exit(Qty);
+        end;
+
+        Item.SetFilter("Location Filter", LocationFilter);
+        Item.CalcFields(Inventory, "Qty. on Sales Order");
+        Qty := Item."Qty. on Sales Order";
+
+        exit(Qty);
+    end;
+
+    procedure CalcQtyOnSalesReturn(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        VariantStockQty: Decimal;
+    begin
+        VariantFilter := UpperCase(VariantFilter);
+        LocationFilter := UpperCase(LocationFilter);
+
+        Qty := 0;
+        if not Item.Get(ItemNo) then
+            exit(0);
+
+        if VariantFilter <> '' then begin
+            Item.SetFilter("Variant Filter", VariantFilter);
+            Item.SetFilter("Location Filter", LocationFilter);
+            Item.CalcFields("Qty. on Sales Return");
+            Qty := Item."Qty. on Sales Return";
+            if Qty < 0 then
+                Qty := 0;
+
+            exit(Qty);
+        end;
+
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if ItemVariant.FindSet() then begin
+            Qty := 0;
+            VariantStockQty := 0;
+            repeat
+                Item.SetFilter("Variant Filter", ItemVariant.Code);
+                Item.SetFilter("Location Filter", LocationFilter);
+                Item.CalcFields("Qty. on Sales Return");
+                VariantStockQty := Item."Qty. on Sales Return";
+                if VariantStockQty < 0 then
+                    VariantStockQty := 0;
+
+                Qty += VariantStockQty;
+            until ItemVariant.Next() = 0;
+
+            exit(Qty);
+        end;
+
+        Item.SetFilter("Location Filter", LocationFilter);
+        Item.CalcFields(Inventory, "Qty. on Sales Return");
+        Qty := Item."Qty. on Sales Return";
+
+        exit(Qty);
+    end;
+
+    procedure CalcQtyOnPurchOrder(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        VariantStockQty: Decimal;
+    begin
+        VariantFilter := UpperCase(VariantFilter);
+        LocationFilter := UpperCase(LocationFilter);
+
+        Qty := 0;
+        if not Item.Get(ItemNo) then
+            exit(0);
+
+        if VariantFilter <> '' then begin
+            Item.SetFilter("Variant Filter", VariantFilter);
+            Item.SetFilter("Location Filter", LocationFilter);
+            Item.CalcFields("Qty. on Purch. Order");
+            Qty := Item."Qty. on Purch. Order";
+            if Qty < 0 then
+                Qty := 0;
+
+            exit(Qty);
+        end;
+
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if ItemVariant.FindSet() then begin
+            Qty := 0;
+            VariantStockQty := 0;
+            repeat
+                Item.SetFilter("Variant Filter", ItemVariant.Code);
+                Item.SetFilter("Location Filter", LocationFilter);
+                Item.CalcFields("Qty. on Purch. Order");
+                VariantStockQty := Item."Qty. on Purch. Order";
+                if VariantStockQty < 0 then
+                    VariantStockQty := 0;
+
+                Qty += VariantStockQty;
+            until ItemVariant.Next() = 0;
+
+            exit(Qty);
+        end;
+
+        Item.SetFilter("Location Filter", LocationFilter);
+        Item.CalcFields(Inventory, "Qty. on Purch. Order");
+        Qty := Item."Qty. on Purch. Order";
+
+        exit(Qty);
+    end;
+
+    procedure CalcQtyOnPurchReturn(ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text) Qty: Decimal
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        VariantStockQty: Decimal;
+    begin
+        VariantFilter := UpperCase(VariantFilter);
+        LocationFilter := UpperCase(LocationFilter);
+
+        Qty := 0;
+        if not Item.Get(ItemNo) then
+            exit(0);
+
+        if VariantFilter <> '' then begin
+            Item.SetFilter("Variant Filter", VariantFilter);
+            Item.SetFilter("Location Filter", LocationFilter);
+            Item.CalcFields("Qty. on Purch. Return");
+            Qty := Item."Qty. on Purch. Return";
+            if Qty < 0 then
+                Qty := 0;
+
+            exit(Qty);
+        end;
+
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if ItemVariant.FindSet() then begin
+            Qty := 0;
+            VariantStockQty := 0;
+            repeat
+                Item.SetFilter("Variant Filter", ItemVariant.Code);
+                Item.SetFilter("Location Filter", LocationFilter);
+                Item.CalcFields("Qty. on Purch. Return");
+                VariantStockQty := Item."Qty. on Purch. Return";
+                if VariantStockQty < 0 then
+                    VariantStockQty := 0;
+
+                Qty += VariantStockQty;
+            until ItemVariant.Next() = 0;
+
+            exit(Qty);
+        end;
+
+        Item.SetFilter("Location Filter", LocationFilter);
+        Item.CalcFields(Inventory, "Qty. on Purch. Return");
+        Qty := Item."Qty. on Purch. Return";
+
+        exit(Qty);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR Magento Setup", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnAfterModifyMagentoSetup(var Rec: Record "NPR Magento Setup"; var xRec: Record "NPR Magento Setup"; RunTrigger: Boolean)
     begin

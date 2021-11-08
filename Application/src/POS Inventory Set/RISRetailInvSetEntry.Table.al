@@ -192,26 +192,29 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
     }
 
     trigger OnInsert()
+    var
+        RetailInvSetMgt: codeunit "NPR RIS Retail Inv. Set Mgt.";
     begin
-        SetApiUrl();
+        RetailInvSetMgt.SetApiUrl(Rec);
     end;
 
     trigger OnModify()
+    var
+        RetailInvSetMgt: codeunit "NPR RIS Retail Inv. Set Mgt.";
     begin
-        SetApiUrl();
+        RetailInvSetMgt.SetApiUrl(Rec);
     end;
 
     trigger OnDelete()
+    begin
+        RemoveApiPassword();
+    end;
+
+    internal procedure RemoveApiPassword()
     var
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
     begin
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             WebServiceAuthHelper.RemoveApiPassword("API Password Key");
-    end;
-
-    procedure SetApiUrl()
-    begin
-        if "Api Url" = '' then
-            "Api Url" := CopyStr(GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"NPR Magento Webservice"), 1, MaxStrLen("Api Url"));
     end;
 }
