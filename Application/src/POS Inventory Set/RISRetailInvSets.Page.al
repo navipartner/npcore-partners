@@ -17,14 +17,17 @@ page 6151085 "NPR RIS Retail Inv. Sets"
             {
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Client Type"; Rec."Client Type")
+                {
+                    ToolTip = 'Specifies the value of the web service client type.';
                     ApplicationArea = NPRRetail;
                 }
             }
