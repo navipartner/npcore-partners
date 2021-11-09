@@ -43,32 +43,6 @@ page 6014602 "NPR Item Variants"
 
             }
         }
-
-        area(FactBoxes)
-        {
-            part(ItemVariantsFactBox; "NPR Item Variants FactBox")
-            {
-
-                Caption = 'Availability FactBox';
-                SubPageLink = "No." = FIELD("Item No.");
-                ApplicationArea = all;
-                Visible = true;
-
-            }
-            systempart(Control1900383207; Links)
-            {
-                Visible = false;
-                ApplicationArea = NPRRetail;
-
-            }
-            systempart(Control1905767507; Notes)
-            {
-                Visible = false;
-                ApplicationArea = NPRRetail;
-
-            }
-
-        }
     }
 
     actions
@@ -93,27 +67,5 @@ page 6014602 "NPR Item Variants"
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    var
-        Item: Record Item;
-    begin
-        Item.Reset();
-        Item.Get(Rec."Item No.");
-        Item.SetFilter("No.", '=%1', Rec."Item No.");
-        Item.SetFilter("Variant Filter", '=%1', Rec.Code);
-        Item.SetFilter("Date Filter", '..%1', Today);
-        if (LocationCodeFilter <> '') then
-            Item.SetFilter("Location Filter", '=%1', LocationCodeFilter);
-        Item.CalcFields(Inventory, "Net Change");
-    end;
-
-    var
-        LocationCodeFilter: Code[10];
-
-    procedure SetLocationCodeFilter(LocationCodeFilterIn: Code[10])
-    begin
-        LocationCodeFilter := LocationCodeFilterIn;
-    end;
 }
 
