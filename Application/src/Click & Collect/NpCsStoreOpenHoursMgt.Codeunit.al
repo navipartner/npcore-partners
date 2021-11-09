@@ -398,7 +398,7 @@
         exit(PeriodNoFilter);
     end;
 
-    local procedure Initialize(SetCode: Code[20]; NewStartDate: Date; NewEndDate: Date)
+    internal procedure Initialize(SetCode: Code[20]; NewStartDate: Date; NewEndDate: Date)
     begin
         if Initialized and (NewStartDate = StartDate) and (NewEndDate = EndDate) then
             exit;
@@ -409,6 +409,17 @@
         StartDate := NewStartDate;
         EndDate := NewEndDate;
         SetupOpeningHourEntries(SetCode);
+    end;
+
+    internal procedure GetTempNpCsOpenHourCalendarEntry(var OutTempNpCsOpenHourCalendarEntry: Record "NPR NpCs Open. Hour Cal. Entry" temporary)
+    begin
+        if not OutTempNpCsOpenHourCalendarEntry.IsTemporary() then
+            Exit;
+        If TempNpCsOpenHourCalendarEntry.FindSet() then
+            repeat
+                OutTempNpCsOpenHourCalendarEntry := TempNpCsOpenHourCalendarEntry;
+                OutTempNpCsOpenHourCalendarEntry.Insert();
+            until TempNpCsOpenHourCalendarEntry.Next() = 0;
     end;
 }
 
