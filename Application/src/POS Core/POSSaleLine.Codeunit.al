@@ -158,10 +158,8 @@ codeunit 6150706 "NPR POS Sale Line"
 
         Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
-        if ((Line.Type = Line.Type::Item) and (Line."Variant Code" = '') and (ItemVariantIsRequired(Line."No."))) then begin
-            FillVariantThroughLookUp(Line."No.", Line."Variant Code");
-            if Line."Variant Code" = '' then
-                Error(ITEM_REQUIRES_VARIANT, Line."No.");
+        if (Line.Type = Line.Type::Item) and (Line."Variant Code" = '') then begin
+            Line."Variant Code" := FillVariantThroughLookUp(Line."No.");
             Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
         end;
 
@@ -411,46 +409,38 @@ codeunit 6150706 "NPR POS Sale Line"
         POSSale.RefreshCurrent();
     end;
 
-    local procedure FillVariantThroughLookUp(ItemNo: Code[20]; var VariantCode: Code[10])
+    local procedure FillVariantThroughLookUp(ItemNo: Code[20]): Code[10]
     var
-        Item: Record Item;
-        ItemVariant: Record "Item Variant";
-        ItemVariants: Page "NPR Item Variants";
-        POSStore: Record "NPR POS Store";
+        ItemVariantBuffer: Record "NPR Item Variant Buffer";
+        ItemVariants: Page "NPR Item Variants Lookup";
     begin
-        if ItemNo = '' then exit;
-        if not Item.Get(ItemNo) then exit;
+        FillVariantBuffer(ItemNo, ItemVariantBuffer);
+        if ItemVariantBuffer.IsEmpty() then
+            exit('');
 
-        ItemVariant.SetFilter(ItemVariant."Item No.", Item."No.");
-        ItemVariant.SetFilter(ItemVariant."NPR Blocked", '=%1', false);
-        if ItemVariant.IsEmpty() then exit;
-
-        if POSStore.Get(Sale."POS Store Code") then
-            ItemVariants.SetLocationCodeFilter(POSStore."Location Code");
-
-        ItemVariants.Editable(false);
-        ItemVariants.LookupMode(true);
-        ItemVariants.SetTableView(ItemVariant);
-        if ItemVariants.RunModal() = ACTION::LookupOK then begin
-            ItemVariants.GetRecord(ItemVariant);
-            VariantCode := ItemVariant.Code;
-        end else begin
-            VariantCode := '';
-        end;
+        if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
+            ItemVariants.GetRecord(ItemVariantBuffer);
+            exit(ItemVariantBuffer.Code);
+        end
+        else
+            Error(ITEM_REQUIRES_VARIANT, ItemNo);
     end;
 
-    local procedure ItemVariantIsRequired(ItemNo: Code[20]) IsRequired: Boolean
+    local procedure FillVariantBuffer(ItemNo: Code[20]; var TempItemVariantBuffer: Record "NPR Item Variant Buffer")
     var
-        Item: Record Item;
-        ItemVariant: Record "Item Variant";
+        ItemVariantsQuery: Query "NPR Item Variants";
     begin
-        if ItemNo = '' then exit;
-        if not Item.Get(ItemNo) then exit;
+        ItemVariantsQuery.SetRange(Item_No_, ItemNo);
+        ItemVariantsQuery.Open();
 
-        ItemVariant.SetFilter(ItemVariant."Item No.", Item."No.");
-        ItemVariant.SetFilter(ItemVariant."NPR Blocked", '=%1', false);
-
-        IsRequired := not ItemVariant.IsEmpty();
+        while ItemVariantsQuery.Read() do begin
+            TempItemVariantBuffer.Init();
+            TempItemVariantBuffer.Code := ItemVariantsQuery.Code;
+            TempItemVariantBuffer.Description := ItemVariantsQuery.Description;
+            TempItemVariantBuffer."Description 2" := ItemVariantsQuery.Description_2;
+            TempItemVariantBuffer.Insert();
+        end;
+        ItemVariantsQuery.Close();
     end;
 
     procedure InsertLineRaw(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean): Boolean
