@@ -336,7 +336,7 @@
             "id": "AS0006",
             "action": "Warning",
             "justification": "Temporarily disabled for PR 53324."
-        },        
+        },       
         {
             "id": "AS0018",
             "action":"Hidden",

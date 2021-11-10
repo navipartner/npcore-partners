@@ -276,7 +276,7 @@
                     TagId := CopyStr(ItemIdentifier, 5);
 
                     ItemReference.SetFilter("Reference No.", '=%1', CopyStr(TagId, 1, MaxStrLen(ItemReference."Reference No.")));
-                    ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Retail Serial No.");
+                    ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"NPR Retail Serial No.");
                     ItemReference.FindFirst();
                     FirstRec := Format(ItemReference);
                     ItemReference.FindLast();
@@ -343,7 +343,7 @@
                     Line."No." := ItemReference."Item No.";
                     Line."Variant Code" := ItemReference."Variant Code";
                     Line."Unit of Measure Code" := ItemReference."Unit of Measure";
-                    if (ItemReference."Reference Type" = ItemReference."Reference Type"::"Retail Serial No.") then
+                    if (ItemReference."Reference Type" = ItemReference."Reference Type"::"NPR Retail Serial No.") then
                         Line."Serial No. not Created" := ItemReference."Reference No.";
                 end;
             ItemIdentifierType::SerialNoItemCrossReference:
@@ -357,7 +357,7 @@
                     Line."No." := ItemReference."Item No.";
                     Line."Variant Code" := ItemReference."Variant Code";
                     Line."Unit of Measure Code" := ItemReference."Unit of Measure";
-                    if (ItemReference."Reference Type" = ItemReference."Reference Type"::"Retail Serial No.") then
+                    if (ItemReference."Reference Type" = ItemReference."Reference Type"::"NPR Retail Serial No.") then
                         Line."Serial No. not Created" := ItemReference."Reference No.";
                 end;
         end;
