@@ -1,10 +1,16 @@
 - name: Introduction
   href: intro.md
-- name: How-To  
+- name: Tutorial
   items:
-  - name: Example
-    href: howto/examplehowto.md
-- name: Explanation  
+  - name: Ticket Setup Wizard
+    href: tutorial/ticket_tutorial.md  
+- name: How-To
   items:
-  - name: Example
-    href: explanation/exampleexplanation.md    
+  - name: Issue tickets
+    href: howto/issue_ticket.md
+- name: Explanation
+  items:
+  - name: Ticket
+    href: explanation/ticket.md
+  - name: Admission
+    href: explanation/admission.md
