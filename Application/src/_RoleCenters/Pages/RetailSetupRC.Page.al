@@ -583,6 +583,9 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Runs the Variety page';
                     ApplicationArea = NPRRetail;
                 }
+
+
+
                 action("Variety Fields Setup")
                 {
                     Caption = 'Variety Fields Setup';
@@ -591,6 +594,17 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Executes the Variety Fields Setup action';
                     ApplicationArea = NPRRetail;
                 }
+
+                action("Description Control")
+                {
+                    Caption = 'Description Control';
+                    RunObject = Page "NPR Description Control";
+
+                    ToolTip = 'Description Control';
+                    ApplicationArea = NPRRetail;
+                }
+
+
                 action("Item Categories")
                 {
                     Caption = 'Item Categories';
