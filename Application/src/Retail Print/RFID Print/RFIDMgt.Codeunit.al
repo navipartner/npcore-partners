@@ -56,7 +56,7 @@ codeunit 6059831 "NPR RFID Mgt."
         ItemReference.Init();
         ItemReference.Validate("Item No.", ItemNo);
         ItemReference.Validate("Variant Code", VariantCode);
-        ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"Retail Serial No.");
+        ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
         ItemReference.Validate("Reference No.", TagValue);
         ItemReference.Insert(true);
     end;

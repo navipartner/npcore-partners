@@ -165,6 +165,8 @@ codeunit 6014607 "NPR Upgrade Tag Definitions"
                     'RetailInventorySets':
                         exit('RetailInventorySetsPasswordUpg-20211029');
                 end;
+            Codeunit::"NPR Enum Upgrade":
+                exit('NPREnumUpgrade-20211110');
         end;
     end;
 }
