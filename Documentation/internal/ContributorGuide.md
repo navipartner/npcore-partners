@@ -1,14 +1,16 @@
 # Contributor guide 
+
+Technical documentation helps an intended audience use your product, understand your processes, and get unstuck. Whether that audience is end-users, administrators, colleagues, or technicians doesn’t really matter. What does matter is that it’s clear, searchable, and helpful for them.           
+
 This document guides you through the process of standardizing and delivering external documentation that complies with our users' needs.
 
 It's recommended that you read through the whole guide as a part of the onboarding process for delivering documentation, but its main purpose is that of a reference which you can turn to whenever you're not sure how to structure your topics. If you have dilemmas about the technical side of the documentation process, refer to the Technical Guide.
 
 ## Which documentation is external?
-Whenever you're not sure which documents should be structured in the way described in this guide, this is a good rule of thumb:
-All documents that describe something customers ask consultants to help them with on a regular or a semi-regular basis are potential candidates for external documentation. 
+External documentation describes or contains instructions for something customers ask consultants to help them with on a regular or a semi-regular basis. 
 
 
-However, all documents that deal with back-end stuff that would be more suitable for developers or hosting should be added to the /internal/ folder exclusively.
+Internal documentation deals with back-end information that would be more suitable for developers or hosting. This kind of documentation should be added to the /internal/ folder exclusively.
 
  ## Before you start writing, ask yourself...
 

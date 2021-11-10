@@ -1,16 +1,17 @@
-- name: Getting Started
+- name: Getting started
   href: gettingstarted/toc.yml
-- name: POS Unit
+- name: POS unit
   href: posunit/toc.yml
-- name: POS Fiscalization
+- name: POS fiscalization
   href: posfiscalization/toc.yml
-- name: POS Tax Free
+- name: POS tax Free
   href: postaxfree/toc.yml  
-- name: Electronic Funds Transfer
+- name: Electronic funds transfer
   href: eft/toc.yml
-- name: Ticket Module
+- name: Ticket module
   href: ticket/toc.yml
-- name: Member Module
+- name: Member module
   href: member/toc.yml
-- name: Data Replication Module
+- name: Data replication module
   href: replication/toc.yml
+- name: Webshop integrations

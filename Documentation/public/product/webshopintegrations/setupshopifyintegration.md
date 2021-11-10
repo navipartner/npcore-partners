@@ -86,7 +86,7 @@ To set up the Shopify integration:
 
    The following data log subscribers are required:
 
-| Table ID    | Table Name              | Direct Data Processing Code unit           | Integration Area                       |
+| Table ID    | Table Name              | Direct Data Processing Codeunit           | Itegration Area                       |
 | :---        |    :----:               |                                      ---: |                                  ---: |
 | 27          | Item                    | 70010442 NP-Spfy Item Mgt.                | Item List Integration                 |
 | 32          | Item Ledger Entry       | 70010446 NP-Spfy Inventory Level Mgt.     | Available Inventory Updates           |
@@ -140,6 +140,3 @@ To include an item into the synchronization scope:
 > The blocked items and item variants are not sent to Shopify.
 
 2. 
-
-
-
