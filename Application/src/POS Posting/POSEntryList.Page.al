@@ -3,7 +3,8 @@ page 6150652 "NPR POS Entry List"
     Caption = 'POS Entry List';
     CardPageID = "NPR POS Entry Card";
     DeleteAllowed = false;
-    Editable = false;
+    InsertAllowed = false;
+
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,POS Entry Lists,Failed POS Lists,Posting Entries';
     SourceTable = "NPR POS Entry";
@@ -24,6 +25,7 @@ page 6150652 "NPR POS Entry List"
                 {
 
                     Visible = false;
+
                     ToolTip = 'Specifies the value of the System Entry field';
                     ApplicationArea = NPRRetail;
                 }
@@ -31,6 +33,7 @@ page 6150652 "NPR POS Entry List"
                 {
 
                     Visible = false;
+
                     ToolTip = 'Specifies the value of the Entry No. field';
                     ApplicationArea = NPRRetail;
                 }
@@ -112,6 +115,7 @@ page 6150652 "NPR POS Entry List"
                 }
                 field(Description; Rec.Description)
                 {
+
 
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
@@ -212,6 +216,7 @@ page 6150652 "NPR POS Entry List"
                 field("Currency Code"; Rec."Currency Code")
                 {
 
+
                     Visible = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
                     ApplicationArea = NPRRetail;
@@ -262,7 +267,7 @@ page 6150652 "NPR POS Entry List"
             part(Sales; "NPR POS Sale Line Subpage")
             {
                 Caption = 'Sales';
-                Editable = false;
+
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
                 ApplicationArea = NPRRetail;
@@ -271,7 +276,7 @@ page 6150652 "NPR POS Entry List"
             part(Payments; "NPR POS Paym. Line Subpage")
             {
                 Caption = 'Payments';
-                Editable = false;
+
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
                 ApplicationArea = NPRRetail;
@@ -280,7 +285,7 @@ page 6150652 "NPR POS Entry List"
             part(Taxes; "NPR POS Tax Line Subpage")
             {
                 Caption = 'Taxes';
-                Editable = false;
+
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive)
                               ORDER(Ascending);
