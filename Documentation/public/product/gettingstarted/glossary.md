@@ -21,3 +21,10 @@ This topic contains the list of Business Central and NPRetail specific terms tha
 - **Stargate** - Communication layer that spans all three levels of NP Retail: back end (AL), front end (JavaScript) and Major Tom (C#). Is currently being outphased, for the hardware connector.
 - **Crane** - An internal tool that helps to manage MS Business Central/Dynamics NAV development environments using Docker containers. They can be ordered from the case system.
 - **Dimensions** - Values that categorize entries so you can track and analyze them on documents, such as sales orders. Dimensions can, for example, indicate the project or department an entry came from. For more information, refer to the [Microsoft documentation](https://docs.microsoft.com/en-us/dynamics365/business-central/finance-dimensions).
+- **Magento**/**The web**- 
+- **The backend** - is that NP Ecommerce?
+- **Clickonce** - A deployment technology that enables you to create self-updating Windows-based applications that can be installed and run with minimal user interraction.
+- **Click & Collect** - A hybrid e-commerce model in which people purchase or select items online and pick them up in-store.
+- **Dynamics NAV** - an easily adaptable ERP solution which helps small and medium-sized businesses to automate and connect their sales, purchasing, operations, accounting, and stock management. The latest version of Dynamics NAV is Dynamics 365 Business Central.
+- **GDPR (General Data Protection Regulation)** - A legal framework that sets guidelines for the collection and processing of personal information from individuals who live in the European Union. It mandates that the EU visitors be given a number of data disclosures.
+
