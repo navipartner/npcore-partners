@@ -69,7 +69,7 @@ table 6014455 "NPR CleanCash Trans. Response"
             InitValue = NO_VALUE;
         }
 
-        field(230; "CleanCash Storage Status"; Enum "NPR CleanCash Unit Storage Status")
+        field(230; "CleanCash Storage Status"; Enum "NPR CC Unit Stor. Stat.")
         {
             Caption = 'CleanCash Unit Storage Status';
             DataClassification = CustomerContent;

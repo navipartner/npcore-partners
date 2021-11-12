@@ -32,7 +32,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     var
-        mobilePayAuxRequestType: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayAuxRequestType: Enum "NPR MobilePayV10 Aux. Req.";
     begin
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := Tok_INTEGRATIONTYPE;
@@ -258,7 +258,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     var
         eftTrxRequest: Record "NPR EFT Transaction Request";
         eftFramework: Codeunit "NPR EFT Framework Mgt.";
-        mobilePayAuxRequest: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayAuxRequest: Enum "NPR MobilePayV10 Aux. Req.";
     begin
         eftFramework.CreateAuxRequest(eftTrxRequest, eftSetup, mobilePayAuxRequest::CreatePOSRequest.AsInteger(), eftSetup."POS Unit No.", '');
         Commit();
@@ -273,7 +273,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     var
         eftTrxRequest: Record "NPR EFT Transaction Request";
         eftFramework: Codeunit "NPR EFT Framework Mgt.";
-        mobilePayAuxRequest: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayAuxRequest: Enum "NPR MobilePayV10 Aux. Req.";
     begin
         eftFramework.CreateAuxRequest(eftTrxRequest, eftSetup, mobilePayAuxRequest::DeletePOSRequest.AsInteger(), eftSetup."POS Unit No.", '');
         Commit();

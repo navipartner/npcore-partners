@@ -14,7 +14,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
 
     internal procedure SendTrxRequest(EftTrxRequest: record "NPR EFT Transaction Request")
     var
-        mobilePayAuxRequestType: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayAuxRequestType: Enum "NPR MobilePayV10 Aux. Req.";
         mobilePayCorrelation: Codeunit "NPR MobilePayV10 Correlat. ID";
     begin
         mobilePayCorrelation.GenerateNewID(); //For mobilepays backend to correlate create, polling, capture/cancel requests.
@@ -492,7 +492,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         token: Text;
         eftTrxRequest: Record "NPR EFT Transaction Request";
         eftFramework: Codeunit "NPR EFT Framework Mgt.";
-        mobilePayAuxRequest: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayAuxRequest: Enum "NPR MobilePayV10 Aux. Req.";
     begin
         if mobilePayToken.TryGetToken(token) then
             exit(token);
@@ -836,7 +836,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
         eftTransRequest: Record "NPR EFT Transaction Request";
         eftFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         mobilePayV10GetPayment: Codeunit "NPR MobilePayV10 Get Payment";
-        mobilePayV10AuxiliaryRequest: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayV10AuxiliaryRequest: Enum "NPR MobilePayV10 Aux. Req.";
         success: Boolean;
     begin
         tempMobilePayV10Payment.Reset();
@@ -866,7 +866,7 @@ codeunit 6014519 "NPR MobilePayV10 Protocol"
     var
         eftFramework: Codeunit "NPR EFT Framework Mgt.";
         eftTrxRequest: Record "NPR EFT Transaction Request";
-        mobilePayAuxRequest: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayAuxRequest: Enum "NPR MobilePayV10 Aux. Req.";
         success: Boolean;
         mobilePayCancelPayment: Codeunit "NPR MobilePayV10 Can.Payment";
         mobilePayCancelRefund: Codeunit "NPR MobilePayV10 Can. Refund";

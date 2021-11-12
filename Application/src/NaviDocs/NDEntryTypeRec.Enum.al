@@ -1,4 +1,4 @@
-enum 6014463 "NPR NaviDocs Entry Type (Recipient)"
+enum 6014463 "NPR ND Entry Type (Rec.)"
 {
     Extensible = true;
 

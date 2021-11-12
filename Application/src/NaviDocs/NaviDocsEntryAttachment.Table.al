@@ -35,7 +35,7 @@ table 6059944 "NPR NaviDocs Entry Attachment"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(50; "Internal Type"; Enum "NPR NaviDocs Entry Att. Internal Type")
+        field(50; "Internal Type"; Enum "NPR ND Entry Att. Int. Type")
         {
             Caption = 'Internal Type';
             DataClassification = CustomerContent;

@@ -62,7 +62,7 @@ table 6059960 "NPR MCS Webcam Arg. Table"
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
-        field(13; "Image Orientation"; enum "NPR MCS API Setup Image Orientation")
+        field(13; "Image Orientation"; enum "NPR MCS API Setup Img Orien.")
         {
             Caption = 'Image Orientation';
             DataClassification = CustomerContent;

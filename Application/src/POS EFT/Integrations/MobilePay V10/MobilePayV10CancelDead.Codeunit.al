@@ -32,7 +32,7 @@ codeunit 6014510 "NPR MobilePayV10 CancelDead"
         mobilePayV10GetPayment: Codeunit "NPR MobilePayV10 Get Payment";
         eftFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         eftTransRequest: Record "NPR EFT Transaction Request";
-        mobilePayV10AuxiliaryRequest: Enum "NPR MobilePayV10 Auxiliary Request";
+        mobilePayV10AuxiliaryRequest: Enum "NPR MobilePayV10 Aux. Req.";
         mobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
         tempMobilePayV10Payment: Record "NPR MobilePayV10 Payment" temporary;
         tempMobilePayV10Payment2: Record "NPR MobilePayV10 Payment" temporary;
