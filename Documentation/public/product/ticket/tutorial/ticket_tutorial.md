@@ -10,6 +10,6 @@ This tutorial will teach you how to create the setup for a fully functional tick
 
 The **Ticket BOM** page will open and show the created setup.
 
-## Next Step:
+## Next Steps:
  - [Issue tickets from Business Central](../howto/issue_ticket.md)
  - [Issue tickets from POS](../404.md)
