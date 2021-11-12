@@ -575,14 +575,14 @@ page 6014410 "NPR APIV1 - Vendors"
 #ENDIF
                     EntityName = 'picture';
                     EntitySetName = 'pictures';
-                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(3);
+                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(Vendor);
                 }
                 part(defaultDimensions; "NPR APIV1 - Default Dimensions")
                 {
                     Caption = 'Default Dimensions';
                     EntityName = 'defaultDimension';
                     EntitySetName = 'defaultDimensions';
-                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(3);
+                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(Vendor);
                 }
 
                 //part(agedAccountsPayable; "APIV2 - Aged AP")
