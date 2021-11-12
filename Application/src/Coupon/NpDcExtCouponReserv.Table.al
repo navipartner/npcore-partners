@@ -18,12 +18,10 @@ table 6151605 "NPR NpDc Ext. Coupon Reserv."
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(10; "Document Type"; Option)
+        field(10; "Document Type"; Enum "Sales Document Type")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         }
         field(15; "Document No."; Code[20])
         {

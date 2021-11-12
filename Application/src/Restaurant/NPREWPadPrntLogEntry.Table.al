@@ -25,12 +25,10 @@ table 6150671 "NPR NPRE W.Pad Prnt LogEntry"
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Print/Prod. Cat.";
         }
-        field(5; "Flow Status Object"; Option)
+        field(5; "Flow Status Object"; Enum "NPR NPRE Status Object")
         {
             Caption = 'Flow Status Object';
             DataClassification = CustomerContent;
-            OptionCaption = 'Seating,Waiter Pad,Waiter Pad Line Meal Flow,Waiter Pad Line Status';
-            OptionMembers = Seating,WaiterPad,WaiterPadLineMealFlow,WaiterPadLineStatus;
         }
         field(6; "Flow Status Code"; Code[10])
         {

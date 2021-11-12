@@ -568,30 +568,15 @@ page 6014507 "NPR APIV1 - Customers"
 #ENDIF
                     EntityName = 'picture';
                     EntitySetName = 'pictures';
-                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(1);
+                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(Customer);
                 }
                 part(defaultDimensions; "NPR APIV1 - Default Dimensions")
                 {
                     Caption = 'Default Dimensions';
                     EntityName = 'defaultDimension';
                     EntitySetName = 'defaultDimensions';
-                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(1);
+                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(Customer);
                 }
-                // part(agedAccountsReceivable; "APIV2 - Aged AR")
-                // {
-                //     Caption = 'Aged Accounts Receivable';
-                //     Multiplicity = ZeroOrOne;
-                //     EntityName = 'agedAccountsReceivable';
-                //     EntitySetName = 'agedAccountsReceivables';
-                //     SubPageLink = AccountId = Field(SystemId);
-                // }
-                // part(contactsInformation; "APIV2 - Contacts Information")
-                // {
-                //     Caption = 'Contacts Information';
-                //     EntityName = 'contactInformation';
-                //     EntitySetName = 'contactsInformation';
-                //     SubPageLink = "Related Id" = field(SystemId), "Related Type" = const(1);
-                // }
             }
         }
     }

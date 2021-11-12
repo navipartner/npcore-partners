@@ -595,14 +595,14 @@ page 6014501 "NPR APIV1 - Items"
 #ENDIF
                     EntityName = 'picture';
                     EntitySetName = 'pictures';
-                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(2);
+                    SubPageLink = Id = Field(SystemId), "Parent Type" = const(Item);
                 }
                 part(defaultDimensions; "NPR APIV1 - Default Dimensions")
                 {
                     Caption = 'Default Dimensions';
                     EntityName = 'defaultDimension';
                     EntitySetName = 'defaultDimensions';
-                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(2);
+                    SubPageLink = ParentId = Field(SystemId), "Parent Type" = const(Item);
                 }
                 part(itemVariants; "NPR APIV1 - Item Variants")
                 {
