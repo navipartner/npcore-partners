@@ -45,7 +45,7 @@ table 6150616 "NPR POS Payment Method"
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }
-        field(28; "Account Type"; Enum "NPR POS Payment Method Account Type")
+        field(28; "Account Type"; Enum "NPR POS Pay. Met. Acc. Type")
         {
             Caption = 'Account Type';
             DataClassification = CustomerContent;

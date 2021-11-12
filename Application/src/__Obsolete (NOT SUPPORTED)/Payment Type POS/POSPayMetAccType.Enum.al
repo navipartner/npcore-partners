@@ -1,4 +1,4 @@
-enum 6014445 "NPR POS Payment Method Account Type"
+enum 6014445 "NPR POS Pay. Met. Acc. Type"
 {
 
     value(0; "G/L Account")

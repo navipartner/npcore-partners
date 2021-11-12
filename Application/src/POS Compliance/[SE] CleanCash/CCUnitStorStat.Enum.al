@@ -1,4 +1,4 @@
-enum 6014404 "NPR CleanCash Unit Storage Status"
+enum 6014404 "NPR CC Unit Stor. Stat."
 {
     Extensible = true;
     value(0; OK)
