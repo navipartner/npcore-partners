@@ -80,6 +80,10 @@ dotnet
         Culture = 'neutral';
         PublicKeyToken = 'b77a5c561934e089';
 
+        type("System.Reflection.Assembly"; "NPRNetAssembly")
+        {
+        }
+
         type("System.String"; "NPRNetString")
         {
         }
@@ -298,6 +302,14 @@ dotnet
 
     assembly("Newtonsoft.Json")
     {
+#if BC17
+        Version = '10.0.0.0';
+#else
+        Version = '11.0.0.0';
+#endif
+        Culture = 'neutral';
+        PublicKeyToken = '30ad4fe6b2a6aeed';
+
         type("Newtonsoft.Json.Linq.JValue"; "NPRNetJValue")
         {
         }
@@ -977,4 +989,15 @@ dotnet
             IsControlAddIn = true;
         }
     }
+    assembly("NavHelper.AssemblyResolver")
+    {
+        Version = '2.4.0.0';
+        Culture = 'neutral';
+        PublicKeyToken = 'cc06fd55bdc3ade8';
+
+        type("NavHelper.AssemblyResolver.AssemblyResolver"; "NPRNetAssemblyResolver")
+        {
+        }
+    }
+
 }
