@@ -4,8 +4,6 @@ The **Ticket** is the entity that links all properties and characteristics of a 
 
 The ticket information structure is complex and consists of several entities to be able to present its capabilities and capture all events when a ticket is used.
 
-
-
 ### Tutorial
  - [Create setup for a ticket](../tutorial/ticket_tutorial.md)
 
