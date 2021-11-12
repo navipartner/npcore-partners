@@ -479,6 +479,12 @@ table 6184495 "NPR EFT Transaction Request"
             Caption = 'Access Token';
             DataClassification = CustomerContent;
         }
+        field(800; "Matched in Reconciliation"; Boolean)
+        {
+            CalcFormula = exist("NPR EFT Recon. Line" where("Applied Entry No." = field("Entry No.")));
+            Caption = 'Matched in Reconciliation';
+            FieldClass = FlowField;
+        }
         field(10000; "FF Moved to POS Entry"; Boolean)
         {
             CalcFormula = Exist("NPR POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));
@@ -508,6 +514,9 @@ table 6184495 "NPR EFT Transaction Request"
         {
         }
         key(key7; "Integration Type", "Processing Type", "External Result Known")
+        {
+        }
+        key(Key8; "DCC Amount")
         {
         }
     }
