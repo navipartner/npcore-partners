@@ -53,7 +53,7 @@ table 6059955 "NPR MCS API Setup"
                 end;
             end;
         }
-        field(13; "Image Orientation"; Enum "NPR MCS API Setup Image Orientation")
+        field(13; "Image Orientation"; Enum "NPR MCS API Setup Img Orien.")
         {
             Caption = 'Image Orientation';
             DataClassification = CustomerContent;

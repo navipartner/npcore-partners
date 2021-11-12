@@ -1,4 +1,4 @@
-enum 6014466 "NPR MobilePayV10 Auxiliary Request"
+enum 6014466 "NPR MobilePayV10 Aux. Req."
 {
     Extensible = false;
 

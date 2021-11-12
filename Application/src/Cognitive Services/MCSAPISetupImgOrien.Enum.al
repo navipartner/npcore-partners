@@ -1,4 +1,4 @@
-enum 6014442 "NPR MCS API Setup Image Orientation"
+enum 6014442 "NPR MCS API Setup Img Orien."
 {
     Extensible = true;
 

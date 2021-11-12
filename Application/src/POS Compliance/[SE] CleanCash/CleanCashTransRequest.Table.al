@@ -41,7 +41,7 @@ table 6014438 "NPR CleanCash Trans. Request"
             Description = 'Specifies when request was created.';
         }
 
-        field(25; "Request Send Status"; Enum "NPR CleanCash Transaction Status")
+        field(25; "Request Send Status"; Enum "NPR CC Transaction Status")
         {
             Caption = 'Request Send Status';
             DataClassification = CustomerContent;
@@ -137,7 +137,7 @@ table 6014438 "NPR CleanCash Trans. Request"
             Description = 'CleanCash unit main status.';
             InitValue = NO_VALUE;
         }
-        field(230; "CleanCash Storage Status"; Enum "NPR CleanCash Unit Storage Status")
+        field(230; "CleanCash Storage Status"; Enum "NPR CC Unit Stor. Stat.")
         {
             Caption = 'CleanCash Unit Storage Status';
             DataClassification = CustomerContent;

@@ -101,7 +101,7 @@ table 6059768 "NPR NaviDocs Entry"
             Editable = false;
             DataClassification = CustomerContent;
         }
-        field(190; "Type (Recipient)"; Enum "NPR NaviDocs Entry Type (Recipient)")
+        field(190; "Type (Recipient)"; Enum "NPR ND Entry Type (Rec.)")
         {
             Caption = 'Type (Recipient)';
             DataClassification = CustomerContent;
