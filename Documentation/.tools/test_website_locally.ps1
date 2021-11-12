@@ -3,7 +3,11 @@ param (
     [Parameter(Mandatory=$false)]
     [string]$workspaceFolder = "..\..",  #if .ps1 file is executed directly in cloned project
     [Parameter(Mandatory=$false)]
-    [string]$docfxUrl = "https://github.com/dotnet/docfx/releases/download/v2.58.4/docfx.zip"
+    [string]$docfxUrl = "https://github.com/dotnet/docfx/releases/download/v2.58.4/docfx.zip",
+    [Parameter(Mandatory=$false)]
+    [int] $port = 8080,
+    [Parameter(Mandatory=$false)]
+    [switch] $forceDownload = $false
 )
 $ErrorActionPreference = 'Stop';
 
@@ -15,14 +19,16 @@ Write-Host "Cleaning and creating docfx folders"
 
 $downloadFolder = ($workspaceFolder + "\Documentation\.tools\docfx\download")
 $buildFolder = ($workspaceFolder + "\Documentation\.tools\docfx\_site")
-Remove-Item $downloadFolder -Recurse -ErrorAction Ignore
 Remove-Item $buildFolder -Recurse -ErrorAction Ignor
-New-Item -ItemType Directory -Force -Path $downloadFolder
 
-Write-Host "Downloading docfx"
+if (-not (Test-Path $($downloadFolder+"\docfx.exe") -PathType Leaf) -or $forceDownload) {
+    Remove-Item $downloadFolder -Recurse -ErrorAction Ignore
+    New-Item -ItemType Directory -Force -Path $downloadFolder
 
-Invoke-WebRequest -OutFile ($downloadFolder+"\docfx.zip") $docfxUrl
-Expand-Archive -Path ($downloadFolder+"\docfx.zip") -DestinationPath $downloadFolder
+    Write-Host "Downloading docfx to: " ($downloadFolder+"\docfx.zip")
+    Invoke-WebRequest -OutFile ($downloadFolder+"\docfx.zip") $docfxUrl
+    Expand-Archive -Path ($downloadFolder+"\docfx.zip") -DestinationPath $downloadFolder
+}
 
 Write-Host "Executing docfx"
 
@@ -37,4 +43,4 @@ Copy-Item -Path ($workspaceFolder + "\Documentation\public\openapi\*") -Destinat
 Copy-Item ($workspaceFolder + "\Documentation\.tools\rapidocs\sandbox.html") -Destination ($buildFolder + "\api\")
 
 Write-Host "Serve site on localhost"
-& ($downloadFolder + "\docfx.exe") "serve" $buildFolder "-p 8080"
+& ($downloadFolder + "\docfx.exe") "serve" $buildFolder "-p" $port
