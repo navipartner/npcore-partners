@@ -2,15 +2,15 @@
   href: intro.md
 - name: Tutorial
   items:
-  - name: Ticket Setup Wizard
+  - name: Setting up tickets using the ticket wizard
     href: tutorial/ticket_tutorial.md  
 - name: How-To
   items:
-  - name: Issue tickets
+  - name: Issue tickets from Business Central
     href: howto/issue_ticket.md
 - name: Explanation
   items:
   - name: Ticket
     href: explanation/ticket.md
-  - name: Admission
+  - name: Ticket Admission
     href: explanation/admission.md
