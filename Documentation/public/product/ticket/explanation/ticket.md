@@ -8,4 +8,4 @@ The ticket information structure is complex and consists of several entities to 
  - [Create setup for a ticket](../tutorial/ticket_tutorial.md)
 
 ### Related links
- - [Admission](./admission.md)
+ - [Ticket Admission](./admission.md)

@@ -5,13 +5,13 @@ When issuing tickets in Business Central, payment is deferred to another time an
 
 To issue tickets from Business Central:
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do"), enter **Ticket BOM** and choose the related link.
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Ticket BOM** and choose the related link.
 2. On the **Ticket BOM** page, choose the **Item No.** for which you want to create tickets.
-3. Choose either [**Create Prepaid Tickets** or **Create Postpaid Tickets**](../404.md "Prepaid vs Postpaid tickets") from the **Create Tickets** action.
+3. Choose the **Create Tickets** action, from the sub-menu, choose either [**Create Prepaid Tickets** or **Create Postpaid Tickets**](../404.md "Prepaid vs Postpaid tickets").
 4. Click **Description** to drill down to schedules and select a date and time for the tickets. Click **OK** to select.
-5. Specify **Quantity**.
-6. Specify **Customer No.**.
-7. Specify **External Order No.**.
+5. Specify a value for the **Quantity** field.
+6. Specify a value for the **Customer No.** field.
+7. Specify a value for the **External Order No.** field.
 8. Click **OK**. 
 
    You might be prompted to:
