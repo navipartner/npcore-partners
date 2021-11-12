@@ -21,7 +21,7 @@ To issue tickets from Business Central:
 
 The **Ticket List** pages opens with the created tickets.
 
-### Next Step:
+### Next Steps:
  - [Admit an issued ticket](../404.md)
  - [Handle postpaid tickets](../404.md)
  
