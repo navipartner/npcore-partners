@@ -205,6 +205,26 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
+
+        field(170; "Auto Process Ext. POS Sales"; Boolean)
+        {
+            Caption = 'Auto Process External POS Sales';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                ExtPOSSaleProcessor: Codeunit "NPR Ext. POS Sale Processor";
+                PosPostingProfile: Record "NPR POS Posting Profile";
+            begin
+                IF Rec."Auto Process Ext. POS Sales" then
+                    ExtPOSSaleProcessor.RegisterNcImportType('EXTPOSSALES')
+                else begin
+                    PosPostingProfile.SetFilter(Code, '<>%1', Rec.Code);
+                    PosPostingProfile.SetRange("Auto Process Ext. POS Sales", true);
+                    IF PosPostingProfile.IsEmpty() then
+                        ExtPOSSaleProcessor.DeleteNCImportType('EXTPOSSALES');
+                end;
+            end;
+        }
     }
 
     keys
