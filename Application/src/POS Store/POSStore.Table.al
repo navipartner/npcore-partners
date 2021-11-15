@@ -326,20 +326,8 @@ table 6150614 "NPR POS Store"
         {
             Caption = 'Auto Process External POS Sales';
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            var
-                ExtPOSSaleProcessor: Codeunit "NPR Ext. POS Sale Processor";
-                POSStore: Record "NPR POS Store";
-            begin
-                IF Rec."Auto Process Ext. POS Sales" then
-                    ExtPOSSaleProcessor.RegisterNcImportType('EXTPOSSALES')
-                else begin
-                    POSStore.SetFilter(Code, '<>%1', Rec.Code);
-                    POSStore.SetRange("Auto Process Ext. POS Sales", true);
-                    IF POSStore.IsEmpty() then
-                        ExtPOSSaleProcessor.DeleteNCImportType('EXTPOSSALES');
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Posting Profile';
         }
     }
 
