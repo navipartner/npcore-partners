@@ -12,7 +12,8 @@ This topic describes the process of configuring the Replication Setup. As soon a
  
 4. Press the ellipsis button next to the **From Company Name** field and select the company from which you want to import data.   
    If the **External Company** is disabled, you can select a company from the current database, otherwise the system makes a web API request to the external database to retrieve companies and you can select a company from that database.
-5. The **From Company Id** is automatically populated. This field is used by the system when it makes API requests to retrieve data from the selected company.
+5. The **From Company Id** is automatically populated.       
+   This field is used by the system when it makes API requests to retrieve data from the selected company.
 6. Enter the **From Company Tenant** if you work in a multitenant environment.
 7. Select the authorization type and the necessary credentials, then enable the authorization if needed.
 8. Press **Test Connection** to see if the connection can be established.
