@@ -31,6 +31,7 @@ codeunit 6014648 "NPR Get External POS Sale" implements "NPR Nc Import List IUpd
     var
         ExtPOSSale: Record "NPR External POS Sale";
         POSStore: Record "NPR POS Store";
+        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         ExtPOSSale.SetCurrentKey("Converted To POS Entry", "Has Conversion Error", "POS Store Code");
         ExtPOSSale.SetRange("Converted To POS Entry", false);
@@ -38,10 +39,12 @@ codeunit 6014648 "NPR Get External POS Sale" implements "NPR Nc Import List IUpd
         IF ExtPOSSale.FindSet() then
             repeat
                 ExtPOSSale.SetRange("POS Store Code", ExtPOSSale."POS Store Code");
-                IF ExtPOSSale."POS Store Code" <> POSStore.Code then
+                IF ExtPOSSale."POS Store Code" <> POSStore.Code then begin
                     IF POSStore.Get(ExtPOSSale."POS Store Code") then;
+                    POSStore.GetProfile(POSPostingProfile);
+                end;
 
-                IF POSStore."Auto Process Ext. POS Sales" then
+                IF POSPostingProfile."Auto Process Ext. POS Sales" then
                     InsertImportEntry(ImportType.Code, ExtPOSSale)
                 else
                     ExtPOSSale.FindLast(); // to skip records with the same Store No.

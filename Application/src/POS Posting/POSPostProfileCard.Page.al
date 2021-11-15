@@ -78,6 +78,12 @@ page 6150639 "NPR POS Post. Profile Card"
                     ToolTip = 'Specifies the value of the Posting Compression field';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Auto Process Ext. POS Sales"; Rec."Auto Process Ext. POS Sales")
+                {
+                    ToolTip = 'Specifies the value of the Auto Process Ext. POS Sales field';
+                    ApplicationArea = NPRRetail;
+                }
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';
