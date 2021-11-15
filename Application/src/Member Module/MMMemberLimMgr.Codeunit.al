@@ -305,7 +305,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(RuleNo);
     end;
 
-    local procedure DoesRuleApply(RuleEntryNo: Integer; KeyValue: Text[100]; AdmissionCode: Code[20]; var MatchCount: Integer; IgnoreLogEntryNo: Integer; var RuleConditionalValue: Text): Boolean
+    local procedure DoesRuleApply(RuleEntryNo: Integer; KeyValue: Text[100]; AdmissionCode: Code[20]; IgnoreLogEntryNo: Integer; var MatchCount: Integer; var RuleConditionalValue: Text): Boolean
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
