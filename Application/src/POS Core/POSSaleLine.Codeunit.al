@@ -412,16 +412,13 @@ codeunit 6150706 "NPR POS Sale Line"
     local procedure FillVariantThroughLookUp(ItemNo: Code[20]): Code[10]
     var
         ItemVariantBuffer: Record "NPR Item Variant Buffer";
-        ItemVariants: Page "NPR Item Variants Lookup";
     begin
         FillVariantBuffer(ItemNo, ItemVariantBuffer);
         if ItemVariantBuffer.IsEmpty() then
             exit('');
 
-        if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
-            ItemVariants.GetRecord(ItemVariantBuffer);
-            exit(ItemVariantBuffer.Code);
-        end
+        if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then
+            exit(ItemVariantBuffer.Code)
         else
             Error(ITEM_REQUIRES_VARIANT, ItemNo);
     end;
