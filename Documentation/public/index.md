@@ -102,8 +102,8 @@
   <div class="descriptiontext">        
     <section>                   
       <p>NP Retail is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>
-      <p>The solution documentation is split into two parts:</p>
-      <p>&#9679  Product documentation with How-To's, explanations and more. <br> &#9679  API documentation with technical webservice documentation and a sandbox for testing it.</p>                      
+      <p>The solution documentation currently consists of three parts:</p>
+      <p>&#9679  Product documentation with How-to guides, explanations, glossary of useful terms, and more. <br> &#9679  API documentation with technical webservice documentation and a sandbox for testing it. <br> &#9679 Old Documentation which contains articles that have not yet been migrated to this format. As soon as all articles are rewritten and migrated here, the old documentation portal will be obsoleted.</p>                      
     </section>
   </div>
 </div>
