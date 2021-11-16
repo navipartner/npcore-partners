@@ -1,24 +1,5 @@
 ﻿codeunit 6150903 "NPR HC Connector Web Service"
 {
-    procedure InsertAuditRoll(var auditrolllineimport: XMLport "NPR HC Audit Roll")
-    var
-        NaviConnectImportEntry: Record "NPR Nc Import Entry";
-        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        OutStr: OutStream;
-    begin
-        SelectLatestVersion();
-        auditrolllineimport.Import();
-        InsertImportEntry('InsertAuditRoll', 6150904, NaviConnectImportEntry);
-        NaviConnectImportEntry."Document Name" := CopyStr('NCConnectorAuditRoll' + auditrolllineimport.GetSalesTicketNo(), 1, MaxStrLen(NaviConnectImportEntry."Document Name") - 4) + '.xml';
-        NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
-        auditrolllineimport.SetDestination(OutStr);
-        auditrolllineimport.Export();
-        NaviConnectImportEntry.Modify(true);
-        Commit();
-
-        NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
-    end;
-
     procedure InsertPOSEntry(var posentryimport: XMLport "NPR HC POS Entry")
     var
         NaviConnectImportEntry: Record "NPR Nc Import Entry";
