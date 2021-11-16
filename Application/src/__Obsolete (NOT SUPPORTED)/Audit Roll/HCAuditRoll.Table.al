@@ -2,8 +2,8 @@ table 6150901 "NPR HC Audit Roll"
 {
     Caption = 'HC Audit Roll';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR HC Audit Roll";
-    LookupPageID = "NPR HC Audit Roll";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used anymore';
     PasteIsValid = false;
 
     fields

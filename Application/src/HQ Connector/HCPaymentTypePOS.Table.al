@@ -55,23 +55,12 @@ table 6150905 "NPR HC Payment Type POS"
             OptionMembers = " ",Active,Passive;
 
             trigger OnValidate()
-            var
-                Trans0001: Label 'You cannot change status, since there exists one or more non-posted audit rolls';
             begin
                 if Status = Status::Active then begin
                     if "Account Type" = "Account Type"::"G/L Account" then
                         TestField("G/L Account No.");
                     if "Account Type" = "Account Type"::Customer then
                         TestField("Customer No.");
-                end;
-                if (xRec.Status = xRec.Status::Active) and not (Status = Status::Active) then begin
-                    AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
-                    AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-                    AuditRoll.SetRange(Type, AuditRoll.Type::"Debit Sale");
-                    AuditRoll.SetRange(Posted, false);
-                    AuditRoll.SetRange("No.", xRec."No.");
-                    if AuditRoll.Find('-') then
-                        Error(Trans0001);
                 end;
             end;
         }
@@ -132,18 +121,10 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(27; "Amount in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll"."Amount Including VAT" WHERE("Register No." = FIELD("Register Filter"),
-                                                                            "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                                            "Sale Date" = FIELD("Date Filter"),
-                                                                            "Sale Type" = CONST(Payment),
-                                                                            Type = CONST(Payment),
-                                                                            "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                                            "Closing Time" = FIELD("End Time Filter"),
-                                                                            "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                                            "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
-                                                                            "No." = FIELD("No.")));
             Caption = 'Amount in Audit Roll';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(28; "Customer No."; Code[20])
         {
@@ -226,92 +207,51 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(37; "No. of Sales in Audit Roll"; Integer)
         {
-            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
-                                                       "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                       Type = CONST(Item),
-                                                       "Sale Type" = CONST(Sale),
-                                                       "Line No." = CONST(10000),
-                                                       "Sale Date" = FIELD("Date Filter"),
-                                                       "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                       "Closing Time" = FIELD("End Time Filter"),
-                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. Sales in audit roll';
             Description = 'Tæller kun linier m. linienr=10000,vare, salg';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(38; "Normal Sale in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
-                                                                            "Register No." = FIELD("Register Filter"),
-                                                                            "Sale Type" = CONST(Sale),
-                                                                            Type = CONST(Item),
-                                                                            "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                                            "Closing Time" = FIELD("End Time Filter"),
-                                                                            "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                                            "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
-                                                                            "Sales Ticket No." = FIELD("Receipt Filter")));
             Caption = 'Normal sale in audit roll';
             Description = 'Tæller "bel¢b inkl. moms" hvis salg, vare';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(39; "Debit Sale in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
-                                                                            "Register No." = FIELD("Register Filter"),
-                                                                            "Sale Type" = CONST("Debit Sale"),
-                                                                            Type = CONST(Item),
-                                                                            "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                                            "Closing Time" = FIELD("End Time Filter"),
-                                                                            "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                                            "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
-                                                                            "Sales Ticket No." = FIELD("Receipt Filter")));
             Caption = 'Debit sale in audit roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(40; "No. of Items in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
-                                                              "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                              "Sale Date" = FIELD("Date Filter"),
-                                                              Type = CONST(Item),
-                                                              "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                              "Closing Time" = FIELD("End Time Filter"),
-                                                              "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                              "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. items in audit roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(41; "Cost Amount in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll".Cost WHERE("Register No." = FIELD("Register Filter"),
-                                                          "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                          "Sale Date" = FIELD("Date Filter"),
-                                                          Type = CONST(Item),
-                                                          "Sale Type" = FILTER(<> "Debit Sale"),
-                                                          "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                          "Closing Time" = FIELD("End Time Filter"),
-                                                          "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                          "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'Cost amount in audit roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(42; "No. of Sale Lines in Aud. Roll"; Integer)
         {
-            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
-                                                       "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                       "Sale Date" = FIELD("Date Filter"),
-                                                       Type = FILTER(<> Cancelled & <> "Open/Close"),
-                                                       "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                       "Closing Time" = FIELD("End Time Filter"),
-                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. sales lines in audit roll';
             Description = 'Tæller alle linier m. type <>Afbrudt &<>Åben/Luk';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(43; "Salesperson Filter"; Code[20])
         {
@@ -321,47 +261,27 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(44; "No. of Items in Audit Debit"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
-                                                              "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                              "Sale Date" = FIELD("Date Filter"),
-                                                              Type = CONST("Debit Sale"),
-                                                              "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                              "Closing Time" = FIELD("End Time Filter"),
-                                                              "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                              "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. items in audit debit';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(45; "No. of Item Lines in Aud. Deb."; Integer)
         {
-            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
-                                                       "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                       Type = CONST("Debit Sale"),
-                                                       "No." = FILTER(<> ''),
-                                                       "Sale Date" = FIELD("Date Filter"),
-                                                       "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                       "Closing Time" = FIELD("End Time Filter"),
-                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. item linies in audit debit';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(46; "No. of Deb. Sales in Aud. Roll"; Integer)
         {
-            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
-                                                       "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                       "Sale Type" = CONST("Debit Sale"),
-                                                       "Line No." = CONST(10000),
-                                                       "Sale Date" = FIELD("Date Filter"),
-                                                       "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                       "Closing Time" = FIELD("End Time Filter"),
-                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'No. debit sales in audit roll';
             Description = 'Tæller linie debetsalg,linienr=10000';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(47; Euro; Boolean)
         {
@@ -409,17 +329,10 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(53; "Norm. Sales in Audit Excl. VAT"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
-                                                            "Register No." = FIELD("Register Filter"),
-                                                            "Sale Type" = CONST(Sale),
-                                                            Type = CONST(Item),
-                                                            "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                            "Closing Time" = FIELD("End Time Filter"),
-                                                            "Sales Ticket No." = FIELD("Receipt Filter"),
-                                                            "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                            "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
             Caption = 'Norm sales in audit ex VAT';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(54; "Maximum Amount"; Decimal)
         {
@@ -435,33 +348,19 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(56; "Debit Cost Amount Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll".Cost WHERE("Sale Date" = FIELD("Date Filter"),
-                                                          "Register No." = FIELD("Register Filter"),
-                                                          "Sale Type" = CONST("Debit Sale"),
-                                                          Type = CONST(Item),
-                                                          "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                          "Closing Time" = FIELD("End Time Filter"),
-                                                          "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                          "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
-                                                          "Sales Ticket No." = FIELD("Receipt Filter")));
             Caption = 'Cost amount in audit';
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(57; "Debit Sales in Audit Excl. VAT"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
-                                                            "Register No." = FIELD("Register Filter"),
-                                                            "Sale Type" = CONST("Debit Sale"),
-                                                            Type = CONST(Item),
-                                                            "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                            "Closing Time" = FIELD("End Time Filter"),
-                                                            "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
-                                                            "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter"),
-                                                            "Sales Ticket No." = FIELD("Receipt Filter")));
             Caption = 'Debit sales in audit ex VAT';
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(58; "Cardholder Verification Method"; Option)
         {
@@ -531,11 +430,11 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(71; "Balancing Total"; Decimal)
         {
-            CalcFormula = Sum("NPR HC Audit Roll"."Line No." WHERE("Register No." = FIELD("No."),
-                                                                "Sales Ticket No." = FIELD("Register Filter")));
             Caption = 'Counted';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used';
         }
         field(75; "Match Sales Amount"; Boolean)
         {
@@ -791,24 +690,9 @@ table 6150905 "NPR HC Payment Type POS"
                                 "Global Dimension 1 Code", "Global Dimension 2 Code");
     end;
 
-    trigger OnRename()
-    var
-        ErrorNo1: Label 'All sales tickets in the audit roll concerning this payment type must be posted to rename payment type.';
-    begin
-        AuditRoll.Reset();
-        AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
-        AuditRoll.SetRange(Posted, false);
-        AuditRoll.SetRange("No.", xRec."No.");
-        if AuditRoll.Find('-') then
-            Error(ErrorNo1);
-    end;
-
     var
         RetailSetup: Record "NPR HC Retail Setup";
         GLAccount: Record "G/L Account";
-        AuditRoll: Record "NPR HC Audit Roll";
         Customer: Record Customer;
         DimMgt: Codeunit DimensionManagement;
 
