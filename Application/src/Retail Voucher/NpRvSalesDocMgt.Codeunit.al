@@ -115,8 +115,13 @@
             NpRvSalesLine.Insert(true);
         end;
 
+        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        MagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
+        if MagentoPaymentLine.FindLast() then;
+        LineNo := MagentoPaymentLine."Line No." + 10000;
 
-        LineNo += 10000;
+        Clear(MagentoPaymentLine);
         MagentoPaymentLine.Init();
         MagentoPaymentLine."Document Table No." := Database::"Sales Header";
         MagentoPaymentLine."Document Type" := SalesHeader."Document Type";
