@@ -12,26 +12,6 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
     {
         area(content)
         {
-            usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
-            {
-                ApplicationArea = NPRRetail;
-
-
-                trigger AddInReady()
-                begin
-                    PingPongReady := true;
-                    Ping();
-                end;
-
-                trigger Pong()
-                begin
-                    CurrPage.PingPong.Stop();
-
-                    CurrPage.Update(false);
-
-                    Ping();
-                end;
-            }
             repeater(Group)
             {
                 field("Log Date"; Rec."Log Date")
@@ -115,19 +95,4 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
             }
         }
     }
-
-    var
-        AutoUpdate: Boolean;
-        PingPongReady: Boolean;
-
-    local procedure Ping()
-    begin
-        if not AutoUpdate then
-            exit;
-        if not PingPongReady then
-            exit;
-
-        CurrPage.PingPong.Ping(1000);
-    end;
 }
-

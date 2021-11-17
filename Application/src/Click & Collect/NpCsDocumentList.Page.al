@@ -262,11 +262,10 @@ page 6151200 "NPR NpCs Document List"
 
                 trigger OnAction()
                 var
-                    NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                 begin
                     NpCsWorkflowMgt.ScheduleRunWorkflow(Rec);
-                    NpCsCollectMgt.RunLog(Rec, true);
+                    //NpCsCollectMgt.RunLog(Rec, true);
                 end;
             }
             group("Send Order")
