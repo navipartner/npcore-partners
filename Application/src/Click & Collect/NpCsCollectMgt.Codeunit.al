@@ -377,7 +377,7 @@
     begin
         NpCsDocumentLogEntry.Ascending(false);
         NpCsDocumentLogEntry.SetRange("Document Entry No.", NpCsDocument."Entry No.");
-        NpCsDocumentLogEntries.SetAutoUpdate(WithAutoUpdate);
+        //NpCsDocumentLogEntries.SetAutoUpdate(WithAutoUpdate);
         NpCsDocumentLogEntries.SetTableView(NpCsDocumentLogEntry);
         NpCsDocumentLogEntries.Run();
     end;

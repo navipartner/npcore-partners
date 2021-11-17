@@ -227,12 +227,10 @@ page 6151204 "NPR NpCs Send to Store Orders"
 
                 trigger OnAction()
                 var
-                    NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                 begin
                     NpCsWorkflowMgt.ScheduleRunWorkflow(Rec);
-
-                    NpCsCollectMgt.RunLog(Rec, true);
+                    //NpCsCollectMgt.RunLog(Rec, true);
                 end;
             }
             group("Send Order")
