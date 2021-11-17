@@ -1,13 +1,10 @@
-Read Microsofts latest docs on newer upgrade features in AL, i.e. comparing with a persistant upgrade tag or comparing against pre-upgrade .app version:
+Read Microsofts latest docs on newer upgrade features in AL, i.e. comparing with a persistent upgrade tag or comparing against pre-upgrade .app version:
 https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-upgrading-extensions
 
 # Location
 All upgrade codeunits should be placed inside /src/_Upgrades/
 
 # C/SIDE Migration
-For upgrades that are relevant for any customer coming from C/SIDE to AL (meaning, upgrades for old fields that existed in C/SIDE NPRetail), place them inside another nested folder: CSideMigration, i.e.:
-/src/_Upgrades/CSideMigration
-These upgrades are special as they will not be deleted until C/SIDE migration is done (will take years).
 
 The upgrade routine used by hosting looks something like this:
 1. Prepare new BC environment and install NPCore apps.
@@ -16,7 +13,7 @@ The upgrade routine used by hosting looks something like this:
 
 This means, as long as old tables that existed in C/SIDE are kept as obsolete, data will be transferred into them, from where an upgrade can deal with it as usual.
 
-The goal is that, even if a CSIDE customer is not migrated to the .app until BC21, there is still a big chunk of upgrade codeunits ready to migrate from the obsolete CSIDE tables to AL tables.
+The goal is that, even if a CSIDE customer is not migrated to the .app until years from now, there is still a big chunk of upgrade codeunits ready to migrate from the obsolete CSIDE tables to AL tables.
 
 # Controlling when to run upgrades
 As noted by the MS article above, controlling when to run upgrades is important.

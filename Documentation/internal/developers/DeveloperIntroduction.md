@@ -21,7 +21,7 @@ This is because we need to generate a new .app and these need to be uniquely ver
 
 Illustrated in a graph the flow looks like this:
 
-![image.png](/.attachments/image-1b7d902c-3021-4cf2-943e-268675d4dad3.png)
+![image.png](.attachments/image-1b7d902c-3021-4cf2-943e-268675d4dad3.png)
 
 Note that:
 - Hotfixes are treated as any other topic branch. These are still merged to master before creating any hotfix release branch to make sure master never accidentally falls behind.
