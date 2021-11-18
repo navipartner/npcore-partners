@@ -5,6 +5,7 @@ page 6060120 "NPR TM Ticket Admissions"
     SourceTable = "NPR TM Admission";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    ContextSensitiveHelpPage = 'product/ticket/intro.html';
     PromotedActionCategories = 'New,Process,Report,Navigate';
     layout
     {
@@ -15,17 +16,17 @@ page 6060120 "NPR TM Ticket Admissions"
                 field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Admission Code field';
+                    ToolTip = 'Specifies the code of the specific admission.';
                 }
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies whether the admission is a location or an event.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies useful information about the admission. The value you enter will be suggested as the default admission description when admission is used on the Ticket BOM.';
                 }
                 field("Location Admission Code"; Rec."Location Admission Code")
                 {
@@ -36,22 +37,22 @@ page 6060120 "NPR TM Ticket Admissions"
                 field("Capacity Limits By"; Rec."Capacity Limits By")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Capacity Limits By field';
+                    ToolTip = 'Specifies how the maximum capacity is controlled.';
                 }
                 field("Default Schedule"; Rec."Default Schedule")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Default Schedule field';
+                    ToolTip = 'Specifies how the assisted ticket sales process should select initial time slot.';
                 }
                 field("Prebook Is Required"; Rec."Prebook Is Required")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Prebook Is Required field';
+                    ToolTip = 'Specifies whether the entry is reservation-based or open.';
                 }
                 field("Max Capacity Per Sch. Entry"; Rec."Max Capacity Per Sch. Entry")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
+                    ToolTip = 'Specifies the maximum capacity of the admission.';
                 }
                 field("Reserved For Web"; Rec."Reserved For Web")
                 {
@@ -68,44 +69,46 @@ page 6060120 "NPR TM Ticket Admissions"
                 field("Capacity Control"; Rec."Capacity Control")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Capacity Control field';
+                    ToolTip = 'Specifies whether it’s possible to sell an indefinite number of tickets, if the capacity is limited by the number of seats in the admission, or if the capacity is governed by the number of entries/the difference between the number of admitted and departed customers.';
                 }
                 field("Prebook From"; Rec."Prebook From")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Prebook From field';
+                    ToolTip = 'Specifies how far in advance the time slots will be generated for this admission. Ultimately it governs how far into the future a ticket for this admission can be sold.';
                 }
                 field("Ticketholder Notification Type"; Rec."Ticketholder Notification Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Ticketholder Notification Type field';
+                    ToolTip = 'Specifies whether it’s required for ticketholders to state their phone number/email address when buying a ticket.';
                 }
-                field("Stakeholder (E-Mail/Phone No.)"; Rec."Stakeholder (E-Mail/Phone No.)")
+                field("Stakeholder (E-mail/Phone No.)"; Rec."Stakeholder (E-mail/Phone No.)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Stakeholder (E-Mail/Phone No.) field';
+                    ToolTip = 'Specifies the email or phone number of the admission code owner.';
+                    Caption = 'Stakeholder Email/Phone No.';
                 }
                 field("Dependency Code"; Rec."Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Admission Dependency Code field';
+                    ToolTip = 'Specifies the rules which govern admission dependencies.';
                 }
                 field("POS Schedule Selection Date F."; Rec."POS Schedule Selection Date F.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the POS Admission Schedule Entry Selection Date Filter field';
+                    ToolTip = 'Specifies a date formula to limit the range of possible dates for which a ticket can be sold. Used to make the selection process briefer on the POS.';
+                    Caption = 'Admission Schedule Filter (POS)';
                 }
                 field("Admission Base Calendar Code"; Rec."Admission Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Admission Base Calendar Code field';
+                    ToolTip = 'The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.';
                 }
                 field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChangeAdmission))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Admission Customized Calendar';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Admission Customized Calendar field';
+                    ToolTip = 'If a base calendar is added, you can select calendar variations in this column.';
 
                     trigger OnDrillDown()
                     begin
@@ -117,14 +120,14 @@ page 6060120 "NPR TM Ticket Admissions"
                 field("Ticket Base Calendar Code"; Rec."Ticket Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Ticket Base Calendar Code field';
+                    ToolTip = 'The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.';
                 }
                 field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChangeTicket))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Ticket Customized Calendar';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Ticket Customized Calendar field';
+                    ToolTip = 'If a base calendar is added, you can select calendar variations in this column.';
 
                     trigger OnDrillDown()
                     begin
@@ -142,7 +145,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 field("Waiting List Setup Code"; Rec."Waiting List Setup Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Waiting List Setup Code field';
+                    ToolTip = 'Specifies conditions which need to be met for a waiting list to be created, and how the customers will be notified when they are able to buy tickets.';
                 }
             }
         }

@@ -122,6 +122,19 @@ I recommend the [Greenshot](https://getgreenshot.org/downloads/) screenshot-capt
 > [!NOTE]
 > Avoid adding multiple screenshots one after the other. Wherever possible, try to add some text between them.
 
+## Defining tooltips
+
+Tooltips are user-targeted messages that provide descriptions or explanations of fields and action in the GUI. 
+When constructing tooltips, we're going to strive for the model defined by the Business central style guide. This model includes the following:
+
+- If the control is a field, begin the tooltip with "Specifies".
+- If the control is an action, begin with a verb in the imperative form, such as "Calculate" or "View".
+- Include the most valuable information that users need to perform the task that the field or action supports.        
+  For example, for the Post action, do not write Post the document. Write, for example, Update ledgers with the amounts and quantities on the document or journal lines.
+- Describe complex options in tooltips for option fields. 
+- Try not to exceed 200 characters including spaces.
+- Don't use line breaks in the tooltip text.
+
 ## General recommendations:
 
 To ensure that the documentation style is unified, the following recommendations should be follow, regardless of the type of topic that you're writing. Your docs may still be valid if some of these guidelines aren't met, but it would be best to apply them to maximize the docs' usability.
