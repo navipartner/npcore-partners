@@ -7,7 +7,7 @@
   "description": "NP Retail is a POS solution seamlessly integrated into Business Central.",
   "privacyStatement": "https://www.navipartner.com/privacy-cookie-policy/",
   "EULA": "https://www.navipartner.com/wp-content/uploads/NaviPartner-license-agreement-NLA.pdf",
-  "help": "https://support.navipartner.com/display/NR",
+  "help": "https://docs.navipartner.com/",
   "url": "https://www.navipartner.com/pos-system/",
   "logo": "./media/NP-small-logo.png",
   "dependencies": [],
