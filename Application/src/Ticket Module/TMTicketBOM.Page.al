@@ -21,7 +21,7 @@ page 6060121 "NPR TM Ticket BOM"
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'A code that is added to the value in the **Item No.** column to determine the ticket type (e.g., tickets for children/adults/seniors). Microsoft only supports one dimension of variants.';
+                    ToolTip = 'A code that is added to the value in the Item No. column to determine the ticket type (e.g., tickets for children/adults/seniors). Microsoft only supports one dimension of variants.';
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
@@ -51,7 +51,7 @@ page 6060121 "NPR TM Ticket BOM"
                 field("Enforce Schedule Sales Limits"; Rec."Enforce Schedule Sales Limits")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Determines if the values in the **Sales From Date/Sales Until Date** columns are enforced.';
+                    ToolTip = 'Determines if the values in the Sales From Date/Sales Until Date columns are enforced.';
                 }
                 field("Admission Entry Validation"; Rec."Admission Entry Validation")
                 {
@@ -67,7 +67,7 @@ page 6060121 "NPR TM Ticket BOM"
                 field("Percentage of Adm. Capacity"; Rec."Percentage of Adm. Capacity")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Determines a percentage of maximum admission capacity for the provided **Item No.**. This is a useful option when there are several types of tickets sold for the same admission.';
+                    ToolTip = 'Determines a percentage of maximum admission capacity for the provided Item No.. This is a useful option when there are several types of tickets sold for the same admission.';
                 }
                 field("Max No. Of Entries"; Rec."Max No. Of Entries")
                 {
@@ -124,7 +124,7 @@ page 6060121 "NPR TM Ticket BOM"
                 field("Reschedule Cut-Off (Hours)"; Rec."Reschedule Cut-Off (Hours)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies after how many hours it’s possible to reschedule if **Cut-Off (Hours)** is selected in the **Reschedule Policy** column.';
+                    ToolTip = 'Specifies after how many hours it’s possible to reschedule if Cut-Off (Hours) is selected in the Reschedule Policy column.';
                 }
                 field("Revoke Policy"; Rec."Revoke Policy")
                 {
@@ -144,7 +144,7 @@ page 6060121 "NPR TM Ticket BOM"
                 field("Ticket Base Calendar Code"; Rec."Ticket Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the code of a base calendar. The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.  ';
+                    ToolTip = 'Specifies the code of a base calendar. The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.';
                 }
                 field("Ticket Customized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChange))
                 {
