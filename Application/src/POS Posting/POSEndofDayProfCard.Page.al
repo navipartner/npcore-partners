@@ -53,6 +53,12 @@ page 6150752 "NPR POS End of Day Prof. Card"
                     ToolTip = 'Specifies the value of the Close Workshift UI field';
                     ApplicationArea = NPRRetail;
                 }
+                field("User Experience"; Rec."User Experience")
+                {
+                    ToolTip = 'Specifies which platform will show the End of Day user interface.';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
                 field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
                     ToolTip = 'Specifies the value of the Force Blind Counting field';

@@ -65,6 +65,13 @@ table 6150652 "NPR POS End of Day Profile"
             OptionCaption = 'Print,No print';
             OptionMembers = PRINT,NO_PRINT;
         }
+        field(38; "User Experience"; Option)
+        {
+            Caption = 'User Experience';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Business Central,Point of Sale';
+            OptionMembers = BC,POS;
+        }
         field(40; "Force Blind Counting"; Boolean)
         {
             Caption = 'Force Blind Counting';
