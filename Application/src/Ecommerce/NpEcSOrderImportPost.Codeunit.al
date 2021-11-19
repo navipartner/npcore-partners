@@ -54,6 +54,7 @@ codeunit 6151304 "NPR NpEc S.Order Import (Post)"
         NpEcSalesDocImportMgt.InsertOrderLines(Element, SalesHeader);
         NpEcSalesDocImportMgt.InsertPaymentLines(Element, SalesHeader);
         NpEcSalesDocImportMgt.InsertNote(Element, SalesHeader);
+        NpEcSalesDocImportMgt.ReleaseOrder(Element, SalesHeader);
 
         Commit();
         PostSalesOrder(SalesHeader);

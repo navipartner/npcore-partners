@@ -41,6 +41,7 @@ codeunit 6151303 "NPR NpEc S.Order Import Create"
         NpEcSalesDocImportMgt.InsertOrderLines(Element, SalesHeader);
         NpEcSalesDocImportMgt.InsertPaymentLines(Element, SalesHeader);
         NpEcSalesDocImportMgt.InsertNote(Element, SalesHeader);
+        NpEcSalesDocImportMgt.ReleaseOrder(Element, SalesHeader);
 
         exit(true);
     end;

@@ -62,6 +62,11 @@ page 6151301 "NPR NpEc Store Card"
                     ToolTip = 'Specifies if customer will be updated for current e-commerce store. Customer will be updated if it''s found when order is imported.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Release Order on Import"; Rec."Release Order on Import")
+                {
+                    ToolTip = 'Specifies the value of the Release Order on Import field';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
