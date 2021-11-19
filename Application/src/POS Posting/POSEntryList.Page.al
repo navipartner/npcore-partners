@@ -13,7 +13,6 @@ page 6150652 "NPR POS Entry List"
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -23,112 +22,95 @@ page 6150652 "NPR POS Entry List"
                 FreezeColumn = "Ending Time";
                 field("System Entry"; Rec."System Entry")
                 {
-
                     Visible = false;
-
                     ToolTip = 'Specifies the value of the System Entry field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-
                     Visible = false;
-
                     ToolTip = 'Specifies the value of the Entry No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
-
                     ToolTip = 'Specifies the value of the Entry Date field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-
                     ToolTip = 'Specifies the value of the Document No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
-
                     ToolTip = 'Specifies the value of the Starting Time field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
-
                     ToolTip = 'Specifies the value of the Ending Time field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Fiscal No."; Rec."Fiscal No.")
                 {
-
                     ToolTip = 'Specifies the value of the Fiscal No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-
-                    Visible = false;
+                    Visible = not IsSimpleView;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                     ApplicationArea = NPRRetail;
+                    Visible = not IsSimpleView;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                     ApplicationArea = NPRRetail;
+                    Visible = not IsSimpleView;
                 }
                 field("POS Period Register No."; Rec."POS Period Register No.")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the POS Period Register No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
-
-                    Visible = false;
+                    Visible = not IsSimpleView;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
-
-                    Visible = false;
+                    Visible = not IsSimpleView;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
-
                     ToolTip = 'Specifies the value of the Entry Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-
                     ToolTip = 'Specifies the value of the Customer No. field';
                     ApplicationArea = NPRRetail;
+                    Visible = not IsSimpleView;
                 }
                 field(LastOpenSalesDocumentNo; LastOpenSalesDocumentNo)
                 {
-
                     Caption = 'Last Open Sales Doc.';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Open Sales Doc. field';
@@ -147,7 +129,6 @@ page 6150652 "NPR POS Entry List"
                 }
                 field(LastPostedSalesDocumentNo; LastPostedSalesDocumentNo)
                 {
-
                     Caption = 'Last Posted Sales Doc.';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Posted Sales Doc. field';
@@ -166,99 +147,83 @@ page 6150652 "NPR POS Entry List"
                 }
                 field("No. of Print Output Entries"; Rec."No. of Print Output Entries")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the No. of Print Output Entries field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Item Entry Status"; Rec."Post Item Entry Status")
                 {
-
                     ToolTip = 'Specifies the value of the Post Item Entry Status field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Entry Status"; Rec."Post Entry Status")
                 {
-
                     ToolTip = 'Specifies the value of the Post Entry Status field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Excl. Tax"; Rec."Amount Excl. Tax")
                 {
-
                     ToolTip = 'Specifies the value of the Amount Excl. Tax field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Tax Amount"; Rec."Tax Amount")
                 {
-
                     ToolTip = 'Specifies the value of the Tax Amount field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
                 {
-
                     ToolTip = 'Specifies the value of the Amount Incl. Tax field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Rounding Amount (LCY)"; Rec."Rounding Amount (LCY)")
                 {
-
                     ToolTip = 'Specifies the value of the Rounding Amount (LCY) field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. Tax & Round"; Rec."Amount Incl. Tax & Round")
                 {
-
                     ToolTip = 'Specifies the value of the Amount Incl. Tax & Round field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reason Code"; Rec."Reason Code")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reason Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Tax Area Code"; Rec."Tax Area Code")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Tax Area Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transaction Type"; Rec."Transaction Type")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Transaction Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transport Method"; Rec."Transport Method")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Transport Method field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Exit Point"; Rec."Exit Point")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Exit Point field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Area"; Rec.Area)
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Area field';
                     ApplicationArea = NPRRetail;
@@ -267,31 +232,25 @@ page 6150652 "NPR POS Entry List"
             part(Sales; "NPR POS Sale Line Subpage")
             {
                 Caption = 'Sales';
-
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             part(Payments; "NPR POS Paym. Line Subpage")
             {
                 Caption = 'Payments';
-
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             part(Taxes; "NPR POS Tax Line Subpage")
             {
                 Caption = 'Taxes';
-
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 SubPageView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive)
                               ORDER(Ascending);
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
         area(factboxes)
@@ -300,7 +259,6 @@ page 6150652 "NPR POS Entry List"
             {
                 SubPageLink = "Entry No." = FIELD("Entry No.");
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -319,7 +277,6 @@ page 6150652 "NPR POS Entry List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Log";
                 RunPageLink = "Entry No." = FIELD("POS Posting Log Entry No.");
-
                 ToolTip = 'Executes the POS Posting Log action';
                 ApplicationArea = NPRRetail;
             }
@@ -329,7 +286,6 @@ page 6150652 "NPR POS Entry List"
                 Image = Sales;
                 RunObject = Page "NPR POS Entry Sales Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-
                 ToolTip = 'Executes the Sales Lines action';
                 ApplicationArea = NPRRetail;
             }
@@ -339,7 +295,6 @@ page 6150652 "NPR POS Entry List"
                 Image = Payment;
                 RunObject = Page "NPR POS Entry Pmt. Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-
                 ToolTip = 'Executes the Payment Lines action';
                 ApplicationArea = NPRRetail;
             }
@@ -349,7 +304,6 @@ page 6150652 "NPR POS Entry List"
                 Image = TaxDetail;
                 RunObject = Page "NPR POS Entry Tax Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-
                 ToolTip = 'Executes the Tax Lines action';
                 ApplicationArea = NPRRetail;
             }
@@ -359,7 +313,6 @@ page 6150652 "NPR POS Entry List"
                 Image = Balance;
                 RunObject = Page "NPR POS Balancing Line";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
-
                 ToolTip = 'Executes the Balancing Lines action';
                 ApplicationArea = NPRRetail;
             }
@@ -373,7 +326,6 @@ page 6150652 "NPR POS Entry List"
                 RunPageView = SORTING("Table ID", "POS Entry No.", "POS Entry Line No.", Code, "Line No.")
                               ORDER(Ascending);
                 Visible = false;
-
                 ToolTip = 'Executes the Comment Lines action';
                 ApplicationArea = NPRRetail;
             }
@@ -381,7 +333,6 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Dimensions';
                 Image = Dimensions;
-
                 ToolTip = 'Executes the Dimensions action';
                 ApplicationArea = NPRRetail;
 
@@ -395,7 +346,6 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'Sales Document';
                 Image = CoupledOrder;
                 Visible = false;
-
                 ToolTip = 'Executes the Sales Document action';
                 ApplicationArea = NPRRetail;
 
@@ -414,7 +364,6 @@ page 6150652 "NPR POS Entry List"
                 RunObject = Page "NPR POS Info POS Entry";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("POS Info Code", "POS Entry No.", "Entry No.");
-
                 ToolTip = 'Executes the POS Info POS Entry action';
                 ApplicationArea = NPRRetail;
             }
@@ -425,7 +374,6 @@ page 6150652 "NPR POS Entry List"
                 RunObject = Page "NPR POS Info Audit Roll";
                 RunPageLink = "Sales Ticket No." = FIELD("Document No.");
                 Visible = false;
-
                 ToolTip = 'Executes the POS Info Audit Roll action';
                 ApplicationArea = NPRRetail;
             }
@@ -433,7 +381,6 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'POS Audit Log';
                 Image = InteractionLog;
-
                 ToolTip = 'Executes the POS Audit Log action';
                 ApplicationArea = NPRRetail;
 
@@ -448,7 +395,6 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Related Sales Documents';
                 Image = CoupledOrder;
-
                 ToolTip = 'Executes the Related Sales Documents action';
                 ApplicationArea = NPRRetail;
 
@@ -464,7 +410,6 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Workshift Statistics';
                 Image = Sales;
-
                 ToolTip = 'Executes the Workshift Statistics action';
                 ApplicationArea = NPRRetail;
 
@@ -479,7 +424,6 @@ page 6150652 "NPR POS Entry List"
                 Image = CreditCardLog;
                 RunObject = Page "NPR EFT Transaction Requests";
                 RunPageLink = "Sales Ticket No." = FIELD("Document No.");
-
                 ToolTip = 'Executes the EFT Transaction Requests action';
                 ApplicationArea = NPRRetail;
             }
@@ -488,7 +432,6 @@ page 6150652 "NPR POS Entry List"
                 Image = PeriodEntries;
                 RunObject = Page "NPR POS Period Register List";
                 RunPageLink = "No." = FIELD("POS Period Register No.");
-
                 ToolTip = 'Executes the POS Period Register action';
                 ApplicationArea = NPRRetail;
             }
@@ -505,7 +448,6 @@ page 6150652 "NPR POS Entry List"
                     {
                         Caption = 'New';
                         Image = RefreshVoucher;
-
                         ToolTip = 'Executes the New action';
                         ApplicationArea = NPRRetail;
 
@@ -521,7 +463,6 @@ page 6150652 "NPR POS Entry List"
                     {
                         Caption = 'Issued';
                         Image = PostedPayableVoucher;
-
                         ToolTip = 'Executes the Issued action';
                         ApplicationArea = NPRRetail;
                         trigger OnAction()
@@ -545,7 +486,6 @@ page 6150652 "NPR POS Entry List"
                     Image = RefreshVoucher;
                     RunObject = Page "NPR NpRv Vouchers";
                     RunPageLink = "Issue Document No." = FIELD("Document No.");
-
                     ToolTip = 'Executes the Voucher Lines action';
                     ApplicationArea = NPRRetail;
 
@@ -558,7 +498,6 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Voucher List';
                     Image = VoucherDescription;
                     RunObject = Page "NPR NpRv Vouchers";
-
                     ToolTip = 'Executes the Voucher List action';
                     ApplicationArea = NPRRetail;
 
@@ -571,7 +510,6 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Voucher Types';
                     Image = VoucherGroup;
                     RunObject = Page "NPR NpRv Voucher Types";
-
                     ToolTip = 'Executes the Voucher Types action';
                     ApplicationArea = NPRRetail;
                 }
@@ -588,7 +526,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Sales Line List";
-
                     ToolTip = 'Executes the Sales Line List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -601,7 +538,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Pmt. Line List";
-
                     ToolTip = 'Executes the Payment Line List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -614,7 +550,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Tax Line List";
-
                     ToolTip = 'Executes the Tax Line List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -627,7 +562,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Balancing Line";
-
                     ToolTip = 'Executes the Balancing Line List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -640,7 +574,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
-
                     ToolTip = 'Executes the POS Period Register List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -670,7 +603,6 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Item Entry Status" = FILTER("Error while Posting"));
-
                     ToolTip = 'Executes the Failed Item Posting List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -685,7 +617,6 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Entry Status" = FILTER("Error while Posting"));
-
                     ToolTip = 'Executes the Failed G/L Posting List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -700,7 +631,6 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Item Entry Status" = FILTER(Unposted));
-
                     ToolTip = 'Executes the Unposted Item List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -715,7 +645,6 @@ page 6150652 "NPR POS Entry List"
                     RunObject = Page "NPR POS Entries";
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Entry Status" = FILTER(Unposted));
-
                     ToolTip = 'Executes the Unposted G/L List action';
                     ApplicationArea = NPRRetail;
                 }
@@ -748,6 +677,44 @@ page 6150652 "NPR POS Entry List"
                         Navigate.Run();
                     end;
                 }
+                action(ClassicView)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Show More Columns';
+                    Image = SetupColumns;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    ToolTip = 'View all available fields. Fields not frequently used are currently hidden.';
+                    Visible = IsSimpleView;
+
+                    trigger OnAction()
+                    begin
+                        CurrPage.Close();
+                        SetIsSimpleView(false);
+                        Page.Run(PAGE::"NPR POS Entry List");
+                    end;
+                }
+                action(SimpleView)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Show Fewer Columns';
+                    Image = SetupList;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    ToolTip = 'Hide fields that are not frequently used.';
+                    Visible = NOT IsSimpleView;
+
+                    trigger OnAction()
+                    begin
+                        CurrPage.Close();
+                        SetIsSimpleView(true);
+                        Page.Run(PAGE::"NPR POS Entry List");
+                    end;
+                }
             }
         }
         area(processing)
@@ -760,7 +727,6 @@ page 6150652 "NPR POS Entry List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Post Entry action';
                 ApplicationArea = NPRRetail;
 
@@ -788,7 +754,6 @@ page 6150652 "NPR POS Entry List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Post Range action';
                 ApplicationArea = NPRRetail;
 
@@ -855,7 +820,6 @@ page 6150652 "NPR POS Entry List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = false;
-
                 ToolTip = 'Executes the &Navigate action';
                 ApplicationArea = NPRRetail;
 
@@ -885,7 +849,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Print Entry action';
                     ApplicationArea = NPRRetail;
 
@@ -904,7 +867,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Print Entry Large action';
                     ApplicationArea = NPRRetail;
 
@@ -923,7 +885,6 @@ page 6150652 "NPR POS Entry List"
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the EFT Receipt action';
                     ApplicationArea = NPRRetail;
 
@@ -954,7 +915,6 @@ page 6150652 "NPR POS Entry List"
                 {
                     Caption = 'Entry Overview';
                     Image = PrintCheck;
-
                     ToolTip = 'Executes the Entry Overview action';
                     ApplicationArea = NPRRetail;
 
@@ -975,7 +935,6 @@ page 6150652 "NPR POS Entry List"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-
                     ToolTip = 'Executes the Send SMS action';
                     ApplicationArea = NPRRetail;
                     trigger OnAction()
@@ -994,7 +953,6 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'E-mail Log';
                     Image = Email;
                     Promoted = false;
-
                     ToolTip = 'Executes the E-mail Log action';
                     ApplicationArea = NPRRetail;
 
@@ -1009,7 +967,6 @@ page 6150652 "NPR POS Entry List"
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
-
                     ToolTip = 'Executes the Send as PDF action';
                     ApplicationArea = NPRRetail;
 
@@ -1040,12 +997,11 @@ page 6150652 "NPR POS Entry List"
 
     trigger OnOpenPage()
     begin
-
-
         Rec.SetRange("System Entry", false);
         if Rec.GetFilter("Entry Type") = '' then
             Rec.SetFilter("Entry Type", '<>%1', Rec."Entry Type"::"Cancelled Sale");
         if Rec.FindFirst() then;
+        CheckIsSimpleView();
     end;
 
     var
@@ -1055,6 +1011,7 @@ page 6150652 "NPR POS Entry List"
         TextSalesDocNotFound: Label 'Sales Document %1 %2 not found.';
         LastOpenSalesDocumentNo: Code[20];
         LastPostedSalesDocumentNo: Code[20];
+        IsSimpleView: Boolean;
 
     local procedure TryGetLastOpenSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
@@ -1100,6 +1057,39 @@ page 6150652 "NPR POS Entry List"
             POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
             POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
             PAGE.Run(PAGE::"NPR POS Workshift Checkpoints", POSWorkshiftCheckpoint);
+        end;
+    end;
+
+    local procedure CheckIsSimpleView()
+    var
+        JournalUserPreferences: Record "Journal User Preferences";
+    begin
+        IsSimpleView := true;
+
+        JournalUserPreferences.SetFilter("User ID", '%1', UserSecurityId());
+        JournalUserPreferences.SetRange("Page ID", PAGE::"NPR POS Entry List");
+        if not JournalUserPreferences.FindFirst() then
+            exit;
+
+        IsSimpleView := JournalUserPreferences."Is Simple View";
+    end;
+
+    local procedure SetIsSimpleView(SetIsSimpleView: Boolean)
+    var
+        JournalUserPreferences: Record "Journal User Preferences";
+    begin
+        JournalUserPreferences.SetFilter("User ID", '%1', UserSecurityId());
+        JournalUserPreferences.SetRange("Page ID", PAGE::"NPR POS Entry List");
+        if not JournalUserPreferences.FindFirst() then begin
+            Clear(JournalUserPreferences);
+            JournalUserPreferences."Page ID" := PAGE::"NPR POS Entry List";
+            JournalUserPreferences."User ID" := UserSecurityId();
+            JournalUserPreferences.Insert();
+        end;
+
+        if JournalUserPreferences."Is Simple View" <> SetIsSimpleView then begin
+            JournalUserPreferences."Is Simple View" := SetIsSimpleView;
+            JournalUserPreferences.Modify();
         end;
     end;
 }
