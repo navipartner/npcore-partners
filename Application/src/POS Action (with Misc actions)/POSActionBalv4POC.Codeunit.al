@@ -37,7 +37,7 @@ codeunit 6014600 "NPR POS Action: Bal. v4 POC"
             exit;
         Handled := true;
 
-        BalancingContext.Add('endOfDayCheckpointEntryNo', 'TBD');
+        BalancingContext.Add('endOfDayCheckpointEntryNo', '35');
 
         Request.SetMethod('BalanceSetContext');
         Request.GetContent().Add('balancingContext', BalancingContext);

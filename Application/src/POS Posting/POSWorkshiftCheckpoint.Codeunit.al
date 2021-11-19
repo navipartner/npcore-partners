@@ -250,7 +250,7 @@
         exit(ConfirmEoD);
     end;
 
-    local procedure CreateCheckpointWorker(Mode: Option; UnitNo: Code[10]) CheckPointEntryNo: Integer
+    internal procedure CreateCheckpointWorker(Mode: Option; UnitNo: Code[10]) CheckPointEntryNo: Integer
     var
         POSUnit: Record "NPR POS Unit";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
@@ -446,7 +446,7 @@
         exit(true);
     end;
 
-    local procedure CreateBalancingEntry(Mode: Option; UnitNo: Code[10]; CheckPointEntryNo: Integer; DimensionSetId: Integer) EntryNo: Integer
+    internal procedure CreateBalancingEntry(Mode: Option; UnitNo: Code[10]; CheckPointEntryNo: Integer; DimensionSetId: Integer) EntryNo: Integer
     var
         POSUnit: Record "NPR POS Unit";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
