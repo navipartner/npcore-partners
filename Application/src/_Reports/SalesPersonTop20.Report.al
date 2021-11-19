@@ -201,7 +201,6 @@ report 6014406 "NPR Sales Person Top 20"
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Turnover,Discount,Contribution Margin,Contribution Ratio';
-
                         ToolTip = 'Specifies the value of the Sort By field';
                         ApplicationArea = NPRRetail;
                     }
@@ -209,21 +208,18 @@ report 6014406 "NPR Sales Person Top 20"
                     {
                         Caption = 'Sort By';
                         OptionCaption = 'Largest,Smallest';
-
                         ToolTip = 'Specifies the value of the Sort By field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Show Qty"; ShowQty)
                     {
                         Caption = 'Quantity';
-
                         ToolTip = 'Specifies the value of the Quantity field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Only Sales"; OnlySales)
                     {
                         Caption = 'Only Salespersons With Sale';
-
                         ToolTip = 'Specifies the value of the Only Salespersons With Sale field';
                         ApplicationArea = NPRRetail;
                     }
