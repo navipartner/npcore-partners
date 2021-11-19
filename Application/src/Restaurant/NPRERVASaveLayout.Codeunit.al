@@ -145,7 +145,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
     begin
         SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location")));
 
-        LocationLayout."Seating No." := CopyStr(GetStringValue(ComponentObject, 'user_friendly_id'), 1, MaxStrLen(LocationLayout."Seating No."));
+        LocationLayout."Seating No." := CopyStr(GetOptionalStringValue(ComponentObject, 'user_friendly_id'), 1, MaxStrLen(LocationLayout."Seating No."));
         LocationLayout.Type := CopyStr(GetStringValue(ComponentObject, 'type'), 1, MaxStrLen(LocationLayout.Type));
         LocationLayout.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(LocationLayout.Description));
         LocationLayout."Seating Location" := CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(LocationLayout."Seating Location"));
@@ -174,7 +174,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
     begin
         SeatingLocation.Get(CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location")));
 
-        Seating."Seating No." := CopyStr(GetStringValue(ComponentObject, 'user_friendly_id'), 1, MaxStrLen(Seating."Seating No."));
+        Seating."Seating No." := CopyStr(GetOptionalStringValue(ComponentObject, 'user_friendly_id'), 1, MaxStrLen(Seating."Seating No."));
         Seating.Description := CopyStr(GetStringValue(ComponentObject, 'caption'), 1, MaxStrLen(Seating.Description));
         Seating."Seating Location" := CopyStr(GetStringValue(ComponentObject, 'locationId'), 1, MaxStrLen(Seating."Seating Location"));
         if ComponentObject.get('capacity', JToken) then
@@ -261,6 +261,15 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
     local procedure GetStringValue(JObject: JsonObject; KeyValue: Text): Text
     begin
         exit(GetJsonToken(JObject, KeyValue).AsValue().AsText());
+    end;
+
+    local procedure GetOptionalStringValue(JObject: JsonObject; KeyValue: Text): Text
+    var
+        JToken: JsonToken;
+    begin
+        if not JObject.get(KeyValue, JToken) then
+            exit('');
+        exit(JToken.AsValue().AsText());
     end;
 
     local procedure GetJsonToken(JObject: JsonObject; TokenKey: Text) JToken: JsonToken
