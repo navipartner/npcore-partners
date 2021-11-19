@@ -163,6 +163,17 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
         RecordLink.Modify(true);
     end;
 
+    procedure ReleaseOrder(Element: XmlElement; var SalesHeader: Record "Sales Header")
+    var
+        NpEcStore: Record "NPR NpEc Store";
+        ReleaseSalesDoc: Codeunit "Release Sales Document";
+    begin
+        FindStore(Element, NpEcStore);
+
+        if NpEcStore."Release Order on Import" then
+            ReleaseSalesDoc.PerformManualRelease(SalesHeader);
+    end;
+
     local procedure InsertPaymentLine(Element: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         PaymentLine: Record "NPR Magento Payment Line";

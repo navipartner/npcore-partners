@@ -71,6 +71,11 @@ table 6151300 "NPR NpEc Store"
             Description = 'NPR5.54';
             InitValue = true;
         }
+        field(180; "Release Order on Import"; Boolean)
+        {
+            Caption = 'Release Order on Import';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
