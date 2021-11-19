@@ -17,77 +17,54 @@ page 6014454 "NPR Campaign Discount Lines"
                 ShowCaption = false;
                 field("Item No."; Rec."Item No.")
                 {
-
                     ToolTip = 'Specifies the value of the Item No. field';
                     ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
-                    var
-                        Item2: Record Item;
-                        ItemList: Page "Item List";
                     begin
-                        Item.FilterGroup(2);
-                        Item.FilterGroup(0);
-                        Clear(ItemList);
-                        ItemList.LookupMode(true);
-                        ItemList.SetTableView(Item);
-                        if Item2.Get(Text) then
-                            ItemList.SetRecord(Item2);
-                        if ItemList.RunModal() = ACTION::LookupOK then begin
-                            ItemList.GetRecord(Item);
-                            Rec.Validate("Item No.", Item."No.");
-                            Commit();
-                        end;
+                        LookUpItem(Text);
                     end;
                 }
                 field("Cross-Reference No."; Rec."Cross-Reference No.")
                 {
-
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-
                     ToolTip = 'Specifies the value of the Variant Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Unit Price field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Campaign Unit Price"; Rec."Campaign Unit Price")
                 {
-
                     ToolTip = 'Specifies the value of the Period Price field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Campaign Profit"; Rec."Campaign Profit")
                 {
-
                     ToolTip = 'Specifies the value of the Campaign Profit field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Control1160330002; Rec.Comment)
                 {
-
                     Caption = 'Comment';
                     ToolTip = 'Specifies the value of the Comment field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-
                     Caption = 'Inventory';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Inventory field';
@@ -95,20 +72,17 @@ page 6014454 "NPR Campaign Discount Lines"
                 }
                 field("Quantity On Purchase Order"; Rec."Quantity On Purchase Order")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Quantity in Purchase Order field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Campaign Unit Cost"; Rec."Campaign Unit Cost")
                 {
-
                     ToolTip = 'Specifies the value of the Period Cost field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Profit; Rec.Profit)
                 {
-
                     Caption = 'Revenue of period';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Revenue of period field';
@@ -116,34 +90,29 @@ page 6014454 "NPR Campaign Discount Lines"
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-
                     ToolTip = 'Specifies the value of the Vendor No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Starting Date field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Closing Date field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unit Price Incl. VAT"; Rec."Unit Price Incl. VAT")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-
                     ToolTip = 'Specifies the value of the Priority field';
                     ApplicationArea = NPRRetail;
                 }
@@ -151,60 +120,41 @@ page 6014454 "NPR Campaign Discount Lines"
         }
     }
 
-    actions
-    {
-        area(processing)
-        {
-            action(Comment)
-            {
-                Caption = 'Comment';
-                Image = Comment;
-                RunObject = Page "NPR Retail Comments";
-                RunPageLink = "Table ID" = CONST(6014414),
-                              "No." = FIELD(Code),
-                              "No. 2" = FIELD("Item No.");
-
-                ToolTip = 'Executes the Comment action';
-                ApplicationArea = NPRRetail;
-            }
-        }
-    }
-
     trigger OnAfterGetRecord()
     begin
-        //-NPR5.40 [294655]
         Rec.CalcFields("Unit Price Incl. VAT");
-        //CALCFIELDS(Status,"Unit Price Incl. VAT");
-        //+NPR5.40 [294655]
-        //-NPR5.38 [300893]
-        //OnAfterGetCurrRecord;
         AfterGetCurrRecord();
-        //+NPR5.38 [300893]
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        //-NPR5.38 [300893]
-        //OnAfterGetCurrRecord;
         AfterGetCurrRecord();
-        //+NPR5.38 [300893]
-    end;
-
-    var
-        Item: Record Item;
-
-    procedure GetCurrLine(var PeriodDiscountLine: Record "NPR Period Discount Line")
-    begin
-        PeriodDiscountLine := Rec;
     end;
 
     local procedure AfterGetCurrRecord()
     begin
         xRec := Rec;
-        //-NPR5.40 [294655]
         Rec.CalcFields("Unit Price Incl. VAT");
-        //CALCFIELDS(Status,"Unit Price Incl. VAT");
-        //+NPR5.40 [294655]
+    end;
+
+    local procedure LookUpItem(Text: Text)
+    var
+        Item: Record Item;
+        Item2: Record Item;
+        ItemList: Page "Item List";
+    begin
+        Item.FilterGroup(2);
+        Item.FilterGroup(0);
+        Clear(ItemList);
+        ItemList.LookupMode(true);
+        ItemList.SetTableView(Item);
+        if Item2.Get(Text) then
+            ItemList.SetRecord(Item2);
+        if ItemList.RunModal() = ACTION::LookupOK then begin
+            ItemList.GetRecord(Item);
+            Rec.Validate("Item No.", Item."No.");
+            Commit();
+        end;
     end;
 }
 
