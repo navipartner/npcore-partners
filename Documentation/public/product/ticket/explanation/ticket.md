@@ -1,4 +1,4 @@
-# Ticket
+# Tickets
 
 The **Ticket** is the entity that links all properties and characteristics of a specific issued ticket. From a user perspective, this represents the physical ticket that the user has acquired.
 
