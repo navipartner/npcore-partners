@@ -5,6 +5,8 @@ codeunit 6014490 "NPR GE Assisted Setup Subs"
     local procedure RegisterWizard_OnRegisterAssistedSetup()
     begin
         AddGraphAPIWizard();
+        AddRetailWizard();
+        AddMagentoWizard();
     end;
 
     local procedure AddGraphAPIWizard()
@@ -14,6 +16,24 @@ codeunit 6014490 "NPR GE Assisted Setup Subs"
         AssistedSetupGroup: Enum "Assisted Setup Group";
     begin
         AssistedSetup.Add(GetAppId(), Page::"NPR GraphApi Setup Wizard", SetupTxt, AssistedSetupGroup::NPRetail);
+    end;
+
+    local procedure AddRetailWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        SetupTxt: Label 'Set up Retail Setup';
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Retail Wizard", SetupTxt, AssistedSetupGroup::NPRetail);
+    end;
+
+    local procedure AddMagentoWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        SetupTxt: Label 'Set up Magento Setup';
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Magento Wizard", SetupTxt, AssistedSetupGroup::NPRetail);
     end;
 
     procedure GetAppId(): Guid
