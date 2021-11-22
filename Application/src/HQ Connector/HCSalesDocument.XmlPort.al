@@ -793,7 +793,10 @@ xmlport 6150902 "NPR HC Sales Document"
                         }
                         tableelement("Reservation Entry"; "Reservation Entry")
                         {
+#pragma warning disable AL0603
+                            //pragma to be removed when MS converts ReservationEntry."Source Type" from Option to Enum. Currently they do not plan to do this.
                             LinkFields = "Source Subtype" = FIELD("Document Type"), "Source ID" = FIELD("Document No."), "Source Ref. No." = FIELD("Line No.");
+#pragma warning restore
                             LinkTable = "Sales Line";
                             MinOccurs = Zero;
                             XmlName = 'reservationentry';
