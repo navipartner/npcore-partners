@@ -13,4 +13,5 @@ Newly created or modified records are identified with the field **Replication Co
 
 Import of new or modified records is handled by making API requests to the From Company (source company). API requests are based on [Business Central Custom API pages](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-develop-custom-api).
 
-
+### Related links
+- [Replication Module configuration](./howto/replicationhowto.md)
