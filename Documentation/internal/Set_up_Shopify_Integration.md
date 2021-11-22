@@ -74,6 +74,9 @@ To set up the Shopify integration:
     > [!Note]
     > If it's impossible to identify a Business Central location in the mapping setup, the default location should be used. The default location can be specified in the **Store Card** (the **Location Code** field).
 
+
+test
+
    ## Next steps
 
    ## Automatically generated setups
