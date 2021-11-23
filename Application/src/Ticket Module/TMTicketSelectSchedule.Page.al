@@ -105,11 +105,12 @@ page 6060112 "NPR TM Ticket Select Schedule"
         DateTimeLbl: Label '%1 %2', Locked = true;
         RemainingLbl: Label '%1', Locked = true;
         Remaining2Lbl: Label '%1 (%2)', Locked = true;
+        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
     begin
 
         LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today()), Format(Time()));
 
-        TicketManagement.ValidateAdmSchEntryForSales(Rec, gTicketItemNo, gTicketVariantCode, Today, Time, Remaining);
+        TicketManagement.ValidateAdmSchEntryForSales(Rec, gTicketItemNo, gTicketVariantCode, Today, Time, ReasonCode, Remaining);
 
         RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
@@ -177,9 +178,11 @@ page 6060112 "NPR TM Ticket Select Schedule"
     end;
 
     local procedure AddToTempRecord(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10])
+    var
+        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
     begin
 
-        if (TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, Remaining)) then begin
+        if (TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, ReasonCode, Remaining)) then begin
 
             Rec.TransferFields(AdmissionScheduleEntry, true);
             if (Rec.Insert()) then;
