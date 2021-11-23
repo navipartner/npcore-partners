@@ -341,10 +341,12 @@ codeunit 6059784 "NPR TM Ticket Management"
     procedure SetTicketProperties(var Ticket: Record "NPR TM Ticket"; ValidFromDate: Date)
     var
         TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
     begin
 
         TicketType.Get(Ticket."Ticket Type Code");
         Ticket."Valid From Date" := ValidFromDate;
+        Ticket."Valid To Date" := Ticket."Valid From Date";
         Ticket.TestField("Valid From Date");
 
         Ticket."Valid From Time" := 000000T;
@@ -352,14 +354,44 @@ codeunit 6059784 "NPR TM Ticket Management"
         Ticket.Blocked := false;
         Ticket."Document Date" := Today();
 
-        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
+        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
+            TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+            TicketBom.FindSet();
+
+            repeat
+                case TicketBom."Admission Entry Validation" of
+                    TicketBom."Admission Entry Validation"::SINGLE,
+                    TicketBom."Admission Entry Validation"::SAME_DAY:
+                        begin
+                            if (Format(TicketBom."Duration Formula") <> '') then begin
+                                if (Ticket."Valid To Date" < CalcDate(TicketBom."Duration Formula", ValidFromDate)) then
+                                    Ticket."Valid To Date" := CalcDate(TicketBom."Duration Formula", ValidFromDate);
+
+                                if (Ticket."Valid To Date" < Ticket."Valid From Date") then
+                                    Error(GREATER_THAN, Ticket.FieldCaption("Valid To Date"), Ticket.FieldCaption("Valid From Date"));
+                            end;
+                        end;
+
+                    TicketBom."Admission Entry Validation"::MULTIPLE:
+                        begin
+                            TicketBom.TestField("Duration Formula");
+                            if (Ticket."Valid To Date" < CalcDate(TicketBom."Duration Formula", ValidFromDate)) then
+                                Ticket."Valid To Date" := CalcDate(TicketBom."Duration Formula", ValidFromDate);
+
+                            if (Ticket."Valid To Date" < Ticket."Valid From Date") then
+                                Error(GREATER_THAN, Ticket.FieldCaption("Valid To Date"), Ticket.FieldCaption("Valid From Date"));
+                        end;
+                    else
+                        Error(UNSUPPORTED_VALIDATION_METHOD);
+                end;
+            until (TicketBom.Next() = 0);
             exit;
+        end;
 
         case TicketType."Ticket Entry Validation" of
             TicketType."Ticket Entry Validation"::SINGLE,
             TicketType."Ticket Entry Validation"::SAME_DAY:
                 begin
-                    Ticket."Valid To Date" := Ticket."Valid From Date";
                     if (Format(TicketType."Duration Formula") <> '') then begin
                         Ticket."Valid To Date" := CalcDate(TicketType."Duration Formula", ValidFromDate);
                         if (Ticket."Valid To Date" < Ticket."Valid From Date") then
@@ -405,10 +437,6 @@ codeunit 6059784 "NPR TM Ticket Management"
 
                     if (AdmissionScheduleEntry."Admission Start Date" < LowDate) then
                         LowDate := AdmissionScheduleEntry."Admission Start Date";
-
-                    if (Format(TicketBom."Duration Formula") <> '') then
-                        if (CalcDate(TicketBom."Duration Formula", AdmissionScheduleEntry."Admission Start Date") > HighDate) then
-                            HighDate := CalcDate(TicketBom."Duration Formula", AdmissionScheduleEntry."Admission Start Date");
 
                     if (AdmissionScheduleEntry."Admission End Date" > HighDate) then
                         HighDate := AdmissionScheduleEntry."Admission End Date";
@@ -2065,7 +2093,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(true);
     end;
 
-    procedure ValidateAdmSchEntryForSales(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10]; ReferenceDate: Date; ReferenceTime: Time; var RemainingQuantityOut: Integer): Boolean
+    procedure ValidateAdmSchEntryForSales(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; TicketItemNo: Code[20]; TicketVariantCode: Code[10]; ReferenceDate: Date; ReferenceTime: Time; var ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason"; var RemainingQuantityOut: Integer): Boolean
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
@@ -2077,6 +2105,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         IsReservation: Boolean;
         ConcurrentQuantity: Integer;
         ConcurrentMaxQty: Integer;
+        DurationFormula: DateFormula;
     begin
         if (not Admission.Get(AdmissionScheduleEntry."Admission Code")) then
             Admission.Init();
@@ -2084,19 +2113,12 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (not TicketBOM.Get(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code")) then
             TicketBOM.Init();
 
-        GetTicketCapacity(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
-        RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntry."Entry No.");
-
-        if (CalculateConcurrentCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Admission Start Date", ConcurrentQuantity, ConcurrentMaxQty)) then
-            if (ConcurrentQuantity >= ConcurrentMaxQty) then
-                exit(false);
-
-        // Should this time slot be listed?
-        IsReservation := ((Admission.Type = Admission.Type::OCCASION) and (Admission."Prebook Is Required"));
+        // Should this time slot be listed? 
         ActivateOnSales := false;
         if (Item.Get(TicketItemNo)) then begin
             if (TicketType.Get(Item."NPR Ticket Type")) then begin
                 if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
+                    DurationFormula := TicketBOM."Duration Formula";
                     ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);
                     if (TicketBOM."Activation Method" = TicketBOM."Activation Method"::NA) then
                         TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE; // delegate to Ticket Type setup
@@ -2105,8 +2127,43 @@ codeunit 6059784 "NPR TM Ticket Management"
                 if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
                     ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
                                         ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
+                    DurationFormula := TicketType."Duration Formula";
                 end;
 
+                // Is this schedule beyond the duration set for ticket?
+                if (Format(DurationFormula) = '') then
+                    Evaluate(DurationFormula, '<0D>', 9);
+                if (AdmissionScheduleEntry."Admission Start Date" > CalcDate(DurationFormula, ReferenceDate)) then begin
+                    ReasonCode := ReasonCode::ScheduleExceedTicketDuration;
+                    exit(false);
+                end
+            end;
+        end;
+
+        // Verify the general window of sales
+        if (TicketBOM."Enforce Schedule Sales Limits") then begin
+            if (AdmissionScheduleEntry."Sales From Date" <> 0D) then begin
+                if (AdmissionScheduleEntry."Sales From Date" > ReferenceDate) then begin
+                    ReasonCode := ReasonCode::AdmissionSaleHasNotStartedDate;
+                    exit(false);
+                end;
+                if (AdmissionScheduleEntry."Sales From Date" = ReferenceDate) then
+                    if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then begin
+                        ReasonCode := ReasonCode::AdmissionSaleHasNotStartedTime;
+                        exit(false);
+                    end;
+            end;
+
+            if (AdmissionScheduleEntry."Sales Until Date" <> 0D) then begin
+                if (ReferenceDate > AdmissionScheduleEntry."Sales Until Date") then begin
+                    ReasonCode := ReasonCode::AdmissionSalesHasEndedDate;
+                    exit(false);
+                end;
+                if (ReferenceDate = AdmissionScheduleEntry."Sales Until Date") then
+                    if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then begin
+                        ReasonCode := ReasonCode::AdmissionSalesHasEndedTime;
+                        exit(false);
+                    end;
             end;
         end;
 
@@ -2118,39 +2175,37 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         // if ticket will be admitted automatically, we also need to check valid admission time
         if (ActivateOnSales) then begin
-            if (AdmissionScheduleEntry."Admission Start Date" <> ReferenceDate) then
+            if (AdmissionScheduleEntry."Admission Start Date" <> ReferenceDate) then begin
+                ReasonCode := ReasonCode::EventDateNotReferenceDate;
                 exit(false); // When ticket is activated on sales, and its a reservation for another date than the reference date, it cant be sold now, don't validate the time slot
+            end;
 
-            if (ReferenceTime < AdmissionScheduleEntry."Event Arrival From Time") then
+            if (ReferenceTime < AdmissionScheduleEntry."Event Arrival From Time") then begin
+                ReasonCode := ReasonCode::EventAdmissionNotStarted;
                 exit(false);
+            end;
         end;
 
-        //if (IsReservation) or (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
+        IsReservation := ((Admission.Type = Admission.Type::OCCASION) and (Admission."Prebook Is Required"));
         if (IsReservation) or (Admission."Default Schedule"::SCHEDULE_ENTRY = GetAdmissionSchedule(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code")) then begin
             // when we pass arrival until time, we cant sell this time slot.
-            if ((AdmissionScheduleEntry."Admission Start Date" = ReferenceDate) and (ReferenceTime > AdmissionScheduleEntry."Event Arrival Until Time")) then
+            if ((AdmissionScheduleEntry."Admission Start Date" = ReferenceDate) and (ReferenceTime > AdmissionScheduleEntry."Event Arrival Until Time")) then begin
+                ReasonCode := ReasonCode::EventHasEndedTime;
                 exit(false);
-        end;
-
-        // Verify the general window of sales
-        if (TicketBOM."Enforce Schedule Sales Limits") then begin
-            if (AdmissionScheduleEntry."Sales From Date" <> 0D) then begin
-                if (AdmissionScheduleEntry."Sales From Date" > ReferenceDate) then
-                    exit(false);
-                if (AdmissionScheduleEntry."Sales From Date" = ReferenceDate) then
-                    if (AdmissionScheduleEntry."Sales From Time" > ReferenceTime) then
-                        exit(false);
-            end;
-
-            if (AdmissionScheduleEntry."Sales Until Date" <> 0D) then begin
-                if (ReferenceDate > AdmissionScheduleEntry."Sales Until Date") then
-                    exit(false);
-                if (ReferenceDate = AdmissionScheduleEntry."Sales Until Date") then
-                    if (ReferenceTime > AdmissionScheduleEntry."Sales Until Time") then
-                        exit(false);
             end;
         end;
 
+        // Check the numeric capacity, this is expensive so do it last.
+        if (CalculateConcurrentCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Admission Start Date", ConcurrentQuantity, ConcurrentMaxQty)) then
+            if (ConcurrentQuantity >= ConcurrentMaxQty) then begin
+                ReasonCode := ReasonCode::ConcurrentCapacityExceeded;
+                exit(false);
+            end;
+
+        GetTicketCapacity(TicketItemNo, TicketVariantCode, AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
+        RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity(CapacityControl, AdmissionScheduleEntry."Entry No.");
+
+        ReasonCode := ReasonCode::OpenForSales;
         exit(true);
     end;
 

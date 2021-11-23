@@ -310,6 +310,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         LowDate: Date;
         HighDate: Date;
         UserSetup: Record "User Setup";
+        ScheduleSelectionError: Label 'Ticket is not valid for selected schedule. Ticket is valid until %1 but you have selected a schedule on %2';
     begin
 
         Ticket.Init();
@@ -335,13 +336,9 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
         _IssueAdmissionsAppendToTicket(Ticket, QuantityPerTicket, ReservationRequest, AdditionalAdmissionCosts);
 
-        // Update ticket valid from / to dates based on contents
-        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
-            TicketManagement.GetTicketAccessEntryValidDateBoundary(Ticket, LowDate, HighDate);
-            Ticket."Valid From Date" := LowDate;
-            Ticket."Valid To Date" := HighDate;
-            Ticket.Modify();
-        end;
+        TicketManagement.GetTicketAccessEntryValidDateBoundary(Ticket, LowDate, HighDate);
+        if (HighDate > Ticket."Valid To Date") then
+            Error(ScheduleSelectionError, Ticket."Valid To Date", HighDate);
 
     end;
 

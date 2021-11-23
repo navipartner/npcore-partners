@@ -272,6 +272,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         TicketWaitingList: Record "NPR TM Ticket Wait. List";
         TempTicketWaitingList: Record "NPR TM Ticket Wait. List" temporary;
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
         ReferenceDateTime: DateTime;
         RemainingQty: Integer;
         SelectCounter: Integer;
@@ -308,7 +309,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
 
             if (ReferenceDateTime > TicketWaitingList."Notification Expires At") then begin
 
-                CandidateForNotification := TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketWaitingList."Item No.", TicketWaitingList."Variant Code", ReferenceDate, ReferenceTime, RemainingQty);
+                CandidateForNotification := TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketWaitingList."Item No.", TicketWaitingList."Variant Code", ReferenceDate, ReferenceTime, ReasonCode, RemainingQty);
                 CandidateForNotification := CandidateForNotification and (RemainingQty >= TicketWaitingList.Quantity);
                 CandidateForNotification := CandidateForNotification and (RemainingQty >= WaitingListSetup."Remaing Capacity Threshold");
                 CandidateForNotification := CandidateForNotification and (TicketWaitingList."Notification Count" < WaitingListSetup."Max Notifications per Address");
