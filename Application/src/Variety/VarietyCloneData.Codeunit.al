@@ -475,7 +475,6 @@ codeunit 6059972 "NPR Variety Clone Data"
     var
         Item: Record Item;
         ItemRef: Record "Item Reference";
-        DescriptionControl: Codeunit "NPR Description Control";
     begin
         if Item.Get(Barcode) then
             Error(Text002);
@@ -491,7 +490,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemRef.Validate("Reference Type", CrossRefType);
         ItemRef.Validate("Reference Type No.", CrossRefTypeNo);
         ItemRef."Reference No." := Barcode;
-        ItemRef.Description := DescriptionControl.GetItemRefDescription(ItemNo, VariantCode);
+        ItemRef.Description := Item.Description;
         ItemRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
 
         ItemRef.Insert();

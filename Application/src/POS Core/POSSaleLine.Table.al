@@ -2126,8 +2126,6 @@ table 6014406 "NPR POS Sale Line"
     end;
 
     local procedure InitFromItem()
-    var
-        DescriptionControl: Codeunit "NPR Description Control";
     begin
         if "No." = '' then
             exit;
@@ -2144,7 +2142,8 @@ table 6014406 "NPR POS Sale Line"
         if "Unit of Measure Code" = '' then
             "Unit of Measure Code" := Item."Base Unit of Measure";
 
-        DescriptionControl.GetDescriptionPOS(Rec, xRec, Item);
+        Description := Item.Description;
+        "Description 2" := Item."Description 2";
         "Magento Brand" := Item."NPR Magento Brand";
     end;
 

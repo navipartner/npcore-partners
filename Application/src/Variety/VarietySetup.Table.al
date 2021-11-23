@@ -175,6 +175,11 @@ table 6059970 "NPR Variety Setup"
                 //+NPR5.43 [317108]
             end;
         }
+        field(80; "Custom Descriptions"; Boolean)
+        {
+            Caption = 'Custom Descriptions';
+            DataClassification = CustomerContent;
+        }
         field(750; "Variant No. Series"; Code[20])
         {
             Caption = 'Variant Std. No. Serie';

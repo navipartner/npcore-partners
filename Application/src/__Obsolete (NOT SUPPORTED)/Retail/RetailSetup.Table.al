@@ -214,7 +214,6 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'Sales Line Description Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Description Control";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -223,7 +222,6 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'Purchase Line Description Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Description Control";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -232,7 +230,6 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'Transfer Line Description Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Description Control";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
@@ -241,7 +238,6 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'POS Line Description Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Description Control";
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';

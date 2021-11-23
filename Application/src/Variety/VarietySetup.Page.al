@@ -44,6 +44,11 @@ page 6059970 "NPR Variety Setup"
                     ToolTip = 'Specifies the value of the Create Variant Code From field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Custom Descriptions"; Rec."Custom Descriptions")
+                {
+                    ToolTip = 'If variant is selected on sales and purchase line item description is copied into description on sales and purchase line, and variant description is copied into description 2 on sales and purchase line.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Variant No. Series"; Rec."Variant No. Series")
                 {
 
