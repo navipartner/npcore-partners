@@ -48,7 +48,7 @@
             SplitWaiterPadLine(WaiterPad, ChoosenWaiterPadLine, TempWaiterPadLine."Marked Qty", NewWaiterPad);
         until (0 = TempWaiterPadLine.Next());
 
-        WaiterPadMgt.CloseWaiterPad(WaiterPad, false);
+        WaiterPadMgt.CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
 
         if CopyToSale then begin
             POSSession.GetSaleLine(POSSaleLine);
@@ -769,7 +769,7 @@
             end;
 
             if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
-                WaiterPadMgt.CloseWaiterPad(WaiterPad, false);
+                WaiterPadMgt.CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
         end;
     end;
 

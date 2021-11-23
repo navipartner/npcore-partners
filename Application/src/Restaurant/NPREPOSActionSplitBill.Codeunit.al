@@ -366,7 +366,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         if TempTouchedWaiterPad.FindSet() then
             repeat
                 FromWaiterPad.Get(TempTouchedWaiterPad."No.");
-                WaiterPadMgt.CloseWaiterPad(FromWaiterPad, false);
+                WaiterPadMgt.CloseWaiterPad(FromWaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
             until TempTouchedWaiterPad.Next() = 0;
     end;
 
