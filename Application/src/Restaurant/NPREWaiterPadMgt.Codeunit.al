@@ -189,11 +189,11 @@
             until WaiterPadLine.Next() = 0;
         end;
 
-        CloseWaiterPad(WaiterPad, false);
+        CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
         exit(true);
     end;
 
-    procedure CloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; ForceClose: Boolean)
+    procedure CloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; ForceClose: Boolean; CloseReason: Enum "NPR NPRE W/Pad Closing Reason")
     var
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         Handled: Boolean;
@@ -216,6 +216,7 @@
             WaiterPad."Close Date" := WorkDate();
             WaiterPad."Close Time" := Time;
             WaiterPad.Closed := true;
+            WaiterPad."Close Reason" := CloseReason;
             WaiterPad.Modify();
 
             CloseWaiterPadSeatings(WaiterPad, SetupProxy);
