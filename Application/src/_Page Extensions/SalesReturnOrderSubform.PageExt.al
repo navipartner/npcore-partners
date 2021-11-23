@@ -1,0 +1,28 @@
+﻿pageextension 6014419 "NPR Sales Return Order Subform" extends "Sales Return Order Subform"
+{
+    layout
+    {
+        modify("No.")
+        {
+            trigger OnAfterValidate()
+            var
+                Item: Record Item;
+                VRTWrapper: Codeunit "NPR Variety Wrapper";
+            begin
+                if (Rec.Type = Rec.Type::Item) and Item.Get(Rec."No.") then begin
+                    Item.CalcFields("NPR Has Variants");
+                    if Item."NPR Has Variants" then
+                        VRTWrapper.SalesLineShowVariety(Rec, 0);
+                end;
+            end;
+        }
+    }
+
+    actions
+    {
+        // Add changes to page actions here
+    }
+
+    var
+
+}
