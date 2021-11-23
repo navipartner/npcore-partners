@@ -181,6 +181,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         TicketManagement: Codeunit "NPR TM Ticket Management";
                         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
                         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
+                        ReasonCode: Enum "NPR TM Schedule Blocked Sales Reason";
                         ItemNumber: Code[20];
                         VariantCode: Code[10];
                         ResolvingTable: Integer;
@@ -209,8 +210,11 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                             TicketRequestManager.TranslateBarcodeToItemVariant(gExternalItemNo, ItemNumber, VariantCode, ResolvingTable);
                         end;
 
-                        if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, Today, Time, RemainingCapacity)) then
+                        if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, Today, Time, ReasonCode, RemainingCapacity)) then begin
                             CapacityStatusCode := -1;
+                            if (ReasonCode = ReasonCode::ScheduleExceedTicketDuration) then
+                                currXMLport.Skip();
+                        end;
 
                         TicketManagement.CheckTicketBaseCalendar(TmpAdmScheduleEntryResponse."Admission Code", ItemNumber, VariantCode, TmpAdmScheduleEntryResponse."Admission Start Date", NonWorking, _CalendarExceptionText);
                         if (NonWorking) then
