@@ -82,6 +82,12 @@ page 6150663 "NPR NPRE Waiter Pad List"
                     ToolTip = 'Specifies the value of the Close Time field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Close Reason"; Rec."Close Reason")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies a reason or process context for the waiter pad was closure.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

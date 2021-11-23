@@ -64,6 +64,11 @@ table 6150660 "NPR NPRE Waiter Pad"
             ObsoleteState = Removed;
             ObsoleteReason = 'Replaced by procedure GetCurrentSeating(), as the field could contain an outdated value';
         }
+        field(22; "Close Reason"; Enum "NPR NPRE W/Pad Closing Reason")
+        {
+            Caption = 'Close Reason';
+            DataClassification = CustomerContent;
+        }
         field(30; Status; Code[10])
         {
             Caption = 'Status';
@@ -219,6 +224,6 @@ table 6150660 "NPR NPRE Waiter Pad"
     begin
         if not Confirm(ConfirmCloseQst, false, Rec."No.") then
             exit;
-        WaiterPadManagement.CloseWaiterPad(Rec, true);
+        WaiterPadManagement.CloseWaiterPad(Rec, true, "NPR NPRE W/Pad Closing Reason"::"Manually Closed");
     end;
 }

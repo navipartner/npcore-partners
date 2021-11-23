@@ -99,7 +99,17 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         Line: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
+            WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
+            WaiterPadManagement.CloseWaiterPad(WaiterPad, true, "NPR NPRE W/Pad Closing Reason"::"Cancelled Sale");
+        end;
+
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
 
@@ -112,7 +122,6 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         Line."Sale Type" := Line."Sale Type"::Cancelled;
         POSSaleLine.InsertLine(Line);
 
-        POSSession.GetSale(POSSale);
         exit(POSSale.TryEndSale(POSSession, false));
     end;
 
@@ -121,4 +130,3 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         AltSaleCancelDescription := NewAltSaleCancelDescription;
     end;
 }
-

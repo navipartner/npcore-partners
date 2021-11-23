@@ -244,7 +244,7 @@
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         if FindAndPrintTemplates(WaiterPad, WaiterPadLine, GlobalPrintTemplate."Print Type"::"Pre Receipt", '', '') then begin
             SetWaiterPadPreReceiptPrinted(WaiterPad, true, true);
-            WaiterPadMgt.CloseWaiterPad(WaiterPad, false);
+            WaiterPadMgt.CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::Undefined);
         end;
     end;
 
