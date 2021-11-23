@@ -4,8 +4,8 @@ table 6059969 "NPR Description Control"
 
     Caption = 'Description Control';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Description Control";
-    LookupPageID = "NPR Description Control";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
 
     fields
     {
