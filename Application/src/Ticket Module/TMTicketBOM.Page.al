@@ -16,12 +16,12 @@ page 6060121 "NPR TM Ticket BOM"
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'The identification number of an item created in the ERP system that is used in the POS for selling a specific ticket. ';
+                    ToolTip = 'Specifies the identification number of an item created in the ERP system that is used in the POS for selling a specific ticket. ';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'A code that is added to the value in the Item No. column to determine the ticket type (e.g., tickets for children/adults/seniors). Microsoft only supports one dimension of variants.';
+                    ToolTip = 'Specifies the code that is added to the value in the Item No. column to determine the ticket type (e.g., tickets for children/adults/seniors). Microsoft only supports one dimension of variants.';
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
