@@ -18,44 +18,44 @@ page 6150703 "NPR POS Actions"
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code for the POS Action';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies what the description is';
+                    ToolTip = 'Specifies what the POS Action does.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
 
-                    ToolTip = 'Specifies what version it is';
+                    ToolTip = 'Specifies the version of the Codeunit for the POS action.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
-                    ToolTip = 'Specifies whether or not it is blocked';
+                    ToolTip = 'Specifies whether or not the POS Action is blocked';
                     ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
 
-                    ToolTip = 'Specifies what type of action it is';
+                    ToolTip = 'Specifies which type the action belongs to. The default type is Generic, while the Button & BackEnd types are not used.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Workflow Defined"; Rec.Workflow.HasValue())
                 {
 
                     Caption = 'Workflow Defined';
-                    ToolTip = 'Specifies the value of the Workflow Defined field';
+                    ToolTip = 'Specifies the workflow that can be can be defined for a POS Action. Currently not used.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Data Source Name"; Rec."Data Source Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Data Source Name field';
+                    ToolTip = 'Specifies the data source that is used for/by the POS action.Currently there are 4 values:BUILTIN_PAYMENTLINE, BUILTIN_REGISTER_BALANCING, BUILTIN_SALE & BUILTIN_SALELINE';
                     ApplicationArea = NPRRetail;
                 }
                 field("Blocking UI"; Rec."Blocking UI")
@@ -69,13 +69,13 @@ page 6150703 "NPR POS Actions"
                 field("<Blocking UI>"; Rec."Codeunit ID")
                 {
 
-                    ToolTip = 'Specifies the codeunit ID of the connected codeunit';
+                    ToolTip = 'Specifies which Codeunit is related to the POS Action';
                     ApplicationArea = NPRRetail;
                 }
                 field("Secure Method Code"; Rec."Secure Method Code")
                 {
 
-                    ToolTip = 'Specifies if the action has been assigned a secure method code';
+                    ToolTip = 'Specifies which security code can be assigned to the POS Action. There are the following options:ADMIN-PWD: Admin password, ANY-SALESP: Any salesperson password, CUR-SALESP:Current salesperson password, REGIST-PWD: Open register password, SUPERVISOR: Supervisors password';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -18,13 +18,13 @@ page 6150710 "NPR POS View List"
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code for the POS View';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the POS View ';
                     ApplicationArea = NPRRetail;
                 }
             }
