@@ -326,7 +326,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
                 end;
             end;
 
-        exit(TicketNotifyParticipant.AquireTicketParticipant(Token, SuggestMethod, SuggestAddress));
+        exit(TicketNotifyParticipant.AcquireTicketParticipant(Token, SuggestMethod, SuggestAddress));
     end;
 
     procedure RevokeTicketWithLog(var JobPlanningLine: Record "Job Planning Line")

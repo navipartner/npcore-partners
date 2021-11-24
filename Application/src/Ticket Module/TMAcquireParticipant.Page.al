@@ -1,6 +1,6 @@
-page 6060110 "NPR TM Ticket Aquire Particip."
+page 6060110 "NPR TM Acquire Participant"
 {
-    Caption = 'Aquire Participant';
+    Caption = 'Acquire Participant';
     DataCaptionExpression = Rec."Admission Description";
     DataCaptionFields = "Admission Description";
     DeleteAllowed = false;
