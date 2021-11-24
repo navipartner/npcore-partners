@@ -17,49 +17,49 @@ page 6151203 "NPR NpCs Document Mapping"
                 field(Type; Rec.Type)
                 {
 
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the type of mapping.';
                     ApplicationArea = NPRRetail;
                 }
                 field("From Store Code"; Rec."From Store Code")
                 {
 
-                    ToolTip = 'Specifies the value of the From Store Code field';
+                    ToolTip = 'Specifies the store code where the Click and Collect order has been created.';
                     ApplicationArea = NPRRetail;
                 }
                 field("From No."; Rec."From No.")
                 {
 
-                    ToolTip = 'Specifies the value of the From No. field';
+                    ToolTip = 'Specifies the customer/item number used to create the Click and Collect order in the current store.';
                     ApplicationArea = NPRRetail;
                 }
                 field("From Description"; Rec."From Description")
                 {
 
-                    ToolTip = 'Specifies the value of the From Description field';
+                    ToolTip = 'Specifies the description of the ‘From No’.';
                     ApplicationArea = NPRRetail;
                 }
                 field("From Description 2"; Rec."From Description 2")
                 {
 
-                    ToolTip = 'Specifies the value of the From Description 2 field';
+                    ToolTip = 'Specifies the longer description of the From No. field, if needed';
                     ApplicationArea = NPRRetail;
                 }
                 field("To No."; Rec."To No.")
                 {
 
-                    ToolTip = 'Specifies the value of the To No. field';
+                    ToolTip = 'Specifies the customer/item no. that will be mapped in the collect store.';
                     ApplicationArea = NPRRetail;
                 }
                 field("To Description"; Rec."To Description")
                 {
 
-                    ToolTip = 'Specifies the value of the To Description field';
+                    ToolTip = 'Specifies the description of the To No. field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("To Description 2"; Rec."To Description 2")
                 {
 
-                    ToolTip = 'Specifies the value of the To Description 2 field';
+                    ToolTip = 'Specifies the longer description of the To No. field, if needed.';
                     ApplicationArea = NPRRetail;
                 }
             }
